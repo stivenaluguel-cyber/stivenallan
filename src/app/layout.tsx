@@ -74,7 +74,7 @@ const schemaAgent = {
     { '@type': 'City', name: 'Cocal do Sul', containedInPlace: { '@type': 'State', name: 'Santa Catarina' } },
   ],
   hasCredential: 'CRECI/RS 60.275',
-  sameAs: ['https://wa.me/5548991642332', 'https://www.instagram.com/stivenallan'],
+  sameAs: ['https://wa.me/5548991642332', 'https://www.instagram.com/stivenallan.ofc'],
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
