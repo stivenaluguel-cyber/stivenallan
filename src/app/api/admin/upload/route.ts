@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
 
-export const config = { api: { bodyParser: false } }
-
 export async function POST(req: NextRequest) {
   const supabase = getSupabaseAdmin()
+  if (!supabase) return NextResponse.json({ error: 'Serviço indisponível' }, { status: 503 })
 
   const formData = await req.formData()
   const empreendimentoId = formData.get('empreendimentoId') as string
