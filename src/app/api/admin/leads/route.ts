@@ -3,6 +3,8 @@ import { getSupabaseAdmin } from '@/lib/supabase'
 
 export async function GET(req: NextRequest) {
   const supabase = getSupabaseAdmin()
+  if (!supabase) return NextResponse.json({ error: 'Serviço indisponível' }, { status: 503 })
+
   const { searchParams } = new URL(req.url)
   const status = searchParams.get('status')
   const empreendimentoId = searchParams.get('empreendimento_id')
