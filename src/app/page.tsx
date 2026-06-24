@@ -27,18 +27,18 @@ export default function HomePage() {
     <>
       <Header />
 
-      {/* HERO — LCP: next/image com priority para PageSpeed 100 */}
-      <section className="relative flex items-center justify-center min-h-screen overflow-hidden">
+      {/* HERO — LCP: next/image com priority, height via style inline para garantir 100vh */}
+      <section style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', overflow: 'hidden' }}>
         <Image
           src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1600&q=80"
           alt="Lançamentos imobiliários em Criciúma SC"
           fill
           priority
           quality={85}
-          className="object-cover"
+          style={{ objectFit: 'cover' }}
           sizes="100vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[rgba(10,11,13,0.70)] to-[rgba(10,11,13,0.85)]" />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(10,11,13,0.70), rgba(10,11,13,0.85))' }} />
         <div className="relative z-10 container mx-auto px-6 text-center">
           <p className="text-[#c9a24b] text-sm font-semibold tracking-[4px] uppercase mb-4">CRECI/RS 60.275</p>
           <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-4">
@@ -119,13 +119,12 @@ export default function HomePage() {
       <section id="sobre" className="py-20">
         <div className="container mx-auto px-6">
           <div className="grid md:grid-cols-2 gap-12 items-center max-w-5xl mx-auto">
-            {/* next/image no lugar de background-image inline */}
-            <div className="relative h-96 rounded-2xl overflow-hidden">
+            <div style={{ position: 'relative', height: '384px', borderRadius: '1rem', overflow: 'hidden' }}>
               <Image
                 src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=800&q=80"
                 alt="Stiven Allan, corretor de imóveis em Criciúma SC"
                 fill
-                className="object-cover"
+                style={{ objectFit: 'cover' }}
                 sizes="(max-width: 768px) 100vw, 50vw"
               />
             </div>
