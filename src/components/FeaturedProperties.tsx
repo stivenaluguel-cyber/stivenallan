@@ -2,6 +2,16 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { getSupabaseClient } from '@/lib/supabase'
 
+const C = {
+  card: '#202327',
+  border: '#2c3035',
+  accent: '#c9a24b',
+  accent2: '#e2c275',
+  muted: '#a7adb4',
+  text: '#f4f4f4',
+  green: '#1f9d55',
+}
+
 const FALLBACK_PROPERTIES = [
   {
     id: '1',
@@ -63,11 +73,11 @@ const STATUS_LABELS: Record<string, string> = {
   vendido: 'Vendido',
 }
 
-const STATUS_COLORS: Record<string, string> = {
-  lancamento: 'bg-[#c9a24b] text-[#1a1305]',
-  em_obras: 'bg-blue-600 text-white',
-  pronto: 'bg-[#1f9d55] text-white',
-  vendido: 'bg-gray-600 text-white',
+const STATUS_STYLE: Record<string, React.CSSProperties> = {
+  lancamento: { background: C.accent, color: '#1a1305' },
+  em_obras: { background: '#2563eb', color: '#fff' },
+  pronto: { background: C.green, color: '#fff' },
+  vendido: { background: '#4b5563', color: '#fff' },
 }
 
 async function getEmpreendimentos() {
@@ -117,42 +127,85 @@ export default async function FeaturedProperties() {
   const properties = dbProperties || FALLBACK_PROPERTIES
 
   return (
-    <div className="grid md:grid-cols-3 gap-7">
+    <div style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(3, 1fr)',
+      gap: '28px',
+    }}>
       {properties.map((emp) => (
         <Link
           key={emp.id}
           href={`/empreendimento/${emp.construtora_slug}/${emp.slug}`}
-          className="bg-[#202327] border border-[#2c3035] rounded-2xl overflow-hidden hover:-translate-y-1.5 hover:border-[#c9a24b] hover:shadow-xl transition-all duration-300 cursor-pointer group"
+          style={{
+            background: C.card,
+            border: `1px solid ${C.border}`,
+            borderRadius: '20px',
+            overflow: 'hidden',
+            textDecoration: 'none',
+            display: 'block',
+            transition: 'transform 0.25s, border-color 0.25s, box-shadow 0.25s',
+          }}
         >
-          <div className="relative h-52 overflow-hidden">
+          {/* Thumb */}
+          <div style={{ position: 'relative', height: '210px', overflow: 'hidden' }}>
             <Image
               src={emp.thumb_url}
               alt={emp.nome + ' em ' + emp.bairro + ', ' + emp.cidade + '/' + emp.uf}
               fill
-              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              style={{ objectFit: 'cover' }}
               sizes="(max-width: 768px) 100vw, 33vw"
             />
-            <span className={'absolute top-3 left-3 text-xs font-bold px-3 py-1.5 rounded-full ' + (STATUS_COLORS[emp.status] || 'bg-gray-700 text-white')}>
+            {/* Status badge */}
+            <span style={{
+              position: 'absolute', top: '12px', left: '12px',
+              fontSize: '11px', fontWeight: 700,
+              padding: '4px 12px', borderRadius: '50px',
+              ...(STATUS_STYLE[emp.status] || { background: '#4b5563', color: '#fff' }),
+            }}>
               {STATUS_LABELS[emp.status] || emp.status}
             </span>
           </div>
-          <div className="p-5">
-            <p className="text-[#a7adb4] text-xs mb-1">{emp.construtora_nome}</p>
-            <h3 className="font-bold text-lg mb-1 group-hover:text-[#c9a24b] transition-colors">{emp.nome}</h3>
-            <p className="text-[#a7adb4] text-sm mb-4">{emp.bairro ? emp.bairro + ', ' : ''}{emp.cidade}</p>
-            <div className="flex gap-4 text-sm text-[#a7adb4] border-t border-[#2c3035] pt-4 mb-4">
+
+          {/* Content */}
+          <div style={{ padding: '20px' }}>
+            <p style={{ color: C.muted, fontSize: '11px', marginBottom: '6px', fontWeight: 600 }}>
+              {emp.construtora_nome}
+            </p>
+            <h3 style={{
+              fontWeight: 800, fontSize: '17px',
+              marginBottom: '6px', color: C.text,
+              lineHeight: 1.3,
+            }}>
+              {emp.nome}
+            </h3>
+            <p style={{ color: C.muted, fontSize: '13px', marginBottom: '16px' }}>
+              {emp.bairro ? emp.bairro + ', ' : ''}{emp.cidade}
+            </p>
+
+            {/* Specs */}
+            <div style={{
+              display: 'flex', gap: '16px',
+              fontSize: '12px', color: C.muted,
+              borderTop: `1px solid ${C.border}`,
+              paddingTop: '16px', marginBottom: '16px',
+            }}>
               {emp.dorms_min && (
                 <span>
-                  {emp.dorms_min === emp.dorms_max ? emp.dorms_min : emp.dorms_min + ' a ' + emp.dorms_max} dorm.
+                  {emp.dorms_min === emp.dorms_max ? emp.dorms_min : emp.dorms_min + '–' + emp.dorms_max} dorm.
                 </span>
               )}
               {emp.area_min && (
                 <span>
-                  {emp.area_min === emp.area_max ? emp.area_min : emp.area_min + ' a ' + emp.area_max}m²
+                  {emp.area_min === emp.area_max ? emp.area_min : emp.area_min + '–' + emp.area_max}m²
                 </span>
               )}
             </div>
-            <div className="text-[#e2c275] font-extrabold text-lg">
+
+            {/* Price */}
+            <div style={{
+              color: C.accent2, fontWeight: 900,
+              fontSize: '17px',
+            }}>
               {emp.preco_a_partir
                 ? 'A partir de R$ ' + emp.preco_a_partir.toLocaleString('pt-BR')
                 : 'Sob consulta'}
