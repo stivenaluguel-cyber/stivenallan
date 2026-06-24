@@ -6,6 +6,9 @@ import Footer from '@/components/Footer'
 import WppFloat from '@/components/WppFloat'
 import LeadForm from '@/components/LeadForm'
 
+// ISR: revalidar a cada 1 hora (Regra Absoluta do projeto)
+export const revalidate = 3600
+
 type Props = { params: Promise<{ construtora: string; slug: string }> }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -52,20 +55,36 @@ export default async function EmpreendimentoPage({ params }: Props) {
     ],
   }
 
+  const schemaAgent = {
+    '@context': 'https://schema.org',
+    '@type': 'RealEstateAgent',
+    name: 'Stiven Allan',
+    description: 'Corretor de imóveis em Criciúma/SC e região. CRECI/RS 60.275.',
+    url: 'https://stivenallan.com.br',
+    telephone: '+5548991642332',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Criciúma',
+      addressRegion: 'SC',
+      addressCountry: 'BR',
+    },
+  }
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaListing) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaBreadcrumb) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaAgent) }} />
       <Header />
 
       <main className="pt-24">
         <div className="container mx-auto px-6 py-8">
-          <nav className="flex items-center gap-2 text-sm text-[#a7adb4] mb-6">
+          <nav aria-label="breadcrumb" className="flex items-center gap-2 text-sm text-[#a7adb4] mb-6">
             <Link href="/" className="hover:text-[#c9a24b] transition-colors">Início</Link>
-            <span>/</span>
+            <span aria-hidden="true">/</span>
             <Link href="/lancamentos/criciuma-sc" className="hover:text-[#c9a24b] transition-colors">Criciúma</Link>
-            <span>/</span>
-            <span className="text-[#f4f4f4]">{nomeFormatado}</span>
+            <span aria-hidden="true">/</span>
+            <span className="text-[#f4f4f4]" aria-current="page">{nomeFormatado}</span>
           </nav>
 
           <div className="grid lg:grid-cols-3 gap-8">
