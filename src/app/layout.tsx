@@ -35,7 +35,8 @@ export const metadata: Metadata = {
     url: SITE_URL,
     siteName: 'Stiven Allan — Corretor de Imóveis',
     title: 'Stiven Allan — Corretor de Imóveis em Criciúma e Região | SC',
-    description: 'Lançamentos e empreendimentos premium em Criciúma e região. Atendimento personalizado do primeiro contato até a entrega das chaves.',
+    description:
+      'Lançamentos e empreendimentos premium em Criciúma e região. Atendimento personalizado do primeiro contato até a entrega das chaves.',
   },
   twitter: {
     card: 'summary_large_image',
@@ -45,7 +46,13 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
-    googleBot: { index: true, follow: true, 'max-video-preview': -1, 'max-image-preview': 'large', 'max-snippet': -1 },
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
   alternates: { canonical: SITE_URL },
 }
@@ -54,7 +61,8 @@ const schemaAgent = {
   '@context': 'https://schema.org',
   '@type': 'RealEstateAgent',
   name: 'Stiven Allan',
-  description: 'Corretor de imóveis especialista em lançamentos e empreendimentos de construtoras em Criciúma/SC e região.',
+  description:
+    'Corretor de imóveis especialista em lançamentos e empreendimentos de construtoras em Criciúma/SC e região.',
   url: SITE_URL,
   telephone: '+5548991642332',
   email: 'contato@stivenallan.com.br',
@@ -73,11 +81,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="pt-BR" className={inter.variable}>
       <head>
+        {/* Schema.org RealEstateAgent — sem render-blocking */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaAgent) }}
         />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        {/* DNS prefetch para assets externos */}
+        <link rel="dns-prefetch" href="https://images.unsplash.com" />
+        <link rel="dns-prefetch" href="https://xpkznaqgctfkoonqpcye.supabase.co" />
+        <link rel="preconnect" href="https://xpkznaqgctfkoonqpcye.supabase.co" crossOrigin="anonymous" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
       </head>
       <body className="bg-[#121315] text-[#f4f4f4] antialiased">{children}</body>
