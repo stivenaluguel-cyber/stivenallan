@@ -7,6 +7,7 @@ export async function GET(
 ) {
   const { id } = await params
   const supabase = getSupabaseAdmin()
+  if (!supabase) return NextResponse.json({ error: 'Serviço indisponível' }, { status: 503 })
 
   const { data, error } = await supabase
     .from('leads')
@@ -27,6 +28,8 @@ export async function PATCH(
 ) {
   const { id } = await params
   const supabase = getSupabaseAdmin()
+  if (!supabase) return NextResponse.json({ error: 'Serviço indisponível' }, { status: 503 })
+
   const body = await req.json()
 
   const allowedFields = ['status', 'anotacoes', 'atendido_em']
@@ -44,7 +47,6 @@ export async function PATCH(
 
   updateData.updated_at = new Date().toISOString()
 
-  // Auto-set atendido_em when status changes from novo
   if (body.status && body.status !== 'novo' && !updateData.atendido_em) {
     const { data: existing } = await supabase
       .from('leads')
@@ -77,6 +79,7 @@ export async function DELETE(
 ) {
   const { id } = await params
   const supabase = getSupabaseAdmin()
+  if (!supabase) return NextResponse.json({ error: 'Serviço indisponível' }, { status: 503 })
 
   const { error } = await supabase
     .from('leads')
