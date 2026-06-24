@@ -15,11 +15,11 @@ export const metadata = {
 const BAIRROS = ['Centro','Próspera','Michel','Pio Corrêa','Comerciário','Santa Luzia','Universitário','Içara','Nova Veneza','Forquilhinha','Cocal do Sul']
 
 const CIDADES = [
-  { nome: 'Criciúma', slug: 'criciuma', uf: 'SC' },
-  { nome: 'Içara', slug: 'icara', uf: 'SC' },
-  { nome: 'Nova Veneza', slug: 'nova-veneza', uf: 'SC' },
-  { nome: 'Forquilhinha', slug: 'forquilhinha', uf: 'SC' },
-  { nome: 'Cocal do Sul', slug: 'cocal-do-sul', uf: 'SC' },
+  { nome: 'Criciúma', slug: 'criciuma-sc', uf: 'SC' },
+  { nome: 'Içara', slug: 'icara-sc', uf: 'SC' },
+  { nome: 'Nova Veneza', slug: 'nova-veneza-sc', uf: 'SC' },
+  { nome: 'Forquilhinha', slug: 'forquilhinha-sc', uf: 'SC' },
+  { nome: 'Cocal do Sul', slug: 'cocal-do-sul-sc', uf: 'SC' },
 ]
 
 export default function HomePage() {
@@ -27,7 +27,7 @@ export default function HomePage() {
     <>
       <Header />
 
-      {/* HERO — LCP: next/image com priority */}
+      {/* HERO — LCP: next/image com priority para PageSpeed 100 */}
       <section className="relative flex items-center justify-center min-h-screen overflow-hidden">
         <Image
           src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1600&q=80"
@@ -69,7 +69,7 @@ export default function HomePage() {
               <option>3+</option>
               <option>4+</option>
             </select>
-            <Link href="/lancamentos/criciuma" className="bg-[#1f9d55] text-white font-bold p-3 rounded-xl text-sm text-center hover:bg-[#17854a] transition-colors">
+            <Link href="/lancamentos/criciuma-sc" className="bg-[#1f9d55] text-white font-bold p-3 rounded-xl text-sm text-center hover:bg-[#17854a] transition-colors">
               Buscar Imóveis
             </Link>
           </div>
@@ -84,7 +84,7 @@ export default function HomePage() {
           <p className="text-center text-[#a7adb4] mb-12 text-lg">Lançamentos selecionados em Criciúma e região</p>
           <FeaturedProperties />
           <div className="text-center mt-12">
-            <Link href="/lancamentos/criciuma" className="inline-block border border-[#c9a24b] text-[#c9a24b] hover:bg-[#c9a24b] hover:text-[#1a1305] font-bold px-8 py-4 rounded-full transition-all duration-200">
+            <Link href="/lancamentos/criciuma-sc" className="inline-block border border-[#c9a24b] text-[#c9a24b] hover:bg-[#c9a24b] hover:text-[#1a1305] font-bold px-8 py-4 rounded-full transition-all duration-200">
               Ver todos os lançamentos em Criciúma →
             </Link>
           </div>
