@@ -7,6 +7,7 @@ export async function GET(
 ) {
   const { id } = await params
   const supabase = getSupabaseAdmin()
+  if (!supabase) return NextResponse.json({ error: 'Serviço indisponível' }, { status: 503 })
 
   const { data, error } = await supabase
     .from('empreendimentos')
@@ -27,6 +28,8 @@ export async function PATCH(
 ) {
   const { id } = await params
   const supabase = getSupabaseAdmin()
+  if (!supabase) return NextResponse.json({ error: 'Serviço indisponível' }, { status: 503 })
+
   const body = await req.json()
 
   const {
@@ -37,7 +40,6 @@ export async function PATCH(
     meta_title, meta_description,
   } = body
 
-  // Check slug uniqueness (excluding current)
   if (slug) {
     const { data: existing } = await supabase
       .from('empreendimentos')
@@ -78,6 +80,7 @@ export async function DELETE(
 ) {
   const { id } = await params
   const supabase = getSupabaseAdmin()
+  if (!supabase) return NextResponse.json({ error: 'Serviço indisponível' }, { status: 503 })
 
   const { error } = await supabase
     .from('empreendimentos')
