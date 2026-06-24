@@ -51,6 +51,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export const revalidate = 3600
 
+interface Construtora {
+  nome: string
+  slug: string
+}
+
 interface Empreendimento {
   id: string
   nome: string
@@ -63,7 +68,28 @@ interface Empreendimento {
   preco_min: number | null
   preco_max: number | null
   fotos: string[]
-  construtoras: { nome: string; slug: string } | null
+  construtoras: Construtora | null
+}
+
+interface SupabaseEmpreendimento {
+  id: string
+  nome: string
+  slug: string
+  cidade: string
+  bairro: string | null
+  uf: string
+  tipo: string
+  status: string
+  preco_min: number | null
+  preco_max: number | null
+  fotos: string[]
+  construtoras: Construtora | Construtora[] | null
+}
+
+function normalizeConstrutora(c: Construtora | Construtora[] | null): Construtora | null {
+  if (!c) return null
+  if (Array.isArray(c)) return c[0] ?? null
+  return c
 }
 
 async function getEmpreendimentosPorBairro(cidade: string, bairro: string): Promise<Empreendimento[]> {
@@ -77,7 +103,12 @@ async function getEmpreendimentosPorBairro(cidade: string, bairro: string): Prom
       .ilike('bairro', nomeBairro)
       .order('destaque', { ascending: false })
       .order('created_at', { ascending: false })
-    return (data as Empreendimento[]) ?? []
+
+    if (!data) return []
+    return (data as unknown as SupabaseEmpreendimento[]).map((emp) => ({
+      ...emp,
+      construtoras: normalizeConstrutora(emp.construtoras),
+    }))
   } catch {
     return []
   }
@@ -172,8 +203,8 @@ export default async function BairroPage({ params }: Props) {
             <span className="text-white">{nomeCidade}/SC</span>
           </h1>
           <p className="text-[#a7adb4] text-lg max-w-2xl">
-            Encontre os melhores imóveis no bairro {nomeBairro} em {nomeCidade}. 
-            Lançamentos, apartamentos, casas e terrenos com Stiven Allan, 
+            Encontre os melhores imóveis no bairro {nomeBairro} em {nomeCidade}.
+            Lançamentos, apartamentos, casas e terrenos com Stiven Allan,
             seu corretor especialista na região sul catarinense.
           </p>
           {empreendimentos.length > 0 && (
@@ -190,14 +221,15 @@ export default async function BairroPage({ params }: Props) {
           {empreendimentos.length === 0 ? (
             <div className="text-center py-20">
               <p className="text-[#a7adb4] text-lg mb-4">
-                Ainda não há empreendimentos cadastrados para o bairro <strong className="text-white">{nomeBairro}</strong>.
+                Ainda não há empreendimentos cadastrados para o bairro{' '}
+                <strong className="text-white">{nomeBairro}</strong>.
               </p>
               <p className="text-[#a7adb4] mb-8">
                 Fale comigo — tenho acesso a lançamentos exclusivos nesta região!
               </p>
               <Link
                 href={`/lancamentos/${cidade}`}
-                className="inline-block px-6 py-3 border border-[#c9a24b]/40 text-[#c9a24b] rounded-full hover:bg-[#c9a24b]/10 transition-colors mr-4"
+                className="inline-block px-6 py-3 border border-[#c9a24b]/40 text-[#c9a24b] rounded-full hover:bg-[#c9a24b]/10 transition-colors"
               >
                 Ver todos em {nomeCidade}
               </Link>
@@ -237,7 +269,9 @@ export default async function BairroPage({ params }: Props) {
                       </h2>
                       {(emp.preco_min || emp.preco_max) && (
                         <p className="text-[#c9a24b] font-semibold text-sm">
-                          {emp.preco_min ? `A partir de ${formatPreco(emp.preco_min)}` : `Até ${formatPreco(emp.preco_max!)}`}
+                          {emp.preco_min
+                            ? `A partir de ${formatPreco(emp.preco_min)}`
+                            : `Até ${formatPreco(emp.preco_max!)}`}
                         </p>
                       )}
                     </div>
@@ -249,7 +283,9 @@ export default async function BairroPage({ params }: Props) {
 
           {/* CTA */}
           <div className="mt-16 text-center bg-[#1a1c1f] border border-[#2c3035] rounded-2xl p-10">
-            <h2 className="text-2xl font-bold mb-3">Quer conhecer outros imóveis no {nomeBairro}?</h2>
+            <h2 className="text-2xl font-bold mb-3">
+              Quer conhecer outros imóveis no {nomeBairro}?
+            </h2>
             <p className="text-[#a7adb4] mb-6">
               Tenho acesso a lançamentos exclusivos e posso te ajudar a encontrar o imóvel ideal.
             </p>
@@ -267,17 +303,18 @@ export default async function BairroPage({ params }: Props) {
           <div className="mt-12">
             <h3 className="text-white font-semibold mb-4">Outros bairros em {nomeCidade}</h3>
             <div className="flex flex-wrap gap-2">
-              {['centro', 'universitario', 'santa-barbara', 'mina-do-mato', 'pio-correia', 'comerciario', 'michel', 'nossa-senhora-da-saude'].map((b) => (
-                b !== bairro && (
-                  <Link
-                    key={b}
-                    href={`/lancamentos/${cidade}/${b}`}
-                    className="px-4 py-2 bg-[#202327] border border-[#2c3035] rounded-full text-[#a7adb4] text-sm hover:border-[#c9a24b]/40 hover:text-[#c9a24b] transition-colors"
-                  >
-                    {formatBairro(b)}
-                  </Link>
-                )
-              ))}
+              {['centro', 'universitario', 'santa-barbara', 'mina-do-mato', 'pio-correia', 'comerciario', 'michel', 'nossa-senhora-da-saude'].map(
+                (b) =>
+                  b !== bairro ? (
+                    <Link
+                      key={b}
+                      href={`/lancamentos/${cidade}/${b}`}
+                      className="px-4 py-2 bg-[#202327] border border-[#2c3035] rounded-full text-[#a7adb4] text-sm hover:border-[#c9a24b]/40 hover:text-[#c9a24b] transition-colors"
+                    >
+                      {formatBairro(b)}
+                    </Link>
+                  ) : null
+              )}
             </div>
           </div>
         </div>
