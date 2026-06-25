@@ -2,25 +2,34 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { enviarFollowUp, enviarAlertaEscalada } from '@/lib/evolution';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+export const dynamic = 'force-dynamic';
 
-// Mensagens de follow-up por estagio
+// Lazy init supabase - evita erro de build
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
+
+// Mensagens de follow-up por estagio_funil
 const MENSAGENS_FOLLOWUP: Record<string, string[]> = {
   primeiro_contato: [
-    'Oi {nome}! Stiven aqui. Vi que voce demonstrou interesse no {empreendimento}. Posso te contar mais sobre as opcoes disponiveis?',
-    'Ola {nome}, tudo bem? Queria saber se voce ainda tem interesse no {empreendimento}. As unidades estao se esgotando rapido.',
-    '{nome}, ultima mensagem minha por aqui. Se quiser conversar sobre o {empreendimento}, estou a disposicao. Abraco!',
+    'Oi {nome}! Vi que voce demonstrou interesse em um dos nossos empreendimentos. Posso te contar mais sobre as opcoes disponiveis?',
+    'Ola {nome}, tudo bem? Queria saber se voce ainda tem interesse. As unidades estao se esgotando rapido.',
+    '{nome}, ultima mensagem minha por aqui. Se quiser conversar, estou a disposicao. Abraco!',
   ],
   qualificado: [
-    'Oi {nome}! Com base no seu perfil, tenho condicoes especiais para o {empreendimento}. Podemos conversar hoje?',
-    'Ola {nome}! Queria compartilhar uma novidade sobre o {empreendimento} que pode te interessar muito.',
+    'Oi {nome}! Com base no seu perfil, tenho condicoes especiais para {empreendimento}. Podemos conversar hoje?',
+    'Ola {nome}! Queria compartilhar uma novidade sobre {empreendimento} que pode te interessar muito.',
+  ],
+  interessado: [
+    '{nome}, que tal agendarmos uma visita ao {empreendimento}? Tenho horarios disponiveis essa semana.',
+    'Oi {nome}! Ainda pensando em {empreendimento}? Posso tirar qualquer duvida por aqui.',
   ],
   proposta_enviada: [
     '{nome}, voce teve chance de analisar a proposta do {empreendimento}? Fico a disposicao para tirar qualquer duvida.',
-    'Oi {nome}! Queria saber se surgiu alguma duvida sobre a proposta. Posso agendar uma visita se preferir ver pessoalmente.',
+    'Oi {nome}! Queria saber se surgiu alguma duvida sobre a proposta. Posso agendar uma visita se preferir.',
   ],
   visita_agendada: [
     'Ola {nome}! Confirmando nossa visita ao {empreendimento}. Voce confirma presenca? Qualquer imprevisto me avisa.',
@@ -36,6 +45,7 @@ function getMensagemFollowUp(estagio: string, tentativa: number, nome: string, e
 }
 
 async function processarLeadFollowUp(lead: any) {
+  const supabase = getSupabase();
   const { id, nome, whatsapp, estagio_funil, tentativas_followup = 0, empreendimento_interesse, lead_score = 0 } = lead;
 
   let nomeEmpreendimento = 'nosso empreendimento';
@@ -48,9 +58,9 @@ async function processarLeadFollowUp(lead: any) {
     if (emp) nomeEmpreendimento = emp.nome;
   }
 
-  const mensagem = getMensagemFollowUp(estagio_funil, tentativas_followup, nome, nomeEmpreendimento);
+  const mensagem = getMensagemFollowUp(estagio_funil, tentativas_followup, nome ?? 'amigo', nomeEmpreendimento);
 
-  // Sem mais mensagens — escalar para Stiven com score atual
+  // Sem mais mensagens — escalar para Stiven
   if (!mensagem) {
     await enviarAlertaEscalada(whatsapp, nome, lead_score ?? 0);
     await supabase.from('leads').update({
@@ -98,6 +108,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+    const supabase = getSupabase();
     const agora = new Date().toISOString();
 
     const { data: leads, error } = await supabase
@@ -105,7 +116,7 @@ export async function GET(req: NextRequest) {
       .select('id, nome, whatsapp, estagio_funil, tentativas_followup, empreendimento_interesse, lead_score')
       .lte('proximo_followup', agora)
       .eq('requer_atencao', false)
-      .in('status', ['novo', 'em_atendimento', 'qualificado', 'proposta_enviada', 'visita_agendada'])
+      .in('status', ['novo', 'ativo', 'qualificado'])
       .not('whatsapp', 'is', null)
       .limit(50);
 
