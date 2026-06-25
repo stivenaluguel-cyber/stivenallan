@@ -7,25 +7,26 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-// Mensagens de follow-up por estágio
+// Mensagens de follow-up por estagio
 const MENSAGENS_FOLLOWUP: Record<string, string[]> = {
   primeiro_contato: [
-    'Oi {nome}! Stiven aqui. Vi que você demonstrou interesse no {empreendimento}. Posso te contar mais sobre as opções disponíveis? 🏠',
-    'Olá {nome}, tudo bem? Queria saber se você ainda tem interesse no {empreendimento}. As unidades estão se esgotando rápido.',
-    '{nome}, última mensagem minha por aqui. Se quiser conversar sobre o {empreendimento}, estou à disposição. Abraço!',
+    'Oi {nome}! Stiven aqui. Vi que voce demonstrou interesse no {empreendimento}. Posso te contar mais sobre as opcoes disponiveis?',
+    'Ola {nome}, tudo bem? Queria saber se voce ainda tem interesse no {empreendimento}. As unidades estao se esgotando rapido.',
+    '{nome}, ultima mensagem minha por aqui. Se quiser conversar sobre o {empreendimento}, estou a disposicao. Abraco!',
   ],
   qualificado: [
-    'Oi {nome}! Com base no seu perfil, tenho condições especiais para o {empreendimento}. Podemos conversar hoje?',
-    'Olá {nome}! Queria compartilhar uma novidade sobre o {empreendimento} que pode te interessar muito.',
+    'Oi {nome}! Com base no seu perfil, tenho condicoes especiais para o {empreendimento}. Podemos conversar hoje?',
+    'Ola {nome}! Queria compartilhar uma novidade sobre o {empreendimento} que pode te interessar muito.',
   ],
   proposta_enviada: [
-    '{nome}, você teve chance de analisar a proposta do {empreendimento}? Fico à disposição para tirar qualquer dúvida.',
-    'Oi {nome}! Queria saber se surgiu alguma dúvida sobre a proposta. Posso agendar uma visita se preferir ver pessoalmente.',
+    '{nome}, voce teve chance de analisar a proposta do {empreendimento}? Fico a disposicao para tirar qualquer duvida.',
+    'Oi {nome}! Queria saber se surgiu alguma duvida sobre a proposta. Posso agendar uma visita se preferir ver pessoalmente.',
   ],
   visita_agendada: [
-    'Olá {nome}! Confirmando nossa visita ao {empreendimento}. Você confirma presença? Qualquer imprevisto me avisa.',
+    'Ola {nome}! Confirmando nossa visita ao {empreendimento}. Voce confirma presenca? Qualquer imprevisto me avisa.',
   ],
 };
+
 function getMensagemFollowUp(estagio: string, tentativa: number, nome: string, empreendimento: string): string | null {
   const msgs = MENSAGENS_FOLLOWUP[estagio];
   if (!msgs || tentativa >= msgs.length) return null;
@@ -35,9 +36,8 @@ function getMensagemFollowUp(estagio: string, tentativa: number, nome: string, e
 }
 
 async function processarLeadFollowUp(lead: any) {
-  const { id, nome, whatsapp, estagio_funil, tentativas_followup = 0, empreendimento_interesse } = lead;
+  const { id, nome, whatsapp, estagio_funil, tentativas_followup = 0, empreendimento_interesse, lead_score = 0 } = lead;
 
-  // Buscar nome do empreendimento de interesse
   let nomeEmpreendimento = 'nosso empreendimento';
   if (empreendimento_interesse) {
     const { data: emp } = await supabase
@@ -50,23 +50,17 @@ async function processarLeadFollowUp(lead: any) {
 
   const mensagem = getMensagemFollowUp(estagio_funil, tentativas_followup, nome, nomeEmpreendimento);
 
-  // Se não há mais mensagens — escalar para Stiven
+  // Sem mais mensagens — escalar para Stiven com score atual
   if (!mensagem) {
-    await enviarAlertaEscalada(
-      whatsapp,
-      nome,
-      'Lead esgotou sequência de follow-up automático sem resposta. Avaliação manual necessária.',
-      estagio_funil
-    );
+    await enviarAlertaEscalada(whatsapp, nome, lead_score ?? 0);
     await supabase.from('leads').update({
       requer_atencao: true,
       status: 'cold',
-      observacoes_ia: 'Sequência de follow-up esgotada sem resposta. Encaminhado para avaliação manual.',
+      observacoes_ia: 'Sequencia de follow-up esgotada sem resposta. Encaminhado para avaliacao manual.',
     }).eq('id', id);
     return { id, acao: 'escalado', motivo: 'sem_mais_followups' };
   }
 
-  // Enviar follow-up
   const enviado = await enviarFollowUp(whatsapp, mensagem);
 
   if (!enviado) {
@@ -74,13 +68,11 @@ async function processarLeadFollowUp(lead: any) {
     return { id, acao: 'erro', motivo: 'falha_envio' };
   }
 
-  // Calcular próximo follow-up baseado na tentativa
-  const intervalos = [1, 3, 7, 14]; // dias
+  const intervalos = [1, 3, 7, 14];
   const proximoIntervalo = intervalos[Math.min(tentativas_followup + 1, intervalos.length - 1)];
   const proximoFollowup = new Date();
   proximoFollowup.setDate(proximoFollowup.getDate() + proximoIntervalo);
 
-  // Registrar interação
   await supabase.from('interacoes').insert({
     lead_id: id,
     canal: 'whatsapp',
@@ -90,7 +82,6 @@ async function processarLeadFollowUp(lead: any) {
     intencao_detectada: 'follow_up_automatico',
   });
 
-  // Atualizar lead
   await supabase.from('leads').update({
     tentativas_followup: tentativas_followup + 1,
     ultimo_contato: new Date().toISOString(),
@@ -99,8 +90,8 @@ async function processarLeadFollowUp(lead: any) {
 
   return { id, acao: 'mensagem_enviada', tentativa: tentativas_followup + 1, proximoFollowup };
 }
+
 export async function GET(req: NextRequest) {
-  // Verificar autorização do cron (Vercel Cron envia header authorization)
   const authHeader = req.headers.get('authorization');
   if (authHeader !== 'Bearer ' + process.env.CRON_SECRET) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -109,33 +100,27 @@ export async function GET(req: NextRequest) {
   try {
     const agora = new Date().toISOString();
 
-    // Buscar leads que precisam de follow-up
     const { data: leads, error } = await supabase
       .from('leads')
-      .select('id, nome, whatsapp, estagio_funil, tentativas_followup, empreendimento_interesse')
+      .select('id, nome, whatsapp, estagio_funil, tentativas_followup, empreendimento_interesse, lead_score')
       .lte('proximo_followup', agora)
       .eq('requer_atencao', false)
       .in('status', ['novo', 'em_atendimento', 'qualificado', 'proposta_enviada', 'visita_agendada'])
       .not('whatsapp', 'is', null)
-      .limit(50); // processar até 50 por execução para não sobrecarregar
+      .limit(50);
 
     if (error) {
-      console.error('Erro ao buscar leads:', error);
       return NextResponse.json({ error: 'DB error', details: error.message }, { status: 500 });
     }
 
     if (!leads || leads.length === 0) {
-      return NextResponse.json({ message: 'Nenhum lead para follow-up agora.', processados: 0 });
+      return NextResponse.json({ message: 'Nenhum lead para follow-up.', processados: 0 });
     }
 
-    console.log('Processando follow-ups para', leads.length, 'leads...');
-
-    // Processar com delay entre envios para não ser bloqueado
     const resultados = [];
     for (const lead of leads) {
       const resultado = await processarLeadFollowUp(lead);
       resultados.push(resultado);
-      // 2s entre mensagens para parecer humano
       await new Promise(r => setTimeout(r, 2000));
     }
 
@@ -143,17 +128,9 @@ export async function GET(req: NextRequest) {
     const escalados = resultados.filter(r => r.acao === 'escalado').length;
     const erros = resultados.filter(r => r.acao === 'erro').length;
 
-    return NextResponse.json({
-      message: 'Follow-ups processados.',
-      processados: leads.length,
-      enviados,
-      escalados,
-      erros,
-      resultados,
-    });
+    return NextResponse.json({ message: 'Follow-ups processados.', processados: leads.length, enviados, escalados, erros });
 
   } catch (err: any) {
-    console.error('Erro geral no cron:', err);
     return NextResponse.json({ error: 'Internal error', details: err.message }, { status: 500 });
   }
 }
