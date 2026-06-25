@@ -11,11 +11,11 @@ const C = {
 
 export default function Footer() {
   const lancamentos = [
-    { href: '/lancamentos/criciuma-sc', label: 'Criciúma/SC' },
-    { href: '/lancamentos/icara-sc', label: 'Içara/SC' },
-    { href: '/lancamentos/nova-veneza-sc', label: 'Nova Veneza/SC' },
-    { href: '/lancamentos/forquilhinha-sc', label: 'Forquilhinha/SC' },
-    { href: '/lancamentos/cocal-do-sul-sc', label: 'Cocal do Sul/SC' },
+    { href: '/lancamentos/criciuma', label: 'Criciúma/SC' },
+    { href: '/lancamentos/icara', label: 'Içara/SC' },
+    { href: '/lancamentos/nova-veneza', label: 'Nova Veneza/SC' },
+    { href: '/lancamentos/forquilhinha', label: 'Forquilhinha/SC' },
+    { href: '/lancamentos/cocal-do-sul', label: 'Cocal do Sul/SC' },
   ]
 
   return (
