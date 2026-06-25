@@ -33,7 +33,7 @@ async function getStats() {
   const atencao = leads?.filter((l: any) => l.requer_atencao).length ?? 0
   const scoreMedia = leads?.length ? Math.round((leads as any[]).reduce((acc: number, l: any) => acc + (l.lead_score ?? 0), 0) / leads.length) : 0
   const fechados = leads?.filter((l: any) => l.estagio_funil === 'fechado').length ?? 0
-  const hoje = new Date(); hoje.setHours(0,0,0,0)
+  const hoje = new Date(); hoje.setHours(0, 0, 0, 0)
   const novosHoje = leads?.filter((l: any) => new Date(l.created_at) >= hoje).length ?? 0
   return { total, atencao, scoreMedia, fechados, novosHoje }
 }
@@ -47,8 +47,17 @@ async function getInsights() {
   return null
 }
 
+async function getEmpreendimentos() {
+  const { data } = await supabase
+    .from('empreendimentos')
+    .select('id, nome, status_venda, status_obra')
+    .eq('status_venda', 'ativo')
+    .limit(20)
+  return data ?? []
+}
+
 export default async function DashboardPage() {
-  const [leads, stats, insights] = await Promise.all([getLeads(), getStats(), getInsights()])
+  const [leads, stats, insights, empreendimentos] = await Promise.all([getLeads(), getStats(), getInsights(), getEmpreendimentos()])
   const leadsByEstagio = ESTAGIOS.map(e => ({
     ...e,
     leads: (leads as any[]).filter((l: any) => l.estagio_funil === e.key)
@@ -65,8 +74,12 @@ export default async function DashboardPage() {
             <div style={{ fontSize: 12, color: '#718096' }}>CRECI/RS 60.275</div>
           </div>
         </div>
-        <div style={{ fontSize: 13, color: '#718096' }}>
-          {new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <a href="/dashboard/empreendimentos" style={{ background: '#c9a24b', color: '#000', padding: '8px 18px', borderRadius: 8, fontWeight: 700, fontSize: 13, textDecoration: 'none' }}>🏗️ Empreendimentos</a>
+          <a href="/dashboard/leads" style={{ color: '#a7adb4', textDecoration: 'none', fontSize: 13 }}>Leads</a>
+          <div style={{ fontSize: 13, color: '#718096' }}>
+            {new Date().toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'short' })}
+          </div>
         </div>
       </div>
 
@@ -93,6 +106,25 @@ export default async function DashboardPage() {
           ))}
         </div>
 
+        {/* Empreendimentos Ativos */}
+        {empreendimentos.length > 0 && (
+          <div style={{ background: '#1a1d27', border: '1px solid #c9a24b33', borderRadius: 12, padding: '16px 20px', marginBottom: 24 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+              <span style={{ fontWeight: 700, fontSize: 14, color: '#c9a24b' }}>🏗️ Empreendimentos Ativos ({empreendimentos.length})</span>
+              <a href="/dashboard/empreendimentos" style={{ color: '#c9a24b', textDecoration: 'none', fontSize: 12 }}>Ver todos →</a>
+            </div>
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+              {(empreendimentos as any[]).map((emp: any) => (
+                <a key={emp.id} href={`/dashboard/empreendimentos/${emp.id}/editar`} style={{ background: '#0f1117', border: '1px solid #2d3748', borderRadius: 8, padding: '8px 14px', textDecoration: 'none', color: '#e2e8f0', fontSize: 13 }}>
+                  <span style={{ fontWeight: 600 }}>{emp.nome}</span>
+                  <span style={{ color: '#718096', marginLeft: 8, fontSize: 11 }}>{emp.status_obra?.replace(/_/g, ' ')}</span>
+                </a>
+              ))}
+              <a href="/dashboard/empreendimentos/novo" style={{ background: '#c9a24b11', border: '1px dashed #c9a24b', borderRadius: 8, padding: '8px 14px', textDecoration: 'none', color: '#c9a24b', fontSize: 13, fontWeight: 600 }}>+ Novo</a>
+            </div>
+          </div>
+        )}
+
         {/* Layout Principal: Kanban + Insights */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 24 }}>
 
@@ -112,15 +144,11 @@ export default async function DashboardPage() {
                         <div style={{ textAlign: 'center', color: '#4a5568', fontSize: 12, padding: '20px 0' }}>Vazio</div>
                       ) : col.leads.map((lead: any) => (
                         <div key={lead.id} style={{ background: '#0f1117', borderRadius: 8, padding: '10px 12px', border: lead.requer_atencao ? '1px solid #ef4444' : '1px solid #2d3748' }}>
-                          {lead.requer_atencao && <div style={{ fontSize: 10, color: '#ef4444', fontWeight: 700, marginBottom: 4 }}>🔥 ATENÇÃO NECESSÁRIA</div>}
+                          {lead.requer_atencao && <div style={{ fontSize: 10, color: '#ef4444', fontWeight: 700, marginBottom: 4 }}>🔥 ATENÇÃO</div>}
                           <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 4 }}>{lead.nome ?? '+' + lead.whatsapp}</div>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ fontSize: 11, color: '#718096' }}>
-                              {lead.perfil !== 'indefinido' ? lead.perfil : lead.origem}
-                            </span>
-                            <span style={{ fontSize: 11, fontWeight: 700, color: lead.lead_score >= 60 ? '#10b981' : lead.lead_score >= 30 ? '#f59e0b' : '#6b7280' }}>
-                              {lead.lead_score ?? 0}pts
-                            </span>
+                            <span style={{ fontSize: 11, color: '#718096' }}>{lead.perfil !== 'indefinido' ? lead.perfil : lead.origem}</span>
+                            <span style={{ fontSize: 11, fontWeight: 700, color: lead.lead_score >= 60 ? '#10b981' : lead.lead_score >= 30 ? '#f59e0b' : '#6b7280' }}>{lead.lead_score ?? 0}pts</span>
                           </div>
                           {lead.orcamento_max && <div style={{ fontSize: 10, color: '#718096', marginTop: 4 }}>R$ {Number(lead.orcamento_max).toLocaleString('pt-BR')}</div>}
                           {lead.ultimo_contato && <div style={{ fontSize: 10, color: '#4a5568', marginTop: 2 }}>Último: {new Date(lead.ultimo_contato).toLocaleDateString('pt-BR')}</div>}
@@ -134,10 +162,8 @@ export default async function DashboardPage() {
             </div>
           </div>
 
-          {/* SIDEBAR: Insights + Atenção */}
+          {/* SIDEBAR */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-
-            {/* Leads que precisam de atenção */}
             <div style={{ background: '#1a1d27', border: '1px solid #2d3748', borderRadius: 12 }}>
               <div style={{ padding: '14px 16px', borderBottom: '1px solid #2d3748', display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span>🔥</span>
@@ -157,26 +183,21 @@ export default async function DashboardPage() {
               </div>
             </div>
 
-            {/* Insights IA */}
             <div style={{ background: 'linear-gradient(135deg, #1a1d27, #1e1b2e)', border: '1px solid #c9a24b44', borderRadius: 12 }}>
               <div style={{ padding: '14px 16px', borderBottom: '1px solid #2d3748', display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span>✨</span>
                 <span style={{ fontWeight: 700, fontSize: 14 }}>Insights da IA</span>
-                <span style={{ fontSize: 10, color: '#c9a24b', marginLeft: 'auto', fontWeight: 600 }}>Claude API</span>
+                <span style={{ fontSize: 10, color: '#c9a24b', marginLeft: 'auto', fontWeight: 600 }}>Groq AI</span>
               </div>
               <div style={{ padding: '16px' }}>
                 {insights ? (
                   <div style={{ fontSize: 13, color: '#e2e8f0', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>{insights.texto}</div>
                 ) : (
-                  <div style={{ color: '#718096', fontSize: 13 }}>
-                    <div style={{ marginBottom: 8 }}>Configure ANTHROPIC_API_KEY nas env vars do Vercel para ativar insights com Claude.</div>
-                    <div style={{ color: '#4a5568', fontSize: 12 }}>Os insights analisam o pipeline completo e sugerem ações prioritárias.</div>
-                  </div>
+                  <div style={{ color: '#718096', fontSize: 13 }}>Analisando pipeline...</div>
                 )}
               </div>
             </div>
 
-            {/* Top Leads por Score */}
             <div style={{ background: '#1a1d27', border: '1px solid #2d3748', borderRadius: 12 }}>
               <div style={{ padding: '14px 16px', borderBottom: '1px solid #2d3748' }}>
                 <span style={{ fontWeight: 700, fontSize: 14 }}>⭐ Top Leads por Score</span>
@@ -195,7 +216,6 @@ export default async function DashboardPage() {
                 {leads.length === 0 && <div style={{ color: '#4a5568', fontSize: 13, textAlign: 'center', padding: '16px 0' }}>Nenhum lead ainda</div>}
               </div>
             </div>
-
           </div>
         </div>
       </div>
