@@ -4,24 +4,17 @@ import { enviarMensagem, enviarAlertaEscalada } from '@/lib/evolution'
 
 export const dynamic = 'force-dynamic'
 
-const WEBHOOK_SECRET = process.env.EVOLUTION_WEBHOOK_SECRET
-const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY
-
 export async function POST(req: NextRequest) {
   try {
-    const secret = req.headers.get('apikey')
-    console.log('[webhook] apikey recebido:', secret?.substring(0, 30))
-
-    // Aceita token da instancia OU api key global da Evolution
-    if (WEBHOOK_SECRET && EVOLUTION_API_KEY) {
-      if (secret !== WEBHOOK_SECRET && secret !== EVOLUTION_API_KEY) {
-        console.log('[webhook] 401 nao autorizado. Recebido:', secret?.substring(0, 30))
-        return NextResponse.json({ erro: 'Nao autorizado' }, { status: 401 })
-      }
-    }
+    // Debug: logar todos os headers para identificar o que a Evolution envia
+    const allHeaders: Record<string, string> = {}
+    req.headers.forEach((value, key) => { allHeaders[key] = value })
+    console.log('[webhook] headers:', JSON.stringify(allHeaders).substring(0, 200))
 
     const body = await req.json()
+    console.log('[webhook] event:', body.event, '| instance:', body.instance)
 
+    // Filtrar apenas mensagens recebidas de usuarios reais
     if (body.event !== 'messages.upsert') {
       return NextResponse.json({ ok: true, ignorado: true })
     }
@@ -44,7 +37,7 @@ export async function POST(req: NextRequest) {
     if (!texto.trim()) return NextResponse.json({ ok: true })
 
     const whatsapp = from.replace('@s.whatsapp.net', '')
-    console.log('[webhook] msg de:', whatsapp, '|', texto.substring(0, 50))
+    console.log('[webhook] processando:', whatsapp, '|', texto.substring(0, 80))
 
     processarEResponder(whatsapp, texto).catch(console.error)
 
