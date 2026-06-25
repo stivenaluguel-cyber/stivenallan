@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
       expires_at: expires.toISOString()
     })
 
-    // Enviar email via Resend (gratuito ate 3000/mes)
+    // Enviar email via Resend
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://stivenallan.vercel.app'
     const resetUrl = `${siteUrl}/dashboard/redefinir-senha?token=${token}`
 
@@ -49,26 +49,32 @@ export async function POST(request: NextRequest) {
         'Authorization': `Bearer ${process.env.RESEND_API_KEY}`
       },
       body: JSON.stringify({
-        from: 'SA Imoveis <noreply@stivenallan.vercel.app>',
-        to: [admin.email],
+        from: 'SA Imoveis <onboarding@resend.dev>',
+        to: ['stiven.aluguel@gmail.com'],
         subject: 'Redefinir senha - Dashboard SA Imoveis',
         html: `
-          <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px">
-            <h2 style="color:#c9a24b">Redefinir sua senha</h2>
+          <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px;background:#121315;color:#fff;border-radius:16px">
+            <div style="text-align:center;margin-bottom:24px">
+              <div style="background:#c9a24b;color:#121315;font-size:24px;font-weight:800;width:64px;height:64px;border-radius:16px;display:inline-flex;align-items:center;justify-content:center">SA</div>
+            </div>
+            <h2 style="color:#c9a24b;text-align:center">Redefinir sua senha</h2>
             <p>Ola, ${admin.nome}!</p>
-            <p>Clique no botao abaixo para redefinir sua senha. O link expira em 1 hora.</p>
-            <a href="${resetUrl}" style="display:inline-block;background:#c9a24b;color:#000;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;margin:16px 0">
-              Redefinir senha
-            </a>
-            <p style="color:#666;font-size:12px">Se voce nao solicitou isso, ignore este email.</p>
-            <p style="color:#666;font-size:12px">Link: ${resetUrl}</p>
+            <p>Clique no botao abaixo para redefinir sua senha. O link expira em <strong>1 hora</strong>.</p>
+            <div style="text-align:center;margin:32px 0">
+              <a href="${resetUrl}" style="background:#c9a24b;color:#121315;padding:14px 32px;border-radius:10px;text-decoration:none;font-weight:700;font-size:16px;display:inline-block">
+                Redefinir senha
+              </a>
+            </div>
+            <p style="color:#a7adb4;font-size:12px">Se voce nao solicitou isso, ignore este email.</p>
+            <p style="color:#a7adb4;font-size:12px">Link direto: ${resetUrl}</p>
           </div>
         `
       })
     })
 
     if (!emailRes.ok) {
-      console.error('Email error:', await emailRes.text())
+      const errText = await emailRes.text()
+      console.error('Resend error:', errText)
     }
 
     return NextResponse.json({ success: true })
