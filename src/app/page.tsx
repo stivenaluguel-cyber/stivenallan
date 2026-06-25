@@ -5,10 +5,22 @@ import Footer from '@/components/Footer'
 import WppFloat from '@/components/WppFloat'
 import FeaturedProperties from '@/components/FeaturedProperties'
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://stivenallan.vercel.app'
+const WPP = 'https://wa.me/5548991642332'
+
 export const metadata = {
   title: 'Stiven Allan — Corretor de Imóveis em Criciúma e Região | SC',
-  description: 'Lançamentos e empreendimentos de construtoras em Criciúma, Içara, Nova Veneza, Forquilhinha e Cocal do Sul/SC. CRECI/RS 60.275.',
-  alternates: { canonical: 'https://stivenallan.com.br' },
+  description: 'Lançamentos e empreendimentos de construtoras em Criciúma, Içara, Nova Veneza, Forquilhinha e Cocal do Sul/SC. Atendimento premium. CRECI/RS 60.275.',
+  alternates: { canonical: SITE_URL },
+  openGraph: {
+    title: 'Stiven Allan — Corretor de Imóveis em Criciúma e Região | SC',
+    description: 'Especialista em lançamentos imobiliários em Criciúma e região do Sul Catarinense. CRECI/RS 60.275.',
+    url: SITE_URL,
+    siteName: 'Stiven Allan Corretor',
+    locale: 'pt_BR',
+    type: 'website',
+    images: [{ url: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80', width: 1200, height: 630, alt: 'Stiven Allan — Corretor de Imóveis em Criciúma SC' }],
+  },
 }
 
 const CIDADES = [
@@ -21,23 +33,91 @@ const CIDADES = [
 
 const BAIRROS = ['Centro','Próspera','Michel','Pio Corrêa','Comerciário','Santa Luzia','Universitário','Içara','Nova Veneza','Forquilhinha','Cocal do Sul']
 
-// Paleta de cores
 const C = {
-  bg: '#121315',
-  bg2: '#1a1c1f',
-  card: '#202327',
-  accent: '#c9a24b',
-  accent2: '#e2c275',
-  green: '#1f9d55',
-  greenHover: '#17854a',
-  text: '#f4f4f4',
-  muted: '#a7adb4',
-  border: '#2c3035',
+  bg: '#121315', bg2: '#1a1c1f', card: '#202327',
+  accent: '#c9a24b', accent2: '#e2c275', green: '#1f9d55',
+  text: '#f4f4f4', muted: '#a7adb4', border: '#2c3035',
+}
+
+const schemaOrg = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'RealEstateAgent',
+      name: 'Stiven Allan',
+      description: 'Corretor de imóveis especializado em lançamentos e empreendimentos de construtoras em Criciúma/SC e região. CRECI/RS 60.275.',
+      url: SITE_URL,
+      telephone: '+5548991642332',
+      image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=400&q=80',
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: 'Criciúma',
+        addressRegion: 'SC',
+        addressCountry: 'BR',
+      },
+      areaServed: ['Criciúma', 'Içara', 'Nova Veneza', 'Forquilhinha', 'Cocal do Sul'],
+      hasCredential: 'CRECI/RS 60.275',
+    },
+    {
+      '@type': 'WebSite',
+      name: 'Stiven Allan Corretor',
+      url: SITE_URL,
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: SITE_URL + '/lancamentos/criciuma-sc?q={search_term_string}',
+        'query-input': 'required name=search_term_string',
+      },
+    },
+  ],
 }
 
 export default function HomePage() {
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaOrg) }} />
+      <style>{`
+        .hero-search-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr 1fr auto;
+          gap: 12px;
+        }
+        @media (max-width: 600px) {
+          .hero-search-grid {
+            grid-template-columns: 1fr 1fr;
+          }
+          .hero-search-btn {
+            grid-column: span 2;
+          }
+        }
+        .cidades-grid {
+          display: grid;
+          grid-template-columns: repeat(5, 1fr);
+          gap: 16px;
+        }
+        @media (max-width: 900px) {
+          .cidades-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 500px) {
+          .cidades-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        .sobre-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 60px;
+          align-items: center;
+        }
+        @media (max-width: 768px) {
+          .sobre-grid {
+            grid-template-columns: 1fr;
+            gap: 32px;
+          }
+          .sobre-foto { height: 280px !important; }
+        }
+        .cidade-link:hover {
+          border-color: #c9a24b !important;
+          transform: translateY(-2px);
+        }
+      `}</style>
       <Header />
 
       {/* ── HERO ─────────────────────────────────────────────────────── */}
@@ -58,13 +138,11 @@ export default function HomePage() {
           style={{ objectFit: 'cover', objectPosition: 'center' }}
           sizes="100vw"
         />
-        {/* Overlay escuro */}
         <div style={{
           position: 'absolute', inset: 0,
           background: 'linear-gradient(160deg, rgba(10,11,13,0.82) 0%, rgba(10,11,13,0.65) 50%, rgba(10,11,13,0.88) 100%)',
           zIndex: 1,
         }} />
-        {/* Conteúdo hero */}
         <div style={{
           position: 'relative', zIndex: 2,
           width: '100%', maxWidth: '900px',
@@ -74,7 +152,7 @@ export default function HomePage() {
           <p style={{
             color: C.accent, fontSize: '11px', fontWeight: 700,
             letterSpacing: '5px', textTransform: 'uppercase', marginBottom: '20px',
-          }}>CRECI/RS 60.275 · Criciúma, SC</p>
+          }}>CRECI/RS 60.275 · CRICIÚMA, SC</p>
           <h1 style={{
             fontSize: 'clamp(2rem, 5vw, 3.75rem)',
             fontWeight: 900, lineHeight: 1.15,
@@ -102,58 +180,57 @@ export default function HomePage() {
             padding: '20px',
             maxWidth: '680px',
             margin: '0 auto',
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr 1fr auto',
-            gap: '12px',
           }}>
-            <select style={{
-              background: C.bg, border: `1px solid ${C.border}`,
-              color: C.text, padding: '12px 16px', borderRadius: '12px',
-              fontSize: '14px', outline: 'none', cursor: 'pointer',
-            }}>
-              <option>Tipo de Imóvel</option>
-              <option>Apartamento</option>
-              <option>Casa</option>
-              <option>Cobertura</option>
-            </select>
-            <select style={{
-              background: C.bg, border: `1px solid ${C.border}`,
-              color: C.text, padding: '12px 16px', borderRadius: '12px',
-              fontSize: '14px', outline: 'none', cursor: 'pointer',
-            }}>
-              <option>Cidade</option>
-              <option>Criciúma</option>
-              <option>Içara</option>
-              <option>Nova Veneza</option>
-              <option>Forquilhinha</option>
-            </select>
-            <select style={{
-              background: C.bg, border: `1px solid ${C.border}`,
-              color: C.text, padding: '12px 16px', borderRadius: '12px',
-              fontSize: '14px', outline: 'none', cursor: 'pointer',
-            }}>
-              <option>Dorm.</option>
-              <option>1+</option><option>2+</option>
-              <option>3+</option><option>4+</option>
-            </select>
-            <Link href="/lancamentos/criciuma-sc" style={{
-              background: C.green, color: '#fff',
-              fontWeight: 700, padding: '12px 24px',
-              borderRadius: '12px', fontSize: '14px',
-              textDecoration: 'none', whiteSpace: 'nowrap',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              Buscar →
-            </Link>
+            <div className="hero-search-grid">
+              <select id="busca-tipo" style={{
+                background: C.bg, border: `1px solid ${C.border}`,
+                color: C.text, padding: '12px 16px', borderRadius: '12px',
+                fontSize: '14px', outline: 'none', cursor: 'pointer',
+              }}>
+                <option value="">Tipo de Imóvel</option>
+                <option value="apartamento">Apartamento</option>
+                <option value="casa">Casa</option>
+                <option value="cobertura">Cobertura</option>
+              </select>
+              <select id="busca-cidade" style={{
+                background: C.bg, border: `1px solid ${C.border}`,
+                color: C.text, padding: '12px 16px', borderRadius: '12px',
+                fontSize: '14px', outline: 'none', cursor: 'pointer',
+              }}>
+                <option value="criciuma-sc">Cidade</option>
+                <option value="criciuma-sc">Criciúma</option>
+                <option value="icara-sc">Içara</option>
+                <option value="nova-veneza-sc">Nova Veneza</option>
+                <option value="forquilhinha-sc">Forquilhinha</option>
+                <option value="cocal-do-sul-sc">Cocal do Sul</option>
+              </select>
+              <select id="busca-dorms" style={{
+                background: C.bg, border: `1px solid ${C.border}`,
+                color: C.text, padding: '12px 16px', borderRadius: '12px',
+                fontSize: '14px', outline: 'none', cursor: 'pointer',
+              }}>
+                <option value="">Dorm.</option>
+                <option value="1">1+</option>
+                <option value="2">2+</option>
+                <option value="3">3+</option>
+                <option value="4">4+</option>
+              </select>
+              <Link href="/lancamentos/criciuma-sc" className="hero-search-btn" style={{
+                background: C.green, color: '#fff',
+                fontWeight: 700, padding: '12px 24px',
+                borderRadius: '12px', fontSize: '14px',
+                textDecoration: 'none', whiteSpace: 'nowrap',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                Buscar →
+              </Link>
+            </div>
           </div>
         </div>
       </section>
 
       {/* ── CREDENCIAIS BAR ───────────────────────────────────────────── */}
-      <div style={{
-        background: C.accent,
-        padding: '16px 24px',
-      }}>
+      <div style={{ background: C.accent, padding: '16px 24px' }}>
         <div style={{
           maxWidth: '900px', margin: '0 auto',
           display: 'flex', flexWrap: 'wrap',
@@ -232,13 +309,9 @@ export default function HomePage() {
           }}>
             {BAIRROS.map((b) => (
               <span key={b} style={{
-                background: C.card,
-                border: `1px solid ${C.border}`,
-                color: C.muted,
-                padding: '8px 20px',
-                borderRadius: '50px',
-                fontSize: '13px',
-                cursor: 'pointer',
+                background: C.card, border: `1px solid ${C.border}`,
+                color: C.muted, padding: '8px 20px',
+                borderRadius: '50px', fontSize: '13px',
               }}>
                 {b}
               </span>
@@ -246,23 +319,15 @@ export default function HomePage() {
           </div>
 
           {/* Cidades grid */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(5, 1fr)',
-            gap: '16px',
-          }}>
+          <div className="cidades-grid">
             {CIDADES.map((c) => (
-              <Link key={c.slug} href={`/lancamentos/${c.slug}`} style={{
-                background: C.card,
-                border: `1px solid ${C.border}`,
-                borderRadius: '16px',
-                padding: '20px 16px',
-                textAlign: 'center',
-                textDecoration: 'none',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '8px',
+              <Link key={c.slug} href={`/lancamentos/${c.slug}`} className="cidade-link" style={{
+                background: C.card, border: `1px solid ${C.border}`,
+                borderRadius: '16px', padding: '20px 16px',
+                textAlign: 'center', textDecoration: 'none',
+                display: 'flex', flexDirection: 'column',
+                alignItems: 'center', gap: '8px',
+                transition: 'border-color 0.2s, transform 0.2s',
               }}>
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={C.accent} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
@@ -279,14 +344,9 @@ export default function HomePage() {
       {/* ── SOBRE ─────────────────────────────────────────────────────── */}
       <section id="sobre" style={{ padding: '80px 24px', background: C.bg }}>
         <div style={{ maxWidth: '960px', margin: '0 auto' }}>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: '60px',
-            alignItems: 'center',
-          }}>
+          <div className="sobre-grid">
             {/* Foto */}
-            <div style={{
+            <div className="sobre-foto" style={{
               position: 'relative', height: '480px',
               borderRadius: '20px', overflow: 'hidden',
               border: `1px solid ${C.border}`,
@@ -298,7 +358,6 @@ export default function HomePage() {
                 style={{ objectFit: 'cover', objectPosition: 'top center' }}
                 sizes="(max-width: 768px) 100vw, 50vw"
               />
-              {/* Tag dourada sobre foto */}
               <div style={{
                 position: 'absolute', bottom: '20px', left: '20px',
                 background: 'rgba(18,19,21,0.92)',
@@ -326,8 +385,7 @@ export default function HomePage() {
               <p style={{ color: C.muted, marginBottom: '36px', lineHeight: 1.75, fontSize: '15px' }}>
                 Seja para morar ou investir, ofereço curadoria premium e acompanhamento do primeiro contato até a entrega das chaves.
               </p>
-              {/* Stats */}
-              <div style={{ display: 'flex', gap: '32px', marginBottom: '36px' }}>
+              <div style={{ display: 'flex', gap: '32px', marginBottom: '36px', flexWrap: 'wrap' }}>
                 {[
                   { num: '+50', label: 'Empreendimentos' },
                   { num: '5★', label: 'Atendimento' },
@@ -340,7 +398,7 @@ export default function HomePage() {
                 ))}
               </div>
               <a
-                href="https://wa.me/5548991642332"
+                href={WPP}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
@@ -388,7 +446,7 @@ export default function HomePage() {
               Fale comigo agora pelo WhatsApp. Resposta rápida e sem compromisso.
             </p>
             <a
-              href="https://wa.me/5548991642332?text=Ol%C3%A1+Stiven!+Vi+seu+site+e+quero+saber+mais."
+              href={`${WPP}?text=Ol%C3%A1+Stiven!+Vi+seu+site+e+quero+saber+mais.`}
               target="_blank"
               rel="noopener noreferrer"
               style={{
