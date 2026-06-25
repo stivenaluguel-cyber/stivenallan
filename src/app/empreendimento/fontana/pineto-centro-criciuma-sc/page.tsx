@@ -1,314 +1,271 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import Image from 'next/image'
 
 const C = {
-  bg: '#121315', card: '#202327', border: '#2c3035',
+  bg: '#121315', card: '#1a1d24', border: '#2a2d35',
   accent: '#c9a24b', accent2: '#e2c275', muted: '#a7adb4',
-  white: '#f1f3f5', green: '#1f9d55', danger: '#e63946',
+  white: '#f1f3f5', green: '#1f9d55',
 }
 
 const WPP = 'https://api.whatsapp.com/send?phone=5548991455522&text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Pineto%20Residencial!'
 
+export const revalidate = 3600
+
 export const metadata: Metadata = {
-  title: 'Pineto Residencial | Apartamento 2 Quartos Centro Criciúma SC | Stiven Allan Corretor',
-  description: 'Pineto Residencial: apartamentos 2 dormitórios (1 suíte), 75 a 76m², academia, coworking, salão de festas. Em obras no Centro de Criciúma/SC. Construtora Fontana. Stiven Allan, CRECI/RS 60.275.',
-  keywords: ['Pineto Residencial', 'apartamento 2 quartos Centro Criciúma', 'em obras Fontana Criciúma', 'apartamento compacto moderno Criciúma SC', 'Stiven Allan corretor', 'coworking residencial Criciúma'],
+  title: 'Pineto Residencial | Apartamentos 2 e 3 Dormitórios Centro Criciúma SC | Stiven Allan',
+  description: 'Pineto Residencial: apartamentos 2 e 3 dormitórios com suíte no Centro de Criciúma/SC. Coworking, espaço yoga, piscina, playground. Lançamento Fontana Construtora. Consultor Stiven Allan CRECI/RS 60.275.',
+  keywords: ['Pineto Residencial', 'apartamento Criciúma', 'lançamento Fontana', 'coworking apartamento Criciúma', 'Stiven Allan corretor SC'],
   alternates: { canonical: 'https://stivenallan.vercel.app/empreendimento/fontana/pineto-centro-criciuma-sc' },
   openGraph: {
-    title: 'Pineto Residencial — Modernidade e Praticidade no Centro de Criciúma/SC',
-    description: 'Apartamentos 2 dorm. (1 suíte), 75–76m², academia, coworking, espaço ioga. Em obras. Stiven Allan CRECI/RS 60.275.',
+    title: 'Pineto Residencial — Lifestyle Completo no Centro de Criciúma/SC',
+    description: 'Apartamentos 2 e 3 dorm. com coworking, espaço yoga, piscina, academia e salão gourmet. Lançamento exclusivo Fontana.',
     url: 'https://stivenallan.vercel.app/empreendimento/fontana/pineto-centro-criciuma-sc',
+    images: [{ url: 'https://lh3.googleusercontent.com/d/1WoeVn8nWbU-Zbr-NGK9fT-quhSH_OFas', width: 1200, height: 630 }],
     type: 'website',
     locale: 'pt_BR',
   },
 }
 
-const schemaLD = {
+const GALERIA = [
+  { id: '1WoeVn8nWbU-Zbr-NGK9fT-quhSH_OFas', alt: 'Pineto Residencial — fachada frontal Centro Criciúma', label: 'Fachada' },
+  { id: '1pAWa8inPVV_XM0-CDKNC6M8T6YO5wNGv', alt: 'Pineto — perspectiva angular', label: 'Perspectiva' },
+  { id: '1KmOmEQuPraRJUfmW8FBoK-6_WyQ8fFK_', alt: 'Pineto — acesso principal', label: 'Acesso Principal' },
+  { id: '1lzQM-x4vIGkMBbwuGrqwIiTZ8RqgdolJ', alt: 'Pineto — hall de entrada sofisticado', label: 'Hall de Entrada' },
+  { id: '1PwMdWzuLF7hXM9SkEVNtv90kvjdPR3dt', alt: 'Pineto — living integrado', label: 'Living' },
+  { id: '1HKmiz9MsLrg3xrW2WknSq3YdLLlsv921', alt: 'Pineto — suíte master', label: 'Suíte' },
+  { id: '1mt3O1a0jWgMHBXK8CCIRjMOQPBrdIqRS', alt: 'Pineto — coworking integrado', label: 'Coworking' },
+  { id: '1UY_UxkyWI1gN8dMqW_7UJVl2uMBHsAMP', alt: 'Pineto — espaço yoga e meditação', label: 'Espaço Yoga' },
+  { id: '1osvUbZHc8XJP0gZP2Oxbn1PZK1V3fgVW', alt: 'Pineto — academia fitness', label: 'Academia' },
+  { id: '1Mg6ipBSqIecSJ9nWmlQtClUwFVzvsm9R', alt: 'Pineto — playground área kids', label: 'Playground' },
+  { id: '1ISCgwxJn2DIBQAhUb3bl1dfcOf-34hzC', alt: 'Pineto — salão de festas gourmet', label: 'Salão de Festas' },
+]
+
+const DIFERENCIAIS = [
+  { icon: '💻', titulo: 'Coworking', desc: 'Espaço de trabalho compartilhado integrado ao empreendimento — trabalhe de casa sem abrir mão do profissionalismo' },
+  { icon: '🧘', titulo: 'Espaço Yoga', desc: 'Área exclusiva para yoga e meditação, um diferencial único em Criciúma' },
+  { icon: '🏋️', titulo: 'Academia Completa', desc: 'Fitness center equipado para manter a rotina de exercícios no próprio condomínio' },
+  { icon: '🏊', titulo: 'Piscina', desc: 'Área aquática para lazer e relaxamento nos momentos de descanso' },
+  { icon: '🛝', titulo: 'Playground', desc: 'Espaço kids planejado com segurança e diversão para as crianças' },
+  { icon: '🎉', titulo: 'Salão Gourmet', desc: 'Espaço de festas sofisticado com cozinha integrada para seus momentos especiais' },
+]
+
+const SCHEMA = {
   '@context': 'https://schema.org',
-  '@graph': [
-    {
-      '@type': 'RealEstateListing',
-      '@id': 'https://stivenallan.vercel.app/empreendimento/fontana/pineto-centro-criciuma-sc#listing',
-      name: 'Pineto Residencial',
-      description: 'Apartamentos 2 dormitórios (1 suíte), 75 a 76m², academia, coworking, espaço ioga, salão de festas. Em obras. Construtora Fontana, Centro de Criciúma/SC.',
-      url: 'https://stivenallan.vercel.app/empreendimento/fontana/pineto-centro-criciuma-sc',
-      address: {
-        '@type': 'PostalAddress',
-        streetAddress: 'Rua Itajaí, 185',
-        addressLocality: 'Criciúma',
-        addressRegion: 'SC',
-        addressCountry: 'BR',
-      },
-      numberOfRooms: 2,
-      floorSize: { '@type': 'QuantitativeValue', value: 75, maxValue: 76, unitCode: 'MTK' },
-      offers: { '@type': 'Offer', priceCurrency: 'BRL', availability: 'https://schema.org/InStock' },
-    },
-    {
-      '@type': 'BreadcrumbList',
-      itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Início', item: 'https://stivenallan.vercel.app' },
-        { '@type': 'ListItem', position: 2, name: 'Lançamentos Criciúma', item: 'https://stivenallan.vercel.app/lancamentos/criciuma-sc' },
-        { '@type': 'ListItem', position: 3, name: 'Pineto Residencial', item: 'https://stivenallan.vercel.app/empreendimento/fontana/pineto-centro-criciuma-sc' },
-      ],
-    },
-    {
-      '@type': 'FAQPage',
-      mainEntity: [
-        { '@type': 'Question', name: 'Qual o preço do Pineto Residencial?', acceptedAnswer: { '@type': 'Answer', text: 'Preços sob consulta. O Pineto oferece condições especiais para quem compra ainda em obras. Contate Stiven Allan.' } },
-        { '@type': 'Question', name: 'Onde fica o Pineto Residencial?', acceptedAnswer: { '@type': 'Answer', text: 'Rua Itajaí, 185 — Centro de Criciúma/SC. Localização central com fácil acesso a comércio e mobilidade urbana.' } },
-        { '@type': 'Question', name: 'O Pineto tem academia?', acceptedAnswer: { '@type': 'Answer', text: 'Sim. O Pineto tem academia, coworking, espaço ioga e salão de festas nas áreas comuns.' } },
-        { '@type': 'Question', name: 'O Pineto é bom para investimento?', acceptedAnswer: { '@type': 'Answer', text: 'Sim. Apartamentos compactos no Centro têm alta demanda para locação e valorização consistente em Criciúma.' } },
-        { '@type': 'Question', name: 'O Pineto aceita FGTS?', acceptedAnswer: { '@type': 'Answer', text: 'Sim, o Pineto pode ser financiado com FGTS dependendo do perfil. Consulte Stiven Allan para simulação personalizada.' } },
-      ],
-    },
-  ],
+  '@type': 'RealEstateListing',
+  name: 'Pineto Residencial',
+  description: 'Lançamento residencial no Centro de Criciúma/SC com apartamentos de 2 e 3 dormitórios, coworking, espaço yoga, academia, piscina e salão gourmet. Construtora Fontana.',
+  url: 'https://stivenallan.vercel.app/empreendimento/fontana/pineto-centro-criciuma-sc',
+  image: 'https://lh3.googleusercontent.com/d/1WoeVn8nWbU-Zbr-NGK9fT-quhSH_OFas',
+  offers: { '@type': 'Offer', priceCurrency: 'BRL', price: '450000', availability: 'https://schema.org/InStock' },
+  address: { '@type': 'PostalAddress', addressLocality: 'Criciúma', addressRegion: 'SC', postalCode: '88802-100', addressCountry: 'BR' },
+  floorSize: { '@type': 'QuantitativeValue', minValue: 72, maxValue: 108, unitCode: 'MTK' },
 }
 
-export default function Pineto() {
+export default function PinetoPage() {
   return (
-    <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaLD) }} />
-
-      {/* BARRA OBRAS */}
-      <div style={{ background: '#1a4a7a', color: '#fff', textAlign: 'center', padding: '10px 16px', fontSize: '13px', fontWeight: 600, position: 'sticky', top: 0, zIndex: 100 }}>
-        🏗️ Em obras — Compre agora e garanta as melhores condições.{' '}
-        <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ color: '#90c8ff', textDecoration: 'underline' }}>Falar com corretor →</a>
-      </div>
+    <main style={{ background: C.bg, color: C.white, fontFamily: "'Inter', system-ui, sans-serif", minHeight: '100vh', overflowX: 'hidden' }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHEMA) }} />
 
       {/* HERO */}
-      <section style={{ position: 'relative', minHeight: '100vh', background: '#0a0b0d', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '80px 24px 60px' }}>
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(18,19,21,0.88) 100%)', zIndex: 0 }} />
-        <div style={{ position: 'relative', zIndex: 1, maxWidth: '860px' }}>
-          <p style={{ color: C.accent, fontSize: '13px', fontWeight: 700, letterSpacing: '3px', textTransform: 'uppercase', marginBottom: '16px' }}>
-            Em Obras · Fontana · Centro – Criciúma/SC
-          </p>
-          <h1 style={{ fontSize: 'clamp(2.2rem, 6vw, 4.5rem)', fontWeight: 900, color: C.white, lineHeight: 1.05, marginBottom: '20px', letterSpacing: '-1px' }}>
-            Pineto<br /><span style={{ color: C.accent }}>Residencial</span>
-          </h1>
-          <p style={{ fontSize: 'clamp(1rem, 2.5vw, 1.2rem)', color: C.muted, maxWidth: '600px', margin: '0 auto 16px' }}>
-            Experimente. Sinta. Viva. O apartamento compacto e completo no coração de Criciúma.
-          </p>
-          <p style={{ fontSize: '15px', color: C.muted, maxWidth: '540px', margin: '0 auto 40px', fontStyle: 'italic' }}>
-            2 dormitórios (1 suíte) · 75–76m² · Academia · Coworking · Espaço Ioga
-          </p>
-          <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href={WPP} target="_blank" rel="noopener noreferrer"
-              style={{ background: C.green, color: '#fff', padding: '16px 36px', borderRadius: '8px', fontWeight: 700, fontSize: '16px', textDecoration: 'none' }}>
-              📲 Quero Conhecer
-            </a>
-            <a href="#diferenciais"
-              style={{ background: 'transparent', color: C.accent, padding: '16px 36px', borderRadius: '8px', fontWeight: 700, fontSize: '16px', textDecoration: 'none', border: `2px solid ${C.accent}` }}>
-              Ver Detalhes ↓
-            </a>
+      <section style={{ position: 'relative', height: '100vh', minHeight: 640, overflow: 'hidden' }}>
+        <Image
+          src={`https://lh3.googleusercontent.com/d/${GALERIA[0].id}`}
+          alt="Pineto Residencial — fachada Centro Criciúma SC"
+          fill priority
+          style={{ objectFit: 'cover', objectPosition: 'center top' }}
+          sizes="100vw"
+        />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(18,19,21,0.2) 0%, rgba(18,19,21,0.88) 100%)' }} />
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '0 5% 10%' }}>
+          <div style={{ maxWidth: 720 }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: C.accent, color: '#000', borderRadius: 20, padding: '5px 14px', fontSize: 12, fontWeight: 700, letterSpacing: '0.08em', marginBottom: 20, textTransform: 'uppercase' }}>
+              Lançamento · Fontana Construtora
+            </div>
+            <h1 style={{ fontSize: 'clamp(2.4rem, 6vw, 4.2rem)', fontWeight: 800, lineHeight: 1.05, margin: '0 0 16px', letterSpacing: '-0.02em' }}>
+              Pineto Residencial
+            </h1>
+            <p style={{ fontSize: 'clamp(1rem, 2vw, 1.2rem)', color: C.muted, marginBottom: 32, maxWidth: 540, lineHeight: 1.6 }}>
+              O empreendimento que redefine o estilo de vida no Centro de Criciúma. Apartamentos 2 e 3 dormitórios com coworking, yoga, academia e piscina — tudo no mesmo lugar.
+            </p>
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+              <a href={WPP} target="_blank" rel="noopener noreferrer"
+                style={{ background: C.accent, color: '#000', borderRadius: 8, padding: '14px 28px', fontWeight: 700, fontSize: 15, textDecoration: 'none' }}>
+                Tenho interesse
+              </a>
+              <a href="#galeria"
+                style={{ background: 'rgba(255,255,255,0.1)', color: C.white, border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, padding: '14px 24px', fontWeight: 600, fontSize: 15, textDecoration: 'none', backdropFilter: 'blur(8px)' }}>
+                Ver galeria
+              </a>
+            </div>
           </div>
         </div>
-        <div style={{ position: 'relative', zIndex: 1, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1px', background: C.border, borderRadius: '12px', overflow: 'hidden', marginTop: '60px', width: '100%', maxWidth: '720px' }}>
-          {[{ n: '2', d: 'Dormitórios' }, { n: '1', d: 'Suíte' }, { n: '76m²', d: 'Área Privativa' }, { n: '2', d: 'Elevadores' }].map((i) => (
-            <div key={i.d} style={{ background: C.card, padding: '22px 14px', textAlign: 'center' }}>
-              <div style={{ fontSize: '1.7rem', fontWeight: 800, color: C.accent }}>{i.n}</div>
-              <div style={{ fontSize: '12px', color: C.muted, marginTop: '4px' }}>{i.d}</div>
+        <div style={{ position: 'absolute', top: 32, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
+          {['Centro Criciúma', 'Coworking', 'Yoga', '2 e 3 Dorms'].map(t => (
+            <span key={t} style={{ background: 'rgba(18,19,21,0.7)', border: '1px solid rgba(201,162,75,0.4)', borderRadius: 20, padding: '6px 14px', fontSize: 12, fontWeight: 600, color: C.accent2, backdropFilter: 'blur(8px)' }}>{t}</span>
+          ))}
+        </div>
+      </section>
+
+      {/* NÚMEROS */}
+      <section style={{ background: C.card, borderBottom: `1px solid ${C.border}` }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '40px 5%', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 32 }}>
+          {[
+            { v: 'R$ 450 mil', l: 'A partir de' },
+            { v: '72–108 m²', l: 'Área privativa' },
+            { v: '2 e 3', l: 'Dormitórios' },
+            { v: 'Coworking', l: 'Diferencial único' },
+            { v: 'Centro', l: 'Criciúma / SC' },
+          ].map(({ v, l }) => (
+            <div key={l} style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: 'clamp(1.3rem, 2.5vw, 1.8rem)', fontWeight: 800, color: C.accent }}>{v}</div>
+              <div style={{ fontSize: 13, color: C.muted, marginTop: 4 }}>{l}</div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* CONCEITO */}
-      <section style={{ background: C.bg, padding: '80px 24px' }}>
-        <div style={{ maxWidth: '780px', margin: '0 auto', textAlign: 'center' }}>
-          <p style={{ color: C.accent, fontSize: '12px', letterSpacing: '3px', textTransform: 'uppercase', fontWeight: 700, marginBottom: '16px' }}>O Empreendimento</p>
-          <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', fontWeight: 800, color: C.white, marginBottom: '24px', lineHeight: 1.15 }}>Aqui a sua originalidade é o segredo para viver bem.</h2>
-          <p style={{ color: C.muted, fontSize: '1.05rem', lineHeight: 1.8 }}>
-            Todas as decisões ainda podem ser tomadas. Todas as oportunidades ainda irão surgir. O Pineto Residencial foi pensado para quem valoriza a vida no centro, com praticidade, design inteligente e espaços que estimulam um novo modo de viver.
-          </p>
-          <p style={{ color: C.muted, fontSize: '1.05rem', lineHeight: 1.8, marginTop: '16px' }}>
-            Ideal para quem busca primeiro imóvel, investimento para locação, ou um endereço moderno no coração de Criciúma.
-          </p>
+      {/* GALERIA */}
+      <section id="galeria" style={{ padding: '80px 5%', maxWidth: 1300, margin: '0 auto' }}>
+        <div style={{ marginBottom: 48, textAlign: 'center' }}>
+          <div style={{ color: C.accent, fontSize: 13, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>Galeria</div>
+          <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', fontWeight: 800, margin: 0 }}>Um novo padrão para Criciúma</h2>
         </div>
-      </section>
-
-      {/* TIPOLOGIA */}
-      <section id="plantas" style={{ background: '#0e1012', padding: '80px 24px' }}>
-        <div style={{ maxWidth: '820px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-            <p style={{ color: C.accent, fontSize: '12px', letterSpacing: '3px', textTransform: 'uppercase', fontWeight: 700, marginBottom: '12px' }}>Planta & Tipologia</p>
-            <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.2rem)', fontWeight: 800, color: C.white }}>Design inteligente em espaço otimizado</h2>
+        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 12, marginBottom: 12 }}>
+          <div style={{ borderRadius: 16, overflow: 'hidden', position: 'relative', height: 480 }}>
+            <Image src={`https://lh3.googleusercontent.com/d/${GALERIA[0].id}`} alt={GALERIA[0].alt} fill style={{ objectFit: 'cover' }} sizes="60vw" />
+            <div style={{ position: 'absolute', bottom: 16, left: 16, background: 'rgba(18,19,21,0.75)', borderRadius: 8, padding: '6px 14px', fontSize: 13, color: C.accent, fontWeight: 600, backdropFilter: 'blur(6px)' }}>{GALERIA[0].label}</div>
           </div>
-          <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: '12px', padding: '36px', position: 'relative', overflow: 'hidden' }}>
-            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: `linear-gradient(90deg, ${C.accent}, ${C.accent2})` }} />
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '20px', marginBottom: '24px' }}>
-              {[
-                { label: 'Área Privativa', value: '75–76m²' },
-                { label: 'Dormitórios', value: '2 (1 suíte)' },
-                { label: 'Living', value: 'Integrado' },
-                { label: 'Sacada', value: 'Guarda-corpo vidro' },
-              ].map((s) => (
-                <div key={s.label} style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: '1.3rem', fontWeight: 800, color: C.accent }}>{s.value}</div>
-                  <div style={{ fontSize: '13px', color: C.muted, marginTop: '4px' }}>{s.label}</div>
-                </div>
-              ))}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {GALERIA.slice(1, 3).map(img => (
+              <div key={img.id} style={{ borderRadius: 12, overflow: 'hidden', position: 'relative', flex: 1 }}>
+                <Image src={`https://lh3.googleusercontent.com/d/${img.id}`} alt={img.alt} fill style={{ objectFit: 'cover' }} sizes="30vw" />
+                <div style={{ position: 'absolute', bottom: 10, left: 10, background: 'rgba(18,19,21,0.7)', borderRadius: 6, padding: '4px 10px', fontSize: 12, color: C.accent, fontWeight: 600 }}>{img.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 12 }}>
+          {GALERIA.slice(3).map(img => (
+            <div key={img.id} style={{ borderRadius: 12, overflow: 'hidden', position: 'relative', height: 200 }}>
+              <Image src={`https://lh3.googleusercontent.com/d/${img.id}`} alt={img.alt} fill style={{ objectFit: 'cover' }} sizes="300px" />
+              <div style={{ position: 'absolute', bottom: 10, left: 10, background: 'rgba(18,19,21,0.7)', borderRadius: 6, padding: '4px 10px', fontSize: 12, color: C.accent, fontWeight: 600 }}>{img.label}</div>
             </div>
-            <p style={{ color: C.muted, fontSize: '14px', lineHeight: 1.7 }}>
-              Living integrado, sacada ampla com guarda-corpo em vidro, persiana nos dormitórios, churrasqueira a carvão, piso porcelanato retificado, rebaixo em gesso, laje técnica para split.
-            </p>
-          </div>
+          ))}
         </div>
       </section>
 
       {/* DIFERENCIAIS */}
-      <section id="diferenciais" style={{ background: C.bg, padding: '80px 24px' }}>
-        <div style={{ maxWidth: '1080px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-            <p style={{ color: C.accent, fontSize: '12px', letterSpacing: '3px', textTransform: 'uppercase', fontWeight: 700, marginBottom: '12px' }}>Diferenciais & Lazer</p>
-            <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.2rem)', fontWeight: 800, color: C.white }}>Mais do que um apartamento — um estilo de vida</h2>
+      <section style={{ background: C.card, padding: '80px 5%' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 48 }}>
+            <div style={{ color: C.accent, fontSize: 13, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>Diferenciais</div>
+            <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.6rem)', fontWeight: 800, margin: 0 }}>O que só o Pineto tem</h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '14px' }}>
-            {[
-              { icon: '🏋️', label: 'Academia' },
-              { icon: '💼', label: 'Coworking' },
-              { icon: '🧘', label: 'Espaço Ioga' },
-              { icon: '🎉', label: 'Salão de Festas' },
-              { icon: '🧒', label: 'Playground' },
-              { icon: '🌳', label: 'Área Externa' },
-              { icon: '🛗', label: '2 Elevadores' },
-              { icon: '🔐', label: 'Sistema de Segurança' },
-              { icon: '⚡', label: 'Gerador de Energia' },
-              { icon: '📹', label: 'Câmeras 24h' },
-              { icon: '🏡', label: 'Hall Pé-Direito Duplo' },
-              { icon: '🚿', label: 'Persiana nos Dormitórios' },
-            ].map((d) => (
-              <div key={d.label} style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: '10px', padding: '18px 14px', textAlign: 'center' }}>
-                <div style={{ fontSize: '26px', marginBottom: '8px' }}>{d.icon}</div>
-                <div style={{ color: C.white, fontSize: '13px', fontWeight: 600 }}>{d.label}</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 20 }}>
+            {DIFERENCIAIS.map(d => (
+              <div key={d.titulo} style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 12, padding: '24px 28px', display: 'flex', gap: 16, alignItems: 'flex-start', borderLeft: `3px solid ${C.accent}` }}>
+                <span style={{ fontSize: 28, flexShrink: 0 }}>{d.icon}</span>
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 6 }}>{d.titulo}</div>
+                  <div style={{ fontSize: 13, color: C.muted, lineHeight: 1.6 }}>{d.desc}</div>
+                </div>
               </div>
             ))}
           </div>
+        </div>
+      </section>
 
-          {/* Destaque investimento */}
-          <div style={{ marginTop: '36px', background: `linear-gradient(135deg, rgba(201,162,75,0.08), rgba(201,162,75,0.03))`, border: `1px solid ${C.accent}`, borderRadius: '12px', padding: '28px', textAlign: 'center' }}>
-            <div style={{ fontSize: '28px', marginBottom: '12px' }}>💰</div>
-            <h3 style={{ color: C.accent, fontWeight: 800, fontSize: '16px', marginBottom: '8px' }}>Excelente para investimento</h3>
-            <p style={{ color: C.muted, fontSize: '14px', lineHeight: 1.7, maxWidth: '600px', margin: '0 auto' }}>
-              Apartamentos compactos no Centro de Criciúma têm alta demanda para locação por estudantes, profissionais e turistas. Rentabilidade atrativa e valorização consistente no mercado local.
+      {/* COWORKING DESTAQUE */}
+      <section style={{ padding: '80px 5%', maxWidth: 1100, margin: '0 auto' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center' }}>
+          <div style={{ borderRadius: 16, overflow: 'hidden', position: 'relative', height: 400 }}>
+            <Image src={`https://lh3.googleusercontent.com/d/${GALERIA[6].id}`} alt="Pineto — coworking integrado" fill style={{ objectFit: 'cover' }} sizes="50vw" />
+          </div>
+          <div>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(201,162,75,0.15)', border: '1px solid rgba(201,162,75,0.3)', borderRadius: 20, padding: '5px 14px', fontSize: 12, fontWeight: 700, color: C.accent, marginBottom: 20, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+              Exclusivo no Pineto
+            </div>
+            <h2 style={{ fontSize: 'clamp(1.8rem, 3vw, 2.4rem)', fontWeight: 800, margin: '0 0 20px', lineHeight: 1.2 }}>Coworking integrado ao seu lar</h2>
+            <p style={{ fontSize: 15, color: C.muted, lineHeight: 1.8, marginBottom: 20 }}>
+              O Pineto é o único empreendimento residencial em Criciúma com coworking profissional integrado. Trabalhe com produtividade, sem deslocamento, com toda a infraestrutura que você precisa a passos do seu apartamento.
             </p>
+            <p style={{ fontSize: 15, color: C.muted, lineHeight: 1.8 }}>
+              Ideal para profissionais remotos, empreendedores e quem valoriza equilíbrio entre vida profissional e pessoal.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* YOGA DESTAQUE */}
+      <section style={{ background: C.card, padding: '80px 5%' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center' }}>
+            <div>
+              <div style={{ color: C.accent, fontSize: 13, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 16 }}>Bem-Estar</div>
+              <h2 style={{ fontSize: 'clamp(1.8rem, 3vw, 2.4rem)', fontWeight: 800, margin: '0 0 20px', lineHeight: 1.2 }}>Espaço Yoga e Meditação</h2>
+              <p style={{ fontSize: 15, color: C.muted, lineHeight: 1.8 }}>
+                Um espaço dedicado ao equilíbrio mental e físico, projetado para a prática de yoga, meditação e alongamento. Mais um diferencial que coloca o Pineto em uma categoria única no mercado imobiliário de Criciúma.
+              </p>
+            </div>
+            <div style={{ borderRadius: 16, overflow: 'hidden', position: 'relative', height: 360 }}>
+              <Image src={`https://lh3.googleusercontent.com/d/${GALERIA[7].id}`} alt="Pineto — espaço yoga meditação" fill style={{ objectFit: 'cover' }} sizes="50vw" />
+            </div>
           </div>
         </div>
       </section>
 
       {/* LOCALIZAÇÃO */}
-      <section id="localizacao" style={{ background: '#0e1012', padding: '80px 24px' }}>
-        <div style={{ maxWidth: '1080px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '48px', alignItems: 'center' }}>
-          <div>
-            <p style={{ color: C.accent, fontSize: '12px', letterSpacing: '3px', textTransform: 'uppercase', fontWeight: 700, marginBottom: '12px' }}>Localização</p>
-            <h2 style={{ fontSize: 'clamp(1.4rem, 3vw, 2rem)', fontWeight: 800, color: C.white, marginBottom: '14px' }}>No Centro de todos os seus novos planos</h2>
-            <p style={{ color: C.muted, lineHeight: 1.8, marginBottom: '16px' }}>Rua Itajaí, 185 — Centro, Criciúma/SC. Localização estratégica no coração da cidade.</p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
-              {['📍 Centro histórico e comercial de Criciúma', '🚌 Terminal de ônibus e transporte público', '🎓 Universidades e cursos técnicos próximos', '🍴 Restaurantes e entretenimento a pé', '🏪 Supermercados e farmácias no bairro'].map((l) => (
-                <div key={l} style={{ color: C.muted, fontSize: '14px' }}>{l}</div>
-              ))}
+      <section style={{ padding: '80px 5%', maxWidth: 1100, margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', marginBottom: 48 }}>
+          <div style={{ color: C.accent, fontSize: 13, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>Localização</div>
+          <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.6rem)', fontWeight: 800, margin: 0 }}>Centro de Criciúma — tudo a sua porta</h2>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
+          {['Shopping Della', 'Hospital São José', 'Universidades UNESC e SATC', 'Gastronomia e bares', 'Comércio e bancos', 'Terminal de ônibus'].map(item => (
+            <div key={item} style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 10, padding: '16px 20px', display: 'flex', gap: 10, alignItems: 'center' }}>
+              <div style={{ width: 8, height: 8, background: C.accent, borderRadius: '50%', flexShrink: 0 }} />
+              <span style={{ fontSize: 14 }}>{item}</span>
             </div>
-            <a href="https://www.google.com/maps/search/?api=1&query=Rua+Itajaí+185+Criciúma+SC" target="_blank" rel="noopener noreferrer"
-              style={{ display: 'inline-block', background: 'transparent', color: C.accent, border: `2px solid ${C.accent}`, padding: '12px 22px', borderRadius: '8px', fontWeight: 700, fontSize: '14px', textDecoration: 'none' }}>
-              Ver no Google Maps →
-            </a>
-          </div>
-          <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: '12px', overflow: 'hidden', height: '300px' }}>
-            <iframe title="Localização Pineto Residencial"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3550.3!2d-49.3700!3d-28.6760!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zUGluZXRvIFJlc2lkZW5jaWFs!5e0!3m2!1spt-BR!2sbr!4v1700000000002"
-              width="100%" height="100%" style={{ border: 0 }} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
-          </div>
+          ))}
         </div>
       </section>
 
-      {/* CORRETOR */}
-      <section style={{ background: C.bg, padding: '80px 24px' }}>
-        <div style={{ maxWidth: '880px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '48px', alignItems: 'center' }}>
-          <div style={{ background: C.card, border: `2px solid ${C.accent}`, borderRadius: '12px', padding: '28px', textAlign: 'center' }}>
-            <div style={{ width: '76px', height: '76px', background: `linear-gradient(135deg, ${C.accent}, ${C.accent2})`, borderRadius: '50%', margin: '0 auto 14px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '30px' }}>🏡</div>
-            <h3 style={{ color: C.white, fontWeight: 800, fontSize: '1.1rem', marginBottom: '4px' }}>Stiven Allan</h3>
-            <p style={{ color: C.accent, fontSize: '12px', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase' }}>CRECI/RS 60.275</p>
-          </div>
+      {/* CTA */}
+      <section style={{ background: 'linear-gradient(135deg, #1a1d27, #1e1b2e)', border: `1px solid rgba(201,162,75,0.2)`, margin: '0 5% 80px', borderRadius: 20, padding: '60px 5%', maxWidth: 1000, marginLeft: 'auto', marginRight: 'auto' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 40, alignItems: 'center' }}>
           <div>
-            <p style={{ color: C.accent, fontSize: '12px', letterSpacing: '3px', textTransform: 'uppercase', fontWeight: 700, marginBottom: '10px' }}>Seu Corretor</p>
-            <h2 style={{ fontSize: 'clamp(1.2rem, 2.5vw, 1.7rem)', fontWeight: 800, color: C.white, marginBottom: '12px' }}>Especialista em Fontana em Criciúma</h2>
-            <p style={{ color: C.muted, lineHeight: 1.8, marginBottom: '20px', fontSize: '14px' }}>
-              Do primeiro contato à entrega das chaves. Stiven Allan oferece simulação de financiamento, consultoria documental e acompanhamento completo. Condições especiais para quem compra ainda em obras.
+            <div style={{ color: C.accent, fontSize: 13, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 12 }}>Consultor Exclusivo</div>
+            <h2 style={{ fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', fontWeight: 800, margin: '0 0 12px' }}>Stiven Allan — CRECI/RS 60.275</h2>
+            <p style={{ fontSize: 15, color: C.muted, lineHeight: 1.7, margin: '0 0 28px' }}>
+              Especialista em lançamentos Fontana em Criciúma. Atendimento personalizado, análise de investimento e acompanhamento completo do processo de compra.
             </p>
-            <a href={WPP} target="_blank" rel="noopener noreferrer"
-              style={{ background: C.green, color: '#fff', padding: '13px 26px', borderRadius: '8px', fontWeight: 700, fontSize: '15px', textDecoration: 'none', display: 'inline-block' }}>
-              📲 Falar no WhatsApp
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* CAPTAÇÃO */}
-      <section id="contato" style={{ background: '#0e1012', padding: '80px 24px' }}>
-        <div style={{ maxWidth: '540px', margin: '0 auto', textAlign: 'center' }}>
-          <p style={{ color: C.accent, fontSize: '12px', letterSpacing: '3px', textTransform: 'uppercase', fontWeight: 700, marginBottom: '12px' }}>Fale com o Corretor</p>
-          <h2 style={{ fontSize: 'clamp(1.4rem, 3vw, 2rem)', fontWeight: 800, color: C.white, marginBottom: '10px' }}>Receba tabela e condições</h2>
-          <p style={{ color: C.muted, marginBottom: '28px', fontSize: '14px' }}>Sem compromisso. Resposta em minutos no WhatsApp.</p>
-          <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: '12px', padding: '28px' }}>
-            <div style={{ display: 'grid', gap: '12px' }}>
-              <input type="text" placeholder="Seu nome" aria-label="Nome" style={{ background: '#1a1d21', border: `1px solid ${C.border}`, borderRadius: '8px', padding: '14px 16px', color: C.white, fontSize: '15px', width: '100%', boxSizing: 'border-box' }} />
-              <input type="tel" placeholder="WhatsApp (com DDD)" aria-label="WhatsApp" style={{ background: '#1a1d21', border: `1px solid ${C.border}`, borderRadius: '8px', padding: '14px 16px', color: C.white, fontSize: '15px', width: '100%', boxSizing: 'border-box' }} />
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               <a href={WPP} target="_blank" rel="noopener noreferrer"
-                style={{ background: C.green, color: '#fff', padding: '15px', borderRadius: '8px', fontWeight: 700, fontSize: '16px', textDecoration: 'none', textAlign: 'center', display: 'block' }}>
-                📲 Enviar pelo WhatsApp
+                style={{ background: '#25d366', color: '#fff', borderRadius: 8, padding: '14px 24px', fontWeight: 700, fontSize: 15, textDecoration: 'none' }}>
+                Chamar no WhatsApp
+              </a>
+              <a href="tel:+5548991455522"
+                style={{ background: 'transparent', color: C.white, border: `1px solid ${C.border}`, borderRadius: 8, padding: '14px 20px', fontWeight: 600, fontSize: 15, textDecoration: 'none' }}>
+                (48) 99145-5522
               </a>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* FAQ */}
-      <section id="faq" style={{ background: C.bg, padding: '80px 24px' }}>
-        <div style={{ maxWidth: '780px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '36px' }}>
-            <p style={{ color: C.accent, fontSize: '12px', letterSpacing: '3px', textTransform: 'uppercase', fontWeight: 700, marginBottom: '12px' }}>FAQ</p>
-            <h2 style={{ fontSize: 'clamp(1.4rem, 3vw, 2rem)', fontWeight: 800, color: C.white }}>Perguntas Frequentes</h2>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {[
-              { q: 'Qual o preço do Pineto Residencial?', a: 'Preços sob consulta. O Pineto oferece condições especiais para quem compra ainda em obras. Entre em contato com Stiven Allan.' },
-              { q: 'Onde fica o Pineto?', a: 'Rua Itajaí, 185 — Centro de Criciúma/SC, com localização central e fácil acesso a toda a cidade.' },
-              { q: 'O Pineto é bom para investimento?', a: 'Sim. Unidades compactas no Centro têm alta demanda para locação e consistente valorização no mercado imobiliário de Criciúma.' },
-              { q: 'Posso usar FGTS no Pineto?', a: 'Dependendo do valor e perfil, o FGTS pode ser utilizado. Stiven Allan realiza análise gratuita para você.' },
-              { q: 'O Pineto tem coworking?', a: 'Sim. O Pineto é um dos poucos empreendimentos em Criciúma com coworking, além de academia, espaço ioga e área externa.' },
-            ].map((item, i) => (
-              <div key={i} style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: '10px', padding: '20px' }}>
-                <h3 style={{ color: C.white, fontWeight: 700, marginBottom: '8px', fontSize: '14px' }}>❓ {item.q}</h3>
-                <p style={{ color: C.muted, lineHeight: 1.7, fontSize: '14px' }}>{item.a}</p>
-              </div>
-            ))}
+          <div style={{ textAlign: 'center', flexShrink: 0 }}>
+            <div style={{ width: 80, height: 80, background: `linear-gradient(135deg, ${C.accent}, ${C.accent2})`, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, fontWeight: 800, color: '#000', margin: '0 auto 12px' }}>S</div>
+            <div style={{ fontSize: 13, color: C.muted }}>Seg–Sáb · 8h–20h</div>
           </div>
         </div>
       </section>
 
-      {/* CTA FINAL */}
-      <section style={{ background: `linear-gradient(135deg, #0e1012, #1a1d21)`, padding: '80px 24px', textAlign: 'center', borderTop: `1px solid ${C.border}` }}>
-        <div style={{ maxWidth: '660px', margin: '0 auto' }}>
-          <div style={{ fontSize: '44px', marginBottom: '18px' }}>🏙️</div>
-          <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.7rem)', fontWeight: 900, color: C.white, marginBottom: '14px' }}>Pineto — experimente, sinta, viva</h2>
-          <p style={{ color: C.muted, fontSize: '1rem', lineHeight: 1.7, marginBottom: '32px' }}>Condições especiais ainda em obras. Ideal para morar ou investir no Centro de Criciúma.</p>
-          <a href={WPP} target="_blank" rel="noopener noreferrer"
-            style={{ background: C.green, color: '#fff', padding: '17px 42px', borderRadius: '10px', fontWeight: 800, fontSize: '17px', textDecoration: 'none', display: 'inline-block' }}>
-            📲 Falar com Stiven Allan
-          </a>
-          <p style={{ color: C.muted, fontSize: '13px', marginTop: '14px' }}>CRECI/RS 60.275 · Criciúma/SC</p>
-        </div>
-      </section>
-
-      {/* BREADCRUMB */}
-      <nav aria-label="Breadcrumb" style={{ background: '#0a0b0d', padding: '12px 24px', borderTop: `1px solid ${C.border}` }}>
-        <ol style={{ display: 'flex', gap: '8px', listStyle: 'none', margin: 0, padding: 0, flexWrap: 'wrap', maxWidth: '1100px', marginLeft: 'auto', marginRight: 'auto' }}>
-          <li><Link href="/" style={{ color: C.muted, fontSize: '13px', textDecoration: 'none' }}>Início</Link></li>
-          <li style={{ color: C.border }}>›</li>
-          <li><Link href="/lancamentos/criciuma-sc" style={{ color: C.muted, fontSize: '13px', textDecoration: 'none' }}>Lançamentos Criciúma</Link></li>
-          <li style={{ color: C.border }}>›</li>
-          <li><span style={{ color: C.accent, fontSize: '13px', fontWeight: 600 }}>Pineto Residencial</span></li>
-        </ol>
-      </nav>
-    </>
+      <footer style={{ borderTop: `1px solid ${C.border}`, padding: '32px 5%', textAlign: 'center', color: C.muted, fontSize: 13 }}>
+        <p style={{ margin: 0 }}>
+          Pineto Residencial · Fontana Construtora · Centro, Criciúma/SC<br />
+          Consultor: Stiven Allan · CRECI/RS 60.275 · (48) 99145-5522
+        </p>
+        <p style={{ margin: '8px 0 0', fontSize: 12, color: '#4a5568' }}>
+          As imagens são ilustrativas. Informações sujeitas a alterações sem aviso prévio.
+        </p>
+      </footer>
+    </main>
   )
 }
