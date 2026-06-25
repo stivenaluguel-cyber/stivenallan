@@ -1,103 +1,81 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSupabaseAdmin } from '@/lib/supabase'
+import { cookies } from 'next/headers'
+import { jwtVerify } from 'jose'
+import { createClient } from '@supabase/supabase-js'
 
 export const dynamic = 'force-dynamic'
 
-// GET: listar empreendimentos
-export async function GET(request: NextRequest) {
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
+
+async function checkAuth(request: NextRequest) {
+  const cookieStore = await cookies()
+  const token = cookieStore.get('dashboard_token')?.value
+  if (!token) return false
   try {
-    const supabase = getSupabaseAdmin()
-    if (!supabase) {
-      return NextResponse.json({ error: 'Supabase não configurado' }, { status: 500 })
-    }
-
-    const { searchParams } = new URL(request.url)
-    const destaque = searchParams.get('destaque')
-
-    let query = supabase
-      .from('empreendimentos')
-      .select(`
-        id, nome, slug, cidade, uf, status, destaque, ativo, publicado, created_at,
-        construtoras ( id, nome, slug )
-      `)
-      .order('created_at', { ascending: false })
-
-    if (destaque === 'true') {
-      query = query.eq('destaque', true)
-    }
-
-    const { data, error } = await query
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 400 })
-    }
-
-    return NextResponse.json(data)
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET!)
+    await jwtVerify(token, secret)
+    return true
+  } catch {
+    return false
   }
 }
 
-// POST: criar empreendimento
+export async function GET(request: NextRequest) {
+  const auth = await checkAuth(request)
+  if (!auth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const supabase = getSupabase()
+  const { data, error } = await supabase
+    .from('empreendimentos')
+    .select(`
+      id, nome, construtora, cidade, uf, slug, status_obra, status_venda,
+      descricao_curta, preco_a_partir, whatsapp, created_at,
+      tipologias(id, dormitorios, suites, vagas, area_privativa_m2, preco_a_partir_de),
+      diferenciais_empreendimento(id, icone, descricao, categoria)
+    `)
+    .order('created_at', { ascending: false })
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  return NextResponse.json({ data })
+}
+
 export async function POST(request: NextRequest) {
-  try {
-    const supabase = getSupabaseAdmin()
-    if (!supabase) {
-      return NextResponse.json({ error: 'Supabase não configurado' }, { status: 500 })
-    }
+  const auth = await checkAuth(request)
+  if (!auth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const body = await request.json()
+  const supabase = getSupabase()
 
-    const body = await request.json()
+  const { tipologias, diferenciais, ...empreendimentoData } = body
 
-    // Validações básicas
-    if (!body.nome?.trim()) {
-      return NextResponse.json({ error: 'Nome é obrigatório' }, { status: 400 })
-    }
-    if (!body.slug?.trim()) {
-      return NextResponse.json({ error: 'Slug é obrigatório' }, { status: 400 })
-    }
-
-    // Verificar se slug já existe
-    const { data: existing } = await supabase
-      .from('empreendimentos')
-      .select('id')
-      .eq('slug', body.slug)
-      .single()
-
-    if (existing) {
-      return NextResponse.json({ error: 'Este slug já está em uso. Escolha outro.' }, { status: 400 })
-    }
-
-    const { data, error } = await supabase
-      .from('empreendimentos')
-      .insert({
-        nome: body.nome.trim(),
-        slug: body.slug.trim().toLowerCase(),
-        construtora_id: body.construtora_id || null,
-        cidade: body.cidade || 'Criciúma',
-        uf: body.uf || 'SC',
-        bairro: body.bairro || null,
-        endereco: body.endereco || null,
-        descricao: body.descricao || null,
-        status: body.status || 'lancamento',
-        dorms_min: body.dorms_min || null,
-        dorms_max: body.dorms_max || null,
-        area_min: body.area_min || null,
-        area_max: body.area_max || null,
-        preco_a_partir: body.preco_a_partir || null,
-        preco_min: body.preco_min || null,
-        destaque: body.destaque || false,
-        ativo: body.ativo !== undefined ? body.ativo : true,
-        publicado: body.publicado !== undefined ? body.publicado : true,
-      })
-      .select()
-      .single()
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 400 })
-    }
-
-    return NextResponse.json(data, { status: 201 })
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+  if (!empreendimentoData.slug && empreendimentoData.nome && empreendimentoData.cidade && empreendimentoData.uf) {
+    const base = `${empreendimentoData.nome} ${empreendimentoData.cidade} ${empreendimentoData.uf}`
+    empreendimentoData.slug = base
+      .toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '')
   }
+
+  const { data: emp, error: empError } = await supabase
+    .from('empreendimentos')
+    .insert(empreendimentoData)
+    .select()
+    .single()
+
+  if (empError) return NextResponse.json({ error: empError.message }, { status: 500 })
+
+  if (tipologias && tipologias.length > 0) {
+    const tiposData = tipologias.map((t: any) => ({ ...t, empreendimento_id: emp.id }))
+    await supabase.from('tipologias').insert(tiposData)
+  }
+
+  if (diferenciais && diferenciais.length > 0) {
+    const difData = diferenciais.map((d: any) => ({ ...d, empreendimento_id: emp.id }))
+    await supabase.from('diferenciais_empreendimento').insert(difData)
+  }
+
+  return NextResponse.json({ data: emp }, { status: 201 })
 }
