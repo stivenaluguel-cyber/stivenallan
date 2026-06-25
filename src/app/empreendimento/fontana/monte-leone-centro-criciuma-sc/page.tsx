@@ -1,379 +1,488 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 
-const C = {
-  bg: '#121315',
-  card: '#202327',
-  border: '#2c3035',
-  accent: '#c9a24b',
-  accent2: '#e2c275',
-  muted: '#a7adb4',
-  white: '#f1f3f5',
-  green: '#1f9d55',
-  greenHover: '#17773f',
-  danger: '#e63946',
+export const revalidate = 3600
+
+const WPP = 'https://api.whatsapp.com/send?phone=5548991455522&text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Monte%20Leone!'
+
+// Google Drive image helper
+const gd = (id: string, w = 1200) => `https://lh3.googleusercontent.com/d/${id}=w${w}`
+
+// Image IDs from Google Drive (Monte Leone)
+const IMG = {
+  fachadaFrontal: '1fMiRBzC7f5QjEWSWfrCf9ExxdjtBqsQw',
+  fachadaAngular: '1qTxY-6kI1MiToh9HKPQ7Gy4B3E17VOEs',
+  vooPassaro:    '1oXgD-F-4VuFNUmAIUzl8TTeKintea2t0',
+  piscina1:      '1qAe2EIqVS1pvCcvByVipcp7Qtyi1Wl1h',
+  piscina2:      '167seez0Pt30BKoXGEZNCN0Nx7potXKt5',
+  areaGourmet:   '1IbZsHWqT55sQy3vnEOC6EN60LUrj4DFt',
+  salaoFestas:   '1DwD8l2Fuz6jykw4S_b_oF1nubJAeUBBo',
+  living1:       '1cN-urMYTdZyD91iOBVTVH3IY43ZflCeW',
+  living2:       '1xbkDVtpM_LTGxwfDvafWWL99urH-SZfF',
+  suite:         '1Ho1yTZ2AQx5hvGV-YbmDqUJSFXZ019-X',
+  banheiro:      '1hpuLwJlhpuyXwGHRtpaWHefBb__whD5I',
+  hall:          '1MR5AdLgREy_ZnknnbNBhaQ027gRBNwQe',
+  lounge1:       '1PU5JZnVqRr2zIjylYXfs3EvOq-Wbsxd7',
+  deck1:         '1vM9NMNoNuLbWX4MjqoZ0oFb2DLLjBPUs',
+  playground:    '1T0yhEpnCMFmcX-OBpUxyVbJWUceHvhKt',
+  academiaExt:   '1_qP-mJQKB049pBC33kGxrQQHQjJTzvhE',
+  salaJogos:     '1lLgmjXGMcEdJC4FimZ0lGZIklAnd1EVH',
+  sacada:        '1mvRpHDHf9i6tRn9_2y59ph1sFIa2tvuB',
+  brinquedoteca: '1ZJy-vixChyH1ZzdoJYWuMFvHAvJVEm4V',
+  // plantas
+  planta1:       '1_Mi2tuLiJEb5PV3A2DBh3sJfE6o3PI1y',
+  planta2:       '11RRpaBbyBlAlm5fzLrunDr_YNDzrjndt',
+  planta3:       '13kdzMA6kJqJdEiZgtxacqsEogTqdoQhm',
+  plantaLazer:   '1RxvMPVCK-k95lKz8-jNb6aczB0IciCGv',
+  plantaGaragem: '1-paSD_GgaA7Hx4wfYah_rn20EZ9SDhdy',
 }
-
-const WPP = 'https://api.whatsapp.com/send?phone=5548991455522&text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Monte%20Leone%20Residencial!'
-
 export const metadata: Metadata = {
-  title: 'Monte Leone Residencial | Apartamento 4 Quartos Centro Criciúma SC | Stiven Allan Corretor',
-  description: 'Monte Leone Residencial: apartamentos de luxo 4 dormitórios (3 suítes), 230 a 253m², no Centro de Criciúma/SC. Lançamento Fontana. Vista para a Serra. Consultoria de Stiven Allan, CRECI/RS 60.275.',
-  keywords: ['Monte Leone Residencial', 'apartamento 4 quartos Centro Criciúma', 'lançamento Fontana Criciúma', 'apartamento de luxo Criciúma SC', 'imóvel Centro Criciúma', 'Stiven Allan corretor'],
+  title: 'Monte Leone Residencial | Apartamento 4 Quartos Centro Criciuma SC | Stiven Allan Corretor',
+  description: 'Monte Leone Residencial: apartamentos de luxo 4 dorm (3 suites), 230-253m2, 3 vagas, piscina climatizada. Lancamento no Centro de Criciuma/SC. Consulte Stiven Allan CRECI/RS 60.275.',
+  keywords: ['Monte Leone Residencial','apartamento 4 quartos Criciuma','lancamento Criciuma SC','apartamento 230m2 Criciuma','Construtora Fontana Criciuma','apartamento de luxo Criciuma','3 suites Criciuma','Stiven Allan corretor','CRECI RS 60275'],
   alternates: { canonical: 'https://stivenallan.vercel.app/empreendimento/fontana/monte-leone-centro-criciuma-sc' },
   openGraph: {
-    title: 'Monte Leone Residencial — Lançamento de Luxo no Centro de Criciúma/SC',
-    description: 'Apartamentos 4 dorm. (3 suítes), 230–253m², piscina climatizada, 3 vagas. Vista para a Serra. Consultoria exclusiva: Stiven Allan CRECI/RS 60.275.',
+    title: 'Monte Leone Residencial | 4 Dorm 253m2 | Lancamento Centro Criciuma',
+    description: 'Lancamento exclusivo no ponto mais alto do Centro de Criciuma. Vista para a Serra, 230-253m2, piscina climatizada.',
     url: 'https://stivenallan.vercel.app/empreendimento/fontana/monte-leone-centro-criciuma-sc',
-    type: 'website',
+    siteName: 'Stiven Allan Corretor',
     locale: 'pt_BR',
-    images: [{ url: 'https://estilofontana.com.br/wp-content/uploads/2024/08/monte-leone-hero.jpg', width: 1200, height: 630, alt: 'Monte Leone Residencial - Fachada' }],
+    type: 'website',
   },
 }
-
-const schemaLD = {
-  '@context': 'https://schema.org',
-  '@graph': [
-    {
-      '@type': 'RealEstateListing',
-      '@id': 'https://stivenallan.vercel.app/empreendimento/fontana/monte-leone-centro-criciuma-sc#listing',
-      name: 'Monte Leone Residencial',
-      description: 'Apartamentos de luxo 4 dormitórios (3 suítes), 230 a 253m², piscina climatizada, 3 vagas de garagem, reconhecimento facial, vista para a Serra. Lançamento Construtora Fontana no Centro de Criciúma/SC.',
-      url: 'https://stivenallan.vercel.app/empreendimento/fontana/monte-leone-centro-criciuma-sc',
-      address: {
-        '@type': 'PostalAddress',
-        streetAddress: 'Rua Hortêncio João da Silva, esquina Rua Antônio Baptista de Lucca, 98',
-        addressLocality: 'Criciúma',
-        addressRegion: 'SC',
-        postalCode: '88801-000',
-        addressCountry: 'BR',
-      },
-      numberOfRooms: 4,
-      floorSize: { '@type': 'QuantitativeValue', value: 230, maxValue: 253, unitCode: 'MTK' },
-      offers: { '@type': 'Offer', priceCurrency: 'BRL', availability: 'https://schema.org/InStock' },
-    },
-    {
-      '@type': 'BreadcrumbList',
-      itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Início', item: 'https://stivenallan.vercel.app' },
-        { '@type': 'ListItem', position: 2, name: 'Lançamentos Criciúma', item: 'https://stivenallan.vercel.app/lancamentos/criciuma-sc' },
-        { '@type': 'ListItem', position: 3, name: 'Monte Leone Residencial', item: 'https://stivenallan.vercel.app/empreendimento/fontana/monte-leone-centro-criciuma-sc' },
-      ],
-    },
-    {
-      '@type': 'FAQPage',
-      mainEntity: [
-        { '@type': 'Question', name: 'Qual o preço do Monte Leone Residencial?', acceptedAnswer: { '@type': 'Answer', text: 'O Monte Leone é um empreendimento premium. Consulte o corretor Stiven Allan para valores atualizados e condições de pagamento exclusivas.' } },
-        { '@type': 'Question', name: 'Onde fica o Monte Leone?', acceptedAnswer: { '@type': 'Answer', text: 'Rua Hortêncio João da Silva, esquina Rua Antônio Baptista de Lucca, 98 — Centro de Criciúma/SC.' } },
-        { '@type': 'Question', name: 'Quantas vagas de garagem tem o Monte Leone?', acceptedAnswer: { '@type': 'Answer', text: 'O Monte Leone conta com até 3 vagas de garagem por unidade.' } },
-        { '@type': 'Question', name: 'Posso usar FGTS para comprar no Monte Leone?', acceptedAnswer: { '@type': 'Answer', text: 'Sim, dependendo do valor do imóvel e do perfil do comprador o FGTS pode ser utilizado. Entre em contato com Stiven Allan para uma análise personalizada.' } },
-        { '@type': 'Question', name: 'Qual a construtora do Monte Leone?', acceptedAnswer: { '@type': 'Answer', text: 'O Monte Leone Residencial é um empreendimento da Construtora Fontana, com tradição em Criciúma e Santa Catarina.' } },
-      ],
-    },
-  ],
-}
-
 export default function MonteLeone() {
+  const schema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'RealEstateListing',
+        name: 'Monte Leone Residencial',
+        description: 'Lancamento de alto padrao no Centro de Criciuma/SC. Apartamentos 4 dormitorios (3 suites), 230-253m2, 3 vagas, piscina climatizada.',
+        url: 'https://stivenallan.vercel.app/empreendimento/fontana/monte-leone-centro-criciuma-sc',
+        image: `https://lh3.googleusercontent.com/d/1fMiRBzC7f5QjEWSWfrCf9ExxdjtBqsQw=w1200`,
+        address: { '@type': 'PostalAddress', streetAddress: 'Rua Conselheiro Joao Zancan, 193', addressLocality: 'Criciuma', addressRegion: 'SC', addressCountry: 'BR' },
+        offers: { '@type': 'Offer', availability: 'https://schema.org/InStock', priceCurrency: 'BRL' },
+      },
+      {
+        '@type': 'RealEstateAgent',
+        name: 'Stiven Allan',
+        telephone: '+5548991455522',
+        url: 'https://stivenallan.vercel.app',
+        address: { '@type': 'PostalAddress', addressLocality: 'Criciuma', addressRegion: 'SC' },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Inicio', item: 'https://stivenallan.vercel.app' },
+          { '@type': 'ListItem', position: 2, name: 'Lancamentos Criciuma', item: 'https://stivenallan.vercel.app/lancamentos/criciuma-sc' },
+          { '@type': 'ListItem', position: 3, name: 'Monte Leone Residencial' },
+        ],
+      },
+      {
+        '@type': 'FAQPage',
+        mainEntity: [
+          { '@type': 'Question', name: 'Qual o preco do Monte Leone?', acceptedAnswer: { '@type': 'Answer', text: 'Os valores e condicoes de pagamento variam conforme a unidade. Entre em contato com Stiven Allan CRECI/RS 60.275 pelo WhatsApp para receber a tabela atualizada.' } },
+          { '@type': 'Question', name: 'Quais as opcoes de planta do Monte Leone?', acceptedAnswer: { '@type': 'Answer', text: 'O Monte Leone oferece tres opcoes de planta: Tipo 01, Tipo 02 e Tipo 03, com areas de 230m2 a 253m2, todas com 4 dormitorios (3 suites) e 3 vagas de garagem.' } },
+          { '@type': 'Question', name: 'Onde fica o Monte Leone Residencial?', acceptedAnswer: { '@type': 'Answer', text: 'No Centro de Criciuma/SC, na Rua Conselheiro Joao Zancan, 193, no ponto mais alto do Centro, com vista permanente para a Serra.' } },
+          { '@type': 'Question', name: 'Qual o status do empreendimento?', acceptedAnswer: { '@type': 'Answer', text: 'Monte Leone esta em fase de lancamento com unidades disponiveis. A entrega esta prevista conforme cronograma da Construtora Fontana.' } },
+          { '@type': 'Question', name: 'Quais as areas de lazer?', acceptedAnswer: { '@type': 'Answer', text: 'Piscina climatizada com deck, academia interna e externa, area gourmet, salao de festas, sala de jogos, brinquedoteca e playground.' } },
+        ],
+      },
+    ],
+  }
+  const galeria = [
+    { id: '1fMiRBzC7f5QjEWSWfrCf9ExxdjtBqsQw', label: 'Fachada Frontal' },
+    { id: '1qTxY-6kI1MiToh9HKPQ7Gy4B3E17VOEs', label: 'Fachada Angular' },
+    { id: '1qAe2EIqVS1pvCcvByVipcp7Qtyi1Wl1h', label: 'Piscina Climatizada' },
+    { id: '1oXgD-F-4VuFNUmAIUzl8TTeKintea2t0', label: 'Vista Aerea' },
+    { id: '1cN-urMYTdZyD91iOBVTVH3IY43ZflCeW', label: 'Living' },
+    { id: '1Ho1yTZ2AQx5hvGV-YbmDqUJSFXZ019-X', label: 'Suite Master' },
+    { id: '1hpuLwJlhpuyXwGHRtpaWHefBb__whD5I', label: 'Banheiro Suite' },
+    { id: '1IbZsHWqT55sQy3vnEOC6EN60LUrj4DFt', label: 'Area Gourmet' },
+    { id: '1DwD8l2Fuz6jykw4S_b_oF1nubJAeUBBo', label: 'Salao de Festas' },
+    { id: '1MR5AdLgREy_ZnknnbNBhaQ027gRBNwQe', label: 'Hall de Entrada' },
+    { id: '1vM9NMNoNuLbWX4MjqoZ0oFb2DLLjBPUs', label: 'Deck' },
+    { id: '1mvRpHDHf9i6tRn9_2y59ph1sFIa2tvuB', label: 'Sacada' },
+    { id: '1_qP-mJQKB049pBC33kGxrQQHQjJTzvhE', label: 'Academia Externa' },
+    { id: '1PU5JZnVqRr2zIjylYXfs3EvOq-Wbsxd7', label: 'Lounge' },
+    { id: '1lLgmjXGMcEdJC4FimZ0lGZIklAnd1EVH', label: 'Sala de Jogos' },
+    { id: '1T0yhEpnCMFmcX-OBpUxyVbJWUceHvhKt', label: 'Playground' },
+    { id: '1ZJy-vixChyH1ZzdoJYWuMFvHAvJVEm4V', label: 'Brinquedoteca' },
+  ]
+
+  const plantas = [
+    { id: '1_Mi2tuLiJEb5PV3A2DBh3sJfE6o3PI1y', label: 'Tipo 01', area: '230m²', dorms: '4 dorm / 3 suites' },
+    { id: '11RRpaBbyBlAlm5fzLrunDr_YNDzrjndt', label: 'Tipo 02', area: '241m²', dorms: '4 dorm / 3 suites' },
+    { id: '13kdzMA6kJqJdEiZgtxacqsEogTqdoQhm', label: 'Tipo 03', area: '253m²', dorms: '4 dorm / 3 suites' },
+    { id: '1RxvMPVCK-k95lKz8-jNb6aczB0IciCGv', label: 'Pavimento Lazer', area: '3° Pav', dorms: 'Piscina · Deck · Academia' },
+    { id: '1-paSD_GgaA7Hx4wfYah_rn20EZ9SDhdy', label: 'Garagem', area: '2° Pav', dorms: '3 vagas / unidade' },
+  ]
+  const faq = [
+    { q: 'Qual o preco do Monte Leone?', a: 'Os valores variam por unidade e andar. Consulte Stiven Allan pelo WhatsApp para receber a tabela de vendas atualizada com todas as opcoes de pagamento.' },
+    { q: 'Quais sao as opcoes de planta?', a: 'Tres tipologias: Tipo 01 (230m²), Tipo 02 (241m²) e Tipo 03 (253m²). Todas com 4 dormitorios, 3 suites e 3 vagas de garagem.' },
+    { q: 'Onde fica o Monte Leone?', a: 'No Centro de Criciuma/SC, Rua Conselheiro Joao Zancan, 193. Ponto mais alto do centro, com vista permanente para a Serra catarinense.' },
+    { q: 'Qual o prazo de entrega?', a: 'Empreendimento em lancamento. Consulte o corretor Stiven Allan para informacoes atualizadas sobre cronograma de obras e entrega.' },
+    { q: 'Como visitar o stand?', a: 'Entre em contato via WhatsApp com Stiven Allan (CRECI/RS 60.275). Ele agenda uma apresentacao completa do empreendimento e do decorado.' },
+  ]
+
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaLD) }}
-      />
+      <script type='application/ld+json' dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
 
-      {/* SEÇÃO 0 — BARRA FLUTUANTE DE URGÊNCIA */}
-      <div style={{ background: C.danger, color: '#fff', textAlign: 'center', padding: '10px 16px', fontSize: '13px', fontWeight: 600, position: 'sticky', top: 0, zIndex: 100 }}>
-        🚨 Lançamento limitado — Unidades disponíveis.{' '}
-        <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ color: '#fff', textDecoration: 'underline' }}>
-          Garanta a sua →
-        </a>
+      {/* Urgency bar */}
+      <div style={{ background: '#e63946', color: '#fff', textAlign: 'center', padding: '10px 20px', fontSize: '13px', fontWeight: 600, letterSpacing: '0.5px', position: 'sticky', top: 0, zIndex: 50 }}>
+        LANCAMENTO — Unidades limitadas disponveis.&nbsp;
+        <a href={WPP} target='_blank' rel='noopener noreferrer' style={{ color: '#fff', textDecoration: 'underline' }}>Falar com corretor agora →</a>
       </div>
+      {/* HERO - full viewport com imagem real */}
+      <section style={{ position: 'relative', minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', overflow: 'hidden', background: '#0a0a0b' }}>
+        {/* Imagem de fundo real - fachada angular */}
+        <img
+          src={`https://lh3.googleusercontent.com/d/1qTxY-6kI1MiToh9HKPQ7Gy4B3E17VOEs=w1600`}
+          alt='Monte Leone Residencial - Fachada'
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', filter: 'brightness(0.55)' }}
+          loading='eager'
+        />
+        {/* Gradient overlay */}
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(10,10,11,0.2) 0%, rgba(10,10,11,0.1) 40%, rgba(10,10,11,0.75) 75%, rgba(10,10,11,0.97) 100%)' }} />
 
-      {/* SEÇÃO 1 — HERO */}
-      <section style={{ position: 'relative', minHeight: '100vh', background: '#0a0b0d', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '80px 24px 60px' }}>
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(18,19,21,0.85) 100%)', zIndex: 0 }} />
-        <div style={{ position: 'relative', zIndex: 1, maxWidth: '860px' }}>
-          <p style={{ color: C.accent, fontSize: '13px', fontWeight: 700, letterSpacing: '3px', textTransform: 'uppercase', marginBottom: '16px' }}>
-            Lançamento · Fontana · Centro – Criciúma/SC
+        {/* Badge superior esquerdo */}
+        <div style={{ position: 'absolute', top: 32, left: 32, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          <span style={{ background: '#c9a24b', color: '#0a0a0b', fontSize: '11px', fontWeight: 800, letterSpacing: '2px', padding: '6px 14px', textTransform: 'uppercase' }}>Lancamento</span>
+          <span style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(8px)', color: '#fff', fontSize: '11px', fontWeight: 600, letterSpacing: '1.5px', padding: '6px 14px', textTransform: 'uppercase', border: '1px solid rgba(255,255,255,0.2)' }}>Construtora Fontana</span>
+        </div>
+
+        {/* Conteudo hero */}
+        <div style={{ position: 'relative', zIndex: 2, padding: '0 32px 60px', maxWidth: 900 }}>
+          <p style={{ color: '#c9a24b', fontSize: '13px', letterSpacing: '3px', textTransform: 'uppercase', fontWeight: 600, marginBottom: 16 }}>Centro · Criciuma/SC</p>
+          <h1 style={{ color: '#fff', fontSize: 'clamp(3rem, 8vw, 7rem)', fontWeight: 900, lineHeight: 1, margin: '0 0 8px', letterSpacing: '-2px' }}>Monte Leone</h1>
+          <h2 style={{ color: '#c9a24b', fontSize: 'clamp(1.8rem, 4vw, 3.5rem)', fontWeight: 300, lineHeight: 1, margin: '0 0 32px', letterSpacing: '-1px', fontStyle: 'italic' }}>Residencial</h2>
+          <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: 'clamp(1rem, 2vw, 1.25rem)', maxWidth: 560, lineHeight: 1.6, marginBottom: 40 }}>
+            O ponto mais alto do Centro. Vista permanente para a Serra. 4 dormitorios, 230–253m², piscina climatizada.
           </p>
-          <h1 style={{ fontSize: 'clamp(2.2rem, 6vw, 4.5rem)', fontWeight: 900, color: C.white, lineHeight: 1.05, marginBottom: '20px', letterSpacing: '-1px' }}>
-            Monte Leone<br />
-            <span style={{ color: C.accent }}>Residencial</span>
-          </h1>
-          <p style={{ fontSize: 'clamp(1rem, 2.5vw, 1.3rem)', color: C.muted, maxWidth: '600px', margin: '0 auto 40px' }}>
-            O ponto mais alto do Centro de Criciúma. Vista permanente para a Serra. 4 dormitórios, 230–253m², piscina climatizada.
-          </p>
-          <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href={WPP} target="_blank" rel="noopener noreferrer"
-              style={{ background: C.green, color: '#fff', padding: '16px 36px', borderRadius: '8px', fontWeight: 700, fontSize: '16px', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-              📲 Quero Conhecer
+          {/* CTAs */}
+          <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 48 }}>
+            <a href={WPP} target='_blank' rel='noopener noreferrer' style={{ background: '#1f9d55', color: '#fff', padding: '16px 36px', fontWeight: 700, fontSize: '15px', textDecoration: 'none', letterSpacing: '0.5px' }}>
+              Quero conhecer →
             </a>
-            <a href="#diferenciais"
-              style={{ background: 'transparent', color: C.accent, padding: '16px 36px', borderRadius: '8px', fontWeight: 700, fontSize: '16px', textDecoration: 'none', border: `2px solid ${C.accent}` }}>
-              Ver Detalhes ↓
+            <a href='#galeria' style={{ background: 'transparent', color: '#fff', padding: '16px 36px', fontWeight: 600, fontSize: '15px', textDecoration: 'none', border: '1.5px solid rgba(255,255,255,0.5)', letterSpacing: '0.5px' }}>
+              Ver fotos
             </a>
           </div>
+          {/* Stats bar */}
+          <div style={{ display: 'flex', gap: 0, borderTop: '1px solid rgba(255,255,255,0.15)', paddingTop: 24 }}>
+            {[['4', 'Dormitorios'],['3', 'Suites'],['253m²', 'Ate'],['3', 'Vagas']].map(([v, l], i) => (
+              <div key={i} style={{ flex: 1, borderRight: i < 3 ? '1px solid rgba(255,255,255,0.12)' : 'none', paddingRight: 24, marginRight: 24 }}>
+                <div style={{ color: '#c9a24b', fontSize: 'clamp(1.5rem, 3vw, 2.5rem)', fontWeight: 800, lineHeight: 1 }}>{v}</div>
+                <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '11px', letterSpacing: '2px', textTransform: 'uppercase', marginTop: 4 }}>{l}</div>
+              </div>
+            ))}
+          </div>
         </div>
-        {/* Barra de números */}
-        <div style={{ position: 'relative', zIndex: 1, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1px', background: C.border, borderRadius: '12px', overflow: 'hidden', marginTop: '60px', width: '100%', maxWidth: '760px' }}>
-          {[
-            { n: '4', d: 'Dormitórios' },
-            { n: '3', d: 'Suítes' },
-            { n: '253m²', d: 'Área Privativa' },
-            { n: '3', d: 'Vagas Garagem' },
-          ].map((i) => (
-            <div key={i.d} style={{ background: C.card, padding: '24px 16px', textAlign: 'center' }}>
-              <div style={{ fontSize: '1.8rem', fontWeight: 800, color: C.accent }}>{i.n}</div>
-              <div style={{ fontSize: '12px', color: C.muted, marginTop: '4px' }}>{i.d}</div>
+      </section>
+      {/* GALERIA - scroll horizontal */}
+      <section id='galeria' style={{ background: '#0a0a0b', paddingTop: 0 }}>
+        <div style={{ overflowX: 'auto', display: 'flex', gap: 4, scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch' }}>
+          {galeria.map((item, i) => (
+            <div key={i} style={{ flex: '0 0 auto', width: 'clamp(280px, 33vw, 440px)', height: 'clamp(200px, 25vw, 320px)', position: 'relative', scrollSnapAlign: 'start', overflow: 'hidden' }}>
+              <img
+                src={`https://lh3.googleusercontent.com/d/${item.id}=w800`}
+                alt={item.label}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform 0.4s ease' }}
+                loading={i < 3 ? 'eager' : 'lazy'}
+              />
+              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(transparent, rgba(0,0,0,0.7)', padding: '32px 16px 12px' }}>
+                <span style={{ color: '#fff', fontSize: '12px', fontWeight: 500, letterSpacing: '0.5px' }}>{item.label}</span>
+              </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* SEÇÃO 2 — APRESENTAÇÃO DO CONCEITO */}
-      <section style={{ background: C.bg, padding: '80px 24px' }}>
-        <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
-          <p style={{ color: C.accent, fontSize: '12px', letterSpacing: '3px', textTransform: 'uppercase', fontWeight: 700, marginBottom: '16px' }}>O Empreendimento</p>
-          <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 3rem)', fontWeight: 800, color: C.white, marginBottom: '24px', lineHeight: 1.15 }}>
-            Magnífico por essência.
-          </h2>
-          <p style={{ color: C.muted, fontSize: '1.1rem', lineHeight: 1.8 }}>
-            Na altura dos seus sonhos, o Monte Leone é um reflexo do estilo de quem valoriza o que há de mais raro — o tempo de qualidade, o espaço para contemplar e a liberdade para viver plenamente. Uma joia arquitetônica lapidada para brilhar no coração nobre de Criciúma, com vista deslumbrante para a Serra que emoldura cada unidade.
-          </p>
-          <p style={{ color: C.muted, fontSize: '1.1rem', lineHeight: 1.8, marginTop: '16px' }}>
-            Mais do que um empreendimento, o Monte Leone é um legado — um símbolo de sofisticação, exclusividade e permanência no endereço mais desejado de Criciúma.
-          </p>
-        </div>
-      </section>
-
-      {/* SEÇÃO 3 — TIPOLOGIAS */}
-      <section id="plantas" style={{ background: '#0e1012', padding: '80px 24px' }}>
-        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-            <p style={{ color: C.accent, fontSize: '12px', letterSpacing: '3px', textTransform: 'uppercase', fontWeight: 700, marginBottom: '12px' }}>Plantas & Tipologias</p>
-            <h2 style={{ fontSize: 'clamp(1.6rem, 3.5vw, 2.5rem)', fontWeight: 800, color: C.white }}>Espaço que eleva o padrão de viver</h2>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
-            {[
-              { tipo: 'Apartamento Padrão', area: '230m²', quartos: '4 dorm. (3 suítes)', vagas: '1 a 3 vagas', descricao: 'Living integrado, sacada ampla com guarda-corpo em vidro, suíte master com banheira de imersão.' },
-              { tipo: 'Apartamento Plus', area: '253m²', quartos: '4 dorm. (3 suítes)', vagas: '3 vagas', descricao: 'Planta personalizável, lavabo, forro da sacada em madeira natural, churrasqueira com exaustor.' },
-            ].map((p) => (
-              <div key={p.tipo} style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: '12px', padding: '32px', position: 'relative', overflow: 'hidden' }}>
-                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: `linear-gradient(90deg, ${C.accent}, ${C.accent2})` }} />
-                <div style={{ display: 'inline-block', background: 'rgba(201,162,75,0.15)', color: C.accent, padding: '4px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: 700, marginBottom: '16px' }}>{p.tipo}</div>
-                <div style={{ fontSize: '2.5rem', fontWeight: 900, color: C.accent, marginBottom: '8px' }}>{p.area}</div>
-                <div style={{ color: C.white, fontWeight: 600, marginBottom: '4px' }}>{p.quartos}</div>
-                <div style={{ color: C.muted, fontSize: '14px', marginBottom: '16px' }}>{p.vagas}</div>
-                <p style={{ color: C.muted, fontSize: '14px', lineHeight: 1.7 }}>{p.descricao}</p>
-              </div>
-            ))}
-          </div>
-          <p style={{ textAlign: 'center', color: C.muted, fontSize: '14px', marginTop: '24px' }}>
-            Possibilidade de personalização de planta • Consulte disponibilidade
-          </p>
-        </div>
-      </section>
-
-      {/* SEÇÃO 4 — DIFERENCIAIS E LAZER */}
-      <section id="diferenciais" style={{ background: C.bg, padding: '80px 24px' }}>
-        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-            <p style={{ color: C.accent, fontSize: '12px', letterSpacing: '3px', textTransform: 'uppercase', fontWeight: 700, marginBottom: '12px' }}>Diferenciais & Lazer</p>
-            <h2 style={{ fontSize: 'clamp(1.6rem, 3.5vw, 2.5rem)', fontWeight: 800, color: C.white }}>Sinta o sublime em cada detalhe</h2>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
-            {[
-              { icon: '🏊', label: 'Piscina Climatizada' },
-              { icon: '🏋️', label: 'Academia Interna' },
-              { icon: '🎮', label: 'Sala de Jogos' },
-              { icon: '🎉', label: 'Salão de Festas' },
-              { icon: '🌳', label: 'Terraço Externo' },
-              { icon: '🧒', label: 'Brinquedoteca' },
-              { icon: '🛗', label: '3 Elevadores' },
-              { icon: '🔐', label: 'Reconhecimento Facial' },
-              { icon: '⚡', label: 'Gerador de Energia' },
-              { icon: '📦', label: 'Espaço Delivery' },
-              { icon: '🚗', label: 'Garagem Epóxi' },
-              { icon: '🍖', label: 'Churrasqueira com Exaustor' },
-            ].map((d) => (
-              <div key={d.label} style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: '10px', padding: '20px 16px', textAlign: 'center' }}>
-                <div style={{ fontSize: '28px', marginBottom: '10px' }}>{d.icon}</div>
-                <div style={{ color: C.white, fontSize: '13px', fontWeight: 600 }}>{d.label}</div>
-              </div>
-            ))}
-          </div>
-          {/* Diferenciais internos */}
-          <div style={{ marginTop: '48px', background: C.card, border: `1px solid ${C.border}`, borderRadius: '12px', padding: '32px' }}>
-            <h3 style={{ color: C.accent, fontWeight: 700, marginBottom: '20px', fontSize: '16px', letterSpacing: '1px', textTransform: 'uppercase' }}>Acabamentos Premium</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '10px' }}>
-              {[
-                'Porcelanato retificado', 'Rebaixo em gesso', 'Fechadura digital', 'Pé-direito duplo no hall',
-                'Banheira de imersão (suíte master)', 'Parede dupla entre apartamentos', 'Nicho nos banheiros',
-                'Forro da sacada em madeira natural', 'Janela com peitoril em vidro', 'Espera para aspiração central',
-                'Automação de persianas', 'Som integrado', 'Recirculação de água quente', 'Toalheiro aquecido',
-              ].map((item) => (
-                <div key={item} style={{ display: 'flex', alignItems: 'center', gap: '8px', color: C.muted, fontSize: '14px' }}>
-                  <span style={{ color: C.accent, fontWeight: 700 }}>✓</span> {item}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* SEÇÃO 5 — LOCALIZAÇÃO */}
-      <section id="localizacao" style={{ background: '#0e1012', padding: '80px 24px' }}>
-        <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '48px', alignItems: 'center' }}>
+      {/* CONCEITO */}
+      <section style={{ background: '#0f1012', padding: '100px 32px' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center' }}>
           <div>
-            <p style={{ color: C.accent, fontSize: '12px', letterSpacing: '3px', textTransform: 'uppercase', fontWeight: 700, marginBottom: '12px' }}>Localização</p>
-            <h2 style={{ fontSize: 'clamp(1.6rem, 3.5vw, 2.5rem)', fontWeight: 800, color: C.white, marginBottom: '20px' }}>
-              O endereço dos que transformam a vida em arte
+            <p style={{ color: '#c9a24b', fontSize: '11px', letterSpacing: '4px', textTransform: 'uppercase', fontWeight: 600, marginBottom: 24 }}>O Empreendimento</p>
+            <h2 style={{ color: '#f1f3f5', fontSize: 'clamp(2rem, 4vw, 3.5rem)', fontWeight: 800, lineHeight: 1.1, margin: '0 0 28px', letterSpacing: '-1px' }}>
+              Magnifico<br /><span style={{ color: '#c9a24b', fontStyle: 'italic', fontWeight: 300 }}>por essencia.</span>
             </h2>
-            <p style={{ color: C.muted, lineHeight: 1.8, marginBottom: '24px' }}>
-              Rua Hortêncio João da Silva, esquina Rua Antônio Baptista de Lucca, 98 — Centro, Criciúma/SC.
+            <p style={{ color: '#a7adb4', fontSize: '17px', lineHeight: 1.8, marginBottom: 20 }}>
+              No ponto mais alto do Centro de Criciuma, o Monte Leone Residencial ergue-se como simbolo de exclusividade e sofisticacao. Vista permanente para a Serra catarinense, arquitetura assinada e acabamentos de alto padrao.
             </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {[
-                { icon: '🏫', text: 'Escolas e universidades a 5 min a pé' },
-                { icon: '🛒', text: 'Shopping e comércio no entorno imediato' },
-                { icon: '🏥', text: 'Hospitais e clínicas nas proximidades' },
-                { icon: '🚌', text: 'Eixo principal de mobilidade urbana' },
-                { icon: '🌄', text: 'Vista permanente para a Serra catarinense' },
-              ].map((l) => (
-                <div key={l.text} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', color: C.muted, fontSize: '14px' }}>
-                  <span style={{ fontSize: '18px', marginTop: '1px' }}>{l.icon}</span>
-                  <span>{l.text}</span>
-                </div>
-              ))}
-            </div>
-            <a href={`https://www.google.com/maps/search/?api=1&query=Rua+Hortêncio+João+da+Silva+98+Criciúma+SC`} target="_blank" rel="noopener noreferrer"
-              style={{ display: 'inline-block', marginTop: '24px', background: 'transparent', color: C.accent, border: `2px solid ${C.accent}`, padding: '12px 24px', borderRadius: '8px', fontWeight: 700, fontSize: '14px', textDecoration: 'none' }}>
-              Ver no Google Maps →
+            <p style={{ color: '#a7adb4', fontSize: '17px', lineHeight: 1.8, marginBottom: 36 }}>
+              Apenas unidades por andar, garantindo privacidade absoluta. Piscina climatizada, academia completa e areas de convivencia que transformam cada dia em experiencia premium.
+            </p>
+            <a href={WPP} target='_blank' rel='noopener noreferrer' style={{ display: 'inline-block', background: '#c9a24b', color: '#0a0a0b', padding: '14px 32px', fontWeight: 700, fontSize: '14px', textDecoration: 'none', letterSpacing: '1px', textTransform: 'uppercase' }}>
+              Agendar visita
             </a>
           </div>
-          <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: '12px', overflow: 'hidden', height: '340px' }}>
-            <iframe
-              title="Localização Monte Leone Residencial"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3550.07!2d-49.3706!3d-28.6773!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjjCsDQwJzM4LjMiUyA0OcKwMjInMTQuMiJX!5e0!3m2!1spt-BR!2sbr!4v1700000000000"
-              width="100%" height="100%" style={{ border: 0 }} loading="lazy" referrerPolicy="no-referrer-when-downgrade"
+          <div style={{ position: 'relative' }}>
+            <img
+              src='https://lh3.googleusercontent.com/d/1qAe2EIqVS1pvCcvByVipcp7Qtyi1Wl1h=w900'
+              alt='Piscina climatizada Monte Leone'
+              style={{ width: '100%', aspectRatio: '4/5', objectFit: 'cover', display: 'block' }}
+              loading='lazy'
             />
-          </div>
-        </div>
-      </section>
-
-      {/* SEÇÃO 6 — SOBRE O CORRETOR */}
-      <section style={{ background: C.bg, padding: '80px 24px' }}>
-        <div style={{ maxWidth: '900px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '48px', alignItems: 'center' }}>
-          <div style={{ background: C.card, border: `2px solid ${C.accent}`, borderRadius: '12px', padding: '32px', textAlign: 'center' }}>
-            <div style={{ width: '90px', height: '90px', background: `linear-gradient(135deg, ${C.accent}, ${C.accent2})`, borderRadius: '50%', margin: '0 auto 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '36px' }}>🏡</div>
-            <h3 style={{ color: C.white, fontWeight: 800, fontSize: '1.3rem', marginBottom: '4px' }}>Stiven Allan</h3>
-            <p style={{ color: C.accent, fontSize: '12px', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase' }}>CRECI/RS 60.275</p>
-          </div>
-          <div>
-            <p style={{ color: C.accent, fontSize: '12px', letterSpacing: '3px', textTransform: 'uppercase', fontWeight: 700, marginBottom: '12px' }}>Seu Corretor</p>
-            <h2 style={{ fontSize: 'clamp(1.4rem, 3vw, 2rem)', fontWeight: 800, color: C.white, marginBottom: '16px' }}>
-              Especialista em lançamentos Fontana em Criciúma
-            </h2>
-            <p style={{ color: C.muted, lineHeight: 1.8, marginBottom: '24px' }}>
-              Com mais de 8 anos de atuação no mercado imobiliário de Criciúma e região, Stiven Allan é especialista em lançamentos de construtoras premium. Assessoria completa: simulação, documentação, financiamento e acompanhamento até a entrega das chaves.
-            </p>
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-              <a href={WPP} target="_blank" rel="noopener noreferrer"
-                style={{ background: C.green, color: '#fff', padding: '14px 28px', borderRadius: '8px', fontWeight: 700, fontSize: '15px', textDecoration: 'none' }}>
-                📲 Falar no WhatsApp
-              </a>
-              <Link href="/" style={{ background: 'transparent', color: C.accent, border: `2px solid ${C.accent}`, padding: '14px 28px', borderRadius: '8px', fontWeight: 700, fontSize: '15px', textDecoration: 'none', display: 'inline-block' }}>
-                Ver outros empreendimentos
-              </Link>
+            <div style={{ position: 'absolute', bottom: -24, left: -24, background: '#c9a24b', padding: '20px 24px', maxWidth: 200 }}>
+              <div style={{ fontSize: '28px', fontWeight: 900, color: '#0a0a0b', lineHeight: 1 }}>253m²</div>
+              <div style={{ fontSize: '12px', color: '#0a0a0b', opacity: 0.7, marginTop: 4 }}>ate (Tipo Plus)</div>
             </div>
           </div>
         </div>
       </section>
-
-      {/* SEÇÃO 7 — FORMULÁRIO DE CAPTAÇÃO */}
-      <section id="contato" style={{ background: '#0e1012', padding: '80px 24px' }}>
-        <div style={{ maxWidth: '600px', margin: '0 auto', textAlign: 'center' }}>
-          <p style={{ color: C.accent, fontSize: '12px', letterSpacing: '3px', textTransform: 'uppercase', fontWeight: 700, marginBottom: '12px' }}>Fale com o Corretor</p>
-          <h2 style={{ fontSize: 'clamp(1.6rem, 3.5vw, 2.5rem)', fontWeight: 800, color: C.white, marginBottom: '12px' }}>
-            Receba informações exclusivas
-          </h2>
-          <p style={{ color: C.muted, marginBottom: '36px' }}>
-            Tabela de preços, plantas, condições especiais e simulação de financiamento — sem compromisso.
-          </p>
-          <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: '16px', padding: '36px', textAlign: 'left' }}>
-            <div style={{ display: 'grid', gap: '16px' }}>
-              <input type="text" placeholder="Seu nome completo" aria-label="Nome"
-                style={{ background: '#1a1d21', border: `1px solid ${C.border}`, borderRadius: '8px', padding: '14px 16px', color: C.white, fontSize: '15px', width: '100%', boxSizing: 'border-box', outline: 'none' }} />
-              <input type="tel" placeholder="WhatsApp (com DDD)" aria-label="WhatsApp"
-                style={{ background: '#1a1d21', border: `1px solid ${C.border}`, borderRadius: '8px', padding: '14px 16px', color: C.white, fontSize: '15px', width: '100%', boxSizing: 'border-box', outline: 'none' }} />
-              <select aria-label="Interesse"
-                style={{ background: '#1a1d21', border: `1px solid ${C.border}`, borderRadius: '8px', padding: '14px 16px', color: C.muted, fontSize: '15px', width: '100%', boxSizing: 'border-box', outline: 'none' }}>
-                <option value="">Qual seu interesse?</option>
-                <option value="compra">Compra para morar</option>
-                <option value="investimento">Investimento</option>
-                <option value="info">Só quero informações</option>
-              </select>
-              <a href={WPP} target="_blank" rel="noopener noreferrer"
-                style={{ background: C.green, color: '#fff', padding: '16px', borderRadius: '8px', fontWeight: 700, fontSize: '16px', textDecoration: 'none', textAlign: 'center', display: 'block' }}>
-                📲 Enviar pelo WhatsApp
-              </a>
-            </div>
+      {/* PLANTAS */}
+      <section id='plantas' style={{ background: '#121315', padding: '100px 32px' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div style={{ marginBottom: 60 }}>
+            <p style={{ color: '#c9a24b', fontSize: '11px', letterSpacing: '4px', textTransform: 'uppercase', fontWeight: 600, marginBottom: 16 }}>Plantas e Tipologias</p>
+            <h2 style={{ color: '#f1f3f5', fontSize: 'clamp(1.8rem, 3vw, 2.8rem)', fontWeight: 800, margin: 0, letterSpacing: '-0.5px' }}>Escolha seu apartamento ideal</h2>
           </div>
-        </div>
-      </section>
-
-      {/* SEÇÃO 8 — FAQ */}
-      <section id="faq" style={{ background: C.bg, padding: '80px 24px' }}>
-        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-            <p style={{ color: C.accent, fontSize: '12px', letterSpacing: '3px', textTransform: 'uppercase', fontWeight: 700, marginBottom: '12px' }}>FAQ</p>
-            <h2 style={{ fontSize: 'clamp(1.6rem, 3.5vw, 2.5rem)', fontWeight: 800, color: C.white }}>Perguntas Frequentes</h2>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {[
-              { q: 'Qual o preço do Monte Leone Residencial?', a: 'O Monte Leone é um empreendimento premium com preços sob consulta. Entre em contato com Stiven Allan para receber a tabela atualizada e as melhores condições de pagamento.' },
-              { q: 'Onde fica o Monte Leone?', a: 'Rua Hortêncio João da Silva, esquina com Rua Antônio Baptista de Lucca, nº 98 — Centro de Criciúma/SC. Localização nobre com vista para a Serra.' },
-              { q: 'Quantas vagas de garagem tem?', a: 'O empreendimento oferece de 1 a 3 vagas de garagem por unidade, com piso em epóxi.' },
-              { q: 'Posso usar FGTS?', a: 'Dependendo do valor e do perfil, o FGTS pode ser utilizado como parte do pagamento. Stiven Allan realiza análise gratuita.' },
-              { q: 'Qual a construtora responsável?', a: 'Construtora Fontana, tradição em Santa Catarina com dezenas de empreendimentos entregues em Criciúma, Içara, Joinville e litoral catarinense.' },
-            ].map((item, i) => (
-              <div key={i} style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: '10px', padding: '24px' }}>
-                <h3 style={{ color: C.white, fontWeight: 700, marginBottom: '10px', fontSize: '15px' }}>❓ {item.q}</h3>
-                <p style={{ color: C.muted, lineHeight: 1.7, fontSize: '14px' }}>{item.a}</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 2 }}>
+            {plantas.map((p, i) => (
+              <div key={i} style={{ background: '#0f1012', overflow: 'hidden', position: 'relative' }}>
+                <div style={{ aspectRatio: '4/3', overflow: 'hidden', background: '#1a1c20' }}>
+                  <img
+                    src={`https://lh3.googleusercontent.com/d/${p.id}=w700`}
+                    alt={`Planta ${p.label} - Monte Leone`}
+                    style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '20px', background: '#fff' }}
+                    loading='lazy'
+                  />
+                </div>
+                <div style={{ padding: '24px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div>
+                      <h3 style={{ color: '#f1f3f5', fontSize: '18px', fontWeight: 700, margin: '0 0 6px' }}>{p.label}</h3>
+                      <p style={{ color: '#a7adb4', fontSize: '13px', margin: 0 }}>{p.dorms}</p>
+                    </div>
+                    <span style={{ background: '#c9a24b', color: '#0a0a0b', padding: '6px 14px', fontSize: '14px', fontWeight: 800 }}>{p.area}</span>
+                  </div>
+                  <a href={WPP} target='_blank' rel='noopener noreferrer' style={{ display: 'block', marginTop: 16, color: '#c9a24b', fontSize: '13px', fontWeight: 600, textDecoration: 'none', letterSpacing: '0.5px' }}>
+                    Consultar preco desta planta →
+                  </a>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
-
-      {/* SEÇÃO 9 — CTA FINAL */}
-      <section style={{ background: `linear-gradient(135deg, #0e1012 0%, #1a1d21 100%)`, padding: '80px 24px', textAlign: 'center', borderTop: `1px solid ${C.border}` }}>
-        <div style={{ maxWidth: '700px', margin: '0 auto' }}>
-          <div style={{ width: '64px', height: '64px', background: `linear-gradient(135deg, ${C.accent}, ${C.accent2})`, borderRadius: '16px', margin: '0 auto 24px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px' }}>🏔️</div>
-          <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 3rem)', fontWeight: 900, color: C.white, marginBottom: '16px' }}>
-            Monte Leone está te esperando
-          </h2>
-          <p style={{ color: C.muted, fontSize: '1.1rem', lineHeight: 1.7, marginBottom: '36px' }}>
-            Unidades limitadas. Lançamento exclusivo no Centro de Criciúma. Não perca a oportunidade de garantir o seu apartamento com as melhores condições.
-          </p>
-          <a href={WPP} target="_blank" rel="noopener noreferrer"
-            style={{ background: C.green, color: '#fff', padding: '18px 48px', borderRadius: '10px', fontWeight: 800, fontSize: '18px', textDecoration: 'none', display: 'inline-block' }}>
-            📲 Falar com Stiven Allan agora
-          </a>
-          <p style={{ color: C.muted, fontSize: '13px', marginTop: '16px' }}>
-            CRECI/RS 60.275 · Criciúma e Região · SC
-          </p>
+      {/* DIFERENCIAIS com foto real */}
+      <section style={{ background: '#0f1012', padding: '100px 32px' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'start' }}>
+            <div>
+              <p style={{ color: '#c9a24b', fontSize: '11px', letterSpacing: '4px', textTransform: 'uppercase', fontWeight: 600, marginBottom: 16 }}>Infraestrutura</p>
+              <h2 style={{ color: '#f1f3f5', fontSize: 'clamp(1.8rem, 3vw, 2.8rem)', fontWeight: 800, margin: '0 0 48px', letterSpacing: '-0.5px' }}>Lazer e Diferenciais</h2>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 }}>
+                {[
+                  ['Piscina climatizada',''],
+                  ['Deck com solarium',''],
+                  ['Academia interna',''],
+                  ['Academia externa',''],
+                  ['Area gourmet',''],
+                  ['Salao de festas',''],
+                  ['Sala de jogos',''],
+                  ['Brinquedoteca',''],
+                  ['Playground',''],
+                  ['Lounge social',''],
+                  ['Hall privativo',''],
+                  ['3 vagas garagem',''],
+                ].map(([label], i) => (
+                  <div key={i} style={{ padding: '16px 0', borderBottom: '1px solid #1e2024', display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <span style={{ color: '#c9a24b', fontSize: '16px' }}>—</span>
+                    <span style={{ color: '#f1f3f5', fontSize: '14px', fontWeight: 500 }}>{label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
+              <img src='https://lh3.googleusercontent.com/d/1IbZsHWqT55sQy3vnEOC6EN60LUrj4DFt=w600' alt='Area Gourmet' style={{ width: '100%', aspectRatio: '1', objectFit: 'cover' }} loading='lazy' />
+              <img src='https://lh3.googleusercontent.com/d/1DwD8l2Fuz6jykw4S_b_oF1nubJAeUBBo=w600' alt='Salao de Festas' style={{ width: '100%', aspectRatio: '1', objectFit: 'cover' }} loading='lazy' />
+              <img src='https://lh3.googleusercontent.com/d/1lLgmjXGMcEdJC4FimZ0lGZIklAnd1EVH=w600' alt='Sala de Jogos' style={{ width: '100%', aspectRatio: '1', objectFit: 'cover' }} loading='lazy' />
+              <img src='https://lh3.googleusercontent.com/d/1_qP-mJQKB049pBC33kGxrQQHQjJTzvhE=w600' alt='Academia' style={{ width: '100%', aspectRatio: '1', objectFit: 'cover' }} loading='lazy' />
+            </div>
+          </div>
+        </div>
+      </section>
+      {/* ACABAMENTOS */}
+      <section style={{ background: '#121315', padding: '100px 32px' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center' }}>
+          <div>
+            <img src='https://lh3.googleusercontent.com/d/1Ho1yTZ2AQx5hvGV-YbmDqUJSFXZ019-X=w900' alt='Suite Master Monte Leone' style={{ width: '100%', aspectRatio: '4/5', objectFit: 'cover', display: 'block' }} loading='lazy' />
+          </div>
+          <div>
+            <p style={{ color: '#c9a24b', fontSize: '11px', letterSpacing: '4px', textTransform: 'uppercase', fontWeight: 600, marginBottom: 16 }}>Qualidade</p>
+            <h2 style={{ color: '#f1f3f5', fontSize: 'clamp(1.8rem, 3vw, 2.8rem)', fontWeight: 800, margin: '0 0 12px', letterSpacing: '-0.5px' }}>Acabamentos Premium</h2>
+            <p style={{ color: '#a7adb4', fontSize: '15px', lineHeight: 1.7, marginBottom: 40 }}>Cada detalhe projetado para um nivel de vida superior. Materiais selecionados e tecnologia aplicada a cada metro quadrado.</p>
+            <div>
+              {[
+                'Porcelanato retificado nas areas sociais',
+                'Cozinha com armarios planejados',
+                'Bancadas em granito ou quartzo',
+                'Suites com closet integrado',
+                'Banheiros com louças de alto padrao',
+                'Varanda com esquadria de aluminio',
+                'Ar-condicionado pre-instalado',
+                'Tomadas USB em todos os ambientes',
+                'Interfone digital com video',
+                'Elevadores de ultima geracao',
+                'Gerador para areas comuns',
+                'Sistema de seguranca 24h',
+              ].map((item, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 0', borderBottom: '1px solid #1e2024' }}>
+                  <span style={{ color: '#c9a24b', fontWeight: 700, fontSize: '16px', flexShrink: 0 }}>✓</span>
+                  <span style={{ color: '#f1f3f5', fontSize: '14px' }}>{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+      {/* LOCALIZACAO */}
+      <section style={{ background: '#0f1012', padding: '100px 32px' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <p style={{ color: '#c9a24b', fontSize: '11px', letterSpacing: '4px', textTransform: 'uppercase', fontWeight: 600, marginBottom: 16 }}>Onde fica</p>
+          <h2 style={{ color: '#f1f3f5', fontSize: 'clamp(1.8rem, 3vw, 2.8rem)', fontWeight: 800, margin: '0 0 48px', letterSpacing: '-0.5px' }}>Localizacao privilegiada</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40 }}>
+            <div>
+              <p style={{ color: '#a7adb4', fontSize: '15px', lineHeight: 1.7, marginBottom: 32 }}>
+                <strong style={{ color: '#f1f3f5' }}>Rua Conselheiro Joao Zancan, 193</strong><br />
+                Centro · Criciuma/SC
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 32 }}>
+                {[
+                  ['5 min', 'Shopping Della'],
+                  ['5 min', 'Hospital Sao Jose'],
+                  ['8 min', 'UNESC'],
+                  ['10 min', 'Rodoviaria'],
+                  ['10 min', 'Forum'],
+                  ['15 min', 'Aeroporto Diomicio Freitas'],
+                ].map(([tempo, local]) => (
+                  <div key={local} style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                    <span style={{ background: '#c9a24b', color: '#0a0a0b', padding: '4px 10px', fontSize: '12px', fontWeight: 700, flexShrink: 0 }}>{tempo}</span>
+                    <span style={{ color: '#f1f3f5', fontSize: '14px' }}>{local}</span>
+                  </div>
+                ))}
+              </div>
+              <a href='https://maps.google.com/?q=Rua+Conselheiro+Joao+Zancan+193+Criciuma+SC' target='_blank' rel='noopener noreferrer' style={{ color: '#c9a24b', fontSize: '13px', fontWeight: 600, textDecoration: 'none', letterSpacing: '0.5px' }}>
+                Abrir no Google Maps →
+              </a>
+            </div>
+            <div>
+              <iframe
+                src='https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3535.5!2d-49.3712!3d-28.6803!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjjCsDQwJzQ5LjEiUyA0OcKwMjInMTYuMyJX!5e0!3m2!1spt-BR!2sbr!4v1234567890'
+                width='100%'
+                height='360'
+                style={{ border: 0, display: 'block' }}
+                allowFullScreen
+                loading='lazy'
+                referrerPolicy='no-referrer-when-downgrade'
+                title='Localizacao Monte Leone Criciuma'
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+      {/* CORRETOR */}
+      <section style={{ background: '#121315', padding: '80px 32px' }}>
+        <div style={{ maxWidth: 800, margin: '0 auto' }}>
+          <div style={{ display: 'flex', gap: 40, alignItems: 'center' }}>
+            <div style={{ flexShrink: 0, width: 120, height: 120, borderRadius: '50%', overflow: 'hidden', border: '3px solid #c9a24b' }}>
+              <div style={{ width: '100%', height: '100%', background: '#202327', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '40px' }}>SA</div>
+            </div>
+            <div style={{ flex: 1 }}>
+              <p style={{ color: '#c9a24b', fontSize: '11px', letterSpacing: '3px', textTransform: 'uppercase', fontWeight: 600, marginBottom: 8 }}>Seu Corretor</p>
+              <h3 style={{ color: '#f1f3f5', fontSize: '28px', fontWeight: 800, margin: '0 0 4px' }}>Stiven Allan</h3>
+              <p style={{ color: '#a7adb4', fontSize: '14px', marginBottom: 16 }}>CRECI/RS 60.275 · Especialista em Lancamentos · Criciuma/SC</p>
+              <p style={{ color: '#a7adb4', fontSize: '15px', lineHeight: 1.7, marginBottom: 24 }}>
+                Corretor de imoveis especializado em lancamentos de construtoras na regiao de Criciuma. Atendimento personalizado, transparencia e suporte completo do primeiro contato ate a entrega das chaves.
+              </p>
+              <a href={WPP} target='_blank' rel='noopener noreferrer' style={{ display: 'inline-flex', alignItems: 'center', gap: 10, background: '#1f9d55', color: '#fff', padding: '14px 28px', fontWeight: 700, fontSize: '14px', textDecoration: 'none' }}>
+                Falar com Stiven no WhatsApp
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+      {/* FORMULARIO */}
+      <section id='contato' style={{ background: '#0f1012', padding: '100px 32px' }}>
+        <div style={{ maxWidth: 640, margin: '0 auto', textAlign: 'center' }}>
+          <p style={{ color: '#c9a24b', fontSize: '11px', letterSpacing: '4px', textTransform: 'uppercase', fontWeight: 600, marginBottom: 16 }}>Solicite informacoes</p>
+          <h2 style={{ color: '#f1f3f5', fontSize: 'clamp(1.8rem, 3vw, 2.5rem)', fontWeight: 800, margin: '0 0 16px', letterSpacing: '-0.5px' }}>Quero saber mais sobre o Monte Leone</h2>
+          <p style={{ color: '#a7adb4', fontSize: '15px', lineHeight: 1.7, marginBottom: 48 }}>Preencha o formulario e Stiven Allan entra em contato via WhatsApp com tabela de precos e disponibilidade de unidades.</p>
+          <form
+            action={WPP}
+            method='get'
+            target='_blank'
+            onSubmit={(e) => {
+              e.preventDefault()
+              const nome = (e.currentTarget.elements.namedItem('nome') as HTMLInputElement)?.value
+              const tel = (e.currentTarget.elements.namedItem('tel') as HTMLInputElement)?.value
+              const planta = (e.currentTarget.elements.namedItem('planta') as HTMLSelectElement)?.value
+              const msg = encodeURIComponent(`Ola Stiven, me chamo ${nome}. Tenho interesse no Monte Leone Residencial. Planta preferida: ${planta}. Meu whatsapp: ${tel}`)
+              window.open(`https://api.whatsapp.com/send?phone=5548991455522&text=${msg}`, '_blank')
+            }}
+            style={{ display: 'flex', flexDirection: 'column', gap: 16, textAlign: 'left' }}
+          >
+            <input name='nome' type='text' placeholder='Seu nome completo' required style={{ background: '#202327', border: '1px solid #2c3035', color: '#f1f3f5', padding: '16px 20px', fontSize: '15px', outline: 'none', width: '100%', boxSizing: 'border-box' }} />
+            <input name='tel' type='tel' placeholder='Seu WhatsApp (com DDD)' required style={{ background: '#202327', border: '1px solid #2c3035', color: '#f1f3f5', padding: '16px 20px', fontSize: '15px', outline: 'none', width: '100%', boxSizing: 'border-box' }} />
+            <select name='planta' style={{ background: '#202327', border: '1px solid #2c3035', color: '#a7adb4', padding: '16px 20px', fontSize: '15px', outline: 'none', width: '100%', boxSizing: 'border-box' }}>
+              <option value='Qualquer'>Todas as opcoes</option>
+              <option value='Tipo 01 - 230m2'>Tipo 01 — 230m²</option>
+              <option value='Tipo 02 - 241m2'>Tipo 02 — 241m²</option>
+              <option value='Tipo 03 - 253m2'>Tipo 03 — 253m²</option>
+            </select>
+            <button type='submit' style={{ background: '#1f9d55', color: '#fff', padding: '18px', fontWeight: 800, fontSize: '16px', border: 'none', cursor: 'pointer', letterSpacing: '0.5px' }}>
+              Enviar pelo WhatsApp →
+            </button>
+          </form>
+          <p style={{ color: '#4a5568', fontSize: '12px', marginTop: 16 }}>Stiven Allan — CRECI/RS 60.275 · Nao compartilhamos seus dados.</p>
+        </div>
+      </section>
+      {/* FAQ */}
+      <section style={{ background: '#121315', padding: '100px 32px' }}>
+        <div style={{ maxWidth: 800, margin: '0 auto' }}>
+          <p style={{ color: '#c9a24b', fontSize: '11px', letterSpacing: '4px', textTransform: 'uppercase', fontWeight: 600, marginBottom: 16 }}>Duvidas frequentes</p>
+          <h2 style={{ color: '#f1f3f5', fontSize: 'clamp(1.8rem, 3vw, 2.5rem)', fontWeight: 800, margin: '0 0 48px', letterSpacing: '-0.5px' }}>Perguntas frequentes</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+            {faq.map((item, i) => (
+              <details key={i} style={{ borderBottom: '1px solid #1e2024', paddingBottom: 0 }}>
+                <summary style={{ color: '#f1f3f5', fontSize: '16px', fontWeight: 600, padding: '20px 0', cursor: 'pointer', listStyle: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  {item.q}
+                  <span style={{ color: '#c9a24b', fontSize: '20px', flexShrink: 0, marginLeft: 16 }}>+</span>
+                </summary>
+                <p style={{ color: '#a7adb4', fontSize: '15px', lineHeight: 1.7, padding: '0 0 20px', margin: 0 }}>{item.a}</p>
+              </details>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* BREADCRUMB NAVEGAÇÃO */}
-      <nav aria-label="Breadcrumb" style={{ background: '#0a0b0d', padding: '12px 24px', borderTop: `1px solid ${C.border}` }}>
-        <ol style={{ display: 'flex', gap: '8px', listStyle: 'none', margin: 0, padding: 0, flexWrap: 'wrap', maxWidth: '1100px', marginLeft: 'auto', marginRight: 'auto' }}>
-          <li><Link href="/" style={{ color: C.muted, fontSize: '13px', textDecoration: 'none' }}>Início</Link></li>
-          <li style={{ color: C.border }}>›</li>
-          <li><Link href="/lancamentos/criciuma-sc" style={{ color: C.muted, fontSize: '13px', textDecoration: 'none' }}>Lançamentos Criciúma</Link></li>
-          <li style={{ color: C.border }}>›</li>
-          <li><span style={{ color: C.accent, fontSize: '13px', fontWeight: 600 }}>Monte Leone Residencial</span></li>
+      {/* CTA FINAL */}
+      <section style={{ position: 'relative', padding: '120px 32px', overflow: 'hidden', background: '#0a0a0b' }}>
+        <img src='https://lh3.googleusercontent.com/d/1oXgD-F-4VuFNUmAIUzl8TTeKintea2t0=w1600' alt='Monte Leone Criciuma vista aerea' style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.3)', objectPosition: 'center' }} loading='lazy' />
+        <div style={{ position: 'relative', zIndex: 2, maxWidth: 700, margin: '0 auto', textAlign: 'center' }}>
+          <p style={{ color: '#c9a24b', fontSize: '11px', letterSpacing: '4px', textTransform: 'uppercase', fontWeight: 600, marginBottom: 24 }}>Ainda tem duvidas?</p>
+          <h2 style={{ color: '#fff', fontSize: 'clamp(2rem, 5vw, 4rem)', fontWeight: 900, margin: '0 0 24px', lineHeight: 1.1, letterSpacing: '-1px' }}>
+            Monte Leone<br /><span style={{ color: '#c9a24b', fontStyle: 'italic', fontWeight: 300 }}>esta te esperando.</span>
+          </h2>
+          <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '17px', lineHeight: 1.7, marginBottom: 40 }}>
+            Unidades limitadas. Fale agora com Stiven Allan e garanta sua reserva sem compromisso.
+          </p>
+          <a href={WPP} target='_blank' rel='noopener noreferrer' style={{ display: 'inline-block', background: '#1f9d55', color: '#fff', padding: '20px 48px', fontWeight: 800, fontSize: '18px', textDecoration: 'none', letterSpacing: '0.5px' }}>
+            Falar com Stiven Allan agora
+          </a>
+          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px', marginTop: 20 }}>CRECI/RS 60.275 · Atendimento via WhatsApp</p>
+        </div>
+      </section>
+
+      {/* BREADCRUMB */}
+      <nav aria-label='Breadcrumb' style={{ background: '#0a0a0b', padding: '16px 32px', borderTop: '1px solid #1e2024' }}>
+        <ol style={{ display: 'flex', gap: 8, listStyle: 'none', margin: 0, padding: 0, flexWrap: 'wrap' }}>
+          <li><a href='/' style={{ color: '#a7adb4', fontSize: '13px', textDecoration: 'none' }}>Inicio</a></li>
+          <li style={{ color: '#4a5568' }}>/</li>
+          <li><a href='/lancamentos/criciuma-sc' style={{ color: '#a7adb4', fontSize: '13px', textDecoration: 'none' }}>Lancamentos Criciuma</a></li>
+          <li style={{ color: '#4a5568' }}>/</li>
+          <li style={{ color: '#c9a24b', fontSize: '13px', fontWeight: 600 }}>Monte Leone Residencial</li>
         </ol>
       </nav>
     </>
