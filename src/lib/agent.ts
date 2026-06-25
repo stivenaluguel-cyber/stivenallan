@@ -21,6 +21,7 @@ function getSupabase(): ReturnType<typeof createClient> {
   }
   return _supabase
 }
+
 // ============================================
 // SYSTEM PROMPT MASTER - Allan IA
 // ============================================
@@ -48,7 +49,7 @@ FLUXO DE QUALIFICACAO (1 pergunta por vez, natural como conversa real)
 ESCALADA PARA STIVEN - chame atualizar_lead(requer_atencao=true) quando:
 - Lead pede desconto ou condicao especial
 - Lead compara com concorrente ou ja tem proposta
-- Lead diz 'estou quase decidindo' ou similar
+- Lead diz estou quase decidindo ou similar
 - Lead pede para falar com o corretor
 - Lead investe acima de R$ 2 milhoes
 - Sentimento negativo persistente (2+ mensagens)
@@ -71,21 +72,28 @@ CORRETOR
 Nome: Stiven Allan | CRECI/RS 60.275 | WhatsApp: +55 48 99145-5522
 Atendimento humano: Seg-Sab 8h-20h
 `
+
 // ============================================
 // TOOL DEFINITIONS
 // ============================================
 const tools: OpenAI.Chat.ChatCompletionTool[] = [
   { type: 'function', function: { name: 'buscar_empreendimentos', description: 'Busca empreendimentos compativeis com o perfil do lead no banco', parameters: { type: 'object', properties: { orcamento_max: { type: 'number' }, dormitorios_min: { type: 'number' }, cidade: { type: 'string' }, status_obra: { type: 'string', enum: ['lancamento','em_obras','pronto'] } } } } },
-  { type: 'function', function: { name: 'atualizar_lead', description: 'Atualiza perfil, estagio e score do lead', parameters: { type: 'object', required: ['lead_id'], properties: { lead_id: { type: 'string' }, nome: { type: 'string' }, perfil: { type: 'string', enum: ['investidor','moradia_propria','ambos','indefinido'] }, orcamento_min: { type: 'number' }, orcamento_max: { type: 'number' }, prazo_compra: { type: 'string' }, estagio: { type: 'string', enum: ['novo','qualificado','interessado','visita_agendada','proposta','negociacao','fechado','perdido','nurturing'] }, lead_score: { type: 'number' }, requer_atencao: { type: 'boolean' }, motivacao: { type: 'string' } } } } },
+  { type: 'function', function: { name: 'atualizar_lead', description: 'Atualiza perfil, estagio e score do lead. Use estagio_funil para mover no pipeline kanban.', parameters: { type: 'object', required: ['lead_id'], properties: { lead_id: { type: 'string' }, nome: { type: 'string' }, perfil: { type: 'string', enum: ['investidor','moradia_propria','ambos','indefinido'] }, orcamento_min: { type: 'number' }, orcamento_max: { type: 'number' }, prazo_compra: { type: 'string' }, estagio_funil: { type: 'string', enum: ['primeiro_contato','qualificado','interessado','visita_agendada','proposta_enviada','negociacao','fechado','perdido','nurturing'] }, lead_score: { type: 'number' }, requer_atencao: { type: 'boolean' }, motivacao: { type: 'string' } } } } },
   { type: 'function', function: { name: 'criar_agendamento', description: 'Registra visita ou reuniao confirmada', parameters: { type: 'object', required: ['lead_id','empreendimento_id','data_hora'], properties: { lead_id: { type: 'string' }, empreendimento_id: { type: 'string' }, data_hora: { type: 'string' }, tipo: { type: 'string', enum: ['visita','videochamada','reuniao'] }, observacoes: { type: 'string' } } } } },
 ]
+
 // ============================================
 // TOOL EXECUTOR
 // ============================================
 async function executarFerramenta(nome: string, args: Record<string, unknown>) {
   const supabase = getSupabase()
+
   if (nome === 'buscar_empreendimentos') {
-    let query = supabase.from('empreendimentos').select('id, nome, slug, cidade, bairro, status_obra, preco_a_partir_de, landing_page_url, descricao_curta, tipologias(dormitorios, suites, area_privativa_m2, preco_a_partir_de), construtoras(nome), diferenciais_empreendimento(descricao)').eq('status_venda', 'ativo').limit(3) as any
+    let query = supabase
+      .from('empreendimentos')
+      .select('id, nome, slug, cidade, bairro, status_obra, preco_a_partir_de, landing_page_url, descricao_curta, tipologias(dormitorios, suites, area_privativa_m2, preco_a_partir_de), construtoras(nome), diferenciais_empreendimento(descricao)')
+      .eq('status_venda', 'ativo')
+      .limit(3) as any
     if (args.orcamento_max) query = query.lte('preco_a_partir_de', args.orcamento_max)
     if (args.cidade) query = query.ilike('cidade', '%' + args.cidade + '%')
     if (args.status_obra) query = query.eq('status_obra', args.status_obra)
@@ -93,18 +101,25 @@ async function executarFerramenta(nome: string, args: Record<string, unknown>) {
     if (error) return { erro: error.message }
     return data ?? []
   }
+
   if (nome === 'atualizar_lead') {
     const { lead_id, ...updates } = args
-    const { error } = await supabase.from('leads').update({ ...updates, ultimo_contato: new Date().toISOString() }).eq('id', lead_id)
+    const { error } = await supabase
+      .from('leads')
+      .update({ ...updates, ultimo_contato: new Date().toISOString() })
+      .eq('id', lead_id)
     return error ? { erro: error.message } : { ok: true }
   }
+
   if (nome === 'criar_agendamento') {
     const { data, error } = await supabase.from('agendamentos').insert(args).select().single() as any
-    if (!error) await supabase.from('leads').update({ estagio: 'visita_agendada' }).eq('id', args.lead_id)
+    if (!error) await supabase.from('leads').update({ estagio_funil: 'visita_agendada' }).eq('id', args.lead_id)
     return error ? { erro: (error as any).message } : data
   }
+
   return { erro: 'Ferramenta nao encontrada' }
 }
+
 // ============================================
 // MAIN: PROCESSAR MENSAGEM
 // ============================================
@@ -112,11 +127,23 @@ export async function processarMensagem(whatsapp: string, texto: string): Promis
   const openai = getOpenAI()
   const supabase = getSupabase()
 
-  const { data: lead } = await supabase
+  let lead: any = null
+  const { data: existingLead } = await supabase
     .from('leads')
-    .upsert({ whatsapp }, { onConflict: 'whatsapp' })
-    .select()
-    .single() as any
+    .select('*')
+    .eq('whatsapp', whatsapp)
+    .single()
+
+  if (existingLead) {
+    lead = existingLead
+  } else {
+    const { data: newLead } = await supabase
+      .from('leads')
+      .insert({ whatsapp, estagio_funil: 'primeiro_contato', lead_score: 0, origem: 'whatsapp' })
+      .select()
+      .single()
+    lead = newLead
+  }
 
   if (!lead) throw new Error('Falha ao criar/buscar lead')
 
@@ -134,11 +161,17 @@ export async function processarMensagem(whatsapp: string, texto: string): Promis
       content: m.mensagem,
     }))
 
-  await supabase.from('interacoes').insert({ lead_id: lead.id, canal: 'whatsapp', direcao: 'entrada', mensagem: texto, processado_por_ia: true })
+  await supabase.from('interacoes').insert({
+    lead_id: lead.id,
+    canal: 'whatsapp',
+    direcao: 'entrada',
+    mensagem: texto,
+    processado_por_ia: true,
+  })
 
   const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
     { role: 'system', content: SYSTEM_PROMPT },
-    { role: 'system', content: 'CONTEXTO DO LEAD:\n' + JSON.stringify({ id: lead.id, nome: lead.nome, perfil: lead.perfil, estagio: lead.estagio, lead_score: lead.lead_score, orcamento_max: lead.orcamento_max }) },
+    { role: 'system', content: 'CONTEXTO DO LEAD: ' + JSON.stringify({ id: lead.id, nome: lead.nome, perfil: lead.perfil, estagio_funil: lead.estagio_funil, lead_score: lead.lead_score, orcamento_max: lead.orcamento_max }) },
     ...mensagensHistorico,
     { role: 'user', content: texto },
   ]
@@ -159,7 +192,13 @@ export async function processarMensagem(whatsapp: string, texto: string): Promis
 
   if (!resposta) resposta = 'Desculpe, tive um problema tecnico. Tente novamente em instantes.'
 
-  await supabase.from('interacoes').insert({ lead_id: lead.id, canal: 'whatsapp', direcao: 'saida', mensagem: resposta, processado_por_ia: true })
+  await supabase.from('interacoes').insert({
+    lead_id: lead.id,
+    canal: 'whatsapp',
+    direcao: 'saida',
+    mensagem: resposta,
+    processado_por_ia: true,
+  })
 
   return resposta
 }
