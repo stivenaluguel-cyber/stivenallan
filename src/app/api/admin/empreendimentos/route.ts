@@ -12,7 +12,7 @@ function getSupabase() {
   )
 }
 
-async function checkAuth(request: NextRequest) {
+async function checkAuth() {
   const cookieStore = await cookies()
   const token = cookieStore.get('dashboard_token')?.value
   if (!token) return false
@@ -26,15 +26,16 @@ async function checkAuth(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  const auth = await checkAuth(request)
+  const auth = await checkAuth()
   if (!auth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const supabase = getSupabase()
   const { data, error } = await supabase
     .from('empreendimentos')
     .select(`
       id, nome, construtora, cidade, uf, slug, status_obra, status_venda,
-      descricao_curta, preco_a_partir, whatsapp, created_at,
-      tipologias(id, dormitorios, suites, vagas, area_privativa_m2, preco_a_partir_de),
+      descricao_curta, preco_a_partir, preco_a_partir_de, whatsapp, imagens_urls, video_url,
+      bairro, endereco, descricao_completa, created_at,
+      tipologias(id, dormitorios, suites, vagas, area_privativa_m2, area_total_m2, preco_a_partir_de, preco_ate),
       diferenciais_empreendimento(id, icone, descricao, categoria)
     `)
     .order('created_at', { ascending: false })
@@ -43,13 +44,19 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const auth = await checkAuth(request)
+  const auth = await checkAuth()
   if (!auth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const body = await request.json()
   const supabase = getSupabase()
 
   const { tipologias, diferenciais, ...empreendimentoData } = body
 
+  // Normaliza campo de preço
+  if (empreendimentoData.preco_a_partir && !empreendimentoData.preco_a_partir_de) {
+    empreendimentoData.preco_a_partir_de = empreendimentoData.preco_a_partir
+  }
+
+  // Gera slug automaticamente se não fornecido
   if (!empreendimentoData.slug && empreendimentoData.nome && empreendimentoData.cidade && empreendimentoData.uf) {
     const base = `${empreendimentoData.nome} ${empreendimentoData.cidade} ${empreendimentoData.uf}`
     empreendimentoData.slug = base
@@ -67,11 +74,13 @@ export async function POST(request: NextRequest) {
 
   if (empError) return NextResponse.json({ error: empError.message }, { status: 500 })
 
+  // Insere tipologias
   if (tipologias && tipologias.length > 0) {
     const tiposData = tipologias.map((t: any) => ({ ...t, empreendimento_id: emp.id }))
     await supabase.from('tipologias').insert(tiposData)
   }
 
+  // Insere diferenciais
   if (diferenciais && diferenciais.length > 0) {
     const difData = diferenciais.map((d: any) => ({ ...d, empreendimento_id: emp.id }))
     await supabase.from('diferenciais_empreendimento').insert(difData)
