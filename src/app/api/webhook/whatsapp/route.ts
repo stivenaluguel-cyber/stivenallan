@@ -2,21 +2,26 @@ import { NextRequest, NextResponse } from 'next/server'
 import { processarMensagem } from '@/lib/agent'
 import { enviarMensagem, enviarAlertaEscalada } from '@/lib/evolution'
 
-// Segredo para validar que o POST vem da Evolution API
+export const dynamic = 'force-dynamic'
+
 const WEBHOOK_SECRET = process.env.EVOLUTION_WEBHOOK_SECRET
+const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY
 
 export async function POST(req: NextRequest) {
   try {
-    // 1. Validar segredo
     const secret = req.headers.get('apikey')
-    if (WEBHOOK_SECRET && secret !== WEBHOOK_SECRET) {
-      return NextResponse.json({ erro: 'Nao autorizado' }, { status: 401 })
+    console.log('[webhook] apikey recebido:', secret?.substring(0, 30))
+
+    // Aceita token da instancia OU api key global da Evolution
+    if (WEBHOOK_SECRET && EVOLUTION_API_KEY) {
+      if (secret !== WEBHOOK_SECRET && secret !== EVOLUTION_API_KEY) {
+        console.log('[webhook] 401 nao autorizado. Recebido:', secret?.substring(0, 30))
+        return NextResponse.json({ erro: 'Nao autorizado' }, { status: 401 })
+      }
     }
 
     const body = await req.json()
 
-    // 2. Filtrar apenas mensagens recebidas de usuarios reais
-    // Evolution API envia evento 'messages.upsert'
     if (body.event !== 'messages.upsert') {
       return NextResponse.json({ ok: true, ignorado: true })
     }
@@ -24,13 +29,11 @@ export async function POST(req: NextRequest) {
     const msg = body.data?.message
     const from = body.data?.key?.remoteJid
 
-    // Ignorar mensagens do proprio bot, grupos e status
     if (!msg || !from) return NextResponse.json({ ok: true })
     if (body.data?.key?.fromMe) return NextResponse.json({ ok: true })
-    if (from.includes('@g.us')) return NextResponse.json({ ok: true })  // grupo
+    if (from.includes('@g.us')) return NextResponse.json({ ok: true })
     if (from === 'status@broadcast') return NextResponse.json({ ok: true })
 
-    // 3. Extrair texto (suporte a texto simples e botoes)
     const texto =
       msg.conversation ||
       msg.extendedTextMessage?.text ||
@@ -40,11 +43,9 @@ export async function POST(req: NextRequest) {
 
     if (!texto.trim()) return NextResponse.json({ ok: true })
 
-    // 4. Normalizar numero (remover @s.whatsapp.net)
     const whatsapp = from.replace('@s.whatsapp.net', '')
+    console.log('[webhook] msg de:', whatsapp, '|', texto.substring(0, 50))
 
-    // 5. Processar com o agente (async — nao bloqueia o webhook)
-    // Retornar 200 imediatamente para a Evolution API nao reenviar
     processarEResponder(whatsapp, texto).catch(console.error)
 
     return NextResponse.json({ ok: true })
@@ -57,15 +58,9 @@ export async function POST(req: NextRequest) {
 
 async function processarEResponder(whatsapp: string, texto: string) {
   try {
-    // Processar com o agente
     const resposta = await processarMensagem(whatsapp, texto)
-
-    // Enviar resposta via Evolution API
     await enviarMensagem(whatsapp, resposta)
 
-    // Verificar se precisa de alerta de escalada
-    // (o agente ja atualiza requer_atencao no banco via tool call)
-    // Aqui consultamos o banco para disparar notificacao se necessario
     const { createClient } = await import('@supabase/supabase-js')
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -80,7 +75,6 @@ async function processarEResponder(whatsapp: string, texto: string) {
 
     if (lead?.requer_atencao) {
       await enviarAlertaEscalada(whatsapp, lead.nome, lead.lead_score)
-      // Resetar flag para nao reenviar multiplos alertas
       await supabase
         .from('leads')
         .update({ requer_atencao: false })
