@@ -73,7 +73,9 @@ export default async function DashboardPage() {
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <a href="/dashboard/empreendimentos" style={{ background: D.bronze, color: '#fff', padding: '8px 16px', borderRadius: 2, fontWeight: 700, fontSize: 13, textDecoration: 'none', letterSpacing: '0.02em' }}>Empreendimentos</a>
+            <a href="/dashboard/crm" style={{ background: D.bronze, color: '#fff', padding: '8px 16px', borderRadius: 2, fontWeight: 700, fontSize: 13, textDecoration: 'none', letterSpacing: '0.02em' }}>CRM</a>
+            <a href="/dashboard/clientes" style={{ color: D.onDarkMuted, textDecoration: 'none', fontSize: 13 }}>Clientes</a>
+            <a href="/dashboard/empreendimentos" style={{ color: D.onDarkMuted, textDecoration: 'none', fontSize: 13 }}>Empreendimentos</a>
             <a href="/dashboard/leads" style={{ color: D.onDarkMuted, textDecoration: 'none', fontSize: 13 }}>Leads</a>
             <div style={{ fontSize: 12, color: D.onDarkMuted }}>{new Date().toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'short' })}</div>
           </div>
@@ -122,7 +124,10 @@ export default async function DashboardPage() {
 
           {/* KANBAN */}
           <div>
-            <div style={{ fontFamily: "'Bricolage Grotesque',system-ui,sans-serif", fontSize: 16, fontWeight: 700, marginBottom: 14, color: D.ink }}>Pipeline de Leads</div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+              <div style={{ fontFamily: "'Bricolage Grotesque',system-ui,sans-serif", fontSize: 16, fontWeight: 700, color: D.ink }}>Pipeline de Leads</div>
+              <a href="/dashboard/crm" style={{ color: D.bronze, textDecoration: 'none', fontSize: 13, fontWeight: 600 }}>Ver CRM completo →</a>
+            </div>
             <div style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 12 }}>
               {leadsByEstagio.map(col => (
                 <div key={col.key} style={{ minWidth: 200, flex: '0 0 200px' }}>
@@ -214,4 +219,4 @@ export default async function DashboardPage() {
       </div>
     </div>
   )
-}
+      }
