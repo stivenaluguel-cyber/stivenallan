@@ -1,94 +1,57 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSupabaseAdmin } from '@/lib/supabase'
+import { cookies } from 'next/headers'
+import { jwtVerify } from 'jose'
+import { createClient } from '@supabase/supabase-js'
 
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const { id } = await params
-  const supabase = getSupabaseAdmin()
-  if (!supabase) return NextResponse.json({ error: 'Serviço indisponível' }, { status: 503 })
-
-  const { data, error } = await supabase
-    .from('leads')
-    .select('*, empreendimentos(nome, slug, cidade)')
-    .eq('id', id)
-    .single()
-
-  if (error || !data) {
-    return NextResponse.json({ error: 'Lead não encontrado' }, { status: 404 })
-  }
-
-  return NextResponse.json(data)
+export const dynamic = 'force-dynamic'
+const sb = () => createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+async function auth() {
+  const s = await cookies(); const t = s.get('dashboard_token')?.value; if (!t) return false
+  try { await jwtVerify(t, new TextEncoder().encode(process.env.JWT_SECRET!)); return true } catch { return false }
 }
 
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const { id } = await params
-  const supabase = getSupabaseAdmin()
-  if (!supabase) return NextResponse.json({ error: 'Serviço indisponível' }, { status: 503 })
+type Params = { params: Promise<{ id: string }> }
 
+export async function GET(_req: NextRequest, { params }: Params) {
+  if (!await auth()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const { id } = await params
+  const { data, error } = await sb().from('leads').select('*, empreendimentos(nome, slug), leads_interacoes(*)').eq('id', id).single()
+  if (error || !data) return NextResponse.json({ error: 'Lead nao encontrado' }, { status: 404 })
+  return NextResponse.json({ data })
+}
+
+export async function PUT(req: NextRequest, { params }: Params) {
+  if (!await auth()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const { id } = await params
   const body = await req.json()
-
-  const allowedFields = ['status', 'anotacoes', 'atendido_em']
-  const updateData: Record<string, unknown> = {}
-
-  for (const field of allowedFields) {
-    if (field in body) {
-      updateData[field] = body[field]
+  body.updated_at = new Date().toISOString()
+  if (body.estagio_funil) {
+    const { data: lead } = await sb().from('leads').select('estagio_funil').eq('id', id).single()
+    if (lead && lead.estagio_funil !== body.estagio_funil) {
+      await sb().from('leads_interacoes').insert({ lead_id: id, tipo: 'status_change', descricao: 'Movido de ' + lead.estagio_funil + ' para ' + body.estagio_funil, estagio_de: lead.estagio_funil, estagio_para: body.estagio_funil })
     }
   }
-
-  if (Object.keys(updateData).length === 0) {
-    return NextResponse.json({ error: 'Nenhum campo para atualizar' }, { status: 400 })
-  }
-
-  updateData.updated_at = new Date().toISOString()
-
-  if (body.status && body.status !== 'novo' && !updateData.atendido_em) {
-    const { data: existing } = await supabase
-      .from('leads')
-      .select('status, atendido_em')
-      .eq('id', id)
-      .single()
-
-    if (existing && existing.status === 'novo' && !existing.atendido_em) {
-      updateData.atendido_em = new Date().toISOString()
-    }
-  }
-
-  const { data, error } = await supabase
-    .from('leads')
-    .update(updateData)
-    .eq('id', id)
-    .select()
-    .single()
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
-  }
-
-  return NextResponse.json(data)
+  const { data, error } = await sb().from('leads').update(body).eq('id', id).select().single()
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  return NextResponse.json({ data })
 }
 
-export async function DELETE(
-  _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(req: NextRequest, { params }: Params) {
+  if (!await auth()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const { id } = await params
-  const supabase = getSupabaseAdmin()
-  if (!supabase) return NextResponse.json({ error: 'Serviço indisponível' }, { status: 503 })
+  const body = await req.json()
+  const allowed = ['estagio_funil','lead_score','requer_atencao','notas','temperatura','kanban_ordem']
+  const update: Record<string, unknown> = { updated_at: new Date().toISOString() }
+  for (const k of allowed) { if (k in body) update[k] = body[k] }
+  const { data, error } = await sb().from('leads').update(update).eq('id', id).select().single()
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  return NextResponse.json({ data })
+}
 
-  const { error } = await supabase
-    .from('leads')
-    .delete()
-    .eq('id', id)
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
-  }
-
+export async function DELETE(_req: NextRequest, { params }: Params) {
+  if (!await auth()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const { id } = await params
+  const { error } = await sb().from('leads').delete().eq('id', id)
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ success: true })
 }
