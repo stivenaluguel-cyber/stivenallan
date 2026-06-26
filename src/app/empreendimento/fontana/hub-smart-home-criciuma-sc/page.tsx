@@ -1,28 +1,18 @@
 import type { Metadata } from 'next'
-import Image from 'next/image'
+import { c, font, ui } from '@/lib/theme'
+import Simulador from '@/components/Simulador'
 
 export const revalidate = 3600
+
+const WHATSAPP = 'https://api.whatsapp.com/send?phone=5548991455522&text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Hub%20Smart%20Home!'
 
 export const metadata: Metadata = {
   title: 'Hub Smart Home | Apartamentos Inteligentes Centro Criciúma SC | Stiven Allan',
   description: 'Hub Smart Home em Criciúma SC — Apartamentos com automação residencial, design contemporâneo e localização privilegiada no Centro. Fontana Construtora. Consulte Stiven Allan CRECI/RS 60.275.',
-  keywords: [
-    'Hub Smart Home Criciúma',
-    'apartamento smart home Criciúma',
-    'automação residencial Criciúma SC',
-    'apartamento inteligente Criciúma',
-    'Fontana Construtora Criciúma',
-    'lançamento imobiliário Criciúma centro',
-    'comprar apartamento Criciúma SC',
-    'Stiven Allan corretor Criciúma',
-    'imóvel novo Centro Criciúma',
-    'Hub Smart Home lançamento',
-  ],
+  keywords: ['Hub Smart Home Criciúma','apartamento smart home Criciúma','automação residencial Criciúma SC','apartamento inteligente Criciúma','Fontana Construtora Criciúma','lançamento imobiliário Criciúma centro','comprar apartamento Criciúma SC','Stiven Allan corretor Criciúma','imóvel novo Centro Criciúma','Hub Smart Home lançamento'],
   authors: [{ name: 'Stiven Allan', url: 'https://stivenallan.vercel.app' }],
   creator: 'Stiven Allan — CRECI/RS 60.275',
-  alternates: {
-    canonical: 'https://stivenallan.vercel.app/empreendimento/fontana/hub-smart-home-criciuma-sc',
-  },
+  alternates: { canonical: 'https://stivenallan.vercel.app/empreendimento/fontana/hub-smart-home-criciuma-sc' },
   openGraph: {
     title: 'Hub Smart Home | Apartamentos Inteligentes em Criciúma SC',
     description: 'Tecnologia e conforto integrados. Hub Smart Home oferece apartamentos com automação residencial completa no coração de Criciúma.',
@@ -31,16 +21,7 @@ export const metadata: Metadata = {
     locale: 'pt_BR',
     type: 'website',
   },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Hub Smart Home | Criciúma SC',
-    description: 'Apartamentos com automação residencial no Centro de Criciúma. Fontana Construtora.',
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: { index: true, follow: true, 'max-image-preview': 'large' },
-  },
+  robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large' } },
 }
 
 const schema = {
@@ -51,75 +32,29 @@ const schema = {
       name: 'Hub Smart Home',
       description: 'Apartamentos com automação residencial completa no Centro de Criciúma SC. Condomínio inteligente com tecnologia integrada, lazer completo e design contemporâneo. Fontana Construtora.',
       url: 'https://stivenallan.vercel.app/empreendimento/fontana/hub-smart-home-criciuma-sc',
-      image: 'https://stivenallan.vercel.app/empreendimento/fontana/hub-smart-home-criciuma-sc',
-      offers: {
-        '@type': 'Offer',
-        priceCurrency: 'BRL',
-        availability: 'https://schema.org/InStock',
-        seller: {
-          '@type': 'RealEstateAgent',
-          name: 'Stiven Allan',
-          identifier: 'CRECI/RS 60.275',
-          telephone: '+5548991455522',
-          url: 'https://stivenallan.vercel.app',
-        },
-      },
-      address: {
-        '@type': 'PostalAddress',
-        streetAddress: 'Centro',
-        addressLocality: 'Criciúma',
-        addressRegion: 'SC',
-        addressCountry: 'BR',
-      },
-      geo: {
-        '@type': 'GeoCoordinates',
-        latitude: -28.678,
-        longitude: -49.370,
-      },
+      offers: { '@type': 'Offer', priceCurrency: 'BRL', availability: 'https://schema.org/InStock', seller: { '@type': 'RealEstateAgent', name: 'Stiven Allan', identifier: 'CRECI/RS 60.275', telephone: '+5548991455522', url: 'https://stivenallan.vercel.app' } },
+      address: { '@type': 'PostalAddress', streetAddress: 'Centro', addressLocality: 'Criciúma', addressRegion: 'SC', addressCountry: 'BR' },
+      geo: { '@type': 'GeoCoordinates', latitude: -28.678, longitude: -49.370 },
     },
     {
       '@type': 'BreadcrumbList',
       itemListElement: [
         { '@type': 'ListItem', position: 1, name: 'Início', item: 'https://stivenallan.vercel.app' },
-        { '@type': 'ListItem', position: 2, name: 'Empreendimentos', item: 'https://stivenallan.vercel.app/empreendimentos' },
+        { '@type': 'ListItem', position: 2, name: 'Lançamentos Criciúma', item: 'https://stivenallan.vercel.app/lancamentos/criciuma-sc' },
         { '@type': 'ListItem', position: 3, name: 'Hub Smart Home', item: 'https://stivenallan.vercel.app/empreendimento/fontana/hub-smart-home-criciuma-sc' },
       ],
     },
     {
       '@type': 'FAQPage',
       mainEntity: [
-        {
-          '@type': 'Question',
-          name: 'O que é o Hub Smart Home em Criciúma?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Hub Smart Home é um empreendimento residencial da Fontana Construtora localizado no Centro de Criciúma SC, com apartamentos dotados de automação residencial integrada, design contemporâneo e infraestrutura de condomínio completa.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'Quais são os diferenciais do Hub Smart Home?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'O Hub Smart Home oferece automação residencial (controle de iluminação, climatização e segurança pelo smartphone), acabamentos de alto padrão, área de lazer completa e localização central em Criciúma SC com fácil acesso a comércio e serviços.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'Como entrar em contato para saber mais sobre o Hub Smart Home?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Entre em contato com Stiven Allan, CRECI/RS 60.275, pelo WhatsApp (48) 99145-5522. Atendimento personalizado para tirar dúvidas, agendar visita ao decorado e conhecer as condições de pagamento.',
-          },
-        },
+        { '@type': 'Question', name: 'O que é o Hub Smart Home em Criciúma?', acceptedAnswer: { '@type': 'Answer', text: 'Hub Smart Home é um empreendimento residencial da Fontana Construtora localizado no Centro de Criciúma SC, com apartamentos dotados de automação residencial integrada, design contemporâneo e infraestrutura de condomínio completa.' } },
+        { '@type': 'Question', name: 'Quais são os diferenciais do Hub Smart Home?', acceptedAnswer: { '@type': 'Answer', text: 'O Hub Smart Home oferece automação residencial (controle de iluminação, climatização e segurança pelo smartphone), acabamentos de alto padrão, área de lazer completa e localização central em Criciúma SC.' } },
+        { '@type': 'Question', name: 'Como entrar em contato para saber mais sobre o Hub Smart Home?', acceptedAnswer: { '@type': 'Answer', text: 'Entre em contato com Stiven Allan, CRECI/RS 60.275, pelo WhatsApp (48) 99145-5522. Atendimento personalizado para tirar dúvidas, agendar visita ao decorado e conhecer as condições de pagamento.' } },
       ],
     },
   ],
 }
 
-const WHATSAPP = 'https://api.whatsapp.com/send?phone=5548991455522&text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Hub%20Smart%20Home!'
-
-// Diferenciais smart home
 const diferenciais = [
   { icon: '📱', titulo: 'Automação Residencial', desc: 'Controle iluminação, climatização e segurança pelo smartphone de qualquer lugar' },
   { icon: '🔒', titulo: 'Acesso Inteligente', desc: 'Fechadura digital com reconhecimento facial, senha e aplicativo — sem chave convencional' },
@@ -131,7 +66,6 @@ const diferenciais = [
   { icon: '🚗', titulo: 'Vagas Cobertas', desc: 'Vagas de garagem cobertas com infraestrutura para carregamento de veículos elétricos' },
 ]
 
-// Números do empreendimento
 const numeros = [
   { valor: '1 e 2', unidade: 'suítes', label: 'Tipologias' },
   { valor: 'Centro', unidade: 'Criciúma', label: 'Localização' },
@@ -139,7 +73,6 @@ const numeros = [
   { valor: 'Fontana', unidade: 'construtora', label: 'Incorporadora' },
 ]
 
-// Tecnologias smart
 const tecnologias = [
   { nome: 'App de Controle', desc: 'Gerencie todo o apartamento pelo celular' },
   { nome: 'Iluminação Cênica', desc: 'Cenas de luz pré-programadas para cada momento' },
@@ -148,160 +81,134 @@ const tecnologias = [
   { nome: 'Sensor de Presença', desc: 'Acionamento automático de luzes em áreas comuns' },
   { nome: 'Central de Alarme', desc: 'Monitoramento 24h integrado ao sistema do condomínio' },
 ]
-
 export default function HubSmartHomePage() {
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-      />
+      <style>{`
+        .hub-card:hover { transform: translateY(-2px); border-color: #FF6A3D !important; transition: transform .22s ease, border-color .22s ease; }
+        .hub-cta:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,106,61,0.35); }
+        .hub-tech:hover { border-color: rgba(210,78,34,0.4) !important; }
+      `}</style>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
 
-      <main style={{ background: '#121315', color: '#e8eaed', fontFamily: 'system-ui, -apple-system, sans-serif', minHeight: '100vh' }}>
+      <main style={{ background: c.paper, color: c.ink, fontFamily: font.body, minHeight: '100vh' }}>
 
-        {/* HEADER NAV */}
-        <header style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, background: 'rgba(18,19,21,0.95)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(201,162,75,0.2)', padding: '0 clamp(1rem,4vw,2rem)' }}>
-          <nav style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '64px' }}>
-            <a href="/" style={{ color: '#c9a24b', fontWeight: 700, fontSize: 'clamp(0.9rem,2vw,1.1rem)', textDecoration: 'none', letterSpacing: '0.05em' }}>
-              STIVEN ALLAN
-            </a>
-            <a
-              href={WHATSAPP}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ background: '#c9a24b', color: '#121315', padding: '0.5rem 1.25rem', borderRadius: '6px', fontWeight: 700, fontSize: '0.85rem', textDecoration: 'none', letterSpacing: '0.03em' }}
-            >
-              FALAR COM CORRETOR
-            </a>
-          </nav>
-        </header>
+        {/* BREADCRUMB */}
+        <nav aria-label="Breadcrumb" style={{ background: c.charcoal, borderBottom: `1px solid ${c.lineDark}`, padding: '12px 5%' }}>
+          <ol style={{ display: 'flex', gap: 8, listStyle: 'none', margin: 0, padding: 0, flexWrap: 'wrap' }}>
+            <li><a href="/" style={{ color: c.onDarkMuted, fontSize: 13, textDecoration: 'none' }}>Início</a></li>
+            <li style={{ color: c.onDarkMuted }}>›</li>
+            <li><a href="/lancamentos/criciuma-sc" style={{ color: c.onDarkMuted, fontSize: 13, textDecoration: 'none' }}>Lançamentos Criciúma</a></li>
+            <li style={{ color: c.onDarkMuted }}>›</li>
+            <li style={{ color: c.bronze, fontSize: 13, fontWeight: 600 }}>Hub Smart Home</li>
+          </ol>
+        </nav>
 
-        {/* HERO */}
-        <section style={{ position: 'relative', height: 'clamp(500px,80vh,800px)', marginTop: '64px', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, #1a1c1f 0%, #0d0e10 50%, #1a1c1f 100%)' }} />
-          
-          {/* Smart Home visual pattern */}
+        {/* HERO — padrão geométrico areia/bronze */}
+        <section style={{ position: 'relative', height: 'clamp(500px,80vh,800px)', overflow: 'hidden' }}>
+          {/* Fundo areia com gradiente */}
+          <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(135deg, ${c.charcoal} 0%, #1e1b18 50%, ${c.charcoal} 100%)` }} />
+
+          {/* Padrão geométrico recolorido bronze/laranja */}
           <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-            <div style={{ width: 'clamp(300px,60vw,700px)', height: 'clamp(300px,60vw,700px)', border: '1px solid rgba(201,162,75,0.1)', borderRadius: '50%', position: 'absolute' }} />
-            <div style={{ width: 'clamp(200px,45vw,520px)', height: 'clamp(200px,45vw,520px)', border: '1px solid rgba(201,162,75,0.15)', borderRadius: '50%', position: 'absolute' }} />
-            <div style={{ width: 'clamp(120px,28vw,320px)', height: 'clamp(120px,28vw,320px)', border: '1px solid rgba(201,162,75,0.2)', borderRadius: '50%', position: 'absolute' }} />
-            <div style={{ fontSize: 'clamp(4rem,12vw,9rem)', opacity: 0.08 }}>🏠</div>
+            <div style={{ width: 'clamp(300px,60vw,700px)', height: 'clamp(300px,60vw,700px)', border: `1px solid rgba(210,78,34,0.12)`, borderRadius: '50%', position: 'absolute' }} />
+            <div style={{ width: 'clamp(200px,45vw,520px)', height: 'clamp(200px,45vw,520px)', border: `1px solid rgba(210,78,34,0.18)`, borderRadius: '50%', position: 'absolute' }} />
+            <div style={{ width: 'clamp(120px,28vw,320px)', height: 'clamp(120px,28vw,320px)', border: `1px solid rgba(255,106,61,0.22)`, borderRadius: '50%', position: 'absolute' }} />
+            <div style={{ fontSize: 'clamp(4rem,12vw,9rem)', opacity: 0.07 }}>🏠</div>
           </div>
 
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(18,19,21,0.98) 0%, rgba(18,19,21,0.7) 60%, rgba(18,19,21,0.3) 100%)' }} />
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(19,18,17,0.97) 0%, rgba(19,18,17,0.72) 60%, rgba(19,18,17,0.3) 100%)' }} />
 
-          <div style={{ position: 'relative', zIndex: 10, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 clamp(1.5rem,6vw,5rem)', maxWidth: '1200px', margin: '0 auto' }}>
-            
-            {/* Breadcrumb */}
-            <nav aria-label="breadcrumb" style={{ marginBottom: '1.5rem' }}>
-              <ol style={{ display: 'flex', gap: '0.5rem', listStyle: 'none', padding: 0, margin: 0, fontSize: '0.78rem', color: '#a7adb4' }}>
-                <li><a href="/" style={{ color: '#a7adb4', textDecoration: 'none' }}>Início</a></li>
-                <li style={{ color: '#c9a24b' }}>›</li>
-                <li><a href="/empreendimentos" style={{ color: '#a7adb4', textDecoration: 'none' }}>Empreendimentos</a></li>
-                <li style={{ color: '#c9a24b' }}>›</li>
-                <li style={{ color: '#c9a24b' }}>Hub Smart Home</li>
-              </ol>
-            </nav>
-
+          <div style={{ position: 'relative', zIndex: 10, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 clamp(1.5rem,6vw,5rem)', maxWidth: 1200, margin: '0 auto' }}>
             {/* Badges */}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1.25rem' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
               {['Fontana Construtora', 'Smart Home', 'Centro Criciúma SC', 'Lançamento'].map(b => (
-                <span key={b} style={{ background: 'rgba(201,162,75,0.15)', border: '1px solid rgba(201,162,75,0.35)', color: '#c9a24b', padding: '0.3rem 0.75rem', borderRadius: '20px', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                <span key={b} style={{ background: `rgba(210,78,34,0.12)`, border: `1px solid rgba(210,78,34,0.35)`, color: c.bronze, padding: '5px 14px', borderRadius: 40, fontSize: 11, fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
                   {b}
                 </span>
               ))}
             </div>
 
-            <h1 style={{ fontSize: 'clamp(2.2rem,6vw,4.5rem)', fontWeight: 900, lineHeight: 1.05, margin: '0 0 0.5rem', letterSpacing: '-0.02em' }}>
+            <h1 style={{ fontFamily: font.display, fontSize: 'clamp(2.2rem,6vw,4.5rem)', fontWeight: 900, lineHeight: 1.05, margin: '0 0 8px', letterSpacing: '-0.025em', color: c.onDark }}>
               Hub
-              <span style={{ display: 'block', color: '#c9a24b' }}>Smart Home</span>
+              <span style={{ display: 'block', color: c.orange }}>Smart Home</span>
             </h1>
 
-            <p style={{ fontSize: 'clamp(1rem,2.5vw,1.4rem)', color: '#a7adb4', margin: '0.75rem 0 0', maxWidth: '520px', lineHeight: 1.5 }}>
+            <p style={{ fontSize: 'clamp(1rem,2.5vw,1.4rem)', color: c.onDarkMuted, margin: '12px 0 0', maxWidth: 520, lineHeight: 1.5 }}>
               O primeiro condomínio com automação residencial completa no Centro de Criciúma
             </p>
 
-            <p style={{ fontSize: 'clamp(0.85rem,1.8vw,1rem)', color: '#c9a24b', margin: '0.5rem 0 0', fontWeight: 500, letterSpacing: '0.04em' }}>
+            <p style={{ fontSize: 'clamp(0.85rem,1.8vw,1rem)', color: c.bronze, margin: '8px 0 0', fontWeight: 600, letterSpacing: '0.04em' }}>
               FONTANA CONSTRUTORA • CENTRO • CRICIÚMA SC
             </p>
 
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginTop: '2rem' }}>
-              <a
-                href={WHATSAPP}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ background: '#c9a24b', color: '#121315', padding: '0.9rem 2rem', borderRadius: '8px', fontWeight: 800, fontSize: 'clamp(0.85rem,2vw,1rem)', textDecoration: 'none', letterSpacing: '0.04em', display: 'inline-block' }}
-              >
-                SOLICITAR INFORMAÇÕES
-              </a>
-              <a
-                href="#diferenciais"
-                style={{ background: 'transparent', color: '#e8eaed', padding: '0.9rem 2rem', borderRadius: '8px', fontWeight: 700, fontSize: 'clamp(0.85rem,2vw,1rem)', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.2)', display: 'inline-block' }}
-              >
-                VER DIFERENCIAIS
-              </a>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, marginTop: 32 }}>
+              <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="hub-cta"
+                style={{ ...ui.btnConvert, minHeight: 48 }}>SOLICITAR INFORMAÇÕES</a>
+              <a href="#diferenciais"
+                style={{ background: 'transparent', color: c.onDark, padding: '14px 26px', borderRadius: 2, fontWeight: 600, fontSize: 15, textDecoration: 'none', border: '1px solid rgba(255,255,255,0.2)', display: 'inline-flex', alignItems: 'center', minHeight: 48 }}>VER DIFERENCIAIS</a>
             </div>
           </div>
         </section>
 
         {/* NÚMEROS */}
-        <section style={{ background: '#202327', borderTop: '1px solid rgba(201,162,75,0.2)', borderBottom: '1px solid rgba(201,162,75,0.2)' }}>
-          <div style={{ maxWidth: '1200px', margin: '0 auto', padding: 'clamp(2rem,5vw,3rem) clamp(1rem,4vw,2rem)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: '2rem' }}>
+        <section style={{ background: c.charcoal, borderTop: `1px solid ${c.lineDark}`, borderBottom: `1px solid ${c.lineDark}` }}>
+          <div style={{ maxWidth: 1200, margin: '0 auto', padding: 'clamp(2rem,5vw,3rem) 5%', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: '2rem' }}>
             {numeros.map(n => (
               <div key={n.label} style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 'clamp(1.6rem,4vw,2.4rem)', fontWeight: 900, color: '#c9a24b', lineHeight: 1 }}>{n.valor}</div>
-                <div style={{ fontSize: '0.8rem', color: '#a7adb4', textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: '0.25rem' }}>{n.unidade}</div>
-                <div style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{n.label}</div>
+                <div style={{ fontFamily: font.display, fontSize: 'clamp(1.6rem,4vw,2.4rem)', fontWeight: 900, color: c.orange, lineHeight: 1 }}>{n.valor}</div>
+                <div style={{ fontSize: 12, color: c.onDarkMuted, textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: 4 }}>{n.unidade}</div>
+                <div style={{ fontSize: 11, color: c.muted, marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{n.label}</div>
               </div>
             ))}
           </div>
         </section>
-
         {/* SMART HOME SHOWCASE */}
-        <section style={{ padding: 'clamp(3rem,8vw,6rem) clamp(1rem,4vw,2rem)', maxWidth: '1200px', margin: '0 auto' }}>
+        <section style={{ padding: 'clamp(3rem,8vw,6rem) 5%', maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 'clamp(2rem,5vw,3.5rem)' }}>
-            <div style={{ display: 'inline-block', background: 'rgba(201,162,75,0.1)', border: '1px solid rgba(201,162,75,0.3)', color: '#c9a24b', padding: '0.3rem 1rem', borderRadius: '20px', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '1rem' }}>
-              TECNOLOGIA
-            </div>
-            <h2 style={{ fontSize: 'clamp(1.6rem,4vw,2.8rem)', fontWeight: 800, margin: '0 0 1rem', lineHeight: 1.2 }}>
-              Seu apartamento, inteligente
-            </h2>
-            <p style={{ color: '#a7adb4', fontSize: 'clamp(0.9rem,2vw,1.05rem)', maxWidth: '600px', margin: '0 auto', lineHeight: 1.7 }}>
+            <div style={{ ...ui.eyebrow, marginBottom: 16 }}>TECNOLOGIA</div>
+            <h2 style={{ ...ui.h2, color: c.ink }}>Seu apartamento, inteligente</h2>
+            <p style={{ color: c.muted, fontSize: 'clamp(0.9rem,2vw,1.05rem)', maxWidth: 600, margin: '16px auto 0', lineHeight: 1.7 }}>
               Hub Smart Home integra tecnologia de automação residencial em cada detalhe. Controle tudo pelo smartphone — de qualquer lugar do mundo.
             </p>
           </div>
-
-          {/* Tech grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: '1.5rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: 20 }}>
             {tecnologias.map(t => (
-              <div key={t.nome} style={{ background: '#202327', borderRadius: '12px', padding: '1.5rem 2rem', border: '1px solid rgba(201,162,75,0.1)', display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
-                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#c9a24b', marginTop: '6px', flexShrink: 0 }} />
+              <div key={t.nome} className="hub-tech" style={{ background: c.surface, borderRadius: 3, padding: '1.5rem 2rem', border: `1px solid ${c.line}`, display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+                <div style={{ width: 8, height: 8, borderRadius: '50%', background: c.bronze, marginTop: 6, flexShrink: 0 }} />
                 <div>
-                  <div style={{ fontWeight: 700, color: '#e8eaed', fontSize: '0.95rem', marginBottom: '0.35rem' }}>{t.nome}</div>
-                  <div style={{ color: '#a7adb4', fontSize: '0.85rem', lineHeight: 1.5 }}>{t.desc}</div>
+                  <div style={{ fontFamily: font.display, fontWeight: 700, color: c.ink, fontSize: 15, marginBottom: 6 }}>{t.nome}</div>
+                  <div style={{ color: c.muted, fontSize: 14, lineHeight: 1.5 }}>{t.desc}</div>
                 </div>
               </div>
             ))}
           </div>
         </section>
 
-        {/* DIFERENCIAIS */}
-        <section id="diferenciais" style={{ background: '#202327', padding: 'clamp(3rem,8vw,6rem) clamp(1rem,4vw,2rem)', borderTop: '1px solid rgba(201,162,75,0.1)', borderBottom: '1px solid rgba(201,162,75,0.1)' }}>
-          <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-            <div style={{ textAlign: 'center', marginBottom: 'clamp(2rem,5vw,3.5rem)' }}>
-              <div style={{ display: 'inline-block', background: 'rgba(201,162,75,0.1)', border: '1px solid rgba(201,162,75,0.3)', color: '#c9a24b', padding: '0.3rem 1rem', borderRadius: '20px', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '1rem' }}>
-                DIFERENCIAIS
-              </div>
-              <h2 style={{ fontSize: 'clamp(1.6rem,4vw,2.8rem)', fontWeight: 800, margin: '0 0 1rem', lineHeight: 1.2 }}>
-                Mais que um apartamento —<br/>um estilo de vida conectado
-              </h2>
+        {/* SIMULADOR */}
+        <section style={{ background: c.surface, padding: '64px 5%', borderTop: `1px solid ${c.line}`, borderBottom: `1px solid ${c.line}` }}>
+          <div style={{ maxWidth: 900, margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: 40 }}>
+              <div style={{ ...ui.eyebrow, marginBottom: 10 }}>Simulação de Financiamento</div>
+              <h2 style={{ ...ui.h2, color: c.ink, margin: 0 }}>Calcule sua parcela</h2>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))', gap: '1.5rem' }}>
+            <Simulador valorInicial={380000} valorMin={280000} valorMax={600000} hrefReserva={WHATSAPP} />
+          </div>
+        </section>
+
+        {/* DIFERENCIAIS */}
+        <section id="diferenciais" style={{ background: c.paper, padding: 'clamp(3rem,8vw,6rem) 5%' }}>
+          <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: 'clamp(2rem,5vw,3.5rem)' }}>
+              <div style={{ ...ui.eyebrow, marginBottom: 16 }}>DIFERENCIAIS</div>
+              <h2 style={{ ...ui.h2, color: c.ink }}>Mais que um apartamento —<br/>um estilo de vida conectado</h2>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))', gap: 20 }}>
               {diferenciais.map(d => (
-                <div key={d.titulo} style={{ background: '#121315', borderRadius: '12px', padding: '1.75rem', border: '1px solid rgba(201,162,75,0.1)', transition: 'border-color 0.2s' }}>
-                  <div style={{ fontSize: '2rem', marginBottom: '0.75rem' }}>{d.icon}</div>
-                  <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#e8eaed', margin: '0 0 0.5rem', lineHeight: 1.3 }}>{d.titulo}</h3>
-                  <p style={{ fontSize: '0.85rem', color: '#a7adb4', margin: 0, lineHeight: 1.6 }}>{d.desc}</p>
+                <div key={d.titulo} className="hub-card" style={{ ...ui.card, padding: '1.75rem', borderRadius: 3, border: `1px solid ${c.line}` }}>
+                  <div style={{ fontSize: '2rem', marginBottom: 12 }}>{d.icon}</div>
+                  <h3 style={{ fontFamily: font.display, fontSize: 15, fontWeight: 700, color: c.ink, margin: '0 0 8px', lineHeight: 1.3 }}>{d.titulo}</h3>
+                  <p style={{ fontSize: 14, color: c.muted, margin: 0, lineHeight: 1.6 }}>{d.desc}</p>
                 </div>
               ))}
             </div>
@@ -309,20 +216,15 @@ export default function HubSmartHomePage() {
         </section>
 
         {/* LOCALIZAÇÃO */}
-        <section style={{ padding: 'clamp(3rem,8vw,6rem) clamp(1rem,4vw,2rem)', maxWidth: '1200px', margin: '0 auto' }}>
+        <section style={{ padding: 'clamp(3rem,8vw,6rem) 5%', maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 'clamp(2rem,5vw,3.5rem)' }}>
-            <div style={{ display: 'inline-block', background: 'rgba(201,162,75,0.1)', border: '1px solid rgba(201,162,75,0.3)', color: '#c9a24b', padding: '0.3rem 1rem', borderRadius: '20px', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '1rem' }}>
-              LOCALIZAÇÃO
-            </div>
-            <h2 style={{ fontSize: 'clamp(1.6rem,4vw,2.8rem)', fontWeight: 800, margin: '0 0 1rem', lineHeight: 1.2 }}>
-              Centro de Criciúma —<br/>tudo ao seu alcance
-            </h2>
-            <p style={{ color: '#a7adb4', fontSize: 'clamp(0.9rem,2vw,1rem)', maxWidth: '560px', margin: '0 auto', lineHeight: 1.7 }}>
+            <div style={{ ...ui.eyebrow, marginBottom: 16 }}>LOCALIZAÇÃO</div>
+            <h2 style={{ ...ui.h2, color: c.ink }}>Centro de Criciúma —<br/>tudo ao seu alcance</h2>
+            <p style={{ color: c.muted, fontSize: 'clamp(0.9rem,2vw,1rem)', maxWidth: 560, margin: '16px auto 0', lineHeight: 1.7 }}>
               Localizado no coração de Criciúma, Hub Smart Home oferece proximidade a centros comerciais, hospitais, escolas e vias de acesso.
             </p>
           </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: '1rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 16 }}>
             {[
               { icon: '🏬', local: 'Shopping Criciúma', dist: '5 min' },
               { icon: '🏥', local: 'Hospital São José', dist: '7 min' },
@@ -331,80 +233,82 @@ export default function HubSmartHomePage() {
               { icon: '🏦', local: 'Agências Bancárias', dist: '3 min a pé' },
               { icon: '🍽️', local: 'Restaurantes e Cafés', dist: '1 min a pé' },
             ].map(l => (
-              <div key={l.local} style={{ background: '#202327', borderRadius: '10px', padding: '1.25rem', border: '1px solid rgba(201,162,75,0.1)', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <div key={l.local} className="hub-card" style={{ background: c.surface, borderRadius: 3, padding: '1.25rem', border: `1px solid ${c.line}`, display: 'flex', alignItems: 'center', gap: '1rem', minHeight: 72 }}>
                 <div style={{ fontSize: '1.5rem' }}>{l.icon}</div>
                 <div>
-                  <div style={{ fontWeight: 600, color: '#e8eaed', fontSize: '0.9rem' }}>{l.local}</div>
-                  <div style={{ color: '#c9a24b', fontSize: '0.8rem', fontWeight: 600, marginTop: '0.15rem' }}>{l.dist}</div>
+                  <div style={{ fontFamily: font.display, fontWeight: 600, color: c.ink, fontSize: 14 }}>{l.local}</div>
+                  <div style={{ color: c.bronze, fontSize: 13, fontWeight: 600, marginTop: 2 }}>{l.dist}</div>
                 </div>
               </div>
             ))}
           </div>
         </section>
-
         {/* CONSTRUTORA */}
-        <section style={{ background: '#202327', padding: 'clamp(3rem,8vw,5rem) clamp(1rem,4vw,2rem)', borderTop: '1px solid rgba(201,162,75,0.1)', borderBottom: '1px solid rgba(201,162,75,0.1)' }}>
-          <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
-            <div style={{ display: 'inline-block', background: 'rgba(201,162,75,0.1)', border: '1px solid rgba(201,162,75,0.3)', color: '#c9a24b', padding: '0.3rem 1rem', borderRadius: '20px', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '1.5rem' }}>
-              FONTANA CONSTRUTORA
-            </div>
-            <h2 style={{ fontSize: 'clamp(1.4rem,3.5vw,2.2rem)', fontWeight: 800, margin: '0 0 1rem', lineHeight: 1.3 }}>
-              Tradição em qualidade e inovação no Sul de Santa Catarina
-            </h2>
-            <p style={{ color: '#a7adb4', fontSize: 'clamp(0.9rem,2vw,1rem)', lineHeight: 1.8, margin: '0 auto', maxWidth: '720px' }}>
+        <section style={{ background: c.surface, padding: 'clamp(3rem,8vw,5rem) 5%', borderTop: `1px solid ${c.line}`, borderBottom: `1px solid ${c.line}` }}>
+          <div style={{ maxWidth: 900, margin: '0 auto', textAlign: 'center' }}>
+            <div style={{ ...ui.eyebrow, marginBottom: 24 }}>FONTANA CONSTRUTORA</div>
+            <h2 style={{ ...ui.h2, color: c.ink, marginBottom: 16 }}>Tradição em qualidade e inovação no Sul de Santa Catarina</h2>
+            <p style={{ color: c.muted, fontSize: 'clamp(0.9rem,2vw,1rem)', lineHeight: 1.8, margin: '0 auto', maxWidth: 720 }}>
               A Fontana Construtora é referência em Criciúma e região pela excelência na entrega de empreendimentos residenciais. O Hub Smart Home é mais um projeto que une tecnologia de ponta, materiais de qualidade superior e design contemporâneo — garantindo valorização e qualidade de vida para seus moradores.
             </p>
           </div>
         </section>
 
         {/* CTA PRINCIPAL */}
-        <section style={{ padding: 'clamp(4rem,10vw,7rem) clamp(1rem,4vw,2rem)', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at center, rgba(201,162,75,0.08) 0%, transparent 70%)' }} />
-          <div style={{ position: 'relative', zIndex: 1, maxWidth: '700px', margin: '0 auto' }}>
-            <div style={{ display: 'inline-block', background: 'rgba(201,162,75,0.1)', border: '1px solid rgba(201,162,75,0.3)', color: '#c9a24b', padding: '0.3rem 1rem', borderRadius: '20px', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '1.5rem' }}>
-              FALE COM O ESPECIALISTA
-            </div>
-            <h2 style={{ fontSize: 'clamp(1.8rem,5vw,3.2rem)', fontWeight: 900, margin: '0 0 1rem', lineHeight: 1.1 }}>
+        <section style={{ padding: 'clamp(4rem,10vw,7rem) 5%', textAlign: 'center', position: 'relative', overflow: 'hidden', background: c.charcoal }}>
+          <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse at center, rgba(210,78,34,0.08) 0%, transparent 70%)` }} />
+          <div style={{ position: 'relative', zIndex: 1, maxWidth: 700, margin: '0 auto' }}>
+            <div style={{ ...ui.eyebrow, marginBottom: 24 }}>FALE COM O ESPECIALISTA</div>
+            <h2 style={{ fontFamily: font.display, color: c.onDark, fontSize: 'clamp(1.8rem,5vw,3.2rem)', fontWeight: 900, margin: '0 0 16px', lineHeight: 1.1, letterSpacing: '-0.025em' }}>
               Pronto para viver no futuro?
             </h2>
-            <p style={{ color: '#a7adb4', fontSize: 'clamp(0.95rem,2.2vw,1.1rem)', margin: '0 auto 2rem', lineHeight: 1.7, maxWidth: '520px' }}>
+            <p style={{ color: c.onDarkMuted, fontSize: 'clamp(0.95rem,2.2vw,1.1rem)', margin: '0 auto 32px', lineHeight: 1.7, maxWidth: 520 }}>
               Converse com Stiven Allan, especialista em lançamentos da Fontana em Criciúma. Condições exclusivas, atendimento personalizado e todo o suporte até a entrega das chaves.
             </p>
-            <a
-              href={WHATSAPP}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ display: 'inline-block', background: '#c9a24b', color: '#121315', padding: 'clamp(0.9rem,2.5vw,1.1rem) clamp(2rem,5vw,3rem)', borderRadius: '8px', fontWeight: 800, fontSize: 'clamp(0.9rem,2vw,1.05rem)', textDecoration: 'none', letterSpacing: '0.05em' }}
-            >
+            <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="hub-cta"
+              style={{ display: 'inline-block', ...ui.btnConvert, fontSize: 'clamp(0.9rem,2vw,1.05rem)', minHeight: 52 }}>
               QUERO SABER MAIS — WHATSAPP
             </a>
-            <div style={{ marginTop: '1.25rem', color: '#a7adb4', fontSize: '0.8rem' }}>
+            <div style={{ marginTop: 20, color: c.onDarkMuted, fontSize: 13 }}>
               Stiven Allan • CRECI/RS 60.275 • (48) 99145-5522
             </div>
           </div>
         </section>
 
         {/* FOOTER */}
-        <footer style={{ background: '#0d0e10', borderTop: '1px solid rgba(201,162,75,0.2)', padding: 'clamp(2rem,5vw,3rem) clamp(1rem,4vw,2rem)' }}>
-          <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexWrap: 'wrap', gap: '2rem', justifyContent: 'space-between', alignItems: 'center' }}>
+        <footer style={{ background: c.charcoal, borderTop: `1px solid ${c.lineDark}`, padding: 'clamp(2rem,5vw,3rem) 5%' }}>
+          <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', flexWrap: 'wrap', gap: '2rem', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <div style={{ color: '#c9a24b', fontWeight: 800, fontSize: '1rem', letterSpacing: '0.05em', marginBottom: '0.4rem' }}>STIVEN ALLAN</div>
-              <div style={{ color: '#a7adb4', fontSize: '0.8rem' }}>CRECI/RS 60.275</div>
-              <div style={{ color: '#a7adb4', fontSize: '0.8rem', marginTop: '0.2rem' }}>Criciúma e região — SC</div>
+              <div style={{ fontFamily: font.display, color: c.bronze, fontWeight: 800, fontSize: '1rem', letterSpacing: '0.05em', marginBottom: 6 }}>STIVEN ALLAN</div>
+              <div style={{ color: c.onDarkMuted, fontSize: 13 }}>CRECI/RS 60.275</div>
+              <div style={{ color: c.onDarkMuted, fontSize: 13, marginTop: 2 }}>Criciúma e região — SC</div>
             </div>
             <div style={{ textAlign: 'right' }}>
-              <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" style={{ color: '#c9a24b', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}>
+              <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" style={{ color: c.bronze, textDecoration: 'none', fontSize: 14, fontWeight: 600 }}>
                 (48) 99145-5522
               </a>
-              <div style={{ color: '#6b7280', fontSize: '0.75rem', marginTop: '0.4rem' }}>
+              <div style={{ color: c.muted, fontSize: 12, marginTop: 6 }}>
                 © {new Date().getFullYear()} Stiven Allan. Todos os direitos reservados.
               </div>
-              <div style={{ color: '#4b5563', fontSize: '0.7rem', marginTop: '0.2rem' }}>
+              <div style={{ color: c.muted, fontSize: 11, marginTop: 2 }}>
                 Hub Smart Home é um empreendimento da Fontana Construtora
               </div>
             </div>
           </div>
         </footer>
+
+        {/* CTA STICKY MOBILE */}
+        <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100, background: c.charcoal, borderTop: `1px solid ${c.lineDark}`, padding: '12px 5%', display: 'flex', gap: 10 }} className="hub-mobile-cta">
+          <style>{`.hub-mobile-cta { display: flex; } @media (min-width: 768px) { .hub-mobile-cta { display: none !important; } }`}</style>
+          <a href={WHATSAPP} target="_blank" rel="noopener noreferrer"
+            style={{ flex: 1, ...ui.btnConvert, borderRadius: 2, textAlign: 'center', minHeight: 48, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 700, textDecoration: 'none' }}>
+            Falar com Stiven
+          </a>
+          <a href="tel:+5548991455522"
+            style={{ flex: 1, ...ui.btnPrimary, borderRadius: 2, textAlign: 'center', minHeight: 48, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 600, textDecoration: 'none' }}>
+            Ligar agora
+          </a>
+        </div>
       </main>
     </>
   )
