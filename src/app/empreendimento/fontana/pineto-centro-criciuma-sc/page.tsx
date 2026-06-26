@@ -72,10 +72,12 @@ const SCHEMA = {
 }
 
 export default function PinetoPage() {
-  const wppMsg = WPP
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHEMA) }} />
+
+      {/* Hover CSS para cards de diferenciais */}
+      <style>{'.diff-card:hover { transform: translateY(-2px); border-left-color: #FF6A3D !important; box-shadow: 0 4px 16px rgba(210,78,34,0.12); } .diff-card { transition: transform .2s, border-color .2s, box-shadow .2s; }'}</style>
 
       {/* NAV / BREADCRUMB */}
       <nav style={{ position: 'sticky', top: 0, zIndex: 50, background: c.paper, borderBottom: `1px solid ${c.line}`, padding: '0 clamp(16px,4vw,40px)' }}>
@@ -87,7 +89,7 @@ export default function PinetoPage() {
             <span>/</span>
             <span style={{ color: c.ink, fontWeight: 600 }}>Pineto Residencial</span>
           </nav>
-          <a href={wppMsg} target="_blank" rel="noopener noreferrer" style={{ ...ui.btnConvert, fontSize: 13, padding: '10px 20px', minHeight: 44 }}>Reservar</a>
+          <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ ...ui.btnConvert, fontSize: 13, padding: '10px 20px', minHeight: 44 }}>Reservar</a>
         </div>
       </nav>
 
@@ -111,7 +113,7 @@ export default function PinetoPage() {
               O empreendimento que redefine o estilo de vida no Centro de Criciúma. Apartamentos 2 e 3 dormitórios com coworking, yoga, academia e piscina — tudo no mesmo lugar.
             </p>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-              <a href={wppMsg} target="_blank" rel="noopener noreferrer" style={{ ...ui.btnConvert, minHeight: 48, display: 'inline-flex', alignItems: 'center', boxShadow: '0 8px 28px rgba(255,106,61,0.35)' }}>
+              <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ ...ui.btnConvert, minHeight: 48, display: 'inline-flex', alignItems: 'center', boxShadow: '0 8px 28px rgba(255,106,61,0.35)' }}>
                 Tenho interesse
               </a>
               <a href="#galeria" style={{ ...ui.btnSecondary, color: c.onDark, borderColor: 'rgba(245,241,234,0.3)', minHeight: 48, display: 'inline-flex', alignItems: 'center' }}>
@@ -120,7 +122,6 @@ export default function PinetoPage() {
             </div>
           </div>
         </div>
-        {/* Pills */}
         <div style={{ position: 'absolute', top: 24, left: 'clamp(16px,5vw,40px)', display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           {['Centro Criciúma', 'Coworking', 'Yoga', '2 e 3 Dorms'].map(t => (
             <span key={t} style={{ background: 'rgba(19,18,17,0.65)', border: `1px solid ${c.bronze}66`, borderRadius: 40, padding: '5px 14px', fontSize: 12, fontWeight: 600, color: c.onDark, backdropFilter: 'blur(8px)' }}>{t}</span>
@@ -152,7 +153,6 @@ export default function PinetoPage() {
           <span style={{ ...ui.eyebrow, display: 'block', marginBottom: 12 }}>GALERIA</span>
           <h2 style={{ ...ui.h2, color: c.ink }}>Um novo padrão para Criciúma</h2>
         </div>
-        {/* Destaque 2-col */}
         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,2fr) minmax(0,1fr)', gap: 8, marginBottom: 8 }}>
           <div style={{ borderRadius: 4, overflow: 'hidden', position: 'relative', height: 'clamp(260px,38vw,460px)' }}>
             <Image src={`https://lh3.googleusercontent.com/d/${GALERIA[0].id}`} alt={GALERIA[0].alt} fill style={{ objectFit: 'cover' }} sizes="60vw" />
@@ -167,7 +167,6 @@ export default function PinetoPage() {
             ))}
           </div>
         </div>
-        {/* Grid restante */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 8 }}>
           {GALERIA.slice(3).map(img => (
             <div key={img.id} style={{ borderRadius: 4, overflow: 'hidden', position: 'relative', height: 180 }}>
@@ -187,10 +186,7 @@ export default function PinetoPage() {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
             {DIFERENCIAIS.map(d => (
-              <div key={d.titulo} style={{ ...ui.card, padding: '22px 24px', display: 'flex', gap: 16, alignItems: 'flex-start', borderLeft: `3px solid ${c.bronze}`, transition: 'transform .2s, border-color .2s, box-shadow .2s' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLDivElement).style.borderColor = c.orange; (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 16px rgba(210,78,34,0.12)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = ''; (e.currentTarget as HTMLDivElement).style.borderColor = c.bronze; (e.currentTarget as HTMLDivElement).style.boxShadow = ''; }}
-              >
+              <div key={d.titulo} className="diff-card" style={{ ...ui.card, padding: '22px 24px', display: 'flex', gap: 16, alignItems: 'flex-start', borderLeft: `3px solid ${c.bronze}` }}>
                 <span style={{ fontSize: 26, flexShrink: 0, marginTop: 2 }}>{d.icon}</span>
                 <div>
                   <div style={{ fontFamily: font.display, fontWeight: 700, fontSize: 15, color: c.ink, marginBottom: 6 }}>{d.titulo}</div>
@@ -247,7 +243,7 @@ export default function PinetoPage() {
           valorInicial={450000}
           valorMin={315000}
           valorMax={700000}
-          hrefReserva={wppMsg}
+          hrefReserva={WPP}
         />
       </div>
 
@@ -276,7 +272,7 @@ export default function PinetoPage() {
             Especialista em lançamentos Fontana em Criciúma. Atendimento personalizado, análise de investimento e acompanhamento completo do processo de compra.
           </p>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href={wppMsg} target="_blank" rel="noopener noreferrer"
+            <a href={WPP} target="_blank" rel="noopener noreferrer"
               style={{ background: '#25d366', color: '#fff', borderRadius: 2, padding: '15px 28px', fontWeight: 700, fontSize: 15, textDecoration: 'none', minHeight: 48, display: 'inline-flex', alignItems: 'center' }}>
               Chamar no WhatsApp
             </a>
@@ -301,7 +297,7 @@ export default function PinetoPage() {
 
       {/* CTA STICKY MOBILE */}
       <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 80, background: c.paper, borderTop: `1px solid ${c.line}`, padding: '12px 16px', display: 'flex', gap: 8 }}>
-        <a href={wppMsg} target="_blank" rel="noopener noreferrer"
+        <a href={WPP} target="_blank" rel="noopener noreferrer"
           style={{ ...ui.btnConvert, flex: 1, textAlign: 'center', minHeight: 48, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 15 }}>
           Tenho interesse — WhatsApp
         </a>
