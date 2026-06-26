@@ -75,6 +75,9 @@ export default async function DashboardPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <a href="/dashboard/crm" style={{ background: D.bronze, color: '#fff', padding: '8px 16px', borderRadius: 2, fontWeight: 700, fontSize: 13, textDecoration: 'none', letterSpacing: '0.02em' }}>CRM</a>
             <a href="/dashboard/clientes" style={{ color: D.onDarkMuted, textDecoration: 'none', fontSize: 13 }}>Clientes</a>
+            <a href="/dashboard/propostas" style={{ color: D.onDarkMuted, textDecoration: 'none', fontSize: 13 }}>Propostas</a>
+            <a href="/dashboard/agenda" style={{ color: D.onDarkMuted, textDecoration: 'none', fontSize: 13 }}>Agenda</a>
+            <a href="/dashboard/financeiro" style={{ color: D.onDarkMuted, textDecoration: 'none', fontSize: 13 }}>Financeiro</a>
             <a href="/dashboard/empreendimentos" style={{ color: D.onDarkMuted, textDecoration: 'none', fontSize: 13 }}>Empreendimentos</a>
             <a href="/dashboard/leads" style={{ color: D.onDarkMuted, textDecoration: 'none', fontSize: 13 }}>Leads</a>
             <div style={{ fontSize: 12, color: D.onDarkMuted }}>{new Date().toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'short' })}</div>
