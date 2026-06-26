@@ -1,58 +1,51 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Bricolage_Grotesque, Hanken_Grotesk } from 'next/font/google'
 import './globals.css'
 
-const inter = Inter({
+const bricolage = Bricolage_Grotesque({
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-inter',
+  variable: '--font-bricolage',
+  weight: ['400', '500', '600', '700', '800'],
 })
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://stivenallan.com.br'
+const hanken = Hanken_Grotesk({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-hanken',
+  weight: ['400', '500', '600', '700'],
+})
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://stivenallan.vercel.app'
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'Stiven Allan — Corretor de Imóveis em Criciúma e Região | SC',
-    template: '%s | Stiven Allan — CRECI/RS 60.275',
+    default: 'Stiven Allan — Imóveis de Alto Padrão em Criciúma/SC | CRECI/RS 60.275',
+    template: '%s | Stiven Allan',
   },
   description:
-    'Stiven Allan, corretor de imóveis CRECI/RS 60.275 especializado em lançamentos e empreendimentos de construtoras em Criciúma, Içara, Nova Veneza, Forquilhinha e Cocal do Sul/SC.',
-  keywords: [
-    'corretor de imóveis criciúma',
-    'lançamentos imobiliários criciúma',
-    'apartamentos na planta criciúma',
-    'empreendimentos criciúma sc',
-    'imóveis criciúma sc',
-    'stiven allan corretor',
-    'creci 60275',
-  ],
+    'Stiven Allan, corretor CRECI/RS 60.275. Lançamentos e empreendimentos de construtoras em Criciúma e região. Financiamento direto sem banco.',
+  keywords: ['corretor de imóveis criciúma', 'lançamentos imobiliários criciúma', 'apartamentos na planta criciúma', 'empreendimentos criciúma sc', 'stiven allan corretor', 'creci 60275', 'financiamento direto imóveis'],
   authors: [{ name: 'Stiven Allan', url: SITE_URL }],
   creator: 'Stiven Allan',
   openGraph: {
     type: 'website',
     locale: 'pt_BR',
     url: SITE_URL,
-    siteName: 'Stiven Allan — Corretor de Imóveis',
-    title: 'Stiven Allan — Corretor de Imóveis em Criciúma e Região | SC',
-    description:
-      'Lançamentos e empreendimentos premium em Criciúma e região. Atendimento personalizado do primeiro contato até a entrega das chaves.',
+    siteName: 'Stiven Allan — Imóveis de Alto Padrão',
+    title: 'Stiven Allan — Imóveis de Alto Padrão em Criciúma/SC',
+    description: 'Lançamentos e empreendimentos premium em Criciúma e região. Financiamento direto, sem banco.',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Stiven Allan — Corretor de Imóveis em Criciúma/SC',
+    title: 'Stiven Allan — Imóveis de Alto Padrão em Criciúma/SC',
     description: 'Lançamentos e empreendimentos premium em Criciúma e região.',
   },
   robots: {
     index: true,
     follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
+    googleBot: { index: true, follow: true, 'max-video-preview': -1, 'max-image-preview': 'large', 'max-snippet': -1 },
   },
   alternates: { canonical: SITE_URL },
 }
@@ -61,8 +54,7 @@ const schemaAgent = {
   '@context': 'https://schema.org',
   '@type': 'RealEstateAgent',
   name: 'Stiven Allan',
-  description:
-    'Corretor de imóveis especialista em lançamentos e empreendimentos de construtoras em Criciúma/SC e região.',
+  description: 'Corretor de imóveis especialista em lançamentos e empreendimentos de construtoras em Criciúma/SC. Financiamento direto. CRECI/RS 60.275.',
   url: SITE_URL,
   telephone: '+5548991642332',
   email: 'contato@stivenallan.com.br',
@@ -79,20 +71,15 @@ const schemaAgent = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className={inter.variable}>
+    <html lang="pt-BR" className={`${bricolage.variable} ${hanken.variable}`}>
       <head>
-        {/* Schema.org RealEstateAgent — sem render-blocking */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaAgent) }}
-        />
-        {/* DNS prefetch para assets externos */}
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaAgent) }} />
         <link rel="dns-prefetch" href="https://images.unsplash.com" />
         <link rel="dns-prefetch" href="https://xpkznaqgctfkoonqpcye.supabase.co" />
         <link rel="preconnect" href="https://xpkznaqgctfkoonqpcye.supabase.co" crossOrigin="anonymous" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
       </head>
-      <body className="bg-[#121315] text-[#f4f4f4] antialiased">{children}</body>
+      <body>{children}</body>
     </html>
   )
 }
