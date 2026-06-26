@@ -99,8 +99,8 @@ function SiteHeader() {
         <nav style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
           {[['/#portfólio', 'Empreendimentos'], ['/lancamentos/criciuma-sc', 'Lançamentos'], ['/#sobre', 'Sobre']].map(([href, label]) => (
             <Link key={href} href={href} style={{ fontSize: 13, fontWeight: 600, color: c.muted, textDecoration: 'none', letterSpacing: '0.01em', transition: 'color .2s' }}
-              onMouseOver={e => (e.currentTarget.style.color = c.ink)}
-              onMouseOut={e => (e.currentTarget.style.color = c.muted)}>
+              
+              >
               {label}
             </Link>
           ))}
