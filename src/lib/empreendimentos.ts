@@ -23,6 +23,8 @@ export interface Empreendimento {
   descricao: string;
   diferenciais: string[];
   imagens: string[];       // urls de fotos reais (vazio = usa fallback)
+  catalogoUrl?: string;
+  videoUrl?: string;
   oculto?: boolean;        // não aparece em listagens, mas a página resolve
 }
 
@@ -119,6 +121,8 @@ export const EMPREENDIMENTOS: Empreendimento[] = [
       'https://lh3.googleusercontent.com/d/1UY_UxkyWI1gN8dMqW_7UJVl2uMBHsAMP=w1600',
       'https://lh3.googleusercontent.com/d/1Mg6ipBSqIecSJ9nWmlQtClUwFVzvsm9R=w1600',
     ],
+    catalogoUrl: 'https://drive.google.com/file/d/1NvzrWE4HAz8UnI9NaTqKeEpaEgmTv5wr/view',
+    videoUrl: 'https://drive.google.com/file/d/1cNbxAoNKNQwoSo6bzCGYAl9_C1_gELOG/preview',
   },
   {
     slug: 'hub-smart-home-criciuma-sc',
