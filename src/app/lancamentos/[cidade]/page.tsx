@@ -29,13 +29,13 @@ const CIDADES: Record<string, { nome: string; uf: string; descricao: string }> =
 // REGRA: se exibir_preco=false, mostrar "Sob consulta" em TODOS os lugares
 // Este objeto é o fallback — o ideal é vir do Supabase via exibir_preco
 const EMPREENDIMENTOS_POR_CIDADE: Record<string, {
-  nome: string; slug: string; construtora: string; dorms: string;
+  nome: string; fase?: string; slug: string; construtora: string; dorms: string;
   exibir_preco: boolean; preco_a_partir_de: number | null;
 }[]> = {
   'criciuma': [
-    { nome: 'Monte Leone', slug: '/empreendimento/fontana/monte-leone-ana-lucia-criciuma-sc', construtora: 'Fontana', dorms: '2 e 3 dorms', exibir_preco: true, preco_a_partir_de: 280000 },
-    { nome: 'Lavis Residencial', slug: '/empreendimento/fontana/lavis-residencial-centro-criciuma-sc', construtora: 'Fontana', dorms: '2 e 3 dorms', exibir_preco: true, preco_a_partir_de: 320000 },
-    { nome: 'Pineto Residencial', slug: '/empreendimento/fontana/pineto-centro-criciuma-sc', construtora: 'Fontana', dorms: '2 e 3 dorms', exibir_preco: true, preco_a_partir_de: 350000 },
+    { nome: 'Monte Leone', fase: 'Na planta', slug: '/empreendimento/fontana/monte-leone-ana-lucia-criciuma-sc', construtora: 'Fontana', dorms: '2 e 3 dorms', exibir_preco: true, preco_a_partir_de: 280000 },
+    { nome: 'Lavis Residencial', fase: 'Em obras', slug: '/empreendimento/fontana/lavis-residencial-centro-criciuma-sc', construtora: 'Fontana', dorms: '2 e 3 dorms', exibir_preco: true, preco_a_partir_de: 320000 },
+    { nome: 'Pineto Residencial', fase: 'Na planta', slug: '/empreendimento/fontana/pineto-centro-criciuma-sc', construtora: 'Fontana', dorms: '2 dorms · 1 suíte', exibir_preco: true, preco_a_partir_de: 619250 },
   ],
 }
 
@@ -111,6 +111,7 @@ export default async function LancamentosCidadePage({ params }: Props) {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 24, marginBottom: 60 }}>
             {empreendimentos.map((emp, i) => (
               <Link key={i} href={emp.slug} style={{ display: 'block', background: '#202327', borderRadius: 12, padding: '28px 24px', border: '1px solid #2e3338', textDecoration: 'none', color: '#fff' }}>
+                {emp.fase && (<span style={{ display: 'inline-block', fontSize: 11, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: '#c9a24b', border: '1px solid #c9a24b', borderRadius: 40, padding: '3px 10px', marginBottom: 12 }}>{emp.fase}</span>)}
                 <p style={{ fontSize: 12, color: '#c9a24b', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>{emp.construtora}</p>
                 <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>{emp.nome}</h2>
                 <p style={{ fontSize: 14, color: '#a7adb4', marginBottom: 4 }}>{emp.dorms}</p>
