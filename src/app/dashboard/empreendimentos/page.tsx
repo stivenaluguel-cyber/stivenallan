@@ -2,36 +2,21 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
+const D = {
+  bg: '#F3F2EE', surface: '#FAFAF7', ink: '#161512',
+  bronze: '#D24E22', orange: '#FF6A3D', muted: '#6B655B',
+  line: 'rgba(26,24,21,0.08)', green: '#22c55e', red: '#ef4444', amber: '#f59e0b',
+}
+
 type Empreendimento = {
-  id: string
-  nome: string
-  construtora: string
-  cidade: string
-  uf: string
-  slug: string
-  status_obra: string
-  status_venda: string
-  preco_a_partir: number | null
-  created_at: string
+  id: string; nome: string; construtora: string; cidade: string; uf: string
+  slug: string; status_obra: string; status_venda: string
+  preco_a_partir: number | null; created_at: string
 }
 
-const STATUS_OBRA_LABEL: Record<string, string> = {
-  lancamento: 'Lançamento',
-  em_obras: 'Em Obras',
-  pronto: 'Pronto',
-}
-
-const STATUS_VENDA_LABEL: Record<string, string> = {
-  ativo: 'Ativo',
-  pausado: 'Pausado',
-  encerrado: 'Encerrado',
-}
-
-const STATUS_VENDA_COLOR: Record<string, string> = {
-  ativo: '#22c55e',
-  pausado: '#f59e0b',
-  encerrado: '#ef4444',
-}
+const STATUS_OBRA_LABEL: Record<string, string> = { lancamento: 'Lancamento', em_obras: 'Em Obras', pronto: 'Pronto' }
+const STATUS_VENDA_LABEL: Record<string, string> = { ativo: 'Ativo', pausado: 'Pausado', encerrado: 'Encerrado' }
+const STATUS_VENDA_COLOR: Record<string, string> = { ativo: D.green, pausado: D.amber, encerrado: D.red }
 
 export default function EmpreendimentosPage() {
   const router = useRouter()
@@ -39,9 +24,7 @@ export default function EmpreendimentosPage() {
   const [loading, setLoading] = useState(true)
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
-  useEffect(() => {
-    fetchEmpreendimentos()
-  }, [])
+  useEffect(() => { fetchEmpreendimentos() }, [])
 
   async function fetchEmpreendimentos() {
     setLoading(true)
@@ -50,138 +33,82 @@ export default function EmpreendimentosPage() {
       if (res.status === 401) { router.push('/dashboard/login'); return }
       const json = await res.json()
       setEmpreendimentos(json.data || [])
-    } catch (e) {
-      console.error(e)
-    } finally {
-      setLoading(false)
-    }
+    } catch (e) { console.error(e) } finally { setLoading(false) }
   }
 
   async function handleDelete(id: string, nome: string) {
-    if (!confirm(`Tem certeza que deseja excluir "${nome}"? Esta ação não pode ser desfeita.`)) return
+    if (!confirm('Tem certeza que deseja excluir "' + nome + '"? Esta acao nao pode ser desfeita.')) return
     setDeletingId(id)
     try {
-      const res = await fetch(`/api/admin/empreendimentos/${id}`, { method: 'DELETE' })
-      if (res.ok) {
-        setEmpreendimentos(prev => prev.filter(e => e.id !== id))
-      } else {
-        alert('Erro ao excluir empreendimento')
-      }
-    } catch (e) {
-      alert('Erro ao excluir empreendimento')
-    } finally {
-      setDeletingId(null)
-    }
+      const res = await fetch('/api/admin/empreendimentos/' + id, { method: 'DELETE' })
+      if (res.ok) { setEmpreendimentos(prev => prev.filter(e => e.id !== id)) }
+      else { alert('Erro ao excluir empreendimento') }
+    } catch { alert('Erro ao excluir empreendimento') } finally { setDeletingId(null) }
   }
 
   async function handleStatusVenda(id: string, novoStatus: string) {
     try {
-      await fetch(`/api/admin/empreendimentos/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+      await fetch('/api/admin/empreendimentos/' + id, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status_venda: novoStatus }),
       })
       setEmpreendimentos(prev => prev.map(e => e.id === id ? { ...e, status_venda: novoStatus } : e))
-    } catch (e) {
-      alert('Erro ao atualizar status')
-    }
+    } catch { alert('Erro ao atualizar status') }
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#121315', color: '#fff', fontFamily: 'system-ui, sans-serif' }}>
-      {/* Header */}
-      <div style={{ background: '#202327', borderBottom: '1px solid #2a2d31', padding: '0 32px' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-            <a href="/dashboard" style={{ color: '#c9a24b', fontWeight: 700, fontSize: 18, textDecoration: 'none' }}>SA Imóveis</a>
-            <span style={{ color: '#a7adb4' }}>›</span>
-            <span style={{ color: '#fff', fontWeight: 600 }}>Empreendimentos</span>
+    <div style={{ minHeight: '100vh', background: D.bg, color: D.ink, fontFamily: "'Hanken Grotesk',system-ui,sans-serif" }}>
+      <div style={{ maxWidth: 1400, margin: '0 auto', padding: 'clamp(20px,3vw,32px) clamp(16px,3vw,32px)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28, flexWrap: 'wrap', gap: 12 }}>
+          <div>
+            <h1 style={{ margin: 0, fontFamily: "'Bricolage Grotesque',system-ui", fontSize: 'clamp(20px,3vw,28px)', fontWeight: 800, color: D.ink }}>Empreendimentos</h1>
+            <p style={{ margin: '4px 0 0', color: D.muted, fontSize: 14 }}>{empreendimentos.length} cadastrado{empreendimentos.length !== 1 ? 's' : ''}</p>
           </div>
-          <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
-            <a href="/dashboard" style={{ color: '#a7adb4', textDecoration: 'none', fontSize: 14 }}>Dashboard</a>
-            <a href="/dashboard/leads" style={{ color: '#a7adb4', textDecoration: 'none', fontSize: 14 }}>Leads</a>
-            <button
-              onClick={() => router.push('/dashboard/empreendimentos/novo')}
-              style={{ background: '#c9a24b', color: '#000', border: 'none', borderRadius: 8, padding: '8px 20px', fontWeight: 700, cursor: 'pointer', fontSize: 14 }}
-            >
-              + Novo Empreendimento
-            </button>
-          </div>
+          <button onClick={() => router.push('/dashboard/empreendimentos/novo')}
+            style={{ padding: '11px 22px', border: 'none', borderRadius: 3, background: D.bronze, color: '#fff', fontWeight: 700, fontSize: 14, cursor: 'pointer', minHeight: 44 }}>
+            + Novo Empreendimento
+          </button>
         </div>
-      </div>
-
-      {/* Content */}
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '32px 32px' }}>
-        <div style={{ marginBottom: 24 }}>
-          <h1 style={{ fontSize: 24, fontWeight: 700, margin: 0 }}>Empreendimentos</h1>
-          <p style={{ color: '#a7adb4', margin: '4px 0 0' }}>{empreendimentos.length} empreendimento{empreendimentos.length !== 1 ? 's' : ''} cadastrado{empreendimentos.length !== 1 ? 's' : ''}</p>
-        </div>
-
         {loading ? (
-          <div style={{ display: 'flex', justifyContent: 'center', padding: 64 }}>
-            <div style={{ width: 40, height: 40, border: '3px solid #2a2d31', borderTopColor: '#c9a24b', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {[1,2,3].map(i => <div key={i} style={{ background: D.surface, borderRadius: 3, height: 80, border: '1px solid ' + D.line, opacity: 0.5 }} />)}
           </div>
         ) : empreendimentos.length === 0 ? (
-          <div style={{ background: '#202327', borderRadius: 12, padding: 48, textAlign: 'center' }}>
-            <div style={{ fontSize: 48, marginBottom: 16 }}>🏗️</div>
-            <h3 style={{ fontWeight: 600, marginBottom: 8 }}>Nenhum empreendimento cadastrado</h3>
-            <p style={{ color: '#a7adb4', marginBottom: 24 }}>Cadastre seu primeiro empreendimento para exibi-lo no site.</p>
-            <button
-              onClick={() => router.push('/dashboard/empreendimentos/novo')}
-              style={{ background: '#c9a24b', color: '#000', border: 'none', borderRadius: 8, padding: '12px 28px', fontWeight: 700, cursor: 'pointer' }}
-            >
+          <div style={{ background: D.surface, borderRadius: 3, padding: 48, textAlign: 'center', border: '1px solid ' + D.line }}>
+            <h3 style={{ fontFamily: "'Bricolage Grotesque',system-ui", fontWeight: 700, marginBottom: 8, color: D.ink }}>Nenhum empreendimento cadastrado</h3>
+            <p style={{ color: D.muted, marginBottom: 24, fontSize: 14 }}>Cadastre seu primeiro empreendimento.</p>
+            <button onClick={() => router.push('/dashboard/empreendimentos/novo')}
+              style={{ background: D.bronze, color: '#fff', border: 'none', borderRadius: 3, padding: '12px 28px', fontWeight: 700, cursor: 'pointer', fontSize: 14 }}>
               + Cadastrar Empreendimento
             </button>
           </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {empreendimentos.map(emp => (
-              <div key={emp.id} style={{ background: '#202327', borderRadius: 12, padding: '20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px solid #2a2d31' }}>
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 }}>
-                    <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0 }}>{emp.nome}</h3>
-                    <span style={{ fontSize: 12, background: '#2a2d31', padding: '2px 10px', borderRadius: 20, color: '#a7adb4' }}>
-                      {STATUS_OBRA_LABEL[emp.status_obra] || emp.status_obra}
-                    </span>
-                    <span style={{ fontSize: 12, background: STATUS_VENDA_COLOR[emp.status_venda] + '22', color: STATUS_VENDA_COLOR[emp.status_venda], padding: '2px 10px', borderRadius: 20, fontWeight: 600 }}>
-                      {STATUS_VENDA_LABEL[emp.status_venda] || emp.status_venda}
-                    </span>
+              <div key={emp.id} style={{ background: D.surface, borderRadius: 3, padding: '18px 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px solid ' + D.line, gap: 12, flexWrap: 'wrap' }}>
+                <div style={{ flex: 1, minWidth: 200 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6, flexWrap: 'wrap' }}>
+                    <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: D.ink }}>{emp.nome}</h3>
+                    <span style={{ fontSize: 11, background: 'rgba(26,24,21,0.06)', padding: '2px 10px', borderRadius: 20, color: D.muted, fontWeight: 600 }}>{STATUS_OBRA_LABEL[emp.status_obra] || emp.status_obra}</span>
+                    <span style={{ fontSize: 11, background: (STATUS_VENDA_COLOR[emp.status_venda] ?? D.muted) + '22', color: STATUS_VENDA_COLOR[emp.status_venda] ?? D.muted, padding: '2px 10px', borderRadius: 20, fontWeight: 700 }}>{STATUS_VENDA_LABEL[emp.status_venda] || emp.status_venda}</span>
                   </div>
-                  <p style={{ color: '#a7adb4', margin: 0, fontSize: 14 }}>
-                    {emp.construtora} · {emp.cidade}/{emp.uf}
-                    {emp.preco_a_partir ? ` · A partir de R$ ${emp.preco_a_partir.toLocaleString('pt-BR')}` : ''}
-                  </p>
+                  <p style={{ color: D.muted, margin: 0, fontSize: 13 }}>{emp.construtora} · {emp.cidade}/{emp.uf}{emp.preco_a_partir ? ' · A partir de R$ ' + emp.preco_a_partir.toLocaleString('pt-BR') : ''}</p>
                 </div>
-                <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0 }}>
-                  <a
-                    href={`/empreendimento/${emp.construtora?.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}/${emp.slug}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ background: '#2a2d31', color: '#a7adb4', border: 'none', borderRadius: 8, padding: '8px 14px', cursor: 'pointer', fontSize: 13, textDecoration: 'none' }}
-                  >
-                    👁️ Ver
-                  </a>
-                  <button
-                    onClick={() => router.push(`/dashboard/empreendimentos/${emp.id}/editar`)}
-                    style={{ background: '#2a2d31', color: '#c9a24b', border: '1px solid #c9a24b33', borderRadius: 8, padding: '8px 14px', cursor: 'pointer', fontSize: 13 }}
-                  >
-                    ✏️ Editar
-                  </button>
-                  <select
-                    value={emp.status_venda}
-                    onChange={e => handleStatusVenda(emp.id, e.target.value)}
-                    style={{ background: '#2a2d31', color: '#fff', border: '1px solid #3a3d41', borderRadius: 8, padding: '8px 10px', cursor: 'pointer', fontSize: 13 }}
-                  >
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0, flexWrap: 'wrap' }}>
+                  <a href={'/empreendimento/' + emp.construtora?.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') + '/' + emp.slug}
+                    target="_blank" rel="noopener noreferrer"
+                    style={{ display: 'inline-flex', alignItems: 'center', background: D.bg, color: D.muted, border: '1px solid ' + D.line, borderRadius: 3, padding: '8px 14px', fontSize: 13, textDecoration: 'none', minHeight: 36 }}>Ver</a>
+                  <button onClick={() => router.push('/dashboard/empreendimentos/' + emp.id + '/editar')}
+                    style={{ background: D.bg, color: D.bronze, border: '1px solid ' + D.bronze + '44', borderRadius: 3, padding: '8px 14px', cursor: 'pointer', fontSize: 13, minHeight: 36 }}>Editar</button>
+                  <select value={emp.status_venda} onChange={e => handleStatusVenda(emp.id, e.target.value)}
+                    style={{ background: '#fff', color: D.ink, border: '1px solid ' + D.line, borderRadius: 3, padding: '8px 10px', cursor: 'pointer', fontSize: 13, font: 'inherit', minHeight: 36 }}>
                     <option value="ativo">Ativo</option>
                     <option value="pausado">Pausado</option>
                     <option value="encerrado">Encerrado</option>
                   </select>
-                  <button
-                    onClick={() => handleDelete(emp.id, emp.nome)}
-                    disabled={deletingId === emp.id}
-                    style={{ background: '#ef444422', color: '#ef4444', border: '1px solid #ef444433', borderRadius: 8, padding: '8px 14px', cursor: 'pointer', fontSize: 13 }}
-                  >
-                    {deletingId === emp.id ? '...' : '🗑️'}
+                  <button onClick={() => handleDelete(emp.id, emp.nome)} disabled={deletingId === emp.id}
+                    style={{ background: '#fee2e2', color: D.red, border: '1px solid #fecaca', borderRadius: 3, padding: '8px 14px', cursor: 'pointer', fontSize: 13, minHeight: 36 }}>
+                    {deletingId === emp.id ? '...' : 'Excluir'}
                   </button>
                 </div>
               </div>
@@ -189,10 +116,6 @@ export default function EmpreendimentosPage() {
           </div>
         )}
       </div>
-
-      <style>{
-        '@keyframes spin { to { transform: rotate(360deg) } }'
-      }</style>
     </div>
   )
 }
