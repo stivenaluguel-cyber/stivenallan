@@ -30,3 +30,37 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.json(data ?? [])
 }
+
+export async function POST(req: NextRequest) {
+  const supabase = getSupabaseAdmin()
+  if (!supabase) return NextResponse.json({ error: 'Serviço indisponível' }, { status: 503 })
+
+  let body: Record<string, unknown>
+  try {
+    body = await req.json()
+  } catch {
+    return NextResponse.json({ error: 'JSON inválido' }, { status: 400 })
+  }
+
+  const whatsapp = typeof body.whatsapp === 'string' ? body.whatsapp.replace(/\D/g, '') : ''
+  if (!whatsapp) {
+    return NextResponse.json({ error: 'WhatsApp é obrigatório' }, { status: 400 })
+  }
+
+  const insert: Record<string, unknown> = {
+    whatsapp,
+    nome: body.nome ?? null,
+    email: body.email ?? null,
+    origem: body.origem ?? null,
+    orcamento_max: body.orcamento_max ?? null,
+    estagio_funil: body.estagio_funil ?? 'primeiro_contato',
+  }
+
+  const { data, error } = await supabase.from('leads').insert(insert).select().single()
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+
+  return NextResponse.json(data, { status: 201 })
+}
