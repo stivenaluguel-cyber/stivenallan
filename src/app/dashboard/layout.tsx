@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { href: '/dashboard/financeiro', label: 'Financeiro' },
   { href: '/dashboard/empreendimentos', label: 'Empreendimentos' },
   { href: '/dashboard/leads', label: 'Leads' },
+  { href: '/dashboard/simulador', label: 'Simulador' },
 ];
 
 const PAGE_LABELS: Record<string, string> = {
@@ -22,6 +23,7 @@ const PAGE_LABELS: Record<string, string> = {
   '/dashboard/financeiro': 'Financeiro',
   '/dashboard/empreendimentos': 'Empreendimentos',
   '/dashboard/leads': 'Leads',
+  '/dashboard/simulador': 'Simulador',
 };
 
 function getLabel(pathname: string) {
