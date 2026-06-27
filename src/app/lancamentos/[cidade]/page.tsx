@@ -36,7 +36,6 @@ const EMPREENDIMENTOS_POR_CIDADE: Record<string, {
     { nome: 'Monte Leone', slug: '/empreendimento/fontana/monte-leone-ana-lucia-criciuma-sc', construtora: 'Fontana', dorms: '2 e 3 dorms', exibir_preco: true, preco_a_partir_de: 280000 },
     { nome: 'Lavis Residencial', slug: '/empreendimento/fontana/lavis-residencial-centro-criciuma-sc', construtora: 'Fontana', dorms: '2 e 3 dorms', exibir_preco: true, preco_a_partir_de: 320000 },
     { nome: 'Pineto Residencial', slug: '/empreendimento/fontana/pineto-centro-criciuma-sc', construtora: 'Fontana', dorms: '2 e 3 dorms', exibir_preco: true, preco_a_partir_de: 350000 },
-    { nome: 'Hub Smart Home', slug: '/empreendimento/fontana/hub-smart-home-criciuma-sc', construtora: 'Fontana', dorms: '1 e 2 dorms', exibir_preco: false, preco_a_partir_de: null },
   ],
 }
 
