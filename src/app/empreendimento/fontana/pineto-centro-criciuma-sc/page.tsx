@@ -110,7 +110,7 @@ export default function PinetoPage() {
               Pineto Residencial
             </h1>
             <p style={{ fontSize: 'clamp(15px,2vw,18px)', color: c.onDarkMuted, marginBottom: 32, maxWidth: 520, lineHeight: 1.65 }}>
-              O empreendimento que redefine o estilo de vida no Centro de Criciúma. Apartamentos 2 e 3 dormitórios com coworking, yoga, academia e piscina — tudo no mesmo lugar.
+              Imagine acordar no coração de Criciúma, descer para o coworking sem enfrentar trânsito, treinar antes do almoço e relaxar na piscina ao fim do dia. O Pineto não vende apenas um apartamento — entrega o estilo de vida que você já merecia. 2 e 3 dormitórios, lazer completo e financiamento direto com a construtora.
             </p>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ ...ui.btnConvert, minHeight: 48, display: 'inline-flex', alignItems: 'center', boxShadow: '0 8px 28px rgba(255,106,61,0.35)' }}>
@@ -144,6 +144,30 @@ export default function PinetoPage() {
               <div style={{ fontSize: 12, color: c.muted, marginTop: 4, letterSpacing: '0.04em' }}>{l}</div>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* OPORTUNIDADE / URGÊNCIA */}
+      <section style={{ background: c.ink, padding: 'clamp(40px,6vw,72px) clamp(16px,4vw,40px)' }}>
+        <div style={{ maxWidth: 1080, margin: '0 auto' }}>
+          <span style={{ ...ui.eyebrow, color: c.orange }}>POR QUE AGORA</span>
+          <h2 style={{ ...ui.h2, color: c.onDark, maxWidth: 720 }}>Na planta é onde o seu dinheiro rende mais</h2>
+          <p style={{ color: c.onDarkMuted, fontSize: 'clamp(1rem,1.6vw,1.15rem)', maxWidth: 720, lineHeight: 1.6, margin: '0 0 32px' }}>
+            Comprar na fase de lançamento significa o melhor preço por m², condições de pagamento que cabem no seu planejamento e a valorização natural até a entrega das chaves. Quem entra primeiro, escolhe melhor — e paga menos.
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 16 }}>
+            {[
+              { k: 'Melhor preço da tabela', d: 'Valores de lançamento, antes do reajuste das próximas etapas de vendas.' },
+              { k: 'Entrada parcelada', d: 'Plano direto com a construtora, sem depender de aprovação bancária para começar.' },
+              { k: 'Valorização até a entrega', d: 'Imóveis no Centro de Criciúma tendem a valorizar enquanto você ainda está pagando.' },
+              { k: 'Escolha a melhor unidade', d: 'Andar, posição solar e planta: as melhores unidades saem primeiro.' },
+            ].map(({ k, d }) => (
+              <div key={k} style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${c.lineDark}`, borderRadius: 4, padding: '20px 18px' }}>
+                <div style={{ fontFamily: font.display, fontWeight: 700, fontSize: '1.05rem', color: c.orange, marginBottom: 8 }}>{k}</div>
+                <div style={{ fontSize: 14, color: c.onDarkMuted, lineHeight: 1.55 }}>{d}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -237,6 +261,62 @@ export default function PinetoPage() {
         </div>
       </section>
 
+      {/* PARA QUEM É */}
+      <section style={{ background: c.paper, padding: 'clamp(48px,7vw,80px) clamp(16px,4vw,40px)', borderTop: `1px solid ${c.line}` }}>
+        <div style={{ maxWidth: 1080, margin: '0 auto' }}>
+          <span style={{ ...ui.eyebrow, color: c.bronze }}>FEITO PARA O SEU MOMENTO</span>
+          <h2 style={{ ...ui.h2, color: c.ink, maxWidth: 720 }}>O Pineto foi pensado para quem vive intensamente</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(250px,1fr))', gap: 20, marginTop: 32 }}>
+            {[
+              { icon: '👩‍💻', t: 'Profissional remoto', d: 'Trabalha de casa com o coworking a um elevador de distância. Produtividade sem perder o conforto de morar bem.' },
+              { icon: '💑', t: 'Casal que está começando', d: 'O primeiro apartamento dos sonhos, em localização nobre, com financiamento que cabe no orçamento de quem está construindo a vida.' },
+              { icon: '📈', t: 'Investidor inteligente', d: 'Imóvel no Centro de Criciúma, na planta, com alto potencial de valorização e demanda garantida de locação.' },
+              { icon: '🧘', t: 'Quem busca qualidade de vida', d: 'Yoga, academia e piscina no próprio prédio. Bem-estar deixa de ser meta e vira rotina.' },
+            ].map(({ icon, t, d }) => (
+              <div key={t} style={{ ...ui.card, padding: '24px 22px' }}>
+                <div style={{ fontSize: 32, marginBottom: 12 }}>{icon}</div>
+                <div style={{ fontFamily: font.display, fontWeight: 700, fontSize: '1.15rem', color: c.ink, marginBottom: 8 }}>{t}</div>
+                <div style={{ fontSize: 14.5, color: c.muted, lineHeight: 1.6 }}>{d}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* PLANTAS / UNIDADES */}
+      <section style={{ background: c.surface, padding: 'clamp(48px,7vw,80px) clamp(16px,4vw,40px)', borderTop: `1px solid ${c.line}` }}>
+        <div style={{ maxWidth: 1080, margin: '0 auto' }}>
+          <span style={{ ...ui.eyebrow, color: c.bronze }}>PLANTAS E VALORES</span>
+          <h2 style={{ ...ui.h2, color: c.ink, maxWidth: 720 }}>Escolha a metragem que combina com a sua vida</h2>
+          <p style={{ color: c.muted, fontSize: '1.05rem', maxWidth: 700, lineHeight: 1.6, margin: '0 0 32px' }}>
+            Unidades de 2 e 3 dormitórios, com opções de suíte e varanda. Valores de lançamento, sujeitos à disponibilidade.
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))', gap: 18 }}>
+            {[
+              { tag: '2 dormitórios', area: '72 m²', from: 'R$ 450.000', feats: ['Sala ampliada', '1 vaga de garagem', 'Varanda gourmet'] },
+              { tag: '2 dorms + suíte', area: '88 m²', from: 'R$ 520.000', feats: ['Suíte master', '1 a 2 vagas', 'Living integrado'], destaque: true },
+              { tag: '3 dormitórios', area: '108 m²', from: 'R$ 620.000', feats: ['Suíte + 2 dorms', '2 vagas', 'Espaço home office'] },
+            ].map(({ tag, area, from, feats, destaque }) => (
+              <div key={tag} style={{ ...ui.card, padding: '26px 22px', borderColor: destaque ? c.orange : c.line, position: 'relative' }}>
+                {destaque && <span style={{ position: 'absolute', top: -11, left: 22, background: c.orange, color: '#fff', fontSize: 11, fontWeight: 700, letterSpacing: '0.05em', padding: '4px 10px', borderRadius: 40 }}>MAIS PROCURADO</span>}
+                <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: c.bronze, marginBottom: 6 }}>{tag}</div>
+                <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: '2rem', color: c.ink, lineHeight: 1 }}>{area}</div>
+                <div style={{ fontSize: 14, color: c.muted, margin: '10px 0 14px' }}>A partir de <strong style={{ color: c.ink }}>{from}</strong></div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 7, marginBottom: 18 }}>
+                  {feats.map(f => (
+                    <div key={f} style={{ fontSize: 13.5, color: c.ink, display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ width: 5, height: 5, borderRadius: 40, background: c.orange, flexShrink: 0 }} />{f}
+                    </div>
+                  ))}
+                </div>
+                <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ ...ui.btnSecondary, width: '100%', justifyContent: 'center', boxSizing: 'border-box' }}>Consultar disponibilidade</a>
+              </div>
+            ))}
+          </div>
+          <p style={{ fontSize: 12.5, color: c.muted, marginTop: 16 }}>* Metragens e valores ilustrativos, sujeitos a alteração e disponibilidade. Consulte a tabela atualizada com o consultor.</p>
+        </div>
+      </section>
+
       {/* SIMULADOR */}
       <div style={{ background: c.surface, borderTop: `1px solid ${c.line}` }}>
         <Simulador
@@ -258,6 +338,53 @@ export default function PinetoPage() {
                 <div style={{ width: 6, height: 6, background: c.bronze, borderRadius: '50%', flexShrink: 0 }} />
                 <span style={{ fontSize: 14, color: c.ink }}>{item}</span>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* PROVA SOCIAL / AUTORIDADE */}
+      <section style={{ background: c.paper, padding: 'clamp(48px,7vw,80px) clamp(16px,4vw,40px)', borderTop: `1px solid ${c.line}` }}>
+        <div style={{ maxWidth: 1080, margin: '0 auto' }}>
+          <span style={{ ...ui.eyebrow, color: c.bronze }}>CONFIANÇA</span>
+          <h2 style={{ ...ui.h2, color: c.ink, maxWidth: 720 }}>Você não está sozinho nessa decisão</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 16, marginTop: 28 }}>
+            {[
+              { v: 'Fontana', l: 'Construtora consolidada em Criciúma' },
+              { v: 'CRECI/RS 60.275', l: 'Consultor registrado e regularizado' },
+              { v: 'Financiamento', l: 'Direto com a construtora, sem burocracia bancária' },
+              { v: 'Atendimento 1:1', l: 'Acompanhamento do interesse à entrega das chaves' },
+            ].map(({ v, l }) => (
+              <div key={l} style={{ textAlign: 'center', padding: '24px 16px', borderRight: `1px solid ${c.line}` }}>
+                <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: '1.4rem', color: c.orange, marginBottom: 8 }}>{v}</div>
+                <div style={{ fontSize: 13.5, color: c.muted, lineHeight: 1.5 }}>{l}</div>
+              </div>
+            ))}
+          </div>
+          <blockquote style={{ margin: '40px auto 0', maxWidth: 760, textAlign: 'center', fontFamily: font.display, fontWeight: 600, fontSize: 'clamp(1.2rem,2.4vw,1.6rem)', lineHeight: 1.45, color: c.ink }}>
+            "Meu trabalho é simples: te mostrar a unidade certa, com as melhores condições, e cuidar de cada detalhe até a chave na sua mão."
+            <footer style={{ fontFamily: font.body, fontWeight: 500, fontSize: 14, color: c.bronze, marginTop: 14 }}>— Stiven Allan, seu consultor Fontana</footer>
+          </blockquote>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section style={{ background: c.surface, padding: 'clamp(48px,7vw,80px) clamp(16px,4vw,40px)', borderTop: `1px solid ${c.line}` }}>
+        <div style={{ maxWidth: 820, margin: '0 auto' }}>
+          <span style={{ ...ui.eyebrow, color: c.bronze }}>DÚVIDAS FREQUENTES</span>
+          <h2 style={{ ...ui.h2, color: c.ink }}>Tudo o que você precisa saber antes de decidir</h2>
+          <div style={{ marginTop: 28 }}>
+            {[
+              { q: 'O Pineto já está pronto para morar?', a: 'O Pineto é um lançamento. Comprar agora garante o melhor preço de tabela e a escolha das melhores unidades, com prazo até a entrega das chaves para se organizar financeiramente.' },
+              { q: 'Consigo financiar direto com a construtora?', a: 'Sim. A Fontana oferece plano de pagamento direto, com entrada parcelada e parcelas mensais, sem depender da aprovação inicial de um banco. O consultor monta o plano que cabe no seu orçamento.' },
+              { q: 'Quais as opções de planta e metragem?', a: 'Há unidades de 2 e 3 dormitórios, de 72 m² a 108 m², com opções de suíte e varanda. A disponibilidade muda conforme as vendas — vale consultar a tabela atualizada.' },
+              { q: 'O coworking e a academia têm custo extra?', a: 'A infraestrutura de lazer (coworking, espaço yoga, academia, piscina, playground e salão gourmet) faz parte do condomínio e é de uso de todos os moradores.' },
+              { q: 'Como faço para garantir a minha unidade?', a: 'Basta falar com o consultor pelo WhatsApp. Ele verifica a disponibilidade em tempo real, apresenta as condições e conduz a reserva de forma segura.' },
+            ].map(({ q, a }) => (
+              <details key={q} style={{ borderBottom: `1px solid ${c.line}`, padding: '18px 0' }}>
+                <summary style={{ cursor: 'pointer', fontFamily: font.display, fontWeight: 700, fontSize: '1.08rem', color: c.ink, listStyle: 'none' }}>{q}</summary>
+                <p style={{ margin: '12px 0 0', fontSize: 15, color: c.muted, lineHeight: 1.65 }}>{a}</p>
+              </details>
             ))}
           </div>
         </div>
