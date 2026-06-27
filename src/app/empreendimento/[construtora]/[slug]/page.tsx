@@ -7,7 +7,6 @@ import {
   getEmpreendimento,
   precoLabel,
   statusLabel,
-  IMAGEM_FALLBACK,
   type Empreendimento,
 } from '@/lib/empreendimentos';
 import FormContato from './FormContato';
@@ -48,7 +47,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       siteName: 'Stiven Allan',
       locale: 'pt_BR',
       type: 'website',
-      images: [{ url: emp.imagens[0] || IMAGEM_FALLBACK }],
+      images: emp.imagens[0] ? [{ url: emp.imagens[0] }] : undefined,
     },
   };
 }
@@ -71,7 +70,7 @@ export default async function EmpreendimentoPage({ params }: PageProps) {
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/\s+/g, '-') + '-sc';
   const cidadeHref = '/lancamentos/' + cidadeSlug;
-  const imagens = emp.imagens.length > 0 ? emp.imagens : [IMAGEM_FALLBACK];
+  const temFotos = emp.imagens.length > 0;
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -79,7 +78,7 @@ export default async function EmpreendimentoPage({ params }: PageProps) {
     name: emp.nome,
     description: emp.descricao,
     url: SITE_URL + '/empreendimento/' + emp.construtoraSlug + '/' + emp.slug,
-    image: (emp.imagens[0] || IMAGEM_FALLBACK),
+    ...(temFotos ? { image: emp.imagens[0] } : {}),
     address: {
       '@type': 'PostalAddress',
       addressLocality: emp.cidade,
@@ -127,17 +126,29 @@ export default async function EmpreendimentoPage({ params }: PageProps) {
             aspectRatio: '16 / 9',
             borderRadius: 16,
             overflow: 'hidden',
-            background: '#e7dfd2',
+            background: 'linear-gradient(135deg, #e7dfd2 0%, #d8cbb6 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
-          <Image
-            src={imagens[0]}
-            alt={'Foto do empreendimento ' + emp.nome + ' em ' + emp.cidade + '/' + emp.uf}
-            fill
-            priority
-            sizes="(max-width: 1100px) 100vw, 1100px"
-            style={{ objectFit: 'cover' }}
-          />
+          {temFotos ? (
+            <Image
+              src={emp.imagens[0]}
+              alt={'Foto do empreendimento ' + emp.nome + ' em ' + emp.cidade + '/' + emp.uf}
+              fill
+              priority
+              sizes="(max-width: 1100px) 100vw, 1100px"
+              style={{ objectFit: 'cover' }}
+            />
+          ) : (
+            <div style={{ textAlign: 'center', color: '#8a6d3b', padding: 24 }}>
+              <p style={{ fontSize: 22, fontWeight: 700, margin: 0 }}>{emp.nome}</p>
+              <p style={{ fontSize: 14, margin: '6px 0 0', letterSpacing: 1 }}>
+                Fotos em breve
+              </p>
+            </div>
+          )}
           <span
             style={{
               position: 'absolute',
@@ -155,7 +166,7 @@ export default async function EmpreendimentoPage({ params }: PageProps) {
             {statusLabel(emp.statusObra)}
           </span>
         </div>
-        {imagens.length > 1 && (
+        {temFotos && emp.imagens.length > 1 && (
           <div
             style={{
               display: 'grid',
@@ -164,7 +175,7 @@ export default async function EmpreendimentoPage({ params }: PageProps) {
               marginTop: 12,
             }}
           >
-            {imagens.slice(1).map((img, i) => (
+            {emp.imagens.slice(1).map((img, i) => (
               <div
                 key={i}
                 style={{
