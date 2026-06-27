@@ -3,20 +3,32 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { c, font, brl, ui } from '@/lib/theme'
 import Simulador from '@/components/Simulador'
+import { CUB_SC, cubLabel, CUB_NOTA } from '@/lib/cub'
 
-const WPP = 'https://api.whatsapp.com/send?phone=5548991455522&text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Pineto%20Residencial!'
+const WPP = 'https://api.whatsapp.com/send?phone=5548991642332&text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Pineto%20Residencial'
+
+// Ultima revisao da tabela de unidades (edite ao atualizar).
+const TABELA_ATUALIZADA = 'junho/2026'
+// Link do catalogo/tabela em PDF (Drive). Deixe '' para ocultar o botao.
+const CATALOGO_PDF = ''
+// Tabela de unidades - facil de atualizar mensalmente.
+const UNIDADES: { apto: string; area: string; valor: string; tag?: string }[] = [
+  { apto: 'Apto 104', area: '76,25 m\u00b2', valor: 'R$ 650.212,50', tag: 'menor valor' },
+  { apto: 'Apto 102', area: '76,34 m\u00b2', valor: 'R$ 693.560,00' },
+  { apto: 'Apto 1505', area: '75,72 m\u00b2', valor: 'R$ 817.410,00' },
+]
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://stivenallan.vercel.app'
 
 export const revalidate = 3600
 
 export const metadata: Metadata = {
-  title: 'Pineto Residencial | Apartamentos 2 e 3 Dormitórios Centro Criciúma SC | Stiven Allan',
-  description: 'Pineto Residencial: apartamentos 2 e 3 dormitórios com suíte no Centro de Criciúma/SC. Coworking, espaço yoga, piscina, playground. Lançamento Fontana Construtora. Consultor Stiven Allan CRECI/RS 60.275.',
+  title: 'Pineto Residencial — apartamentos no Centro de Criciúma com financiamento direto',
+  description: 'Pineto Residencial: apartamentos de 2 dormitórios (1 suíte), 75–76 m², no Centro de Criciúma/SC. Na planta, entrega em 2029, a partir de R$ 619 mil com financiamento direto com a construtora (sem banco). Lançamento Fontana. Consultor Stiven Allan CRECI/RS 60.275.',
   keywords: ['Pineto Residencial', 'apartamento Criciúma', 'lançamento Fontana', 'coworking apartamento Criciúma', 'Stiven Allan corretor SC'],
   alternates: { canonical: `${SITE_URL}/empreendimento/fontana/pineto-centro-criciuma-sc` },
   openGraph: {
     title: 'Pineto Residencial — Lifestyle Completo no Centro de Criciúma/SC',
-    description: 'Apartamentos 2 e 3 dorm. com coworking, espaço yoga, piscina, academia e salão gourmet. Lançamento exclusivo Fontana.',
+    description: 'Apartamentos de 2 dormitórios (1 suíte), 75–76 m², no Centro de Criciúma/SC. Na planta, entrega 2029. A partir de R$ 619 mil com financiamento direto com a construtora.',
     url: `${SITE_URL}/empreendimento/fontana/pineto-centro-criciuma-sc`,
     images: [{ url: 'https://lh3.googleusercontent.com/d/1WoeVn8nWbU-Zbr-NGK9fT-quhSH_OFas', width: 1200, height: 630 }],
     type: 'website',
@@ -53,12 +65,12 @@ const SCHEMA = {
     {
       '@type': 'RealEstateListing',
       name: 'Pineto Residencial',
-      description: 'Lançamento residencial no Centro de Criciúma/SC com apartamentos de 2 e 3 dormitórios, coworking, espaço yoga, academia, piscina e salão gourmet. Construtora Fontana.',
+      description: 'Lançamento na planta no Centro de Criciúma/SC: apartamentos de 2 dormitórios (1 suíte), 75 a 76 m², com financiamento direto com a construtora. Entrega em 30/11/2029. Incorporação OBF Construções Ltda — Construtora Fontana.',
       url: `${SITE_URL}/empreendimento/fontana/pineto-centro-criciuma-sc`,
       image: 'https://lh3.googleusercontent.com/d/1WoeVn8nWbU-Zbr-NGK9fT-quhSH_OFas',
-      offers: { '@type': 'Offer', priceCurrency: 'BRL', price: '450000', availability: 'https://schema.org/InStock' },
-      address: { '@type': 'PostalAddress', addressLocality: 'Criciúma', addressRegion: 'SC', postalCode: '88802-100', addressCountry: 'BR' },
-      floorSize: { '@type': 'QuantitativeValue', minValue: 72, maxValue: 108, unitCode: 'MTK' },
+      offers: { '@type': 'Offer', priceCurrency: 'BRL', price: '619250', availability: 'https://schema.org/InStock' },
+      address: { '@type': 'PostalAddress', streetAddress: 'Rua Itajaí, Centro', addressLocality: 'Criciúma', addressRegion: 'SC', postalCode: '88801-000', addressCountry: 'BR' },
+      floorSize: { '@type': 'QuantitativeValue', minValue: 75, maxValue: 76, unitCode: 'MTK' },
     },
     {
       '@type': 'BreadcrumbList',
@@ -105,12 +117,12 @@ export default function PinetoPage() {
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(19,18,17,0.25) 0%, rgba(19,18,17,0.78) 100%)' }} />
         <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: 'clamp(24px,5vw,56px)' }}>
           <div style={{ maxWidth: 700 }}>
-            <span style={{ ...ui.eyebrow, display: 'inline-block', marginBottom: 14, color: c.orange }}>LANÇAMENTO · FONTANA CONSTRUTORA</span>
+            <span style={{ ...ui.eyebrow, display: 'inline-block', marginBottom: 14, color: c.orange }}>LANÇAMENTO · NA PLANTA · ENTREGA 2029 · FONTANA</span>
             <h1 style={{ fontFamily: font.display, fontWeight: 800, fontSize: 'clamp(2.2rem,6vw,4rem)', lineHeight: 1.05, letterSpacing: '-0.025em', color: c.onDark, margin: '0 0 16px' }}>
               Pineto Residencial
             </h1>
             <p style={{ fontSize: 'clamp(15px,2vw,18px)', color: c.onDarkMuted, marginBottom: 32, maxWidth: 520, lineHeight: 1.65 }}>
-              Imagine acordar no coração de Criciúma, descer para o coworking sem enfrentar trânsito, treinar antes do almoço e relaxar na piscina ao fim do dia. O Pineto não vende apenas um apartamento — entrega o estilo de vida que você já merecia. 2 e 3 dormitórios, lazer completo e financiamento direto com a construtora.
+              Aqui a sua originalidade é o segredo para viver bem — no centro de todos os seus novos planos. Apartamentos de 2 dormitórios com suíte, 75 a 76 m², na Rua Itajaí, coração de Criciúma. Lançamento na planta com entrega em 2029 e financiamento direto com a construtora, sem depender de banco.
             </p>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ ...ui.btnConvert, minHeight: 48, display: 'inline-flex', alignItems: 'center', boxShadow: '0 8px 28px rgba(255,106,61,0.35)' }}>
@@ -123,7 +135,7 @@ export default function PinetoPage() {
           </div>
         </div>
         <div style={{ position: 'absolute', top: 24, left: 'clamp(16px,5vw,40px)', display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          {['Centro Criciúma', 'Coworking', 'Yoga', '2 e 3 Dorms'].map(t => (
+          {['Centro · Rua Itajaí', '2 dorms + suíte', '75–76 m²', 'Financiamento direto'].map(t => (
             <span key={t} style={{ background: 'rgba(19,18,17,0.65)', border: `1px solid ${c.bronze}66`, borderRadius: 40, padding: '5px 14px', fontSize: 12, fontWeight: 600, color: c.onDark, backdropFilter: 'blur(8px)' }}>{t}</span>
           ))}
         </div>
@@ -133,11 +145,11 @@ export default function PinetoPage() {
       <section style={{ background: c.surface, borderBottom: `1px solid ${c.line}` }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: 'clamp(28px,4vw,40px) clamp(16px,4vw,40px)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 24 }}>
           {[
-            { v: 'R$ 450 mil', l: 'A partir de' },
-            { v: '72–108 m²', l: 'Área privativa' },
-            { v: '2 e 3', l: 'Dormitórios' },
-            { v: 'Coworking', l: 'Diferencial único' },
-            { v: 'Centro', l: 'Criciúma / SC' },
+            { v: 'R$ 619.250', l: 'A partir de' },
+            { v: '75–76 m²', l: 'Área privativa' },
+            { v: '2 dorms + suíte', l: 'Tipologia' },
+            { v: '56 unidades', l: 'Edifício 15+ andares' },
+            { v: 'Entrega 2029', l: 'Na planta · 30/11/2029' },
           ].map(({ v, l }) => (
             <div key={l} style={{ textAlign: 'center' }}>
               <div style={{ fontFamily: font.display, fontSize: 'clamp(1.2rem,2.5vw,1.6rem)', fontWeight: 800, color: c.bronze, letterSpacing: '-0.02em' }}>{v}</div>
@@ -283,46 +295,96 @@ export default function PinetoPage() {
         </div>
       </section>
 
-      {/* PLANTAS / UNIDADES */}
-      <section style={{ background: c.surface, padding: 'clamp(48px,7vw,80px) clamp(16px,4vw,40px)', borderTop: `1px solid ${c.line}` }}>
+      {/* CONDIÇÕES DE NEGOCIAÇÃO — protagonista */}
+      <section style={{ background: c.ink, padding: 'clamp(48px,7vw,84px) clamp(16px,4vw,40px)' }}>
         <div style={{ maxWidth: 1080, margin: '0 auto' }}>
-          <span style={{ ...ui.eyebrow, color: c.bronze }}>PLANTAS E VALORES</span>
-          <h2 style={{ ...ui.h2, color: c.ink, maxWidth: 720 }}>Escolha a metragem que combina com a sua vida</h2>
-          <p style={{ color: c.muted, fontSize: '1.05rem', maxWidth: 700, lineHeight: 1.6, margin: '0 0 32px' }}>
-            Unidades de 2 e 3 dormitórios, com opções de suíte e varanda. Valores de lançamento, sujeitos à disponibilidade.
+          <span style={{ ...ui.eyebrow, color: c.orange }}>FINANCIAMENTO DIRETO COM A CONSTRUTORA</span>
+          <h2 style={{ ...ui.h2, color: c.onDark, maxWidth: 760 }}>Compre sem depender de banco</h2>
+          <p style={{ color: c.onDarkMuted, fontSize: 'clamp(1rem,1.6vw,1.15rem)', maxWidth: 720, lineHeight: 1.6, margin: '0 0 36px' }}>
+            Na Fontana você negocia direto com a incorporadora: entrada parcelada, reforços anuais e parcela mensal que cabem no seu planejamento — sem fila de banco e sem análise demorada.
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))', gap: 18 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))', gap: 14, marginBottom: 28 }}>
             {[
-              { tag: '2 dormitórios', area: '72 m²', from: 'R$ 450.000', feats: ['Sala ampliada', '1 vaga de garagem', 'Varanda gourmet'] },
-              { tag: '2 dorms + suíte', area: '88 m²', from: 'R$ 520.000', feats: ['Suíte master', '1 a 2 vagas', 'Living integrado'], destaque: true },
-              { tag: '3 dormitórios', area: '108 m²', from: 'R$ 620.000', feats: ['Suíte + 2 dorms', '2 vagas', 'Espaço home office'] },
-            ].map(({ tag, area, from, feats, destaque }) => (
-              <div key={tag} style={{ ...ui.card, padding: '26px 22px', borderColor: destaque ? c.orange : c.line, position: 'relative' }}>
-                {destaque && <span style={{ position: 'absolute', top: -11, left: 22, background: c.orange, color: '#fff', fontSize: 11, fontWeight: 700, letterSpacing: '0.05em', padding: '4px 10px', borderRadius: 40 }}>MAIS PROCURADO</span>}
-                <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: c.bronze, marginBottom: 6 }}>{tag}</div>
-                <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: '2rem', color: c.ink, lineHeight: 1 }}>{area}</div>
-                <div style={{ fontSize: 14, color: c.muted, margin: '10px 0 14px' }}>A partir de <strong style={{ color: c.ink }}>{from}</strong></div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 7, marginBottom: 18 }}>
-                  {feats.map(f => (
-                    <div key={f} style={{ fontSize: 13.5, color: c.ink, display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span style={{ width: 5, height: 5, borderRadius: 40, background: c.orange, flexShrink: 0 }} />{f}
-                    </div>
-                  ))}
-                </div>
-                <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ ...ui.btnSecondary, width: '100%', justifyContent: 'center', boxSizing: 'border-box' }}>Consultar disponibilidade</a>
+              { n: '1x', l: 'Entrada' },
+              { n: '4x', l: 'Reforços anuais' },
+              { n: '41x', l: 'Parcelas mensais' },
+            ].map(({ n, l }) => (
+              <div key={l} style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${c.lineDark}`, borderRadius: 4, padding: '22px 18px', textAlign: 'center' }}>
+                <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: '2.4rem', color: c.orange, lineHeight: 1 }}>{n}</div>
+                <div style={{ fontSize: 13.5, color: c.onDarkMuted, marginTop: 8 }}>{l}</div>
               </div>
             ))}
           </div>
-          <p style={{ fontSize: 12.5, color: c.muted, marginTop: 16 }}>* Metragens e valores ilustrativos, sujeitos a alteração e disponibilidade. Consulte a tabela atualizada com o consultor.</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))', gap: 14 }}>
+            {[
+              { t: 'À vista com 5% OFF', d: 'Desconto de 5% para pagamento à vista do valor da unidade.' },
+              { t: 'Parcelamento estendido', d: 'Opção em até 240x, corrigidas por IGPM + 0,75% a.m.' },
+              { t: 'Correção na obra: CUB/SC', d: 'Durante a construção, parcelas e reforços seguem o CUB/SC. Após a obra: IGPM + 0,75% a.m.' },
+              { t: 'Vencimento flexível', d: 'Escolha o melhor dia: 10, 15, 20, 25 ou 27.' },
+            ].map(({ t, d }) => (
+              <div key={t} style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${c.lineDark}`, borderRadius: 4, padding: '20px 18px' }}>
+                <div style={{ fontFamily: font.display, fontWeight: 700, fontSize: '1.05rem', color: c.onDark, marginBottom: 8 }}>{t}</div>
+                <div style={{ fontSize: 13.5, color: c.onDarkMuted, lineHeight: 1.55 }}>{d}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{ marginTop: 28, background: c.paper, borderRadius: 6, padding: 'clamp(20px,3vw,28px)', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 18, borderLeft: `4px solid ${c.orange}` }}>
+            <div>
+              <div style={{ ...ui.eyebrow, color: c.bronze, marginBottom: 6 }}>ÍNDICE DE CORREÇÃO · CUB/SC</div>
+              <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 'clamp(1.8rem,4vw,2.4rem)', color: c.ink, lineHeight: 1 }}>{cubLabel(CUB_SC)} <span style={{ fontSize: '0.9rem', fontWeight: 500, color: c.muted }}>/ m²</span></div>
+              <div style={{ fontSize: 13.5, color: c.muted, marginTop: 6 }}>Vigência {CUB_SC.vigencia} · fonte {CUB_SC.fonte}. {CUB_NOTA}</div>
+            </div>
+            <a href={CUB_SC.fonteUrl} target="_blank" rel="noopener noreferrer" style={{ ...ui.btnSecondary, whiteSpace: 'nowrap' }}>Ver no {CUB_SC.fonte}</a>
+          </div>
+        </div>
+      </section>
+
+      {/* TABELA DE UNIDADES */}
+      <section style={{ background: c.surface, padding: 'clamp(48px,7vw,80px) clamp(16px,4vw,40px)', borderTop: `1px solid ${c.line}` }}>
+        <div style={{ maxWidth: 1080, margin: '0 auto' }}>
+          <span style={{ ...ui.eyebrow, color: c.bronze }}>TABELA DE UNIDADES</span>
+          <h2 style={{ ...ui.h2, color: c.ink, maxWidth: 720 }}>Disponibilidade e valores</h2>
+          <p style={{ color: c.muted, fontSize: '1.05rem', maxWidth: 700, lineHeight: 1.6, margin: '0 0 28px' }}>
+            Faixa de R$ 619.250,00 a R$ 832.891,25. Unidades de 2 dormitórios (1 suíte). Valores sujeitos a alteração e disponibilidade — consulte a tabela atualizada.
+          </p>
+          <div style={{ overflowX: 'auto', border: `1px solid ${c.line}`, borderRadius: 6 }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 15, minWidth: 460 }}>
+              <thead>
+                <tr style={{ background: c.ink }}>
+                  <th style={{ textAlign: 'left', padding: '14px 18px', color: c.onDark, fontFamily: font.display, fontWeight: 700 }}>Apto</th>
+                  <th style={{ textAlign: 'left', padding: '14px 18px', color: c.onDark, fontFamily: font.display, fontWeight: 700 }}>Área privativa</th>
+                  <th style={{ textAlign: 'right', padding: '14px 18px', color: c.onDark, fontFamily: font.display, fontWeight: 700 }}>Valor</th>
+                </tr>
+              </thead>
+              <tbody>
+                {UNIDADES.map((u, i) => (
+                  <tr key={u.apto} style={{ background: i % 2 ? c.paper : c.surface, borderTop: `1px solid ${c.line}` }}>
+                    <td style={{ padding: '13px 18px', color: c.ink, fontWeight: 600 }}>
+                      {u.apto}{u.tag && <span style={{ marginLeft: 8, fontSize: 11, fontWeight: 700, color: c.orange, border: `1px solid ${c.orange}`, borderRadius: 40, padding: '2px 8px' }}>{u.tag}</span>}
+                    </td>
+                    <td style={{ padding: '13px 18px', color: c.muted }}>{u.area}</td>
+                    <td style={{ padding: '13px 18px', color: c.ink, fontWeight: 700, textAlign: 'right' }}>{u.valor}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 18, alignItems: 'center' }}>
+            <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ ...ui.btnSecondary }}>Ver tabela completa (56 unidades)</a>
+            {CATALOGO_PDF && (
+              <a href={CATALOGO_PDF} target="_blank" rel="noopener noreferrer" style={{ ...ui.btnPrimary }}>Baixar catálogo / tabela (PDF)</a>
+            )}
+            <span style={{ fontSize: 12.5, color: c.muted }}>Tabela atualizada mensalmente. Última atualização: {TABELA_ATUALIZADA}.</span>
+          </div>
         </div>
       </section>
 
       {/* SIMULADOR */}
       <div style={{ background: c.surface, borderTop: `1px solid ${c.line}` }}>
         <Simulador
-          valorInicial={450000}
-          valorMin={315000}
-          valorMax={700000}
+          valorInicial={619250}
+          valorMin={619250}
+          valorMax={832891}
           hrefReserva={WPP}
         />
       </div>
@@ -340,6 +402,35 @@ export default function PinetoPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* FICHA TECNICA */}
+      <section style={{ background: c.paper, padding: 'clamp(48px,7vw,80px) clamp(16px,4vw,40px)', borderTop: `1px solid ${c.line}` }}>
+        <div style={{ maxWidth: 1080, margin: '0 auto' }}>
+          <span style={{ ...ui.eyebrow, color: c.bronze }}>FICHA T\u00c9CNICA</span>
+          <h2 style={{ ...ui.h2, color: c.ink }}>Informa\u00e7\u00f5es do empreendimento</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))', gap: 0, marginTop: 28, border: `1px solid ${c.line}`, borderRadius: 6, overflow: 'hidden' }}>
+            {[
+              { k: 'Empreendimento', v: 'Pineto Residencial' },
+              { k: 'Construtora / vendas', v: 'Fontana' },
+              { k: 'Incorporadora', v: 'OBF Constru\u00e7\u00f5es Ltda' },
+              { k: 'Endere\u00e7o', v: 'Rua Itaja\u00ed, Centro \u2014 Crici\u00fama/SC' },
+              { k: 'Tipologia', v: '2 dormit\u00f3rios (1 su\u00edte)' },
+              { k: '\u00c1rea privativa', v: '75 a 76 m\u00b2' },
+              { k: 'Edif\u00edcio', v: '15+ andares \u00b7 56 unidades \u00b7 2 elevadores' },
+              { k: 'Fase da obra', v: 'Na planta' },
+              { k: 'Previs\u00e3o de entrega', v: '30/11/2029' },
+              { k: 'Faixa de pre\u00e7o', v: 'R$ 619.250,00 a R$ 832.891,25' },
+              { k: 'Matr\u00edcula', v: 'R-7-160.123 \u2014 1\u00ba Of\u00edcio R.I. Crici\u00fama/SC' },
+            ].map(({ k, v }) => (
+              <div key={k} style={{ padding: '16px 20px', borderTop: `1px solid ${c.line}`, borderRight: `1px solid ${c.line}` }}>
+                <div style={{ fontSize: 12, letterSpacing: '0.04em', textTransform: 'uppercase', color: c.bronze, marginBottom: 5 }}>{k}</div>
+                <div style={{ fontSize: 15, color: c.ink, fontWeight: 600 }}>{v}</div>
+              </div>
+            ))}
+          </div>
+          <p style={{ fontSize: 12.5, color: c.muted, marginTop: 14 }}>Imagens ilustrativas. Informa\u00e7\u00f5es e valores sujeitos a altera\u00e7\u00e3o sem aviso pr\u00e9vio.</p>
         </div>
       </section>
 
@@ -375,9 +466,9 @@ export default function PinetoPage() {
           <h2 style={{ ...ui.h2, color: c.ink }}>Tudo o que você precisa saber antes de decidir</h2>
           <div style={{ marginTop: 28 }}>
             {[
-              { q: 'O Pineto já está pronto para morar?', a: 'O Pineto é um lançamento. Comprar agora garante o melhor preço de tabela e a escolha das melhores unidades, com prazo até a entrega das chaves para se organizar financeiramente.' },
-              { q: 'Consigo financiar direto com a construtora?', a: 'Sim. A Fontana oferece plano de pagamento direto, com entrada parcelada e parcelas mensais, sem depender da aprovação inicial de um banco. O consultor monta o plano que cabe no seu orçamento.' },
-              { q: 'Quais as opções de planta e metragem?', a: 'Há unidades de 2 e 3 dormitórios, de 72 m² a 108 m², com opções de suíte e varanda. A disponibilidade muda conforme as vendas — vale consultar a tabela atualizada.' },
+              { q: 'Quando o Pineto fica pronto?', a: 'O Pineto está na planta, com entrega prevista para 30/11/2029. Comprar agora garante o melhor preço de tabela, a escolha das melhores unidades e prazo para se organizar financeiramente até as chaves.' },
+              { q: 'Consigo financiar direto com a construtora?', a: 'Sim. A Fontana financia direto: entrada + 4 reforços anuais + 41 parcelas mensais (ou em até 240x corrigidas por IGPM + 0,75% a.m.), sem depender de banco. Há 5% de desconto à vista. Durante a obra a correção é pelo CUB/SC. O consultor monta o plano ideal para você.' },
+              { q: 'Quais as opções de planta e metragem?', a: 'São apartamentos de 2 dormitórios, sendo 1 suíte, com área privativa de 75 a 76 m². A disponibilidade e os valores (de R$ 619.250 a R$ 832.891) mudam conforme as vendas — vale consultar a tabela atualizada.' },
               { q: 'O coworking e a academia têm custo extra?', a: 'A infraestrutura de lazer (coworking, espaço yoga, academia, piscina, playground e salão gourmet) faz parte do condomínio e é de uso de todos os moradores.' },
               { q: 'Como faço para garantir a minha unidade?', a: 'Basta falar com o consultor pelo WhatsApp. Ele verifica a disponibilidade em tempo real, apresenta as condições e conduz a reserva de forma segura.' },
             ].map(({ q, a }) => (
@@ -403,9 +494,9 @@ export default function PinetoPage() {
               style={{ background: '#25d366', color: '#fff', borderRadius: 2, padding: '15px 28px', fontWeight: 700, fontSize: 15, textDecoration: 'none', minHeight: 48, display: 'inline-flex', alignItems: 'center' }}>
               Chamar no WhatsApp
             </a>
-            <a href="tel:+5548991455522"
+            <a href="tel:+5548991642332"
               style={{ ...ui.btnSecondary, color: c.onDark, borderColor: c.lineDark, minHeight: 48, display: 'inline-flex', alignItems: 'center' }}>
-              (48) 99145-5522
+              (48) 99164-2332
             </a>
           </div>
         </div>
@@ -415,7 +506,7 @@ export default function PinetoPage() {
       <footer style={{ background: c.charcoal, borderTop: `1px solid ${c.lineDark}`, padding: 'clamp(24px,3vw,32px) clamp(16px,4vw,40px)', textAlign: 'center', color: c.onDarkMuted, fontSize: 13 }}>
         <p style={{ margin: 0 }}>
           Pineto Residencial · Fontana Construtora · Centro, Criciúma/SC<br />
-          Consultor: Stiven Allan · CRECI/RS 60.275 · (48) 99145-5522
+          Consultor: Stiven Allan · CRECI/RS 60.275 · (48) 99164-2332
         </p>
         <p style={{ margin: '8px 0 0', fontSize: 12, color: 'rgba(245,241,234,0.35)' }}>
           As imagens são ilustrativas. Informações sujeitas a alterações sem aviso prévio.
