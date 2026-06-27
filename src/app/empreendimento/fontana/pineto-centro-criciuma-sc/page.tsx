@@ -13,9 +13,9 @@ const TABELA_ATUALIZADA = 'junho/2026'
 const CATALOGO_PDF = ''
 // Tabela de unidades - facil de atualizar mensalmente.
 const UNIDADES: { apto: string; area: string; valor: string; tag?: string }[] = [
-  { apto: 'Apto 104', area: '76,25 m\u00b2', valor: 'R$ 650.212,50', tag: 'menor valor' },
-  { apto: 'Apto 102', area: '76,34 m\u00b2', valor: 'R$ 693.560,00' },
-  { apto: 'Apto 1505', area: '75,72 m\u00b2', valor: 'R$ 817.410,00' },
+  { apto: 'Apto 104', area: '76,25 m²', valor: 'R$ 650.212,50', tag: 'menor valor' },
+  { apto: 'Apto 102', area: '76,34 m²', valor: 'R$ 693.560,00' },
+  { apto: 'Apto 1505', area: '75,72 m²', valor: 'R$ 817.410,00' },
 ]
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://stivenallan.vercel.app'
 
@@ -408,21 +408,21 @@ export default function PinetoPage() {
       {/* FICHA TECNICA */}
       <section style={{ background: c.paper, padding: 'clamp(48px,7vw,80px) clamp(16px,4vw,40px)', borderTop: `1px solid ${c.line}` }}>
         <div style={{ maxWidth: 1080, margin: '0 auto' }}>
-          <span style={{ ...ui.eyebrow, color: c.bronze }}>FICHA T\u00c9CNICA</span>
-          <h2 style={{ ...ui.h2, color: c.ink }}>Informa\u00e7\u00f5es do empreendimento</h2>
+          <span style={{ ...ui.eyebrow, color: c.bronze }}>FICHA TÉCNICA</span>
+          <h2 style={{ ...ui.h2, color: c.ink }}>Informações do empreendimento</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))', gap: 0, marginTop: 28, border: `1px solid ${c.line}`, borderRadius: 6, overflow: 'hidden' }}>
             {[
               { k: 'Empreendimento', v: 'Pineto Residencial' },
               { k: 'Construtora / vendas', v: 'Fontana' },
-              { k: 'Incorporadora', v: 'OBF Constru\u00e7\u00f5es Ltda' },
-              { k: 'Endere\u00e7o', v: 'Rua Itaja\u00ed, Centro \u2014 Crici\u00fama/SC' },
-              { k: 'Tipologia', v: '2 dormit\u00f3rios (1 su\u00edte)' },
-              { k: '\u00c1rea privativa', v: '75 a 76 m\u00b2' },
-              { k: 'Edif\u00edcio', v: '15+ andares \u00b7 56 unidades \u00b7 2 elevadores' },
+              { k: 'Incorporadora', v: 'OBF Construções Ltda' },
+              { k: 'Endereço', v: 'Rua Itajaí, Centro — Criciúma/SC' },
+              { k: 'Tipologia', v: '2 dormitórios (1 suíte)' },
+              { k: 'Área privativa', v: '75 a 76 m²' },
+              { k: 'Edifício', v: '15+ andares · 56 unidades · 2 elevadores' },
               { k: 'Fase da obra', v: 'Na planta' },
-              { k: 'Previs\u00e3o de entrega', v: '30/11/2029' },
-              { k: 'Faixa de pre\u00e7o', v: 'R$ 619.250,00 a R$ 832.891,25' },
-              { k: 'Matr\u00edcula', v: 'R-7-160.123 \u2014 1\u00ba Of\u00edcio R.I. Crici\u00fama/SC' },
+              { k: 'Previsão de entrega', v: '30/11/2029' },
+              { k: 'Faixa de preço', v: 'R$ 619.250,00 a R$ 832.891,25' },
+              { k: 'Matrícula', v: 'R-7-160.123 — 1º Ofício R.I. Criciúma/SC' },
             ].map(({ k, v }) => (
               <div key={k} style={{ padding: '16px 20px', borderTop: `1px solid ${c.line}`, borderRight: `1px solid ${c.line}` }}>
                 <div style={{ fontSize: 12, letterSpacing: '0.04em', textTransform: 'uppercase', color: c.bronze, marginBottom: 5 }}>{k}</div>
@@ -430,7 +430,7 @@ export default function PinetoPage() {
               </div>
             ))}
           </div>
-          <p style={{ fontSize: 12.5, color: c.muted, marginTop: 14 }}>Imagens ilustrativas. Informa\u00e7\u00f5es e valores sujeitos a altera\u00e7\u00e3o sem aviso pr\u00e9vio.</p>
+          <p style={{ fontSize: 12.5, color: c.muted, marginTop: 14 }}>Imagens ilustrativas. Informações e valores sujeitos a alteração sem aviso prévio.</p>
         </div>
       </section>
 
