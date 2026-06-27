@@ -199,6 +199,32 @@ export default async function EmpreendimentoPage({ params }: PageProps) {
         )}
       </section>
 
+      {emp.videoUrl && (
+        <section style={{ maxWidth: 1100, margin: '0 auto', padding: '8px 20px 24px' }}>
+          <h2 style={{ fontSize: 22, margin: '0 0 16px' }}>Vídeo do empreendimento</h2>
+          <div
+            style={{
+              position: 'relative',
+              width: '100%',
+              aspectRatio: '16 / 9',
+              borderRadius: 16,
+              overflow: 'hidden',
+              background: '#000',
+              boxShadow: '0 8px 30px rgba(0,0,0,0.12)',
+            }}
+          >
+            <iframe
+              src={emp.videoUrl}
+              title={`Vídeo – ${emp.nome}`}
+              allow="autoplay; encrypted-media; fullscreen"
+              allowFullScreen
+              loading="lazy"
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0 }}
+            />
+          </div>
+        </section>
+      )}
+
       <section
         style={{
           maxWidth: 1100,
@@ -271,6 +297,27 @@ export default async function EmpreendimentoPage({ params }: PageProps) {
           >
             Tenho interesse (WhatsApp)
           </a>
+          {emp.catalogoUrl && (
+            <a
+              href={emp.catalogoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'block',
+                textAlign: 'center',
+                background: 'transparent',
+                color: '#8a6d3b',
+                fontWeight: 600,
+                padding: '12px 20px',
+                borderRadius: 10,
+                border: '1px solid #d8c7a8',
+                textDecoration: 'none',
+                margin: '12px 0 0',
+              }}
+            >
+              ↓ Baixar catálogo (PDF)
+            </a>
+          )}
           <p style={{ fontSize: 13, color: '#8a6d3b', textAlign: 'center', margin: '0 0 12px' }}>
             ou deixe seu contato
           </p>
