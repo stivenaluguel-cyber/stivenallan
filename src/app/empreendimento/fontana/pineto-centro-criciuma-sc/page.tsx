@@ -10,7 +10,7 @@ const WPP = 'https://api.whatsapp.com/send?phone=5548991642332&text=Ol%C3%A1%20S
 // Ultima revisao da tabela de unidades (edite ao atualizar).
 const TABELA_ATUALIZADA = 'junho/2026'
 // Link do catalogo/tabela em PDF (Drive). Deixe '' para ocultar o botao.
-const CATALOGO_PDF = ''
+const CATALOGO_PDF = 'https://drive.google.com/file/d/1NvzrWE4HAz8UnI9NaTqKeEpaEgmTv5wr/view'
 // Tabela de unidades - facil de atualizar mensalmente.
 const UNIDADES: { apto: string; area: string; valor: string; tag?: string }[] = [
   { apto: 'Apto 104', area: '76,25 m²', valor: 'R$ 650.212,50', tag: 'menor valor' },
@@ -210,6 +210,23 @@ export default function PinetoPage() {
               <div style={{ position: 'absolute', bottom: 8, left: 8, background: 'rgba(19,18,17,0.72)', borderRadius: 2, padding: '3px 10px', fontSize: 11, color: c.onDark, fontWeight: 600 }}>{img.label}</div>
             </div>
           ))}
+        </div>
+      </section>
+
+      <section style={{ padding: 'clamp(8px,2vw,24px) clamp(16px,4vw,40px) clamp(40px,6vw,64px)', maxWidth: 1300, margin: '0 auto' }}>
+        <div style={{ marginBottom: 28 }}>
+          <span style={{ ...ui.eyebrow, display: 'block', marginBottom: 12 }}>VÍDEO</span>
+          <h2 style={{ ...ui.h2, color: c.ink }}>Conheça o Pineto em movimento</h2>
+        </div>
+        <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 9', borderRadius: 4, overflow: 'hidden', background: '#000' }}>
+          <iframe
+            src="https://drive.google.com/file/d/1cNbxAoNKNQwoSo6bzCGYAl9_C1_gELOG/preview"
+            title="Vídeo Pineto Residencial"
+            allow="autoplay; encrypted-media; fullscreen"
+            allowFullScreen
+            loading="lazy"
+            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0 }}
+          />
         </div>
       </section>
 
