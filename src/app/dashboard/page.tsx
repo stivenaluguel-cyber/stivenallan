@@ -14,7 +14,7 @@ const ESTAGIOS = [
   { key: 'interessado', label: 'Interessado', cor: '#8b5cf6' },
   { key: 'proposta_enviada', label: 'Proposta Enviada', cor: '#f59e0b' },
   { key: 'visita_agendada', label: 'Visita Agendada', cor: '#ec4899' },
-  { key: 'negociacao', label: 'Em NegociÃ§Ã£o', cor: '#D24E22' },
+  { key: 'negociacao', label: 'Em Negociação', cor: '#D24E22' },
   { key: 'fechado', label: 'Fechado', cor: '#22c55e' },
 ]
 
@@ -69,8 +69,8 @@ export default async function DashboardPage() {
           {[
             { label: 'Total Leads', value: stats.total, cor: '#3b82f6' },
             { label: 'Novos Hoje', value: stats.novosHoje, cor: '#22c55e' },
-            { label: 'Precisam AtenÃ§Ã£o', value: stats.atencao, cor: '#D24E22' },
-            { label: 'Score MÃ©dio', value: stats.scoreMedia + '/100', cor: '#f59e0b' },
+            { label: 'Precisam Atenção', value: stats.atencao, cor: '#D24E22' },
+            { label: 'Score Médio', value: stats.scoreMedia + '/100', cor: '#f59e0b' },
             { label: 'Fechados', value: stats.fechados, cor: '#8b5cf6' },
           ].map((s, i) => (
             <div key={i} style={{ background: D.surface, border: `1px solid ${D.line}`, borderRadius: 3, padding: '18px 20px', borderTop: `3px solid ${s.cor}` }}>
@@ -85,7 +85,7 @@ export default async function DashboardPage() {
           <div style={{ background: D.surface, border: `1px solid ${D.line}`, borderRadius: 3, padding: '14px 20px', marginBottom: 20 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
               <span style={{ fontWeight: 700, fontSize: 13, color: D.bronze }}>Empreendimentos Ativos ({empreendimentos.length})</span>
-              <a href="/dashboard/empreendimentos" style={{ color: D.bronze, textDecoration: 'none', fontSize: 12, fontWeight: 600 }}>Ver todos â</a>
+              <a href="/dashboard/empreendimentos" style={{ color: D.bronze, textDecoration: 'none', fontSize: 12, fontWeight: 600 }}>Ver todos →</a>
             </div>
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
               {(empreendimentos as any[]).map((emp: any) => (
@@ -106,7 +106,7 @@ export default async function DashboardPage() {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
               <div style={{ fontFamily: "'Bricolage Grotesque',system-ui,sans-serif", fontSize: 16, fontWeight: 700, color: D.ink }}>Pipeline de Leads</div>
-              <a href="/dashboard/crm" style={{ color: D.bronze, textDecoration: 'none', fontSize: 13, fontWeight: 600 }}>Ver CRM completo â</a>
+              <a href="/dashboard/crm" style={{ color: D.bronze, textDecoration: 'none', fontSize: 13, fontWeight: 600 }}>Ver CRM completo →</a>
             </div>
             <div style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 12 }}>
               {leadsByEstagio.map(col => (
@@ -121,7 +121,7 @@ export default async function DashboardPage() {
                         <div style={{ textAlign: 'center', color: D.muted, fontSize: 12, padding: '16px 0' }}>Vazio</div>
                       ) : col.leads.map((lead: any) => (
                         <div key={lead.id} style={{ background: D.bg, borderRadius: 2, padding: '9px 11px', border: lead.requer_atencao ? `1px solid ${D.bronze}` : `1px solid ${D.line}` }}>
-                          {lead.requer_atencao && <div style={{ fontSize: 10, color: D.bronze, fontWeight: 700, marginBottom: 3 }}>ATENÃÃO</div>}
+                          {lead.requer_atencao && <div style={{ fontSize: 10, color: D.bronze, fontWeight: 700, marginBottom: 3 }}>ATENÇÃO</div>}
                           <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 4, color: D.ink }}>{lead.nome ?? '+' + lead.whatsapp}</div>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <span style={{ fontSize: 11, color: D.muted }}>{lead.perfil !== 'indefinido' ? lead.perfil : lead.origem}</span>
@@ -144,7 +144,7 @@ export default async function DashboardPage() {
             {/* ATENCAO */}
             <div style={{ background: D.surface, border: `1px solid ${D.line}`, borderRadius: 3 }}>
               <div style={{ padding: '12px 16px', borderBottom: `1px solid ${D.line}`, display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ fontWeight: 700, fontSize: 13, color: D.ink }}>Precisam de AtenÃ§Ã£o</span>
+                <span style={{ fontWeight: 700, fontSize: 13, color: D.ink }}>Precisam de Atenção</span>
                 {stats.atencao > 0 && <span style={{ background: D.bronze, color: '#fff', borderRadius: 10, padding: '2px 8px', fontSize: 11, fontWeight: 700, marginLeft: 'auto' }}>{stats.atencao}</span>}
               </div>
               <div style={{ padding: 10, maxHeight: 260, overflowY: 'auto' }}>
