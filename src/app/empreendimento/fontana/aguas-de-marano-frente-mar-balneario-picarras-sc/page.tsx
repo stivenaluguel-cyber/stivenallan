@@ -66,8 +66,8 @@ const AMENIDADES = [
 ]
 
 export const metadata: Metadata = {
-  title: 'Águas de Marano Residencial — frente mar no Centro de Balneário Piçarras/SC | Stiven Allan',
-  description: 'Águas de Marano Residencial (Construtora Fontana): apartamentos frente mar de alto padrão no Centro de Balneário Piçarras/SC. 3 e 4 dormitórios, ate 3 suítes, 196 a 199 m² privativos. Atendimento exclusivo com Stiven Allan.',
+  title: 'Águas de Marano — Frente Mar Balneário Piçarras/SC',
+  description: 'Águas de Marano Residencial (Construtora Fontana): apartamentos frente mar de alto padrão no Centro de Balneário Piçarras/SC. 3 e 4 dormitórios, até 3 suítes, 196 a 199 m² privativos. Atendimento exclusivo com Stiven Allan.',
   alternates: { canonical: SITE_URL + '/empreendimento/fontana/aguas-de-marano-frente-mar-balneario-picarras-sc' },
   openGraph: {
     title: 'Águas de Marano Residencial — frente mar em Balneário Piçarras/SC',
@@ -76,14 +76,22 @@ export const metadata: Metadata = {
     type: 'website',
     images: [{ url: "https://estilofontana.com.br/images/2024/01/15/f-adm-fachada-02-ef-web-65a588a03d4c8.jpg?fm=webp", width: 1200, height: 800, alt: 'Fachada do Águas de Marano Residencial' }],
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Águas de Marano Residencial — frente mar em Balneário Piçarras/SC',
+    description: 'Tenha o mar como seu vizinho. Apartamentos frente mar de alto padrão no Centro de Balneário Piçarras/SC. Atendimento exclusivo com Stiven Allan.',
+    images: ["https://estilofontana.com.br/images/2024/01/15/f-adm-fachada-02-ef-web-65a588a03d4c8.jpg?fm=webp"],
+  },
   robots: { index: true, follow: true },
 }
 
 const SCHEMA = {
   '@context': 'https://schema.org',
-  '@type': 'Residence',
-  name: 'Águas de Marano Residencial',
-  description: 'Apartamentos frente mar de alto padrão no Centro de Balneário Piçarras/SC. 3 e 4 dormitórios, ate 3 suítes, 196 a 199 m² privativos.',
+  '@graph': [
+    {
+      '@type': 'Residence',
+      name: 'Águas de Marano Residencial',
+  description: 'Apartamentos frente mar de alto padrão no Centro de Balneário Piçarras/SC. 3 e 4 dormitórios, até 3 suítes, 196 a 199 m² privativos.',
   url: SITE_URL + '/empreendimento/fontana/aguas-de-marano-frente-mar-balneario-picarras-sc',
   image: "https://estilofontana.com.br/images/2024/01/15/f-adm-fachada-02-ef-web-65a588a03d4c8.jpg?fm=webp",
   address: {
@@ -98,6 +106,20 @@ const SCHEMA = {
     { '@type': 'LocationFeatureSpecification', name: 'Spa aquecido', value: true },
     { '@type': 'LocationFeatureSpecification', name: 'Acesso à praia', value: true },
     { '@type': 'LocationFeatureSpecification', name: 'Frente mar', value: true },
+      ],
+      areaServed: { '@type': 'City', name: 'Balneário Piçarras', containedInPlace: { '@type': 'State', name: 'Santa Catarina' } },
+    },
+    {
+      '@type': 'Apartment',
+      name: 'Águas de Marano Residencial',
+      description: 'Apartamentos frente mar de alto padrão no Centro de Balneário Piçarras/SC. 3 e 4 dormitórios, até 3 suítes, 196 a 199 m² privativos.',
+      image: "https://estilofontana.com.br/images/2024/01/15/f-adm-fachada-02-ef-web-65a588a03d4c8.jpg?fm=webp",
+      numberOfRooms: 4,
+      numberOfBathroomsTotal: 4,
+      floorSize: { '@type': 'QuantitativeValue', value: 199, unitCode: 'MTK' },
+      address: { '@type': 'PostalAddress', streetAddress: 'Av. Nereu Ramos, esq. Rua Henrique Todeschini', addressLocality: 'Balneário Piçarras', addressRegion: 'SC', addressCountry: 'BR' },
+      areaServed: { '@type': 'City', name: 'Balneário Piçarras', containedInPlace: { '@type': 'State', name: 'Santa Catarina' } },
+    },
   ],
 }
 
