@@ -23,6 +23,8 @@ const CIDADES: Record<string, { nome: string; uf: string; descricao: string }> =
   'sombrio-sc': { nome: 'Sombrio', uf: 'SC', descricao: 'Lançamentos imobiliários em Sombrio/SC.' },
   'bom-jardim-da-serra': { nome: 'Bom Jardim da Serra', uf: 'SC', descricao: 'Empreendimentos na Serra Catarinense.' },
   'bom-jardim-da-serra-sc': { nome: 'Bom Jardim da Serra', uf: 'SC', descricao: 'Empreendimentos na Serra Catarinense.' },
+  'balneario-picarras': { nome: 'Balneário Piçarras', uf: 'SC', descricao: 'Empreendimentos frente mar em Balneário Piçarras/SC.' },
+  'balneario-picarras-sc': { nome: 'Balneário Piçarras', uf: 'SC', descricao: 'Empreendimentos frente mar em Balneário Piçarras/SC.' },
 }
 
 // Portfólio hardcoded com preço híbrido (exibir_preco + preco_a_partir_de)
@@ -33,9 +35,12 @@ const EMPREENDIMENTOS_POR_CIDADE: Record<string, {
   exibir_preco: boolean; preco_a_partir_de: number | null;
 }[]> = {
   'criciuma': [
-    { nome: 'Monte Leone', fase: 'Na planta', slug: '/empreendimento/fontana/monte-leone-ana-lucia-criciuma-sc', construtora: 'Fontana', dorms: '2 e 3 dorms', exibir_preco: true, preco_a_partir_de: 280000 },
+    { nome: 'Monte Leone', fase: 'Na planta', slug: '/empreendimento/fontana/monte-leone-centro-criciuma-sc', construtora: 'Fontana', dorms: '2 e 3 dorms', exibir_preco: false, preco_a_partir_de: null },
     { nome: 'Lavis Residencial', fase: 'Em obras', slug: '/empreendimento/fontana/lavis-residencial-centro-criciuma-sc', construtora: 'Fontana', dorms: '2 e 3 dorms', exibir_preco: true, preco_a_partir_de: 320000 },
     { nome: 'Pineto Residencial', fase: 'Na planta', slug: '/empreendimento/fontana/pineto-centro-criciuma-sc', construtora: 'Fontana', dorms: '2 dorms · 1 suíte', exibir_preco: true, preco_a_partir_de: 619250 },
+  ],
+  'balneario-picarras': [
+    { nome: 'Águas de Marano Residencial', fase: 'Em obras', slug: '/empreendimento/fontana/aguas-de-marano-frente-mar-balneario-picarras-sc', construtora: 'Fontana', dorms: '3 e 4 dorms · 3 suítes', exibir_preco: false, preco_a_partir_de: null },
   ],
 }
 
