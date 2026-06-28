@@ -24,6 +24,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'lh3.googleusercontent.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'estilofontana.com.br',
+      },
     ],
     deviceSizes: [390, 768, 1024, 1280, 1536],
     imageSizes: [64, 128, 256, 384, 512],
