@@ -67,7 +67,7 @@ const AMENIDADES = [
 
 export const metadata: Metadata = {
   title: 'Águas de Marano Residencial — frente mar no Centro de Balneário Piçarras/SC | Stiven Allan',
-  description: 'Águas de Marano Residencial (Construtora Fontana): apartamentos frente mar de alto padrão no Centro de Balneário Piçarras/SC. 3 e 4 dormitórios, ate 3 suítes, 196 a 199 m2 privativos. Atendimento exclusivo com Stiven Allan.',
+  description: 'Águas de Marano Residencial (Construtora Fontana): apartamentos frente mar de alto padrão no Centro de Balneário Piçarras/SC. 3 e 4 dormitórios, ate 3 suítes, 196 a 199 m² privativos. Atendimento exclusivo com Stiven Allan.',
   alternates: { canonical: SITE_URL + '/empreendimento/fontana/aguas-de-marano-frente-mar-balneario-picarras-sc' },
   openGraph: {
     title: 'Águas de Marano Residencial — frente mar em Balneário Piçarras/SC',
@@ -83,7 +83,7 @@ const SCHEMA = {
   '@context': 'https://schema.org',
   '@type': 'Residence',
   name: 'Águas de Marano Residencial',
-  description: 'Apartamentos frente mar de alto padrão no Centro de Balneário Piçarras/SC. 3 e 4 dormitórios, ate 3 suítes, 196 a 199 m2 privativos.',
+  description: 'Apartamentos frente mar de alto padrão no Centro de Balneário Piçarras/SC. 3 e 4 dormitórios, ate 3 suítes, 196 a 199 m² privativos.',
   url: SITE_URL + '/empreendimento/fontana/aguas-de-marano-frente-mar-balneario-picarras-sc',
   image: "https://estilofontana.com.br/images/2024/01/15/f-adm-fachada-02-ef-web-65a588a03d4c8.jpg?fm=webp",
   address: {
@@ -182,7 +182,7 @@ export default function AguasDeMaranoPage() {
         <div style={{ maxWidth: 820, margin: '0 auto' }}>
           <p className="am-eyebrow" style={{ marginBottom: 26 }}>O Residencial</p>
           <p className="am-serif" style={{ fontSize: 'clamp(24px,3.4vw,40px)', lineHeight: 1.35, color: t.ink, margin: 0 }}>
-            Tenha o mar como seu vizinho. Veja a transparencia das aguas a cada movimento do mar. Um endereco onde o bem-estar se torna estilo de vida e a sua liberdade fica proxima de tudo &mdash; frente mar, no coração de Balneário Piçarras.
+            Tenha o mar como seu vizinho. Veja a transparência das águas a cada movimento do mar. Um endereço onde o bem-estar se torna estilo de vida e a sua liberdade fica próxima de tudo &mdash; frente mar, no coração de Balneário Piçarras.
           </p>
           <hr className="am-rule" style={{ margin: '46px auto 0' }} />
         </div>
@@ -227,9 +227,9 @@ export default function AguasDeMaranoPage() {
           <p className="am-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 56 }}>Plantas amplas, 100% frente mar.</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 'clamp(28px,5vw,64px)', marginBottom: 56 }}>
             {[
-              { n: '3 e 4', l: 'Dormitorios' },
-              { n: '3', l: 'Suites' },
-              { n: '196 a 199', l: 'm2 privativos' },
+              { n: '3 e 4', l: 'Dormitórios' },
+              { n: '3', l: 'Suítes' },
+              { n: '196 a 199', l: 'm² privativos' },
               { n: '100%', l: 'Frente mar' },
             ].map((it, i) => (
               <div key={i}>
@@ -285,7 +285,7 @@ export default function AguasDeMaranoPage() {
         <div style={{ maxWidth: 1180, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px,1fr))', gap: 'clamp(34px,5vw,64px)', alignItems: 'center' }}>
           <div>
             <p className="am-eyebrow" style={{ color: t.onDark, marginBottom: 18 }}>Localização</p>
-            <h2 className="am-h2" style={{ color: t.onDark }}>A sua liberdade proxima de tudo.</h2>
+            <h2 className="am-h2" style={{ color: t.onDark }}>A sua liberdade próxima de tudo.</h2>
             <p style={{ color: t.onDarkMuted, fontSize: 17, lineHeight: 1.6, marginTop: 24 }}>
               Av. Nereu Ramos, esq. Rua Henrique Todeschini &mdash; Centro, Balneário Piçarras/SC
             </p>
