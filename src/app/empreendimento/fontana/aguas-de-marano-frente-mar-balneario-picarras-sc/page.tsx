@@ -238,7 +238,7 @@ export default function AguasDeMaranoPage() {
               </div>
             ))}
           </div>
-          <a href={CATALOGO_PDF} target="_blank" rel="noopener noreferrer" className="am-cta am-cta-light">Baixar Catalogo &amp; Plantas</a>
+          <a href={CATALOGO_PDF} target="_blank" rel="noopener noreferrer" className="am-cta am-cta-light">Baixar Catálogo &amp; Plantas</a>
         </div>
       </section>
 
