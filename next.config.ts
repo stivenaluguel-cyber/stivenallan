@@ -59,6 +59,13 @@ const nextConfig: NextConfig = {
       headers: [{ key: 'Cache-Control', value: 'public, max-age=86400' }],
     },
   ],
+  redirects: async () => [
+    {
+      source: '/empreendimento/fontana/monte-leone-ana-lucia-criciuma-sc',
+      destination: '/empreendimento/fontana/monte-leone-centro-criciuma-sc',
+      permanent: true,
+    },
+  ],
 }
 
 export default nextConfig
