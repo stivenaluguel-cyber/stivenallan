@@ -189,7 +189,8 @@ export default function AguasDeMaranoPage() {
       </section>
 
       {/* VIDEO */}
-      <section style={{ padding: '0 clamp(0px,4vw,56px) clamp(40px,8vh,96px)' }}>
+      <section id="video" style={{ padding: '0 clamp(0px,4vw,56px) clamp(40px,8vh,96px)' }}>
+        <p className="am-eyebrow" style={{ textAlign: 'center', marginBottom: 26 }}>Conheça o Águas de Marano</p>
         <div style={{ maxWidth: 1180, margin: '0 auto', position: 'relative', aspectRatio: '16 / 9', overflow: 'hidden', background: t.dark }}>
           <iframe
             src={IMG.video}
@@ -338,7 +339,7 @@ export default function AguasDeMaranoPage() {
         <div style={{ maxWidth: 1180, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px,1fr))', gap: 'clamp(28px,5vw,56px)' }}>
           <div>
             <div style={{ fontFamily: t.display, fontWeight: 400, letterSpacing: '0.22em', fontSize: 18, color: t.onDark, textTransform: 'uppercase' }}>Stiven Allan</div>
-            <p style={{ marginTop: 14, fontSize: 14, lineHeight: 1.6 }}>Imóveis de alto padrão em Santa Catarina.<br />CRECI/RS 60.275</p>
+            <p style={{ marginTop: 14, fontSize: 14, lineHeight: 1.6 }}>Imóveis de alto padrão em Santa Catarina.<br />CRECI 60.275</p>
           </div>
           <div>
             <div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDark, marginBottom: 14 }}>Contato</div>
