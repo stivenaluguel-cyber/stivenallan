@@ -12,6 +12,7 @@ const t = {
   bg: '#FAFAF8',
   ink: '#1A1916',
   gold: '#B89B5E',
+  goldDark: '#8A6D2F',
   muted: '#6E685E',
   line: 'rgba(26,25,22,0.12)',
   dark: '#14130F',
@@ -129,7 +130,8 @@ export default function MonteLeonePage() {
       <style>{`
         html { scroll-behavior: smooth; }
         .ml-eyebrow { font-size: 11px; letter-spacing: 0.42em; text-transform: uppercase; color: ${t.gold}; font-family: ${t.body}; }
-        .ml-h1 { font-family: ${t.display}; font-weight: 300; text-transform: uppercase; letter-spacing: 0.14em; line-height: 1.04; }
+        .ml-h1 { font-family: ${t.display}; font-weight: 300; text-transform: uppercase; letter-spacing: 0.14em; line-height: 1.04; text-shadow: 0 2px 24px rgba(0,0,0,0.55), 0 1px 4px rgba(0,0,0,0.4); }
+        .ml-onimg { text-shadow: 0 1px 16px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.5); }
         .ml-h2 { font-family: ${t.display}; font-weight: 300; text-transform: uppercase; letter-spacing: 0.16em; line-height: 1.1; font-size: clamp(26px,4vw,46px); margin: 0; }
         .ml-rule { width: 56px; height: 1px; background: ${t.gold}; border: 0; }
         .ml-cta { display: inline-block; font-family: ${t.body}; font-size: 12px; letter-spacing: 0.32em; text-transform: uppercase; color: ${t.ink}; border: 1px solid ${t.gold}; padding: 16px 34px; text-decoration: none; transition: background .35s ease, color .35s ease; }
@@ -165,9 +167,9 @@ export default function MonteLeonePage() {
       {/* HERO */}
       <section style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'flex-end' }}>
         <Image src={IMG.heroFrontal} alt="Fachada frontal do Monte Leone Residencial, no Centro de Criciúma/SC" fill priority sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(20,19,15,0.28) 0%, rgba(20,19,15,0.05) 40%, rgba(20,19,15,0.72) 100%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(20,19,15,0.45) 0%, rgba(20,19,15,0.18) 38%, rgba(20,19,15,0.82) 100%)' }} />
         <div style={{ position: 'relative', zIndex: 2, padding: '0 28px 12vh', maxWidth: 980 }}>
-          <p className="ml-eyebrow" style={{ color: t.gold }}>Monte Leone Residencial — Centro, Criciúma/SC</p>
+          <p className="ml-eyebrow ml-onimg" style={{ color: t.gold }}>Monte Leone Residencial — Centro, Criciúma/SC</p>
           <h1 className="ml-h1" style={{ color: t.onDark }}>Magnífico<br />por essência</h1>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginTop: 34 }}>
             <a href={WPP} target="_blank" rel="noopener noreferrer" className="ml-cta" style={{ borderColor: t.gold, color: t.onDark }}>Atendimento exclusivo</a>
@@ -179,7 +181,7 @@ export default function MonteLeonePage() {
       {/* CONCEITO */}
       <section id="residencial" style={{ padding: '14vh 28px', maxWidth: 1280, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '6vw', alignItems: 'center' }}>
         <div>
-          <p className="ml-eyebrow" style={{ color: t.gold }}>O Residencial</p>
+          <p className="ml-eyebrow" style={{ color: t.goldDark }}>O Residencial</p>
           <h2 className="ml-h2">Na altura<br />dos seus sonhos</h2>
           <div className="ml-rule" />
           <p style={{ fontSize: 18, lineHeight: 1.8, color: t.muted, maxWidth: 560 }}>
@@ -216,7 +218,7 @@ export default function MonteLeonePage() {
 
       {/* AS RESIDÊNCIAS — números */}
       <section style={{ padding: '14vh 28px', maxWidth: 1280, margin: '0 auto', textAlign: 'center' }}>
-        <p className="ml-eyebrow" style={{ color: t.gold }}>As Residências</p>
+        <p className="ml-eyebrow" style={{ color: t.goldDark }}>As Residências</p>
         <h2 className="ml-h2" style={{ margin: '0 auto' }}>Espaço para<br />contemplação</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 40, marginTop: '7vh', maxWidth: 1000, marginLeft: 'auto', marginRight: 'auto' }}>
           {[
@@ -231,13 +233,13 @@ export default function MonteLeonePage() {
             </div>
           ))}
         </div>
-        <p style={{ marginTop: '7vh', fontFamily: t.display, fontSize: 'clamp(20px, 2.4vw, 30px)', color: t.gold, letterSpacing: '0.12em', textTransform: 'uppercase' }}>Sob consulta</p>
+        <p style={{ marginTop: '7vh', fontFamily: t.display, fontSize: 'clamp(20px, 2.4vw, 30px)', color: t.goldDark, letterSpacing: '0.12em', textTransform: 'uppercase' }}>Sob consulta</p>
       </section>
 
       {/* PLANTAS */}
       <section id="plantas" style={{ background: t.bg, padding: '12vh 28px', borderTop: '1px solid ' + t.line }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
-          <p className="ml-eyebrow" style={{ color: t.gold }}>Plantas</p>
+          <p className="ml-eyebrow" style={{ color: t.goldDark }}>Plantas</p>
           <h2 className="ml-h2">Liberdade para<br />viver plenamente</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 28, marginTop: '6vh' }}>
             {PLANTAS.map((p, i) => (
@@ -247,7 +249,7 @@ export default function MonteLeonePage() {
                 </div>
                 <div style={{ padding: '20px 22px', borderTop: '1px solid ' + t.line }}>
                   <p style={{ fontFamily: t.display, fontWeight: 600, fontSize: 18, color: t.ink }}>{p.tipo}</p>
-                  <p style={{ fontSize: 14, color: t.gold, marginTop: 4, letterSpacing: '0.08em' }}>{p.area}</p>
+                  <p style={{ fontSize: 14, color: t.goldDark, marginTop: 4, letterSpacing: '0.08em' }}>{p.area}</p>
                   <p style={{ fontSize: 14, color: t.muted, marginTop: 10, lineHeight: 1.6 }}>{p.desc}</p>
                 </div>
               </div>
@@ -290,7 +292,7 @@ export default function MonteLeonePage() {
       <section id="localizacao" style={{ background: t.bg, borderTop: '1px solid ' + t.line, padding: '12vh 28px' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '5vw', alignItems: 'center' }}>
           <div>
-            <p className="ml-eyebrow" style={{ color: t.gold }}>Localização</p>
+            <p className="ml-eyebrow" style={{ color: t.goldDark }}>Localização</p>
             <h2 className="ml-h2">O endereço dos<br />que transformam<br />a vida em arte</h2>
             <div className="ml-rule" />
             <p style={{ fontSize: 18, lineHeight: 1.8, color: t.ink }}>Rua Hortêncio João da Silva, esquina com a Rua Antônio Baptista de Lucca, nº 98</p>
@@ -330,9 +332,9 @@ export default function MonteLeonePage() {
       {/* CTA FINAL */}
       <section style={{ position: 'relative', minHeight: '78vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
         <Image src={IMG.heroAerea} alt="Vista aérea do Monte Leone Residencial" fill loading="lazy" sizes="100vw" style={{ objectFit: 'cover' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(20,19,15,0.6)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(20,19,15,0.7)' }} />
         <div style={{ position: 'relative', zIndex: 2, padding: '0 28px', maxWidth: 760 }}>
-          <h2 className="ml-h2" style={{ color: t.onDark, margin: '0 auto' }}>Sinta o sublime<br />em cada detalhe</h2>
+          <h2 className="ml-h2 ml-onimg" style={{ color: t.onDark, margin: '0 auto' }}>Sinta o sublime<br />em cada detalhe</h2>
           <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap', marginTop: 34 }}>
             <a href={WPP} target="_blank" rel="noopener noreferrer" className="ml-cta" style={{ borderColor: t.gold, color: t.onDark }}>Atendimento exclusivo</a>
             <a href={CATALOGO_PDF} target="_blank" rel="noopener noreferrer" className="ml-cta" style={{ borderColor: 'rgba(244,241,234,0.4)', color: t.onDark }}>Baixar catálogo</a>
