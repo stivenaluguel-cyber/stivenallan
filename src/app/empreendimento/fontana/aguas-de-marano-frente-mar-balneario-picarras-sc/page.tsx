@@ -35,8 +35,8 @@ const GALERIA = [
   { src: "https://estilofontana.com.br/images/empreendimento/slideshows/aguas-de-marano-residencial-65a6bfc2517cc.jpg?fm=webp", alt: 'Águas de Marano Residencial — perspectiva externa', label: 'Arquitetura' },
   { src: "https://estilofontana.com.br/images/2024/01/15/f-adm-piscina-completa-ef-web-65a59327c6b50.jpg?fm=webp", alt: 'Piscina adulto com wet bar do Águas de Marano', label: 'Piscina & wet bar' },
   { src: "https://estilofontana.com.br/images/2024/01/15/f-adm-spa-aquecido-ef-web-65a593695f5f0.jpg?fm=webp", alt: 'Spa aquecido do Águas de Marano', label: 'Spa aquecido' },
-  { src: "https://estilofontana.com.br/images/2024/01/15/f-adm-terraco-espaco-fogo-ef-web-65a5938b45e1b.jpg?fm=webp", alt: 'Terraco com espaco fogo do Águas de Marano', label: 'Terraco & espaco fogo' },
-  { src: "https://estilofontana.com.br/images/2024/01/15/f-adm-salao-festas-01-ef-web-65a593fa7718c.jpg?fm=webp", alt: 'Salao de festas do Águas de Marano', label: 'Salão de festas' },
+  { src: "https://estilofontana.com.br/images/2024/01/15/f-adm-terraco-espaco-fogo-ef-web-65a5938b45e1b.jpg?fm=webp", alt: 'Terraço com espaço fogo do Águas de Marano', label: 'Terraço & espaço fogo' },
+  { src: "https://estilofontana.com.br/images/2024/01/15/f-adm-salao-festas-01-ef-web-65a593fa7718c.jpg?fm=webp", alt: 'Salão de festas do Águas de Marano', label: 'Salão de festas' },
   { src: "https://estilofontana.com.br/images/2024/01/15/f-adm-playground-ef-web-65a596dc5e2e7.jpg?fm=webp", alt: 'Playground do Águas de Marano', label: 'Playground' },
 ]
 
