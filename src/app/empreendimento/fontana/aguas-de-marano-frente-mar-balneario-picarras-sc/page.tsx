@@ -5,7 +5,7 @@ import Link from 'next/link'
 // Hotsite premium Águas de Marano Residencial (Fontana, FRENTE MAR, Centro de Balneário Piçarras/SC). Padrao EPIC.
 // WhatsApp do corretor Stiven (NAO usar numeros internos da Fontana).
 const WPP = "https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20%C3%81guas%20de%20Marano%20Residencial."
-const CATALOGO_PDF = "https://estilofontana.com.br/upload/empreendimento/catalogo/Águas-de-marano-residencial-1707323527.pdf"
+const CATALOGO_PDF = "https://estilofontana.com.br/upload/empreendimento/catalogo/Aguas-de-marano-residencial-1707323527.pdf"
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://stivenallan.vercel.app'
 
 const t = {
