@@ -352,7 +352,7 @@ export default function MonteLeonePage() {
           <div>
             <p style={{ fontSize: 12, letterSpacing: '0.14em', textTransform: 'uppercase', color: t.gold }}>Corretor</p>
             <p style={{ marginTop: 12, fontSize: 14, lineHeight: 1.7, color: t.onDark }}>Stiven Allan</p>
-            <p style={{ fontSize: 14, lineHeight: 1.7 }}>CRECI/RS 60.275</p>
+            <p style={{ fontSize: 14, lineHeight: 1.7 }}>CRECI 60.275</p>
             <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', marginTop: 10, fontSize: 14, color: t.gold, textDecoration: 'none' }}>Falar no WhatsApp →</a>
           </div>
           <div>
