@@ -276,7 +276,7 @@ export default function MonteLeonePage() {
 
       {/* LAZER & ÁREAS COMUNS */}
       <section style={{ padding: '14vh 28px', maxWidth: 1280, margin: '0 auto' }}>
-        <p className="ml-eyebrow" style={{ color: t.gold }}>Lazer & áreas comuns</p>
+        <p className="ml-eyebrow" style={{ color: t.goldDark }}>Lazer & áreas comuns</p>
         <h2 className="ml-h2">Bem-estar<br />em cada andar</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '0 56px', marginTop: '5vh' }}>
           {AMENIDADES.map((a, i) => (
