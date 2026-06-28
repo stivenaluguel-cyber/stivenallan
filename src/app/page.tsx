@@ -20,9 +20,10 @@ export const metadata = {
 }
 
 const PORTFOLIO_FALLBACK = [
-  { id: '1', nome: 'Monte Leone Residencial', slug: 'monte-leone-ana-lucia-criciuma-sc', construtora_slug: 'fontana', construtora_nome: 'Construtora Fontana', bairro: 'Centro', cidade: 'Criciúma', uf: 'SC', regiao: 'cidade', status_obra: 'na planta', area_min: 230, area_max: 253, exibir_preco: true, preco_a_partir_de: 280000, frase: 'Viver no centro com a sofisticação que você merece.', imagem_capa_url: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=700&q=80' },
+  { id: '1', nome: 'Monte Leone Residencial', slug: 'monte-leone-centro-criciuma-sc', construtora_slug: 'fontana', construtora_nome: 'Construtora Fontana', bairro: 'Centro', cidade: 'Criciúma', uf: 'SC', regiao: 'cidade', status_obra: 'na planta', area_min: 230, area_max: 253, exibir_preco: false, preco_a_partir_de: null, frase: 'Viver no centro com a sofisticação que você merece.', imagem_capa_url: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=700&q=80' },
   { id: '2', nome: 'Lavis Residencial', slug: 'lavis-residencial-centro-criciuma-sc', construtora_slug: 'fontana', construtora_nome: 'Construtora Fontana', bairro: 'Centro', cidade: 'Criciúma', uf: 'SC', regiao: 'cidade', status_obra: 'em obras', area_min: 65, area_max: 95, exibir_preco: true, preco_a_partir_de: 320000, frase: 'Conforto moderno no coração de Criciúma.', imagem_capa_url: 'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=700&q=80' },
   { id: '3', nome: 'Pineto Residencial', slug: 'pineto-centro-criciuma-sc', construtora_slug: 'fontana', construtora_nome: 'Construtora Fontana', bairro: 'Centro', cidade: 'Criciúma', uf: 'SC', regiao: 'cidade', status_obra: 'na planta', area_min: 75, area_max: 76, exibir_preco: true, preco_a_partir_de: 619250, frase: 'Na planta no Centro de Criciúma, com financiamento direto com a construtora.', imagem_capa_url: 'https://lh3.googleusercontent.com/d/1WoeVn8nWbU-Zbr-NGK9fT-quhSH_OFas=w1200' },
+  { id: '4', nome: 'Águas de Marano Residencial', slug: 'aguas-de-marano-frente-mar-balneario-picarras-sc', construtora_slug: 'fontana', construtora_nome: 'Construtora Fontana', bairro: 'Centro', cidade: 'Balneário Piçarras', uf: 'SC', regiao: 'praia', status_obra: 'em obras', area_min: 196, area_max: 199, exibir_preco: false, preco_a_partir_de: null, frase: 'Frente mar — mergulhe em cada detalhe.', imagem_capa_url: 'https://estilofontana.com.br/images/empreendimento/slideshows/aguas-de-marano-residencial-65a583e5c68f2.jpg?fm=webp' },
 ]
 
 const DEPOIMENTOS = [
@@ -87,7 +88,7 @@ function cidadeParaSlug(cidade: string): string {
 }
 
 const REGIOES_CONFIG = [
-  { id: 'praia', label: 'PRAIA', icon: '🏖️', cidades: ['Rincão', 'Laguna'], cor: '#2563eb' },
+  { id: 'praia', label: 'PRAIA', icon: '🏖️', cidades: ['Balneário Piçarras', 'Rincão', 'Laguna'], cor: '#2563eb' },
   { id: 'serra', label: 'SERRA', icon: '⛰️', cidades: ['Nova Veneza', 'Bom Jardim da Serra'], cor: '#16a34a' },
   { id: 'cidade', label: 'CIDADE', icon: '🏙️', cidades: ['Criciúma', 'Içara', 'Forquilhinha'], cor: '#9333ea' },
 ]
@@ -121,7 +122,7 @@ function WppFloat() {
   )
 }
 
-function SiteFooter() {
+function SiteFooter({ cidades }: { cidades: string[] }) {
   return (
     <footer style={{ background: c.charcoal, color: c.onDark, padding: 'clamp(56px,7vw,96px) clamp(16px,4vw,56px) 36px' }}>
       <div style={{ maxWidth: 1100, margin: '0 auto' }}>
@@ -130,11 +131,11 @@ function SiteFooter() {
             <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 22, letterSpacing: '-0.02em', marginBottom: 6 }}>STIVEN ALLAN</div>
             <div style={{ fontSize: 11, color: c.onDarkMuted, letterSpacing: '0.2em', marginBottom: 20 }}>CRECI/RS 60.275</div>
             <p style={{ fontSize: 13, color: c.onDarkMuted, lineHeight: 1.75, maxWidth: 260 }}>Especialista em empreendimentos com financiamento direto no Sul de Santa Catarina.</p>
-            <div style={{ marginTop: 20, fontSize: 12, color: 'rgba(245,241,234,0.4)', lineHeight: 1.8 }}>Rincão · Laguna · Nova Veneza<br />Bom Jardim da Serra · Criciúma<br />Içara · Forquilhinha</div>
+            <div style={{ marginTop: 20, fontSize: 12, color: 'rgba(245,241,234,0.4)', lineHeight: 1.8 }}>{cidades.join(' · ')}</div>
           </div>
           <div>
             <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.25em', color: c.bronze, marginBottom: 18 }}>EMPREENDIMENTOS</div>
-            {['Criciúma', 'Içara', 'Nova Veneza', 'Forquilhinha', 'Laguna', 'Rincão'].map(cid => (
+            {cidades.map(cid => (
               <div key={cid} style={{ marginBottom: 10 }}>
                 <Link href={`/lancamentos/${cid.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,'-')}-sc`} style={{ fontSize: 13, color: 'rgba(245,241,234,0.55)', textDecoration: 'none' }}>{cid}/SC</Link>
               </div>
@@ -161,10 +162,12 @@ function SiteFooter() {
 export default async function HomePage() {
   const [dbPortfolio, cidadesComEmp] = await Promise.all([getEmpreendimentosDB(), getCidadesComEmpreendimentos()])
   const portfolio = dbPortfolio || PORTFOLIO_FALLBACK
+  const cidadesAtivas = Array.from(new Set([...cidadesComEmp, ...portfolio.map((e: any) => (e.cidade || '').toLowerCase())].filter(Boolean)))
+  const cidadesNomes = Array.from(new Set(portfolio.map((e: any) => e.cidade).filter(Boolean)))
   const destaque = portfolio[0]
 
   const regioesVisiveis = REGIOES_CONFIG.map(r => ({
-    ...r, cidadesVisiveis: r.cidades.filter(c2 => cidadesComEmp.includes(c2.toLowerCase())),
+    ...r, cidadesVisiveis: r.cidades.filter(c2 => cidadesAtivas.includes(c2.toLowerCase())),
   })).filter(r => r.cidadesVisiveis.length > 0)
 
   return (
@@ -395,7 +398,7 @@ export default async function HomePage() {
           </a>
         </div>
       </section>
-      <SiteFooter />
+      <SiteFooter cidades={cidadesNomes} />
       <WppFloat />
     </>
   )
