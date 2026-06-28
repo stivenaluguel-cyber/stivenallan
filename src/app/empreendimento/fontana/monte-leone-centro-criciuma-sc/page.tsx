@@ -86,7 +86,7 @@ const AMENIDADES: string[] = [
 export const revalidate = 3600
 
 export const metadata: Metadata = {
-  title: 'Monte Leone Residencial — alto padrão no Centro de Criciúma/SC | Stiven Allan',
+  title: 'Monte Leone Residencial — Alto Padrão Criciúma/SC',
   description: 'Monte Leone Residencial: 4 dormitórios (3 suítes), 230 a 253 m², 3 vagas, no Centro de Criciúma/SC. Vista para a Serra, financiamento direto com a construtora. Construtora Fontana. Atendimento exclusivo com Stiven Allan, CRECI/RS 60.275.',
   keywords: ['Monte Leone Residencial', 'apartamento alto padrão Criciúma', 'cobertura Criciúma', 'lançamento Fontana', 'Stiven Allan corretor SC'],
   alternates: { canonical: `${SITE_URL}/empreendimento/fontana/monte-leone-centro-criciuma-sc` },
@@ -94,9 +94,15 @@ export const metadata: Metadata = {
     title: 'Monte Leone Residencial — Magnífico por essência',
     description: '4 dormitórios (3 suítes), 230 a 253 m², no coração nobre de Criciúma/SC. Financiamento direto com a construtora.',
     url: `${SITE_URL}/empreendimento/fontana/monte-leone-centro-criciuma-sc`,
-    images: [{ url: IMG.heroFrontal, width: 1081, height: 1920 }],
+    images: [{ url: IMG.heroAerea, width: 1200, height: 630, alt: 'Monte Leone Residencial — fachada' }],
     type: 'website',
     locale: 'pt_BR',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Monte Leone Residencial — Magnífico por essência',
+    description: '4 dormitórios (3 suítes), 230 a 253 m², no coração nobre de Criciúma/SC. Financiamento direto com a construtora.',
+    images: [IMG.heroAerea],
   },
 }
 
@@ -109,6 +115,16 @@ const SCHEMA = {
       description: 'Empreendimento de alto padrão no Centro de Criciúma/SC: 4 dormitórios (3 suítes), 230 a 253 m², 3 vagas, com financiamento direto com a Construtora Fontana.',
       url: `${SITE_URL}/empreendimento/fontana/monte-leone-centro-criciuma-sc`,
       image: IMG.heroFrontal,
+      address: { '@type': 'PostalAddress', streetAddress: 'Rua Hortêncio João da Silva, 98', addressLocality: 'Criciúma', addressRegion: 'SC', addressCountry: 'BR' },
+    },
+    {
+      '@type': 'Apartment',
+      name: 'Monte Leone Residencial',
+      description: 'Apartamentos de alto padrão no Centro de Criciúma/SC: 4 dormitórios sendo 3 suítes, 230 a 253 m² privativos, 3 vagas de garagem, com financiamento direto com a Construtora Fontana.',
+      image: IMG.heroFrontal,
+      numberOfRooms: 4,
+      numberOfBathroomsTotal: 5,
+      floorSize: { '@type': 'QuantitativeValue', value: 253, unitCode: 'MTK' },
       address: { '@type': 'PostalAddress', streetAddress: 'Rua Hortêncio João da Silva, 98', addressLocality: 'Criciúma', addressRegion: 'SC', addressCountry: 'BR' },
     },
     {
@@ -170,7 +186,8 @@ export default function MonteLeonePage() {
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(20,19,15,0.45) 0%, rgba(20,19,15,0.18) 38%, rgba(20,19,15,0.82) 100%)' }} />
         <div style={{ position: 'relative', zIndex: 2, padding: '0 28px 12vh', maxWidth: 980 }}>
           <p className="ml-eyebrow ml-onimg" style={{ color: t.gold }}>Monte Leone Residencial — Centro, Criciúma/SC</p>
-          <h1 className="ml-h1" style={{ color: t.onDark }}>Magnífico<br />por essência</h1>
+          <h1 className="ml-h1" style={{ color: t.onDark }}>Monte Leone Residencial</h1>
+          <p className="ml-h1-slogan" style={{ color: t.gold, fontFamily: t.display, fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,34px)', marginTop: 10, marginBottom: 0 }}>Magnífico por essência</p>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginTop: 34 }}>
             <a href={WPP} target="_blank" rel="noopener noreferrer" className="ml-cta" style={{ borderColor: t.gold, color: t.onDark }}>Atendimento exclusivo</a>
             <a href="#residencial" className="ml-cta" style={{ borderColor: 'rgba(244,241,234,0.4)', color: t.onDark }}>Conheça o residencial</a>
