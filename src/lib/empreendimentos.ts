@@ -33,7 +33,7 @@ export const IMAGEM_FALLBACK = '/og-image.jpg';
 
 export const EMPREENDIMENTOS: Empreendimento[] = [
   {
-    slug: 'monte-leone-ana-lucia-criciuma-sc',
+    slug: 'monte-leone-centro-criciuma-sc',
     nome: 'Monte Leone Residencial',
     construtoraSlug: 'fontana',
     construtoraNome: 'Construtora Fontana',
@@ -45,8 +45,8 @@ export const EMPREENDIMENTOS: Empreendimento[] = [
     dorms: '2 e 3 dorms',
     areaMin: 230,
     areaMax: 253,
-    exibirPreco: true,
-    precoAPartirDe: 280000,
+    exibirPreco: false,
+    precoAPartirDe: 0,
     frase: 'Viver no centro com a sofisticação que você merece.',
     descricao:
       'Empreendimento na planta no coração de Criciúma, com apartamentos amplos de 2 e 3 dormitórios e acabamento de alto padrão. Financiamento direto com a construtora, sem aprovação bancária.',
@@ -123,6 +123,34 @@ export const EMPREENDIMENTOS: Empreendimento[] = [
     ],
     catalogoUrl: 'https://drive.google.com/file/d/1NvzrWE4HAz8UnI9NaTqKeEpaEgmTv5wr/view',
     videoUrl: 'https://drive.google.com/file/d/1cNbxAoNKNQwoSo6bzCGYAl9_C1_gELOG/preview',
+  },
+  {
+    slug: 'aguas-de-marano-frente-mar-balneario-picarras-sc',
+    nome: 'Águas de Marano Residencial',
+    construtoraSlug: 'fontana',
+    construtoraNome: 'Construtora Fontana',
+    cidade: 'Balneário Piçarras',
+    bairro: 'Centro',
+    uf: 'SC',
+    regiao: 'Litoral Catarinense',
+    statusObra: 'em obras',
+    dorms: '3 e 4 dorms (3 suítes)',
+    areaMin: 196,
+    areaMax: 199,
+    exibirPreco: false,
+    precoAPartirDe: 0,
+    frase: 'Frente mar — mergulhe em cada detalhe.',
+    descricao:
+      'Residencial frente mar no Centro de Balneário Piçarras, com apartamentos de 3 e 4 dormitórios, 3 suítes e 196 a 199 m² privativos. Lazer completo e financiamento direto com a construtora.',
+    diferenciais: [
+      'Frente mar, no Centro de Balneário Piçarras',
+      'Apartamentos de 3 e 4 dormitórios, 3 suítes',
+      'Áreas privativas de 196 a 199 m²',
+      'Financiamento direto com a construtora',
+    ],
+    imagens: [
+      'https://estilofontana.com.br/images/empreendimento/slideshows/aguas-de-marano-residencial-65a583e5c68f2.jpg?fm=webp',
+    ],
   },
   {
     slug: 'hub-smart-home-criciuma-sc',
