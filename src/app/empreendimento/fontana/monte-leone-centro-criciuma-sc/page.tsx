@@ -1,7 +1,6 @@
-'use client'
-import { useState, useEffect, useCallback } from 'react'
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import GalleryWithLightbox, { LightboxPhoto } from './gallery-lightbox'
 import Link from 'next/link'
 
 // Hotsite premium Monte Leone Residencial (Fontana, Centro Criciuma/SC). Padrao EPIC — benchmark Aguas de Marano.
@@ -45,10 +44,6 @@ const GALERIA: { src: string; alt: string; label: string }[] = [
 { src: 'https://estilofontana.com.br/images/2025/08/11/f-ml-deck-ang-02-ef-web-689a45c5b88a0.jpg', alt: 'Monte Leone — deck da piscina', label: 'Deck' },
 ]
 
-const LB_IMGS = [
-...GALERIA,
-{ src: IMG.piscina, alt: 'Piscina climatizada adulto e infantil do Monte Leone Residencial', label: 'Lazer — Piscina' },
-]
 
 const DIFERENCIAIS: string[] = [
 'Hall de entrada com pé-direito duplo',
@@ -136,151 +131,7 @@ itemListElement: [
 ],
 }
 
-// ── LIGHTBOX COMPONENT ──────────────────────────────────────────
-function Lightbox({ images, startIndex, onClose }: {
-images: { src: string; alt: string; label: string }[]
-startIndex: number
-onClose: () => void
-}) {
-const [idx, setIdx] = useState(startIndex)
-const [zoom, setZoom] = useState(1)
-const [offset, setOffset] = useState({ x: 0, y: 0 })
-const [dragging, setDragging] = useState(false)
-const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
-const [pinchDist, setPinchDist] = useState<number | null>(null)
-
-const prev = useCallback(() => { setIdx(i => (i - 1 + images.length) % images.length); setZoom(1); setOffset({ x: 0, y: 0 }) }, [images.length])
-const next = useCallback(() => { setIdx(i => (i + 1) % images.length); setZoom(1); setOffset({ x: 0, y: 0 }) }, [images.length])
-
-useEffect(() => {
-document.body.style.overflow = 'hidden'
-const onKey = (e: KeyboardEvent) => {
-if (e.key === 'Escape') onClose()
-if (e.key === 'ArrowLeft') prev()
-if (e.key === 'ArrowRight') next()
-}
-window.addEventListener('keydown', onKey)
-return () => { window.removeEventListener('keydown', onKey); document.body.style.overflow = '' }
-}, [onClose, prev, next])
-
-const handleWheel = (e: React.WheelEvent) => {
-e.preventDefault()
-setZoom(z => Math.min(4, Math.max(1, z - e.deltaY * 0.002)))
-}
-
-const handleMouseDown = (e: React.MouseEvent) => {
-if (zoom > 1) { setDragging(true); setDragStart({ x: e.clientX - offset.x, y: e.clientY - offset.y }) }
-}
-const handleMouseMove = (e: React.MouseEvent) => {
-if (dragging) setOffset({ x: e.clientX - dragStart.x, y: e.clientY - dragStart.y })
-}
-const handleMouseUp = () => setDragging(false)
-
-const handleTouchStart = (e: React.TouchEvent) => {
-if (e.touches.length === 2) {
-const dx = e.touches[0].clientX - e.touches[1].clientX
-const dy = e.touches[0].clientY - e.touches[1].clientY
-setPinchDist(Math.sqrt(dx*dx+dy*dy))
-}
-}
-const handleTouchMove = (e: React.TouchEvent) => {
-if (e.touches.length === 2 && pinchDist !== null) {
-const dx = e.touches[0].clientX - e.touches[1].clientX
-const dy = e.touches[0].clientY - e.touches[1].clientY
-const dist = Math.sqrt(dx*dx+dy*dy)
-setZoom(z => Math.min(4, Math.max(1, z * (dist / pinchDist))))
-setPinchDist(dist)
-}
-}
-const handleTouchEnd = () => setPinchDist(null)
-
-const img = images[idx]
-return (
-<div
-role="dialog"
-aria-modal="true"
-aria-label={"Lightbox — " + img.label}
-style={{
-position:'fixed',inset:0,zIndex:9999,
-background:'rgba(0,0,0,0.92)',
-display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',
-}}
->
-<div onClick={onClose} style={{ position:'absolute', inset:0, zIndex:0 }} aria-hidden="true" />
-<button
-onClick={onClose}
-aria-label="Fechar lightbox"
-style={{
-position:'absolute',top:18,right:22,zIndex:3,
-background:'none',border:'none',color:'#fff',fontSize:32,cursor:'pointer',
-lineHeight:1,padding:'4px 10px',fontWeight:300,
-}}
->&#x2715;</button>
-{images.length > 1 && (
-<button
-onClick={(e)=>{e.stopPropagation();prev()}}
-aria-label="Imagem anterior"
-style={{
-position:'absolute',left:12,top:'50%',transform:'translateY(-50%)',zIndex:3,
-background:'rgba(255,255,255,0.12)',border:'1px solid rgba(255,255,255,0.25)',
-color:'#fff',fontSize:28,cursor:'pointer',padding:'12px 18px',lineHeight:1,
-borderRadius:2,backdropFilter:'blur(4px)',
-}}
->&#8249;</button>
-)}
-{images.length > 1 && (
-<button
-onClick={(e)=>{e.stopPropagation();next()}}
-aria-label="Próxima imagem"
-style={{
-position:'absolute',right:12,top:'50%',transform:'translateY(-50%)',zIndex:3,
-background:'rgba(255,255,255,0.12)',border:'1px solid rgba(255,255,255,0.25)',
-color:'#fff',fontSize:28,cursor:'pointer',padding:'12px 18px',lineHeight:1,
-borderRadius:2,backdropFilter:'blur(4px)',
-}}
->&#8250;</button>
-)}
-<div
-onWheel={handleWheel}
-onMouseDown={handleMouseDown}
-onMouseMove={handleMouseMove}
-onMouseUp={handleMouseUp}
-onMouseLeave={handleMouseUp}
-onTouchStart={handleTouchStart}
-onTouchMove={handleTouchMove}
-onTouchEnd={handleTouchEnd}
-style={{
-position:'relative',zIndex:2,maxWidth:'90vw',maxHeight:'80vh',
-cursor: zoom>1?'grab':'zoom-in',
-transform:`scale(${zoom}) translate(${offset.x/zoom}px,${offset.y/zoom}px)`,
-transformOrigin:'center center',
-transition: dragging?'none':'transform 0.1s ease',
-}}
->
-<img
-src={img.src}
-alt={img.alt}
-style={{ maxWidth:'90vw', maxHeight:'80vh', display:'block', userSelect:'none', pointerEvents:'none', objectFit:'contain' }}
-/>
-</div>
-<div style={{
-position:'absolute',bottom:18,left:0,right:0,textAlign:'center',zIndex:3,
-color:'rgba(255,255,255,0.85)',fontSize:12,letterSpacing:'0.26em',textTransform:'uppercase',
-}}>
-{img.label}
-{images.length > 1 && <span style={{ marginLeft:14, opacity:0.55 }}>{idx+1} / {images.length}</span>}
-</div>
-</div>
-)
-}
-
-type LBState = { open: boolean; index: number }
-
 export default function MonteLeonePage() {
-const [lb, setLb] = useState<LBState>({ open: false, index: 0 })
-const openLb = useCallback((i: number) => setLb({ open: true, index: i }), [])
-const closeLb = useCallback(() => setLb(s => ({ ...s, open: false })), [])
-
 return (
 <main style={{ background: t.bg, color: t.ink, fontFamily: t.body, overflowX: 'hidden' }}>
 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHEMA) }} />
@@ -397,22 +248,7 @@ style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 
 <h2 className="ml-h2">Onde a vida pulsa<br />com elegância</h2>
 </div>
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 2 }}>
-{GALERIA.map((g, i) => (
-<figure
-key={i}
-className="ml-gcard"
-style={{ margin: 0, aspectRatio: '4 / 3', position: 'relative' }}
-role="button"
-tabIndex={0}
-aria-label={`Ampliar imagem: ${g.label}`}
-onClick={() => openLb(i)}
-onKeyDown={e => (e.key==='Enter'||e.key===' ') && openLb(i)}
->
-<Image src={g.src} alt={g.alt} fill loading="lazy" sizes="(max-width: 768px) 100vw, 33vw" style={{ objectFit: 'cover' }} />
-<div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(15,24,16,0.55), rgba(15,24,16,0) 45%)' }} />
-<figcaption className="ml-onimg" style={{ position: 'absolute', left: 18, bottom: 16, color: '#fff', fontSize: 12, letterSpacing: '0.24em', textTransform: 'uppercase' }}>{g.label}</figcaption>
-</figure>
-))}
+<GalleryWithLightbox galeria={GALERIA} prefix="ml" gradient="rgba(15,24,16,0.55)" />
 </div>
 </section>
 
@@ -465,17 +301,7 @@ onKeyDown={e => (e.key==='Enter'||e.key===' ') && openLb(i)}
 <h2 className="ml-h2">Bem-estar<br />em cada andar</h2>
 </div>
 <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1.15fr) minmax(0,1fr)', gap: 'clamp(28px,5vw,64px)', alignItems: 'center' }}>
-<div
-className="ml-lazer-card"
-style={{ position: 'relative', aspectRatio: '4 / 3', overflow: 'hidden' }}
-role="button"
-tabIndex={0}
-aria-label="Ampliar imagem: Lazer — Piscina"
-onClick={() => openLb(GALERIA.length)}
-onKeyDown={e => (e.key==='Enter'||e.key===' ') && openLb(GALERIA.length)}
->
-<Image src={IMG.piscina} alt="Piscina climatizada adulto e infantil do Monte Leone Residencial" fill loading="lazy" sizes="(max-width: 768px) 100vw, 55vw" style={{ objectFit: 'cover' }} />
-</div>
+<LightboxPhoto src={IMG.piscina} alt="Piscina climatizada adulto e infantil do Monte Leone Residencial" label="Piscina" cardClass="ml-lazer-card" imgSizes="(max-width: 768px) 100vw, 55vw" />
 <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
 {AMENIDADES.map((a, i) => (
 <div key={i} className="ml-amen">{a}</div>
@@ -568,8 +394,6 @@ No coração nobre de Criciúma, a poucos passos de comércio premium, gastronom
 <svg width="30" height="30" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.515 5.26l-.999 3.648 3.973-1.042zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
 </a>
 
-{/* LIGHTBOX */}
-{lb.open && <Lightbox images={LB_IMGS} startIndex={lb.index} onClose={closeLb} />}
 
 </div></div></div></div>
 </main>
