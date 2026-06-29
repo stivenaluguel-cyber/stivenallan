@@ -565,6 +565,8 @@ Av. Nereu Ramos, esq. Rua Henrique Todeschini &mdash; Centro, Balneário Piçarr
 
 {/* LIGHTBOX */}
 {lb.open && <Lightbox images={LB_IMGS} startIndex={lb.index} onClose={closeLb} />}
+
+</div></div></div></div>
 </main>
 )
 }
