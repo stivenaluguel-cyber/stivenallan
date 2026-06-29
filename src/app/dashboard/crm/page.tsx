@@ -22,66 +22,91 @@ const ESTAGIOS = [
   { key: 'interessado', label: 'Interessado', cor: '#8b5cf6' },
   { key: 'proposta_enviada', label: 'Proposta', cor: '#f59e0b' },
   { key: 'visita_agendada', label: 'Visita', cor: '#ec4899' },
-  { key: 'negociacao', label: 'NegociaÃ§Ã£o', cor: '#D24E22' },
+  { key: 'negociacao', label: 'Negociação', cor: '#D24E22' },
   { key: 'fechado', label: 'Fechado', cor: '#22c55e' },
 ]
 
-// ================= WIDGET CUB =================
+// ========================= WIDGET CUB ========================= //
 function WidgetCub({ cub, onSaved }: { cub: Cub | null; onSaved: () => void }) {
-  const [editing, setEditing] = useState(false)
-  const [valor, setValor] = useState(cub?.valor_m2?.toString() ?? '')
-  const [mes, setMes] = useState(cub?.mes_referencia?.substring(0, 7) ?? new Date().toISOString().substring(0, 7))
-  const [var_m, setVarM] = useState(cub?.variacao_mensal?.toString() ?? '')
   const [saving, setSaving] = useState(false)
+  const [status, setStatus] = useState('')
 
-  async function save() {
+  async function atualizarCub() {
     setSaving(true)
+    setStatus('')
     try {
+      // 1. Busca o valor atual do SINDUSCON via nossa API route
+      const res = await fetch('/api/cub', { cache: 'no-store' })
+      if (!res.ok) throw new Error('Falha ao consultar SINDUSCON (' + res.status + ')')
+      const data = await res.json()
+
+      // 2. Persiste no backend (Supabase via /api/admin/cub)
       await fetch('/api/admin/cub', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mes_referencia: mes + '-01', valor_m2: parseFloat(valor), variacao_mensal: var_m ? parseFloat(var_m) : null }),
+        body: JSON.stringify({
+          mes_referencia: (data.competencia ?? new Date().toISOString().slice(0, 7)) + '-01',
+          valor_m2: Number(data.valor_m2),
+          variacao_mensal: null,
+        }),
       })
-      setEditing(false)
+
+      const label = data.competencia_label ?? data.usar_em_label ?? ''
+      const labelCap = label.charAt(0).toUpperCase() + label.slice(1)
+      setStatus(data.online
+        ? 'Atualizado pelo SINDUSCON — ' + labelCap
+        : 'SINDUSCON indisponível — valor de referência aplicado (' + labelCap + ')')
       onSaved()
-    } finally { setSaving(false) }
+    } catch (e: unknown) {
+      setStatus('Não foi possível atualizar. Tente novamente.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  function fmt(v: number) {
+    return 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 2 })
   }
 
   return (
-    <div style={{ background: D.sidebar, border: '1px solid ' + D.lineDark, borderRadius: 3, padding: '20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
+    <div style={{ background: D.sidebar, border: '1px solid ' + D.lineDark, borderRadius: 12, padding: '18px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
       <div>
-        <div style={{ fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', color: D.onDarkMuted, marginBottom: 6 }}>CUB/SC Vigente Â· SINDUSCON-SC</div>
-        {editing ? (
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-            <input type="month" value={mes} onChange={e => setMes(e.target.value)} style={{ background: '#222', color: D.onDark, border: '1px solid ' + D.lineDark, borderRadius: 2, padding: '6px 10px', fontSize: 13 }} />
-            <input type="number" placeholder="Valor mÂ²" value={valor} onChange={e => setValor(e.target.value)} style={{ width: 120, background: '#222', color: D.onDark, border: '1px solid ' + D.lineDark, borderRadius: 2, padding: '6px 10px', fontSize: 13 }} />
-            <input type="number" placeholder="VariaÃ§Ã£o %" value={var_m} onChange={e => setVarM(e.target.value)} style={{ width: 100, background: '#222', color: D.onDark, border: '1px solid ' + D.lineDark, borderRadius: 2, padding: '6px 10px', fontSize: 13 }} />
-            <button onClick={save} disabled={saving} style={{ background: D.bronze, color: '#fff', border: 'none', borderRadius: 2, padding: '7px 18px', fontWeight: 700, fontSize: 13, cursor: 'pointer', minHeight: 36 }}>{saving ? '...' : 'Salvar'}</button>
-            <button onClick={() => setEditing(false)} style={{ background: 'transparent', color: D.onDarkMuted, border: '1px solid ' + D.lineDark, borderRadius: 2, padding: '7px 14px', fontSize: 13, cursor: 'pointer' }}>Cancelar</button>
-          </div>
-        ) : (
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
-            <span style={{ fontFamily: "'Bricolage Grotesque',system-ui", fontSize: 'clamp(1.6rem,3vw,2.2rem)', fontWeight: 800, color: D.orange, letterSpacing: '-0.02em' }}>
-              {cub ? fmt(cub.valor_m2) + '/mÂ²' : 'NÃ£o definido'}
+        <div style={{ fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', color: D.onDarkMuted, marginBottom: 4 }}>
+          CUB/SC VIGENTE · SINDUSCON-SC
+        </div>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
+          <span style={{ fontFamily: "'Bricolage Grotesque',system-ui", fontSize: 'clamp(1.6rem,3vw,2.4rem)', fontWeight: 800, color: D.bronze }}>
+            {cub ? fmt(cub.valor_m2) + '/m²' : 'Sem CUB cadastrado'}
+          </span>
+          {cub?.variacao_mensal && (
+            <span style={{ fontSize: 13, color: cub.variacao_mensal > 0 ? D.green : D.red, fontWeight: 600 }}>
+              {cub.variacao_mensal > 0 ? '+' : ''}{cub.variacao_mensal.toFixed(2)}% mês
             </span>
-            {cub?.variacao_mensal && (
-              <span style={{ fontSize: 13, color: cub.variacao_mensal > 0 ? D.green : D.red, fontWeight: 600 }}>
-                {cub.variacao_mensal > 0 ? '+' : ''}{cub.variacao_mensal.toFixed(2)}% mÃªs
-              </span>
-            )}
-            {cub && <span style={{ fontSize: 12, color: D.onDarkMuted }}>{new Date(cub.mes_referencia).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}</span>}
-          </div>
+          )}
+        </div>
+        {cub && (
+          <span style={{ fontSize: 12, color: D.onDarkMuted }}>
+            {new Date(cub.mes_referencia).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
+          </span>
+        )}
+        {status && (
+          <p style={{ margin: '6px 0 0', fontSize: 12, color: D.onDarkMuted, fontStyle: 'italic' }}>
+            {status}
+          </p>
         )}
       </div>
-      {!editing && (
-        <button onClick={() => { setValor(cub?.valor_m2?.toString() ?? ''); setMes(cub?.mes_referencia?.substring(0,7) ?? new Date().toISOString().substring(0,7)); setEditing(true) }}
-          style={{ background: D.bronze, color: '#fff', border: 'none', borderRadius: 2, padding: '9px 20px', fontWeight: 700, fontSize: 13, cursor: 'pointer', flexShrink: 0, minHeight: 40 }}>
-          Atualizar CUB
-        </button>
-      )}
+      <button
+        onClick={atualizarCub}
+        disabled={saving}
+        style={{ background: D.bronze, color: '#fff', border: 'none', borderRadius: 2, padding: '9px 20px', fontWeight: 700, fontSize: 14, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1 }}
+      >
+        {saving ? 'Atualizando...' : 'Atualizar CUB'}
+      </button>
     </div>
   )
 }
+
+
 // ================= SIMULADOR FLUXO DIRETO =================
 function SimuladorFluxo({ cub }: { cub: Cub | null }) {
   const [valorImovel, setValorImovel] = useState(400000)
@@ -100,15 +125,15 @@ function SimuladorFluxo({ cub }: { cub: Cub | null }) {
     <div style={{ background: D.surface, border: '1px solid ' + D.line, borderRadius: 3 }}>
       <div style={{ padding: '14px 20px', borderBottom: '1px solid ' + D.line, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span style={{ fontFamily: "'Bricolage Grotesque',system-ui", fontWeight: 700, fontSize: 14, color: D.ink }}>Simulador de Fluxo Direto</span>
-        {cub && <span style={{ fontSize: 11, color: D.muted }}>CUB: {fmt(cub.valor_m2)}/mÂ²</span>}
+        {cub && <span style={{ fontSize: 11, color: D.muted }}>CUB: {fmt(cub.valor_m2)}/m²</span>}
       </div>
       <div style={{ padding: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
         <div style={{ display: 'grid', gap: 14 }}>
           {[
-            { label: 'Valor do ImÃ³vel', value: valorImovel, set: setValorImovel, min: 50000, max: 5000000, step: 10000 },
+            { label: 'Valor do Imóvel', value: valorImovel, set: setValorImovel, min: 50000, max: 5000000, step: 10000 },
             { label: 'Entrada', value: entrada, set: setEntrada, min: 0, max: valorImovel * 0.8, step: 5000 },
             { label: 'Prazo (meses)', value: prazo, set: setPrazo, min: 12, max: 240, step: 12 },
-            { label: 'Valor do BalÃ£o', value: balao, set: setBalao, min: 0, max: 100000, step: 2500 },
+            { label: 'Valor do Balão', value: balao, set: setBalao, min: 0, max: 100000, step: 2500 },
           ].map(({ label, value, set, min, max, step }) => (
             <div key={label}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 4 }}>
@@ -123,7 +148,7 @@ function SimuladorFluxo({ cub }: { cub: Cub | null }) {
           <div style={{ display: 'flex', gap: 8 }}>
             {(['anual', 'semestral'] as const).map(f => (
               <button key={f} onClick={() => setFreq(f)} style={{ flex: 1, padding: '7px 0', borderRadius: 2, border: '1px solid ' + (freq === f ? D.bronze : D.line), background: freq === f ? D.bronze : 'transparent', color: freq === f ? '#fff' : D.ink, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
-                BalÃ£o {f}
+                Balão {f}
               </button>
             ))}
           </div>
@@ -132,7 +157,7 @@ function SimuladorFluxo({ cub }: { cub: Cub | null }) {
           <div style={{ fontSize: 11, color: D.onDarkMuted, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Parcela mensal estimada</div>
           <div style={{ fontFamily: "'Bricolage Grotesque',system-ui", fontSize: 'clamp(1.8rem,4vw,2.8rem)', fontWeight: 800, color: D.orange, margin: '8px 0', letterSpacing: '-0.025em' }}>{fmt(parcela)}</div>
           <div style={{ display: 'grid', gap: 8, marginTop: 16, fontSize: 13 }}>
-            {[['Entrada', entrada, D.orange],['Total balÃµes (' + freq + ')', totalBaloes, '#8a6f49'],['Saldo parcelado', saldoParc, '#5c5446']].map(([l, v, cor]) => (
+            {[['Entrada', entrada, D.orange],['Total balões (' + freq + ')', totalBaloes, '#8a6f49'],['Saldo parcelado', saldoParc, '#5c5446']].map(([l, v, cor]) => (
               <div key={String(l)} style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ display: 'flex', alignItems: 'center', gap: 6, color: D.onDarkMuted }}>
                   <span style={{ width: 8, height: 8, borderRadius: 2, background: String(cor) }} />{String(l)}
@@ -143,14 +168,14 @@ function SimuladorFluxo({ cub }: { cub: Cub | null }) {
             {cubAjuste > 0 && (
               <div style={{ marginTop: 8, padding: '8px 10px', background: 'rgba(210,78,34,0.12)', borderRadius: 2, fontSize: 12 }}>
                 <div style={{ color: D.bronze, fontWeight: 600 }}>Reajuste CUB estimado</div>
-                <div style={{ color: D.onDarkMuted }}>{fmt(parcela * (1 + (cub?.variacao_mensal ?? 0) / 100))}/mÃªs apÃ³s reajuste anual</div>
+                <div style={{ color: D.onDarkMuted }}>{fmt(parcela * (1 + (cub?.variacao_mensal ?? 0) / 100))}/mês após reajuste anual</div>
               </div>
             )}
           </div>
           <a href={'https://api.whatsapp.com/send?phone=5548991455522&text=Ol%C3%A1!%20Simul ei%20e%20cabe%20' + encodeURIComponent(fmt(parcela)) + '%20por%20m%C3%AAs.%20Quero%20saber%20mais!'}
             target="_blank" rel="noopener noreferrer"
             style={{ display: 'block', marginTop: 20, background: '#25d366', color: '#fff', borderRadius: 2, padding: '11px', textAlign: 'center', textDecoration: 'none', fontWeight: 700, fontSize: 14, minHeight: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            Enviar simulaÃ§Ã£o p/ cliente
+            Enviar simulação p/ cliente
           </a>
         </div>
       </div>
@@ -176,7 +201,7 @@ function TabelaUnidades({ emp, cub }: { emp: Emp; cub: Cub | null }) {
     setUnidades(prev => prev.map(x => x.id === u.id ? { ...x, disponivel: !x.disponivel } : x))
   }
 
-  const msg = (u: Unidade) => encodeURIComponent('OlÃ¡! Tenho interesse na Unidade ' + u.unidade + ' do ' + emp.nome + ' â ' + u.metragem + 'mÂ², R$' + (u.valor_tabela?.toLocaleString('pt-BR') ?? '?'))
+  const msg = (u: Unidade) => encodeURIComponent('Olá! Tenho interesse na Unidade ' + u.unidade + ' do ' + emp.nome + ' â ' + u.metragem + 'm², R$' + (u.valor_tabela?.toLocaleString('pt-BR') ?? '?'))
   const wppUrl = (u: Unidade) => 'https://api.whatsapp.com/send?phone=5548991455522&text=' + msg(u)
 
   return (
@@ -184,38 +209,38 @@ function TabelaUnidades({ emp, cub }: { emp: Emp; cub: Cub | null }) {
       <div style={{ padding: '14px 20px', borderBottom: '1px solid ' + D.line, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
         <div>
           <span style={{ fontFamily: "'Bricolage Grotesque',system-ui", fontWeight: 700, fontSize: 14, color: D.ink }}>{emp.nome}</span>
-          <span style={{ marginLeft: 10, fontSize: 12, color: D.green, fontWeight: 600 }}>{disponiveis} disponÃ­veis</span>
+          <span style={{ marginLeft: 10, fontSize: 12, color: D.green, fontWeight: 600 }}>{disponiveis} disponíveis</span>
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           {(['todas', 'disponiveis'] as const).map(f => (
             <button key={f} onClick={() => setFiltro(f)} style={{ padding: '6px 14px', borderRadius: 2, border: '1px solid ' + (filtro === f ? D.bronze : D.line), background: filtro === f ? D.bronze : 'transparent', color: filtro === f ? '#fff' : D.ink, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
-              {f === 'todas' ? 'Todas' : 'DisponÃ­veis'}
+              {f === 'todas' ? 'Todas' : 'Disponíveis'}
             </button>
           ))}
         </div>
       </div>
       {loading ? <div style={{ padding: 32, textAlign: 'center', color: D.muted }}>Carregando...</div> : lista.length === 0 ? (
-        <div style={{ padding: 32, textAlign: 'center', color: D.muted }}>Nenhuma unidade{filtro === 'disponiveis' ? ' disponÃ­vel' : ''}</div>
+        <div style={{ padding: 32, textAlign: 'center', color: D.muted }}>Nenhuma unidade{filtro === 'disponiveis' ? ' disponível' : ''}</div>
       ) : (
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
             <thead><tr style={{ background: D.bg }}>
-              {['Unidade','Metragem','Dorms','Valor Tabela','PromoÃ§Ã£o','CondiÃ§Ãµes','Status','AÃ§Ã£o'].map(h => (
+              {['Unidade','Metragem','Dorms','Valor Tabela','Promoção','Condições','Status','Ação'].map(h => (
                 <th key={h} style={{ padding: '10px 16px', textAlign: 'left', fontSize: 11, letterSpacing: '0.06em', color: D.muted, fontWeight: 600, textTransform: 'uppercase', borderBottom: '1px solid ' + D.line }}>{h}</th>
               ))}
             </tr></thead>
             <tbody>
               {lista.map((u, i) => (
                 <tr key={u.id} style={{ borderBottom: '1px solid ' + D.line, background: i % 2 === 0 ? D.surface : D.bg }}>
-                  <td style={{ padding: '10px 16px', fontWeight: 700, color: D.ink }}>{u.bloco ? u.bloco + ' Â· ' : ''}{u.unidade}</td>
-                  <td style={{ padding: '10px 16px', color: D.ink }}>{u.metragem}mÂ²</td>
+                  <td style={{ padding: '10px 16px', fontWeight: 700, color: D.ink }}>{u.bloco ? u.bloco + ' · ' : ''}{u.unidade}</td>
+                  <td style={{ padding: '10px 16px', color: D.ink }}>{u.metragem}m²</td>
                   <td style={{ padding: '10px 16px', color: D.ink }}>{u.dormitorios ?? 'â'}</td>
                   <td style={{ padding: '10px 16px', color: D.ink, fontWeight: 600 }}>{u.valor_tabela ? fmt(u.valor_tabela) : 'â'}</td>
                   <td style={{ padding: '10px 16px', color: D.green, fontWeight: 600 }}>{u.valor_promocional ? fmt(u.valor_promocional) : 'â'}</td>
                   <td style={{ padding: '10px 16px', color: D.muted, maxWidth: 200, fontSize: 12 }}>{u.condicoes_negociacao ?? 'â'}</td>
                   <td style={{ padding: '10px 16px' }}>
                     <button onClick={() => toggleDisp(u)} style={{ background: u.disponivel ? '#22c55e22' : '#ef444422', color: u.disponivel ? D.green : D.red, border: '1px solid ' + (u.disponivel ? D.green : D.red) + '44', borderRadius: 20, padding: '4px 10px', fontSize: 11, fontWeight: 700, cursor: 'pointer', minHeight: 28 }}>
-                      {u.disponivel ? 'DisponÃ­vel' : 'Vendida'}
+                      {u.disponivel ? 'Disponível' : 'Vendida'}
                     </button>
                   </td>
                   <td style={{ padding: '10px 16px' }}>
@@ -252,7 +277,7 @@ function Kanban({ leads, onMove }: { leads: Lead[]; onMove: (id: string, estagio
                     <div style={{ color: D.muted, fontSize: 12, textAlign: 'center', padding: '16px 0' }}>Vazio</div>
                   ) : colLeads.map(lead => (
                     <div key={lead.id} style={{ background: D.bg, borderRadius: 2, padding: '9px 11px', border: '1px solid ' + (lead.requer_atencao ? D.bronze : D.line) }}>
-                      {lead.requer_atencao && <div style={{ fontSize: 10, color: D.bronze, fontWeight: 700, marginBottom: 3 }}>ATENÃÃO</div>}
+                      {lead.requer_atencao && <div style={{ fontSize: 10, color: D.bronze, fontWeight: 700, marginBottom: 3 }}>ATENÇÃO</div>}
                       <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 4, color: D.ink }}>{lead.nome ?? '+' + lead.whatsapp}</div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
                         <span style={{ fontSize: 11, color: D.muted }}>{lead.perfil !== 'indefinido' ? lead.perfil : lead.origem}</span>
@@ -279,7 +304,7 @@ function Kanban({ leads, onMove }: { leads: Lead[]; onMove: (id: string, estagio
   )
 }
 
-// ================= PÃGINA PRINCIPAL =================
+// ================= PÁGINA PRINCIPAL =================
 type Tab = 'funil' | 'disponibilidade' | 'simulador' | 'clientes'
 
 export default function CrmPage() {
@@ -344,9 +369,9 @@ export default function CrmPage() {
               {[
                 { l: 'Total Leads', v: leads.length, cor: D.blue },
                 { l: 'Novos', v: leads.filter(l => l.estagio_funil === 'primeiro_contato').length, cor: '#6b7280' },
-                { l: 'Em NegociaÃ§Ã£o', v: leads.filter(l => l.estagio_funil === 'negociacao').length, cor: D.bronze },
+                { l: 'Em Negociação', v: leads.filter(l => l.estagio_funil === 'negociacao').length, cor: D.bronze },
                 { l: 'Fechados', v: leads.filter(l => l.estagio_funil === 'fechado').length, cor: D.green },
-                { l: 'AtenÃ§Ã£o', v: leads.filter(l => l.requer_atencao).length, cor: D.red },
+                { l: 'Atenção', v: leads.filter(l => l.requer_atencao).length, cor: D.red },
               ].map(({ l, v, cor }) => (
                 <div key={l} style={{ background: D.surface, border: '1px solid ' + D.line, borderRadius: 3, padding: '14px 16px', borderTop: '3px solid ' + cor }}>
                   <div style={{ fontSize: 10, color: D.muted, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>{l}</div>
@@ -377,10 +402,10 @@ export default function CrmPage() {
         {!loading && tab === 'clientes' && (
           <div style={{ background: D.surface, border: '1px solid ' + D.line, borderRadius: 3, padding: '24px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-              <h2 style={{ fontFamily: "'Bricolage Grotesque',system-ui", fontSize: 18, fontWeight: 700, margin: 0, color: D.ink }}>MÃ³dulo de Clientes</h2>
+              <h2 style={{ fontFamily: "'Bricolage Grotesque',system-ui", fontSize: 18, fontWeight: 700, margin: 0, color: D.ink }}>Módulo de Clientes</h2>
               <a href="/dashboard/clientes" style={{ background: D.bronze, color: '#fff', borderRadius: 2, padding: '9px 20px', textDecoration: 'none', fontWeight: 700, fontSize: 13, minHeight: 40, display: 'inline-flex', alignItems: 'center' }}>Acessar completo</a>
             </div>
-            <p style={{ color: D.muted, fontSize: 14, margin: 0 }}>Gerencie clientes, proprietÃ¡rios e parceiros. Acesse o mÃ³dulo completo para CRUD, busca avanÃ§ada e histÃ³rico de interaÃ§Ãµes.</p>
+            <p style={{ color: D.muted, fontSize: 14, margin: 0 }}>Gerencie clientes, proprietários e parceiros. Acesse o módulo completo para CRUD, busca avançada e histórico de interações.</p>
           </div>
         )}
       </div>
