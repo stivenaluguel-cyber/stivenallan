@@ -178,6 +178,36 @@ export const EMPREENDIMENTOS: Empreendimento[] = [
     imagens: [],
     oculto: true,
   },
+  {
+    slug: 'fidenza-residencial-cruzeiro-do-sul-criciuma-sc',
+    nome: 'Fidenza Residencial',
+    construtoraSlug: 'fontana',
+    construtoraNome: 'Construtora Fontana',
+    cidade: 'Criciúma',
+    bairro: 'Cruzeiro do Sul',
+    uf: 'SC',
+    regiao: 'Sul Catarinense',
+    statusObra: 'em obras',
+    dorms: '3 suítes',
+    areaMin: 149,
+    areaMax: 161,
+    exibirPreco: false,
+    precoAPartirDe: null,
+    frase: 'Autenticidade em cada detalhe — Cruzeiro do Sul.',
+    descricao:
+      'Fidenza Residencial: apartamentos de alto padrão no Cruzeiro do Sul, Criciúma/SC. 3 dormitórios (todos suítes), 149 a 161 m² privativos, 2 unidades por andar, 11 pavimentos. Em frente ao Criciúma Clube. Financiamento direto com a Construtora Fontana.',
+    diferenciais: [
+      'Hall com pé-direito duplo',
+      'Sacada com churrasqueira a carvão e guarda-corpo de vidro',
+      'Persianas automatizadas nos dorm',
+      'Manta acústica entre pavimentos',
+      'Fechadura digital',
+      'Espóra para split e coifa',
+      'Financiamento direto com a construtora',
+    ],
+    imagens: [],
+    oculto: false,
+  },
 ];
 
 // --- Helpers ---
