@@ -570,6 +570,8 @@ No coração nobre de Criciúma, a poucos passos de comércio premium, gastronom
 
 {/* LIGHTBOX */}
 {lb.open && <Lightbox images={LB_IMGS} startIndex={lb.index} onClose={closeLb} />}
+
+</div></div></div></div>
 </main>
 )
 }
