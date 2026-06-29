@@ -75,7 +75,7 @@ const AMENIDADES: string[] = [
 export const revalidate = 3600
 
 export const metadata: Metadata = {
-  title: 'Fidenza Residencial — Alto Padrão Criciúma/SC | Stiven Allan',
+  title: 'Fidenza Residencial — Alto Padrão Criciúma/SC',
   description: 'Fidenza Residencial (Construtora Fontana): apartamentos de alto padrão no Cruzeiro do Sul, Criciúma/SC. 3 suítes, 149 a 161 m², 2 aptos por andar. Financiamento direto. Atendimento exclusivo com Stiven Allan.',
   keywords: ['Fidenza Residencial', 'apartamento alto padrão Criciúma', 'lançamento Fontana', 'Cruzeiro do Sul Criciúma', 'Stiven Allan corretor SC'],
   alternates: { canonical: `${SITE_URL}/empreendimento/fontana/fidenza-residencial-cruzeiro-do-sul-criciuma-sc` },
