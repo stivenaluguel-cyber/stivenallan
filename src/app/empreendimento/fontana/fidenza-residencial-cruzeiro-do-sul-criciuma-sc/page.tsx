@@ -317,7 +317,7 @@ export default function FidenzaPage() {
             <span style={{ fontFamily: t.display, fontWeight: 300, fontSize: 'clamp(26px,3.2vw,42px)', color: t.gold, letterSpacing: '0.06em' }}>Dez/2027</span>
             <span style={{ width: 32, height: 1, background: t.gold, display: 'inline-block' }} />
             <span style={{ fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: t.onDarkMuted }}>Entrega prevista</span>
-          </div>iv>
+          </div>
           <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
             <a href={CATALOGO_PDF} target="_blank" rel="noopener noreferrer" className="fz-cta fz-cta-light">Baixar Catálogo & Plantas</a>
             <a href={WPP} target="_blank" rel="noopener noreferrer" className="fz-cta" style={{ borderColor: t.gold, color: t.onDark }}>Atendimento exclusivo</a>
