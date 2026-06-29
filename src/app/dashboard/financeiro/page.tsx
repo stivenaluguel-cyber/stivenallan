@@ -484,7 +484,7 @@ export default function FinanceiroPage() {
             <p style={{ margin: '0 0 24px', color: '#6b7280', fontSize: 14 }}>Esta ação não pode ser desfeita.</p>
             <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
               <button onClick={() => setConfirmarExcluir(null)} style={{ padding: '9px 18px', borderRadius: 8, border: '1.5px solid #e5e7eb', background: '#fff', color: '#374151', fontWeight: 600, cursor: 'pointer' }}>Cancelar</button>
-              <button onClick={() => excluirVenda(confirmarExcluir)} style={{ padding: '9px 22px', borderRadius: 8, border: 'none', background: '#ef4444', color: '#fff', fontWeight: 700, cursor: 'pointer' }}>Sim, excluir</button>
+              <button onClick={() => excluirVenda(confirmarExcluir as string)} style={{ padding: '9px 22px', borderRadius: 8, border: 'none', background: '#ef4444', color: '#fff', fontWeight: 700, cursor: 'pointer' }}>Sim, excluir</button>
             </div>
           </div>
         </div>
