@@ -40,6 +40,7 @@ export default function FinanceiroPage() {
   const [cubSalvando, setCubSalvando] = useState(false)
   const [cubCompLabel, setCubCompLabel] = useState('')
   const [cubCompKey, setCubCompKey] = useState('')
+  const [cubStatus, setCubStatus] = useState('')
 
   useEffect(() => {
     const stored = localStorage.getItem('cub_historico')
@@ -62,16 +63,36 @@ export default function FinanceiroPage() {
 
   useEffect(() => { loadPropostas() }, [loadPropostas])
 
-  function abrirModalCub() {
-    const agora = new Date()
-    const aaaamm = agora.toISOString().slice(0, 7)
-    const label = agora.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
-    const labelCapit = label.charAt(0).toUpperCase() + label.slice(1)
-    setCubCompLabel(labelCapit)
-    setCubCompKey(aaaamm)
-    const existing = cubHistorico.find(c => c.competencia === aaaamm)
-    setCubInputValor(existing ? String(existing.valor_m2) : '')
-    setModalCub(true)
+  async function atualizarCub() {
+    setCubSalvando(true)
+    try {
+      const res = await fetch('/api/cub', { cache: 'no-store' })
+      if (!res.ok) throw new Error('Falha ao consultar o SINDUSCON')
+      const data = await res.json()
+      // competencia vem da fonte oficial (mes "para ser usado em")
+      const fallbackAgora = new Date().toISOString().slice(0, 7)
+      const competencia = data.competencia || fallbackAgora
+      const labelBruto = data.competencia_label || new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
+      const competencia_label = labelBruto.charAt(0).toUpperCase() + labelBruto.slice(1)
+      const novo: RegistroCub = {
+        competencia,
+        competencia_label,
+        valor_m2: Number(data.valor_m2),
+        atualizado_em: new Date().toISOString(),
+      }
+      // upsert: nao duplica a mesma competencia
+      const hist = cubHistorico.filter(c => c.competencia !== competencia)
+      hist.unshift(novo)
+      setCubHistorico(hist)
+      localStorage.setItem('cub_historico', JSON.stringify(hist))
+      setCubStatus(data.online
+        ? 'Atualizado pelo SINDUSCON (' + competencia_label + ')'
+        : 'SINDUSCON indisponivel — usando ultimo valor conhecido (' + competencia_label + ')')
+    } catch (e) {
+      setCubStatus('Nao foi possivel atualizar agora. Tente novamente em instantes.')
+    } finally {
+      setCubSalvando(false)
+    }
   }
 
   function salvarCub() {
@@ -158,8 +179,11 @@ export default function FinanceiroPage() {
               <div style={{ fontSize: 14, color: '#9ca3af', fontStyle: 'italic' }}>Sem CUB cadastrado — clique em Atualizar</div>
             )}
           </div>
-          <button onClick={abrirModalCub} style={{ background: '#8b5cf6', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 18px', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>Atualizar CUB</button>
+          <button onClick={atualizarCub} disabled={cubSalvando} style={{ background: '#8b5cf6', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 18px', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>{cubSalvando ? 'Atualizando...' : 'Atualizar CUB'}</button>
         </div>
+        {cubStatus && (
+          <p style={{ margin: '6px 0 0', fontSize: 13, color: '#16a34a', fontStyle: 'italic' }}>{cubStatus}</p>
+        )}
         {cubHistorico.length > 1 && (
           <div style={{ marginTop: 16, borderTop: '1px solid #f3f4f6', paddingTop: 12 }}>
             <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', marginBottom: 8, textTransform: 'uppercase' }}>Histórico</div>
