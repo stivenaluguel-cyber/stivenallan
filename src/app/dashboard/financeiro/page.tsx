@@ -11,6 +11,8 @@ interface Proposta {
   created_at: string
   leads?: { nome: string }
   empreendimentos?: { nome: string }
+  recebido?: number
+  a_receber?: number
 }
 
 interface RegistroCub {
@@ -43,6 +45,11 @@ export default function FinanceiroPage() {
   const [cubStatus, setCubStatus] = useState('')
   const [modalVenda, setModalVenda] = useState(false)
   const [vendaSalvando, setVendaSalvando] = useState(false)
+  const [vendaRecebido, setVendaRecebido] = useState('')
+  const [vendaAReceber, setVendaAReceber] = useState('')
+  const [modalEditar, setModalEditar] = useState(false)
+  const [editandoId, setEditandoId] = useState<string | null>(null)
+  const [confirmarExcluir, setConfirmarExcluir] = useState<string | null>(null)
   const [vendaCliente, setVendaCliente] = useState('')
   const [vendaEmpreendimento, setVendaEmpreendimento] = useState('')
   const [vendaValor, setVendaValor] = useState('')
@@ -81,45 +88,63 @@ export default function FinanceiroPage() {
     if (!vendaCliente.trim() || !valor || isNaN(valor)) return
     setVendaSalvando(true)
     try {
-      const payload = {
+      const payload: any = {
         status: 'aceita',
         valor_proposto: valor,
         entrada: vendaEntrada ? parseFloat(vendaEntrada.replace(/[^\d,]/g,'').replace(',','.')) : undefined,
         parcelas_qtd: vendaParcelasQtd ? parseInt(vendaParcelasQtd) : undefined,
         parcelas_valor: vendaParcelasValor ? parseFloat(vendaParcelasValor.replace(/[^\d,]/g,'').replace(',','.')) : undefined,
+        recebido: vendaRecebido ? parseFloat(vendaRecebido.replace(/[^\d,]/g,'').replace(',','.')) : 0,
+        a_receber: vendaAReceber ? parseFloat(vendaAReceber.replace(/[^\d,]/g,'').replace(',','.')) : 0,
         created_at: vendaData || new Date().toISOString(),
         leads: { nome: vendaCliente.trim() },
         empreendimentos: { nome: vendaEmpreendimento.trim() || '—' },
       }
-      // Tenta persistir via API; cai em localStorage se não disponível
-      try {
-        const res = await fetch('/api/admin/propostas', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        })
-        if (res.ok) {
-          await loadPropostas()
-        } else {
-          throw new Error('api-fail')
+      if (editandoId) {
+        setPropostas(prev => prev.map(p => p.id === editandoId ? { ...p, ...payload, id: editandoId } : p))
+        const arrE = JSON.parse(localStorage.getItem('propostas_local') || '[]')
+        localStorage.setItem('propostas_local', JSON.stringify(arrE.map((p: any) => p.id === editandoId ? { ...p, ...payload } : p)))
+        try { await fetch('/api/admin/propostas/' + editandoId, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }) } catch {}
+      } else {
+        try {
+          const res = await fetch('/api/admin/propostas', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+          if (res.ok) { await loadPropostas() } else { throw new Error('api') }
+        } catch {
+          const id = crypto.randomUUID()
+          const nova = { id, ...payload }
+          const arr = JSON.parse(localStorage.getItem('propostas_local') || '[]')
+          arr.unshift(nova); localStorage.setItem('propostas_local', JSON.stringify(arr))
+          setPropostas(prev => [nova as any, ...prev])
         }
-      } catch {
-        // fallback localStorage
-        const id = crypto.randomUUID()
-        const nova = { id, ...payload, created_at: vendaData }
-        const arr = JSON.parse(localStorage.getItem('propostas_local') || '[]')
-        arr.unshift(nova)
-        localStorage.setItem('propostas_local', JSON.stringify(arr))
-        setPropostas(prev => [nova as any, ...prev])
       }
-      // limpa form
       setVendaCliente(''); setVendaEmpreendimento(''); setVendaValor('')
       setVendaEntrada(''); setVendaParcelasQtd(''); setVendaParcelasValor('')
+      setVendaRecebido(''); setVendaAReceber('')
       setVendaData(new Date().toISOString().slice(0,10))
-      setModalVenda(false)
-    } finally {
-      setVendaSalvando(false)
-    }
+      setEditandoId(null); setModalEditar(false); setModalVenda(false)
+    } finally { setVendaSalvando(false) }
+  }
+
+  function abrirEditar(p: Proposta) {
+    setEditandoId(p.id)
+    setVendaCliente(p.leads?.nome || '')
+    setVendaEmpreendimento(p.empreendimentos?.nome || '')
+    setVendaValor(p.valor_proposto ? String(p.valor_proposto) : '')
+    setVendaEntrada(p.entrada ? String(p.entrada) : '')
+    setVendaParcelasQtd(p.parcelas_qtd ? String(p.parcelas_qtd) : '')
+    setVendaParcelasValor(p.parcelas_valor ? String(p.parcelas_valor) : '')
+    setVendaRecebido(p.recebido ? String(p.recebido) : '')
+    setVendaAReceber(p.a_receber ? String(p.a_receber) : '')
+    setVendaData(p.created_at?.slice(0,10) || new Date().toISOString().slice(0,10))
+    setModalEditar(true)
+  }
+
+  function excluirVenda(id: string) {
+    setPropostas(prev => prev.filter(p => p.id !== id))
+    const arr = JSON.parse(localStorage.getItem('propostas_local') || '[]')
+    localStorage.setItem('propostas_local', JSON.stringify(arr.filter((p: any) => p.id !== id)))
+    try { fetch('/api/admin/propostas/' + id, { method: 'DELETE' }) } catch {}
+    setConfirmarExcluir(null)
   }
 
     async function atualizarCub() {
@@ -315,7 +340,7 @@ export default function FinanceiroPage() {
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem' }}>
               <thead>
                 <tr style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
-                  {['Lead','Empreendimento','Valor Venda','Entrada','Parcelas','Comissão','Data'].map(h => (
+                  {['Lead','Empreendimento','Valor Venda','Entrada','Recebido','A Receber','Comissão','Data','Ações'].map(h => (
                     <th key={h} style={{ padding: '0.6rem 0.75rem', textAlign: h==='Lead'||h==='Empreendimento'||h==='Data'?'left':'right', fontWeight: 600, color: '#374151', fontSize: '0.8rem' }}>{h}</th>
                   ))}
                 </tr>
@@ -323,38 +348,44 @@ export default function FinanceiroPage() {
               <tbody>
                 {aceitas.map((p, i) => (
                   <tr key={p.id} style={{ borderBottom: i<aceitas.length-1?'1px solid #f3f4f6':'none' }}>
-                    <td style={{ padding: '0.6rem 0.75rem', fontWeight: 600, color: '#111' }}>{p.leads?.nome || '—'}</td>
-                    <td style={{ padding: '0.6rem 0.75rem', color: '#374151' }}>{p.empreendimentos?.nome || '—'}</td>
-                    <td style={{ padding: '0.6rem 0.75rem', textAlign: 'right', fontWeight: 700, color: '#22c55e' }}>{fmtMoeda(p.valor_proposto)}</td>
-                    <td style={{ padding: '0.6rem 0.75rem', textAlign: 'right', color: '#374151' }}>{fmtMoeda(p.entrada||0)}</td>
-                    <td style={{ padding: '0.6rem 0.75rem', textAlign: 'right', color: '#374151' }}>{p.parcelas_qtd ? p.parcelas_qtd+'x '+fmtMoeda(p.parcelas_valor||0) : '—'}</td>
-                    <td style={{ padding: '0.6rem 0.75rem', textAlign: 'right', fontWeight: 600, color: '#D24E22' }}>{fmtMoeda(p.valor_proposto * percComissao/100)}</td>
-                    <td style={{ padding: '0.6rem 0.75rem', color: '#6b7280', fontSize: '0.8rem' }}>{fmtData(p.created_at)}</td>
-                  </tr>
+                <td style={{ padding: '0.6rem 0.75rem', fontWeight: 600, color: '#111' }}>{p.leads?.nome || '—'}</td>
+                <td style={{ padding: '0.6rem 0.75rem', color: '#374151' }}>{p.empreendimentos?.nome || '—'}</td>
+                <td style={{ padding: '0.6rem 0.75rem', textAlign: 'right', fontWeight: 700, color: '#22c55e' }}>{fmtMoeda(p.valor_proposto)}</td>
+                <td style={{ padding: '0.6rem 0.75rem', textAlign: 'right', color: '#374151' }}>{p.entrada ? fmtMoeda(p.entrada) : '—'}</td>
+                <td style={{ padding: '0.6rem 0.75rem', textAlign: 'right', fontWeight: 600, color: '#16a34a' }}>{(p.recebido||0)>0 ? fmtMoeda(p.recebido!) : <span style={{color:'#9ca3af'}}>—</span>}</td>
+                <td style={{ padding: '0.6rem 0.75rem', textAlign: 'right', fontWeight: 600, color: (p.a_receber||0)>0 ? '#ea580c' : '#9ca3af' }}>{(p.a_receber||0)>0 ? fmtMoeda(p.a_receber!) : <span style={{color:'#9ca3af'}}>—</span>}</td>
+                <td style={{ padding: '0.6rem 0.75rem', textAlign: 'right', fontWeight: 600, color: '#D24E22' }}>{fmtMoeda(p.valor_proposto * (percComissao / 100))}</td>
+                <td style={{ padding: '0.6rem 0.75rem', color: '#6b7280', fontSize: '0.8rem' }}>{fmtData(p.created_at)}</td>
+                <td style={{ padding: '0.6rem 0.75rem', textAlign: 'center', whiteSpace: 'nowrap' }}>
+                  <button onClick={() => abrirEditar(p)} title="Editar" style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 15, padding: '2px 5px' }}>✏️</button>
+                  <button onClick={() => setConfirmarExcluir(p.id)} title="Excluir" style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 15, padding: '2px 5px' }}>🗑️</button>
+                </td>
+              </tr>
                 ))}
               </tbody>
               <tfoot>
-                <tr style={{ background: '#f9fafb', borderTop: '2px solid #e5e7eb', fontWeight: 700 }}>
-                  <td colSpan={2} style={{ padding: '0.75rem', color: '#374151' }}>TOTAL ({aceitas.length} vendas)</td>
-                  <td style={{ padding: '0.75rem', textAlign: 'right', color: '#22c55e' }}>{fmtMoeda(totalVendas)}</td>
-                  <td style={{ padding: '0.75rem', textAlign: 'right', color: '#374151' }}>{fmtMoeda(totalEntradas)}</td>
-                  <td></td>
-                  <td style={{ padding: '0.75rem', textAlign: 'right', color: '#D24E22' }}>{fmtMoeda(totalComissoes)}</td>
-                  <td></td>
-                </tr>
-              </tfoot>
+              <tr style={{ background: '#f9fafb', borderTop: '2px solid #e5e7eb', fontWeight: 700 }}>
+                <td colSpan={2} style={{ padding: '0.75rem', color: '#374151' }}>TOTAL ({aceitas.length} venda{aceitas.length !== 1 ? 's' : ''})</td>
+                <td style={{ padding: '0.75rem', textAlign: 'right', color: '#22c55e' }}>{fmtMoeda(totalVendas)}</td>
+                <td style={{ padding: '0.75rem', textAlign: 'right', color: '#374151' }}>{fmtMoeda(totalEntradas)}</td>
+                <td style={{ padding: '0.75rem', textAlign: 'right', color: '#16a34a' }}>{fmtMoeda(aceitas.reduce((s,p)=>s+(p.recebido||0),0))}</td>
+                <td style={{ padding: '0.75rem', textAlign: 'right', color: '#ea580c' }}>{fmtMoeda(aceitas.reduce((s,p)=>s+(p.a_receber||0),0))}</td>
+                <td style={{ padding: '0.75rem', textAlign: 'right', color: '#D24E22' }}>{fmtMoeda(totalComissoes)}</td>
+                <td colSpan={2}></td>
+              </tr>
+            </tfoot>
             </table>
           </div>
         )}
       </div>
 
       {/* Modal Registrar Venda */}
-      {modalVenda && (
+      {(modalVenda || modalEditar) && (
         <div onClick={() => setModalVenda(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
           <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 12, padding: 28, width: '100%', maxWidth: 480, boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#111827' }}>✅ Registrar Venda Concluída</h2>
-              <button onClick={() => setModalVenda(false)} style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#6b7280' }}>×</button>
+              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#111827' }}>{editandoId ? '✏️ Editar Venda' : '✅ Registrar Venda Concluída'}</h2>
+              <button onClick={() => { setModalVenda(false); setModalEditar(false); setEditandoId(null) }} style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#6b7280' }}>×</button>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -410,7 +441,17 @@ export default function FinanceiroPage() {
                   />
                 </div>
               </div>
-              <div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#16a34a', marginBottom: 4, textTransform: 'uppercase' }}>✅ Recebido (R$)</label>
+                  <input type="text" value={vendaRecebido} onChange={e => setVendaRecebido(e.target.value)} placeholder="Valor já recebido" style={{ width: '100%', padding: '9px 12px', border: '1.5px solid #d1d5db', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' }} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#ea580c', marginBottom: 4, textTransform: 'uppercase' }}>⏳ A Receber (R$)</label>
+                  <input type="text" value={vendaAReceber} onChange={e => setVendaAReceber(e.target.value)} placeholder="Valor pendente" style={{ width: '100%', padding: '9px 12px', border: '1.5px solid #d1d5db', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' }} />
+                </div>
+              </div>
+                            <div>
                 <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#374151', marginBottom: 4, textTransform: 'uppercase' }}>Data da Venda</label>
                 <input
                   type="date" value={vendaData} onChange={e => setVendaData(e.target.value)}
@@ -420,7 +461,7 @@ export default function FinanceiroPage() {
             </div>
 
             <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 24 }}>
-              <button onClick={() => setModalVenda(false)} style={{ padding: '9px 18px', borderRadius: 8, border: '1.5px solid #e5e7eb', background: '#fff', color: '#374151', fontWeight: 600, cursor: 'pointer' }}>
+              <button onClick={() => { setModalVenda(false); setModalEditar(false); setEditandoId(null) }} style={{ padding: '9px 18px', borderRadius: 8, border: '1.5px solid #e5e7eb', background: '#fff', color: '#374151', fontWeight: 600, cursor: 'pointer' }}>
                 Cancelar
               </button>
               <button
@@ -428,8 +469,22 @@ export default function FinanceiroPage() {
                 disabled={vendaSalvando || !vendaCliente.trim() || !vendaValor}
                 style={{ padding: '9px 22px', borderRadius: 8, border: 'none', background: vendaSalvando || !vendaCliente.trim() || !vendaValor ? '#d1d5db' : '#ea580c', color: '#fff', fontWeight: 700, cursor: vendaSalvando || !vendaCliente.trim() || !vendaValor ? 'not-allowed' : 'pointer' }}
               >
-                {vendaSalvando ? 'Salvando...' : '✅ Confirmar Venda'}
+                {vendaSalvando ? 'Salvando...' : editandoId ? '💾 Salvar Alterações' : '✅ Confirmar Venda'}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmar Exclusão */}
+      {confirmarExcluir && (
+        <div onClick={() => setConfirmarExcluir(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 12, padding: 28, width: '100%', maxWidth: 360, boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
+            <h3 style={{ margin: '0 0 12px', fontSize: 18, fontWeight: 700, color: '#111827' }}>🗑️ Excluir venda?</h3>
+            <p style={{ margin: '0 0 24px', color: '#6b7280', fontSize: 14 }}>Esta ação não pode ser desfeita.</p>
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+              <button onClick={() => setConfirmarExcluir(null)} style={{ padding: '9px 18px', borderRadius: 8, border: '1.5px solid #e5e7eb', background: '#fff', color: '#374151', fontWeight: 600, cursor: 'pointer' }}>Cancelar</button>
+              <button onClick={() => excluirVenda(confirmarExcluir)} style={{ padding: '9px 22px', borderRadius: 8, border: 'none', background: '#ef4444', color: '#fff', fontWeight: 700, cursor: 'pointer' }}>Sim, excluir</button>
             </div>
           </div>
         </div>
