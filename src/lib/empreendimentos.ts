@@ -192,8 +192,7 @@ export const EMPREENDIMENTOS: Empreendimento[] = [
     areaMin: 149,
     areaMax: 161,
     exibirPreco: false,
-    precoAPartirDe: null,
-    frase: 'Autenticidade em cada detalhe — Cruzeiro do Sul.',
+    precoAPartirDe: 0,    frase: 'Autenticidade em cada detalhe — Cruzeiro do Sul.',
     descricao:
       'Fidenza Residencial: apartamentos de alto padrão no Cruzeiro do Sul, Criciúma/SC. 3 dormitórios (todos suítes), 149 a 161 m² privativos, 2 unidades por andar, 11 pavimentos. Em frente ao Criciúma Clube. Financiamento direto com a Construtora Fontana.',
     diferenciais: [
