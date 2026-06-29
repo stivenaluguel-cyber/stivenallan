@@ -324,8 +324,6 @@ export default function LavisPage() {
           Ligar agora
         </a>
       </div>
-    
-</div></div>
-</main>
+    </main>
   )
 }
