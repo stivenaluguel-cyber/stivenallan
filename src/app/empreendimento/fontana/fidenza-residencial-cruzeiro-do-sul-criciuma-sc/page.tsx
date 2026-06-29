@@ -298,14 +298,13 @@ export default function FidenzaPage() {
           <p className="fz-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 56 }}>
             Apenas 2 apartamentos por andar. 22 unidades em 11 pavimentos.
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 'clamp(28px,5vw,64px)', marginBottom: 64 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 'clamp(24px,4vw,48px)', marginBottom: 40 }}>
             {[
               { n: '3', l: 'Dormitórios (todos suítes)' },
               { n: '149–161', l: 'm² privativos' },
               { n: '2', l: 'Apartamentos por andar' },
               { n: '2', l: 'Elevadores' },
               { n: '11', l: 'Pavimentos' },
-              { n: 'Dez/2027', l: 'Entrega prevista' },
             ].map((it, i) => (
               <div key={i}>
                 <div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 'clamp(28px,4vw,52px)', letterSpacing: '0.04em', lineHeight: 1, color: t.gold }}>{it.n}</div>
@@ -313,6 +312,12 @@ export default function FidenzaPage() {
               </div>
             ))}
           </div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 56, opacity: 0.75 }}>
+            <span style={{ width: 32, height: 1, background: t.gold, display: 'inline-block' }} />
+            <span style={{ fontFamily: t.display, fontWeight: 300, fontSize: 'clamp(26px,3.2vw,42px)', color: t.gold, letterSpacing: '0.06em' }}>Dez/2027</span>
+            <span style={{ width: 32, height: 1, background: t.gold, display: 'inline-block' }} />
+            <span style={{ fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: t.onDarkMuted }}>Entrega prevista</span>
+          </div>iv>
           <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
             <a href={CATALOGO_PDF} target="_blank" rel="noopener noreferrer" className="fz-cta fz-cta-light">Baixar Catálogo & Plantas</a>
             <a href={WPP} target="_blank" rel="noopener noreferrer" className="fz-cta" style={{ borderColor: t.gold, color: t.onDark }}>Atendimento exclusivo</a>
@@ -334,7 +339,7 @@ export default function FidenzaPage() {
             <p className="fz-eyebrow" style={{ color: t.goldDark, marginBottom: 16 }}>Diferenciais das Unidades</p>
             <h2 className="fz-h2">Detalhes que<br />definem o padrão</h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 1, background: t.line }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1px', background: t.line }}>
             {DIFERENCIAIS.map((d, i) => (
               <div key={i} style={{ background: t.bg, padding: 'clamp(28px,4vw,44px)' }}>
                 <div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 22, color: t.gold, marginBottom: 14 }}>{String(i + 1).padStart(2, '0')}</div>
