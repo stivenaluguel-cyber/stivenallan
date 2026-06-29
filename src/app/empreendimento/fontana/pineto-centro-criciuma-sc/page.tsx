@@ -537,6 +537,7 @@ export default function PinetoPage() {
           Tenho interesse — WhatsApp
         </a>
       </div>
+</div></div>
     </>
   )
 }
