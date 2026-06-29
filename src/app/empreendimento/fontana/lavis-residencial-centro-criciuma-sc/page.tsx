@@ -175,6 +175,7 @@ return (
 </div>
 <div style={{ position:'absolute',bottom:18,left:0,right:0,textAlign:'center',zIndex:3,color:'rgba(255,255,255,0.85)',fontSize:12,letterSpacing:'0.26em',textTransform:'uppercase' }}>{img.label}{images.length > 1 && <span style={{ marginLeft:14, opacity:0.55 }}>{idx+1} / {images.length}</span>}</div>
 </div>
+</div>
 )
 }
 type LBState = { open: boolean; index: number }
@@ -443,6 +444,8 @@ Um respiro em meio à rotina. Traços orgânicos e curvas que transmitem calmari
 
 {/* LIGHTBOX */}
 {lb.open && <Lightbox images={LB_IMGS} startIndex={lb.index} onClose={closeLb} />}
+
+</div></div></div>
 </main>
 )
 }
