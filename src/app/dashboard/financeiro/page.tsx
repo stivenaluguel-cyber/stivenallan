@@ -41,6 +41,15 @@ export default function FinanceiroPage() {
   const [cubCompLabel, setCubCompLabel] = useState('')
   const [cubCompKey, setCubCompKey] = useState('')
   const [cubStatus, setCubStatus] = useState('')
+  const [modalVenda, setModalVenda] = useState(false)
+  const [vendaSalvando, setVendaSalvando] = useState(false)
+  const [vendaCliente, setVendaCliente] = useState('')
+  const [vendaEmpreendimento, setVendaEmpreendimento] = useState('')
+  const [vendaValor, setVendaValor] = useState('')
+  const [vendaEntrada, setVendaEntrada] = useState('')
+  const [vendaParcelasQtd, setVendaParcelasQtd] = useState('')
+  const [vendaParcelasValor, setVendaParcelasValor] = useState('')
+  const [vendaData, setVendaData] = useState(new Date().toISOString().slice(0,10))
 
   useEffect(() => {
     const stored = localStorage.getItem('cub_historico')
@@ -53,7 +62,11 @@ export default function FinanceiroPage() {
       const res = await fetch('/api/admin/propostas?limit=100')
       if (!res.ok) throw new Error()
       const json = await res.json()
-      setPropostas(json.data || [])
+      const apiData = json.data || []
+        // merge with any vendas registradas manualmente (localStorage fallback)
+        const localRaw = localStorage.getItem('propostas_local')
+        const local: any[] = localRaw ? JSON.parse(localRaw).filter((p:any) => !apiData.find((a:any)=>a.id===p.id)) : []
+        setPropostas([...apiData, ...local])
     } catch {
       const stored = localStorage.getItem('propostas_local')
       setPropostas(stored ? JSON.parse(stored) : [])
@@ -63,7 +76,53 @@ export default function FinanceiroPage() {
 
   useEffect(() => { loadPropostas() }, [loadPropostas])
 
-  async function atualizarCub() {
+  async function salvarVenda() {
+    const valor = parseFloat(vendaValor.replace(/[^\d,]/g,'').replace(',','.'))
+    if (!vendaCliente.trim() || !valor || isNaN(valor)) return
+    setVendaSalvando(true)
+    try {
+      const payload = {
+        status: 'aceita',
+        valor_proposto: valor,
+        entrada: vendaEntrada ? parseFloat(vendaEntrada.replace(/[^\d,]/g,'').replace(',','.')) : undefined,
+        parcelas_qtd: vendaParcelasQtd ? parseInt(vendaParcelasQtd) : undefined,
+        parcelas_valor: vendaParcelasValor ? parseFloat(vendaParcelasValor.replace(/[^\d,]/g,'').replace(',','.')) : undefined,
+        created_at: vendaData || new Date().toISOString(),
+        leads: { nome: vendaCliente.trim() },
+        empreendimentos: { nome: vendaEmpreendimento.trim() || '—' },
+      }
+      // Tenta persistir via API; cai em localStorage se não disponível
+      try {
+        const res = await fetch('/api/admin/propostas', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        })
+        if (res.ok) {
+          await loadPropostas()
+        } else {
+          throw new Error('api-fail')
+        }
+      } catch {
+        // fallback localStorage
+        const id = crypto.randomUUID()
+        const nova = { id, ...payload, created_at: vendaData }
+        const arr = JSON.parse(localStorage.getItem('propostas_local') || '[]')
+        arr.unshift(nova)
+        localStorage.setItem('propostas_local', JSON.stringify(arr))
+        setPropostas(prev => [nova as any, ...prev])
+      }
+      // limpa form
+      setVendaCliente(''); setVendaEmpreendimento(''); setVendaValor('')
+      setVendaEntrada(''); setVendaParcelasQtd(''); setVendaParcelasValor('')
+      setVendaData(new Date().toISOString().slice(0,10))
+      setModalVenda(false)
+    } finally {
+      setVendaSalvando(false)
+    }
+  }
+
+    async function atualizarCub() {
     setCubSalvando(true)
     try {
       const res = await fetch('/api/cub', { cache: 'no-store' })
@@ -234,7 +293,15 @@ export default function FinanceiroPage() {
       )}
 
       <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '12px', overflow: 'hidden' }}>
-        <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid #e5e7eb', fontWeight: 700, fontSize: '1rem', color: '#111827' }}>Vendas Concluídas</div>
+        <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontWeight: 700, fontSize: '1rem', color: '#111827' }}>Vendas Concluídas</span>
+          <button
+            onClick={() => setModalVenda(true)}
+            style={{ background: '#ea580c', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 18px', fontWeight: 700, fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
+          >
+            ＋ Registrar Venda
+          </button>
+        </div>
         {loading ? (
           <div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>Carregando...</div>
         ) : aceitas.length === 0 ? (
@@ -280,6 +347,93 @@ export default function FinanceiroPage() {
           </div>
         )}
       </div>
+
+      {/* Modal Registrar Venda */}
+      {modalVenda && (
+        <div onClick={() => setModalVenda(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 12, padding: 28, width: '100%', maxWidth: 480, boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#111827' }}>✅ Registrar Venda Concluída</h2>
+              <button onClick={() => setModalVenda(false)} style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#6b7280' }}>×</button>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#374151', marginBottom: 4, textTransform: 'uppercase' }}>Cliente / Lead *</label>
+                <input
+                  type="text" value={vendaCliente} onChange={e => setVendaCliente(e.target.value)}
+                  placeholder="Nome do cliente"
+                  style={{ width: '100%', padding: '9px 12px', border: '1.5px solid #d1d5db', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#374151', marginBottom: 4, textTransform: 'uppercase' }}>Empreendimento</label>
+                <input
+                  type="text" value={vendaEmpreendimento} onChange={e => setVendaEmpreendimento(e.target.value)}
+                  placeholder="Nome do empreendimento"
+                  style={{ width: '100%', padding: '9px 12px', border: '1.5px solid #d1d5db', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' }}
+                />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#374151', marginBottom: 4, textTransform: 'uppercase' }}>Valor da Venda (R$) *</label>
+                  <input
+                    type="text" value={vendaValor} onChange={e => setVendaValor(e.target.value)}
+                    placeholder="Ex: 350.000,00"
+                    style={{ width: '100%', padding: '9px 12px', border: '1.5px solid #d1d5db', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#374151', marginBottom: 4, textTransform: 'uppercase' }}>Entrada (R$)</label>
+                  <input
+                    type="text" value={vendaEntrada} onChange={e => setVendaEntrada(e.target.value)}
+                    placeholder="Ex: 70.000,00"
+                    style={{ width: '100%', padding: '9px 12px', border: '1.5px solid #d1d5db', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' }}
+                  />
+                </div>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#374151', marginBottom: 4, textTransform: 'uppercase' }}>Parcelas (qtd)</label>
+                  <input
+                    type="number" value={vendaParcelasQtd} onChange={e => setVendaParcelasQtd(e.target.value)}
+                    placeholder="Ex: 120"
+                    style={{ width: '100%', padding: '9px 12px', border: '1.5px solid #d1d5db', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#374151', marginBottom: 4, textTransform: 'uppercase' }}>Valor Parcela (R$)</label>
+                  <input
+                    type="text" value={vendaParcelasValor} onChange={e => setVendaParcelasValor(e.target.value)}
+                    placeholder="Ex: 2.333,33"
+                    style={{ width: '100%', padding: '9px 12px', border: '1.5px solid #d1d5db', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' }}
+                  />
+                </div>
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#374151', marginBottom: 4, textTransform: 'uppercase' }}>Data da Venda</label>
+                <input
+                  type="date" value={vendaData} onChange={e => setVendaData(e.target.value)}
+                  style={{ width: '100%', padding: '9px 12px', border: '1.5px solid #d1d5db', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' }}
+                />
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 24 }}>
+              <button onClick={() => setModalVenda(false)} style={{ padding: '9px 18px', borderRadius: 8, border: '1.5px solid #e5e7eb', background: '#fff', color: '#374151', fontWeight: 600, cursor: 'pointer' }}>
+                Cancelar
+              </button>
+              <button
+                onClick={salvarVenda}
+                disabled={vendaSalvando || !vendaCliente.trim() || !vendaValor}
+                style={{ padding: '9px 22px', borderRadius: 8, border: 'none', background: vendaSalvando || !vendaCliente.trim() || !vendaValor ? '#d1d5db' : '#ea580c', color: '#fff', fontWeight: 700, cursor: vendaSalvando || !vendaCliente.trim() || !vendaValor ? 'not-allowed' : 'pointer' }}
+              >
+                {vendaSalvando ? 'Salvando...' : '✅ Confirmar Venda'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal CUB */}
       {modalCub && (
