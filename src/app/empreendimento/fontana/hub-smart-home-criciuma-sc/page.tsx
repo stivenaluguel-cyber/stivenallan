@@ -309,7 +309,9 @@ export default function HubSmartHomePage() {
             Ligar agora
           </a>
         </div>
-      </main>
+      
+</div></div></div></div></div></div></div>
+</main>
     </>
   )
 }
