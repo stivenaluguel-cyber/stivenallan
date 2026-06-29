@@ -30,8 +30,7 @@ function Lightbox({ images, startIndex, onClose }: { images: GalItem[]; startInd
         onWheel={e => { e.preventDefault(); setZoom(z => Math.min(4, Math.max(1, z - e.deltaY * 0.002))) }}
         onMouseDown={e => { if (zoom > 1) { setDragging(true); setDragStart({ x: e.clientX - offset.x, y: e.clientY - offset.y }) } }}
         onMouseMove={e => { if (dragging) setOffset({ x: e.clientX - dragStart.x, y: e.clientY - dragStart.y }) }}
-        onMouseUp={() => setDragging(false)}
-        onMouseLeave={() => setDragging(false)}
+        onMouseUp={() => setDragging(false)} onMouseLeave={() => setDragging(false)}
         onTouchStart={e => { if (e.touches.length === 2) { const dx = e.touches[0].clientX - e.touches[1].clientX; const dy = e.touches[0].clientY - e.touches[1].clientY; setPinchDist(Math.sqrt(dx * dx + dy * dy)) } }}
         onTouchMove={e => { if (e.touches.length === 2 && pinchDist !== null) { const dx = e.touches[0].clientX - e.touches[1].clientX; const dy = e.touches[0].clientY - e.touches[1].clientY; const d = Math.sqrt(dx * dx + dy * dy); setZoom(z => Math.min(4, Math.max(1, z * (d / pinchDist)))); setPinchDist(d) } }}
         onTouchEnd={() => setPinchDist(null)}
@@ -46,32 +45,38 @@ function Lightbox({ images, startIndex, onClose }: { images: GalItem[]; startInd
   )
 }
 
-export default function GalleryWithLightbox({ galeria, lazerSrc, lazerAlt, prefix, gradient }: {
+export default function GalleryWithLightbox({ galeria, prefix, gradient }: {
   galeria: GalItem[]
-  lazerSrc: string
-  lazerAlt: string
   prefix: string
   gradient: string
 }) {
-  const lbImgs = [...galeria, { src: lazerSrc, alt: lazerAlt, label: 'Lazer' }]
   const [lb, setLb] = useState({ open: false, index: 0 })
   const openLb = useCallback((i: number) => setLb({ open: true, index: i }), [])
   const closeLb = useCallback(() => setLb(s => ({ ...s, open: false })), [])
   return (
     <>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 2 }}>
-        {galeria.map((g, i) => (
-          <figure key={i} className={`${prefix}-gcard`} style={{ margin: 0, aspectRatio: '4 / 3', position: 'relative', cursor: 'zoom-in' }} role="button" tabIndex={0} aria-label={`Ampliar: ${g.label}`} onClick={() => openLb(i)} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && openLb(i)}>
-            <Image src={g.src} alt={g.alt} fill loading="lazy" sizes="(max-width: 768px) 100vw, 33vw" style={{ objectFit: 'cover' }} />
-            <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(to top, ${gradient}, rgba(0,0,0,0) 45%)` }} />
-            <figcaption className={`${prefix}-onimg`} style={{ position: 'absolute', left: 18, bottom: 16, color: '#fff', fontSize: 12, letterSpacing: '0.24em', textTransform: 'uppercase' }}>{g.label}</figcaption>
-          </figure>
-        ))}
+      {galeria.map((g, i) => (
+        <figure key={i} className={`${prefix}-gcard`} style={{ margin: 0, aspectRatio: '4 / 3', position: 'relative', cursor: 'zoom-in' }} role="button" tabIndex={0} aria-label={`Ampliar: ${g.label}`} onClick={() => openLb(i)} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && openLb(i)}>
+          <Image src={g.src} alt={g.alt} fill loading="lazy" sizes="(max-width: 768px) 100vw, 33vw" style={{ objectFit: 'cover' }} />
+          <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(to top, ${gradient}, rgba(0,0,0,0) 45%)` }} />
+          <figcaption className={`${prefix}-onimg`} style={{ position: 'absolute', left: 18, bottom: 16, color: '#fff', fontSize: 12, letterSpacing: '0.24em', textTransform: 'uppercase' }}>{g.label}</figcaption>
+        </figure>
+      ))}
+      {lb.open && <Lightbox images={galeria} startIndex={lb.index} onClose={closeLb} />}
+    </>
+  )
+}
+
+export function LightboxPhoto({ src, alt, label, cardClass, imgSizes }: {
+  src: string; alt: string; label: string; cardClass: string; imgSizes: string
+}) {
+  const [open, setOpen] = useState(false)
+  return (
+    <>
+      <div className={cardClass} style={{ position: 'relative', aspectRatio: '4 / 3', overflow: 'hidden', cursor: 'zoom-in' }} role="button" tabIndex={0} aria-label={`Ampliar: ${label}`} onClick={() => setOpen(true)} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && setOpen(true)}>
+        <Image src={src} alt={alt} fill loading="lazy" sizes={imgSizes} style={{ objectFit: 'cover' }} />
       </div>
-      <div className={`${prefix}-lazer-card`} style={{ position: 'relative', aspectRatio: '4 / 3', overflow: 'hidden', cursor: 'zoom-in' }} role="button" tabIndex={0} aria-label="Ampliar: Lazer — Piscina" onClick={() => openLb(galeria.length)} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && openLb(galeria.length)}>
-        <Image src={lazerSrc} alt={lazerAlt} fill loading="lazy" sizes="(max-width: 768px) 100vw, 55vw" style={{ objectFit: 'cover' }} />
-      </div>
-      {lb.open && <Lightbox images={lbImgs} startIndex={lb.index} onClose={closeLb} />}
+      {open && <Lightbox images={[{ src, alt, label }]} startIndex={0} onClose={() => setOpen(false)} />}
     </>
   )
 }
