@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 
-// Hotsite premium Fidenza Residencial (Fontana, Cruzeiro do Sul, Criciuma/SC). Padrao EPIC.
-// WhatsApp do corretor Stiven (NAO usar numeros internos da Fontana).
+// Hotsite premium Fidenza Residencial (Fontana, Cruzeiro do Sul, Criciuma/SC). Padrao EPIC — benchmark Aguas de Marano.
+// Acento: grafite #2B2B2B com detalhe azul #1E3A8A discreto (motivo Mondrian).
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Fidenza%20Residencial.'
 const CATALOGO_PDF = 'https://estilofontana.com.br/upload/empreendimento/catalogo/fidenza-residencial-1725383545.pdf'
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://stivenallan.vercel.app'
@@ -11,8 +11,9 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://stivenallan.vercel
 const t = {
   bg: '#FAFAF8',
   ink: '#1A1916',
-  gold: '#B89B5E',
-  goldDark: '#8A6D2F',
+  graphite: '#2B2B2B',
+  graphiteDark: '#1A1A1A',
+  blue: '#1E3A8A',    // Mondrian accent — usar com muita discrição
   muted: '#6E685E',
   line: 'rgba(26,25,22,0.12)',
   dark: '#14130F',
@@ -48,16 +49,15 @@ const GALERIA: { src: string; alt: string; label: string }[] = [
 ]
 
 const DIFERENCIAIS: string[] = [
-  'Hall com pé-direito duplo — grandiosidade logo na entrada',
+  'Hall com pé-direito duplo',
   'Sacada com churrasqueira a carvão e guarda-corpo de vidro',
   'Persianas automatizadas nos dormitórios',
-  'Manta acústica entre pavimentos para máximo conforto sonoro',
-  'Fechadura digital de alta segurança',
+  'Manta acústica entre pavimentos',
+  'Fechadura digital',
   'Tubulação de água quente com espera para recirculação',
-  'Espera para split em todos os ambientes',
-  'Espera para coifa na cozinha',
-  'Nichos embutidos nos banheiros',
-  'Rebaixo em gesso com acabamento refinado',
+  'Espera para split e para coifa',
+  'Nicho nos banheiros',
+  'Rebaixo em gesso',
 ]
 
 const AMENIDADES: string[] = [
@@ -67,8 +67,8 @@ const AMENIDADES: string[] = [
   'Brinquedoteca',
   'Playground ao ar livre',
   'Espaço de lazer integrado',
-  'Câmeras de segurança em todo o condomínio',
-  'Gerador para as áreas comuns',
+  'Câmeras de segurança',
+  'Gerador para áreas comuns',
   'Espera para carregador de carro elétrico',
 ]
 
@@ -102,15 +102,9 @@ const SCHEMA = {
     {
       '@type': 'RealEstateAgent',
       name: 'Stiven Allan',
-      description: 'Corretor de imóveis CRECI 60.275 especialista em lançamentos de alto padrão no Sul de Santa Catarina.',
       url: SITE_URL,
       telephone: '+5548991642332',
-      address: {
-        '@type': 'PostalAddress',
-        addressLocality: 'Criciúma',
-        addressRegion: 'SC',
-        addressCountry: 'BR',
-      },
+      areaServed: { '@type': 'City', name: 'Criciúma', containedInPlace: { '@type': 'State', name: 'Santa Catarina' } },
     },
     {
       '@type': 'Apartment',
@@ -120,13 +114,7 @@ const SCHEMA = {
       numberOfRooms: 3,
       numberOfBathroomsTotal: 3,
       floorSize: { '@type': 'QuantitativeValue', minValue: 149, maxValue: 161, unitCode: 'MTK' },
-      address: {
-        '@type': 'PostalAddress',
-        streetAddress: 'Rua São José, 1000',
-        addressLocality: 'Criciúma',
-        addressRegion: 'SC',
-        addressCountry: 'BR',
-      },
+      address: { '@type': 'PostalAddress', streetAddress: 'Rua São José, 1000', addressLocality: 'Criciúma', addressRegion: 'SC', addressCountry: 'BR' },
     },
     {
       '@type': 'BreadcrumbList',
@@ -143,51 +131,70 @@ export default function FidenzaPage() {
   return (
     <main lang="pt-BR" style={{ background: t.bg, color: t.ink, fontFamily: t.body, overflowX: 'hidden' }}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHEMA) }} />
+
       <style>{`
         html { scroll-behavior: smooth; }
-        .fz-eyebrow { font-size: 11px; letter-spacing: 0.42em; text-transform: uppercase; color: ${t.gold}; font-family: ${t.body}; font-weight: 500; }
+        /* Mondrian grid — linhas horizontais e verticais inspiradas em Piet Mondrian */
+        .fz-mondrian { position: absolute; inset: 0; pointer-events: none; overflow: hidden; opacity: 0.035; z-index: 1; }
+        .fz-mondrian line { stroke: ${t.blue}; stroke-width: 1; }
+        .fz-eyebrow { font-size: 11px; letter-spacing: 0.42em; text-transform: uppercase; color: ${t.graphite}; font-family: ${t.body}; font-weight: 500; }
         .fz-h1 { font-family: ${t.display}; font-weight: 300; text-transform: uppercase; letter-spacing: 0.14em; line-height: 1.04; text-shadow: 0 2px 24px rgba(0,0,0,0.55), 0 1px 4px rgba(0,0,0,0.4); font-size: clamp(40px,8vw,104px); margin: 0; }
         .fz-onimg { text-shadow: 0 1px 16px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.5); }
         .fz-h2 { font-family: ${t.display}; font-weight: 300; text-transform: uppercase; letter-spacing: 0.16em; line-height: 1.1; font-size: clamp(26px,4vw,46px); margin: 0; }
         .fz-serif { font-family: ${t.serif}; font-style: italic; font-weight: 400; }
-        .fz-rule { width: 56px; height: 1px; background: ${t.gold}; border: 0; }
-        .fz-cta { display: inline-block; font-family: ${t.body}; font-size: 12px; letter-spacing: 0.3em; text-transform: uppercase; padding: 14px 32px; border: 1px solid ${t.ink}; color: ${t.ink}; text-decoration: none; transition: background .35s ease, color .35s ease; }
-        .fz-cta:hover { background: ${t.gold}; color: #fff; border-color: ${t.gold}; }
+        .fz-rule { width: 56px; height: 1px; background: ${t.graphite}; border: 0; }
+        .fz-cta { display: inline-block; font-family: ${t.body}; font-size: 12px; letter-spacing: 0.3em; text-transform: uppercase; color: ${t.ink}; border: 1px solid ${t.graphite}; padding: 16px 34px; text-decoration: none; transition: background .35s ease, color .35s ease; cursor: pointer; }
+        .fz-cta:hover { background: ${t.graphite}; color: #fff; }
         .fz-cta-light { color: ${t.onDark}; border-color: rgba(244,241,234,0.55); }
-        .fz-cta-light:hover { background: ${t.onDark}; color: ${t.dark}; border-color: ${t.onDark}; }
+        .fz-cta-light:hover { background: ${t.onDark}; color: ${t.graphiteDark}; }
         .fz-navlink { font-family: ${t.body}; font-size: 11px; letter-spacing: 0.28em; text-transform: uppercase; color: rgba(255,255,255,0.85); text-decoration: none; transition: color .3s ease; }
         .fz-navlink:hover { color: #fff; }
         .fz-fade { opacity: 0; transform: translateY(24px); animation: fzfade .9s ease forwards; }
-        .fz-fade-d1 { animation-delay: .15s; }
-        .fz-fade-d2 { animation-delay: .3s; }
-        .fz-fade-d3 { animation-delay: .45s; }
         @keyframes fzfade { to { opacity: 1; transform: none; } }
-        .fz-gcard { position: relative; overflow: hidden; cursor: zoom-in; }
-        .fz-gcard img { transition: transform .9s ease; }
-        .fz-gcard:hover img { transform: scale(1.05); }
-        .fz-amen { border-bottom: 1px solid ${t.line}; padding: 18px 0; display: flex; align-items: center; gap: 16px; }
-        .fz-wa { position: fixed; right: 18px; bottom: 18px; z-index: 90; width: 54px; height: 54px; border-radius: 50%; background: #25D366; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(0,0,0,0.22); text-decoration: none; }
-        .fz-mondrian { position: absolute; inset: 0; pointer-events: none; overflow: hidden; opacity: 0.035; }
-        .fz-mondrian line { stroke: ${t.ink}; stroke-width: 1; }
-        @media (max-width: 760px) { .fz-nav-links { display: none !important; } }
+        .fz-gcard { position: relative; overflow: hidden; }
+        .fz-gcard img { transition: transform .8s ease; }
+        .fz-gcard:hover img { transform: scale(1.06); }
+        .fz-amen { display: flex; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid ${t.line}; font-size: 15px; }
+        .fz-amen::before { content: ''; width: 6px; height: 6px; background: ${t.graphite}; border-radius: 50%; flex: 0 0 auto; }
+        .fz-wa { position: fixed; right: 20px; bottom: 20px; z-index: 60; width: 56px; height: 56px; border-radius: 50%; background: #25D366; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(0,0,0,0.25); text-decoration: none; }
+        .fz-burger { display: none; }
+        @media (max-width: 860px) {
+          .fz-nav-links { display: none !important; }
+          .fz-burger { display: flex !important; }
+        }
+        details.fz-menu > summary { list-style: none; }
+        details.fz-menu > summary::-webkit-details-marker { display: none; }
       `}</style>
 
       {/* NAV */}
-      <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 80, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 28px', backdropFilter: 'blur(6px)', background: 'rgba(250,250,248,0.0)', borderBottom: '1px solid transparent' }}>
-        <span style={{ fontFamily: t.display, fontWeight: 600, letterSpacing: '0.18em', fontSize: 15, color: t.onDark, textTransform: 'uppercase', mixBlendMode: 'difference' }}>Fidenza</span>
-        <div className="fz-nav-links" style={{ display: 'flex', gap: 28 }}>
-          <a href="#conceito" className="fz-navlink">O Residencial</a>
-          <a href="#galeria" className="fz-navlink">Galeria</a>
-          <a href="#residencias" className="fz-navlink">As Residências</a>
-          <a href="#diferenciais" className="fz-navlink">Diferenciais</a>
-          <a href="#localizacao" className="fz-navlink">Localização</a>
-        </div>
-        <a href={WPP} target="_blank" rel="noopener noreferrer" className="fz-cta" style={{ borderColor: 'rgba(244,241,234,0.6)', color: t.onDark, padding: '10px 22px', mixBlendMode: 'difference' }}>Falar com Stiven</a>
-      </nav>
+      <header style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 50 }}>
+        <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '22px clamp(18px,5vw,56px)' }}>
+          <a href="#top" style={{ fontFamily: t.display, fontWeight: 400, letterSpacing: '0.26em', fontSize: 16, color: '#fff', textDecoration: 'none', textTransform: 'uppercase' }}>Fidenza</a>
+          <div className="fz-nav-links" style={{ display: 'flex', alignItems: 'center', gap: 30 }}>
+            <a href="#residencial" className="fz-navlink">O Residencial</a>
+            <a href="#galeria" className="fz-navlink">Galeria</a>
+            <a href="#residencias" className="fz-navlink">As Residências</a>
+            <a href="#diferenciais" className="fz-navlink">Diferenciais</a>
+            <a href="#localizacao" className="fz-navlink">Localização</a>
+            <a href={WPP} target="_blank" rel="noopener noreferrer" className="fz-cta fz-cta-light" style={{ padding: '12px 24px' }}>Atendimento Exclusivo</a>
+          </div>
+          <details className="fz-menu fz-burger" style={{ position: 'relative' }}>
+            <summary style={{ cursor: 'pointer', color: '#fff', fontSize: 22, lineHeight: 1, padding: 6 }} aria-label="Abrir menu">&#9776;</summary>
+            <div style={{ position: 'absolute', right: 0, top: '120%', background: t.graphiteDark, padding: '18px 22px', display: 'flex', flexDirection: 'column', gap: 16, minWidth: 200, boxShadow: '0 12px 40px rgba(0,0,0,0.35)' }}>
+              <a href="#residencial" className="fz-navlink">O Residencial</a>
+              <a href="#galeria" className="fz-navlink">Galeria</a>
+              <a href="#residencias" className="fz-navlink">As Residências</a>
+              <a href="#diferenciais" className="fz-navlink">Diferenciais</a>
+              <a href="#localizacao" className="fz-navlink">Localização</a>
+              <a href={WPP} target="_blank" rel="noopener noreferrer" className="fz-navlink">Atendimento Exclusivo</a>
+            </div>
+          </details>
+        </nav>
+      </header>
 
-      {/* HERO */}
-      <section style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'flex-end' }}>
-        {/* Mondrian grid motif — finas linhas decorativas inspiradas em Piet Mondrian */}
+      {/* 1 HERO */}
+      <section id="top" style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'flex-end' }}>
+        {/* Mondrian grid motif — linhas finas inspiradas em Piet Mondrian */}
         <svg className="fz-mondrian" aria-hidden="true" viewBox="0 0 1440 900" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
           <line x1="0" y1="180" x2="1440" y2="180" />
           <line x1="0" y1="450" x2="1440" y2="450" />
@@ -196,49 +203,38 @@ export default function FidenzaPage() {
           <line x1="720" y1="0" x2="720" y2="900" />
           <line x1="1120" y1="0" x2="1120" y2="900" />
         </svg>
-        <Image
-          src={IMG.heroFrontal}
-          alt="Fidenza Residencial — fachada frontal, Cruzeiro do Sul, Criciúma/SC, em frente ao Criciúma Clube"
-          fill
-          priority
-          sizes="100vw"
-          style={{ objectFit: 'cover', objectPosition: 'center top' }}
-        />
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(20,19,15,0.38) 0%, rgba(20,19,15,0.14) 40%, rgba(20,19,15,0.84) 100%)' }} />
-        <div style={{ position: 'relative', zIndex: 2, padding: '0 clamp(18px,5vw,56px) 12vh', maxWidth: 1020 }}>
-          <p className="fz-eyebrow fz-onimg fz-fade" style={{ color: t.gold, marginBottom: 14 }}>Construtora Fontana — Cruzeiro do Sul, Criciúma/SC</p>
-          <h1 className="fz-h1 fz-fade fz-fade-d1" style={{ color: t.onDark }}>Fidenza Residencial</h1>
-          <p className="fz-serif fz-fade fz-fade-d2" style={{ color: t.gold, fontSize: 'clamp(22px,3.4vw,38px)', marginTop: 14, marginBottom: 34 }}>Sua autenticidade em cada detalhe.</p>
-          <div className="fz-fade fz-fade-d3" style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-            <a href={WPP} target="_blank" rel="noopener noreferrer" className="fz-cta" style={{ borderColor: t.gold, color: t.onDark }}>Atendimento exclusivo</a>
-            <a href="#conceito" className="fz-cta" style={{ borderColor: 'rgba(244,241,234,0.4)', color: t.onDark }}>Conheça o residencial</a>
-          </div>
+        <Image src={IMG.heroFrontal} alt="Fachada frontal do Fidenza Residencial — Cruzeiro do Sul, Criciúma/SC, em frente ao Criciúma Clube" fill priority sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center top' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(20,19,15,0.42) 0%, rgba(20,19,15,0.12) 40%, rgba(20,19,15,0.82) 100%)' }} />
+        <div className="fz-fade" style={{ position: 'relative', zIndex: 2, padding: '0 clamp(18px,5vw,56px) clamp(56px,9vh,110px)', maxWidth: 1100 }}>
+          <p className="fz-eyebrow fz-onimg" style={{ color: '#fff', marginBottom: 18 }}>Construtora Fontana &mdash; Cruzeiro do Sul, Criciúma/SC</p>
+          <h1 className="fz-h1" style={{ color: '#fff' }}>Fidenza Residencial</h1>
+          <p className="fz-serif fz-onimg" style={{ color: t.onDark, fontSize: 'clamp(20px,3vw,32px)', marginTop: 14, marginBottom: 34 }}>Sua autenticidade em cada detalhe.</p>
+          <a href={WPP} target="_blank" rel="noopener noreferrer" className="fz-cta fz-cta-light">Atendimento Exclusivo</a>
         </div>
       </section>
 
-      {/* CONCEITO */}
-      <section id="conceito" style={{ position: 'relative', padding: 'clamp(90px,16vh,180px) clamp(18px,5vw,56px)' }}>
-        {/* Mondrian grid motif sutil no fundo */}
-        <svg className="fz-mondrian" aria-hidden="true" viewBox="0 0 1440 900" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      {/* 2 CONCEITO */}
+      <section id="residencial" style={{ position: 'relative', padding: 'clamp(80px,14vh,160px) clamp(18px,5vw,56px)', textAlign: 'center' }}>
+        <svg className="fz-mondrian" aria-hidden="true" style={{ opacity: 0.02 }} viewBox="0 0 1440 900" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
           <line x1="0" y1="300" x2="1440" y2="300" />
           <line x1="0" y1="600" x2="1440" y2="600" />
           <line x1="480" y1="0" x2="480" y2="900" />
           <line x1="960" y1="0" x2="960" y2="900" />
         </svg>
-        <div style={{ maxWidth: 880, margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 1 }}>
-          <p className="fz-eyebrow" style={{ color: t.goldDark, marginBottom: 22 }}>O Residencial</p>
+        <div style={{ maxWidth: 820, margin: '0 auto', position: 'relative', zIndex: 2 }}>
+          <p className="fz-eyebrow" style={{ marginBottom: 26 }}>O Residencial</p>
           <h2 className="fz-h2">Uma obra de arte<br />para chamar de lar</h2>
           <hr className="fz-rule" style={{ margin: '34px auto' }} />
-          <p style={{ fontSize: 'clamp(20px,2.8vw,32px)', lineHeight: 1.55, color: t.ink, margin: '0 0 28px', fontFamily: t.serif, fontStyle: 'italic' }}>
+          <p className="fz-serif" style={{ fontSize: 'clamp(24px,3.4vw,40px)', lineHeight: 1.35, color: t.ink, margin: 0 }}>
             Nasce em Criciúma um lugar que acompanha seu momento de vida. Um encontro de linhas horizontais e verticais, que se tornam uma obra de arte.
           </p>
-          <p style={{ fontSize: 'clamp(16px,1.9vw,21px)', lineHeight: 1.75, color: t.muted, margin: '0 0 20px', maxWidth: 680, marginLeft: 'auto', marginRight: 'auto' }}>
+          <p style={{ fontSize: 18, lineHeight: 1.8, color: t.muted, marginTop: 26, maxWidth: 620, marginLeft: 'auto', marginRight: 'auto' }}>
             Onde o seu estilo de vida autêntico se transforma em seu novo lar.
           </p>
-          <p className="fz-serif" style={{ fontSize: 'clamp(17px,2.1vw,24px)', color: t.gold, marginTop: 28 }}>
+          <p className="fz-serif" style={{ fontSize: 'clamp(17px,2.1vw,24px)', color: t.graphite, marginTop: 28 }}>
             A originalidade de viver em um lugar que se encaixa no que você é.
           </p>
-          <div style={{ marginTop: 48, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20, flexWrap: 'wrap' }}>
+          <div style={{ marginTop: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20, flexWrap: 'wrap' }}>
             <span style={{ fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: t.muted }}>Apenas 2 apartamentos por andar</span>
             <span style={{ width: 1, height: 28, background: t.line, display: 'inline-block' }} />
             <span style={{ fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: t.muted }}>22 unidades · 11 pavimentos</span>
@@ -248,213 +244,169 @@ export default function FidenzaPage() {
         </div>
       </section>
 
-      {/* VIDEO */}
-      <section id="video" style={{ padding: '0 clamp(0px,4vw,56px) clamp(40px,8vh,96px)', background: t.bg }}>
-        <p className="fz-eyebrow" style={{ textAlign: 'center', marginBottom: 26, color: t.goldDark }}>Conheça o Fidenza</p>
+      {/* 3 VIDEO */}
+      <section id="video" style={{ padding: '0 clamp(0px,4vw,56px) clamp(40px,8vh,96px)' }}>
+        <p className="fz-eyebrow" style={{ textAlign: 'center', marginBottom: 26 }}>Conheça o Fidenza</p>
         <div style={{ maxWidth: 1180, margin: '0 auto', position: 'relative', aspectRatio: '16 / 9', overflow: 'hidden', background: t.dark }}>
           <iframe
             src={IMG.video}
             title="Vídeo Fidenza Residencial — Construtora Fontana"
             loading="lazy"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0 }}
           />
         </div>
       </section>
 
-      {/* GALERIA */}
-      <section id="galeria" style={{ background: t.dark, padding: 'clamp(80px,14vh,160px) 0' }}>
-        <div style={{ padding: '0 28px', maxWidth: 1280, margin: '0 auto 6vh' }}>
-          <p className="fz-eyebrow" style={{ color: t.gold }}>Galeria</p>
-          <h2 className="fz-h2" style={{ color: t.onDark }}>Linhas que<br />se tornam arte</h2>
-          <p className="fz-serif" style={{ fontSize: 'clamp(18px,2.4vw,26px)', lineHeight: 1.6, color: t.onDarkMuted, maxWidth: 620, marginTop: 14 }}>
-            Arquitetura inspirada na precisão geométrica de Piet Mondrian.
-          </p>
+      {/* 4 GALERIA */}
+      <section id="galeria" style={{ padding: 'clamp(40px,8vh,80px) 0 0' }}>
+        <div style={{ textAlign: 'center', padding: '0 clamp(18px,5vw,56px) clamp(34px,6vh,60px)' }}>
+          <p className="fz-eyebrow" style={{ marginBottom: 16 }}>Galeria</p>
+          <h2 className="fz-h2">Linhas que<br />se tornam arte</h2>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 14, padding: '0 14px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 2 }}>
           {GALERIA.map((g, i) => (
-            <figure key={i} className="fz-gcard" style={{ position: 'relative', margin: 0, aspectRatio: '4 / 3' }}>
-              <Image
-                src={g.src}
-                alt={g.alt}
-                fill
-                loading="lazy"
-                sizes="(max-width: 760px) 100vw, 33vw"
-                style={{ objectFit: 'cover' }}
-              />
-              <figcaption style={{ position: 'absolute', left: 16, bottom: 14, zIndex: 2, fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: '#fff', textShadow: '0 1px 8px rgba(0,0,0,0.6)' }}>{g.label}</figcaption>
-              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, transparent 55%, rgba(0,0,0,0.45) 100%)' }} />
+            <figure key={i} className="fz-gcard" style={{ margin: 0, aspectRatio: '4 / 3', position: 'relative' }}>
+              <Image src={g.src} alt={g.alt} fill loading="lazy" sizes="(max-width: 768px) 100vw, 33vw" style={{ objectFit: 'cover' }} />
+              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(20,19,15,0.55), rgba(20,19,15,0) 45%)' }} />
+              <figcaption className="fz-onimg" style={{ position: 'absolute', left: 18, bottom: 16, color: '#fff', fontSize: 12, letterSpacing: '0.24em', textTransform: 'uppercase' }}>{g.label}</figcaption>
             </figure>
           ))}
         </div>
       </section>
 
-      {/* AS RESIDÊNCIAS */}
-      <section id="residencias" style={{ background: t.dark, color: t.onDark, borderTop: '1px solid rgba(244,241,234,0.08)', padding: 'clamp(80px,14vh,160px) clamp(18px,5vw,56px)' }}>
+      {/* 5 AS RESIDÊNCIAS */}
+      <section id="residencias" style={{ background: t.dark, color: t.onDark, padding: 'clamp(80px,14vh,160px) clamp(18px,5vw,56px)' }}>
         <div style={{ maxWidth: 1080, margin: '0 auto', textAlign: 'center' }}>
-          <p className="fz-eyebrow" style={{ color: t.gold, marginBottom: 18 }}>As Residências</p>
-          <h2 className="fz-h2" style={{ color: t.onDark }}>Espaço para o seu<br />estilo autêntico</h2>
-          <p className="fz-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 56 }}>
-            Apenas 2 apartamentos por andar. 22 unidades em 11 pavimentos.
-          </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 'clamp(24px,4vw,48px)', marginBottom: 40 }}>
+          <p className="fz-eyebrow" style={{ color: t.onDark, marginBottom: 18 }}>As Residências</p>
+          <h2 className="fz-h2" style={{ color: t.onDark }}>Espaço para o<br />seu estilo autêntico</h2>
+          <p className="fz-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 56 }}>Apenas 2 apartamentos por andar. 22 unidades em 11 pavimentos.</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 'clamp(24px,4vw,48px)', marginBottom: 40 }}>
             {[
-              { n: '3', l: 'Dormitórios (todos suítes)' },
+              { n: '3', l: 'Dormitórios (3 suítes)' },
               { n: '149–161', l: 'm² privativos' },
               { n: '2', l: 'Apartamentos por andar' },
               { n: '2', l: 'Elevadores' },
               { n: '11', l: 'Pavimentos' },
             ].map((it, i) => (
               <div key={i}>
-                <div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 'clamp(28px,4vw,52px)', letterSpacing: '0.04em', lineHeight: 1, color: t.gold }}>{it.n}</div>
+                <div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 'clamp(28px,4vw,52px)', letterSpacing: '0.04em', lineHeight: 1 }}>{it.n}</div>
                 <div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDarkMuted, marginTop: 12 }}>{it.l}</div>
               </div>
             ))}
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 56, opacity: 0.75 }}>
-            <span style={{ width: 32, height: 1, background: t.gold, display: 'inline-block' }} />
-            <span style={{ fontFamily: t.display, fontWeight: 300, fontSize: 'clamp(26px,3.2vw,42px)', color: t.gold, letterSpacing: '0.06em' }}>Dez/2027</span>
-            <span style={{ width: 32, height: 1, background: t.gold, display: 'inline-block' }} />
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 48, opacity: 0.7 }}>
+            <span style={{ width: 32, height: 1, background: t.onDark, display: 'inline-block' }} />
+            <span style={{ fontFamily: t.display, fontWeight: 300, fontSize: 'clamp(22px,3vw,38px)', letterSpacing: '0.06em' }}>Dez/2027</span>
+            <span style={{ width: 32, height: 1, background: t.onDark, display: 'inline-block' }} />
             <span style={{ fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: t.onDarkMuted }}>Entrega prevista</span>
           </div>
-          <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href={CATALOGO_PDF} target="_blank" rel="noopener noreferrer" className="fz-cta fz-cta-light">Baixar Catálogo & Plantas</a>
-            <a href={WPP} target="_blank" rel="noopener noreferrer" className="fz-cta" style={{ borderColor: t.gold, color: t.onDark }}>Atendimento exclusivo</a>
-          </div>
+          <a href={CATALOGO_PDF} target="_blank" rel="noopener noreferrer" className="fz-cta fz-cta-light">Baixar Catálogo &amp; Plantas</a>
         </div>
       </section>
 
-      {/* DIFERENCIAIS DAS UNIDADES */}
+      {/* 6 DIFERENCIAIS */}
       <section id="diferenciais" style={{ position: 'relative', padding: 'clamp(80px,14vh,160px) clamp(18px,5vw,56px)' }}>
-        {/* Mondrian grid sutil */}
-        <svg className="fz-mondrian" aria-hidden="true" viewBox="0 0 1440 900" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <svg className="fz-mondrian" aria-hidden="true" style={{ opacity: 0.02 }} viewBox="0 0 1440 900" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
           <line x1="0" y1="225" x2="1440" y2="225" />
           <line x1="0" y1="675" x2="1440" y2="675" />
           <line x1="360" y1="0" x2="360" y2="900" />
           <line x1="1080" y1="0" x2="1080" y2="900" />
         </svg>
-        <div style={{ maxWidth: 1120, margin: '0 auto', position: 'relative', zIndex: 1 }}>
+        <div style={{ maxWidth: 1120, margin: '0 auto', position: 'relative', zIndex: 2 }}>
           <div style={{ textAlign: 'center', marginBottom: 'clamp(40px,7vh,72px)' }}>
-            <p className="fz-eyebrow" style={{ color: t.goldDark, marginBottom: 16 }}>Diferenciais das Unidades</p>
+            <p className="fz-eyebrow" style={{ marginBottom: 16 }}>Diferenciais das Unidades</p>
             <h2 className="fz-h2">Detalhes que<br />definem o padrão</h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1px', background: t.line }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 1, background: t.line }}>
             {DIFERENCIAIS.map((d, i) => (
               <div key={i} style={{ background: t.bg, padding: 'clamp(28px,4vw,44px)' }}>
-                <div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 22, color: t.gold, marginBottom: 14 }}>{String(i + 1).padStart(2, '0')}</div>
-                <p style={{ margin: 0, fontSize: 16, lineHeight: 1.65, color: t.ink }}>{d}</p>
+                <div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 22, color: t.blue, marginBottom: 14, opacity: 0.7 }}>{String(i + 1).padStart(2, '0')}</div>
+                <p style={{ margin: 0, fontSize: 16, lineHeight: 1.5, color: t.ink }}>{d}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* LAZER & ÁREAS COMUNS */}
-      <section style={{ background: t.bg, borderTop: '1px solid ' + t.line, padding: 'clamp(80px,14vh,160px) clamp(18px,5vw,56px)' }}>
-        <div style={{ maxWidth: 1120, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 'clamp(40px,6vw,80px)', alignItems: 'center' }}>
-          <div>
-            <p className="fz-eyebrow" style={{ color: t.goldDark, marginBottom: 22 }}>Lazer & Áreas Comuns</p>
-            <h2 className="fz-h2" style={{ marginBottom: 32 }}>Cada detalhe<br />pensado para você</h2>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+      {/* 7 LAZER & ÁREAS COMUNS */}
+      <section style={{ background: t.bg, padding: 'clamp(80px,12vh,140px) clamp(18px,5vw,56px)' }}>
+        <div style={{ maxWidth: 1180, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 'clamp(40px,7vh,72px)' }}>
+            <p className="fz-eyebrow" style={{ marginBottom: 16 }}>Lazer &amp; Áreas Comuns</p>
+            <h2 className="fz-h2">Cada detalhe<br />pensado para você</h2>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1.15fr) minmax(0,1fr)', gap: 'clamp(28px,5vw,64px)', alignItems: 'center' }}>
+            <div className="fz-gcard" style={{ position: 'relative', aspectRatio: '4 / 3', overflow: 'hidden' }}>
+              <Image src={IMG.piscina} alt="Piscina adulto e infantil com deck molhado — Fidenza Residencial" fill loading="lazy" sizes="(max-width: 768px) 100vw, 55vw" style={{ objectFit: 'cover' }} />
+            </div>
+            <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
               {AMENIDADES.map((a, i) => (
-                <li key={i} className="fz-amen">
-                  <span style={{ width: 28, height: 1, background: t.gold, flexShrink: 0 }} />
-                  <span style={{ fontSize: 15, color: t.ink }}>{a}</span>
-                </li>
+                <div key={i} className="fz-amen">{a}</div>
               ))}
             </ul>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-            <figure style={{ margin: 0, position: 'relative', aspectRatio: '4/3', overflow: 'hidden', gridColumn: '1 / -1' }}>
-              <Image src={IMG.piscina} alt="Piscina adulto e infantil com deck molhado — Fidenza Residencial" fill loading="lazy" sizes="(max-width: 760px) 100vw, 50vw" style={{ objectFit: 'cover' }} />
-            </figure>
-            <figure style={{ margin: 0, position: 'relative', aspectRatio: '4/3', overflow: 'hidden' }}>
-              <Image src={IMG.academia} alt="Academia com varanda panorâmica — Fidenza Residencial" fill loading="lazy" sizes="25vw" style={{ objectFit: 'cover' }} />
-            </figure>
-            <figure style={{ margin: 0, position: 'relative', aspectRatio: '4/3', overflow: 'hidden' }}>
-              <Image src={IMG.playground} alt="Playground ao ar livre — Fidenza Residencial" fill loading="lazy" sizes="25vw" style={{ objectFit: 'cover' }} />
-            </figure>
-          </div>
         </div>
       </section>
 
-      {/* LOCALIZAÇÃO */}
-      <section id="localizacao" style={{ background: t.dark, color: t.onDark, padding: 'clamp(80px,14vh,160px) clamp(18px,5vw,56px)' }}>
-        <div style={{ maxWidth: 1120, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 'clamp(40px,6vw,80px)', alignItems: 'center' }}>
+      {/* 8 LOCALIZAÇÃO */}
+      <section id="localizacao" style={{ padding: 'clamp(80px,12vh,140px) clamp(18px,5vw,56px)', background: t.dark, color: t.onDark }}>
+        <div style={{ maxWidth: 1180, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px,1fr))', gap: 'clamp(34px,5vw,64px)', alignItems: 'center' }}>
           <div>
-            <p className="fz-eyebrow" style={{ color: t.gold, marginBottom: 22 }}>Localização</p>
-            <h2 className="fz-h2" style={{ color: t.onDark, marginBottom: 28 }}>No coração do<br />Cruzeiro do Sul</h2>
-            <p style={{ fontSize: 16, lineHeight: 1.75, color: t.onDarkMuted, marginBottom: 24 }}>
-              Rua São José, 1000, esq. Rua Monteiro Lobato<br />
-              Cruzeiro do Sul — Criciúma/SC<br />
-              Em frente ao Criciúma Clube.
+            <p className="fz-eyebrow" style={{ color: t.onDark, marginBottom: 18 }}>Localização</p>
+            <h2 className="fz-h2" style={{ color: t.onDark }}>No coração do<br />Cruzeiro do Sul</h2>
+            <hr className="fz-rule" style={{ margin: '28px 0', background: t.onDark }} />
+            <p style={{ color: t.onDarkMuted, fontSize: 17, lineHeight: 1.6 }}>
+              Rua São José, 1000, esq. Rua Monteiro Lobato &mdash; Cruzeiro do Sul, Criciúma/SC. Em frente ao Criciúma Clube.
             </p>
-            <a href={WPP} target="_blank" rel="noopener noreferrer" className="fz-cta fz-cta-light">Quero conhecer o endereço</a>
+            <a href={WPP} target="_blank" rel="noopener noreferrer" className="fz-cta fz-cta-light" style={{ marginTop: 30 }}>Atendimento Exclusivo</a>
           </div>
-          <div style={{ position: 'relative', aspectRatio: '4/3', overflow: 'hidden' }}>
-            <Image
-              src={IMG.mapa}
-              alt="Mapa de localização do Fidenza Residencial — Rua São José, Cruzeiro do Sul, Criciúma/SC"
-              fill
-              loading="lazy"
-              sizes="(max-width: 760px) 100vw, 50vw"
-              style={{ objectFit: 'cover' }}
-            />
+          <div style={{ position: 'relative', aspectRatio: '4 / 3', overflow: 'hidden', borderRadius: 2 }}>
+            <Image src={IMG.mapa} alt="Mapa de localização do Fidenza Residencial — Rua São José, Cruzeiro do Sul, Criciúma/SC" fill loading="lazy" sizes="(max-width: 768px) 100vw, 50vw" style={{ objectFit: 'cover' }} />
           </div>
         </div>
       </section>
 
-      {/* FINANCIAMENTO DIRETO */}
-      <section style={{ background: t.gold, color: '#1A1916', padding: 'clamp(80px,14vh,160px) clamp(18px,5vw,56px)' }}>
+      {/* 9 FINANCIAMENTO DIRETO */}
+      <section style={{ background: t.graphite, color: t.onDark, padding: 'clamp(80px,14vh,160px) clamp(18px,5vw,56px)' }}>
         <div style={{ maxWidth: 1080, margin: '0 auto', textAlign: 'center' }}>
-          <p className="fz-eyebrow" style={{ color: '#5a4a1f', marginBottom: 18 }}>Financiamento Direto</p>
-          <h2 className="fz-h2" style={{ color: '#1A1916' }}>O privilégio de comprar sem banco</h2>
-          <p className="fz-serif" style={{ color: 'rgba(26,25,22,0.78)', fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 60 }}>
-            Sem burocracia, sem intermediários. Liberdade total, direto com a construtora, em 3 passos.
-          </p>
+          <p className="fz-eyebrow" style={{ color: t.onDark, marginBottom: 18 }}>Financiamento Direto</p>
+          <h2 className="fz-h2" style={{ color: t.onDark }}>O privilégio de comprar sem banco</h2>
+          <p className="fz-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 60 }}>Sem burocracia, sem intermediários. Liberdade total, direto com a construtora.</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px,1fr))', gap: 'clamp(28px,4vw,52px)' }}>
             {[
               { n: '01', ti: 'Converse com o corretor', d: 'Atendimento exclusivo e personalizado com Stiven Allan para entender o seu momento e as melhores condições.' },
               { n: '02', ti: 'Escolha a sua unidade', d: 'Selecione o apartamento ideal para o seu estilo de vida, com total liberdade de escolha.' },
               { n: '03', ti: 'Negocie direto com a Fontana', d: 'Condições facilitadas, sem banco, sem burocracia. O privilégio de quem compra com autenticidade.' },
-            ].map((it, i) => (
+            ].map((s, i) => (
               <div key={i} style={{ textAlign: 'left' }}>
-                <div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 38, color: '#1A1916', marginBottom: 14 }}>{it.n}</div>
-                <div style={{ fontSize: 13, letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: 12, color: '#1A1916' }}>{it.ti}</div>
-                <p style={{ margin: 0, fontSize: 15, lineHeight: 1.7, color: 'rgba(26,25,22,0.72)' }}>{it.d}</p>
+                <div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 40, opacity: 0.55, marginBottom: 14 }}>{s.n}</div>
+                <h3 style={{ fontFamily: t.display, fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: 17, margin: '0 0 12px', color: t.onDark }}>{s.ti}</h3>
+                <p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.6, margin: 0 }}>{s.d}</p>
               </div>
             ))}
           </div>
-          <div style={{ marginTop: 56 }}>
-            <a href={WPP} target="_blank" rel="noopener noreferrer" className="fz-cta" style={{ borderColor: '#1A1916', color: '#1A1916' }}>Iniciar atendimento</a>
-          </div>
+          <p style={{ marginTop: 56, fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: t.onDark }}>Premium exclusivo &middot; Sob consulta</p>
         </div>
       </section>
 
-      {/* CTA FINAL */}
-      <section style={{ position: 'relative', minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
-        <Image
-          src={IMG.fachadaAngular}
-          alt="Fidenza Residencial — perspectiva angular da fachada, Cruzeiro do Sul, Criciúma/SC"
-          fill
-          loading="lazy"
-          sizes="100vw"
-          style={{ objectFit: 'cover' }}
-        />
+      {/* 10 CTA FINAL */}
+      <section style={{ position: 'relative', minHeight: '78vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+        <Image src={IMG.fachadaAngular} alt="Fidenza Residencial — perspectiva angular, Cruzeiro do Sul, Criciúma/SC" fill loading="lazy" sizes="100vw" style={{ objectFit: 'cover' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(20,19,15,0.62)' }} />
         <div style={{ position: 'relative', zIndex: 2, padding: '0 clamp(18px,5vw,56px)', maxWidth: 880 }}>
-          <p className="fz-eyebrow fz-onimg" style={{ color: t.gold, marginBottom: 22 }}>Atendimento Exclusivo</p>
+          <p className="fz-eyebrow fz-onimg" style={{ color: '#fff', marginBottom: 22 }}>Atendimento Exclusivo</p>
           <h2 className="fz-serif fz-onimg" style={{ color: '#fff', fontSize: 'clamp(30px,5vw,56px)', fontStyle: 'italic', margin: '0 0 38px' }}>Sua autenticidade em cada detalhe.</h2>
           <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
             <a href={WPP} target="_blank" rel="noopener noreferrer" className="fz-cta fz-cta-light">Atendimento Exclusivo</a>
-            <a href={CATALOGO_PDF} target="_blank" rel="noopener noreferrer" className="fz-cta" style={{ borderColor: t.gold, color: t.onDark }}>Baixar Catálogo</a>
+            <a href={CATALOGO_PDF} target="_blank" rel="noopener noreferrer" className="fz-cta" style={{ borderColor: 'rgba(244,241,234,0.5)', color: t.onDark }}>Baixar Catálogo</a>
           </div>
         </div>
       </section>
 
       {/* FOOTER */}
-      <footer style={{ background: t.dark, color: t.onDarkMuted, padding: 'clamp(56px,9vh,96px) clamp(18px,5vw,56px)' }}>
+      <footer style={{ background: t.graphiteDark, color: t.onDarkMuted, padding: 'clamp(56px,9vh,96px) clamp(18px,5vw,56px)' }}>
         <div style={{ maxWidth: 1180, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px,1fr))', gap: 'clamp(28px,5vw,56px)' }}>
           <div>
             <div style={{ fontFamily: t.display, fontWeight: 400, letterSpacing: '0.22em', fontSize: 18, color: t.onDark, textTransform: 'uppercase' }}>Stiven Allan</div>
@@ -462,30 +414,27 @@ export default function FidenzaPage() {
           </div>
           <div>
             <div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDark, marginBottom: 14 }}>Contato</div>
-            <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ display: 'block', fontSize: 14, color: t.onDarkMuted, textDecoration: 'none', marginBottom: 10 }}>WhatsApp: (48) 99164-2332</a>
-            <a href="https://stivenallan.vercel.app" style={{ display: 'block', fontSize: 14, color: t.onDarkMuted, textDecoration: 'none' }}>stivenallan.vercel.app</a>
+            <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ color: t.onDarkMuted, textDecoration: 'none', fontSize: 14 }}>WhatsApp &middot; (48) 99164-2332</a>
           </div>
           <div>
-            <div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDark, marginBottom: 14 }}>Sobre o Residencial</div>
-            <p style={{ fontSize: 14, lineHeight: 1.6, margin: 0 }}>Fidenza Residencial<br />Construtora Fontana<br />Cruzeiro do Sul — Criciúma/SC<br />Rua São José, 1000</p>
+            <div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDark, marginBottom: 14 }}>Empreendimento</div>
+            <p style={{ fontSize: 14, lineHeight: 1.6, margin: 0 }}>Fidenza Residencial<br />Construtora Fontana<br />Cruzeiro do Sul, Criciúma/SC<br />Rua São José, 1000</p>
           </div>
           <div>
-            <div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDark, marginBottom: 14 }}>Empreendimentos</div>
+            <div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDark, marginBottom: 14 }}>Outros Empreendimentos</div>
             <Link href="/empreendimento/fontana/monte-leone-centro-criciuma-sc" style={{ display: 'block', fontSize: 14, color: t.onDarkMuted, textDecoration: 'none', marginBottom: 8 }}>Monte Leone Residencial</Link>
             <Link href="/empreendimento/fontana/lavis-residencial-centro-criciuma-sc" style={{ display: 'block', fontSize: 14, color: t.onDarkMuted, textDecoration: 'none', marginBottom: 8 }}>Lavis Residencial</Link>
-            <Link href="/empreendimento/fontana/aguas-de-marano-frente-mar-balneario-picarras-sc" style={{ display: 'block', fontSize: 14, color: t.onDarkMuted, textDecoration: 'none' }}>Águas de Marano Residencial</Link>
+            <Link href="/empreendimento/fontana/aguas-de-marano-frente-mar-balneario-picarras-sc" style={{ display: 'block', fontSize: 14, color: t.onDarkMuted, textDecoration: 'none' }}>Águas de Marano</Link>
           </div>
         </div>
-        <div style={{ maxWidth: 1180, margin: '48px auto 0', paddingTop: 28, borderTop: '1px solid rgba(244,241,234,0.1)', fontSize: 12, color: 'rgba(244,241,234,0.35)', letterSpacing: '0.12em' }}>
-          © 2024 Stiven Allan · Imóveis de alto padrão no Sul Catarinense · Preços sob consulta
+        <div style={{ maxWidth: 1180, margin: '40px auto 0', paddingTop: 24, borderTop: '1px solid rgba(244,241,234,0.1)', fontSize: 12 }}>
+          &copy; {new Date().getFullYear()} Stiven Allan. Imagens meramente ilustrativas. Valores sob consulta.
         </div>
       </footer>
 
       {/* WHATSAPP FLUTUANTE */}
       <a href={WPP} target="_blank" rel="noopener noreferrer" className="fz-wa" aria-label="Falar no WhatsApp com Stiven Allan">
-        <svg width="30" height="30" viewBox="0 0 24 24" fill="#fff" aria-hidden="true">
-          <path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.515 5.26l-.999 3.648 3.973-1.042zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/>
-        </svg>
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.515 5.26l-.999 3.648 3.973-1.042zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
       </a>
     </main>
   )
