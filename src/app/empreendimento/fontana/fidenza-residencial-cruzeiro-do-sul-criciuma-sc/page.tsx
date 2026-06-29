@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import GalleryWithLightbox, { LightboxPhoto } from './gallery-lightbox'
 import Link from 'next/link'
 
 // Hotsite premium Fidenza Residencial (Fontana, Cruzeiro do Sul, Criciuma/SC). Padrao EPIC — benchmark Aguas de Marano.
@@ -266,13 +267,7 @@ export default function FidenzaPage() {
           <h2 className="fz-h2">Linhas que<br />se tornam arte</h2>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 2 }}>
-          {GALERIA.map((g, i) => (
-            <figure key={i} className="fz-gcard" style={{ margin: 0, aspectRatio: '4 / 3', position: 'relative' }}>
-              <Image src={g.src} alt={g.alt} fill loading="lazy" sizes="(max-width: 768px) 100vw, 33vw" style={{ objectFit: 'cover' }} />
-              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(20,19,15,0.55), rgba(20,19,15,0) 45%)' }} />
-              <figcaption className="fz-onimg" style={{ position: 'absolute', left: 18, bottom: 16, color: '#fff', fontSize: 12, letterSpacing: '0.24em', textTransform: 'uppercase' }}>{g.label}</figcaption>
-            </figure>
-          ))}
+          <GalleryWithLightbox galeria={GALERIA} prefix="fz" gradient="rgba(20,19,15,0.55)" />
         </div>
       </section>
 
@@ -338,9 +333,7 @@ export default function FidenzaPage() {
             <h2 className="fz-h2">Cada detalhe<br />pensado para você</h2>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1.15fr) minmax(0,1fr)', gap: 'clamp(28px,5vw,64px)', alignItems: 'center' }}>
-            <div className="fz-gcard" style={{ position: 'relative', aspectRatio: '4 / 3', overflow: 'hidden' }}>
-              <Image src={IMG.piscina} alt="Piscina adulto e infantil com deck molhado — Fidenza Residencial" fill loading="lazy" sizes="(max-width: 768px) 100vw, 55vw" style={{ objectFit: 'cover' }} />
-            </div>
+            <LightboxPhoto src={IMG.piscina} alt="Piscina adulto e infantil com deck molhado — Fidenza Residencial" label="Piscina" cardClass="fz-gcard" imgSizes="(max-width: 768px) 100vw, 55vw" />
             <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
               {AMENIDADES.map((a, i) => (
                 <div key={i} className="fz-amen">{a}</div>
