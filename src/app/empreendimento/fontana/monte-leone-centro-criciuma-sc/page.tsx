@@ -395,7 +395,7 @@ No coração nobre de Criciúma, a poucos passos de comércio premium, gastronom
 </a>
 
 
-</div></div></div></div>
+
 </main>
 )
 }
