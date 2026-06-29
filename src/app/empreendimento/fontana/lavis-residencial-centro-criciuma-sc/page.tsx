@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
-import Link from 'next/link'
 
 // Hotsite premium Lavis Residencial (Fontana, Centro de Criciuma/SC). Padrao EPIC.
 // WhatsApp do corretor Stiven (NAO usar numeros internos da Fontana).
@@ -14,7 +13,7 @@ const t = {
   gold: '#B89B5E',
   goldDark: '#8A6D2F',
   muted: '#6E685E',
-  line: 'rgba(26,25,22,0.12)',
+  line: 'rgba(26,25,22,0.10)',
   dark: '#14130F',
   onDark: '#F4F1EA',
   onDarkMuted: 'rgba(244,241,234,0.66)',
@@ -79,7 +78,7 @@ export const metadata: Metadata = {
   alternates: { canonical: `${SITE_URL}/empreendimento/fontana/lavis-residencial-centro-criciuma-sc` },
   openGraph: {
     title: 'Lavis Residencial — Sofisticação em movimento',
-    description: 'Apartamentos de alto padrão no Centro de Criciúma/SC. 3 suítes, 125 a 132 m², financiamento direto com a construtora.',
+    description: 'Lavis Residencial (Construtora Fontana): apartamentos de alto padrão no Centro de Criciúma/SC. 3 suítes, 125 a 132 m², financiamento direto com a construtora. Atendimento exclusivo com Stiven Allan.',
     url: `${SITE_URL}/empreendimento/fontana/lavis-residencial-centro-criciuma-sc`,
     images: [{ url: IMG.fotomontagem, width: 1200, height: 630, alt: 'Lavis Residencial — fachada' }],
     type: 'website',
@@ -88,7 +87,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Lavis Residencial — Sofisticação em movimento',
-    description: 'Apartamentos de alto padrão no Centro de Criciúma/SC. 3 suítes, 125 a 132 m², financiamento direto com a construtora.',
+    description: 'Lavis Residencial (Construtora Fontana): apartamentos de alto padrão no Centro de Criciúma/SC. 3 suítes, 125 a 132 m², financiamento direto com a construtora. Atendimento exclusivo com Stiven Allan.',
     images: [IMG.fotomontagem],
   },
   robots: { index: true, follow: true },
@@ -97,6 +96,13 @@ export const metadata: Metadata = {
 const SCHEMA = {
   '@context': 'https://schema.org',
   '@graph': [
+    {
+      '@type': 'RealEstateAgent',
+      name: 'Stiven Allan',
+      url: SITE_URL,
+      telephone: '+5548991642332',
+      areaServed: { '@type': 'City', name: 'Criciúma', containedInPlace: { '@type': 'State', name: 'Santa Catarina' } },
+    },
     {
       '@type': 'Apartment',
       name: 'Lavis Residencial',
@@ -125,6 +131,15 @@ export default function LavisPage() {
 
       <style>{`
         html { scroll-behavior: smooth; }
+        /* Mondrian grid motif — linhas horizontais e verticais sutis */
+        .lv-mondrian {
+          position: absolute; inset: 0; pointer-events: none; overflow: hidden;
+          background-image:
+            linear-gradient(to right, rgba(184,155,94,0.035) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(184,155,94,0.035) 1px, transparent 1px);
+          background-size: 120px 120px;
+          z-index: 1;
+        }
         .lv-eyebrow { font-size: 11px; letter-spacing: 0.42em; text-transform: uppercase; color: ${t.gold}; font-family: ${t.body}; font-weight: 500; }
         .lv-h1 { font-family: ${t.display}; font-weight: 300; text-transform: uppercase; letter-spacing: 0.14em; line-height: 1.04; text-shadow: 0 2px 24px rgba(0,0,0,0.55), 0 1px 4px rgba(0,0,0,0.4); font-size: clamp(40px,8vw,104px); margin: 0; }
         .lv-onimg { text-shadow: 0 1px 16px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.5); }
@@ -144,6 +159,7 @@ export default function LavisPage() {
         .lv-gcard:hover img { transform: scale(1.05); }
         .lv-amen { border-bottom: 1px solid ${t.line}; padding: 18px 0; display: flex; align-items: center; gap: 16px; }
         .lv-wa { position: fixed; right: 18px; bottom: 18px; z-index: 90; width: 54px; height: 54px; border-radius: 50%; background: #25D366; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(0,0,0,0.22); text-decoration: none; }
+        .lv-difcell { background: ${t.bg}; padding: clamp(28px,4vw,44px); border-bottom: 1px solid ${t.line}; border-right: 1px solid ${t.line}; }
         @media (max-width: 760px) { .lv-nav-links { display: none !important; } }
       `}</style>
 
@@ -160,10 +176,11 @@ export default function LavisPage() {
         <a href={WPP} target="_blank" rel="noopener noreferrer" className="lv-navlink" style={{ border: '1px solid rgba(255,255,255,0.5)', padding: '10px 18px' }}>Atendimento</a>
       </nav>
 
-      {/* HERO */}
+      {/* 1 HERO */}
       <section style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'flex-end' }}>
         <Image src={IMG.heroFrontal} alt="Fachada frontal do Lavis Residencial, no Centro de Criciúma/SC" fill priority sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(20,19,15,0.42) 0%, rgba(20,19,15,0.16) 38%, rgba(20,19,15,0.82) 100%)' }} />
+        <div className="lv-mondrian" />
         <div style={{ position: 'relative', zIndex: 2, padding: '0 28px 12vh', maxWidth: 980 }}>
           <p className="lv-eyebrow lv-onimg" style={{ color: t.gold }}>Lavis Residencial — Centro, Criciúma/SC</p>
           <h1 className="lv-h1" style={{ color: t.onDark }}>Lavis Residencial</h1>
@@ -175,11 +192,12 @@ export default function LavisPage() {
         </div>
       </section>
 
-      {/* CONCEITO */}
-      <section id="conceito" style={{ padding: 'clamp(90px,16vh,180px) clamp(18px,5vw,56px)' }}>
-        <div style={{ maxWidth: 880, margin: '0 auto', textAlign: 'center' }}>
+      {/* 2 CONCEITO */}
+      <section id="conceito" style={{ position: 'relative', padding: 'clamp(90px,16vh,180px) clamp(18px,5vw,56px)' }}>
+        <div className="lv-mondrian" style={{ opacity: 0.5 }} />
+        <div style={{ maxWidth: 880, margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 2 }}>
           <p className="lv-eyebrow" style={{ color: t.goldDark, marginBottom: 22 }}>O Residencial</p>
-          <h2 className="lv-h2">No seu ritmo,<br />em equilíbrio</h2>
+          <h2 className="lv-h2">Sofisticação<br />em equilíbrio</h2>
           <hr className="lv-rule" style={{ margin: '34px auto' }} />
           <p style={{ fontSize: 'clamp(20px,2.8vw,32px)', lineHeight: 1.5, color: t.ink, margin: '0 0 26px', fontFamily: t.serif, fontStyle: 'italic' }}>
             No Lavis, a vida moderna encontra o equilíbrio. E, mesmo em constante movimento, a harmonia permanece.
@@ -190,7 +208,7 @@ export default function LavisPage() {
         </div>
       </section>
 
-      {/* VIDEO */}
+      {/* 3 VIDEO */}
       <section id="video" style={{ padding: '0 clamp(0px,4vw,56px) clamp(40px,8vh,96px)' }}>
         <p className="lv-eyebrow" style={{ textAlign: 'center', marginBottom: 26, color: t.goldDark }}>Conheça o Lavis</p>
         <div style={{ maxWidth: 1180, margin: '0 auto', position: 'relative', aspectRatio: '16 / 9', overflow: 'hidden', background: t.dark }}>
@@ -205,7 +223,7 @@ export default function LavisPage() {
         </div>
       </section>
 
-      {/* GALERIA */}
+      {/* 4 GALERIA */}
       <section id="galeria" style={{ background: t.dark, padding: 'clamp(80px,14vh,160px) 0' }}>
         <div style={{ padding: '0 28px', maxWidth: 1280, margin: '0 auto 6vh' }}>
           <p className="lv-eyebrow" style={{ color: t.gold }}>Galeria</p>
@@ -225,7 +243,7 @@ export default function LavisPage() {
         </div>
       </section>
 
-      {/* AS RESIDENCIAS */}
+      {/* 5 AS RESIDENCIAS */}
       <section id="residencias" style={{ background: t.dark, color: t.onDark, borderTop: '1px solid rgba(244,241,234,0.1)', padding: 'clamp(80px,14vh,160px) clamp(18px,5vw,56px)' }}>
         <div style={{ maxWidth: 1080, margin: '0 auto', textAlign: 'center' }}>
           <p className="lv-eyebrow" style={{ color: t.gold, marginBottom: 18 }}>As Residências</p>
@@ -248,16 +266,16 @@ export default function LavisPage() {
         </div>
       </section>
 
-      {/* DIFERENCIAIS DAS UNIDADES */}
+      {/* 6 DIFERENCIAIS DAS UNIDADES */}
       <section id="diferenciais" style={{ padding: 'clamp(80px,14vh,160px) clamp(18px,5vw,56px)' }}>
         <div style={{ maxWidth: 1120, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 'clamp(40px,7vh,72px)' }}>
             <p className="lv-eyebrow" style={{ color: t.goldDark, marginBottom: 16 }}>Diferenciais das Unidades</p>
             <h2 className="lv-h2">Detalhes que elevam o morar</h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 1, background: t.line }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', borderTop: `1px solid ${t.line}`, borderLeft: `1px solid ${t.line}` }}>
             {DIFERENCIAIS.map((d, i) => (
-              <div key={i} style={{ background: t.bg, padding: 'clamp(28px,4vw,44px)' }}>
+              <div key={i} style={{ background: t.bg, padding: 'clamp(28px,4vw,44px)', borderBottom: `1px solid ${t.line}`, borderRight: `1px solid ${t.line}` }}>
                 <div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 22, color: t.gold, marginBottom: 14 }}>{String(i + 1).padStart(2, '0')}</div>
                 <p style={{ margin: 0, fontSize: 16, lineHeight: 1.6, color: t.ink }}>{d}</p>
               </div>
@@ -266,7 +284,7 @@ export default function LavisPage() {
         </div>
       </section>
 
-      {/* LAZER & AREAS COMUNS */}
+      {/* 7 LAZER & AREAS COMUNS */}
       <section style={{ background: t.bg, borderTop: '1px solid ' + t.line, padding: 'clamp(80px,14vh,160px) clamp(18px,5vw,56px)' }}>
         <div style={{ maxWidth: 1120, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 'clamp(40px,6vw,80px)', alignItems: 'center' }}>
           <div>
@@ -288,7 +306,7 @@ export default function LavisPage() {
         </div>
       </section>
 
-      {/* LOCALIZACAO */}
+      {/* 8 LOCALIZACAO */}
       <section id="localizacao" style={{ background: t.dark, color: t.onDark, padding: 'clamp(80px,14vh,160px) clamp(18px,5vw,56px)' }}>
         <div style={{ maxWidth: 1120, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 'clamp(40px,6vw,80px)', alignItems: 'center' }}>
           <div>
@@ -305,7 +323,7 @@ export default function LavisPage() {
         </div>
       </section>
 
-      {/* FINANCIAMENTO DIRETO */}
+      {/* 9 FINANCIAMENTO DIRETO */}
       <section style={{ background: t.gold, color: '#1A1916', padding: 'clamp(80px,14vh,160px) clamp(18px,5vw,56px)' }}>
         <div style={{ maxWidth: 1080, margin: '0 auto', textAlign: 'center' }}>
           <p className="lv-eyebrow" style={{ color: '#5a4a1f', marginBottom: 18 }}>Financiamento Direto</p>
@@ -330,7 +348,7 @@ export default function LavisPage() {
         </div>
       </section>
 
-      {/* CTA FINAL */}
+      {/* 10 CTA FINAL */}
       <section style={{ position: 'relative', minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
         <Image src={IMG.fotomontagem} alt="Lavis Residencial — fotomontagem no Centro de Criciúma/SC" fill loading="lazy" sizes="100vw" style={{ objectFit: 'cover' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(20,19,15,0.6)' }} />
@@ -352,7 +370,7 @@ export default function LavisPage() {
           </div>
           <div>
             <div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDark, marginBottom: 14 }}>Contato</div>
-            <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ color: t.onDarkMuted, textDecoration: 'none', fontSize: 14 }}>WhatsApp &middot; (48) 99164-2332</a>
+            <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ color: t.onDarkMuted, textDecoration: 'none', fontSize: 14 }}>WhatsApp · (48) 99164-2332</a>
           </div>
           <div>
             <div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDark, marginBottom: 14 }}>Empreendimento</div>
