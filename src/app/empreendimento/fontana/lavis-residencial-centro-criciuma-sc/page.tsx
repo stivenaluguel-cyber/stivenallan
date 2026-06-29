@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import GalleryWithLightbox, { LightboxPhoto } from './gallery-lightbox'
 
 // Hotsite premium Lavis Residencial (Fontana, Centro de Criciuma/SC). Padrao EPIC — benchmark Aguas de Marano.
 // WhatsApp do corretor Stiven (NAO usar numeros internos da Fontana).
@@ -236,13 +237,7 @@ export default function LavisPage() {
           <h2 className="lv-h2">Um respiro<br />em meio à rotina</h2>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 2 }}>
-          {GALERIA.map((g, i) => (
-            <figure key={i} className="lv-gcard" style={{ margin: 0, aspectRatio: '4 / 3', position: 'relative' }}>
-              <Image src={g.src} alt={g.alt} fill loading="lazy" sizes="(max-width: 768px) 100vw, 33vw" style={{ objectFit: 'cover' }} />
-              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(20,16,10,0.55), rgba(20,16,10,0) 45%)' }} />
-              <figcaption className="lv-onimg" style={{ position: 'absolute', left: 18, bottom: 16, color: '#fff', fontSize: 12, letterSpacing: '0.24em', textTransform: 'uppercase' }}>{g.label}</figcaption>
-            </figure>
-          ))}
+          <GalleryWithLightbox galeria={GALERIA} prefix="lv" gradient="rgba(20,16,10,0.55)" />
         </div>
       </section>
 
@@ -295,9 +290,7 @@ export default function LavisPage() {
             <h2 className="lv-h2">A harmonia<br />permanece</h2>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1.15fr) minmax(0,1fr)', gap: 'clamp(28px,5vw,64px)', alignItems: 'center' }}>
-            <div className="lv-gcard" style={{ position: 'relative', aspectRatio: '4 / 3', overflow: 'hidden' }}>
-              <Image src={IMG.piscina} alt="Piscina do Lavis Residencial no Centro de Criciúma/SC" fill loading="lazy" sizes="(max-width: 768px) 100vw, 55vw" style={{ objectFit: 'cover' }} />
-            </div>
+            <LightboxPhoto src={IMG.piscina} alt="Piscina do Lavis Residencial no Centro de Criciúma/SC" label="Piscina" cardClass="lv-gcard" imgSizes="(max-width: 768px) 100vw, 55vw" />
             <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
               {AMENIDADES.map((a, i) => (
                 <div key={i} className="lv-amen">{a}</div>
