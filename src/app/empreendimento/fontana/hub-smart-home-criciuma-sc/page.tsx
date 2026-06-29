@@ -310,7 +310,7 @@ export default function HubSmartHomePage() {
           </a>
         </div>
       
-</div></div></div></div></div></div></div>
+
 </main>
     </>
   )
