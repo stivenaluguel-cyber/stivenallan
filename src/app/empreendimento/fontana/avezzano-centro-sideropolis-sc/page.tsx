@@ -9,9 +9,9 @@ const WA = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20inte
 const HERO = 'https://estilofontana.com.br/images/empreendimento/slideshows/avezzano-residencial-61a626507d294.jpg?fm=webp';
 
 const GALERIA = [
-  { src: 'https://estilofontana.com.br/images/empreendimento/slideshows/avezzano-residencial-61a626507d294.jpg?fm=webp', alt: 'Fachada' },
-  { src: 'https://estilofontana.com.br/images/empreendimento/slideshows/avezzano-residencial-61a6265144c3a.jpg?fm=webp', alt: 'Salão de Festas' },
-  { src: 'https://estilofontana.com.br/images/empreendimento/slideshows/avezzano-residencial-61a626517e285.jpg?fm=webp', alt: 'Suíte' },
+  { src: 'https://estilofontana.com.br/images/empreendimento/slideshows/avezzano-residencial-61a626507d294.jpg?fm=webp', alt: 'Salão de Festas' },
+  { src: 'https://estilofontana.com.br/images/empreendimento/slideshows/avezzano-residencial-61a6265144c3a.jpg?fm=webp', alt: 'Hall de Entrada' },
+  { src: 'https://estilofontana.com.br/images/empreendimento/slideshows/avezzano-residencial-61a626517e285.jpg?fm=webp', alt: 'Fachada' },
 ];
 
 export const metadata: Metadata = {
@@ -47,7 +47,7 @@ export default function AvezzanoPage() {
 
       {/* HERO */}
       <section style={{ position: 'relative', height: '100vh', minHeight: '600px', overflow: 'hidden' }}>
-        <img src={HERO} alt="Avezzano Residencial — Fachada"
+        <img src={HERO} alt="Avezzano Residencial — Salão de Festas"
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.6) 100%)' }} />
         <div style={{ position: 'relative', zIndex: 2, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 1.5rem' }}>
@@ -112,13 +112,9 @@ export default function AvezzanoPage() {
               </div>
             ))}
           </div>
-          <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '1rem', lineHeight: 1.8, maxWidth: '650px', margin: '0 auto 2.5rem' }}>
+          <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '1rem', lineHeight: 1.8, maxWidth: '650px', margin: '0 auto' }}>
             Residências pensadas para quem exige o melhor. Ambientes integrados, acabamentos nobres e espaços que celebram cada momento da sua história.
           </p>
-          <a href={WA} target="_blank" rel="noopener"
-            style={{ display: 'inline-block', border: `2px solid ${ACCENT}`, color: '#fff', padding: '0.9rem 2.5rem', textDecoration: 'none', fontSize: '0.8rem', letterSpacing: '0.12em', textTransform: 'uppercase', fontWeight: 600 }}>
-            SOLICITAR CATÁLOGO
-          </a>
         </div>
       </section>
 
