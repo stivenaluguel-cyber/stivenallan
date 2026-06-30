@@ -37,12 +37,7 @@ const GALERIA: { src: string; alt: string; label: string }[] = [
   { src: 'https://www.estilofontana.com.br/blog/wp-content/uploads/2024/06/lancamento-em-Criciuma-parco-savello-3.jpg', alt: 'Parco Savello Residencial - entorno', label: 'Entorno' },
   { src: 'https://www.estilofontana.com.br/blog/wp-content/uploads/2024/06/lancamento-em-Criciuma-parco-savello-6.jpg', alt: 'Parco Savello Residencial - lazer', label: 'Lazer' },
   { src: 'https://www.estilofontana.com.br/blog/wp-content/uploads/2024/06/lancamento-em-Criciuma-parco-savello-5-1.jpg', alt: 'Parco Savello Residencial - paisagismo', label: 'Paisagismo' },
-] = [
-  { src: IMG.hero, alt: 'Parco Savello Residencial — perspectiva do empreendimento no bairro Santa Barbara, Criciuma/SC', label: 'O Residencial' },
-  { src: IMG.fachada, alt: 'Parco Savello Residencial — fachada fotomontagem aprovada', label: 'Fachada' },
-  { src: IMG.aerea, alt: 'Parco Savello Residencial — vista aerea do empreendimento', label: 'Vista Aerea' },
 ]
-
 const DIFERENCIAIS: string[] = [
   'Hall com pe-direito duplo',
   'Sacada com guarda-corpo em vidro',
