@@ -29,33 +29,26 @@ export const metadata: Metadata = {
 }
 const RENDERS = [
   { src: 'https://lh3.googleusercontent.com/d/1zwMSHa-Ja6MGdlC2lq9fxQU7plgxHBLo', alt: 'Tremezzo Residencial — fachada principal', label: 'Fachada' },
-  { src: 'https://lh3.googleusercontent.com/d/1g9afEAHK0jHFdwjATu0NQNR-RHb0XJ5M', alt: 'Tremezzo Residencial — perspectiva exterior', label: 'Perspectiva' },
-  { src: 'https://lh3.googleusercontent.com/d/1UJt4R_9PgpUm3GMFRoYnTXU7SyVthYAB', alt: 'Tremezzo Residencial — vista geral', label: 'Vista geral' },
-  { src: 'https://lh3.googleusercontent.com/d/1sAi2MrrSvv81n-0rXdD5UUvP2yvIGfk_', alt: 'Tremezzo Residencial — fachada lateral', label: 'Fachada lateral' },
-  { src: 'https://lh3.googleusercontent.com/d/11pQk-K--lBt3G4ob4vzc8eI_iFDNhM8E', alt: 'Tremezzo Residencial — detalhe arquitetônico', label: 'Detalhe' },
-  { src: 'https://lh3.googleusercontent.com/d/15q1c6rVrgvuywQ6SdRsWDtnVcXT8qSoB', alt: 'Tremezzo Residencial — área externa', label: 'Área externa' },
-  { src: 'https://lh3.googleusercontent.com/d/1zwMSHa-Ja6MGdlC2lq9fxQU7plgxHBLo', alt: 'Tremezzo — piscina adulto render', label: 'Piscina adulto' },
-  { src: 'https://lh3.googleusercontent.com/d/1LXRWetoAesYcsX9Z147NG5a6v_1MGR5x', alt: 'Tremezzo — área de lazer render', label: 'Lazer' },
-  { src: 'https://lh3.googleusercontent.com/d/1eU-TvLidHnIJ6fVfD-vZV79eQxjYW1wM', alt: 'Tremezzo — fitness render', label: 'Fitness' },
-  { src: 'https://lh3.googleusercontent.com/d/1_JkJJQdhrpqu2-21VipzXbhA00ODkIyd', alt: 'Tremezzo — coworking render', label: 'Coworking' },
-  { src: 'https://lh3.googleusercontent.com/d/1Y0YSrz60_PHy0NJKLWlIklGgaN3Y-EYC', alt: 'Tremezzo — salão de festas render', label: 'Salão de festas' },
-  { src: 'https://lh3.googleusercontent.com/d/1_JKSBGU6bogh2mWM6J8hjxKpqrzYjzRL', alt: 'Tremezzo — jardim render', label: 'Jardim' },
-  { src: 'https://lh3.googleusercontent.com/d/1bWFhCE1vy7pjxqcnXRe_1h1bGzAN0XVi', alt: 'Tremezzo — terraço render', label: 'Terraço' },
-  { src: 'https://lh3.googleusercontent.com/d/1ugaXCwmuBrKEaF6FBmK11cE5jgjRi4p_', alt: 'Tremezzo — quiosque BBQ render', label: 'Quiosque BBQ' },
-  { src: 'https://lh3.googleusercontent.com/d/1eqfZOe6u4lkrdDuQksBZfZtALcytpRLa', alt: 'Tremezzo — playground render', label: 'Playground' },
-  { src: 'https://lh3.googleusercontent.com/d/1P38Lxc2qz_TNPYSCBg1OCSKyuic1nLg1', alt: 'Tremezzo — espaço pet render', label: 'Espaço pet' },
-  { src: 'https://lh3.googleusercontent.com/d/1xmEp4hjaujYYcoHvgLp7vhpZ8qrehxSY', alt: 'Tremezzo — brinquedoteca render', label: 'Brinquedoteca' },
-  { src: 'https://lh3.googleusercontent.com/d/1kPBhgd9fKOnFNtld1VrUREmU_O_zhZgO', alt: 'Tremezzo — sala de jogos render', label: 'Sala de jogos' },
-  { src: 'https://lh3.googleusercontent.com/d/1x914XE1ccVmLnUoM7F8Df6h4c85-9pJH', alt: 'Tremezzo — render área comum', label: 'Área comum' },
-  { src: 'https://lh3.googleusercontent.com/d/17kPkJxoXpQh1AggivjZGTwr-8_bSuI-u', alt: 'Tremezzo — render área de lazer', label: 'Área de lazer' },
-  { src: 'https://lh3.googleusercontent.com/d/1UzTzNisPdmEp6325oRjxCJB4zZJHXZae', alt: 'Tremezzo — render área social', label: 'Área social' },
-  { src: 'https://lh3.googleusercontent.com/d/1COeweim5wRugw9oLBJ9JbcH42rvwjCNu', alt: 'Tremezzo — render área gourmet', label: 'Área gourmet' },
-  { src: 'https://lh3.googleusercontent.com/d/1H4xGsrk1_xYpi8jZPowW6LxfhRdXm0Hz', alt: 'Tremezzo — vista noturna render', label: 'Vista noturna' },
-  { src: 'https://lh3.googleusercontent.com/d/1DDLQmXlzGCipAfJniuhbrE4I4ODXsG9v', alt: 'Tremezzo — sacada gourmet render', label: 'Sacada gourmet' },
-  { src: 'https://lh3.googleusercontent.com/d/1aiw6SZXMZxhIZ9BLisK1pXjYwiuLtCb6', alt: 'Tremezzo — living integrado render', label: 'Living integrado' },
-  { src: 'https://lh3.googleusercontent.com/d/12lEdyYLbfr2iGixI1zYdHpR1SWYj1Yfd', alt: 'Tremezzo — perspectiva geral render', label: 'Perspectiva geral' },
+  { src: 'https://lh3.googleusercontent.com/d/15q1c6rVrgvuywQ6SdRsWDtnVcXT8qSoB', alt: 'Tremezzo Residencial — fachada angular', label: 'Fachada angular' },
+  { src: 'https://lh3.googleusercontent.com/d/1LXRWetoAesYcsX9Z147NG5a6v_1MGR5x', alt: 'Tremezzo Residencial — fachada lateral', label: 'Fachada lateral' },
+  { src: 'https://lh3.googleusercontent.com/d/1eU-TvLidHnIJ6fVfD-vZV79eQxjYW1wM', alt: 'Tremezzo Residencial — fotomontagem', label: 'Fotomontagem' },
+  { src: 'https://lh3.googleusercontent.com/d/1hqJTMIkDtH3sfz4oiRzTQyPMk1jxcBTL', alt: 'Tremezzo Residencial — acesso principal', label: 'Acesso principal' },
+  { src: 'https://lh3.googleusercontent.com/d/1_JkJJQdhrpqu2-21VipzXbhA00ODkIyd', alt: 'Tremezzo Residencial — hall de entrada', label: 'Hall de entrada' },
+  { src: 'https://lh3.googleusercontent.com/d/17kPkJxoXpQh1AggivjZGTwr-8_bSuI-u', alt: 'Tremezzo — piscina adulto', label: 'Piscina' },
+  { src: 'https://lh3.googleusercontent.com/d/1sAi2MrrSvv81n-0rXdD5UUvP2yvIGfk_', alt: 'Tremezzo — espaço fitness', label: 'Fitness' },
+  { src: 'https://lh3.googleusercontent.com/d/1UJt4R_9PgpUm3GMFRoYnTXU7SyVthYAB', alt: 'Tremezzo — coworking', label: 'Coworking' },
+  { src: 'https://lh3.googleusercontent.com/d/1_JKSBGU6bogh2mWM6J8hjxKpqrzYjzRL', alt: 'Tremezzo — sala de jogos', label: 'Sala de jogos' },
+  { src: 'https://lh3.googleusercontent.com/d/1Y0YSrz60_PHy0NJKLWlIklGgaN3Y-EYC', alt: 'Tremezzo — horta e jardim', label: 'Jardim' },
+  { src: 'https://lh3.googleusercontent.com/d/1DDLQmXlzGCipAfJniuhbrE4I4ODXsG9v', alt: 'Tremezzo — salão de festas', label: 'Salão de festas' },
+  { src: 'https://lh3.googleusercontent.com/d/1aiw6SZXMZxhIZ9BLisK1pXjYwiuLtCb6', alt: 'Tremezzo — salão de festas ângulo 2', label: 'Salão de festas 2' },
+  { src: 'https://lh3.googleusercontent.com/d/1bWFhCE1vy7pjxqcnXRe_1h1bGzAN0XVi', alt: 'Tremezzo — living integrado', label: 'Living integrado' },
+  { src: 'https://lh3.googleusercontent.com/d/1COeweim5wRugw9oLBJ9JbcH42rvwjCNu', alt: 'Tremezzo — quiosque gourmet', label: 'Quiosque gourmet' },
+  { src: 'https://lh3.googleusercontent.com/d/1H4xGsrk1_xYpi8jZPowW6LxfhRdXm0Hz', alt: 'Tremezzo — sacada gourmet', label: 'Sacada gourmet' },
+  { src: 'https://lh3.googleusercontent.com/d/1UzTzNisPdmEp6325oRjxCJB4zZJHXZae', alt: 'Tremezzo — playground', label: 'Playground' },
+  { src: 'https://lh3.googleusercontent.com/d/11pQk-K--lBt3G4oh4vzc8eI_iFDNhM8E', alt: 'Tremezzo — espaço pet', label: 'Espaço pet' },
+  { src: 'https://lh3.googleusercontent.com/d/1g9afEAHK0jHFdwjATu0NQNR-RHb0XJ5M', alt: 'Tremezzo — brinquedoteca', label: 'Brinquedoteca' },
+  { src: 'https://lh3.googleusercontent.com/d/12lEdyYLbfr2iGixI1zYdHpR1SWYj1Yfd', alt: 'Tremezzo — suíte tipo', label: 'Suíte tipo' },
 ]
-
 const GALERIA = [
   { src: 'https://lh3.googleusercontent.com/d/18HE4iwX3yyHWSrwmdDy7Bh24cV5bXfds', alt: 'Tremezzo decorado — sala de estar', label: 'Sala de estar' },
   { src: 'https://lh3.googleusercontent.com/d/1qFS3jO4QLO3NYiti72txNScf3OKYEEPr', alt: 'Tremezzo decorado — living integrado', label: 'Living' },
@@ -230,7 +223,7 @@ const CSS = `
           <div className="tz-metrics-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 'clamp(32px,4vw,56px)' }}>
             {[{ val: '125', label: 'm² privativos' }, { val: '18', label: 'Andares' }, { val: '+1.000', label: 'm² de lazer' }, { val: '03/2027', label: 'Entrega prevista' }].map(({ val, label }) => (
               <div key={label} style={{ textAlign: 'center' }}>
-                <p style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 200, fontSize: 'clamp(40px,6vw,64px)', color: 'rgba(107,45,62,0.22)', letterSpacing: '0.04em', lineHeight: 1 }}>{val}</p>
+                <p style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 200, fontSize: 'clamp(40px,6vw,64px)', color: 'rgba(245,238,240,0.90)', letterSpacing: '0.04em', lineHeight: 1 }}>{val}</p>
                 <p style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: 'rgba(245,238,240,0.65)', marginTop: 4 }}>{label}</p>
               </div>
             ))}
@@ -238,7 +231,7 @@ const CSS = `
           <div style={{ marginTop: 64, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px,1fr))', gap: 24, borderTop: '1px solid rgba(245,238,240,0.10)', paddingTop: 48 }}>
             {[{ n: '3', label: 'Dormitórios (1 suíte)' }, { n: '200', label: 'm² área total' }, { n: '4', label: 'Aptos por andar' }, { n: '2', label: 'Elevadores' }, { n: '2', label: 'Vagas' }, { n: '~72', label: 'Unidades' }].map(({ n, label }) => (
               <div key={label} style={{ textAlign: 'center', padding: '24px 16px' }}>
-                <p style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 200, fontSize: 'clamp(28px,4vw,48px)', color: '#6B2D3E', letterSpacing: '0.04em', lineHeight: 1 }}>{n}</p>
+                <p style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 200, fontSize: 'clamp(28px,4vw,48px)', color: '#D4869A', letterSpacing: '0.04em', lineHeight: 1 }}>{n}</p>
                 <p style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 12, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(245,238,240,0.65)', marginTop: 8 }}>{label}</p>
               </div>
             ))}
