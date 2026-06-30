@@ -79,7 +79,7 @@ function EmpCard({ emp }: { emp: typeof EMPREENDIMENTOS[0] }) {
     <article className="home-card">
       <Link href={href} style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
         <div style={{ position: 'relative', aspectRatio: '4/3', overflow: 'hidden', background: '#e8e4dc' }}>
-          <Image src={emp.img} alt={emp.nome} fill sizes="(max-width:768px)100vw,50vw" style={{ objectFit: 'cover' }} />
+          <Image unoptimized src={emp.img} alt={emp.nome} fill sizes="(max-width:768px)100vw,50vw" style={{ objectFit: 'cover' }} />
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(26,24,20,0.55), transparent 50%)' }} />
           <div style={{ position: 'absolute', top: 16, left: 16, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             <StatusBadge status={emp.status} />
