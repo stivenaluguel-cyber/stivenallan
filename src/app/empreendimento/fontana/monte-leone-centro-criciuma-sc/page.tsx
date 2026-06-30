@@ -30,7 +30,7 @@ heroAerea: 'https://estilofontana.com.br/images/2025/08/28/f-ml-voo-passaro-ef-w
 fachadaAngular: 'https://estilofontana.com.br/upload/2025/08/29/f-ml-fachada-angular-ef-web-68b18b1717c8b.jpg',
 mapa: 'https://estilofontana.com.br/images/2025/08/27/monte-leone-68af608281484.png?fm=webp',
 piscina: 'https://estilofontana.com.br/images/2025/08/11/f-ml-piscina-ang-02-ef-web-689a457c22a22.jpg',
-video: 'https://www.youtube.com/embed/LAlGFIJJALs',
+video: 'https://www.youtube.com/embed/7CIZGHxnTXE',
 }
 
 const GALERIA: { src: string; alt: string; label: string }[] = [
@@ -231,7 +231,7 @@ Uma joia arquitetônica lapidada para brilhar no coração nobre de Criciúma, c
 <p className="ml-eyebrow" style={{ textAlign: 'center', marginBottom: 26 }}>Conheça o Monte Leone</p>
 <div style={{ maxWidth: 1180, margin: '0 auto', position: 'relative', aspectRatio: '16 / 9', overflow: 'hidden', background: t.dark }}>
 <iframe
-src="https://www.youtube.com/embed/LAlGFIJJALs"
+src="https://www.youtube.com/embed/7CIZGHxnTXE"
 title="Vídeo Monte Leone Residencial"
 loading="lazy"
 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
