@@ -1,125 +1,201 @@
-import type { Metadata } from 'next';
-import GalleryWithLightbox from './gallery-lightbox';
+import type { Metadata } from 'next'
+import Image from 'next/image'
+import GalleryWithLightbox, { LightboxPhoto } from './gallery-lightbox'
 
-export const revalidate = 3600;
+const WPP = "https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Bosco%20Del%20Montello%20Residencial."
+const CATALOGO_PDF = "https://estilofontana.com.br/upload/empreendimento/catalogo/bosco-del-montello-1602177950.pdf"
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://stivenallan.vercel.app'
 
-const ACCENT = '#5C3D2E';
-const ACCENT_DARK = '#3b2419';
-const WA = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Bosco%20Del%20Montello%20Residencial.';
-const HERO = 'https://estilofontana.com.br/images/empreendimento/slideshows/bosco-del-montello-residencial-613a4794e8ddd.jpg?fm=webp';
+const t = {
+  bg: '#FAFAF8', ink: '#16201A', brown: '#5C3D2E', brownDark: '#3A2419', muted: '#6A5A50',
+  line: 'rgba(22,32,26,0.12)', dark: '#100C09', onDark: '#F5EDE8', onDarkMuted: 'rgba(245,237,232,0.66)',
+  display: "'Jost', system-ui, sans-serif", serif: "'Cormorant Garamond', Georgia, serif",
+  body: "'Hanken Grotesk', system-ui, sans-serif",
+}
+
+const IMG = {
+  hero: 'https://estilofontana.com.br/images/empreendimento/slideshows/bosco-del-montello-residencial-613a4794e8ddd.jpg?fm=webp',
+  mapa: 'https://estilofontana.com.br/images/2020/10/26/localizacao-5f96e20b6e722.png?fm=webp',
+  lazer: 'https://estilofontana.com.br/images/2020/10/02/f-bdm-suite-ef-web-5f77596286190.jpg?fm=webp',
+}
 
 const GALERIA = [
-  { src: 'https://lh3.googleusercontent.com/d/1tzsfiyBrHb0TF_tY1qpEgLa0Rq12Rl6M', alt: 'Fachada — Torre B' },
-  { src: 'https://lh3.googleusercontent.com/d/18dppXmv4AfEH8YRloVCS-5S89HUa_-_K', alt: 'Hall de Entrada — Torre A' },
-  { src: 'https://lh3.googleusercontent.com/d/1ZLgZXWRErlML66rOa-N08Sc5dNkOd6RQ', alt: 'Hall de Entrada — Torre B' },
-  { src: 'https://lh3.googleusercontent.com/d/1-Xbuto_y1eNxXdHKk9iha0PoxR1fBRN0', alt: 'Hall — Vista 2' },
-  { src: 'https://lh3.googleusercontent.com/d/1KQ17kp5A-nZGJTIiGy-4QW5IGnD3Bvsw', alt: 'Hall — Vista 3' },
-  { src: 'https://lh3.googleusercontent.com/d/12PK77XlYYA4lTeS-1LlazSla039Zpo20', alt: 'Sala de Jogos' },
-  { src: 'https://lh3.googleusercontent.com/d/1wm6LhHH5L5e86ivCuFJTkmy0k3nH4vzR', alt: 'Espaço Gourmet' },
-  { src: 'https://lh3.googleusercontent.com/d/1MbFHE5do6n0ZT4zuuNFLSfywq6TuRam3', alt: 'Salão de Festas — Torre A' },
-  { src: 'https://lh3.googleusercontent.com/d/15RMbMUFl-5Z4VsqexXPCAIte0Q4RoUR4', alt: 'Salão de Festas — Torre B' },
-  { src: 'https://lh3.googleusercontent.com/d/13BOG-GYhIZOhrcSMDh_61042HKsayUWC', alt: 'Salão de Festas — Vista 2' },
-  { src: 'https://lh3.googleusercontent.com/d/1wY_vq0N_dydBErqqvQGUhNFs5PUvExis', alt: 'Brinquedoteca' },
-  { src: 'https://lh3.googleusercontent.com/d/1Yd2sVtxaukeIOluIZR1UGvUdZ--obBGL', alt: 'Academia' },
-  { src: 'https://lh3.googleusercontent.com/d/1sifUF6yi3GGIX6xDhRwiBrRXbgqaR0tL', alt: 'Academia — Vista 2' },
-  { src: 'https://lh3.googleusercontent.com/d/1xIOknHMPEN_zVjZOS0hIM2EfeR7TCXaG', alt: 'Apartamento Tipo' },
-  { src: 'https://lh3.googleusercontent.com/d/1uoDzPSvBCQkyttcfT_gC6HH-QNcBbc9X', alt: 'Apartamento — Vista 2' },
-];
+  { src: IMG.hero, alt: 'Bosco Del Montello Residencial — Fachada', label: 'Fachada' },
+  { src: 'https://lh3.googleusercontent.com/d/18dppXmv4AfEH8YRloVCS-5S89HUa_-_K', alt: 'Hall de Entrada — Torre A', label: 'Hall de Entrada' },
+  { src: 'https://lh3.googleusercontent.com/d/1DfIU3hbUQuXAAsj6-SMs_U6ktNvVXKTs', alt: 'Hall — Vista 2', label: 'Hall — Vista 2' },
+  { src: 'https://lh3.googleusercontent.com/d/1sMd2xIeDrs3PWnWcwjYfl-fPhQFcjnMR', alt: 'Hall — Vista 3', label: 'Hall — Vista 3' },
+  { src: 'https://lh3.googleusercontent.com/d/1ZLgZXWRErlML66rOa-N08Sc5dNkOd6RQ', alt: 'Hall de Entrada — Torre B', label: 'Hall Torre B' },
+  { src: 'https://lh3.googleusercontent.com/d/12PK77XlYYA4lTeS-1LlazSla039Zpo20', alt: 'Sala de Jogos com Espaço Gourmet', label: 'Sala de Jogos' },
+  { src: 'https://lh3.googleusercontent.com/d/1Sbbcykw3nsQwifD-CXSZodB4Z43F2P8B', alt: 'Espaço Gourmet', label: 'Espaço Gourmet' },
+  { src: 'https://lh3.googleusercontent.com/d/10MfuSaAU_jK1_82DU6qGvgjErb_Jwfbs', alt: 'Sala de Jogos — Vista 2', label: 'Sala de Jogos — Vista 2' },
+  { src: 'https://lh3.googleusercontent.com/d/1tcZp320-4dBgUxt7Y9QeiqsU6kA962sb', alt: 'Salão de Festas — Torre A', label: 'Salão de Festas' },
+  { src: 'https://lh3.googleusercontent.com/d/17M29eHp56Hx--4L55WoRJCWmYnPb62xX', alt: 'Salão de Festas — Vista 2', label: 'Salão de Festas — Vista 2' },
+  { src: 'https://lh3.googleusercontent.com/d/1sPbdpOkwZUjHRE-qjfxMfxz9n9UYIS9t', alt: 'Salão de Festas — Vista 3', label: 'Salão de Festas — Vista 3' },
+  { src: 'https://lh3.googleusercontent.com/d/15RMbMUFl-5Z4VsqexXPCAIte0Q4RoUR4', alt: 'Salão de Festas — Torre B', label: 'Salão Torre B' },
+  { src: 'https://lh3.googleusercontent.com/d/1Yd2sVtxaukeIOluIZR1UGvUdZ--obBGL', alt: 'Academia', label: 'Academia' },
+  { src: 'https://lh3.googleusercontent.com/d/15sCM_s4saHIOg5BPKdK-DA7raqkj0fYo', alt: 'Academia — Vista 2', label: 'Academia — Vista 2' },
+  { src: 'https://lh3.googleusercontent.com/d/1wY_vq0N_dydBErqqvQGUhNFs5PUvExis', alt: 'Brinquedoteca', label: 'Brinquedoteca' },
+]
 
 const DIFERENCIAIS = [
-  '1 suíte',
-  'Paredes externas 20 cm (conforto acústico)',
-  'Persianas com blackout',
-  'Sacada privativa',
-];
+  'Paredes externas de 20 cm — conforto acústico e térmico',
+  '1 suíte master com acabamento premium',
+  'Persianas com blackout 100% nos dormitórios',
+  'Sacada privativa em todos os apartamentos',
+]
+
+const AMENIDADES = [
+  'Academia', 'Sala de Jogos com Espaço Gourmet',
+  'Brinquedoteca', 'Salão de Festas', '2 Elevadores',
+]
 
 export const metadata: Metadata = {
   title: 'Bosco Del Montello Residencial | Centro Criciúma SC | Stiven Allan',
   description: 'Bosco Del Montello Residencial — 2 dormitórios (1 suíte), até 66 m², Centro de Criciúma/SC. Financiamento direto Fontana. Conheça com Stiven Allan CRECI 60.275.',
-  openGraph: { title: 'Bosco Del Montello Residencial | Centro Criciúma SC | Stiven Allan', description: 'Repleto de detalhes únicos. Apartamentos com 1 suíte até 66 m² no Centro de Criciúma.', images: [{ url: HERO }] },
-};
+  alternates: { canonical: SITE_URL + '/empreendimento/fontana/bosco-del-montello-centro-criciuma-sc' },
+  openGraph: {
+    title: 'Bosco Del Montello Residencial | Centro Criciúma SC | Stiven Allan',
+    description: 'Repleto de detalhes únicos. Apartamentos com 1 suíte até 66 m² no Centro de Criciúma.',
+    url: SITE_URL + '/empreendimento/fontana/bosco-del-montello-centro-criciuma-sc',
+    type: 'website',
+    images: [{ url: IMG.hero, width: 1200, height: 800, alt: 'Fachada do Bosco Del Montello Residencial' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Bosco Del Montello Residencial | Centro Criciúma SC | Stiven Allan',
+    description: 'Repleto de detalhes únicos. Apartamentos com 1 suíte até 66 m² no Centro de Criciúma.',
+    images: [IMG.hero],
+  },
+  robots: { index: true, follow: true },
+}
 
-export default function BoscoPage() {
+const SCHEMA = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    { '@type': 'Apartment', name: 'Bosco Del Montello Residencial', description: 'Apartamentos de 2 dormitórios (1 suíte) com até 66 m² privativos no Centro de Criciúma/SC.', image: IMG.hero, numberOfRooms: 2, numberOfBathroomsTotal: 2, floorSize: { '@type': 'QuantitativeValue', value: 66, unitCode: 'MTK' }, address: { '@type': 'PostalAddress', streetAddress: 'Rua Urussanga', addressLocality: 'Criciúma', addressRegion: 'SC', addressCountry: 'BR' } },
+  ],
+}
+
+export default function BoscoDelMontelloPage() {
   return (
-    <main style={{ fontFamily: "'Inter', sans-serif", color: '#1a1a1a', overflowX: 'hidden' }}>
+    <main style={{ background: t.bg, color: t.ink, fontFamily: t.body, overflowX: 'hidden' }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHEMA) }} />
+      <style>{`
+        html { scroll-behavior: smooth; }
+        .bm-eyebrow { font-size: 11px; letter-spacing: 0.42em; text-transform: uppercase; color: ${t.brown}; font-family: ${t.body}; font-weight: 500; }
+        .bm-h1 { font-family: ${t.display}; font-weight: 300; text-transform: uppercase; letter-spacing: 0.14em; line-height: 1.04; text-shadow: 0 2px 24px rgba(0,0,0,0.55); }
+        .bm-onimg { text-shadow: 0 1px 16px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.5); }
+        .bm-h2 { font-family: ${t.display}; font-weight: 300; text-transform: uppercase; letter-spacing: 0.16em; line-height: 1.1; font-size: clamp(26px,4vw,46px); margin: 0; }
+        .bm-serif { font-family: ${t.serif}; font-style: italic; font-weight: 400; }
+        .bm-rule { width: 56px; height: 1px; background: ${t.brown}; border: 0; }
+        .bm-cta { display: inline-block; font-family: ${t.body}; font-size: 12px; letter-spacing: 0.3em; text-transform: uppercase; color: ${t.ink}; border: 1px solid ${t.brown}; padding: 16px 34px; text-decoration: none; transition: background .35s ease, color .35s ease; cursor: pointer; }
+        .bm-cta:hover { background: ${t.brown}; color: #fff; }
+        .bm-cta-light { color: ${t.onDark}; border-color: rgba(245,237,232,0.55); }
+        .bm-cta-light:hover { background: ${t.onDark}; color: ${t.brownDark}; }
+        .bm-navlink { font-family: ${t.body}; font-size: 11px; letter-spacing: 0.28em; text-transform: uppercase; color: rgba(255,255,255,0.85); text-decoration: none; transition: color .3s ease; }
+        .bm-navlink:hover { color: #fff; }
+        .bm-fade { opacity: 0; transform: translateY(24px); animation: bmfade .9s ease forwards; }
+        @keyframes bmfade { to { opacity: 1; transform: none; } }
+        .bm-gcard { position: relative; overflow: hidden; }
+        .bm-gcard img { transition: transform .8s ease; }
+        .bm-gcard:hover img { transform: scale(1.06); }
+        .bm-gcard:focus { outline: 2px solid ${t.brown}; outline-offset: 2px; }
+        .bm-amen { display: flex; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid ${t.line}; font-size: 15px; }
+        .bm-amen::before { content: ''; width: 6px; height: 6px; background: ${t.brown}; border-radius: 50%; flex: 0 0 auto; }
+        .bm-lazer-card { position: relative; overflow: hidden; }
+        .bm-lazer-card img { transition: transform .8s ease; }
+        .bm-lazer-card:hover img { transform: scale(1.06); }
+        .bm-lazer-card:focus { outline: 2px solid ${t.brown}; outline-offset: 2px; }
+        .bm-wa { position: fixed; right: 20px; bottom: 20px; z-index: 60; width: 56px; height: 56px; border-radius: 50%; background: #25D366; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
+        .bm-burger { display: none; }
+        @media (max-width: 860px) { .bm-nav-links { display: none !important; } .bm-burger { display: flex !important; } }
+        details.bm-menu > summary { list-style: none; }
+        details.bm-menu > summary::-webkit-details-marker { display: none; }
+      `}</style>
 
       {/* NAV */}
-      <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 2rem', height: '64px' }}>
-        <span style={{ color: '#fff', fontWeight: 700, fontSize: '1rem', letterSpacing: '0.05em' }}>BOSCO DEL MONTELLO</span>
-        <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
-          {['O Residencial','Galeria','As Residências','Diferenciais','Localização'].map(s => (
-            <a key={s} href={`#${s.toLowerCase().replace(/\s/g,'-').replace(/ê/g,'e').replace(/ã/g,'a').replace(/ç/g,'c')}`} style={{ color: 'rgba(255,255,255,0.8)', textDecoration: 'none', fontSize: '0.8rem', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{s}</a>
-          ))}
-          <a href={WA} target="_blank" rel="noopener" style={{ background: ACCENT, color: '#fff', padding: '0.5rem 1.25rem', borderRadius: '2px', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.08em' }}>FALAR COM STIVEN</a>
-        </div>
-      </nav>
+      <header style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 50 }}>
+        <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '22px clamp(18px,5vw,56px)' }}>
+          <a href="#top" style={{ fontFamily: t.display, fontWeight: 400, letterSpacing: '0.26em', fontSize: 16, color: '#fff', textDecoration: 'none', textTransform: 'uppercase' }}>Bosco Del Montello</a>
+          <div className="bm-nav-links" style={{ display: 'flex', alignItems: 'center', gap: 30 }}>
+            <a href="#residencial" className="bm-navlink">O Residencial</a>
+            <a href="#galeria" className="bm-navlink">Galeria</a>
+            <a href="#diferenciais" className="bm-navlink">Diferenciais</a>
+            <a href="#localizacao" className="bm-navlink">Localização</a>
+            <a href={WPP} target="_blank" rel="noopener noreferrer" className="bm-cta bm-cta-light" style={{ padding: '12px 24px' }}>Atendimento Exclusivo</a>
+          </div>
+          <details className="bm-menu bm-burger" style={{ position: 'relative' }}>
+            <summary style={{ cursor: 'pointer', color: '#fff', fontSize: 22, lineHeight: 1, padding: 6 }} aria-label="Abrir menu">&#9776;</summary>
+            <div style={{ position: 'absolute', right: 0, top: '120%', background: t.brownDark, padding: '18px 22px', display: 'flex', flexDirection: 'column', gap: 16, minWidth: 200, boxShadow: '0 12px 40px rgba(0,0,0,0.35)' }}>
+              <a href="#residencial" className="bm-navlink">O Residencial</a>
+              <a href="#galeria" className="bm-navlink">Galeria</a>
+              <a href="#diferenciais" className="bm-navlink">Diferenciais</a>
+              <a href="#localizacao" className="bm-navlink">Localização</a>
+              <a href={WPP} target="_blank" rel="noopener noreferrer" className="bm-navlink">Atendimento Exclusivo</a>
+            </div>
+          </details>
+        </nav>
+      </header>
 
       {/* HERO */}
-      <section style={{ position: 'relative', height: '100vh', minHeight: '600px', overflow: 'hidden' }}>
-        <img src={HERO} alt="Bosco Del Montello Residencial — Fachada" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.6) 100%)' }} />
-        <div style={{ position: 'relative', zIndex: 2, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'flex-end', padding: '0 clamp(1.5rem,5vw,4rem) clamp(3.5rem,8vh,6rem)' }}>
-          <p style={{ color: '#d4b8a8', fontSize: '0.75rem', letterSpacing: '0.25em', textTransform: 'uppercase', marginBottom: '1rem' }}>Centro · Criciúma / SC</p>
-          <h1 style={{ color: '#fff', fontSize: 'clamp(2.8rem,7vw,6rem)', fontWeight: 300, lineHeight: 1.04, margin: '0 0 1.25rem', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-            Bosco Del Montello<br /><strong style={{ fontWeight: 700 }}>Residencial</strong>
-          </h1>
-          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#e8d5c0', fontSize: 'clamp(1.4rem,3vw,2.2rem)', fontStyle: 'italic', marginBottom: '2rem' }}>Repleto de detalhes únicos.</p>
-          <a href={WA} target="_blank" rel="noopener" style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.7)', color: '#fff', padding: '1rem 2.5rem', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 500, letterSpacing: '0.2em', textTransform: 'uppercase' }}>ATENDIMENTO EXCLUSIVO</a>
+      <section id="top" style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'flex-end' }}>
+        <Image src={IMG.hero} alt="Fachada do Bosco Del Montello Residencial — Centro, Criciúma/SC" fill priority sizes="100vw" style={{ objectFit: 'cover' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(16,12,9,0.42) 0%, rgba(16,12,9,0.12) 40%, rgba(16,12,9,0.78) 100%)' }} />
+        <div className="bm-fade" style={{ position: 'relative', zIndex: 2, padding: '0 clamp(18px,5vw,56px) clamp(56px,9vh,110px)', maxWidth: 1100 }}>
+          <p className="bm-eyebrow bm-onimg" style={{ color: '#fff', marginBottom: 18 }}>Bosco Del Montello Residencial &mdash; Centro, Criciúma/SC</p>
+          <h1 className="bm-h1" style={{ color: '#fff', fontSize: 'clamp(40px,8vw,104px)', margin: 0 }}>Bosco Del Montello</h1>
+          <p className="bm-serif bm-onimg" style={{ color: '#fff', fontSize: 'clamp(20px,3vw,32px)', marginTop: 14, marginBottom: 34 }}>Repleto de detalhes únicos.</p>
+          <a href={WPP} target="_blank" rel="noopener noreferrer" className="bm-cta bm-cta-light">Atendimento Exclusivo</a>
         </div>
       </section>
 
       {/* O RESIDENCIAL */}
-      <section id="o-residencial" style={{ background: '#faf9f7', padding: 'clamp(5rem,12vh,10rem) clamp(1.5rem,5vw,4rem)' }}>
-        <div style={{ maxWidth: '820px', margin: '0 auto', textAlign: 'center' }}>
-          <p style={{ color: ACCENT, fontSize: '0.7rem', letterSpacing: '0.35em', textTransform: 'uppercase', marginBottom: '1.5rem', fontWeight: 500 }}>O Residencial</p>
-          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 'clamp(1.5rem,3vw,2.5rem)', lineHeight: 1.35, color: '#1a1a1a', margin: '0 0 2rem' }}>
-            Aqui você vai viver o melhor dos dois mundos: desfrutar da privacidade dentro do seu apartamento e ainda dividir muitas horas de alegria nos espaços inspirados no seu estilo.
-          </p>
-          <hr style={{ width: '56px', height: '1px', border: 0, background: ACCENT, margin: '0 auto' }} />
+      <section id="residencial" style={{ padding: 'clamp(80px,14vh,160px) clamp(18px,5vw,56px)', textAlign: 'center' }}>
+        <div style={{ maxWidth: 820, margin: '0 auto' }}>
+          <p className="bm-eyebrow" style={{ marginBottom: 26 }}>O Residencial</p>
+          <p className="bm-serif" style={{ fontSize: 'clamp(24px,3.4vw,40px)', lineHeight: 1.35, color: t.ink, margin: 0 }}>Aqui você vai viver o melhor dos dois mundos: desfrutar da privacidade dentro do seu apartamento e ainda dividir muitas horas de alegria nos espaços inspirados no seu estilo.</p>
+          <hr className="bm-rule" style={{ margin: '46px auto 0' }} />
         </div>
       </section>
 
       {/* GALERIA */}
-      <section id="galeria" style={{ padding: 'clamp(3rem,7vh,5rem) 0 0' }}>
-        <div style={{ textAlign: 'center', padding: '0 clamp(1.5rem,5vw,4rem) clamp(2rem,5vh,3.5rem)' }}>
-          <p style={{ color: ACCENT, fontSize: '0.7rem', letterSpacing: '0.35em', textTransform: 'uppercase', marginBottom: '1rem', fontWeight: 500 }}>Galeria</p>
-          <h2 style={{ fontFamily: "'Inter', sans-serif", fontWeight: 300, fontSize: 'clamp(1.6rem,3.5vw,2.8rem)', letterSpacing: '0.1em', textTransform: 'uppercase', margin: 0, color: '#1a1a1a' }}>Sinta-se em casa</h2>
+      <section id="galeria" style={{ padding: '0 clamp(0px,4vw,56px) clamp(40px,8vh,96px)' }}>
+        <p className="bm-eyebrow" style={{ textAlign: 'center', marginBottom: 26 }}>Galeria</p>
+        <div style={{ maxWidth: 1180, margin: '0 auto', position: 'relative' }}>
+          <h2 className="bm-h2" style={{ textAlign: 'center', marginBottom: 'clamp(34px,6vh,60px)' }}>Uma vida repleta de detalhes</h2>
         </div>
-        <div style={{ background: '#111' }}>
-          <GalleryWithLightbox images={GALERIA} accent={ACCENT} />
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 2 }}>
+          <GalleryWithLightbox galeria={GALERIA} prefix="bm" gradient="rgba(16,12,9,0.55)" />
         </div>
       </section>
 
       {/* AS RESIDÊNCIAS */}
-      <section id="as-residencias" style={{ background: '#1a1a1a', color: '#fff', padding: 'clamp(5rem,12vh,10rem) clamp(1.5rem,5vw,4rem)' }}>
-        <div style={{ maxWidth: '1100px', margin: '0 auto', textAlign: 'center' }}>
-          <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.7rem', letterSpacing: '0.35em', textTransform: 'uppercase', marginBottom: '1.5rem', fontWeight: 500 }}>As Residências</p>
-          <h2 style={{ fontFamily: "'Inter', sans-serif", fontWeight: 300, fontSize: 'clamp(1.6rem,3.5vw,2.8rem)', letterSpacing: '0.1em', textTransform: 'uppercase', margin: '0 0 1rem', color: '#fff' }}>Espaço para viver bem</h2>
-          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: 'rgba(255,255,255,0.65)', fontSize: 'clamp(1.1rem,2vw,1.5rem)', fontStyle: 'italic', marginBottom: '4rem' }}>Plantas amplas, acabamentos nobres.</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 'clamp(2rem,5vw,4rem)', marginBottom: '3.5rem' }}>
-            {[{ n: '2', l: 'dormitórios' },{ n: '1', l: 'suíte' },{ n: '66', l: 'm² privativos' },{ n: '2', l: 'elevadores' }].map(({ n, l }) => (
-              <div key={l}>
-                <p style={{ fontFamily: "'Inter', sans-serif", fontWeight: 300, fontSize: 'clamp(2.2rem,4.5vw,3.5rem)', letterSpacing: '0.04em', color: '#fff', margin: 0, lineHeight: 1 }}>{n}</p>
-                <p style={{ fontSize: '0.7rem', letterSpacing: '0.25em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)', margin: '0.75rem 0 0' }}>{l}</p>
-              </div>
+      <section id="plantas" style={{ background: t.dark, color: t.onDark, padding: 'clamp(80px,14vh,160px) clamp(18px,5vw,56px)' }}>
+        <div style={{ maxWidth: 1080, margin: '0 auto', textAlign: 'center' }}>
+          <p className="bm-eyebrow" style={{ color: t.onDark, marginBottom: 18 }}>As Residências</p>
+          <h2 className="bm-h2" style={{ color: t.onDark }}>Espaço para viver bem</h2>
+          <p className="bm-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 56 }}>Até 66 m² privativos, 2 dormitórios.</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 'clamp(28px,5vw,64px)', marginBottom: 56 }}>
+            {[{n:'2',l:'Dormitórios'},{n:'1',l:'Suíte'},{n:'66',l:'m² privativos'},{n:'2',l:'Elevadores'}].map((it,i)=>(
+              <div key={i}><div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 'clamp(34px,5vw,58px)', letterSpacing: '0.04em', lineHeight: 1 }}>{it.n}</div><div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDarkMuted, marginTop: 12 }}>{it.l}</div></div>
             ))}
           </div>
-          <a href={WA} target="_blank" rel="noopener" style={{ display: 'inline-block', border: '1px solid rgba(255,255,255,0.5)', color: '#fff', padding: '1rem 2.5rem', textDecoration: 'none', fontSize: '0.8rem', letterSpacing: '0.2em', textTransform: 'uppercase' }}>FALAR COM STIVEN</a>
+          <a href={CATALOGO_PDF} target="_blank" rel="noopener noreferrer" className="bm-cta bm-cta-light">Baixar Catálogo &amp; Plantas</a>
         </div>
       </section>
 
       {/* DIFERENCIAIS */}
-      <section id="diferenciais" style={{ padding: 'clamp(5rem,12vh,10rem) clamp(1.5rem,5vw,4rem)', background: '#faf9f7' }}>
-        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 'clamp(2.5rem,6vh,4.5rem)' }}>
-            <p style={{ color: ACCENT, fontSize: '0.7rem', letterSpacing: '0.35em', textTransform: 'uppercase', marginBottom: '1rem', fontWeight: 500 }}>Diferenciais das Unidades</p>
-            <h2 style={{ fontFamily: "'Inter', sans-serif", fontWeight: 300, fontSize: 'clamp(1.6rem,3.5vw,2.8rem)', letterSpacing: '0.1em', textTransform: 'uppercase', margin: 0 }}>Detalhes que elevam o morar</h2>
+      <section id="diferenciais" style={{ padding: 'clamp(80px,14vh,160px) clamp(18px,5vw,56px)' }}>
+        <div style={{ maxWidth: 1120, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 'clamp(40px,7vh,72px)' }}>
+            <p className="bm-eyebrow" style={{ marginBottom: 16 }}>Diferenciais das Unidades</p>
+            <h2 className="bm-h2">Detalhes que elevam o morar</h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1px', background: 'rgba(22,32,43,0.12)' }}>
-            {DIFERENCIAIS.map((d, i) => (
-              <div key={i} style={{ background: '#faf9f7', padding: 'clamp(1.75rem,4vw,2.75rem)' }}>
-                <div style={{ fontFamily: "'Inter', sans-serif", fontWeight: 300, fontSize: '1.375rem', color: ACCENT, marginBottom: '0.875rem' }}>{String(i + 1).padStart(2, '0')}</div>
-                <p style={{ margin: 0, fontSize: '1rem', lineHeight: 1.5, color: '#1a1a1a' }}>{d}</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 1, background: t.line }}>
+            {DIFERENCIAIS.map((d,i)=>(
+              <div key={i} style={{ background: t.bg, padding: 'clamp(28px,4vw,44px)' }}>
+                <div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 22, color: t.brown, marginBottom: 14 }}>{String(i+1).padStart(2,'0')}</div>
+                <p style={{ margin: 0, fontSize: 16, lineHeight: 1.5, color: t.ink }}>{d}</p>
               </div>
             ))}
           </div>
@@ -127,101 +203,82 @@ export default function BoscoPage() {
       </section>
 
       {/* LAZER */}
-      <section style={{ background: '#111', color: '#fff', padding: 'clamp(5rem,12vh,10rem) clamp(1.5rem,5vw,4rem)' }}>
-        <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
-          <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.7rem', letterSpacing: '0.35em', textTransform: 'uppercase', marginBottom: '1rem', fontWeight: 500 }}>Lazer & Áreas Comuns</p>
-          <h2 style={{ fontFamily: "'Inter', sans-serif", fontWeight: 300, fontSize: 'clamp(1.6rem,3.5vw,2.8rem)', letterSpacing: '0.1em', textTransform: 'uppercase', margin: '0 0 3rem', color: '#fff' }}>Uma casa que surpreende</h2>
-          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '1rem' }}>
-            {['Academia','Brinquedoteca','Sala de Jogos','Salão de Festas','2 Elevadores'].map(item => (
-              <span key={item} style={{ border: '1px solid rgba(255,255,255,0.2)', padding: '0.6rem 1.4rem', fontSize: '0.85rem', letterSpacing: '0.08em', color: 'rgba(255,255,255,0.8)' }}>{item}</span>
-            ))}
+      <section style={{ background: t.bg, padding: 'clamp(80px,12vh,140px) clamp(18px,5vw,56px)' }}>
+        <div style={{ maxWidth: 1180, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 'clamp(40px,7vh,72px)' }}>
+            <p className="bm-eyebrow" style={{ marginBottom: 16 }}>Lazer &amp; Áreas Comuns</p>
+            <h2 className="bm-h2">Uma casa que surpreende</h2>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1.15fr) minmax(0,1fr)', gap: 'clamp(28px,5vw,64px)', alignItems: 'center' }}>
+            <LightboxPhoto src={IMG.lazer} alt="Suíte do Bosco Del Montello Residencial" label="Suíte" cardClass="bm-lazer-card" imgSizes="(max-width: 768px) 100vw, 55vw" />
+            <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+              {AMENIDADES.map((a,i)=>(
+                <div key={i} className="bm-amen">{a}</div>
+              ))}
+            </ul>
           </div>
         </div>
       </section>
 
       {/* LOCALIZAÇÃO */}
-      <section id="localizacao" style={{ padding: 'clamp(5rem,12vh,10rem) clamp(1.5rem,5vw,4rem)', background: '#1a1a1a', color: '#fff' }}>
-        <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px,1fr))', gap: 'clamp(2rem,5vw,4rem)', alignItems: 'center' }}>
+      <section id="localizacao" style={{ padding: 'clamp(80px,12vh,140px) clamp(18px,5vw,56px)', background: t.dark, color: t.onDark }}>
+        <div style={{ maxWidth: 1180, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px,1fr))', gap: 'clamp(34px,5vw,64px)', alignItems: 'center' }}>
           <div>
-            <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.7rem', letterSpacing: '0.35em', textTransform: 'uppercase', marginBottom: '1.25rem', fontWeight: 500 }}>Localização</p>
-            <h2 style={{ fontFamily: "'Inter', sans-serif", fontWeight: 300, fontSize: 'clamp(1.6rem,3.5vw,2.8rem)', letterSpacing: '0.1em', textTransform: 'uppercase', margin: '0 0 1.5rem', color: '#fff' }}>A sua liberdade próxima de tudo.</h2>
-            <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '1.0625rem', lineHeight: 1.6, marginBottom: '2rem' }}>Rua Urussanga — Centro, Criciúma/SC</p>
-            <a href={WA} target="_blank" rel="noopener" style={{ display: 'inline-block', border: '1px solid rgba(255,255,255,0.5)', color: '#fff', padding: '1rem 2.5rem', textDecoration: 'none', fontSize: '0.8rem', letterSpacing: '0.2em', textTransform: 'uppercase' }}>AGENDAR VISITA</a>
+            <p className="bm-eyebrow" style={{ color: t.onDark, marginBottom: 18 }}>Localização</p>
+            <h2 className="bm-h2" style={{ color: t.onDark }}>No coração de Criciúma.</h2>
+            <p style={{ color: t.onDarkMuted, fontSize: 17, lineHeight: 1.6, marginTop: 24 }}>Rua Urussanga &mdash; Centro, Criciúma/SC</p>
+            <a href={WPP} target="_blank" rel="noopener noreferrer" className="bm-cta bm-cta-light" style={{ marginTop: 30 }}>Atendimento Exclusivo</a>
           </div>
-          <div style={{ borderRadius: '2px', overflow: 'hidden' }}>
-            <img src="https://estilofontana.com.br/images/2020/10/26/localizacao-5f96e20b6e722.png?fm=webp" alt="Localização Bosco Del Montello — Centro Criciúma" style={{ width: '100%', aspectRatio: '4/3', objectFit: 'cover', display: 'block' }} />
+          <div style={{ position: 'relative', aspectRatio: '4 / 3', overflow: 'hidden', borderRadius: 2 }}>
+            <Image src={IMG.mapa} alt="Mapa da localização do Bosco Del Montello Residencial" fill loading="lazy" sizes="(max-width: 768px) 100vw, 50vw" style={{ objectFit: 'cover' }} />
           </div>
         </div>
       </section>
 
-      {/* CATÁLOGO */}
-      <section id="catalogo" style={{ background: ACCENT, padding: 'clamp(5rem,12vh,10rem) clamp(1.5rem,5vw,4rem)', textAlign: 'center' }}>
-        <div style={{ maxWidth: '700px', margin: '0 auto' }}>
-          <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.7rem', letterSpacing: '0.35em', textTransform: 'uppercase', marginBottom: '1rem', fontWeight: 500 }}>Material Completo</p>
-          <h2 style={{ fontFamily: "'Inter', sans-serif", fontWeight: 300, fontSize: 'clamp(1.6rem,3vw,2.5rem)', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#fff', margin: '0 0 1rem' }}>Baixe o catálogo completo</h2>
-          <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '1rem', lineHeight: 1.7, marginBottom: '2.5rem' }}>Plantas, acabamentos e todos os detalhes do Bosco Del Montello Residencial.</p>
-          <a href="https://estilofontana.com.br/upload/empreendimento/catalogo/bosco-del-montello-1602177950.pdf" target="_blank" rel="noopener" style={{ background: '#fff', color: ACCENT, padding: '1rem 2.5rem', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', display: 'inline-block' }}>BAIXAR CATÁLOGO</a>
-        </div>
-      </section>
-
-      {/* FINANCIAMENTO */}
-      <section id="financiamento" style={{ background: ACCENT_DARK, color: '#fff', padding: 'clamp(5rem,12vh,10rem) clamp(1.5rem,5vw,4rem)' }}>
-        <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
-          <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.7rem', letterSpacing: '0.35em', textTransform: 'uppercase', marginBottom: '1rem', fontWeight: 500 }}>Facilidade</p>
-          <h2 style={{ fontFamily: "'Inter', sans-serif", fontWeight: 300, fontSize: 'clamp(1.6rem,3.5vw,2.8rem)', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#fff', margin: '0 0 1rem' }}>A liberdade de comprar sem banco</h2>
-          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: 'rgba(255,255,255,0.65)', fontSize: 'clamp(1.1rem,2vw,1.5rem)', fontStyle: 'italic', marginBottom: '3.5rem' }}>Sem burocracia, sem intermediários. Direto com a construtora.</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 'clamp(2rem,4vw,3.5rem)' }}>
-            {[
-              { n: '01', t: 'Converse com Stiven', d: 'Atendimento exclusivo e personalizado para entender o seu momento e as melhores condições.' },
-              { n: '02', t: 'Escolha sua unidade', d: 'Selecione o apartamento ideal e defina uma proposta sob medida, sem amarras bancárias.' },
-              { n: '03', t: 'Negocie direto', d: 'Condições flexíveis diretamente com a Construtora Fontana, com a liberdade que você merece.' },
-            ].map(({ n, t, d }) => (
-              <div key={n} style={{ textAlign: 'left' }}>
-                <div style={{ fontFamily: "'Inter', sans-serif", fontWeight: 300, fontSize: '2.5rem', opacity: 0.4, marginBottom: '0.875rem', letterSpacing: '0.04em' }}>{n}</div>
-                <h3 style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500, letterSpacing: '0.1em', textTransform: 'uppercase', fontSize: '0.9rem', margin: '0 0 0.75rem', color: '#fff' }}>{t}</h3>
-                <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.9rem', lineHeight: 1.6, margin: 0 }}>{d}</p>
-              </div>
+      {/* CATÁLOGO + FINANCIAMENTO */}
+      <section style={{ background: t.brown, color: t.onDark, padding: 'clamp(80px,14vh,160px) clamp(18px,5vw,56px)' }}>
+        <div style={{ maxWidth: 1080, margin: '0 auto', textAlign: 'center' }}>
+          <p className="bm-eyebrow" style={{ color: t.onDark, marginBottom: 18 }}>Financiamento Direto</p>
+          <h2 className="bm-h2" style={{ color: t.onDark }}>A liberdade de comprar sem banco</h2>
+          <p className="bm-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 60 }}>Sem burocracia, sem intermediários. Direto com a construtora.</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px,1fr))', gap: 'clamp(28px,4vw,52px)' }}>
+            {[{n:'01',t:'Converse com o corretor',d:'Atendimento exclusivo e personalizado para entender o seu momento e as melhores condições.'},{n:'02',t:'Escolha a sua unidade',d:'Selecione o apartamento ideal e defina uma proposta sob medida, sem amarras bancárias.'},{n:'03',t:'Negocie direto',d:'Condições flexíveis diretamente com a Construtora Fontana, com a liberdade que você merece.'}].map((s,i)=>(
+              <div key={i} style={{ textAlign: 'left' }}><div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 40, opacity: 0.55, marginBottom: 14 }}>{s.n}</div><h3 style={{ fontFamily: t.display, fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: 17, margin: '0 0 12px', color: t.onDark }}>{s.t}</h3><p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.6, margin: 0 }}>{s.d}</p></div>
             ))}
           </div>
-          <p style={{ marginTop: '3.5rem', fontSize: '0.7rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.7)' }}>Centro, Criciúma/SC &middot; Sob consulta</p>
+          <div style={{ marginTop: 56, display: 'flex', gap: 20, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <a href={CATALOGO_PDF} target="_blank" rel="noopener noreferrer" className="bm-cta bm-cta-light">Baixar Catálogo</a>
+            <a href={WPP} target="_blank" rel="noopener noreferrer" className="bm-cta bm-cta-light">Atendimento Exclusivo</a>
+          </div>
+          <p style={{ marginTop: 40, fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: t.onDark }}>Centro, Criciúma/SC &middot; Sob consulta</p>
         </div>
       </section>
 
       {/* CTA FINAL */}
-      <section style={{ position: 'relative', minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
-        <img src={HERO} alt="Bosco Del Montello Residencial" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.62)' }} />
-        <div style={{ position: 'relative', zIndex: 2, padding: '0 clamp(1.5rem,5vw,4rem)', maxWidth: '880px' }}>
-          <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.7rem', letterSpacing: '0.35em', textTransform: 'uppercase', marginBottom: '1.5rem', fontWeight: 500 }}>Atendimento Exclusivo</p>
-          <h2 style={{ fontFamily: "'Inter', sans-serif", fontWeight: 300, fontSize: 'clamp(1.8rem,4vw,3.5rem)', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#fff', margin: '0 0 2.5rem' }}>Repleto de detalhes únicos.</h2>
-          <a href={WA} target="_blank" rel="noopener" style={{ display: 'inline-block', border: '1px solid rgba(255,255,255,0.7)', color: '#fff', padding: '1rem 2.5rem', textDecoration: 'none', fontSize: '0.8rem', letterSpacing: '0.2em', textTransform: 'uppercase' }}>ATENDIMENTO EXCLUSIVO</a>
+      <section style={{ position: 'relative', minHeight: '78vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+        <Image src={IMG.hero} alt="Bosco Del Montello Residencial — Fachada" fill loading="lazy" sizes="100vw" style={{ objectFit: 'cover' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(16,12,9,0.65)' }} />
+        <div style={{ position: 'relative', zIndex: 2, padding: '0 clamp(18px,5vw,56px)', maxWidth: 880 }}>
+          <p className="bm-eyebrow bm-onimg" style={{ color: '#fff', marginBottom: 22 }}>Atendimento Exclusivo</p>
+          <h2 className="bm-h2 bm-onimg" style={{ color: '#fff', fontSize: 'clamp(30px,5vw,56px)' }}>Repleto de detalhes únicos.</h2>
+          <div style={{ marginTop: 38 }}><a href={WPP} target="_blank" rel="noopener noreferrer" className="bm-cta bm-cta-light">Atendimento Exclusivo</a></div>
         </div>
       </section>
 
       {/* FOOTER */}
-      <footer style={{ background: '#0d0d0d', color: 'rgba(255,255,255,0.55)', padding: 'clamp(3.5rem,9vh,6rem) clamp(1.5rem,5vw,4rem)' }}>
-        <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px,1fr))', gap: 'clamp(2rem,5vw,3.5rem)' }}>
-          <div>
-            <div style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500, letterSpacing: '0.18em', fontSize: '1rem', color: '#fff', textTransform: 'uppercase', marginBottom: '0.875rem' }}>Stiven Allan</div>
-            <p style={{ marginTop: 0, fontSize: '0.875rem', lineHeight: 1.6, color: 'rgba(255,255,255,0.55)' }}>Imóveis de alto padrão em Santa Catarina.<br />CRECI 60.275</p>
-          </div>
-          <div>
-            <div style={{ fontSize: '0.7rem', letterSpacing: '0.28em', textTransform: 'uppercase', color: '#fff', marginBottom: '0.875rem' }}>Contato</div>
-            <a href={WA} target="_blank" rel="noopener" style={{ color: 'rgba(255,255,255,0.55)', textDecoration: 'none', fontSize: '0.875rem' }}>WhatsApp · (48) 99164-2332</a>
-          </div>
-          <div>
-            <div style={{ fontSize: '0.7rem', letterSpacing: '0.28em', textTransform: 'uppercase', color: '#fff', marginBottom: '0.875rem' }}>Empreendimento</div>
-            <p style={{ fontSize: '0.875rem', lineHeight: 1.6, margin: 0 }}>Bosco Del Montello Residencial<br />Construtora Fontana<br />Centro, Criciúma/SC</p>
-          </div>
+      <footer style={{ background: t.brownDark, color: t.onDarkMuted, padding: 'clamp(56px,9vh,96px) clamp(18px,5vw,56px)' }}>
+        <div style={{ maxWidth: 1180, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px,1fr))', gap: 'clamp(28px,5vw,56px)' }}>
+          <div><div style={{ fontFamily: t.display, fontWeight: 400, letterSpacing: '0.22em', fontSize: 18, color: t.onDark, textTransform: 'uppercase' }}>Stiven Allan</div><p style={{ marginTop: 14, fontSize: 14, lineHeight: 1.6 }}>Imóveis de alto padrão em Santa Catarina.<br />CRECI 60.275</p></div>
+          <div><div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDark, marginBottom: 14 }}>Contato</div><a href={WPP} target="_blank" rel="noopener noreferrer" style={{ color: t.onDarkMuted, textDecoration: 'none', fontSize: 14 }}>WhatsApp &middot; (48) 99164-2332</a></div>
+          <div><div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDark, marginBottom: 14 }}>Empreendimento</div><p style={{ fontSize: 14, lineHeight: 1.6, margin: 0 }}>Bosco Del Montello Residencial<br />Construtora Fontana<br />Centro, Criciúma/SC</p></div>
         </div>
-        <div style={{ maxWidth: '1100px', margin: '2.5rem auto 0', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.1)', fontSize: '0.75rem', color: 'rgba(255,255,255,0.3)' }}>
-          &copy; {new Date().getFullYear()} Stiven Allan. Imagens meramente ilustrativas. Valores sob consulta.
-        </div>
+        <div style={{ maxWidth: 1180, margin: '40px auto 0', paddingTop: 24, borderTop: '1px solid rgba(245,237,232,0.12)', fontSize: 12 }}>&copy; {new Date().getFullYear()} Stiven Allan. Imagens meramente ilustrativas. Valores sob consulta.</div>
       </footer>
 
-      {/* WHATSAPP FLUTUANTE */}
-      <a href={WA} target="_blank" rel="noopener" aria-label="WhatsApp" style={{ position: 'fixed', bottom: '1.5rem', right: '1.5rem', zIndex: 100, background: '#25D366', color: '#fff', width: '56px', height: '56px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(0,0,0,0.25)', textDecoration: 'none', fontSize: '1.6rem' }}>💬</a>
-
+      {/* WHATSAPP */}
+      <a href={WPP} target="_blank" rel="noopener noreferrer" className="bm-wa" aria-label="Falar no WhatsApp com Stiven Allan">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.515 5.26l-.999 3.648 3.973-1.042zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+      </a>
     </main>
-  );
+  )
 }
