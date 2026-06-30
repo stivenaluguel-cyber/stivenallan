@@ -28,6 +28,14 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'estilofontana.com.br',
       },
+      {
+        protocol: 'https',
+        hostname: 'drive.google.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.googleusercontent.com',
+      },
     ],
     deviceSizes: [390, 768, 1024, 1280, 1536],
     imageSizes: [64, 128, 256, 384, 512],
