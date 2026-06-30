@@ -7,82 +7,82 @@ const CATALOGO_PDF = "https://estilofontana.com.br/upload/empreendimento/catalog
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://stivenallan.vercel.app'
 
 const t = {
-  bg: '#FAFAF8', ink: '#16201A', slate: '#3A5068', slateDark: '#243240', muted: '#5A6870',
-  line: 'rgba(22,32,26,0.12)', dark: '#0D141A', onDark: '#E8EFF6', onDarkMuted: 'rgba(232,239,246,0.66)',
-  display: "'Jost', system-ui, sans-serif", serif: "'Cormorant Garamond', Georgia, serif",
-  body: "'Hanken Grotesk', system-ui, sans-serif",
+bg: '#FAFAF8', ink: '#16201A', slate: '#3A5068', slateDark: '#243240', muted: '#5A6870',
+line: 'rgba(22,32,26,0.12)', dark: '#0D141A', onDark: '#E8EFF6', onDarkMuted: 'rgba(232,239,246,0.66)',
+display: "'Jost', system-ui, sans-serif", serif: "'Cormorant Garamond', Georgia, serif",
+body: "'Hanken Grotesk', system-ui, sans-serif",
 }
 const IMG = {
-  hero: 'https://estilofontana.com.br/images/empreendimento/slideshows/due-fratelli-residencial-5f889c789761e.jpg?fm=webp',
-  mapa: 'https://estilofontana.com.br/images/2020/10/27/localizacao-5f985c6f66773.png?fm=webp',
-  lazer: 'https://estilofontana.com.br/images/empreendimento/slideshows/due-fratelli-residencial-5f88a49aa91f3.jpg?fm=webp',
+hero: 'https://estilofontana.com.br/images/empreendimento/slideshows/due-fratelli-residencial-5f889c789761e.jpg?fm=webp',
+mapa: 'https://estilofontana.com.br/images/2020/10/27/localizacao-5f985c6f66773.png?fm=webp',
+lazer: 'https://estilofontana.com.br/images/empreendimento/slideshows/due-fratelli-residencial-5f88a49aa91f3.jpg?fm=webp',
 }
 const GALERIA = [
-  { src: IMG.hero, alt: 'Fachada Due Fratelli Residencial', label: 'Fachada' },
-  { src: 'https://lh3.googleusercontent.com/d/1GUOHCMV2J7azSkrNfTIC_vdiMaMEJ8zA', alt: 'Vista Aérea Due Fratelli', label: 'Vista Aérea' },
-  { src: 'https://lh3.googleusercontent.com/d/1hRoRdt7c9SrDsF_zHxMvDUheAHZk0zDj', alt: 'Vista Aérea Due Fratelli', label: 'Vista Aérea' },
-  { src: 'https://lh3.googleusercontent.com/d/1gTMCU8shamu-CYGk3HKiP7uxQPlQ_giB', alt: 'Vista Aérea Due Fratelli', label: 'Vista Aérea' },
-  { src: 'https://lh3.googleusercontent.com/d/1cTRBdYwLYMDy-4YnuQ7NOuaDoKYS4Ujh', alt: 'Vista Aérea Due Fratelli', label: 'Vista Aérea' },
-  { src: 'https://lh3.googleusercontent.com/d/1BiUDSc9pdi664V8dqPITaYX1cofkn-ZN', alt: 'Hall de Entrada Due Fratelli', label: 'Hall de Entrada' },
-  { src: 'https://lh3.googleusercontent.com/d/1tNBzLBD3E-eAZZoZtHgv_6a4i6pdN_va', alt: 'Hall de Entrada Due Fratelli', label: 'Hall de Entrada' },
-  { src: 'https://lh3.googleusercontent.com/d/1UyKq9cffmWDAxdPC-K4pekEp23vkg-vU', alt: 'Hall de Entrada Due Fratelli', label: 'Hall de Entrada' },
-  { src: 'https://lh3.googleusercontent.com/d/18-F3chjVNM3iipTDFuzu16O4zl3oa338', alt: 'Salão de Festas Due Fratelli', label: 'Salão de Festas' },
-  { src: 'https://lh3.googleusercontent.com/d/1B_gew3z7-DVwI7Qn1Euv_QcsL9BqbqG5', alt: 'Salão de Festas Due Fratelli', label: 'Salão de Festas' },
-  { src: 'https://lh3.googleusercontent.com/d/1V1B-TDUqAmA4r2EF_kZu_8Hq91RGtFjO', alt: 'Salão de Festas Due Fratelli', label: 'Salão de Festas' },
-  { src: 'https://lh3.googleusercontent.com/d/1S0Qnk-C1lY6YwmQJvzZnqhkeMp5trMKP', alt: 'Salão de Festas Due Fratelli', label: 'Salão de Festas' },
-  { src: 'https://lh3.googleusercontent.com/d/1zf2aj8pDSsF_gkGKPxyQvRgGD62k9yPB', alt: 'Churrasqueira Due Fratelli', label: 'Churrasqueira' },
-  { src: 'https://lh3.googleusercontent.com/d/1am24wtJl1xUyd__5r4Xp9-ZVPYqhmv7L', alt: 'Churrasqueira Due Fratelli', label: 'Churrasqueira' },
-  { src: 'https://lh3.googleusercontent.com/d/1hsPZl9WnpET6SRunW9o59H3uautSW_xQ', alt: 'Área Comum Due Fratelli', label: 'Área Comum' },
-  { src: 'https://lh3.googleusercontent.com/d/1URfh7bPG-4QouY8r5tNcCv2oQfUs-FXn', alt: 'Área Comum Due Fratelli', label: 'Área Comum' },
-  { src: 'https://lh3.googleusercontent.com/d/1-HGiv8sV7jzlktu5fQ9qJhhPIcXrOkEz', alt: 'Área Comum Due Fratelli', label: 'Área Comum' },
-  { src: 'https://lh3.googleusercontent.com/d/13wxBbGKBEQ5HF-_8iLXQfQFHp7GgubEt', alt: 'Living Due Fratelli', label: 'Living' },
-  { src: 'https://lh3.googleusercontent.com/d/18N-4T-3mhjeWCFPlO_YhW6OobLoAD65G', alt: 'Living Due Fratelli', label: 'Living' },
-  { src: 'https://lh3.googleusercontent.com/d/1rQmRZ3pCT-0mjlZQmntNU5MNvSWaqws9', alt: 'Living Due Fratelli', label: 'Living' },
-  { src: 'https://lh3.googleusercontent.com/d/1K2Zw4JnneikqAYdi6r_vb-OUimGpDzDz', alt: 'Cozinha Due Fratelli', label: 'Cozinha' },
-  { src: 'https://lh3.googleusercontent.com/d/1osmrYxKgU6VHWg--FDM73fn2rIrL83Fx', alt: 'Cozinha Due Fratelli', label: 'Cozinha' },
-  { src: 'https://lh3.googleusercontent.com/d/1gyQinMSW-PwIpoZQP5IkVYX1R1jTQHK_', alt: 'Suíte Due Fratelli', label: 'Suíte' },
-  { src: 'https://lh3.googleusercontent.com/d/1QCPu_8K5T1JuNkErNe_xlw6_OHNJ8i3A', alt: 'Suíte Due Fratelli', label: 'Suíte' },
-  { src: 'https://lh3.googleusercontent.com/d/1aGcgT86-e1YipmR7tvc3KBlUmevIX_ie', alt: 'Sacada Due Fratelli', label: 'Sacada' },
-  { src: 'https://lh3.googleusercontent.com/d/1dVY-C1hGswYqR00fqT0sSONDoSaUo9l7', alt: 'Sacada Due Fratelli', label: 'Sacada' },
-  { src: 'https://lh3.googleusercontent.com/d/1oYwiQgL0nRR_kszOGpvUuc8ZymStCUI7', alt: 'Dormêtório Due Fratelli', label: 'Dormêtório' },
-  { src: 'https://lh3.googleusercontent.com/d/1qA0HsE4vSUI7-j6UFsJBD7dNEuZ1c4Q4', alt: 'Dormêtório Due Fratelli', label: 'Dormêtório' },
-  { src: 'https://lh3.googleusercontent.com/d/1lUhstJvwxFyA9Vin2KhxU_Zf2sXsO2Nw', alt: 'Dormêtório Due Fratelli', label: 'Dormêtório' },
-  { src: 'https://lh3.googleusercontent.com/d/1IatMUMVqUqr5ofMavFYJhRJjQ-QNV6A8', alt: 'Banheiro Due Fratelli', label: 'Banheiro' },
+{ src: IMG.hero, alt: 'Fachada Due Fratelli Residencial', label: 'Fachada' },
+{ src: 'https://lh3.googleusercontent.com/d/1GUOHCMV2J7azSkrNfTIC_vdiMaMEJ8zA', alt: 'Vista Aérea Due Fratelli', label: 'Vista Aérea' },
+{ src: 'https://lh3.googleusercontent.com/d/1hRoRdt7c9SrDsF_zHxMvDUheAHZk0zDj', alt: 'Vista Aérea Due Fratelli', label: 'Vista Aérea' },
+{ src: 'https://lh3.googleusercontent.com/d/1gTMCU8shamu-CYGk3HKiP7uxQPlQ_giB', alt: 'Vista Aérea Due Fratelli', label: 'Vista Aérea' },
+{ src: 'https://lh3.googleusercontent.com/d/1cTRBdYwLYMDy-4YnuQ7NOuaDoKYS4Ujh', alt: 'Vista Aérea Due Fratelli', label: 'Vista Aérea' },
+{ src: 'https://lh3.googleusercontent.com/d/1BiUDSc9pdi664V8dqPITaYX1cofkn-ZN', alt: 'Hall de Entrada Due Fratelli', label: 'Hall de Entrada' },
+{ src: 'https://lh3.googleusercontent.com/d/1tNBzLBD3E-eAZZoZtHgv_6a4i6pdN_va', alt: 'Hall de Entrada Due Fratelli', label: 'Hall de Entrada' },
+{ src: 'https://lh3.googleusercontent.com/d/1UyKq9cffmWDAxdPC-K4pekEp23vkg-vU', alt: 'Hall de Entrada Due Fratelli', label: 'Hall de Entrada' },
+{ src: 'https://lh3.googleusercontent.com/d/18-F3chjVNM3iipTDFuzu16O4zl3oa338', alt: 'Salão de Festas Due Fratelli', label: 'Salão de Festas' },
+{ src: 'https://lh3.googleusercontent.com/d/1B_gew3z7-DVwI7Qn1Euv_QcsL9BqbqG5', alt: 'Salão de Festas Due Fratelli', label: 'Salão de Festas' },
+{ src: 'https://lh3.googleusercontent.com/d/1V1B-TDUqAmA4r2EF_kZu_8Hq91RGtFjO', alt: 'Salão de Festas Due Fratelli', label: 'Salão de Festas' },
+{ src: 'https://lh3.googleusercontent.com/d/1S0Qnk-C1lY6YwmQJvzZnqhkeMp5trMKP', alt: 'Salão de Festas Due Fratelli', label: 'Salão de Festas' },
+{ src: 'https://lh3.googleusercontent.com/d/1zf2aj8pDSsF_gkGKPxyQvRgGD62k9yPB', alt: 'Churrasqueira Due Fratelli', label: 'Churrasqueira' },
+{ src: 'https://lh3.googleusercontent.com/d/1am24wtJl1xUyd__5r4Xp9-ZVPYqhmv7L', alt: 'Churrasqueira Due Fratelli', label: 'Churrasqueira' },
+{ src: 'https://lh3.googleusercontent.com/d/1hsPZl9WnpET6SRunW9o59H3uautSW_xQ', alt: 'Área Comum Due Fratelli', label: 'Área Comum' },
+{ src: 'https://lh3.googleusercontent.com/d/1URfh7bPG-4QouY8r5tNcCv2oQfUs-FXn', alt: 'Área Comum Due Fratelli', label: 'Área Comum' },
+{ src: 'https://lh3.googleusercontent.com/d/1-HGiv8sV7jzlktu5fQ9qJhhPIcXrOkEz', alt: 'Área Comum Due Fratelli', label: 'Área Comum' },
+{ src: 'https://lh3.googleusercontent.com/d/13wxBbGKBEQ5HF-_8iLXQfQFHp7GgubEt', alt: 'Living Due Fratelli', label: 'Living' },
+{ src: 'https://lh3.googleusercontent.com/d/18N-4T-3mhjeWCFPlO_YhW6OobLoAD65G', alt: 'Living Due Fratelli', label: 'Living' },
+{ src: 'https://lh3.googleusercontent.com/d/1rQmRZ3pCT-0mjlZQmntNU5MNvSWaqws9', alt: 'Living Due Fratelli', label: 'Living' },
+{ src: 'https://lh3.googleusercontent.com/d/1K2Zw4JnneikqAYdi6r_vb-OUimGpDzDz', alt: 'Cozinha Due Fratelli', label: 'Cozinha' },
+{ src: 'https://lh3.googleusercontent.com/d/1osmrYxKgU6VHWg--FDM73fn2rIrL83Fx', alt: 'Cozinha Due Fratelli', label: 'Cozinha' },
+{ src: 'https://lh3.googleusercontent.com/d/1gyQinMSW-PwIpoZQP5IkVYX1R1jTQHK_', alt: 'Suíte Due Fratelli', label: 'Suíte' },
+{ src: 'https://lh3.googleusercontent.com/d/1QCPu_8K5T1JuNkErNe_xlw6_OHNJ8i3A', alt: 'Suíte Due Fratelli', label: 'Suíte' },
+{ src: 'https://lh3.googleusercontent.com/d/1aGcgT86-e1YipmR7tvc3KBlUmevIX_ie', alt: 'Sacada Due Fratelli', label: 'Sacada' },
+{ src: 'https://lh3.googleusercontent.com/d/1dVY-C1hGswYqR00fqT0sSONDoSaUo9l7', alt: 'Sacada Due Fratelli', label: 'Sacada' },
+{ src: 'https://lh3.googleusercontent.com/d/1oYwiQgL0nRR_kszOGpvUuc8ZymStCUI7', alt: 'Dormítório Due Fratelli', label: 'Dormítório' },
+{ src: 'https://lh3.googleusercontent.com/d/1qA0HsE4vSUI7-j6UFsJBD7dNEuZ1c4Q4', alt: 'Dormítório Due Fratelli', label: 'Dormítório' },
+{ src: 'https://lh3.googleusercontent.com/d/1lUhstJvwxFyA9Vin2KhxU_Zf2sXsO2Nw', alt: 'Dormítório Due Fratelli', label: 'Dormítório' },
+{ src: 'https://lh3.googleusercontent.com/d/1IatMUMVqUqr5ofMavFYJhRJjQ-QNV6A8', alt: 'Banheiro Due Fratelli', label: 'Banheiro' },
 ]
 const DIFERENCIAIS = [
-  '2 e 3 dormítórios com até 92 m² privativos',
-  '1 suíte com acabamento refinado',
-  'Sacada privativa com churrasqueira',
-  '2 elevadores no edifício',
+'2 e 3 dormítórios com até 92 m² privativos',
+'1 suíte com acabamento refinado',
+'Sacada privativa com churrasqueira',
+'2 elevadores no edifício',
 ]
 const AMENIDADES = [
-  'Salão de Festas', 'Hall de Entrada', 'Churrasqueira', '2 Elevadores',
+'Salão de Festas', 'Hall de Entrada', 'Churrasqueira', '2 Elevadores',
 ]
 
 export const metadata: Metadata = {
-  title: 'Due Fratelli Residencial | Centro Criciúma SC | Stiven Allan',
-  description: 'Due Fratelli Residencial (Construtora Fontana): 2 e 3 dormítórios com até 92 m² privativos no Centro de Criciúma/SC. Sacada com churrasqueira, 2 elevadores. Atendimento exclusivo com Stiven Allan.',
-  alternates: { canonical: SITE_URL + '/empreendimento/fontana/due-fratelli-centro-criciuma-sc' },
-  openGraph: {
-    title: 'Due Fratelli Residencial — Centro Criciúma/SC',
-    description: 'Qualidade de vida e praticidade no Centro de Criciúma. 2 e 3 dormítórios, até 92 m² privativos, sacada com churrasqueira.',
-    url: SITE_URL + '/empreendimento/fontana/due-fratelli-centro-criciuma-sc',
-    type: 'website',
-    images: [{ url: 'https://estilofontana.com.br/images/empreendimento/slideshows/due-fratelli-residencial-5f889c789761e.jpg?fm=webp', width: 1200, height: 800, alt: 'Fachada Due Fratelli Residencial' }],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Due Fratelli Residencial — Centro Criciúma/SC',
-    description: 'Qualidade de vida e praticidade no Centro de Criciúma. 2 e 3 dormítórios, até 92 m² privativos.',
-    images: ['https://estilofontana.com.br/images/empreendimento/slideshows/due-fratelli-residencial-5f889c789761e.jpg?fm=webp'],
-  },
-  robots: { index: true, follow: true },
+title: 'Due Fratelli Residencial — Centro Criciúma/SC | Stiven Allan',
+description: 'Due Fratelli Residencial (Construtora Fontana): 2 e 3 dormítórios com até 92 m² privativos no Centro de Criciúma/SC. Sacada com churrasqueira, 2 elevadores. Atendimento exclusivo com Stiven Allan.',
+alternates: { canonical: SITE_URL + '/empreendimento/fontana/due-fratelli-centro-criciuma-sc' },
+openGraph: {
+title: 'Due Fratelli Residencial — Centro Criciúma/SC',
+description: 'Qualidade de vida e praticidade no Centro de Criciúma. 2 e 3 dormítórios, até 92 m² privativos, sacada com churrasqueira.',
+url: SITE_URL + '/empreendimento/fontana/due-fratelli-centro-criciuma-sc',
+type: 'website',
+images: [{ url: 'https://estilofontana.com.br/images/empreendimento/slideshows/due-fratelli-residencial-5f889c789761e.jpg?fm=webp', width: 1200, height: 800, alt: 'Fachada Due Fratelli Residencial' }],
+},
+twitter: {
+card: 'summary_large_image',
+title: 'Due Fratelli Residencial — Centro Criciúma/SC',
+description: 'Qualidade de vida e praticidade no Centro de Criciúma. 2 e 3 dormítórios, até 92 m² privativos.',
+images: ['https://estilofontana.com.br/images/empreendimento/slideshows/due-fratelli-residencial-5f889c789761e.jpg?fm=webp'],
+},
+robots: { index: true, follow: true },
 }
 const SCHEMA = {
-  '@context': 'https://schema.org',
-  '@graph': [
-    { '@type': 'Apartment', name: 'Due Fratelli Residencial', description: 'Residencial com 2 e 3 dormítórios de até 92 m² privativos no Centro de Criciúma/SC.', image: 'https://estilofontana.com.br/images/empreendimento/slideshows/due-fratelli-residencial-5f889c789761e.jpg?fm=webp', numberOfRooms: 3, floorSize: { '@type': 'QuantitativeValue', value: 92, unitCode: 'MTK' }, address: { '@type': 'PostalAddress', streetAddress: 'Rua Princesa Isabel', addressLocality: 'Criciúma', addressRegion: 'SC', addressCountry: 'BR' } },
-  ],
+'@context': 'https://schema.org',
+'@graph': [
+{ '@type': 'Apartment', name: 'Due Fratelli Residencial', description: 'Residencial com 2 e 3 dormítórios de até 92 m² privativos no Centro de Criciúma/SC.', image: 'https://estilofontana.com.br/images/empreendimento/slideshows/due-fratelli-residencial-5f889c789761e.jpg?fm=webp', numberOfRooms: 3, floorSize: { '@type': 'QuantitativeValue', value: 92, unitCode: 'MTK' }, address: { '@type': 'PostalAddress', streetAddress: 'Rua Princesa Isabel', addressLocality: 'Criciúma', addressRegion: 'SC', addressCountry: 'BR' } },
+],
 }
 
 export default function DueFratelliPage() {
@@ -233,8 +233,8 @@ details.df-menu > summary::-webkit-details-marker { display: none; }
 <h2 className="df-h2" style={{ color: t.onDark }}>A liberdade de comprar sem banco</h2>
 <p className="df-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 60 }}>Sem burocracia, sem intermediários. Direto com a construtora.</p>
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px,1fr))', gap: 'clamp(28px,4vw,52px)' }}>
-{[{n:'01',t2:'Converse com o corretor',d:'Atendimento exclusivo e personalizado para entender o seu momento e as melhores condições.'},{n:'02',t2:'Escolha a sua planta',d:'Selecione a unidade ideal e defina uma proposta sob medida, sem amarras bancárias.'},{n:'03',t2:'Negocie direto',d:'Condições flexíveis diretamente com a Construtora Fontana, com a liberdade que você merece.'}].map((s,i)=>(
-<div key={i} style={{ textAlign: 'left' }}><div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 40, opacity: 0.55, marginBottom: 14 }}>{s.n}</div><h3 style={{ fontFamily: t.display, fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: 17, margin: '0 0 12px' }}>{s.t2}</h3><p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.6, margin: 0 }}>{s.d}</p></div>
+{[{n:'01',tt:'Converse com o corretor',d:'Atendimento exclusivo e personalizado para entender o seu momento e as melhores condições.'},{n:'02',tt:'Escolha a sua planta',d:'Selecione a unidade ideal e defina uma proposta sob medida, sem amarras bancárias.'},{n:'03',tt:'Negocie direto',d:'Condições flexíveis diretamente com a Construtora Fontana, com a liberdade que você merece.'}].map((s,i)=>(
+<div key={i} style={{ textAlign: 'left' }}><div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 40, opacity: 0.55, marginBottom: 14 }}>{s.n}</div><h3 style={{ fontFamily: t.display, fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: 17, margin: '0 0 12px' }}>{s.tt}</h3><p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.6, margin: 0 }}>{s.d}</p></div>
 ))}
 </div>
 <p style={{ marginTop: 56, fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: t.onDark }}>Qualidade &amp; praticidade &middot; Sob consulta</p>
