@@ -38,20 +38,20 @@ const EMPREENDIMENTOS = [
 const DEPOIMENTOS = [
   { nome: 'Rafael T.', cidade: 'Criciúma, SC', texto: 'Nunca imaginei que compraria um apartamento sem depender de banco. O processo foi simples, rápido e as condições são incríveis.' },
   { nome: 'Camila S.', cidade: 'Içara, SC', texto: 'O Stiven apresentou um empreendimento perfeito para mim e estruturou um pagamento que coube no meu orçamento. Recomendo muito.' },
-  { nome: 'Fernando B.', cidade: 'Nova Veneza, SC', texto: 'A flexibilidade do financiamento direto foi o que fez a diferença. Sem filas, sem aprovação, só resultado.' },
+  { nome: 'Fernando B.', cidade: 'Nova Veneza, SC', texto: 'A flexibilidade do financiamento direto foi o que fez a diferença. Sem filas, sem burocracia, só resultado.' },
 ]
 
 const COMO_FUNCIONA = [
   { n: '01', titulo: 'Escolha o imóvel', desc: 'Navegue pelo portfólio e escolha o empreendimento ideal para o seu estilo de vida e objetivos.' },
   { n: '02', titulo: 'Simulação personalizada', desc: 'Stiven estrutura um plano de pagamento sob medida, sem intermediação bancária.' },
-  { n: '03', titulo: 'Contrato direto', desc: 'Assinatura direta com a construtora. Sem aprovação de crédito, sem burocracia.' },
+  { n: '03', titulo: 'Contrato direto', desc: 'Documentação simplificada, sem intermediários.' },
   { n: '04', titulo: 'Chaves na mão', desc: 'Acompanhamento completo até a entrega. Seu imóvel, do jeito que você imaginou.' },
 ]
 
 const METRICAS = [
   { valor: '4+', label: 'Empreendimentos ativos' },
   { valor: '100%', label: 'Financiamento direto' },
-  { valor: '2', label: 'Construtoras parceiras' },
+  { valor: '+', label: 'Construtoras parceiras' },
   { valor: 'SC', label: 'Sul de Santa Catarina' },
 ]
 
@@ -115,6 +115,10 @@ export default function HomePage() {
         *, *::before, *::after { box-sizing: border-box; }
         body { margin: 0; background: #FAFAF8; color: #1A1814; font-family: 'Hanken Grotesk', system-ui, sans-serif; }
         .home-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; transition: background .35s ease, box-shadow .35s ease; background: transparent; }
+        .home-nav--solid { background: rgba(250,250,248,0.97) !important; backdrop-filter: blur(20px); box-shadow: 0 1px 0 rgba(26,24,20,0.08); }
+        .home-nav--solid .home-nav-link { color: #1A1814 !important; text-shadow: none !important; }
+        .home-nav--solid .home-nav-brand { color: #1A1814 !important; text-shadow: none !important; }
+        .home-nav--solid .home-nav-wpp { color: #8A7240 !important; text-shadow: none !important; }
         @supports (animation-timeline: scroll()) {
           .home-nav { animation: nav-fill linear both; animation-timeline: scroll(); animation-range: 0px 80px; }
           @keyframes nav-fill { to { background: rgba(250,250,248,0.96); backdrop-filter: blur(20px); box-shadow: 0 1px 0 rgba(26,24,20,0.08); } }
@@ -148,31 +152,32 @@ export default function HomePage() {
       {/* NAV */}
       <nav className="home-nav">
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 clamp(18px,4vw,48px)', height: 68, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Link href="/" style={{ fontFamily: t.display, fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.22em', fontSize: 16, textDecoration: 'none', color: '#FFFFFF', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>
+          <Link href="/" style={{ fontFamily: t.display, fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.22em', fontSize: 16, textDecoration: 'none', color: '#FFFFFF', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }} className="home-nav-brand">
             Stiven Allan
           </Link>
           <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
-            <Link href="/#empreendimentos" style={{ fontFamily: t.body, fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#FFFFFF', textDecoration: 'none', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>Empreendimentos</Link>
-            <a href={WPP_MSG} target="_blank" rel="noopener noreferrer" style={{ fontFamily: t.body, fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: t.champagne, textDecoration: 'none', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>WhatsApp</a>
+            <Link href="/#empreendimentos" style={{ fontFamily: t.body, fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#FFFFFF', textDecoration: 'none', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }} className="home-nav-link">Empreendimentos</Link>
+            <a href={WPP_MSG} target="_blank" rel="noopener noreferrer" style={{ fontFamily: t.body, fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: t.champagne, textDecoration: 'none', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }} className="home-nav-wpp">WhatsApp</a>
           </div>
         </div>
       </nav>
+      <script dangerouslySetInnerHTML={{ __html: `(function(){var n=document.querySelector('.home-nav');if(!n)return;function u(){n.classList.toggle('home-nav--solid',window.scrollY>40);}window.addEventListener('scroll',u,{passive:true});u();})();` }} />
 
       {/* HERO */}
       <section style={{ position: 'relative', height: '100svh', minHeight: 580, overflow: 'hidden', background: '#1a1814' }}>
         <Image src="https://estilofontana.com.br/images/2025/08/28/f-ml-voo-passaro-ef-web-68b0986133a09.jpg?fm=webp" alt="Vista aérea de empreendimento Fontana — Sul de Santa Catarina" fill priority sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center 30%' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.30) 100%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.40) 60%, rgba(0,0,0,0.50) 100%)' }} />
         <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 clamp(24px,6vw,80px)', paddingTop: 68 }}>
           <p className="home-eyebrow fade-in" style={{ color: 'rgba(184,155,94,0.85)', marginBottom: 24, textShadow: '0 1px 8px rgba(0,0,0,0.5)' }}>Stiven Allan · CRECI/RS 60.275</p>
-          <h1 className="home-h1 fade-in fade-in-1" style={{ fontSize: 'clamp(36px,7vw,88px)', color: '#FFFFFF', textShadow: '0 2px 32px rgba(0,0,0,0.60)', maxWidth: 900 }}>
+          <h1 className="home-h1 fade-in fade-in-1" style={{ fontSize: 'clamp(36px,7vw,88px)', color: '#FFFFFF', textShadow: '0 2px 8px rgba(0,0,0,0.5), 0 2px 32px rgba(0,0,0,0.60)', maxWidth: 900 }}>
             Morar bem não deveria depender de um banco.
           </h1>
           <hr className="home-rule fade-in fade-in-2" style={{ margin: '28px auto' }} />
-          <p className="home-serif fade-in fade-in-2" style={{ fontSize: 'clamp(16px,2.2vw,22px)', color: 'rgba(245,241,234,0.80)', maxWidth: 560, margin: '0 0 40px', lineHeight: 1.6 }}>
+          <p className="home-serif fade-in fade-in-2" style={{ fontSize: 'clamp(16px,2.2vw,22px)', color: '#FFFFFF', maxWidth: 560, margin: '0 0 40px', lineHeight: 1.6, textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
             Empreendimentos de alto padrão com financiamento direto da construtora. Sem banco, sem burocracia.
           </p>
           <div className="fade-in fade-in-3" style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
-            <Link href="/#empreendimentos" className="home-btn" style={{ background: 'rgba(245,241,234,0.12)', borderColor: 'rgba(245,241,234,0.40)', color: '#F5F1EA', backdropFilter: 'blur(8px)' }}>Explorar empreendimentos</Link>
+            <Link href="/#empreendimentos" className="home-btn" style={{ background: 'rgba(245,241,234,0.12)', borderColor: 'rgba(245,241,234,0.40)', color: '#FFFFFF', backdropFilter: 'blur(8px)' }}>Explorar empreendimentos</Link>
             <a href={WPP_MSG} target="_blank" rel="noopener noreferrer" style={{ fontFamily: t.body, fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: 'rgba(245,241,234,0.55)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8, padding: '15px 0' }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
               Falar com Stiven
@@ -215,7 +220,7 @@ export default function HomePage() {
             <p className="home-eyebrow" style={{ color: t.champagne, marginBottom: 16 }}>Como funciona</p>
             <h2 className="home-h2" style={{ color: t.onDark }}>Financiamento direto</h2>
             <p className="home-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(15px,1.8vw,19px)', marginTop: 20, maxWidth: 520, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.65 }}>
-              Sem análise de crédito bancário. Negociado diretamente com a construtora.
+              Financiamento negociado diretamente com a construtora, sem intermediação bancária.
             </p>
           </div>
           <div className="home-how-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 'clamp(24px,3vw,40px)' }}>
