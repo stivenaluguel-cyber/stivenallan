@@ -21,7 +21,7 @@ const GALERIA = [
 { src: 'https://estilofontana.com.br/images/empreendimento/slideshows/mar-di-arienzo-residencial-69d2e834c59ea.jpg?fm=webp', alt: 'Mar di Arienzo Residencial — fachada frontal', label: 'Fachada Frontal' },
 { src: 'https://lh3.googleusercontent.com/d/1Shs1tG3s1Zo9_kzboLZrA0ntvo9vw4CD', alt: 'Mar di Arienzo — fachada angular', label: 'Fachada Angular' },
 { src: 'https://lh3.googleusercontent.com/d/1JKFoh6balPU7QKHjIX3kD5nbsGtU7lBT', alt: 'Mar di Arienzo — fotomontagem', label: 'Vista Mar' },
-{ src: 'https://lh3.googleusercontent.com/d/1d6GcKbUKqb94Vl1pGIwOntXb4-9SylaJ', alt: 'Terrço Mar di Arienzo Residencial', label: 'Terrço' },
+{ src: 'https://lh3.googleusercontent.com/d/1d6GcKbUKqb94Vl1pGIwOntXb4-9SylaJ', alt: 'Terraço Mar di Arienzo Residencial', label: 'Terraço' },
 { src: 'https://lh3.googleusercontent.com/d/1vNhfjwg8oG3EzCeXdRiK1uqfsBPSXaC6', alt: 'Piscina adulto e infantil Mar di Arienzo', label: 'Piscina' },
 { src: 'https://lh3.googleusercontent.com/d/1hV_9NMlQ9WWrG4Jlb6Y3aoHPSOMFJq_s', alt: 'Piscina com vista Mar di Arienzo', label: 'Piscina & Vista' },
 { src: 'https://lh3.googleusercontent.com/d/1puwz1fEXb418qtdNoc7xifJVp0llTugJ', alt: 'Salão de festas Mar di Arienzo', label: 'Salão de Festas' },
@@ -44,7 +44,7 @@ const DIFERENCIAIS = [
 'Possibilidade de personalização de planta',
 ]
 const AMENIDADES = [
-'Piscina adulto e infantil','Terrço','Academia','Salão de Festas',
+'Piscina adulto e infantil','Terraço','Academia','Salão de Festas',
 'Playground','Brinquedoteca','Hall com pé direito duplo',
 'Acesso digital com reconhecimento facial','Câmeras 24h',
 'Gerador para áreas comuns','Espera para carregador elétrico',
