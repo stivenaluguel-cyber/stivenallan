@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { imoveis } from '@/data/imoveis'
 import Image from 'next/image'
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://stivenallan.vercel.app'
@@ -27,14 +28,6 @@ const t = {
   serif: "'Cormorant Garamond', Georgia, serif",
   body: "'Hanken Grotesk', system-ui, sans-serif",
 }
-
-const EMPREENDIMENTOS = [
-  { id: '1', nome: 'Monte Leone Residencial', slug: 'monte-leone-centro-criciuma-sc', construtora_slug: 'fontana', construtora: 'Construtora Fontana', bairro: 'Centro', cidade: 'Criciúma', uf: 'SC', status: 'na planta', exibir_preco: false, preco: null, frase: 'Viver no centro com a sofisticação que você merece.', img: 'https://estilofontana.com.br/images/2025/08/28/f-ml-voo-passaro-ef-web-68b0986133a09.jpg?fm=webp' },
-  { id: '2', nome: 'Lavis Residencial', slug: 'lavis-residencial-centro-criciuma-sc', construtora_slug: 'fontana', construtora: 'Construtora Fontana', bairro: 'Centro', cidade: 'Criciúma', uf: 'SC', status: 'em obras', exibir_preco: false, preco: null, frase: 'Sofisticação em movimento — Centro de Criciúma.', img: 'https://estilofontana.com.br/images/empreendimento/slideshows/lavis-residencial-6926d1adaa325.jpg?fm=webp' },
-  { id: '3', nome: 'Águas de Marano Residencial', slug: 'aguas-de-marano-frente-mar-balneario-picarras-sc', construtora_slug: 'fontana', construtora: 'Construtora Fontana', bairro: 'Centro', cidade: 'Balneário Piçarras', uf: 'SC', status: 'em obras', exibir_preco: false, preco: null, frase: 'Frente mar — mergulhe em cada detalhe.', img: 'https://estilofontana.com.br/images/empreendimento/slideshows/aguas-de-marano-residencial-65a583e5c68f2.jpg?fm=webp' },
-  { id: '4', nome: 'Fidenza Residencial', slug: 'fidenza-residencial-cruzeiro-do-sul-criciuma-sc', construtora_slug: 'fontana', construtora: 'Construtora Fontana', bairro: 'Cruzeiro do Sul', cidade: 'Criciúma', uf: 'SC', status: 'em obras', exibir_preco: false, preco: null, frase: 'Autenticidade em cada detalhe — Cruzeiro do Sul.', img: 'https://estilofontana.com.br/images/2024/09/02/f-f-fachada-frontal-r05-ef-web-66d61ccec113e.jpg?fm=webp' },
-  { id: '5', nome: 'Tremezzo Residencial', slug: 'tremezzo-residencial-centro-criciuma-sc', construtora_slug: 'fontana', construtora: 'Construtora Fontana', bairro: 'Centro', cidade: 'Criciúma', uf: 'SC', status: 'em obras', exibir_preco: false, preco: null, frase: 'Celebre o inesquecível no coração de Criciúma.', img: 'https://lh3.googleusercontent.com/d/1zwMSHa-Ja6MGdlC2lq9fxQU7plgxHBLo' },
-]
 
 const DEPOIMENTOS = [
   { nome: 'Rafael T.', cidade: 'Criciúma, SC', texto: 'Nunca imaginei que compraria um apartamento sem depender de banco. O processo foi simples, rápido e as condições são incríveis.' },
@@ -72,7 +65,7 @@ function StatusBadge({ status }: { status: string }) {
   )
 }
 
-function EmpCard({ emp }: { emp: typeof EMPREENDIMENTOS[0] }) {
+function EmpCard({ emp }: { emp: typeof imoveis[0] }) {
   const href = `/empreendimento/${emp.construtora_slug}/${emp.slug}`
   const wpp = WPP + `?text=Ol%C3%A1+Stiven!+Tenho+interesse+no+${encodeURIComponent(emp.nome)}.`
   return (
@@ -205,7 +198,7 @@ export default function HomePage() {
             <span className="home-region-btn">Balneário Piçarras</span>
           </div>
           <div className="home-cards-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 'clamp(16px,2.5vw,28px)' }}>
-            {EMPREENDIMENTOS.map((emp, i) => (
+            {imoveis.filter(e => e.ativo).map((emp, i) => (
               <div key={emp.id} className={'fade-in fade-in-' + ((i % 4) + 1)}>
                 <EmpCard emp={emp} />
               </div>
@@ -310,7 +303,7 @@ export default function HomePage() {
             </div>
             <div>
               <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.25em', textTransform: 'uppercase', color: t.champagne, marginBottom: 20 }}>Empreendimentos</div>
-              {EMPREENDIMENTOS.map(emp => (
+              {imoveis.filter(e => e.ativo).map(emp => (
                 <div key={emp.id} style={{ marginBottom: 10 }}>
                   <Link href={'/empreendimento/' + emp.construtora_slug + '/' + emp.slug} style={{ fontSize: 13, color: 'rgba(245,241,234,0.55)', textDecoration: 'none' }}>{emp.nome}</Link>
                 </div>
