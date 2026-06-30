@@ -117,9 +117,8 @@ export default function CallianoPage() {
         .ca-lazer-card { border-radius: 2px; overflow: hidden; }
         .ca-wa { position: fixed; right: 20px; bottom: 20px; z-index: 900; width: 54px; height: 54px; border-radius: 50%; background: #25D366; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 18px rgba(0,0,0,0.22); text-decoration: none; transition: transform .2s; }
         .ca-wa:hover { transform: scale(1.08); }
-        .ca-burger { display: none; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 4px; }
-        .ca-burger span { width: 24px; height: 1.5px; background: #fff; display: block; }
-        @media (max-width: 860px) { .ca-nav-links { display: none !important; } .ca-burger { display: flex !important; } }
+        .ca-burger { display: none; }
+        @media (max-width: 860px) { .ca-nav-links { display: none !important; } }
       `}</style>
 
       {/* HEADER */}
@@ -134,9 +133,6 @@ export default function CallianoPage() {
           <a href="#localizacao" className="ca-navlink">Localização</a>
           <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ fontFamily: t.display, fontSize: 12, letterSpacing: '.16em', textTransform: 'uppercase', color: '#fff', background: t.terra, padding: '10px 22px', textDecoration: 'none' }}>Quero saber mais</a>
         </nav>
-        <button className="ca-burger" aria-label="Menu" onClick={() => { const n = document.querySelector('.ca-nav-links') as HTMLElement; if(n) n.style.display = n.style.display === 'flex' ? 'none' : 'flex'; }}>
-          <span /><span /><span />
-        </button>
       </header>
 
       {/* HERO */}
@@ -260,7 +256,7 @@ export default function CallianoPage() {
             <h2 className="ca-h2" style={{ fontSize: 'clamp(24px,3vw,40px)', color: t.onDark, margin: '0 0 24px' }}>Centro de<br />Criciúma/SC</h2>
             <p style={{ fontSize: 15, lineHeight: 1.8, color: t.onDarkMuted, marginBottom: 12 }}>Rua São José — Centro</p>
             <p style={{ fontSize: 15, lineHeight: 1.8, color: t.onDarkMuted, marginBottom: 32 }}>Localização privilegiada no coração de Criciúma, próximo a comércio, serviços e tudo que a cidade oferece de melhor.</p>
-            <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent('Rua São José, Centro, Criciúma SC')}`} target="_blank" rel="noopener noreferrer" className="ca-cta-light">Ver no mapa</a>
+            <a href="https://www.google.com/maps/search/?api=1&query=Rua+S%C3%A3o+Jos%C3%A9%2C+Centro%2C+Crici%C3%BAma+SC" target="_blank" rel="noopener noreferrer" className="ca-cta-light">Ver no mapa</a>
           </div>
           <div style={{ position: 'relative', aspectRatio: '4 / 3', borderRadius: 2, overflow: 'hidden' }}>
             <Image src={IMG.mapa} alt="Mapa localização Calliano Residencial" fill sizes="(max-width: 768px) 100vw, 50vw" style={{ objectFit: 'cover' }} />
@@ -335,4 +331,4 @@ export default function CallianoPage() {
       </a>
     </main>
   )
-}
+        }
