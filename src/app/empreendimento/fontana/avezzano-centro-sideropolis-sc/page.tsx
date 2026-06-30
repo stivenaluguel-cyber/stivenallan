@@ -9,9 +9,17 @@ const WA = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20inte
 const HERO = 'https://estilofontana.com.br/images/empreendimento/slideshows/avezzano-residencial-61a626507d294.jpg?fm=webp';
 
 const GALERIA = [
-  { src: 'https://estilofontana.com.br/images/empreendimento/slideshows/avezzano-residencial-61a626507d294.jpg?fm=webp', alt: 'Salão de Festas' },
-  { src: 'https://estilofontana.com.br/images/empreendimento/slideshows/avezzano-residencial-61a6265144c3a.jpg?fm=webp', alt: 'Hall de Entrada' },
-  { src: 'https://estilofontana.com.br/images/empreendimento/slideshows/avezzano-residencial-61a626517e285.jpg?fm=webp', alt: 'Fachada' },
+  { src: 'https://lh3.googleusercontent.com/d/1teagfJJc-4pfX8o6uiFdTR-kwTnYhB23', alt: 'Fachada' },
+  { src: 'https://lh3.googleusercontent.com/d/1bGjbfuBNtE5CojVHa2ymhK2UcIqgX_7U', alt: 'Acesso' },
+  { src: 'https://lh3.googleusercontent.com/d/179ccQjOJ4CMoyZsQdM_ladrfI9GdkGc_', alt: 'Hall de Entrada' },
+  { src: 'https://lh3.googleusercontent.com/d/1IvoIY1NhC3BrQ0jgWZFQyKGN4yTuXDFe', alt: 'Hall — Vista 2' },
+  { src: 'https://lh3.googleusercontent.com/d/1mzt8N1i4uAKh__Yq1M8dqon3mmdPzbFJ', alt: 'Salão de Festas' },
+  { src: 'https://lh3.googleusercontent.com/d/1ZVdwvaTarO7HbKgxPMRLjgL2GX09ftX6', alt: 'Salão Gourmet' },
+  { src: 'https://lh3.googleusercontent.com/d/19J_HYJIhTyY9CKnfLfY1Uf8Uo3PTebsB', alt: 'Área de Festas' },
+  { src: 'https://lh3.googleusercontent.com/d/1_OS8kjfeFaCRMT9GEGLKt8ygx98B06SA', alt: 'Apartamento Tipo' },
+  { src: 'https://lh3.googleusercontent.com/d/12naltpwq7FnSkCWKw_ZW048rTZwgr-FB', alt: 'Living com Vista' },
+  { src: 'https://lh3.googleusercontent.com/d/10QTO7wycnnDY-xD8lSc-aG6CoqkQexMZ', alt: 'Sacada' },
+  { src: 'https://lh3.googleusercontent.com/d/1CYgrjHd-CNBWhWVij-AYjnYoq2rQu0Kl', alt: 'PlayGround' },
 ];
 
 export const metadata: Metadata = {
