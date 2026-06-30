@@ -9,9 +9,16 @@ const WA = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20inte
 const HERO = 'https://estilofontana.com.br/images/empreendimento/slideshows/bellante-residencial-642b0899097e5.jpg?fm=webp';
 
 const GALERIA = [
-  { src: 'https://estilofontana.com.br/images/empreendimento/slideshows/bellante-residencial-642b0899097e5.jpg?fm=webp', alt: 'Fachada' },
-  { src: 'https://estilofontana.com.br/images/empreendimento/slideshows/bellante-residencial-642c5723dc23d.jpg?fm=webp', alt: 'Coworking' },
-  { src: 'https://estilofontana.com.br/images/empreendimento/slideshows/bellante-residencial-65a58504d98ed.jpg?fm=webp', alt: 'Espaço Fitness' },
+  { src: 'https://lh3.googleusercontent.com/d/12AAsmhPmf2OEAiJ92P1XFUTZMuXYgYjG', alt: 'Fachada' },
+  { src: 'https://lh3.googleusercontent.com/d/103UpUylOmmcbrTKDW6WOKzMQXKh8dhZd', alt: 'Fachada Angular' },
+  { src: 'https://lh3.googleusercontent.com/d/1iWi0zYgKgJXjmjT2DyDm3HiN6owTPqeW', alt: 'Acesso Principal' },
+  { src: 'https://lh3.googleusercontent.com/d/1HSe-qPq4ls2PxPgmq08CjORCPOT41nSl', alt: 'Hall de Entrada' },
+  { src: 'https://lh3.googleusercontent.com/d/11z8F7-sNFXFdOcjD4hP8LMePeBqBQXAI', alt: 'Living' },
+  { src: 'https://lh3.googleusercontent.com/d/1muQ1uCeg1AxqAfU1nr75jD5za255GuiJ', alt: 'Suíte' },
+  { src: 'https://lh3.googleusercontent.com/d/1lvfLyc4vx7abIoitI4YUNo5Ld4juYwyV', alt: 'Salão de Festas' },
+  { src: 'https://lh3.googleusercontent.com/d/1gt3r9jjuDGpK7Vj5hU5MruqexMw9u05f', alt: 'Sports Pub' },
+  { src: 'https://lh3.googleusercontent.com/d/1aFh_rFpxaI-vagoiOhhWdMoWto4vtISd', alt: 'Coworking' },
+  { src: 'https://lh3.googleusercontent.com/d/1Rmvc_bwvgr4LJISFgN4ObYzZ67b8R-pv', alt: 'Academia' },
 ];
 
 export const metadata: Metadata = {
