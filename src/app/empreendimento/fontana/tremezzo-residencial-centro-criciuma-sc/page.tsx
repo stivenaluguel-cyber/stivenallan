@@ -17,18 +17,18 @@ export const metadata: Metadata = {
     siteName: 'Stiven Allan — Imóveis',
     locale: 'pt_BR',
     type: 'website',
-    images: [{ url: 'https://lh3.googleusercontent.com/d/1tzgFeAyXCBdkZ1XII2rgJKXAlDz2RcLK', width: 1200, height: 630 }],
+    images: [{ url: 'https://lh3.googleusercontent.com/d/1zwMSHa-Ja6MGdlC2lq9fxQU7plgxHBLo', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Tremezzo Residencial | Centro Criciúma',
     description: 'Decorado disponível para visita. 125 m², 18 andares. Financiamento direto da construtora.',
-    images: ['https://lh3.googleusercontent.com/d/1tzgFeAyXCBdkZ1XII2rgJKXAlDz2RcLK'],
+    images: ['https://lh3.googleusercontent.com/d/1zwMSHa-Ja6MGdlC2lq9fxQU7plgxHBLo'],
   },
   robots: { index: true, follow: true },
 }
 const RENDERS = [
-  { src: 'https://lh3.googleusercontent.com/d/1tzgFeAyXCBdkZ1XII2rgJKXAlDz2RcLK', alt: 'Tremezzo Residencial — fachada principal', label: 'Fachada' },
+  { src: 'https://lh3.googleusercontent.com/d/1zwMSHa-Ja6MGdlC2lq9fxQU7plgxHBLo', alt: 'Tremezzo Residencial — fachada principal', label: 'Fachada' },
   { src: 'https://lh3.googleusercontent.com/d/1g9afEAHK0jHFdwjATu0NQNR-RHb0XJ5M', alt: 'Tremezzo Residencial — perspectiva exterior', label: 'Perspectiva' },
   { src: 'https://lh3.googleusercontent.com/d/1UJt4R_9PgpUm3GMFRoYnTXU7SyVthYAB', alt: 'Tremezzo Residencial — vista geral', label: 'Vista geral' },
   { src: 'https://lh3.googleusercontent.com/d/1sAi2MrrSvv81n-0rXdD5UUvP2yvIGfk_', alt: 'Tremezzo Residencial — fachada lateral', label: 'Fachada lateral' },
