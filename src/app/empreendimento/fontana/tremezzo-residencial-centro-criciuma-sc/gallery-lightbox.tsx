@@ -38,7 +38,7 @@ function Lightbox({ images, startIndex, onClose }: { images: GalItem[]; startInd
         onWheel={handleWheel}
         style={{ position: 'relative', width: '90vw', maxWidth: 1080, aspectRatio: '4/3', overflow: 'hidden', borderRadius: 4, cursor: scale > 1 ? 'zoom-out' : 'zoom-in' }}
       >
-        <Image
+        <Image unoptimized
           src={images[idx].src} alt={images[idx].alt} fill
           style={{ objectFit: 'contain', transform: `scale(${scale})`, transition: 'transform .2s ease' }}
           sizes="90vw" priority
@@ -71,7 +71,7 @@ export default function GalleryWithLightbox({ galeria, prefix, gradient }: {
             onClick={() => open(i)}
             onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && open(i)}
           >
-            <Image src={item.src} alt={item.alt} fill style={{ objectFit: 'cover' }} sizes="(min-width:1024px) 33vw,50vw" />
+            <Image unoptimized src={item.src} alt={item.alt} fill style={{ objectFit: 'cover' }} sizes="(min-width:1024px) 33vw,50vw" />
             <div style={{ position: 'absolute', inset: 0, background: gradient }} />
             <figcaption style={{ position: 'absolute', bottom: 12, left: 14, right: 14, color: '#fff', fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: "'Hanken Grotesk', system-ui, sans-serif" }}>{item.label}</figcaption>
             <div style={{ position: 'absolute', top: 10, right: 10, background: 'rgba(107,45,62,0.85)', borderRadius: 2, padding: '4px 10px', fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#fff' }}>Decorado</div>
@@ -96,7 +96,7 @@ export function LightboxPhoto({ src, alt, label, cardClass, imgSizes }: {
         onClick={() => setOpen(true)}
         onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && setOpen(true)}
       >
-        <Image src={src} alt={alt} fill style={{ objectFit: 'cover' }} sizes={imgSizes} />
+        <Image unoptimized src={src} alt={alt} fill style={{ objectFit: 'cover' }} sizes={imgSizes} />
         <figcaption style={{ position: 'absolute', bottom: 12, left: 14, color: '#fff', fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: "'Hanken Grotesk', system-ui, sans-serif" }}>{label}</figcaption>
       </figure>
     </>
