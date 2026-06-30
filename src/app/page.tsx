@@ -148,12 +148,12 @@ export default function HomePage() {
       {/* NAV */}
       <nav className="home-nav">
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 clamp(18px,4vw,48px)', height: 68, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Link href="/" style={{ fontFamily: t.display, fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.22em', fontSize: 16, textDecoration: 'none', color: t.onDark, textShadow: '0 1px 8px rgba(0,0,0,0.4)' }}>
+          <Link href="/" style={{ fontFamily: t.display, fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.22em', fontSize: 16, textDecoration: 'none', color: '#FFFFFF', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>
             Stiven Allan
           </Link>
           <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
-            <Link href="/#empreendimentos" style={{ fontFamily: t.body, fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(245,241,234,0.80)', textDecoration: 'none', textShadow: '0 1px 6px rgba(0,0,0,0.4)' }}>Empreendimentos</Link>
-            <a href={WPP_MSG} target="_blank" rel="noopener noreferrer" style={{ fontFamily: t.body, fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: t.champagne, textDecoration: 'none', textShadow: '0 1px 6px rgba(0,0,0,0.3)' }}>WhatsApp</a>
+            <Link href="/#empreendimentos" style={{ fontFamily: t.body, fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#FFFFFF', textDecoration: 'none', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>Empreendimentos</Link>
+            <a href={WPP_MSG} target="_blank" rel="noopener noreferrer" style={{ fontFamily: t.body, fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: t.champagne, textDecoration: 'none', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>WhatsApp</a>
           </div>
         </div>
       </nav>
@@ -161,10 +161,10 @@ export default function HomePage() {
       {/* HERO */}
       <section style={{ position: 'relative', height: '100svh', minHeight: 580, overflow: 'hidden', background: '#1a1814' }}>
         <Image src="https://estilofontana.com.br/images/2025/08/28/f-ml-voo-passaro-ef-web-68b0986133a09.jpg?fm=webp" alt="Vista aérea de empreendimento Fontana — Sul de Santa Catarina" fill priority sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center 30%' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(20,18,16,0.45) 0%, rgba(20,18,16,0.20) 40%, rgba(20,18,16,0.62) 100%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.30) 100%)' }} />
         <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 clamp(24px,6vw,80px)', paddingTop: 68 }}>
           <p className="home-eyebrow fade-in" style={{ color: 'rgba(184,155,94,0.85)', marginBottom: 24, textShadow: '0 1px 8px rgba(0,0,0,0.5)' }}>Stiven Allan · CRECI/RS 60.275</p>
-          <h1 className="home-h1 fade-in fade-in-1" style={{ fontSize: 'clamp(36px,7vw,88px)', color: '#F5F1EA', textShadow: '0 2px 32px rgba(0,0,0,0.55)', maxWidth: 900 }}>
+          <h1 className="home-h1 fade-in fade-in-1" style={{ fontSize: 'clamp(36px,7vw,88px)', color: '#FFFFFF', textShadow: '0 2px 32px rgba(0,0,0,0.60)', maxWidth: 900 }}>
             Morar bem não deveria depender de um banco.
           </h1>
           <hr className="home-rule fade-in fade-in-2" style={{ margin: '28px auto' }} />
@@ -274,9 +274,9 @@ export default function HomePage() {
       <section style={{ background: t.dark, color: t.onDark, padding: 'clamp(80px,14vh,140px) clamp(18px,4vw,40px)', textAlign: 'center' }}>
         <div style={{ maxWidth: 680, margin: '0 auto' }}>
           <p className="home-eyebrow" style={{ color: t.champagne, marginBottom: 24 }}>Próximo passo</p>
-          <h2 className="home-h2" style={{ color: t.onDark, fontSize: 'clamp(28px,5vw,52px)' }}>Pronto para sair do aluguel?</h2>
+          <h2 className="home-serif" style={{ color: t.onDark, fontSize: 'clamp(32px,5.5vw,60px)', fontStyle: 'italic', fontWeight: 300, letterSpacing: '0.01em', lineHeight: 1.15 }}>Seu próximo investimento começa aqui.</h2>
           <p className="home-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(16px,1.9vw,21px)', margin: '24px 0 40px', lineHeight: 1.65 }}>
-            Converse com Stiven e descubra o empreendimento certo para o seu momento.
+            Empreendimentos que valorizam antes mesmo das chaves. Fale com Stiven e descubra como fazer seu capital trabalhar com inteligência.
           </p>
           <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
             <a href={WPP_MSG} target="_blank" rel="noopener noreferrer" className="home-btn" style={{ background: t.champagne, borderColor: t.champagne, color: '#fff' }}>Falar com Stiven</a>
