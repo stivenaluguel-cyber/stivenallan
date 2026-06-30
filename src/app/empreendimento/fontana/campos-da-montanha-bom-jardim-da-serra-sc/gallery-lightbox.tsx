@@ -5,108 +5,76 @@ import Image from 'next/image'
 type GalItem = { src: string; alt: string; label: string }
 
 function Lightbox({ images, startIndex, onClose }: { images: GalItem[]; startIndex: number; onClose: () => void }) {
-    const [idx, setIdx] = useState(startIndex)
-    const [zoom, setZoom] = useState(1)
-    const [offset, setOffset] = useState({ x: 0, y: 0 })
-    const [dragging, setDragging] = useState(false)
-    const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
-    const [pinchDist, setPinchDist] = useState<number | null>(null)
-
-  const prev = useCallback(() => { setIdx(i => (i - 1 + images.length) % images.length); setZoom(1); setOffset({ x: 0, y: 0 }) }, [images.length])
-    const next = useCallback(() => { setIdx(i => (i + 1) % images.length); setZoom(1); setOffset({ x: 0, y: 0 }) }, [images.length])
-
+  const [idx, setIdx] = useState(startIndex)
+  const [zoom, setZoom] = useState(false)
+  const prev = useCallback(() => setIdx(i => (i - 1 + images.length) % images.length), [images.length])
+  const next = useCallback(() => setIdx(i => (i + 1) % images.length), [images.length])
   useEffect(() => {
-        document.body.style.overflow = 'hidden'
-        const h = (e: KeyboardEvent) => {
-                if (e.key === 'Escape') onClose()
-                if (e.key === 'ArrowLeft') prev()
-                if (e.key === 'ArrowRight') next()
-        }
-        window.addEventListener('keydown', h)
-        return () => { window.removeEventListener('keydown', h); document.body.style.overflow = '' }
+    setIdx(startIndex)
+    setZoom(false)
+  }, [startIndex])
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+      if (e.key === 'ArrowLeft') prev()
+      if (e.key === 'ArrowRight') next()
+    }
+    window.addEventListener('keydown', h)
+    return () => window.removeEventListener('keydown', h)
   }, [onClose, prev, next])
-
-  const img = images[idx]
-    return (
-          <div role="dialog" aria-modal="true" aria-label={`Lightbox — ${img.label}`}
-                  style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(0,0,0,0.92)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                  <div onClick={onClose} style={{ position: 'absolute', inset: 0, zIndex: 0 }} aria-hidden="true" />
-                  <button onClick={onClose} aria-label="Fechar lightbox"
-                            style={{ position: 'absolute', top: 16, right: 16, zIndex: 10, background: 'none', border: 'none', color: '#fff', fontSize: 28, cursor: 'pointer', lineHeight: 1, padding: '4px 10px', fontWeight: 300 }}>&#x2715;</button>button>
-            {images.length > 1 && (
-                            <button onClick={e => { e.stopPropagation(); prev() }} aria-label="Imagem anterior"
-                                        style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', zIndex: 10, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.25)', color: '#fff', fontSize: 24, cursor: 'pointer', padding: '12px 18px', lineHeight: 1, borderRadius: 4 }}>&#8249;</button>button>
-                          )}
-            {images.length > 1 && (
-                            <button onClick={e => { e.stopPropagation(); next() }} aria-label="Próxima imagem"
-                                        style={{ position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)', zIndex: 10, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.25)', color: '#fff', fontSize: 24, cursor: 'pointer', padding: '12px 18px', lineHeight: 1, borderRadius: 4 }}>&#8250;</button>button>
-                          )}
-                  <div
-                            onWheel={e => { e.preventDefault(); setZoom(z => Math.min(4, Math.max(1, z - e.deltaY * 0.002))) }}
-                            onMouseDown={e => { if (zoom > 1) { setDragging(true); setDragStart({ x: e.clientX - offset.x, y: e.clientY - offset.y }) } }}
-                            onMouseMove={e => { if (dragging) setOffset({ x: e.clientX - dragStart.x, y: e.clientY - dragStart.y }) }}
-                            onMouseUp={() => setDragging(false)}
-                            onMouseLeave={() => setDragging(false)}
-                            onTouchStart={e => {
-                                        if (e.touches.length === 2) {
-                                                      const dx = e.touches[0].clientX - e.touches[1].clientX
-                                                      const dy = e.touches[0].clientY - e.touches[1].clientY
-                                                      setPinchDist(Math.sqrt(dx * dx + dy * dy))
-                                        }
-                            }}
-                            onTouchMove={e => {
-                                        if (e.touches.length === 2 && pinchDist !== null) {
-                                                      const dx = e.touches[0].clientX - e.touches[1].clientX
-                                                      const dy = e.touches[0].clientY - e.touches[1].clientY
-                                                      const d = Math.sqrt(dx * dx + dy * dy)
-                                                      setZoom(z => Math.min(4, Math.max(1, z * d / pinchDist)))
-                                                      setPinchDist(d)
-                                        }
-                            }}
-                            onTouchEnd={() => setPinchDist(null)}
-                            style={{ position: 'relative', zIndex: 2, maxWidth: '90vw', maxHeight: '80vh', cursor: zoom > 1 ? 'grab' : 'zoom-in', transform: `scale(${zoom}) translate(${offset.x / zoom}px, ${offset.y / zoom}px)`, transformOrigin: 'center center', transition: dragging ? 'none' : 'transform 0.1s ease' }}>
-                            <img src={img.src} alt={img.alt} style={{ maxWidth: '90vw', maxHeight: '80vh', display: 'block', userSelect: 'none', pointerEvents: 'none', objectFit: 'contain' }} />
-                  </div>div>
-                  <div>
-                          <div style={{ position: 'absolute', bottom: 24, left: 0, right: 0, textAlign: 'center', zIndex: 10, color: 'rgba(255,255,255,0.85)', fontSize: 11, letterSpacing: '0.26em', textTransform: 'uppercase' }}>
-                            {img.label}{images.length > 1 && <span style={{ marginLeft: 12, opacity: 0.55 }}>{idx + 1}/{images.length}</span>span>}
-                          </div>div>
-                  </div>div>
-          </div>div>
-        )
+  const cur = images[idx]
+  return (
+    <div
+      onClick={onClose}
+      style={{ position:'fixed', inset:0, zIndex:9999, background:'rgba(0,0,0,0.92)', display:'flex', alignItems:'center', justifyContent:'center' }}
+    >
+      <button onClick={e => { e.stopPropagation(); prev() }} style={{ position:'absolute', left:16, top:'50%', transform:'translateY(-50%)', background:'rgba(255,255,255,0.15)', border:'none', color:'#fff', fontSize:28, borderRadius:8, width:48, height:48, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>&#8249;</button>
+      <div onClick={e => e.stopPropagation()} style={{ position:'relative', maxWidth:'90vw', maxHeight:'88vh', display:'flex', flexDirection:'column', alignItems:'center' }}>
+        <div
+          onClick={() => setZoom(z => !z)}
+          style={{ position:'relative', width: zoom ? '90vw' : 'min(800px,88vw)', height: zoom ? '85vh' : 'min(560px,60vh)', cursor: zoom ? 'zoom-out' : 'zoom-in', transition:'all 0.3s' }}
+        >
+          <Image src={cur.src} alt={cur.alt} fill style={{ objectFit:'contain' }} sizes="90vw" priority />
+        </div>
+        <span style={{ marginTop:10, color:'rgba(255,255,255,0.75)', fontSize:13, letterSpacing:1 }}>{cur.label}</span>
+        <span style={{ marginTop:4, color:'rgba(255,255,255,0.45)', fontSize:12 }}>{idx + 1} / {images.length}</span>
+      </div>
+      <button onClick={e => { e.stopPropagation(); next() }} style={{ position:'absolute', right:16, top:'50%', transform:'translateY(-50%)', background:'rgba(255,255,255,0.15)', border:'none', color:'#fff', fontSize:28, borderRadius:8, width:48, height:48, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>&#8250;</button>
+      <button onClick={onClose} style={{ position:'absolute', top:16, right:16, background:'rgba(255,255,255,0.15)', border:'none', color:'#fff', fontSize:20, borderRadius:8, width:40, height:40, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>&#x2715;</button>
+    </div>
+  )
 }
 
 export default function GalleryWithLightbox({ galeria, prefix, gradient }: { galeria: GalItem[]; prefix: string; gradient: string }) {
-    const [lb, setLb] = useState<{ open: boolean; index: number }>({ open: false, index: 0 })
-        const openLb = useCallback((i: number) => setLb({ open: true, index: i }), [])
-            const closeLb = useCallback(() => setLb(s => ({ ...s, open: false })), [])
-                return (
-                      <>
-                        {galeria.map((item, i) => (
-                                <figure key={i} className={`${prefix}-gcard`}
-                                            style={{ margin: 0, aspectRatio: '4 / 3', position: 'relative', cursor: 'zoom-in' }}
-                                            role="button" tabIndex={0} aria-label={`Ampliar: ${item.label}`}
-                                            onClick={() => openLb(i)}
-                                            onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && openLb(i)}>
-                                          <Image src={item.src} alt={item.alt} fill loading="lazy" sizes="(max-width: 768px) 100vw, 33vw" style={{ objectFit: 'cover' }} />
-                                          <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(to top, ${gradient}, rgba(0,0,0,0) 45%)` }} />
-                                          <figcaption className={`${prefix}-onimg`}
-                                                        style={{ position: 'absolute', left: 16, bottom: 14, color: '#fff', fontSize: 11, letterSpacing: '0.24em', textTransform: 'uppercase' }}>{item.label}</figcaption>figcaption>
-                                </figure>figure>
-                              ))}
-                        {lb.open && <Lightbox images={galeria} startIndex={lb.index} onClose={closeLb} />}
-                      </>>
-                    )
+  const [open, setOpen] = useState<number | null>(null)
+  return (
+    <>
+      {open !== null && <Lightbox images={galeria} startIndex={open} onClose={() => setOpen(null)} />}
+      <div className={`${prefix}gal-grid`}>
+        {galeria.map((item, i) => (
+          <button key={i} className={`${prefix}gal-item`} onClick={() => setOpen(i)} aria-label={`Ver ${item.label}`}>
+            <div className={`${prefix}gal-img-wrap`}>
+              <Image src={item.src} alt={item.alt} fill style={{ objectFit:'cover' }} sizes="(max-width:600px) 50vw,(max-width:900px) 33vw,25vw" />
+              <div className={`${prefix}gal-overlay`} style={{ background: gradient }} />
+            </div>
+            <span className={`${prefix}gal-label`}>{item.label}</span>
+          </button>
+        ))}
+      </div>
+    </>
+  )
 }
 
 export function LightboxPhoto({ src, alt, label, cardClass, imgSizes }: { src: string; alt: string; label: string; cardClass: string; imgSizes: string }) {
-    const [open, setOpen] = useState(false)
-        return (
-              <div className={cardClass} style={{ position: 'relative', aspectRatio: '4 / 3', overflow: 'hidden', cursor: 'zoom-in' }}
-                      role="button" tabIndex={0} aria-label={`Ampliar: ${label}`}
-                      onClick={() => setOpen(true)} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && setOpen(true)}>
-                    <Image src={src} alt={alt} fill loading="lazy" sizes={imgSizes} style={{ objectFit: 'cover' }} />
-                {open && <Lightbox images={[{ src, alt, label }]} startIndex={0} onClose={() => setOpen(false)} />}
-              </div>div>
-            )
-}</></div>
+  const [open, setOpen] = useState(false)
+  return (
+    <>
+      {open && <Lightbox images={[{ src, alt, label }]} startIndex={0} onClose={() => setOpen(false)} />}
+      <button className={cardClass} onClick={() => setOpen(true)} aria-label={`Ver ${label}`} style={{ border:'none', background:'none', padding:0, cursor:'pointer', display:'block', width:'100%' }}>
+        <div style={{ position:'relative', width:'100%', height:'100%' }}>
+          <Image src={src} alt={alt} fill style={{ objectFit:'cover' }} sizes={imgSizes} />
+        </div>
+      </button>
+    </>
+  )
+}
