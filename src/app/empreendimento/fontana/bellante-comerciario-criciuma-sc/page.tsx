@@ -1,15 +1,12 @@
+import type { Metadata } from 'next';
 import GalleryWithLightbox from './gallery-lightbox';
-import Link from 'next/link';
 
 export const revalidate = 3600;
 
-export const metadata = {
-  title: 'Bellante Residencial | Comerciário Criciúma SC | Stiven Allan',
-  description: 'Bellante Residencial — 2 dormitórios (1 suíte), 62–66 m², no Comerciário em Criciúma/SC. Em obras. Financiamento direto Fontana sem análise de crédito. Consulte Stiven Allan CRECI 60.275.',
-};
-
-const ACENTO = '#2C4A7C';
-const WA = 'https://wa.me/5548991642332?text=Ol%C3%A1+Stiven%2C+tenho+interesse+no+Bellante+Residencial.';
+const ACCENT = '#2C4A7C';
+const ACCENT_DARK = '#1a2d4d';
+const WA = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Bellante%20Residencial.';
+const HERO = 'https://estilofontana.com.br/images/empreendimento/slideshows/bellante-residencial-642b0899097e5.jpg?fm=webp';
 
 const GALERIA = [
   { src: 'https://estilofontana.com.br/images/empreendimento/slideshows/bellante-residencial-642b0899097e5.jpg?fm=webp', alt: 'Fachada' },
@@ -17,101 +14,120 @@ const GALERIA = [
   { src: 'https://estilofontana.com.br/images/empreendimento/slideshows/bellante-residencial-65a58504d98ed.jpg?fm=webp', alt: 'Espaço Fitness' },
 ];
 
-const DIFERENCIAIS = [
-  { n: '01', t: '1 Suíte', d: 'Dormitório principal com banheiro privativo e acabamento premium.' },
-  { n: '02', t: 'Pé Direito Duplo', d: 'Hall de entrada com pé direito duplo, ampliando a sensação de espaço.' },
-  { n: '03', t: 'Rebaixo em Gesso', d: 'Teto rebaixado em gesso com iluminação planejada em todos os ambientes.' },
-  { n: '04', t: 'Espera p/ Split', d: 'Infraestrutura completa para instalação de ar-condicionado split.' },
-];
+export const metadata: Metadata = {
+  title: 'Bellante Residencial | Comerciário Criciúma SC | Stiven Allan',
+  description: 'Bellante Residencial — 2 dormitórios (1 suíte), 62–66 m², Comerciário em Criciúma/SC. Em obras. Financiamento direto Fontana. Conheça com Stiven Allan.',
+  openGraph: {
+    title: 'Bellante Residencial | Comerciário Criciúma SC | Stiven Allan',
+    description: 'Feito para você. Apartamentos com 2 dorms (1 suíte) de 62–66 m² no Comerciário de Criciúma.',
+    images: [{ url: HERO }],
+  },
+};
 
-const LAZER = [
-  'Bicicletário', 'Coworking', 'Salão de Festas', 'Espaço Fitness',
-  'Sports Pub', 'Churrasqueira', '2 Elevadores',
-];
-
-export default function BellanteResidencial() {
+export default function BellantePage() {
   return (
-    <main className="font-sans bg-white text-gray-900 antialiased">
+    <main style={{ fontFamily: "'Inter', sans-serif", color: '#1a1a1a', overflowX: 'hidden' }}>
 
       {/* NAV */}
-      <nav className="fixed top-0 left-0 right-0 z-40 bg-black/70 backdrop-blur-sm">
-        <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-          <Link href="/" className="text-white font-semibold text-sm tracking-widest uppercase">Stiven Allan</Link>
-          <div className="hidden md:flex gap-6 text-white/80 text-xs uppercase tracking-widest">
-            <a href="#galeria" className="hover:text-white transition-colors">Galeria</a>
-            <a href="#diferenciais" className="hover:text-white transition-colors">Diferenciais</a>
-            <a href="#lazer" className="hover:text-white transition-colors">Lazer</a>
-            <a href="#localizacao" className="hover:text-white transition-colors">Localização</a>
-          </div>
-          <a href={WA} target="_blank" rel="noopener" className="text-white text-xs font-semibold uppercase tracking-widest border border-white/60 px-4 py-2 hover:bg-white hover:text-gray-900 transition-colors">
-            Tenho interesse
+      <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 2rem', height: '64px' }}>
+        <span style={{ color: '#fff', fontWeight: 700, fontSize: '1rem', letterSpacing: '0.05em' }}>BELLANTE RESIDENCIAL</span>
+        <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+          {['O Residencial','Galeria','As Residências','Lazer','Localização','Financiamento'].map(s => (
+            <a key={s} href={`#${s.toLowerCase().replace(/\s/g,'-').replace(/ê/g,'e').replace(/ã/g,'a').replace(/ç/g,'c')}`}
+              style={{ color: 'rgba(255,255,255,0.8)', textDecoration: 'none', fontSize: '0.8rem', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+              {s}
+            </a>
+          ))}
+          <a href={WA} target="_blank" rel="noopener"
+            style={{ background: ACCENT, color: '#fff', padding: '0.5rem 1.25rem', borderRadius: '2px', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.08em' }}>
+            FALAR COM STIVEN
           </a>
         </div>
       </nav>
 
       {/* HERO */}
-      <section className="relative h-screen flex items-end pb-20 md:pb-32">
-        <img src="https://estilofontana.com.br/images/empreendimento/slideshows/bellante-residencial-642b0899097e5.jpg?fm=webp" alt="Bellante Residencial — Fachada" className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-        <div className="relative z-10 max-w-4xl mx-auto px-6 text-white">
-          <p className="text-xs uppercase tracking-[0.3em] mb-4 opacity-80">Comerciário · Criciúma / SC &nbsp;·&nbsp; Em obras</p>
-          <h1 className="text-5xl md:text-7xl font-bold leading-tight mb-4">Bellante<br/>Residencial</h1>
-          <p className="text-2xl md:text-3xl font-light italic mb-6" style={{fontFamily:'Georgia,serif'}}>"Feito para você."</p>
-          <p className="text-base md:text-lg text-white/80 max-w-xl mb-8">No Bellante Residencial, a arquitetura é única e os motivos para viver nele são muitos. Um projeto moderno que acolhe e expressa a personalidade de seus moradores, em localização privilegiada de Criciúma.</p>
-          <a href={WA} target="_blank" rel="noopener" className="inline-block text-white font-semibold uppercase tracking-widest text-sm px-8 py-4 transition-opacity hover:opacity-80" style={{background: ACENTO}}>
-            Quero conhecer
+      <section style={{ position: 'relative', height: '100vh', minHeight: '600px', overflow: 'hidden' }}>
+        <img src={HERO} alt="Bellante Residencial — Fachada"
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.6) 100%)' }} />
+        <div style={{ position: 'relative', zIndex: 2, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 1.5rem' }}>
+          <p style={{ color: '#a8bfdf', fontSize: '0.75rem', letterSpacing: '0.25em', textTransform: 'uppercase', marginBottom: '1rem' }}>Comerciário · Criciúma / SC</p>
+          <h1 style={{ color: '#fff', fontSize: 'clamp(2.5rem,6vw,5rem)', fontWeight: 300, lineHeight: 1.1, margin: '0 0 1.25rem', maxWidth: '800px' }}>
+            Bellante<br /><strong style={{ fontWeight: 700 }}>Residencial</strong>
+          </h1>
+          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#c8d8ef', fontSize: 'clamp(1.4rem,3vw,2.2rem)', fontStyle: 'italic', marginBottom: '2rem' }}>
+            "Feito para você."
+          </p>
+          <a href={WA} target="_blank" rel="noopener"
+            style={{ background: ACCENT, color: '#fff', padding: '1rem 2.5rem', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', borderRadius: '2px' }}>
+            QUERO SABER MAIS
           </a>
         </div>
       </section>
 
       {/* O RESIDENCIAL */}
-      <section className="py-24 bg-white">
-        <div className="max-w-4xl mx-auto px-6">
-          <p className="text-xs uppercase tracking-[0.3em] mb-6 opacity-50">O Residencial</p>
-          <h2 className="text-3xl md:text-5xl font-bold mb-8 leading-tight">Arquitetura única.<br/>Vida em Criciúma.</h2>
-          <p className="text-lg text-gray-600 leading-relaxed max-w-2xl mb-8">O Bellante Residencial foi projetado para quem busca qualidade de vida em uma das localidades mais valorizadas de Criciúma. Seus 2 dormitórios — com suíte — e os 62 a 66 m² de área privativa oferecem conforto e praticidade para o seu dia a dia.</p>
-          <blockquote className="text-2xl md:text-3xl font-light italic border-l-4 pl-6 text-gray-500" style={{borderColor: ACENTO, fontFamily:'Georgia,serif'}}>
+      <section id="o-residencial" style={{ background: '#faf9f7', padding: '6rem 1.5rem' }}>
+        <div style={{ maxWidth: '860px', margin: '0 auto', textAlign: 'center' }}>
+          <p style={{ color: ACCENT, fontSize: '0.7rem', letterSpacing: '0.3em', textTransform: 'uppercase', marginBottom: '1rem' }}>O Residencial</p>
+          <div style={{ width: '40px', height: '2px', background: ACCENT, margin: '0 auto 2rem' }} />
+          <h2 style={{ fontSize: 'clamp(1.8rem,3.5vw,2.8rem)', fontWeight: 300, lineHeight: 1.3, marginBottom: '2rem', color: '#1a1a1a' }}>
+            Arquitetura única.<br /><strong style={{ fontWeight: 700 }}>Localização privilegiada.</strong>
+          </h2>
+          <p style={{ fontSize: '1.05rem', lineHeight: 1.9, color: '#555', marginBottom: '2rem' }}>
+            No Bellante Residencial, a arquitetura é única e os motivos para viver nele são muitos. Um projeto moderno que acolhe e expressa a personalidade de seus moradores, em localização privilegiada de Criciúma.
+          </p>
+          <blockquote style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 'clamp(1.5rem,2.5vw,2rem)', fontStyle: 'italic', color: '#333', borderLeft: `4px solid ${ACCENT}`, paddingLeft: '1.5rem', margin: '2.5rem auto', maxWidth: '600px', textAlign: 'left' }}>
             "Feito para você."
           </blockquote>
+          <p style={{ fontSize: '1rem', lineHeight: 1.9, color: '#555' }}>
+            2 dormitórios com 1 suíte, apartamentos de 62 a 66 m² privativos no Comerciário em Criciúma/SC. Em obras. Uma construção que honra cada detalhe com acabamentos nobres e espaços que respiram elegância.
+          </p>
         </div>
       </section>
 
       {/* GALERIA */}
-      <section id="galeria" className="py-24 bg-gray-950 text-white">
-        <div className="max-w-6xl mx-auto px-6">
-          <p className="text-xs uppercase tracking-[0.3em] mb-4 opacity-50">Galeria</p>
-          <h2 className="text-3xl md:text-4xl font-bold mb-12">Conheça o Bellante</h2>
-          <GalleryWithLightbox items={GALERIA} />
+      <section id="galeria" style={{ padding: '5rem 1.5rem', background: '#111' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <p style={{ color: ACCENT, fontSize: '0.7rem', letterSpacing: '0.3em', textTransform: 'uppercase', textAlign: 'center', marginBottom: '0.75rem' }}>Galeria</p>
+          <div style={{ width: '40px', height: '2px', background: ACCENT, margin: '0 auto 3rem' }} />
+          <GalleryWithLightbox images={GALERIA} accent={ACCENT} />
         </div>
       </section>
 
       {/* AS RESIDÊNCIAS */}
-      <section className="py-24 bg-gray-900 text-white">
-        <div className="max-w-6xl mx-auto px-6">
-          <p className="text-xs uppercase tracking-[0.3em] mb-4 opacity-50">As Residências</p>
-          <h2 className="text-3xl md:text-4xl font-bold mb-12">2 dormitórios (1 suíte) · 62–66 m²</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            {[['2','Dormitórios'],['1','Suíte'],['62–66','m² privativos'],['Sob consulta','Preço']].map(([n,l]) => (
-              <div key={l}>
-                <p className="text-4xl md:text-5xl font-bold mb-2" style={{color: ACENTO === '#2C4A7C' ? '#6B8FC5' : ACENTO}}>{n}</p>
-                <p className="text-sm text-white/60 uppercase tracking-widest">{l}</p>
+      <section id="as-residencias" style={{ background: '#1a1a1a', color: '#fff', padding: '6rem 1.5rem' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto', textAlign: 'center' }}>
+          <p style={{ color: ACCENT, fontSize: '0.7rem', letterSpacing: '0.3em', textTransform: 'uppercase', marginBottom: '0.75rem' }}>As Residências</p>
+          <div style={{ width: '40px', height: '2px', background: ACCENT, margin: '0 auto 2.5rem' }} />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem', marginBottom: '3rem' }}>
+            {[
+              { n: '2', l: 'dormitórios' },
+              { n: '1', l: 'suíte' },
+              { n: '62–66', l: 'm² privativos' },
+              { n: '2', l: 'elevadores' },
+            ].map(({ n, l }) => (
+              <div key={l} style={{ padding: '2rem', border: '1px solid rgba(255,255,255,0.1)' }}>
+                <p style={{ fontSize: 'clamp(2.5rem,5vw,4rem)', fontWeight: 200, color: '#fff', margin: 0, lineHeight: 1 }}>{n}</p>
+                <p style={{ fontSize: '0.8rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.55)', margin: '0.5rem 0 0' }}>{l}</p>
               </div>
             ))}
           </div>
+          <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '1rem', lineHeight: 1.8, maxWidth: '650px', margin: '0 auto' }}>
+            Residências pensadas para quem exige o melhor. Ambientes integrados, acabamentos nobres e espaços que celebram cada momento da sua história.
+          </p>
         </div>
       </section>
 
       {/* DIFERENCIAIS */}
-      <section id="diferenciais" className="py-24 bg-white">
-        <div className="max-w-6xl mx-auto px-6">
-          <p className="text-xs uppercase tracking-[0.3em] mb-4 opacity-50">Diferenciais</p>
-          <h2 className="text-3xl md:text-4xl font-bold mb-12">Detalhes que fazem a diferença</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {DIFERENCIAIS.map((d) => (
-              <div key={d.n} className="border-t-2 pt-6" style={{borderColor: ACENTO}}>
-                <p className="text-xs font-bold tracking-widest mb-4 opacity-40">{d.n}</p>
-                <h3 className="text-lg font-bold mb-3">{d.t}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{d.d}</p>
+      <section id="diferenciais" style={{ background: '#faf9f7', padding: '6rem 1.5rem' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+          <p style={{ color: ACCENT, fontSize: '0.7rem', letterSpacing: '0.3em', textTransform: 'uppercase', textAlign: 'center', marginBottom: '0.75rem' }}>Diferenciais das Unidades</p>
+          <div style={{ width: '40px', height: '2px', background: ACCENT, margin: '0 auto 3rem' }} />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.5rem' }}>
+            {['1 suíte','Pé direito duplo no hall','Rebaixo em gesso','Espera p/ split'].map((item, i) => (
+              <div key={item} style={{ background: '#fff', padding: '1.75rem 2rem', borderTop: `3px solid ${ACCENT}`, boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
+                <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '2rem', color: ACCENT, fontWeight: 300, display: 'block', marginBottom: '0.5rem' }}>{String(i + 1).padStart(2, '0')}</span>
+                <p style={{ fontWeight: 600, fontSize: '0.95rem', color: '#1a1a1a', margin: 0 }}>{item}</p>
               </div>
             ))}
           </div>
@@ -119,103 +135,122 @@ export default function BellanteResidencial() {
       </section>
 
       {/* LAZER */}
-      <section id="lazer" className="py-24 bg-gray-950 text-white">
-        <div className="max-w-6xl mx-auto px-6">
-          <p className="text-xs uppercase tracking-[0.3em] mb-4 opacity-50">Lazer & Áreas Comuns</p>
-          <h2 className="text-3xl md:text-4xl font-bold mb-12">Vida além do apartamento</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {LAZER.map((item) => (
-              <div key={item} className="flex items-center gap-3 bg-white/5 rounded-lg px-4 py-3">
-                <span className="w-2 h-2 rounded-full flex-shrink-0" style={{background: '#6B8FC5'}} />
-                <span className="text-sm text-white/80">{item}</span>
-              </div>
+      <section id="lazer" style={{ background: '#111', color: '#fff', padding: '6rem 1.5rem' }}>
+        <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
+          <p style={{ color: ACCENT, fontSize: '0.7rem', letterSpacing: '0.3em', textTransform: 'uppercase', marginBottom: '0.75rem' }}>Lazer & Áreas Comuns</p>
+          <div style={{ width: '40px', height: '2px', background: ACCENT, margin: '0 auto 2.5rem' }} />
+          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '1rem' }}>
+            {['Bicicletário','Coworking','Salão de Festas','Espaço Fitness','Sports Pub','Churrasqueira','2 Elevadores'].map(item => (
+              <span key={item} style={{ border: '1px solid rgba(255,255,255,0.2)', padding: '0.6rem 1.4rem', fontSize: '0.85rem', letterSpacing: '0.08em', color: 'rgba(255,255,255,0.8)' }}>{item}</span>
             ))}
           </div>
         </div>
       </section>
 
       {/* LOCALIZAÇÃO */}
-      <section id="localizacao" className="py-24 bg-white">
-        <div className="max-w-6xl mx-auto px-6">
-          <p className="text-xs uppercase tracking-[0.3em] mb-4 opacity-50">Localização</p>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Comerciário, Criciúma/SC</h2>
-          <p className="text-gray-500 mb-8">Rua Treze de Maio, 92 — Comerciário, Criciúma/SC</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <img src="https://estilofontana.com.br/images/2023/04/06/localizacao-bellante-642edb705c4c6.jpg?fm=webp" alt="Localização Bellante Residencial" className="w-full h-64 object-cover rounded-lg" />
-            <iframe src="https://maps.google.com/maps?q=Rua+Treze+de+Maio+92,+Comerci%C3%A1rio,+Crici%C3%BAma,+SC&output=embed" width="100%" height="256" style={{border:0}} allowFullScreen loading="lazy" className="rounded-lg" />
+      <section id="localizacao" style={{ padding: '6rem 1.5rem', background: '#fff' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+          <p style={{ color: ACCENT, fontSize: '0.7rem', letterSpacing: '0.3em', textTransform: 'uppercase', textAlign: 'center', marginBottom: '0.75rem' }}>Localização</p>
+          <div style={{ width: '40px', height: '2px', background: ACCENT, margin: '0 auto 2.5rem' }} />
+          <p style={{ textAlign: 'center', color: '#555', marginBottom: '2.5rem', fontSize: '1rem' }}>
+            Rua Treze de Maio, 92 — Comerciário, Criciúma/SC
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '2.5rem' }}>
+            <img src="https://estilofontana.com.br/images/2023/04/06/localizacao-bellante-642edb705c4c6.jpg?fm=webp"
+              alt="Localização Bellante Residencial — Comerciário Criciúma"
+              style={{ width: '100%', height: '300px', objectFit: 'cover', borderRadius: '4px' }} />
+            <div style={{ borderRadius: '4px', overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.1)' }}>
+              <iframe
+                src="https://maps.google.com/maps?q=Rua+Treze+de+Maio+92,+Comerci%C3%A1rio,+Crici%C3%BAma,+SC&output=embed"
+                width="100%" height="300" style={{ border: 0, display: 'block' }} allowFullScreen loading="lazy"
+              />
+            </div>
           </div>
-          <a href={WA} target="_blank" rel="noopener" className="inline-block text-white font-semibold uppercase tracking-widest text-sm px-8 py-4 transition-opacity hover:opacity-80" style={{background: ACENTO}}>
-            Agendar visita
-          </a>
+          <div style={{ textAlign: 'center' }}>
+            <a href={WA} target="_blank" rel="noopener"
+              style={{ background: ACCENT, color: '#fff', padding: '1rem 2.5rem', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', borderRadius: '2px', display: 'inline-block' }}>
+              AGENDAR VISITA
+            </a>
+          </div>
         </div>
       </section>
 
-      {/* CATÁLOGO */}
-      <section className="py-20 text-white" style={{background: ACENTO}}>
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Baixe o catálogo completo</h2>
-          <p className="text-white/80 text-lg mb-8">Plantas, acabamentos e todos os detalhes do Bellante Residencial.</p>
-          <a href="https://estilofontana.com.br/upload/empreendimento/catalogo/bellante-residencial-1681832793.pdf" target="_blank" rel="noopener" className="inline-block bg-white font-semibold uppercase tracking-widest text-sm px-10 py-4 hover:opacity-90 transition-opacity" style={{color: ACENTO}}>
-            Baixar catálogo
+      {/* CATÁLOGO DOWNLOAD */}
+      <section id="catalogo" style={{ background: ACCENT, padding: '5rem 1.5rem', textAlign: 'center' }}>
+        <div style={{ maxWidth: '700px', margin: '0 auto' }}>
+          <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.7rem', letterSpacing: '0.3em', textTransform: 'uppercase', marginBottom: '1rem' }}>Material Completo</p>
+          <h2 style={{ color: '#fff', fontSize: 'clamp(1.8rem,3vw,2.5rem)', fontWeight: 300, marginBottom: '1rem' }}>
+            Baixe o <strong style={{ fontWeight: 700 }}>catálogo completo</strong>
+          </h2>
+          <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '1rem', lineHeight: 1.7, marginBottom: '2rem' }}>
+            Plantas, acabamentos e todos os detalhes do Bellante Residencial.
+          </p>
+          <a href="https://estilofontana.com.br/upload/empreendimento/catalogo/bellante-residencial-1681832793.pdf"
+            target="_blank" rel="noopener"
+            style={{ background: '#fff', color: ACCENT, padding: '1rem 2.5rem', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', borderRadius: '2px', display: 'inline-block' }}>
+            BAIXAR CATÁLOGO
           </a>
         </div>
       </section>
 
       {/* FINANCIAMENTO DIRETO */}
-      <section className="py-24 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <p className="text-xs uppercase tracking-[0.3em] mb-4 opacity-50">Financiamento</p>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Financiamento Direto Fontana</h2>
-          <p className="text-gray-500 mb-12 text-lg">Sem burocracia. Sem banco. Sob consulta.</p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[['01','Converse conosco','Entre em contato pelo WhatsApp e apresente seu interesse.'],['02','Condições sob medida','A Fontana analisa e oferece condições personalizadas para você.'],['03','Realize seu sonho','Assine, garanta sua unidade e comece a viver o Bellante.']].map(([n,t,d]) => (
-              <div key={n} className="text-center">
-                <p className="text-4xl font-bold mb-4" style={{color: ACENTO}}>{n}</p>
-                <h3 className="text-lg font-bold mb-3">{t}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{d}</p>
+      <section id="financiamento" style={{ background: ACCENT_DARK, color: '#fff', padding: '6rem 1.5rem' }}>
+        <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
+          <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.7rem', letterSpacing: '0.3em', textTransform: 'uppercase', marginBottom: '0.75rem' }}>Facilidade</p>
+          <div style={{ width: '40px', height: '2px', background: 'rgba(255,255,255,0.4)', margin: '0 auto 2rem' }} />
+          <h2 style={{ fontSize: 'clamp(1.8rem,3vw,2.5rem)', fontWeight: 300, marginBottom: '1rem' }}>
+            Financiamento <strong style={{ fontWeight: 700 }}>Direto Fontana</strong>
+          </h2>
+          <p style={{ color: 'rgba(255,255,255,0.7)', marginBottom: '3rem', fontSize: '1rem' }}>Sem banco. Sem burocracia. Condições sob medida para você.</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem', marginBottom: '3rem' }}>
+            {[
+              { n: '01', t: 'Converse com Stiven', d: 'Entenda as condições e tire todas as suas dúvidas.' },
+              { n: '02', t: 'Condições sob medida', d: 'Parcelas e prazos personalizados para o seu perfil.' },
+              { n: '03', t: 'Realize seu sonho', d: 'Assine o contrato e conquiste seu apartamento.' },
+            ].map(({ n, t, d }) => (
+              <div key={n} style={{ padding: '2rem', background: 'rgba(255,255,255,0.07)', borderRadius: '2px' }}>
+                <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '2.5rem', color: 'rgba(255,255,255,0.3)', fontWeight: 300 }}>{n}</span>
+                <p style={{ fontWeight: 600, fontSize: '0.95rem', margin: '0.5rem 0 0.5rem', color: '#fff' }}>{t}</p>
+                <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.85rem', lineHeight: 1.6, margin: 0 }}>{d}</p>
               </div>
             ))}
           </div>
-          <a href={WA} target="_blank" rel="noopener" className="mt-12 inline-block text-white font-semibold uppercase tracking-widest text-sm px-10 py-4 transition-opacity hover:opacity-80" style={{background: ACENTO}}>
-            Iniciar conversa
+          <p style={{ fontSize: '1.5rem', color: '#fff', marginBottom: '0.5rem', fontWeight: 300 }}>Preço: <strong style={{ fontWeight: 700 }}>Sob consulta</strong></p>
+          <a href={WA} target="_blank" rel="noopener"
+            style={{ display: 'inline-block', marginTop: '1.5rem', background: '#fff', color: ACCENT_DARK, padding: '1rem 2.5rem', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', borderRadius: '2px' }}>
+            CONSULTAR CONDIÇÕES
           </a>
         </div>
       </section>
 
       {/* CTA FINAL */}
-      <section className="relative h-96 flex items-center justify-center text-center text-white">
-        <img src="https://estilofontana.com.br/images/empreendimento/slideshows/bellante-residencial-642b0899097e5.jpg?fm=webp" alt="Bellante Residencial" className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-black/70" />
-        <div className="relative z-10 px-6">
-          <h2 className="text-3xl md:text-5xl font-bold mb-6">Feito para você.</h2>
-          <a href={WA} target="_blank" rel="noopener" className="inline-block text-white font-semibold uppercase tracking-widest text-sm px-10 py-4 transition-opacity hover:opacity-80" style={{background: ACENTO}}>
-            Quero meu Bellante
+      <section style={{ position: 'relative', height: '60vh', minHeight: '400px', overflow: 'hidden' }}>
+        <img src={HERO} alt="Bellante Residencial"
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.65)' }} />
+        <div style={{ position: 'relative', zIndex: 2, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 1.5rem' }}>
+          <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#c8d8ef', fontSize: 'clamp(1.5rem,3vw,2.5rem)', fontStyle: 'italic', marginBottom: '2rem' }}>
+            "Feito para você."
+          </p>
+          <a href={WA} target="_blank" rel="noopener"
+            style={{ background: ACCENT, color: '#fff', padding: '1rem 2.5rem', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', borderRadius: '2px' }}>
+            FALAR COM STIVEN
           </a>
         </div>
       </section>
 
       {/* FOOTER */}
-      <footer className="bg-gray-950 text-white py-16">
-        <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div>
-            <p className="font-bold text-lg mb-2">Stiven Allan</p>
-            <p className="text-white/60 text-sm">CRECI 60.275</p>
-          </div>
-          <div>
-            <p className="font-bold mb-2">Bellante Residencial</p>
-            <p className="text-white/60 text-sm">Rua Treze de Maio, 92<br/>Comerciário — Criciúma/SC<br/>2 dorms · 1 suíte · 62–66 m²</p>
-          </div>
-          <div>
-            <a href={WA} target="_blank" rel="noopener" className="inline-block text-white font-semibold uppercase tracking-widest text-xs px-6 py-3 border border-white/30 hover:bg-white hover:text-gray-900 transition-colors">
-              WhatsApp
-            </a>
-          </div>
-        </div>
+      <footer style={{ background: '#0d0d0d', color: 'rgba(255,255,255,0.55)', padding: '3rem 1.5rem', textAlign: 'center' }}>
+        <p style={{ fontWeight: 700, color: '#fff', marginBottom: '0.5rem', fontSize: '1rem', letterSpacing: '0.1em' }}>STIVEN ALLAN</p>
+        <p style={{ fontSize: '0.8rem', marginBottom: '0.25rem' }}>CRECI/SC 60.275</p>
+        <a href={WA} target="_blank" rel="noopener" style={{ color: '#25D366', textDecoration: 'none', fontSize: '0.85rem' }}>WhatsApp: (48) 99164-2332</a>
+        <p style={{ marginTop: '1.5rem', fontSize: '0.75rem', color: 'rgba(255,255,255,0.3)' }}>Bellante Residencial · Comerciário, Criciúma/SC · Construtora Fontana</p>
       </footer>
 
-      {/* WhatsApp flutuante */}
-      <a href={WA} target="_blank" rel="noopener" aria-label="WhatsApp" className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full flex items-center justify-center shadow-lg" style={{background:'#25D366'}}>
-        <svg viewBox="0 0 32 32" className="w-7 h-7 fill-white"><path d="M16 0C7.163 0 0 7.163 0 16c0 2.833.74 5.49 2.034 7.797L0 32l8.448-2.007A15.93 15.93 0 0016 32c8.837 0 16-7.163 16-16S24.837 0 16 0zm8.03 22.47c-.332.936-1.946 1.784-2.666 1.892-.68.103-1.539.146-2.48-.156-.571-.183-1.304-.427-2.239-.838-3.938-1.706-6.502-5.688-6.7-5.954-.196-.265-1.601-2.133-1.601-4.068s1.013-2.884 1.374-3.278c.36-.393.785-.491 1.047-.491.261 0 .523.002.752.014.241.012.564-.092.883.673.332.795 1.128 2.73 1.226 2.927.098.196.163.426.033.685-.131.261-.196.424-.392.653-.196.228-.413.51-.589.685-.196.196-.4.408-.172.8.229.393.017.393 1.043 1.732 1.026 1.34 1.866 1.765 2.26 1.961.392.196.621.164.852-.098.229-.261.979-1.143 1.24-1.535.26-.392.523-.327.883-.196.36.131 2.29 1.08 2.682 1.275.393.196.653.294.752.458.098.163.098.948-.234 1.883z"/></svg>
+      {/* WHATSAPP FLUTUANTE */}
+      <a href={WA} target="_blank" rel="noopener" aria-label="WhatsApp"
+        style={{ position: 'fixed', bottom: '1.5rem', right: '1.5rem', zIndex: 100, background: '#25D366', color: '#fff', width: '56px', height: '56px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(0,0,0,0.25)', textDecoration: 'none', fontSize: '1.6rem' }}>
+        💬
       </a>
 
     </main>
