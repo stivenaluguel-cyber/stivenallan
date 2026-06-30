@@ -30,6 +30,10 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
+        hostname: '*.estilofontana.com.br',
+      },
+      {
+        protocol: 'https',
         hostname: 'drive.google.com',
       },
       {
