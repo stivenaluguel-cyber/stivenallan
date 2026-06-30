@@ -29,6 +29,15 @@ const IMG = {
 }
 
 const GALERIA: { src: string; alt: string; label: string }[] = [
+  { src: 'https://estilofontana.com.br/images/empreendimento/slideshows/parco-savello-residencial-6644aab323ce3.jpg?fm=webp', alt: 'Parco Savello Residencial — perspectiva do empreendimento no bairro Santa Barbara, Criciuma/SC', label: 'O Residencial' },
+  { src: 'https://estilofontana.com.br/images/2024/05/20/f-ps-fotomontagem-ef-aprovada-664bad69c0a0e.jpg?fm=webp', alt: 'Parco Savello Residencial — fachada fotomontagem aprovada', label: 'Fachada' },
+  { src: 'https://estilofontana.com.br/images/2024/05/20/f-ps-voo-passaro-ef-op3-web-aprovada-664babbb72fb9.jpg?fm=webp', alt: 'Parco Savello Residencial — vista aerea do empreendimento', label: 'Vista Aerea' },
+  { src: 'https://blog.estilofontana.com.br/wp-content/uploads/2024/06/lan%C3%A7amento-em-crici%C3%BAma-parco-savello-1.jpg', alt: 'Parco Savello Residencial — acesso principal e jardins', label: 'Acesso Principal' },
+  { src: 'https://www.estilofontana.com.br/blog/wp-content/uploads/2024/06/lan%C3%A7amento-em-Crici%C3%BAma-parco-savello-4.jpg', alt: 'Parco Savello Residencial — torre residencial ao entardecer', label: 'Torre' },
+  { src: 'https://www.estilofontana.com.br/blog/wp-content/uploads/2024/06/lan%C3%A7amento-em-Crici%C3%BAma-parco-savello-3.jpg', alt: 'Parco Savello Residencial — perspectiva aerea e entorno', label: 'Entorno' },
+  { src: 'https://www.estilofontana.com.br/blog/wp-content/uploads/2024/06/lan%C3%A7amento-em-Crici%C3%BAma-parco-savello-6.jpg', alt: 'Parco Savello Residencial — espaco de lazer e areas comuns', label: 'Lazer' },
+  { src: 'https://www.estilofontana.com.br/blog/wp-content/uploads/2024/06/lan%C3%A7amento-em-Crici%C3%BAma-parco-savello-5-1.jpg', alt: 'Parco Savello Residencial — jardins e paisagismo', label: 'Paisagismo' },
+] = [
   { src: IMG.hero, alt: 'Parco Savello Residencial — perspectiva do empreendimento no bairro Santa Barbara, Criciuma/SC', label: 'O Residencial' },
   { src: IMG.fachada, alt: 'Parco Savello Residencial — fachada fotomontagem aprovada', label: 'Fachada' },
   { src: IMG.aerea, alt: 'Parco Savello Residencial — vista aerea do empreendimento', label: 'Vista Aerea' },
