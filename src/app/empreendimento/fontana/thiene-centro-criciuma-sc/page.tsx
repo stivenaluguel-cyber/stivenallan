@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import GalleryWithLightbox from './gallery-lightbox'
 import Link from 'next/link'
 
 // Hotsite premium Thiene Residencial (Fontana, Centro Criciúma/SC). Padrão EPIC.
@@ -24,6 +25,15 @@ body: "\'Hanken Grotesk\', system-ui, sans-serif",
 const IMG = {
 hero: 'https://estilofontana.com.br/images/empreendimento/slideshows/thiene-residencial-64be6b2174a61.jpg?fm=webp',
 }
+
+const GALERIA: { src: string; alt: string; label: string }[] = [
+{ src: 'https://estilofontana.com.br/images/empreendimento/slideshows/thiene-residencial-64be6b2174a61.jpg?fm=webp', alt: 'Thiene Residencial - fachada', label: 'Fachada' },
+{ src: 'https://blog.estilofontana.com.br/wp-content/uploads/FON_THI_ACESSO_EF_web.jpg', alt: 'Thiene Residencial - acesso principal', label: 'Acesso' },
+{ src: 'https://www.estilofontana.com.br/blog/wp-content/uploads/FON_THI_FOTOMONTAGEM_EF_web.jpg', alt: 'Thiene Residencial - fotomontagem', label: 'Perspectiva' },
+{ src: 'https://www.estilofontana.com.br/blog/wp-content/uploads/FON_THI_SUITE_FINAL_01_EF_web.jpg', alt: 'Thiene Residencial - suíte', label: 'Suíte' },
+{ src: 'https://www.estilofontana.com.br/blog/wp-content/uploads/FON_THI_PISCINA_EF_web.jpg', alt: 'Thiene Residencial - piscina', label: 'Piscina' },
+{ src: 'https://www.estilofontana.com.br/blog/wp-content/uploads/FON_THI_FACHADA_ANGULAR_EF_web.jpg', alt: 'Thiene Residencial - fachada angular', label: 'Vista Angular' },
+]
 
 const DIFERENCIAIS: string[] = [
 'Living integrado',
@@ -129,6 +139,10 @@ html { scroll-behavior: smooth; }
 .th-navlink:hover { color: #fff; }
 .th-fade { opacity: 0; transform: translateY(24px); animation: thfade .9s ease forwards; }
 @keyframes thfade { to { opacity: 1; transform: none; } }
+.th-gcard { position: relative; overflow: hidden; cursor: zoom-in; }
+.th-gcard img { transition: transform .8s ease; }
+.th-gcard:hover img { transform: scale(1.06); }
+.th-gcard:focus { outline: 2px solid ${t.blue}; outline-offset: 2px; }
 .th-amen { display: flex; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid ${t.line}; font-size: 15px; }
 .th-amen::before { content: ''; width: 6px; height: 6px; background: ${t.blue}; border-radius: 50%; flex: 0 0 auto; }
 .th-wa { position: fixed; right: 20px; bottom: 20px; z-index: 60; width: 56px; height: 56px; border-radius: 50%; background: #25D366; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(0,0,0,0.25); text-decoration: none; }
@@ -147,6 +161,7 @@ details.th-menu > summary::-webkit-details-marker { display: none; }
 <a href="#top" style={{ fontFamily: t.display, fontWeight: 400, letterSpacing: '0.26em', fontSize: 16, color: '#fff', textDecoration: 'none', textTransform: 'uppercase' }}>Thiene</a>
 <div className="th-nav-links" style={{ display: 'flex', alignItems: 'center', gap: 30 }}>
 <a href="#residencial" className="th-navlink">O Residencial</a>
+<a href="#galeria" className="th-navlink">Galeria</a>
 <a href="#residencias" className="th-navlink">As Residências</a>
 <a href="#diferenciais" className="th-navlink">Diferenciais</a>
 <a href="#localizacao" className="th-navlink">Localização</a>
@@ -156,6 +171,7 @@ details.th-menu > summary::-webkit-details-marker { display: none; }
 <summary style={{ cursor: 'pointer', color: '#fff', fontSize: 22, lineHeight: 1, padding: 6 }} aria-label="Abrir menu">&#9776;</summary>
 <div style={{ position: 'absolute', right: 0, top: '120%', background: t.blueDark, padding: '18px 22px', display: 'flex', flexDirection: 'column', gap: 16, minWidth: 200, boxShadow: '0 12px 40px rgba(0,0,0,0.35)' }}>
 <a href="#residencial" className="th-navlink">O Residencial</a>
+<a href="#galeria" className="th-navlink">Galeria</a>
 <a href="#residencias" className="th-navlink">As Residências</a>
 <a href="#diferenciais" className="th-navlink">Diferenciais</a>
 <a href="#localizacao" className="th-navlink">Localização</a>
@@ -194,7 +210,18 @@ No Centro da cidade, com tudo a poucos passos, o Thiene entrega espaço, sofisti
 </div>
 </section>
 
-{/* 3 AS RESIDÊNCIAS */}
+{/* 3 GALERIA */}
+<section id="galeria" style={{ padding: 'clamp(40px,8vh,80px) 0 0' }}>
+<div style={{ textAlign: 'center', padding: '0 clamp(18px,5vw,56px) clamp(34px,6vh,60px)' }}>
+<p className="th-eyebrow" style={{ marginBottom: 16 }}>Galeria</p>
+<h2 className="th-h2">Sofisticação<br />em cada detalhe</h2>
+</div>
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 2 }}>
+<GalleryWithLightbox galeria={GALERIA} prefix="th" gradient="rgba(10,21,32,0.55)" />
+</div>
+</section>
+
+{/* 4 AS RESIDÊNCIAS */}
 <section id="residencias" style={{ background: t.dark, color: t.onDark, padding: 'clamp(80px,14vh,160px) clamp(18px,5vw,56px)' }}>
 <div style={{ maxWidth: 1080, margin: '0 auto', textAlign: 'center' }}>
 <p className="th-eyebrow" style={{ color: t.onDark, marginBottom: 18 }}>As Residências</p>
@@ -216,7 +243,7 @@ No Centro da cidade, com tudo a poucos passos, o Thiene entrega espaço, sofisti
 </div>
 </section>
 
-{/* 4 DIFERENCIAIS DAS UNIDADES */}
+{/* 5 DIFERENCIAIS DAS UNIDADES */}
 <section id="diferenciais" style={{ padding: 'clamp(80px,14vh,160px) clamp(18px,5vw,56px)' }}>
 <div style={{ maxWidth: 1120, margin: '0 auto' }}>
 <div style={{ textAlign: 'center', marginBottom: 'clamp(40px,7vh,72px)' }}>
@@ -234,7 +261,7 @@ No Centro da cidade, com tudo a poucos passos, o Thiene entrega espaço, sofisti
 </div>
 </section>
 
-{/* 5 LAZER & ÁREAS COMUNS */}
+{/* 6 LAZER & ÁREAS COMUNS */}
 <section style={{ background: t.dark, color: t.onDark, padding: 'clamp(80px,12vh,140px) clamp(18px,5vw,56px)' }}>
 <div style={{ maxWidth: 1180, margin: '0 auto' }}>
 <div style={{ textAlign: 'center', marginBottom: 'clamp(40px,7vh,72px)' }}>
@@ -252,7 +279,7 @@ No Centro da cidade, com tudo a poucos passos, o Thiene entrega espaço, sofisti
 </div>
 </section>
 
-{/* 6 LOCALIZAÇÃO */}
+{/* 7 LOCALIZAÇÃO */}
 <section id="localizacao" style={{ padding: 'clamp(80px,12vh,140px) clamp(18px,5vw,56px)', background: t.bg }}>
 <div style={{ maxWidth: 1180, margin: '0 auto' }}>
 <div style={{ maxWidth: 640 }}>
@@ -270,7 +297,7 @@ Com tudo a poucos passos, o Thiene coloca você no centro da vida urbana de Cric
 </div>
 </section>
 
-{/* 7 FINANCIAMENTO DIRETO */}
+{/* 8 FINANCIAMENTO DIRETO */}
 <section style={{ background: t.blue, color: t.onDark, padding: 'clamp(80px,14vh,160px) clamp(18px,5vw,56px)' }}>
 <div style={{ maxWidth: 1080, margin: '0 auto', textAlign: 'center' }}>
 <p className="th-eyebrow" style={{ color: t.onDark, marginBottom: 18 }}>Financiamento Direto</p>
@@ -293,7 +320,7 @@ Com tudo a poucos passos, o Thiene coloca você no centro da vida urbana de Cric
 </div>
 </section>
 
-{/* 8 CTA FINAL */}
+{/* 9 CTA FINAL */}
 <section style={{ position: 'relative', minHeight: '78vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
 <Image src={IMG.hero} alt="Thiene Residencial — Centro, Criciúma/SC" fill loading="lazy" sizes="100vw" style={{ objectFit: 'cover' }} />
 <div style={{ position: 'absolute', inset: 0, background: 'rgba(10,21,32,0.65)' }} />
