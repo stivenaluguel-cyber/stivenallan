@@ -1,7 +1,5 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { getSupabaseClient } from '@/lib/supabase'
-import { c, font, brl, ui } from '@/lib/theme'
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://stivenallan.vercel.app'
 const WPP = 'https://wa.me/5548991642332'
@@ -15,16 +13,26 @@ export const metadata = {
     title: 'Morar bem não deveria depender de um banco. | Stiven Allan',
     description: 'Empreendimentos com financiamento direto da construtora. Sul de Santa Catarina.',
     url: SITE_URL, siteName: 'Stiven Allan — Imóveis', locale: 'pt_BR', type: 'website',
-    images: [{ url: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80', width: 1200, height: 630 }],
+    images: [{ url: 'https://estilofontana.com.br/images/2025/08/28/f-ml-voo-passaro-ef-web-68b0986133a09.jpg?fm=webp', width: 1200, height: 630 }],
   },
+  twitter: { card: 'summary_large_image', title: 'Morar bem não deveria depender de um banco.', images: ['https://estilofontana.com.br/images/2025/08/28/f-ml-voo-passaro-ef-web-68b0986133a09.jpg?fm=webp'] },
+  robots: { index: true, follow: true },
 }
 
-const PORTFOLIO_FALLBACK = [
-  { id: '1', nome: 'Monte Leone Residencial', slug: 'monte-leone-centro-criciuma-sc', construtora_slug: 'fontana', construtora_nome: 'Construtora Fontana', bairro: 'Centro', cidade: 'Criciúma', uf: 'SC', regiao: 'cidade', status_obra: 'na planta', area_min: 230, area_max: 253, exibir_preco: false, preco_a_partir_de: null, frase: 'Viver no centro com a sofisticação que você merece.', imagem_capa_url: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=700&q=80' },
-  { id: '2', nome: 'Lavis Residencial', slug: 'lavis-residencial-centro-criciuma-sc', construtora_slug: 'fontana', construtora_nome: 'Construtora Fontana', bairro: 'Centro', cidade: 'Criciúma', uf: 'SC', regiao: 'cidade', status_obra: 'em obras', area_min: 65, area_max: 95, exibir_preco: false, preco_a_partir_de: 0, frase: 'Sofisticação em movimento — Centro de Criciúma.', imagem_capa_url: 'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=700&q=80' },
-  { id: '3', nome: 'Pineto Residencial', slug: 'pineto-centro-criciuma-sc', construtora_slug: 'fontana', construtora_nome: 'Construtora Fontana', bairro: 'Centro', cidade: 'Criciúma', uf: 'SC', regiao: 'cidade', status_obra: 'na planta', area_min: 75, area_max: 76, exibir_preco: true, preco_a_partir_de: 619250, frase: 'Na planta no Centro de Criciúma, com financiamento direto com a construtora.', imagem_capa_url: 'https://lh3.googleusercontent.com/d/1WoeVn8nWbU-Zbr-NGK9fT-quhSH_OFas=w1200' },
-  { id: '4', nome: 'Águas de Marano Residencial', slug: 'aguas-de-marano-frente-mar-balneario-picarras-sc', construtora_slug: 'fontana', construtora_nome: 'Construtora Fontana', bairro: 'Centro', cidade: 'Balneário Piçarras', uf: 'SC', regiao: 'praia', status_obra: 'em obras', area_min: 196, area_max: 199, exibir_preco: false, preco_a_partir_de: null, frase: 'Frente mar — mergulhe em cada detalhe.', imagem_capa_url: 'https://estilofontana.com.br/images/empreendimento/slideshows/aguas-de-marano-residencial-65a583e5c68f2.jpg?fm=webp' },
-  { id: '5', nome: 'Fidenza Residencial', slug: 'fidenza-residencial-cruzeiro-do-sul-criciuma-sc', construtora_slug: 'fontana', construtora_nome: 'Construtora Fontana', bairro: 'Cruzeiro do Sul', cidade: 'Criciúma', uf: 'SC', regiao: 'cidade', status_obra: 'em obras', area_min: 149, area_max: 161, exibir_preco: false, preco_a_partir_de: null, frase: 'Autenticidade em cada detalhe — Cruzeiro do Sul.', imagem_capa_url: 'https://estilofontana.com.br/images/2024/09/02/f-f-fachada-frontal-r05-ef-web-66d61ccec113e.jpg?fm=webp' },
+const t = {
+  bg: '#FAFAF8', ink: '#1A1814', champagne: '#B89B5E', chamDark: '#8A7240',
+  muted: '#6B655B', line: 'rgba(26,24,20,0.10)', dark: '#141210',
+  onDark: '#F5F1EA', onDarkMuted: 'rgba(245,241,234,0.60)',
+  display: "'Jost', system-ui, sans-serif",
+  serif: "'Cormorant Garamond', Georgia, serif",
+  body: "'Hanken Grotesk', system-ui, sans-serif",
+}
+
+const EMPREENDIMENTOS = [
+  { id: '1', nome: 'Monte Leone Residencial', slug: 'monte-leone-centro-criciuma-sc', construtora_slug: 'fontana', construtora: 'Construtora Fontana', bairro: 'Centro', cidade: 'Criciúma', uf: 'SC', status: 'na planta', exibir_preco: false, preco: null, frase: 'Viver no centro com a sofisticação que você merece.', img: 'https://estilofontana.com.br/images/2025/08/28/f-ml-voo-passaro-ef-web-68b0986133a09.jpg?fm=webp' },
+  { id: '2', nome: 'Lavis Residencial', slug: 'lavis-residencial-centro-criciuma-sc', construtora_slug: 'fontana', construtora: 'Construtora Fontana', bairro: 'Centro', cidade: 'Criciúma', uf: 'SC', status: 'em obras', exibir_preco: false, preco: null, frase: 'Sofisticação em movimento — Centro de Criciúma.', img: 'https://estilofontana.com.br/images/empreendimento/slideshows/lavis-residencial-6926d1adaa325.jpg?fm=webp' },
+  { id: '3', nome: 'Águas de Marano Residencial', slug: 'aguas-de-marano-frente-mar-balneario-picarras-sc', construtora_slug: 'fontana', construtora: 'Construtora Fontana', bairro: 'Centro', cidade: 'Balneário Piçarras', uf: 'SC', status: 'em obras', exibir_preco: false, preco: null, frase: 'Frente mar — mergulhe em cada detalhe.', img: 'https://estilofontana.com.br/images/empreendimento/slideshows/aguas-de-marano-residencial-65a583e5c68f2.jpg?fm=webp' },
+  { id: '4', nome: 'Fidenza Residencial', slug: 'fidenza-residencial-cruzeiro-do-sul-criciuma-sc', construtora_slug: 'fontana', construtora: 'Construtora Fontana', bairro: 'Cruzeiro do Sul', cidade: 'Criciúma', uf: 'SC', status: 'em obras', exibir_preco: false, preco: null, frase: 'Autenticidade em cada detalhe — Cruzeiro do Sul.', img: 'https://estilofontana.com.br/images/2024/09/02/f-f-fachada-frontal-r05-ef-web-66d61ccec113e.jpg?fm=webp' },
 ]
 
 const DEPOIMENTOS = [
@@ -33,374 +41,292 @@ const DEPOIMENTOS = [
   { nome: 'Fernando B.', cidade: 'Nova Veneza, SC', texto: 'A flexibilidade do financiamento direto foi o que fez a diferença. Sem filas, sem aprovação, só resultado.' },
 ]
 
-const MARQUEE_ITEMS = ['Financiamento Direto', 'Sem Banco', 'Lançamentos', 'Sul Catarinense', 'Construtoras Parceiras', 'CRECI/RS 60.275', 'Sul de Santa Catarina', 'Visitas VIP', 'Financiamento Direto', 'Sem Banco', 'Lançamentos', 'Sul Catarinense', 'Construtoras Parceiras', 'CRECI/RS 60.275', 'Sul de Santa Catarina', 'Visitas VIP']
-
-// Helper: exibe preco ou "Sob consulta" — sem React.CSSProperties para evitar erro de tipo
-function PrecoDisplay({ exibir_preco, preco_a_partir_de, dark }: { exibir_preco: boolean; preco_a_partir_de: number | null; dark?: boolean }) {
-  const color = dark ? 'rgba(245,241,234,0.6)' : c.muted
-  const base = { fontSize: 13, fontWeight: 700, color } as const
-  if (exibir_preco && preco_a_partir_de) {
-    return <div style={base}>A partir de {brl(preco_a_partir_de)}</div>
-  }
-  return <div style={base}>Sob consulta</div>
-}
-
-async function getEmpreendimentosDB() {
-  try {
-    const supabase = getSupabaseClient()
-    if (!supabase) return null
-    const { data, error } = await supabase
-      .from('empreendimentos')
-      .select('id, nome, slug, bairro, cidade, uf, status_obra, area_privativa_min, area_privativa_max, imagem_capa_url, construtora, exibir_preco, preco_a_partir_de')
-      .eq('status_venda', 'ativo')
-      .order('created_at', { ascending: false })
-      .limit(6)
-    if (error || !data?.length) return null
-    return data.map((e: any) => ({
-      id: e.id, nome: e.nome, slug: e.slug,
-      construtora_slug: (e.construtora || 'fontana').toLowerCase().replace(/\s+/g, '-').normalize('NFD').replace(/[\u0300-\u036f]/g, ''),
-      construtora_nome: e.construtora || 'Construtora',
-      bairro: e.bairro || '', cidade: e.cidade || 'Criciúma', uf: e.uf || 'SC',
-      regiao: 'cidade', status_obra: e.status_obra || 'na planta',
-      exibir_preco: e.exibir_preco ?? false,
-      preco_a_partir_de: e.preco_a_partir_de ?? null,
-      frase: 'Um novo padrão de viver no Sul Catarinense.',
-      area_min: e.area_privativa_min, area_max: e.area_privativa_max,
-      imagem_capa_url: e.imagem_capa_url || 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=700&q=80',
-    }))
-  } catch { return null }
-}
-
-async function getCidadesComEmpreendimentos(): Promise<string[]> {
-  try {
-    const supabase = getSupabaseClient()
-    if (!supabase) return ['criciúma']
-    const { data } = await supabase
-      .from('empreendimentos')
-      .select('cidade')
-      .eq('status_venda', 'ativo')
-    if (!data?.length) return ['criciúma']
-    return [...new Set(data.map((d: any) => (d.cidade || '').toLowerCase()))]
-  } catch { return ['criciúma'] }
-}
-
-function cidadeParaSlug(cidade: string): string {
-  return cidade.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '-')
-}
-
-const REGIOES_CONFIG = [
-  { id: 'praia', label: 'PRAIA', icon: '🏖️', cidades: ['Balneário Piçarras', 'Rincão', 'Laguna'], cor: '#2563eb' },
-  { id: 'serra', label: 'SERRA', icon: '⛰️', cidades: ['Nova Veneza', 'Bom Jardim da Serra'], cor: '#16a34a' },
-  { id: 'cidade', label: 'CIDADE', icon: '🏙️', cidades: ['Criciúma', 'Içara', 'Forquilhinha'], cor: '#9333ea' },
+const COMO_FUNCIONA = [
+  { n: '01', titulo: 'Escolha o imóvel', desc: 'Navegue pelo portfólio e escolha o empreendimento ideal para o seu estilo de vida e objetivos.' },
+  { n: '02', titulo: 'Simulação personalizada', desc: 'Stiven estrutura um plano de pagamento sob medida, sem intermediação bancária.' },
+  { n: '03', titulo: 'Contrato direto', desc: 'Assinatura direta com a construtora. Sem aprovação de crédito, sem burocracia.' },
+  { n: '04', titulo: 'Chaves na mão', desc: 'Acompanhamento completo até a entrega. Seu imóvel, do jeito que você imaginou.' },
 ]
 
-function SiteHeader() {
+const METRICAS = [
+  { valor: '4+', label: 'Empreendimentos ativos' },
+  { valor: '100%', label: 'Financiamento direto' },
+  { valor: '2', label: 'Construtoras parceiras' },
+  { valor: 'SC', label: 'Sul de Santa Catarina' },
+]
+
+const SCHEMA = JSON.stringify({ '@context': 'https://schema.org', '@type': 'RealEstateAgent', name: 'Stiven Allan', url: 'https://stivenallan.vercel.app', telephone: '+5548991642332', areaServed: { '@type': 'State', name: 'Santa Catarina' } })
+
+function StatusBadge({ status }: { status: string }) {
+  const map: Record<string, { label: string; bg: string; color: string }> = {
+    'na planta': { label: 'Na planta', bg: 'rgba(184,155,94,0.12)', color: '#8A7240' },
+    'em obras':  { label: 'Em obras',  bg: 'rgba(184,155,94,0.12)', color: '#8A7240' },
+    'pronto':    { label: 'Pronto',    bg: 'rgba(40,120,60,0.10)',  color: '#2a7840' },
+  }
+  const s = map[status] || map['na planta']
   return (
-    <header style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, background: 'rgba(243,242,238,0.94)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', borderBottom: `1px solid ${c.line}` }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 clamp(16px,4vw,40px)', height: 70, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Link href="/" style={{ fontFamily: font.display, fontWeight: 800, fontSize: 18, letterSpacing: '-0.02em', color: c.ink, textDecoration: 'none' }}>
-          STIVEN ALLAN
-          <span style={{ display: 'block', fontSize: 9, fontWeight: 500, letterSpacing: '0.2em', color: c.muted, marginTop: 1, fontFamily: font.body }}>FINANCIAMENTO DIRETO · SUL SC</span>
-        </Link>
-        <nav style={{ display: 'flex', alignItems: 'center', gap: 28 }}>
-          {[['/#empreendimentos', 'Empreendimentos'], ['/#como-funciona', 'Como Funciona'], ['/#sobre', 'Sobre']].map(([href, label]) => (
-            <Link key={href} href={href} style={{ fontSize: 13, fontWeight: 600, color: c.muted, textDecoration: 'none' }}>{label}</Link>
-          ))}
-          <a href={WPP_MSG} target="_blank" rel="noopener noreferrer" style={{ ...ui.btnConvert, fontSize: 13, padding: '10px 20px' }}>Tenho Interesse</a>
-        </nav>
-      </div>
-    </header>
+    <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.22em', textTransform: 'uppercase', background: s.bg, color: s.color, padding: '4px 10px', fontFamily: t.body }}>
+      {s.label}
+    </span>
   )
 }
 
-const STATUS_BADGE: Record<string, string> = { 'na planta': '#1d4ed8', 'em obras': '#d97706', 'pronto': '#16a34a', 'lancamento': '#7c3aed', 'lançamento': '#7c3aed' }
-
-function WppFloat() {
+function EmpCard({ emp }: { emp: typeof EMPREENDIMENTOS[0] }) {
+  const href = `/empreendimento/${emp.construtora_slug}/${emp.slug}`
+  const wpp = WPP + `?text=Ol%C3%A1+Stiven!+Tenho+interesse+no+${encodeURIComponent(emp.nome)}.`
   return (
-    <a href={WPP_MSG} target="_blank" rel="noopener noreferrer" style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 90, width: 56, height: 56, borderRadius: '50%', background: '#25d366', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 24px rgba(37,211,102,0.45)', textDecoration: 'none' }}>
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-    </a>
-  )
-}
-
-function SiteFooter({ cidades }: { cidades: string[] }) {
-  return (
-    <footer style={{ background: c.charcoal, color: c.onDark, padding: 'clamp(56px,7vw,96px) clamp(16px,4vw,56px) 36px' }}>
-      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 48, marginBottom: 56 }}>
-          <div>
-            <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 22, letterSpacing: '-0.02em', marginBottom: 6 }}>STIVEN ALLAN</div>
-            <div style={{ fontSize: 11, color: c.onDarkMuted, letterSpacing: '0.2em', marginBottom: 20 }}>CRECI/RS 60.275</div>
-            <p style={{ fontSize: 13, color: c.onDarkMuted, lineHeight: 1.75, maxWidth: 260 }}>Especialista em empreendimentos com financiamento direto no Sul de Santa Catarina.</p>
-            <div style={{ marginTop: 20, fontSize: 12, color: 'rgba(245,241,234,0.4)', lineHeight: 1.8 }}>{cidades.join(' · ')}</div>
+    <article className="home-card">
+      <Link href={href} style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
+        <div style={{ position: 'relative', aspectRatio: '4/3', overflow: 'hidden', background: '#e8e4dc' }}>
+          <Image src={emp.img} alt={emp.nome} fill sizes="(max-width:768px)100vw,50vw" style={{ objectFit: 'cover' }} />
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(26,24,20,0.55), transparent 50%)' }} />
+          <div style={{ position: 'absolute', top: 16, left: 16, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            <StatusBadge status={emp.status} />
+            <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.22em', textTransform: 'uppercase', background: 'rgba(184,155,94,0.15)', color: '#8A7240', padding: '4px 10px', fontFamily: t.body }}>Financiamento direto</span>
           </div>
-          <div>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.25em', color: c.bronze, marginBottom: 18 }}>EMPREENDIMENTOS</div>
-            {cidades.map(cid => (
-              <div key={cid} style={{ marginBottom: 10 }}>
-                <Link href={`/lancamentos/${cid.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,'-')}-sc`} style={{ fontSize: 13, color: 'rgba(245,241,234,0.55)', textDecoration: 'none' }}>{cid}/SC</Link>
-              </div>
-            ))}
+          <div style={{ position: 'absolute', bottom: 16, left: 16, right: 16 }}>
+            <p style={{ margin: 0, fontFamily: t.body, fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(245,241,234,0.70)', marginBottom: 4 }}>{emp.construtora}</p>
+            <h3 style={{ margin: 0, fontFamily: t.display, fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.10em', fontSize: 'clamp(18px,2.5vw,24px)', color: '#F5F1EA', lineHeight: 1.1 }}>{emp.nome}</h3>
           </div>
-          <div>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.25em', color: c.bronze, marginBottom: 18 }}>CONTATO</div>
-            <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ fontSize: 14, color: '#25d366', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14, fontWeight: 600 }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="#25d366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-              (48) 99164-2332
+        </div>
+        <div style={{ padding: '20px 22px 22px', background: t.bg, borderBottom: `1px solid ${t.line}` }}>
+          <p style={{ margin: '0 0 8px', fontFamily: t.body, fontSize: 12, color: t.champagne, letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 500 }}>{emp.bairro} · {emp.cidade}/{emp.uf}</p>
+          <p style={{ margin: '0 0 16px', fontFamily: t.serif, fontStyle: 'italic', fontSize: 'clamp(15px,1.6vw,17px)', color: t.ink, lineHeight: 1.5 }}>{emp.frase}</p>
+          <p style={{ margin: '0 0 18px', fontFamily: t.body, fontSize: 13, color: t.muted, fontWeight: 500 }}>{emp.exibir_preco && emp.preco ? `A partir de R$ ${emp.preco.toLocaleString('pt-BR')}` : 'Sob consulta'}</p>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span className="home-cta-primary" style={{ fontFamily: t.body, fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.ink, borderBottom: `1px solid ${t.champagne}`, paddingBottom: 2, fontWeight: 500 }}>Ver detalhes →</span>
+            <a href={wpp} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} style={{ width: 36, height: 36, borderRadius: '50%', background: '#25D366', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }} aria-label={`WhatsApp sobre ${emp.nome}`}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
             </a>
-            <a href="https://instagram.com/stivenallan.ofc" target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: 'rgba(245,241,234,0.55)', textDecoration: 'none', display: 'block' }}>@stivenallan.ofc</a>
           </div>
         </div>
-        <div style={{ borderTop: `1px solid ${c.lineDark}`, paddingTop: 24, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
-          <p style={{ fontSize: 12, color: 'rgba(245,241,234,0.35)' }}>© {new Date().getFullYear()} Stiven Allan. CRECI/RS 60.275. Todos os direitos reservados.</p>
-          <p style={{ fontSize: 12, color: 'rgba(245,241,234,0.35)' }}>Sul de Santa Catarina</p>
-        </div>
-      </div>
-    </footer>
+      </Link>
+    </article>
   )
 }
 
-export default async function HomePage() {
-  const [dbPortfolio, cidadesComEmp] = await Promise.all([getEmpreendimentosDB(), getCidadesComEmpreendimentos()])
-  const portfolio = dbPortfolio || PORTFOLIO_FALLBACK
-  const cidadesAtivas = Array.from(new Set([...cidadesComEmp, ...portfolio.map((e: any) => (e.cidade || '').toLowerCase())].filter(Boolean)))
-  const cidadesNomes = Array.from(new Set(portfolio.map((e: any) => e.cidade).filter(Boolean)))
-  const destaque = portfolio[0]
-
-  const regioesVisiveis = REGIOES_CONFIG.map(r => ({
-    ...r, cidadesVisiveis: r.cidades.filter(c2 => cidadesAtivas.includes(c2.toLowerCase())),
-  })).filter(r => r.cidadesVisiveis.length > 0)
-
+export default function HomePage() {
   return (
     <>
-      <SiteHeader />
-      <section style={{ position: 'relative', minHeight: '100svh', display: 'flex', alignItems: 'center', overflow: 'hidden', background: '#0d0c0b' }}>
-        <Image src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1800&q=90" alt="Empreendimento no Sul de Santa Catarina" fill priority quality={90} style={{ objectFit: 'cover', objectPosition: 'center 40%', opacity: 0.28 }} sizes="100vw" />
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(10,9,8,0.85) 0%, rgba(10,9,8,0.3) 60%, rgba(10,9,8,0.7) 100%)' }} />
-        <div style={{ position: 'relative', zIndex: 2, width: '100%', maxWidth: 1100, margin: '0 auto', padding: 'clamp(110px,14vw,160px) clamp(20px,5vw,56px) clamp(80px,10vw,120px)' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 40, padding: '6px 16px', marginBottom: 28 }}>
-            <span style={{ width: 6, height: 6, borderRadius: '50%', background: c.bronze, display: 'inline-block', flexShrink: 0 }} />
-            <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(245,241,234,0.7)', letterSpacing: '0.18em', textTransform: 'uppercase' }}>CRECI/RS 60.275 · Sul de Santa Catarina</span>
-          </div>
-          <h1 style={{ fontFamily: font.display, fontWeight: 800, fontSize: 'clamp(2.4rem,6.5vw,5.2rem)', lineHeight: 1.02, letterSpacing: '-0.035em', color: '#f5f1ea', marginBottom: 28, maxWidth: '15ch' }}>Morar bem não deveria depender de um banco.</h1>
-          <p style={{ fontSize: 'clamp(15px,1.8vw,18px)', color: 'rgba(245,241,234,0.65)', marginBottom: 48, maxWidth: '52ch', lineHeight: 1.7 }}>Empreendimentos com financiamento direto da construtora — sem a burocracia do banco.</p>
-          <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
-            <a href="#empreendimentos" style={{ ...ui.btnConvert, boxShadow: '0 8px 28px rgba(255,106,61,0.35)', fontSize: 15, padding: '14px 28px' }}>Conhecer empreendimentos</a>
-            <a href={WPP_MSG} target="_blank" rel="noopener noreferrer" style={{ ...ui.btnSecondary, color: '#f5f1ea', borderColor: 'rgba(245,241,234,0.28)', fontSize: 15, padding: '14px 28px', display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="#25d366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-              Falar no WhatsApp
-            </a>
-          </div>
-        </div>
-      </section>
-      <div style={{ background: c.bronze, padding: '11px 0', overflow: 'hidden' }}>
-        <div className="marquee-track" style={{ display: 'flex', gap: 0 }}>
-          {MARQUEE_ITEMS.map((item, i) => (
-            <span key={i} style={{ fontFamily: font.display, fontWeight: 700, fontSize: 13, color: c.onDark, letterSpacing: '0.05em', textTransform: 'uppercase', padding: '0 24px', whiteSpace: 'nowrap' }}>
-              {item}<span style={{ marginLeft: 24, color: 'rgba(243,242,238,0.4)' }}>•</span>
-            </span>
-          ))}
-        </div>
-      </div>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: SCHEMA }} />
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,400;1,300;1,400&family=Hanken+Grotesk:wght@300;400;500&display=swap');
+        html { scroll-behavior: smooth; }
+        *, *::before, *::after { box-sizing: border-box; }
+        body { margin: 0; background: #FAFAF8; color: #1A1814; font-family: 'Hanken Grotesk', system-ui, sans-serif; }
+        .home-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; transition: background .35s ease, box-shadow .35s ease; background: transparent; }
+        @supports (animation-timeline: scroll()) {
+          .home-nav { animation: nav-fill linear both; animation-timeline: scroll(); animation-range: 0px 80px; }
+          @keyframes nav-fill { to { background: rgba(250,250,248,0.96); backdrop-filter: blur(20px); box-shadow: 0 1px 0 rgba(26,24,20,0.08); } }
+        }
+        .home-eyebrow { font-size: 11px; letter-spacing: 0.42em; text-transform: uppercase; color: #B89B5E; font-family: 'Hanken Grotesk', system-ui, sans-serif; font-weight: 500; }
+        .home-h1 { font-family: 'Jost', system-ui, sans-serif; font-weight: 300; text-transform: uppercase; letter-spacing: 0.12em; line-height: 1.06; margin: 0; }
+        .home-h2 { font-family: 'Jost', system-ui, sans-serif; font-weight: 300; text-transform: uppercase; letter-spacing: 0.14em; line-height: 1.1; margin: 0; font-size: clamp(26px,4vw,44px); }
+        .home-serif { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-weight: 300; }
+        .home-rule { width: 48px; height: 1px; background: #B89B5E; border: 0; margin: 0; }
+        .home-card { background: #FAFAF8; overflow: hidden; transition: transform .35s ease, box-shadow .35s ease; }
+        .home-card:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(26,24,20,0.12); }
+        .home-cta-primary { transition: border-color .25s ease, color .25s ease; cursor: pointer; }
+        .home-cta-primary:hover { color: #B89B5E; }
+        .home-btn { display: inline-block; font-family: 'Hanken Grotesk', system-ui, sans-serif; font-size: 11px; letter-spacing: 0.32em; text-transform: uppercase; color: #1A1814; border: 1px solid #1A1814; padding: 15px 36px; text-decoration: none; transition: background .3s ease, color .3s ease; }
+        .home-btn:hover { background: #1A1814; color: #FAFAF8; }
+        .home-btn--cham { border-color: #B89B5E; color: #B89B5E; }
+        .home-btn--cham:hover { background: #B89B5E; color: #FAFAF8; }
+        .home-step-n { font-family: 'Jost', system-ui, sans-serif; font-weight: 300; font-size: clamp(40px,6vw,64px); color: rgba(184,155,94,0.18); letter-spacing: 0.04em; line-height: 1; }
+        .home-dep-card { background: #fff; padding: 36px 32px; border-top: 2px solid #B89B5E; }
+        .home-region-btn { font-family: 'Hanken Grotesk', system-ui, sans-serif; font-size: 10px; letter-spacing: 0.30em; text-transform: uppercase; color: #6B655B; border: 1px solid rgba(26,24,20,0.15); padding: 10px 22px; background: transparent; text-decoration: none; display: inline-block; transition: border-color .25s, color .25s; }
+        .home-region-btn:hover { border-color: #B89B5E; color: #B89B5E; }
+        .home-wa-float { position: fixed; right: 22px; bottom: 22px; z-index: 60; width: 54px; height: 54px; border-radius: 50%; background: #25D366; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(37,211,102,0.35); transition: transform .2s ease; }
+        .home-wa-float:hover { transform: scale(1.08); }
+        @keyframes fadein { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:none; } }
+        .fade-in { animation: fadein .7s ease both; }
+        .fade-in-1 { animation-delay: .10s; } .fade-in-2 { animation-delay: .22s; } .fade-in-3 { animation-delay: .34s; } .fade-in-4 { animation-delay: .46s; }
+        @media (max-width: 768px) { .home-cards-grid { grid-template-columns: 1fr !important; } .home-how-grid { grid-template-columns: 1fr 1fr !important; } .home-metrics-grid { grid-template-columns: 1fr 1fr !important; } .home-footer-grid { grid-template-columns: 1fr !important; gap: 40px !important; } .home-dep-grid { grid-template-columns: 1fr !important; } }
+        @media (max-width: 480px) { .home-how-grid { grid-template-columns: 1fr !important; } }
+      `}</style>
 
-      {/* 2. NAVEGAÇÃO POR REGIÃO — só exibe regiões com empreendimentos */}
-      {regioesVisiveis.length > 0 && (
-        <section style={{ background: c.paper, padding: 'clamp(56px,7vw,96px) clamp(16px,4vw,56px)' }}>
-          <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-            <div style={{ textAlign: 'center', marginBottom: 'clamp(36px,4vw,56px)' }}>
-              <span style={{ ...ui.eyebrow, display: 'block', marginBottom: 12 }}>ONDE ATUAMOS</span>
-              <h2 style={{ ...ui.h2, color: c.ink }}>Escolha sua região</h2>
-              <p style={{ fontSize: 16, color: c.muted, marginTop: 12, maxWidth: '44ch', margin: '12px auto 0' }}>Do litoral à serra e às cidades do Sul Catarinense, curadoria de empreendimentos para cada estilo de vida.</p>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))', gap: 20, justifyContent: 'center' }}>
-              {regioesVisiveis.map((r) => (
-                <div key={r.id} style={{ background: c.surface, border: `1px solid ${c.line}`, borderRadius: 6, padding: 'clamp(28px,3vw,40px) clamp(20px,2vw,28px)' }}>
-                  <div style={{ fontSize: 40, marginBottom: 16, lineHeight: 1 }}>{r.icon}</div>
-                  <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 24, letterSpacing: '-0.02em', color: c.ink, marginBottom: 12 }}>{r.label}</div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    {r.cidadesVisiveis.map(cidade2 => (
-                      <Link key={cidade2} href={`/lancamentos/${cidadeParaSlug(cidade2)}-sc`}
-                        style={{ fontSize: 13, color: c.bronze, textDecoration: 'none', fontWeight: 600 }}>
-                        {cidade2} →
-                      </Link>
-                    ))}
-                  </div>
-                  <div style={{ marginTop: 20, width: 36, height: 3, background: r.cor, borderRadius: 2 }} />
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* 3. VITRINE DE EMPREENDIMENTOS */}
-      <section id="empreendimentos" style={{ padding: 'clamp(64px,7vw,100px) clamp(16px,4vw,56px)', background: c.paper }}>
-        <div style={{ maxWidth: 1160, margin: '0 auto' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 16, marginBottom: 'clamp(36px,5vw,56px)' }}>
-            <div>
-              <span style={{ ...ui.eyebrow, display: 'block', marginBottom: 12 }}>PORTFÓLIO</span>
-              <h2 style={{ ...ui.h2, color: c.ink, margin: 0 }}>Empreendimentos em destaque</h2>
-            </div>
-            <Link href="/lancamentos/criciuma-sc" style={{ fontSize: 13, fontWeight: 600, color: c.bronze, textDecoration: 'none', letterSpacing: '0.04em' }}>Ver todos →</Link>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(300px,1fr))', gap: 28 }}>
-            {portfolio.map((emp: any) => (
-              <div key={emp.id} style={{ ...ui.card, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-                <Link href={`/empreendimento/${emp.construtora_slug}/${emp.slug}`} style={{ display: 'block', position: 'relative', height: 280, overflow: 'hidden', flexShrink: 0, textDecoration: 'none' }}>
-                  <Image
-                    src={emp.imagem_capa_url}
-                    alt={emp.nome}
-                    fill
-                    style={{ objectFit: 'cover', transition: 'transform .5s ease' }}
-                    sizes="(max-width:640px) 100vw,(max-width:1024px) 50vw,33vw"
-                  />
-                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg,transparent 50%,rgba(10,9,8,0.7) 100%)' }} />
-                  <div style={{ position: 'absolute', top: 14, left: 14, background: STATUS_BADGE[emp.status_obra] || '#374151', color: '#fff', fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '5px 11px', borderRadius: 3 }}>
-                    {emp.status_obra}
-                  </div>
-                  <div style={{ position: 'absolute', top: 14, right: 14, background: 'rgba(10,9,8,0.72)', border: '1px solid rgba(255,255,255,0.15)', color: '#f5f1ea', fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', padding: '4px 10px', borderRadius: 3 }}>
-                    Financiamento direto
-                  </div>
-                </Link>
-                <div style={{ padding: 'clamp(18px,2vw,24px)', display: 'flex', flexDirection: 'column', flex: 1 }}>
-                  <div style={{ fontSize: 11, color: c.bronze, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 8 }}>{emp.construtora_nome}</div>
-                  <Link href={`/empreendimento/${emp.construtora_slug}/${emp.slug}`} style={{ textDecoration: 'none' }}>
-                    <h3 style={{ fontFamily: font.display, fontWeight: 700, fontSize: 20, color: c.ink, lineHeight: 1.2, marginBottom: 6, letterSpacing: '-0.02em' }}>{emp.nome}</h3>
-                  </Link>
-                  <p style={{ fontSize: 13, color: c.muted, marginBottom: 10 }}>{emp.bairro ? emp.bairro + ', ' : ''}{emp.cidade}/{emp.uf}</p>
-                  <p style={{ fontSize: 13, color: c.muted, lineHeight: 1.6, marginBottom: 'auto', fontStyle: 'italic' }}>“{emp.frase}”</p>
-                  <div style={{ borderTop: `1px solid ${c.line}`, paddingTop: 16, marginTop: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                    <PrecoDisplay exibir_preco={emp.exibir_preco} preco_a_partir_de={emp.preco_a_partir_de} />
-                    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                      <Link href={`/empreendimento/${emp.construtora_slug}/${emp.slug}`}
-                        style={{ background: c.charcoal, color: c.onDark, fontSize: 12, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '9px 14px', borderRadius: 3, textDecoration: 'none' }}>
-                        Ver detalhes
-                      </Link>
-                      <a href={WPP_MSG} target="_blank" rel="noopener noreferrer"
-                        style={{ background: '#25d366', color: '#fff', fontSize: 12, fontWeight: 700, padding: '9px 12px', borderRadius: 3, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 4. EMPREENDIMENTO EM DESTAQUE */}
-      <section style={{ background: c.charcoal, padding: 'clamp(64px,7vw,100px) clamp(16px,4vw,56px)' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(300px,1fr))', gap: 'clamp(40px,6vw,80px)', alignItems: 'center' }}>
-          <Link href={`/empreendimento/${destaque.construtora_slug}/${destaque.slug}`} style={{ display: 'block', position: 'relative', height: 'clamp(360px,45vw,560px)', borderRadius: 4, overflow: 'hidden', textDecoration: 'none' }}>
-            <Image src={destaque.imagem_capa_url} alt={destaque.nome} fill quality={88} style={{ objectFit: 'cover' }} sizes="(max-width:768px) 100vw, 50vw" />
-            <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '40%', background: 'linear-gradient(180deg,transparent,rgba(10,9,8,0.8))' }} />
+      {/* NAV */}
+      <nav className="home-nav">
+        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 clamp(18px,4vw,48px)', height: 68, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Link href="/" style={{ fontFamily: t.display, fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.22em', fontSize: 16, textDecoration: 'none', color: t.onDark, textShadow: '0 1px 8px rgba(0,0,0,0.4)' }}>
+            Stiven Allan
           </Link>
-          <div>
-            <span style={{ ...ui.eyebrow, color: c.orange, display: 'block', marginBottom: 16 }}>EMPREENDIMENTO EM DESTAQUE</span>
-            <h2 style={{ fontFamily: font.display, fontWeight: 800, fontSize: 'clamp(1.8rem,3.5vw,2.8rem)', letterSpacing: '-0.025em', color: c.onDark, lineHeight: 1.1, marginBottom: 16 }}>{destaque.nome}</h2>
-            <p style={{ fontSize: 16, color: c.onDarkMuted, lineHeight: 1.7, marginBottom: 28, fontStyle: 'italic' }}>{destaque.frase}</p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 24 }}>
-              {[destaque.cidade + '/' + destaque.uf, destaque.construtora_nome].filter(Boolean).map((item, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ width: 5, height: 5, borderRadius: '50%', background: c.bronze, flexShrink: 0 }} />
-                  <span style={{ fontSize: 14, color: c.onDarkMuted }}>{item}</span>
-                </div>
-              ))}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div style={{ width: 5, height: 5, borderRadius: '50%', background: c.bronze, flexShrink: 0 }} />
-                <PrecoDisplay exibir_preco={destaque.exibir_preco} preco_a_partir_de={destaque.preco_a_partir_de} dark />
-              </div>
-            </div>
-            <div style={{ background: 'rgba(245,241,234,0.05)', border: '1px solid rgba(245,241,234,0.1)', borderLeft: '3px solid ' + c.bronze, borderRadius: 4, padding: '20px 24px', marginBottom: 28 }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: c.bronze, letterSpacing: '0.14em', marginBottom: 8 }}>CONDIÇÕES EXCLUSIVAS</div>
-              <p style={{ fontSize: 14, color: c.onDarkMuted, lineHeight: 1.7, margin: 0 }}>Financiamento direto com a construtora, sem aprovação bancária. Condições negociadas na conversa.</p>
-            </div>
-            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-              <Link href={`/empreendimento/${destaque.construtora_slug}/${destaque.slug}`}
-                style={{ ...ui.btnPrimary, display: 'inline-block', textDecoration: 'none' }}>
-                Ver detalhes
-              </Link>
-              <a href={WPP_MSG} target="_blank" rel="noopener noreferrer"
-                style={{ ...ui.btnConvert, display: 'inline-flex', alignItems: 'center', gap: 10, boxShadow: '0 8px 28px rgba(255,106,61,0.35)' }}>
-                Quero conhecer as condições
-              </a>
-            </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
+            <Link href="/#empreendimentos" style={{ fontFamily: t.body, fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(245,241,234,0.80)', textDecoration: 'none', textShadow: '0 1px 6px rgba(0,0,0,0.4)' }}>Empreendimentos</Link>
+            <a href={WPP_MSG} target="_blank" rel="noopener noreferrer" style={{ fontFamily: t.body, fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: t.champagne, textDecoration: 'none', textShadow: '0 1px 6px rgba(0,0,0,0.3)' }}>WhatsApp</a>
           </div>
         </div>
-      </section>
+      </nav>
 
-      {/* 5. COMO FUNCIONA */}
-      <section id="como-funciona" style={{ background: c.surface, padding: 'clamp(64px,7vw,100px) clamp(16px,4vw,56px)' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 'clamp(48px,6vw,72px)', maxWidth: '54ch', marginLeft: 'auto', marginRight: 'auto' }}>
-            <span style={{ ...ui.eyebrow, display: 'block', marginBottom: 14 }}>COMO FUNCIONA</span>
-            <h2 style={{ ...ui.h2, color: c.ink }}>Financiamento direto: liberdade, não desconto.</h2>
-            <p style={{ fontSize: 16, color: c.muted, marginTop: 16, lineHeight: 1.7 }}>Não é uma concesão. É um privilégio: você negocia direto com quem constrói, sem fila de banco, sem burocracia.</p>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))', gap: 24 }}>
-            {[
-              { n: '01', title: 'Entrada negociada direto', desc: 'Sem exigências bancárias. A entrada é combinada entre você e a construtora, com flexibilidade real.' },
-              { n: '02', title: 'Parcelas flexíveis', desc: 'O saldo é parcelado em condições acordadas direto com a construtora, sem spread bancário.' },
-              { n: '03', title: 'Sem aprovação bancária', desc: 'Chega de filas e documentos. A decisão é tomada entre você e a construtora, com agilidade.' },
-            ].map((s) => (
-              <div key={s.n} style={{ background: c.paper, border: '1px solid ' + c.line, borderRadius: 6, padding: 'clamp(28px,3vw,40px)' }}>
-                <div style={{ fontFamily: font.display, fontSize: 48, fontWeight: 800, color: c.bronze, lineHeight: 1, marginBottom: 20, letterSpacing: '-0.04em', opacity: 0.7 }}>{s.n}</div>
-                <h3 style={{ fontFamily: font.display, fontWeight: 700, fontSize: 18, color: c.ink, marginBottom: 12, letterSpacing: '-0.01em' }}>{s.title}</h3>
-                <p style={{ fontSize: 14, color: c.muted, lineHeight: 1.75 }}>{s.desc}</p>
-              </div>
-            ))}
-          </div>
-          <div style={{ textAlign: 'center', marginTop: 48 }}>
-            <a href={WPP_MSG} target="_blank" rel="noopener noreferrer" style={{ ...ui.btnConvert, display: 'inline-flex', alignItems: 'center', gap: 10 }}>
-              Quero saber mais
+      {/* HERO */}
+      <section style={{ position: 'relative', height: '100svh', minHeight: 580, overflow: 'hidden', background: '#1a1814' }}>
+        <Image src="https://estilofontana.com.br/images/2025/08/28/f-ml-voo-passaro-ef-web-68b0986133a09.jpg?fm=webp" alt="Vista aérea de empreendimento Fontana — Sul de Santa Catarina" fill priority sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center 30%' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(20,18,16,0.45) 0%, rgba(20,18,16,0.20) 40%, rgba(20,18,16,0.62) 100%)' }} />
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 clamp(24px,6vw,80px)', paddingTop: 68 }}>
+          <p className="home-eyebrow fade-in" style={{ color: 'rgba(184,155,94,0.85)', marginBottom: 24, textShadow: '0 1px 8px rgba(0,0,0,0.5)' }}>Stiven Allan · CRECI/RS 60.275</p>
+          <h1 className="home-h1 fade-in fade-in-1" style={{ fontSize: 'clamp(36px,7vw,88px)', color: '#F5F1EA', textShadow: '0 2px 32px rgba(0,0,0,0.55)', maxWidth: 900 }}>
+            Morar bem não deveria depender de um banco.
+          </h1>
+          <hr className="home-rule fade-in fade-in-2" style={{ margin: '28px auto' }} />
+          <p className="home-serif fade-in fade-in-2" style={{ fontSize: 'clamp(16px,2.2vw,22px)', color: 'rgba(245,241,234,0.80)', maxWidth: 560, margin: '0 0 40px', lineHeight: 1.6 }}>
+            Empreendimentos de alto padrão com financiamento direto da construtora. Sem banco, sem burocracia.
+          </p>
+          <div className="fade-in fade-in-3" style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
+            <Link href="/#empreendimentos" className="home-btn" style={{ background: 'rgba(245,241,234,0.12)', borderColor: 'rgba(245,241,234,0.40)', color: '#F5F1EA', backdropFilter: 'blur(8px)' }}>Explorar empreendimentos</Link>
+            <a href={WPP_MSG} target="_blank" rel="noopener noreferrer" style={{ fontFamily: t.body, fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: 'rgba(245,241,234,0.55)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8, padding: '15px 0' }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+              Falar com Stiven
             </a>
           </div>
         </div>
+        <div style={{ position: 'absolute', bottom: 32, left: '50%', transform: 'translateX(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontFamily: t.body, fontSize: 9, letterSpacing: '0.30em', textTransform: 'uppercase', color: 'rgba(245,241,234,0.40)' }}>rolar</span>
+          <div style={{ width: 1, height: 40, background: 'rgba(245,241,234,0.25)' }} />
+        </div>
       </section>
 
-      <section id="sobre" style={{ background: c.paper, padding: 'clamp(64px,7vw,100px) clamp(16px,4vw,56px)' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: 40, textAlign: 'center', marginBottom: 'clamp(56px,7vw,80px)', paddingBottom: 'clamp(56px,7vw,80px)', borderBottom: '1px solid ' + c.line }}>
-            {[{ num: '+50', label: 'Empreendimentos', desc: 'no portfólio' }, { num: '8+', label: 'Anos', desc: 'de experiência' }, { num: '100%', label: 'Foco', desc: 'em financiamento direto' }, { num: '5★', label: 'Avaliação', desc: 'média dos clientes' }].map((m) => (
-              <div key={m.num}>
-                <div style={{ fontFamily: font.display, fontWeight: 800, fontSize: 'clamp(2rem,3.5vw,3rem)', letterSpacing: '-0.03em', color: c.bronze, lineHeight: 1 }}>{m.num}</div>
-                <div style={{ fontWeight: 700, fontSize: 14, color: c.ink, marginTop: 8 }}>{m.label}</div>
-                <div style={{ fontSize: 12, color: c.muted, marginTop: 3 }}>{m.desc}</div>
+      {/* EMPREENDIMENTOS */}
+      <section id="empreendimentos" style={{ padding: 'clamp(72px,12vh,120px) clamp(18px,4vw,40px)' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 'clamp(48px,8vh,72px)' }}>
+            <p className="home-eyebrow" style={{ marginBottom: 16 }}>Portfólio</p>
+            <h2 className="home-h2">Empreendimentos</h2>
+            <hr className="home-rule" style={{ margin: '20px auto 0' }} />
+          </div>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 48 }}>
+            <span className="home-region-btn">Todos</span>
+            <span className="home-region-btn">Criciúma</span>
+            <span className="home-region-btn">Balneário Piçarras</span>
+          </div>
+          <div className="home-cards-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 'clamp(16px,2.5vw,28px)' }}>
+            {EMPREENDIMENTOS.map((emp, i) => (
+              <div key={emp.id} className={'fade-in fade-in-' + ((i % 4) + 1)}>
+                <EmpCard emp={emp} />
               </div>
             ))}
           </div>
-          <div style={{ textAlign: 'center', marginBottom: 'clamp(36px,4vw,56px)' }}>
-            <span style={{ ...ui.eyebrow, display: 'block', marginBottom: 12 }}>DEPOIMENTOS</span>
-            <h2 style={{ ...ui.h2, color: c.ink }}>O que dizem nossos clientes</h2>
+        </div>
+      </section>
+
+      {/* COMO FUNCIONA */}
+      <section id="como-funciona" style={{ background: t.dark, color: t.onDark, padding: 'clamp(72px,12vh,120px) clamp(18px,4vw,40px)' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 'clamp(48px,8vh,72px)' }}>
+            <p className="home-eyebrow" style={{ color: t.champagne, marginBottom: 16 }}>Como funciona</p>
+            <h2 className="home-h2" style={{ color: t.onDark }}>Financiamento direto</h2>
+            <p className="home-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(15px,1.8vw,19px)', marginTop: 20, maxWidth: 520, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.65 }}>
+              Sem análise de crédito bancário. Negociado diretamente com a construtora.
+            </p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: 24 }}>
+          <div className="home-how-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 'clamp(24px,3vw,40px)' }}>
+            {COMO_FUNCIONA.map((step, i) => (
+              <div key={step.n} className={'fade-in fade-in-' + (i + 1)} style={{ borderTop: '1px solid rgba(245,241,234,0.12)', paddingTop: 28 }}>
+                <div className="home-step-n">{step.n}</div>
+                <h3 style={{ fontFamily: t.display, fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.12em', fontSize: 14, color: t.onDark, margin: '16px 0 10px' }}>{step.titulo}</h3>
+                <p style={{ fontFamily: t.body, fontSize: 14, color: t.onDarkMuted, lineHeight: 1.65, margin: 0 }}>{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* MÉTRICAS */}
+      <section style={{ padding: 'clamp(56px,10vh,96px) clamp(18px,4vw,40px)', borderBottom: `1px solid ${t.line}` }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div className="home-metrics-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 'clamp(24px,3vw,40px)', textAlign: 'center' }}>
+            {METRICAS.map((m, i) => (
+              <div key={m.label} className={'fade-in fade-in-' + (i + 1)} style={{ borderTop: `2px solid ${t.champagne}`, paddingTop: 24 }}>
+                <div style={{ fontFamily: t.display, fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: 'clamp(36px,5vw,56px)', color: t.ink, lineHeight: 1 }}>{m.valor}</div>
+                <p style={{ fontFamily: t.body, fontSize: 12, letterSpacing: '0.20em', textTransform: 'uppercase', color: t.muted, margin: '10px 0 0', fontWeight: 500 }}>{m.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* DEPOIMENTOS */}
+      <section style={{ padding: 'clamp(72px,12vh,120px) clamp(18px,4vw,40px)', background: '#F5F1EA' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 'clamp(48px,8vh,72px)' }}>
+            <p className="home-eyebrow" style={{ marginBottom: 16 }}>Depoimentos</p>
+            <h2 className="home-h2">Quem já realizou</h2>
+          </div>
+          <div className="home-dep-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 'clamp(16px,2.5vw,24px)' }}>
             {DEPOIMENTOS.map((d, i) => (
-              <div key={i} style={{ background: c.surface, border: '1px solid ' + c.line, borderRadius: 6, padding: 'clamp(24px,2.5vw,32px)' }}>
-                <div style={{ fontSize: 28, color: c.bronze, lineHeight: 1, marginBottom: 16, fontFamily: 'Georgia, serif' }}>“</div>
-                <p style={{ fontSize: 14, color: c.muted, lineHeight: 1.8, marginBottom: 20, fontStyle: 'italic' }}>{d.texto}</p>
+              <div key={d.nome} className={'home-dep-card fade-in fade-in-' + (i + 1)}>
+                <p style={{ fontFamily: t.serif, fontStyle: 'italic', fontSize: 'clamp(16px,1.7vw,19px)', color: t.ink, lineHeight: 1.65, margin: '0 0 24px' }}>“{d.texto}”</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{ width: 40, height: 40, borderRadius: '50%', background: c.line, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: font.display, fontWeight: 700, fontSize: 16, color: c.ink }}>{d.nome.charAt(0)}</div>
-                  <div><div style={{ fontSize: 13, fontWeight: 700, color: c.ink }}>{d.nome}</div><div style={{ fontSize: 12, color: c.muted, marginTop: 2 }}>{d.cidade}</div></div>
+                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: t.champagne, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <span style={{ fontFamily: t.display, fontWeight: 300, fontSize: 14, color: '#fff', textTransform: 'uppercase' }}>{d.nome[0]}</span>
+                  </div>
+                  <div>
+                    <p style={{ margin: 0, fontFamily: t.body, fontWeight: 500, fontSize: 13, color: t.ink }}>{d.nome}</p>
+                    <p style={{ margin: 0, fontFamily: t.body, fontSize: 11, color: t.muted, letterSpacing: '0.08em' }}>{d.cidade}</p>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         </div>
       </section>
-      <section style={{ background: c.charcoal, padding: 'clamp(64px,7vw,100px) clamp(16px,4vw,56px)' }}>
-        <div style={{ maxWidth: 640, margin: '0 auto', textAlign: 'center' }}>
-          <span style={{ ...ui.eyebrow, color: c.orange, display: 'block', marginBottom: 16 }}>COMECE AGORA</span>
-          <h2 style={{ ...ui.h2, color: c.onDark }}>Vamos encontrar o seu imóvel ideal?</h2>
-          <p style={{ color: c.onDarkMuted, marginTop: 16, fontSize: 16, lineHeight: 1.7 }}>Resposta rápida, sem enrolação e sem compromisso. As condições são reveladas na conversa.</p>
-          <a href={WPP_MSG} target="_blank" rel="noopener noreferrer" style={{ ...ui.btnConvert, marginTop: 36, display: 'inline-flex', alignItems: 'center', gap: 10, boxShadow: '0 8px 32px rgba(255,106,61,0.4)', fontSize: 16, padding: '16px 36px' }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-            Falar no WhatsApp
-          </a>
+
+      {/* CTA FINAL */}
+      <section style={{ background: t.dark, color: t.onDark, padding: 'clamp(80px,14vh,140px) clamp(18px,4vw,40px)', textAlign: 'center' }}>
+        <div style={{ maxWidth: 680, margin: '0 auto' }}>
+          <p className="home-eyebrow" style={{ color: t.champagne, marginBottom: 24 }}>Próximo passo</p>
+          <h2 className="home-h2" style={{ color: t.onDark, fontSize: 'clamp(28px,5vw,52px)' }}>Pronto para sair do aluguel?</h2>
+          <p className="home-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(16px,1.9vw,21px)', margin: '24px 0 40px', lineHeight: 1.65 }}>
+            Converse com Stiven e descubra o empreendimento certo para o seu momento.
+          </p>
+          <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <a href={WPP_MSG} target="_blank" rel="noopener noreferrer" className="home-btn" style={{ background: t.champagne, borderColor: t.champagne, color: '#fff' }}>Falar com Stiven</a>
+            <Link href="/#empreendimentos" className="home-btn home-btn--cham">Ver empreendimentos</Link>
+          </div>
         </div>
       </section>
-      <SiteFooter cidades={cidadesNomes} />
-      <WppFloat />
+
+      {/* FOOTER */}
+      <footer style={{ background: '#0E0C0A', color: t.onDark, padding: 'clamp(56px,10vh,96px) clamp(18px,4vw,40px) clamp(32px,6vh,56px)' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div className="home-footer-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: 'clamp(32px,4vw,64px)', marginBottom: 56, paddingBottom: 40, borderBottom: '1px solid rgba(245,241,234,0.10)' }}>
+            <div>
+              <p style={{ fontFamily: t.display, fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.22em', fontSize: 16, color: t.onDark, margin: '0 0 16px' }}>Stiven Allan</p>
+              <p style={{ fontFamily: t.body, fontSize: 13, color: t.onDarkMuted, lineHeight: 1.7, margin: '0 0 12px', maxWidth: 280 }}>Corretor de imóveis especializado em empreendimentos Fontana com financiamento direto.</p>
+              <p style={{ fontFamily: t.body, fontSize: 11, letterSpacing: '0.16em', color: 'rgba(245,241,234,0.35)', margin: 0 }}>CRECI/RS 60.275</p>
+            </div>
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.25em', textTransform: 'uppercase', color: t.champagne, marginBottom: 20 }}>Menu</div>
+              {[['/', 'Início'], ['/#empreendimentos', 'Empreendimentos'], ['/#como-funciona', 'Financiamento direto']].map(([href, label]) => (
+                <div key={href} style={{ marginBottom: 10 }}>
+                  <Link href={href} style={{ fontSize: 13, color: 'rgba(245,241,234,0.55)', textDecoration: 'none', letterSpacing: '0.04em' }}>{label}</Link>
+                </div>
+              ))}
+            </div>
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.25em', textTransform: 'uppercase', color: t.champagne, marginBottom: 20 }}>Empreendimentos</div>
+              {EMPREENDIMENTOS.map(emp => (
+                <div key={emp.id} style={{ marginBottom: 10 }}>
+                  <Link href={'/empreendimento/' + emp.construtora_slug + '/' + emp.slug} style={{ fontSize: 13, color: 'rgba(245,241,234,0.55)', textDecoration: 'none' }}>{emp.nome}</Link>
+                </div>
+              ))}
+            </div>
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.25em', textTransform: 'uppercase', color: t.champagne, marginBottom: 20 }}>Contato</div>
+              <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: 'rgba(245,241,234,0.55)', textDecoration: 'none', display: 'block', marginBottom: 10 }}>WhatsApp</a>
+              <p style={{ fontSize: 13, color: 'rgba(245,241,234,0.35)', margin: '16px 0 0', lineHeight: 1.6 }}>Sul de Santa Catarina</p>
+            </div>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
+            <p style={{ fontFamily: t.body, fontSize: 12, color: 'rgba(245,241,234,0.25)', margin: 0 }}>© {new Date().getFullYear()} Stiven Allan. Todos os direitos reservados.</p>
+            <p style={{ fontFamily: t.body, fontSize: 12, color: 'rgba(245,241,234,0.25)', margin: 0 }}>Sul de Santa Catarina · CRECI/RS 60.275</p>
+          </div>
+        </div>
+      </footer>
+
+      {/* WA FLOAT */}
+      <a href={WPP_MSG} target="_blank" rel="noopener noreferrer" className="home-wa-float" aria-label="Falar com Stiven via WhatsApp">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+      </a>
     </>
   )
 }
