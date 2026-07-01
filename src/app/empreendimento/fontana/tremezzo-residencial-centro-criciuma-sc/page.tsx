@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import GalleryWithLightbox from './gallery-lightbox'
+import { LeadCaptureButton } from '@/components/LeadCaptureButton'
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://stivenallan.vercel.app'
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Tremezzo%20Residencial%20em%20Crici%C3%BAma.%20Pode%20me%20passar%20mais%20informa%C3%A7%C3%B5es%3F'
@@ -147,6 +148,7 @@ const CSS = `
           </p>
           <div className="tz-fade tz-fade-3" style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
             <a href={WPP} target="_blank" rel="noopener noreferrer" className="tz-btn tz-btn--solid">Agendar visita ao decorado</a>
+            <LeadCaptureButton slug="tremezzo-residencial-centro-criciuma-sc" construtora_slug="fontana" />
             <a href="#galeria" className="tz-btn" style={{ borderColor: 'rgba(255,255,255,0.55)', color: '#fff', backdropFilter: 'blur(8px)' }}>Ver galeria</a>
           </div>
           <p className="tz-fade tz-fade-3" style={{ marginTop: 20, fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 12, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.55)', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>
