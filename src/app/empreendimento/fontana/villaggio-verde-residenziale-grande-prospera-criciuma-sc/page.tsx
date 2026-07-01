@@ -136,7 +136,7 @@ export default function Page() {
           <a href={WPP} target="_blank" rel="noopener noreferrer" className="vv-cta" style={{ color:'#fff', borderColor:'rgba(255,255,255,0.6)' }}>
             Quero Saber Mais
           </a>
-          <LeadCaptureButton slug="villaggio-verde-residenziale-grande-prospera-criciuma-sc" construtora_slug="fontana" />
+          <LeadCaptureButton slug="villaggio-verde-residenziale-grande-prospera-criciuma-sc" construtora_slug="fontana"  propertyDisplayName="Villaggio Verde Residenziale" />
         </div>
       </section>
 
