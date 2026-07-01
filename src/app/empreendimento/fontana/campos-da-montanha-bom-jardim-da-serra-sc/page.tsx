@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import GalleryWithLightbox, { LightboxPhoto } from './gallery-lightbox'
+import { LeadCaptureButton } from '@/components/LeadCaptureButton'
 
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Campos%20da%20Montanha%20Residencial.'
 const CATALOGO = 'https://estilofontana.com.br/upload/empreendimento/catalogo/campos-da-montanha-residencial-1668428039.pdf'
@@ -185,7 +186,7 @@ html { scroll-behavior: smooth; }
 <section style={{ background:t.forest, padding:'80px 32px', textAlign:'center' }}>
 <p className="cm-eyebrow" style={{ color:t.onDarkMuted, marginBottom:16 }}>Material Completo</p>
 <h2 className="cm-h2" style={{ color:t.onDark, marginBottom:32 }}>Baixe o Catálogo</h2>
-<a href={CATALOGO} target="_blank" rel="noopener noreferrer" className="cm-cta cm-cta-light">Ver Catálogo PDF</a>
+<LeadCaptureButton slug="campos-da-montanha-bom-jardim-da-serra-sc" construtora_slug="fontana" className="cm-cta cm-cta-light" />
 </section>
 <section id="localizacao" style={{ padding:'96px 32px', background:t.bg }}>
 <div style={{ maxWidth:1100, margin:'0 auto' }}>
