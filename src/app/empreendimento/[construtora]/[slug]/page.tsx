@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import {
   EMPREENDIMENTOS,
@@ -9,10 +8,16 @@ import {
   statusLabel,
   type Empreendimento,
 } from '@/lib/empreendimentos';
+import { createClient } from '@/lib/supabase/server';
+import { PropertyCardImage } from '@/components/PropertyCardImage';
+import { LeadCaptureModal } from '@/components/LeadCaptureModal';
 import FormContato from './FormContato';
+import Image from 'next/image';
 
 const SITE_URL = 'https://stivenallan.vercel.app';
 const WHATSAPP = '5548991642332';
+
+export const revalidate = 3600;
 
 interface PageProps {
   params: Promise<{ construtora: string; slug: string }>;
@@ -64,6 +69,27 @@ export default async function EmpreendimentoPage({ params }: PageProps) {
   const emp = getEmpreendimento(construtora, slug);
   if (!emp) notFound();
 
+  // Supabase: busca dados complementares (book_pdf_url, id) sem quebrar se tabela não existir
+  let supabaseId: string | null = null;
+  let bookPdfUrl: string | null = null;
+  let coverImageUrl: string | null = null;
+  try {
+    const supabase = createClient();
+    const { data } = await supabase
+      .from('properties')
+      .select('id, book_pdf_url, cover_image_url')
+      .eq('slug', slug)
+      .eq('construtora_slug', construtora)
+      .maybeSingle();
+    if (data) {
+      supabaseId = data.id ?? null;
+      bookPdfUrl = data.book_pdf_url ?? null;
+      coverImageUrl = data.cover_image_url ?? null;
+    }
+  } catch {
+    // tabela ainda não existe ou erro de conexão — continua com dados locais
+  }
+
   const cidadeSlug = emp.cidade
     .toLowerCase()
     .normalize('NFD')
@@ -71,6 +97,8 @@ export default async function EmpreendimentoPage({ params }: PageProps) {
     .replace(/\s+/g, '-') + '-sc';
   const cidadeHref = '/lancamentos/' + cidadeSlug;
   const temFotos = emp.imagens.length > 0;
+  // Hero image: prefer Supabase cover_image_url, fallback to local imagens[0]
+  const heroSrc = coverImageUrl || (temFotos ? emp.imagens[0] : null);
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -78,7 +106,7 @@ export default async function EmpreendimentoPage({ params }: PageProps) {
     name: emp.nome,
     description: emp.descricao,
     url: SITE_URL + '/empreendimento/' + emp.construtoraSlug + '/' + emp.slug,
-    ...(temFotos ? { image: emp.imagens[0] } : {}),
+    ...(heroSrc ? { image: heroSrc } : {}),
     address: {
       '@type': 'PostalAddress',
       addressLocality: emp.cidade,
@@ -119,54 +147,37 @@ export default async function EmpreendimentoPage({ params }: PageProps) {
       </nav>
 
       <section style={{ maxWidth: 1100, margin: '0 auto', padding: '24px 20px' }}>
-        <div
-          style={{
-            position: 'relative',
-            width: '100%',
-            aspectRatio: '16 / 9',
-            borderRadius: 16,
-            overflow: 'hidden',
-            background: 'linear-gradient(135deg, #e7dfd2 0%, #d8cbb6 100%)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          {temFotos ? (
-            <Image
-              src={emp.imagens[0]}
-              alt={'Foto do empreendimento ' + emp.nome + ' em ' + emp.cidade + '/' + emp.uf}
-              fill
-              priority
-              sizes="(max-width: 1100px) 100vw, 1100px"
-              style={{ objectFit: 'cover' }}
-            />
-          ) : (
+        {heroSrc ? (
+          <PropertyCardImage
+            src={heroSrc}
+            alt={'Foto do empreendimento ' + emp.nome + ' em ' + emp.cidade + '/' + emp.uf}
+            aspectRatio="video"
+            className="rounded-2xl"
+            priority
+          />
+        ) : (
+          <div
+            style={{
+              position: 'relative',
+              width: '100%',
+              aspectRatio: '16 / 9',
+              borderRadius: 16,
+              overflow: 'hidden',
+              background: 'linear-gradient(135deg, #e7dfd2 0%, #d8cbb6 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
             <div style={{ textAlign: 'center', color: '#8a6d3b', padding: 24 }}>
               <p style={{ fontSize: 22, fontWeight: 700, margin: 0 }}>{emp.nome}</p>
               <p style={{ fontSize: 14, margin: '6px 0 0', letterSpacing: 1 }}>
                 Fotos em breve
               </p>
             </div>
-          )}
-          <span
-            style={{
-              position: 'absolute',
-              top: 16,
-              left: 16,
-              background: '#1a1a1a',
-              color: '#f5f1ea',
-              padding: '6px 14px',
-              borderRadius: 999,
-              fontSize: 12,
-              letterSpacing: 1,
-              textTransform: 'uppercase',
-            }}
-          >
-            {statusLabel(emp.statusObra)}
-          </span>
-        </div>
-        {temFotos && emp.imagens.length > 1 && (
+          </div>
+        )}
+        {heroSrc && emp.imagens.length > 1 && (
           <div
             style={{
               display: 'grid',
@@ -175,7 +186,7 @@ export default async function EmpreendimentoPage({ params }: PageProps) {
               marginTop: 12,
             }}
           >
-            {emp.imagens.slice(1).map((img, i) => (
+            {emp.imagens.slice(heroSrc === emp.imagens[0] ? 1 : 0).map((img, i) => (
               <div
                 key={i}
                 style={{
@@ -245,7 +256,7 @@ export default async function EmpreendimentoPage({ params }: PageProps) {
             {emp.bairro}, {emp.cidade}/{emp.uf}
           </p>
           <p style={{ fontStyle: 'italic', color: '#3a342b', fontSize: 18, margin: '0 0 24px' }}>
-            “{emp.frase}”
+            "{emp.frase}"
           </p>
           <p style={{ fontSize: 16, lineHeight: 1.7, color: '#2a2620' }}>{emp.descricao}</p>
 
@@ -318,7 +329,16 @@ export default async function EmpreendimentoPage({ params }: PageProps) {
               ↓ Baixar catálogo (PDF)
             </a>
           )}
-          <p style={{ fontSize: 13, color: '#8a6d3b', textAlign: 'center', margin: '0 0 12px' }}>
+          {bookPdfUrl && supabaseId && (
+            <div style={{ marginTop: 12 }}>
+              <LeadCaptureModal
+                propertyId={supabaseId}
+                propertyName={emp.nome}
+                bookPdfUrl={bookPdfUrl}
+              />
+            </div>
+          )}
+          <p style={{ fontSize: 13, color: '#8a6d3b', textAlign: 'center', margin: '16px 0 8px' }}>
             ou deixe seu contato
           </p>
           <FormContato empreendimento={emp.nome} />
