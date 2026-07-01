@@ -43,7 +43,7 @@ const DIFERENCIAIS = [
   'Acabamentos de alto padrão selecionados',
   'Localização privilegiada no Centro de Balneário Rincão',
   'Construtora Fontana — tradição e qualidade comprovadas',
-  'Financiamento facilitado pelo Minha Casa Minha Vida',
+  'Financiamento direto com a Construtora Fontana',
 ]
 
 const AMENIDADES = [
@@ -273,12 +273,12 @@ export default function Page() {
       <section style={{ background:t.dark, padding:'96px 32px' }}>
         <div style={{ maxWidth:900, margin:'0 auto', textAlign:'center' }}>
           <p className="mp-eyebrow" style={{ color:t.onDarkMuted, marginBottom:20 }}>Financiamento</p>
-          <h2 className="mp-h2" style={{ color:t.onDark, margin:'0 0 24px' }}>Minha Casa Minha Vida</h2>
+          <h2 className="mp-h2" style={{ color:t.onDark, margin:'0 0 24px' }>Financiamento Direto com a Fontana</h2>
           <p style={{ color:t.onDarkMuted, fontSize:16, lineHeight:1.8, marginBottom:48, maxWidth:640, margin:'0 auto 48px' }}>
-            Condições especiais pelo programa Minha Casa Minha Vida com juros reduzidos e entrada facilitada. Sou correspondente Caixa e auxilio em todo o processo — da simulação ao registro.
+            A Construtora Fontana oferece financiamento direto, sem burocracia de banco. Parcelas que cabem no seu bolso, atendimento personalizado e condições especiais para quem compra na planta.
           </p>
           <a href={WPP} target="_blank" rel="noopener noreferrer" className="mp-cta" style={{ color:t.onDark, borderColor:'rgba(245,242,237,0.4)', fontSize:11, textTransform:'uppercase' }}>
-            Simular pelo WhatsApp
+            Consultar Condições
           </a>
         </div>
       </section>
