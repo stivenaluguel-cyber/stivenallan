@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import GalleryWithLightbox, { LightboxPhoto } from './gallery-lightbox'
 import Link from 'next/link'
+import { LeadCaptureButton } from '@/components/LeadCaptureButton'
 
 // Hotsite premium Parco Savello Residencial (Fontana, Santa Bárbara Criciúma/SC). Padrão EPIC.
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Parco%20Savello%20Residencial.'
@@ -248,6 +249,7 @@ No coração do bairro Santa Bárbara, com o Parque da Prefeitura como extensão
 ))}
 </div>
 <a href={WPP} target="_blank" rel="noopener noreferrer" className="ps-cta ps-cta-light" data-wpp="1">Solicitar Catálogo</a>
+<LeadCaptureButton slug="parco-savello-santa-barbara-criciuma-sc" construtora_slug="fontana" />
 </div>
 </section>
 
