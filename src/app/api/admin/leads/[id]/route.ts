@@ -40,7 +40,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   if (!await auth()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const { id } = await params
   const body = await req.json()
-  const allowed = ['estagio_funil','lead_score','requer_atencao','notas','temperatura','kanban_ordem','anotacoes']
+  const allowed = ['estagio_funil','lead_score','requer_atencao','notas','temperatura','kanban_ordem','anotacoes','nome','whatsapp','email','origem','orcamento_max']
   const update: Record<string, unknown> = { updated_at: new Date().toISOString() }
   for (const k of allowed) { if (k in body) update[k] = body[k] }
   const { data, error } = await sb().from('leads').update(update).eq('id', id).select().single()
