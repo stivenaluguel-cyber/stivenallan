@@ -32,7 +32,7 @@ export const imoveis = [
     status: 'lancamento',
     destaque: false,
     imagem: 'https://estilofontana.com.br/images/empreendimento/slideshows/mar-positano-residencial-676db4dfc93f5.jpg',
-  }
+  },
   {
     id: '21',
     nome: 'Pavia Residencial',
