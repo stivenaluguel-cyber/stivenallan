@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import { c, font, ui } from '@/lib/theme'
 import Simulador from '@/components/Simulador'
+import { LeadCaptureButton } from '@/components/LeadCaptureButton'
 
 const WPP = 'https://api.whatsapp.com/send?phone=5548991455522&text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Lavis%20Residencial!'
 
@@ -77,6 +78,7 @@ export default function LavisPage() {
       <style>{`
         .lavis-diff-card:hover { transform: translateY(-2px); border-left-color: ${c.orange} !important; transition: transform .22s ease, border-left-color .22s ease; }
         .lavis-cta-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,106,61,0.35); }
+        <LeadCaptureButton slug="lavis-centro-criciuma-sc" construtora_slug="fontana" />
         .lavis-img-thumb { transition: transform .3s ease; }
         .lavis-img-thumb:hover { transform: scale(1.03); }
       `}</style>
