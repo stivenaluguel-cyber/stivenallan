@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@/lib/supabase/client'
 
 type Props = {
   propertyId: string
@@ -23,11 +23,11 @@ export function LeadCaptureModal({ propertyId, propertyName, bookPdfUrl }: Props
   const [phone, setPhone] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
   const backdropRef = useRef<HTMLDivElement>(null)
-  const supabase = createClientComponentClient()
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setStatus('loading')
+    const supabase = createClient()
     const { error } = await supabase.from('leads').insert({
       name,
       phone: phone.replace(/\D/g, ''),
