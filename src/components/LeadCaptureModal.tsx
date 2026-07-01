@@ -63,7 +63,7 @@ export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName
     <>
       <button
         onClick={() => setOpen(true)}
-        className={`w-full bg-zinc-900 text-white py-3 px-6 rounded-lg text-sm font-medium hover:bg-zinc-700 transition-colors ${buttonClassName ?? ''}`}
+        style={{ width: '100%', background: '#18181b', color: '#fff', border: 'none', borderRadius: '8px', padding: '12px 24px', fontSize: '14px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}
       >
         Baixar Catálogo & Plantas
       </button>
@@ -71,115 +71,82 @@ export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName
       {open && (
         <div
           ref={backdropRef}
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
-          style={{ backgroundColor: 'rgba(0,0,0,0.75)' }}
           onClick={(e) => { if (e.target === backdropRef.current) setOpen(false) }}
+          style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.7)', padding: 0 }}
         >
-          <div
-            className="relative w-full sm:max-w-sm rounded-t-3xl sm:rounded-2xl overflow-hidden"
-            style={{ backgroundColor: '#ffffff', boxShadow: '0 25px 60px rgba(0,0,0,0.4)' }}
-          >
-            {/* Botão fechar */}
+          <div style={{ position: 'relative', width: '100%', maxWidth: '440px', backgroundColor: '#ffffff', borderRadius: '20px 20px 0 0', boxShadow: '0 -8px 40px rgba(0,0,0,0.3)', overflow: 'hidden', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+
+            {/* Fechar */}
             <button
               onClick={() => setOpen(false)}
               aria-label="Fechar"
-              style={{
-                position: 'absolute', top: '12px', right: '12px', zIndex: 10,
-                width: '32px', height: '32px', borderRadius: '50%',
-                background: 'rgba(0,0,0,0.15)', border: 'none', cursor: 'pointer',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: '#fff', fontSize: '18px', lineHeight: 1,
-              }}
+              style={{ position: 'absolute', top: '14px', right: '14px', zIndex: 10, width: '30px', height: '30px', borderRadius: '50%', background: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', color: '#fff', fontSize: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 }}
             >×</button>
 
             {/* Header */}
-            <div style={{ background: '#18181b', padding: '24px 24px 20px' }}>
-              <p style={{ color: '#a1a1aa', fontSize: '11px', letterSpacing: '0.12em', textTransform: 'uppercase', margin: '0 0 6px' }}>
-                Material exclusivo
-              </p>
-              <h2 style={{ color: '#ffffff', fontSize: '20px', fontWeight: '700', margin: '0 0 4px', lineHeight: 1.2 }}>
+            <div style={{ background: '#18181b', padding: '28px 24px 20px', textAlign: 'center' }}>
+              <p style={{ color: '#a1a1aa', fontSize: '10px', letterSpacing: '0.15em', textTransform: 'uppercase', margin: '0 0 8px', fontWeight: 500 }}>Material exclusivo</p>
+              <h2 style={{ color: '#ffffff', fontSize: '22px', fontWeight: '700', margin: '0 0 6px', lineHeight: 1.2 }}>
                 {propertyDisplayName || propertyName}
               </h2>
-              <p style={{ color: '#71717a', fontSize: '13px', margin: 0 }}>
-                Catálogo completo + plantas baixas
-              </p>
+              <p style={{ color: '#71717a', fontSize: '13px', margin: 0 }}>Catálogo completo + plantas baixas</p>
             </div>
 
             {/* Corpo */}
-            <div style={{
-              padding: '24px',
-              backgroundColor: '#ffffff',
-              isolation: 'isolate',
-              position: 'relative',
-            }}>
+            <div style={{ padding: '24px', backgroundColor: '#ffffff' }}>
               {status === 'done' ? (
-                <div style={{ textAlign: 'center', padding: '16px 0' }}>
-                  <div style={{ fontSize: '40px', marginBottom: '12px' }}>✓</div>
-                  <p style={{ fontWeight: '600', color: '#18181b', fontSize: '16px', margin: '0 0 4px' }}>Pronto! Download iniciando...</p>
-                  <p style={{ color: '#71717a', fontSize: '13px', margin: 0 }}>Em instantes você recebe o material.</p>
+                <div style={{ textAlign: 'center', padding: '20px 0' }}>
+                  <div style={{ fontSize: '36px', marginBottom: '10px', color: '#22c55e' }}>✓</div>
+                  <p style={{ fontWeight: '700', color: '#18181b', fontSize: '17px', margin: '0 0 6px', fontFamily: 'inherit' }}>Pronto! Download iniciando...</p>
+                  <p style={{ color: '#71717a', fontSize: '13px', margin: 0, fontFamily: 'inherit' }}>Em instantes você recebe o material.</p>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px', textAlign: 'left' }}>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <label htmlFor="lcm-nome" style={{ fontSize: '11px', fontWeight: '600', color: '#3f3f46', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                    <label htmlFor="lcm-nome" style={{ display: 'block', textAlign: 'left', fontSize: '11px', fontWeight: '700', color: '#52525b', textTransform: 'uppercase', letterSpacing: '0.07em', fontFamily: 'inherit' }}>
                       Nome completo
                     </label>
                     <input
-                      id="lcm-nome"
-                      type="text"
-                      name="name"
-                      autoComplete="name"
-                      required
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="Seu nome"
-                      style={{ width: '100%', border: '1.5px solid #d4d4d8', borderRadius: '10px', padding: '11px 14px', fontSize: '14px', color: '#18181b', backgroundColor: '#ffffff', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', appearance: 'none', WebkitAppearance: 'none' }}
+                      id="lcm-nome" type="text" name="name" autoComplete="name" required
+                      value={name} onChange={(e) => setName(e.target.value)}
+                      placeholder="Seu nome completo"
+                      style={{ display: 'block', width: '100%', border: '1.5px solid #e4e4e7', borderRadius: '10px', padding: '12px 14px', fontSize: '15px', color: '#18181b', backgroundColor: '#fff', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', WebkitAppearance: 'none' }}
                       onFocus={e => (e.currentTarget.style.borderColor = '#18181b')}
-                      onBlur={e => (e.currentTarget.style.borderColor = '#d4d4d8')}
+                      onBlur={e => (e.currentTarget.style.borderColor = '#e4e4e7')}
                     />
                   </div>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <label htmlFor="lcm-phone" style={{ fontSize: '11px', fontWeight: '600', color: '#3f3f46', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                    <label htmlFor="lcm-phone" style={{ display: 'block', textAlign: 'left', fontSize: '11px', fontWeight: '700', color: '#52525b', textTransform: 'uppercase', letterSpacing: '0.07em', fontFamily: 'inherit' }}>
                       WhatsApp
                     </label>
                     <input
-                      id="lcm-phone"
-                      type="tel"
-                      name="tel"
-                      autoComplete="tel-national"
-                      required
-                      value={phone}
-                      onChange={(e) => setPhone(maskPhone(e.target.value))}
-                      placeholder="(48) 99999-9999"
-                      inputMode="numeric"
-                      style={{ width: '100%', border: '1.5px solid #d4d4d8', borderRadius: '10px', padding: '11px 14px', fontSize: '14px', color: '#18181b', backgroundColor: '#ffffff', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', appearance: 'none', WebkitAppearance: 'none' }}
+                      id="lcm-phone" type="tel" name="tel" autoComplete="tel-national" required
+                      value={phone} onChange={(e) => setPhone(maskPhone(e.target.value))}
+                      placeholder="(48) 99999-9999" inputMode="numeric"
+                      style={{ display: 'block', width: '100%', border: '1.5px solid #e4e4e7', borderRadius: '10px', padding: '12px 14px', fontSize: '15px', color: '#18181b', backgroundColor: '#fff', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', WebkitAppearance: 'none' }}
                       onFocus={e => (e.currentTarget.style.borderColor = '#18181b')}
-                      onBlur={e => (e.currentTarget.style.borderColor = '#d4d4d8')}
+                      onBlur={e => (e.currentTarget.style.borderColor = '#e4e4e7')}
                     />
                   </div>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <label htmlFor="lcm-email" style={{ fontSize: '11px', fontWeight: '600', color: '#3f3f46', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                      E-mail <span style={{ color: '#a1a1aa', fontWeight: '400', textTransform: 'none', fontSize: '11px' }}>(opcional)</span>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                    <label htmlFor="lcm-email" style={{ display: 'block', textAlign: 'left', fontSize: '11px', fontWeight: '700', color: '#52525b', textTransform: 'uppercase', letterSpacing: '0.07em', fontFamily: 'inherit' }}>
+                      E-mail <span style={{ fontWeight: '400', textTransform: 'none', color: '#a1a1aa' }}>(opcional)</span>
                     </label>
                     <input
-                      id="lcm-email"
-                      type="email"
-                      name="email"
-                      autoComplete="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      id="lcm-email" type="email" name="email" autoComplete="email"
+                      value={email} onChange={(e) => setEmail(e.target.value)}
                       placeholder="seu@email.com"
-                      style={{ width: '100%', border: '1.5px solid #d4d4d8', borderRadius: '10px', padding: '11px 14px', fontSize: '14px', color: '#18181b', backgroundColor: '#ffffff', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', appearance: 'none', WebkitAppearance: 'none' }}
+                      style={{ display: 'block', width: '100%', border: '1.5px solid #e4e4e7', borderRadius: '10px', padding: '12px 14px', fontSize: '15px', color: '#18181b', backgroundColor: '#fff', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', WebkitAppearance: 'none' }}
                       onFocus={e => (e.currentTarget.style.borderColor = '#18181b')}
-                      onBlur={e => (e.currentTarget.style.borderColor = '#d4d4d8')}
+                      onBlur={e => (e.currentTarget.style.borderColor = '#e4e4e7')}
                     />
                   </div>
 
                   {status === 'error' && (
-                    <p style={{ fontSize: '12px', color: '#ef4444', background: '#fef2f2', padding: '8px 12px', borderRadius: '8px', margin: 0 }}>
+                    <p style={{ fontSize: '12px', color: '#ef4444', background: '#fef2f2', padding: '8px 12px', borderRadius: '8px', margin: 0, fontFamily: 'inherit' }}>
                       Erro ao salvar. Tente novamente.
                     </p>
                   )}
@@ -187,17 +154,16 @@ export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName
                   <button
                     type="submit"
                     disabled={status === 'loading'}
-                    style={{ width: '100%', background: '#18181b', color: '#ffffff', border: 'none', borderRadius: '10px', padding: '13px', fontSize: '14px', fontWeight: '600', cursor: status === 'loading' ? 'not-allowed' : 'pointer', opacity: status === 'loading' ? 0.6 : 1, fontFamily: 'inherit' }}
+                    style={{ width: '100%', background: '#18181b', color: '#fff', border: 'none', borderRadius: '10px', padding: '14px', fontSize: '15px', fontWeight: '700', cursor: status === 'loading' ? 'not-allowed' : 'pointer', opacity: status === 'loading' ? 0.6 : 1, fontFamily: 'inherit', marginTop: '4px' }}
                   >
                     {status === 'loading' ? 'Aguarde...' : 'Receber material gratuitamente'}
                   </button>
 
-                  <p style={{ textAlign: 'center', fontSize: '11px', color: '#a1a1aa', margin: 0 }}>
+                  <p style={{ textAlign: 'center', fontSize: '11px', color: '#a1a1aa', margin: 0, fontFamily: 'inherit' }}>
                     Seus dados são protegidos. Sem spam.
                   </p>
                 </form>
               )}
-            </div>
             </div>
           </div>
         </div>
