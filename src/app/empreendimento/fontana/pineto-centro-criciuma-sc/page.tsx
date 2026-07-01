@@ -192,8 +192,6 @@ export default function Page() {
             </div>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'flex-end' }}>
               <LeadCaptureButton slug="pineto-centro-criciuma-sc" construtora_slug="fontana" className="pn-cta" />
-                Baixar Catálogo
-              </a>
             </div>
           </div>
         </div>
