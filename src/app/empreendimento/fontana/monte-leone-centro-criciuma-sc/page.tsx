@@ -272,7 +272,7 @@ style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 
 </div>
 ))}
 </div>
-<LeadCaptureButton slug="monte-leone-centro-criciuma-sc" construtora_slug="fontana" className="ml-cta ml-cta-light" />
+<LeadCaptureButton slug="monte-leone-centro-criciuma-sc" construtora_slug="fontana" className="ml-cta ml-cta-light"  propertyDisplayName="Monte Leone Residencial" />
 </div>
 </section>
 
