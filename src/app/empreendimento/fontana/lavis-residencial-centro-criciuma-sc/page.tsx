@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import GalleryWithLightbox, { LightboxPhoto } from './gallery-lightbox'
+import { LeadCaptureButton } from '@/components/LeadCaptureButton'
 
 // Hotsite premium Lavis Residencial (Fontana, Centro de Criciuma/SC). Padrao EPIC — benchmark Aguas de Marano.
 // WhatsApp do corretor Stiven (NAO usar numeros internos da Fontana).
@@ -260,7 +261,7 @@ export default function LavisPage() {
               </div>
             ))}
           </div>
-          <a href={CATALOGO_PDF} target="_blank" rel="noopener noreferrer" className="lv-cta lv-cta-light">Baixar Catálogo &amp; Plantas</a>
+          <LeadCaptureButton slug="lavis-residencial-centro-criciuma-sc" construtora_slug="fontana" className="lv-cta lv-cta-light" />
         </div>
       </section>
 
