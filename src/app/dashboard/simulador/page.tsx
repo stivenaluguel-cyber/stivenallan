@@ -1,202 +1,503 @@
-'use client';
-import { useState, useMemo } from 'react';
+'use client'
+import { useState, useMemo } from 'react'
+import { imoveis } from '@/data/imoveis'
+import { simular, planos } from '@/data/financiamento'
+import type { CorrecaoB, OpcoesParcela } from '@/data/financiamento'
 
-interface SimForm {
-  valor_imovel: number; entrada: number; fgts: number;
-  parcelas_qtd: number; reforcos_qtd: number; reforcos_valor: number;
-  chaves_pct: number; prazo_obra_meses: number; indice: string;
-  taxa_juros_am: number; cenario_repasse: boolean;
+// ─── helpers ────────────────────────────────────────────────────────────────
+const D = {
+  bg: '#F3F2EE', surface: '#FAFAF7', ink: '#161512',
+  bronze: '#D24E22', muted: '#6B655B', line: 'rgba(26,24,21,0.08)',
+  green: '#25D366', amber: '#B45309', amberBg: '#FEF3C7',
 }
 
-const TAXAS: Record<string, number> = { incc:0.5, igpm:0.4, ipca:0.35, sem:0 };
-function fmt(v: number) { return v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); }
-function cor(v: number, m: number, t: number) { return t>0 ? v*Math.pow(1+t/100,m) : v; }
+function fmtBRL(v: number) {
+  return 'R$\u00a0' + v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+}
 
-const def: SimForm = {
-  valor_imovel:300000, entrada:60000, fgts:0, parcelas_qtd:36,
-  reforcos_qtd:3, reforcos_valor:15000, chaves_pct:20,
-  prazo_obra_meses:36, indice:'incc', taxa_juros_am:0, cenario_repasse:false,
-};
+function parseBRL(s: string): number {
+  // Remove tudo exceto dígitos e vírgula
+  const clean = s.replace(/[^\d,]/g, '').replace(',', '.')
+  return parseFloat(clean) || 0
+}
 
+function maskBRL(raw: string): string {
+  const digits = raw.replace(/\D/g, '')
+  if (!digits) return ''
+  const num = parseInt(digits, 10) / 100
+  return 'R$\u00a0' + num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+}
+
+// ─── Simulador Bancário (preservado) ────────────────────────────────────────
+interface BankForm {
+  valor_imovel: number; entrada: number; fgts: number
+  parcelas_qtd: number; reforcos_qtd: number; reforcos_valor: number
+  chaves_pct: number; prazo_obra_meses: number; indice: string
+  taxa_juros_am: number; cenario_repasse: boolean
+}
+const TAXAS: Record<string, number> = { incc: 0.5, igpm: 0.4, ipca: 0.35, sem: 0 }
+function cor(v: number, m: number, t: number) { return t > 0 ? v * Math.pow(1 + t / 100, m) : v }
+const defBank: BankForm = {
+  valor_imovel: 300000, entrada: 60000, fgts: 0, parcelas_qtd: 36,
+  reforcos_qtd: 3, reforcos_valor: 15000, chaves_pct: 20,
+  prazo_obra_meses: 36, indice: 'incc', taxa_juros_am: 0, cenario_repasse: false,
+}
+
+// ─── Imóveis com plano ───────────────────────────────────────────────────────
+const imoveisAtivos = imoveis
+  .filter(i => i.ativo && planos[i.slug])
+  .sort((a, b) => a.nome.localeCompare(b.nome))
+
+// ─── Componente principal ────────────────────────────────────────────────────
 export default function SimuladorPage() {
-  const [f, setF] = useState<SimForm>(def);
-  const [show, setShow] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const sf = <K extends keyof SimForm>(k:K, v:SimForm[K]) => setF(p=>({...p,[k]:v}));
 
-  const r = useMemo(()=>{
-    const taxa = f.taxa_juros_am > 0 ? f.taxa_juros_am : TAXAS[f.indice];
-    const chaves = f.valor_imovel*(f.chaves_pct/100);
-    const tot_ref = f.reforcos_qtd*f.reforcos_valor;
-    const parc_total = Math.max(0, f.valor_imovel-f.entrada-tot_ref-chaves);
-    const parcela = f.parcelas_qtd>0 ? parc_total/f.parcelas_qtd : 0;
-    const nominal = f.entrada+tot_ref+parc_total+chaves;
-    const fator = f.parcelas_qtd>0 ? Math.pow(1+taxa/100,f.parcelas_qtd/2) : 1;
-    const corr = f.entrada + f.reforcos_qtd*cor(f.reforcos_valor,12,taxa) + parc_total*fator + cor(chaves,f.prazo_obra_meses,taxa);
-    return { chaves, tot_ref, parc_total, parcela, nominal, corr, taxa,
-      pe:(f.entrada/f.valor_imovel)*100, pp:(parc_total/f.valor_imovel)*100,
-      pr:(tot_ref/f.valor_imovel)*100, ok:Math.abs(nominal-f.valor_imovel)<10 };
-  },[f]);
+  // ── Estado Simulador Direto ──────────────────────────────────────────────
+  const [slug, setSlug] = useState(imoveisAtivos[0]?.slug ?? '')
+  const [valorRaw, setValorRaw] = useState('R$\u00a0500.000,00')
+  const [correcaoB, setCorrecaoB] = useState<CorrecaoB>('igpm')
+  const [showOpcoes, setShowOpcoes] = useState(false)
+  const [opcEntrada, setOpcEntrada] = useState('')
+  const [opcMensais, setOpcMensais] = useState('')
+  const [opcReforcos, setOpcReforcos] = useState('')
+  const [copiado, setCopiado] = useState(false)
 
-  const card:React.CSSProperties={background:'#fff',borderRadius:12,padding:24,boxShadow:'0 1px 4px rgba(0,0,0,0.07)',marginBottom:20};
-  const inp:React.CSSProperties={width:'100%',padding:'9px 12px',borderRadius:8,border:'1.5px solid #e5e7eb',fontSize:14,background:'#f9fafb',boxSizing:'border-box',color:'#111827'};
-  const lbl:React.CSSProperties={display:'block',fontSize:12,fontWeight:600,color:'#6b7280',marginBottom:4,textTransform:'uppercase'};
-  const h2s:React.CSSProperties={fontSize:15,fontWeight:700,marginBottom:16,marginTop:0,color:'#D24E22',paddingBottom:8,borderBottom:'2px solid #FFF3EC'};
+  // ── Estado Simulador Bancário ────────────────────────────────────────────
+  const [showBank, setShowBank] = useState(false)
+  const [bf, setBf] = useState<BankForm>(defBank)
+  const [showCronograma, setShowCronograma] = useState(false)
+  const sbf = <K extends keyof BankForm>(k: K, v: BankForm[K]) => setBf(p => ({ ...p, [k]: v }))
 
-  const fluxo = useMemo(()=>{
-    const taxa=f.taxa_juros_am>0?f.taxa_juros_am:TAXAS[f.indice];
-    const chaves=f.valor_imovel*(f.chaves_pct/100);
-    const tot_ref=f.reforcos_qtd*f.reforcos_valor;
-    const parc_total=Math.max(0,f.valor_imovel-f.entrada-tot_ref-chaves);
-    const parcela=f.parcelas_qtd>0?parc_total/f.parcelas_qtd:0;
-    return [
-      {mes:0,tipo:'entrada',desc:'Ato — Entrada/Sinal',val:f.entrada,valc:f.entrada},
-      ...(f.fgts>0?[{mes:0,tipo:'fgts',desc:'FGTS (abatimento)',val:-f.fgts,valc:-f.fgts}]:[]),
-      ...Array.from({length:f.reforcos_qtd},(_,i)=>({mes:(i+1)*12,tipo:'reforco',desc:'Reforço '+(i+1),val:f.reforcos_valor,valc:cor(f.reforcos_valor,(i+1)*12,taxa)})),
-      {mes:1,tipo:'parcela',desc:'1ª parcela mensal',val:parcela,valc:cor(parcela,1,taxa)},
-      ...(f.parcelas_qtd>2?[{mes:f.parcelas_qtd,tipo:'parcela',desc:'Última parcela',val:parcela,valc:cor(parcela,f.parcelas_qtd,taxa)}]:[]),
-      {mes:f.prazo_obra_meses,tipo:'chaves',desc:'Parcela das chaves',val:chaves,valc:cor(chaves,f.prazo_obra_meses,taxa)},
-    ].sort((a,b)=>a.mes-b.mes);
-  },[f]);
+  // ── Cálculo direto ───────────────────────────────────────────────────────
+  const valorImovel = useMemo(() => {
+    const digits = valorRaw.replace(/\D/g, '')
+    if (!digits) return 0
+    return parseInt(digits, 10) / 100
+  }, [valorRaw])
 
-  const TC:Record<string,string>={entrada:'#D24E22',fgts:'#16a34a',reforco:'#8b5cf6',parcela:'#3b82f6',chaves:'#f59e0b'};
+  const opcoes = useMemo<OpcoesParcela>(() => {
+    const o: OpcoesParcela = {}
+    if (opcEntrada) o.entradaPct = parseFloat(opcEntrada) / 100
+    if (opcMensais) o.mensais = parseInt(opcMensais, 10)
+    if (opcReforcos) o.reforcos = parseInt(opcReforcos, 10)
+    return o
+  }, [opcEntrada, opcMensais, opcReforcos])
 
-  const save=()=>{
-    const stored=JSON.parse(localStorage.getItem('simulacoes')||'[]');
-    stored.unshift({...f,r,ts:new Date().toISOString()});
-    localStorage.setItem('simulacoes',JSON.stringify(stored.slice(0,20)));
-    setSaved(true); setTimeout(()=>setSaved(false),2000);
-  };
+  const sim = useMemo(() => {
+    if (!slug || valorImovel <= 0) return null
+    return simular(slug, valorImovel, opcoes, correcaoB)
+  }, [slug, valorImovel, opcoes, correcaoB])
+
+  const imovelSelecionado = useMemo(
+    () => imoveisAtivos.find(i => i.slug === slug) ?? null,
+    [slug]
+  )
+
+  // ── Cálculo bancário ─────────────────────────────────────────────────────
+  const bCalc = useMemo(() => {
+    const taxa = bf.taxa_juros_am > 0 ? bf.taxa_juros_am : TAXAS[bf.indice]
+    const chaves = bf.valor_imovel * (bf.chaves_pct / 100)
+    const tot_ref = bf.reforcos_qtd * bf.reforcos_valor
+    const parc_total = Math.max(0, bf.valor_imovel - bf.entrada - tot_ref - chaves)
+    const parcela = bf.parcelas_qtd > 0 ? parc_total / bf.parcelas_qtd : 0
+    const nominal = bf.entrada + tot_ref + parc_total + chaves
+    const fator = bf.parcelas_qtd > 0 ? Math.pow(1 + taxa / 100, bf.parcelas_qtd / 2) : 1
+    const corrTotal = bf.entrada + bf.reforcos_qtd * cor(bf.reforcos_valor, 12, taxa) + parc_total * fator + cor(chaves, bf.prazo_obra_meses, taxa)
+    return { chaves, tot_ref, parc_total, parcela, nominal, corr: corrTotal, taxa }
+  }, [bf])
+
+  // ── Aviso de prazo reduzido ──────────────────────────────────────────────
+  const avisoPrazo = useMemo(() => {
+    if (!sim) return null
+    return sim.avisos.find(a => a.startsWith('Prazo reduzido') || a.startsWith('Reforços anuais reduzidos')) ?? null
+  }, [sim])
+
+  const avisosRodape = useMemo(() => {
+    if (!sim) return []
+    return sim.avisos.filter(a => !a.startsWith('Prazo reduzido') && !a.startsWith('Reforços anuais reduzidos'))
+  }, [sim])
+
+  // ── Copiar proposta ──────────────────────────────────────────────────────
+  async function copiarProposta() {
+    if (!sim || !imovelSelecionado) return
+    const { parcelaA, parcelaB, valorAVista, descontoAVista } = sim
+    const nome = imovelSelecionado.nome
+    const linhas = [
+      '📋 *Simulação — ' + nome + '*',
+      'Valor do imóvel: ' + fmtBRL(valorImovel),
+      '',
+      '🏗️ *Parcela A — durante a obra*',
+      '• Entrada: ' + fmtBRL(parcelaA.entrada) + ' (' + Math.round((parcelaA.entrada / valorImovel) * 100) + '%)',
+    ]
+    if (parcelaA.qtdMensais > 0) {
+      linhas.push('• ' + parcelaA.qtdMensais + 'x mensais de ' + fmtBRL(parcelaA.valorMensal))
+    }
+    if (parcelaA.qtdReforcos > 0) {
+      linhas.push('• ' + parcelaA.qtdReforcos + ' reforço(s) anual(is) de ' + fmtBRL(parcelaA.valorReforco))
+    }
+    if (parcelaB) {
+      linhas.push('')
+      linhas.push('🏠 *Parcela B — pós-chaves (' + parcelaB.correcaoLabel + ')*')
+      linhas.push('• Saldo: ' + fmtBRL(parcelaB.saldoDevedor))
+      linhas.push('• Price: ' + parcelaB.meses + 'x de ' + fmtBRL(parcelaB.parcelaMensal))
+      linhas.push('• SAC: 1ª ' + fmtBRL(parcelaB.parcelaSAC1) + ' → última ' + fmtBRL(parcelaB.parcelaSACn))
+    }
+    linhas.push('')
+    linhas.push('💰 *À vista*')
+    linhas.push('• ' + fmtBRL(valorAVista) + ' (economia de ' + fmtBRL(descontoAVista) + ')')
+    linhas.push('')
+    linhas.push('_Valores estimados, sujeitos à tabela vigente. Corrigidos pelo CUB/Sinduscon-SC._')
+    await navigator.clipboard.writeText(linhas.join('\n'))
+    setCopiado(true)
+    setTimeout(() => setCopiado(false), 2000)
+  }
+
+  // ── Estilos compartilhados ───────────────────────────────────────────────
+  const card: React.CSSProperties = {
+    background: '#fff', borderRadius: 16, padding: 24,
+    boxShadow: '0 1px 6px rgba(0,0,0,0.07)', marginBottom: 20,
+  }
+  const inp: React.CSSProperties = {
+    width: '100%', padding: '10px 12px', borderRadius: 10,
+    border: '1.5px solid ' + D.line, fontSize: 14, background: '#fff',
+    color: D.ink, outline: 'none', boxSizing: 'border-box',
+  }
+  const lbl: React.CSSProperties = {
+    display: 'block', fontSize: 11, fontWeight: 700, color: D.muted,
+    marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.05em',
+  }
+  const sectionTitle: React.CSSProperties = {
+    fontSize: 13, fontWeight: 700, color: D.bronze,
+    textTransform: 'uppercase', letterSpacing: '0.07em',
+    margin: '0 0 16px', paddingBottom: 10, borderBottom: '2px solid #FFF3EC',
+  }
 
   return (
-    <div style={{minHeight:'100vh',background:'#f3f4f6',fontFamily:'Inter,system-ui,sans-serif'}}>
-      <div style={{maxWidth:900,margin:'0 auto',padding:'32px 16px 64px'}}>
-        <div style={{marginBottom:24}}>
-          <h1 style={{fontSize:24,fontWeight:800,color:'#111827',margin:'0 0 4px'}}>Simulador de Financiamento Direto</h1>
-          <p style={{fontSize:14,color:'#6b7280',margin:0}}>Parcelamento com a construtora — sem banco. Entrada + parcelas + reforços + chaves.</p>
+    <div style={{ minHeight: '100vh', background: D.bg, fontFamily: 'system-ui, sans-serif', padding: '28px 20px 64px' }}>
+      <div style={{ maxWidth: 860, margin: '0 auto' }}>
+
+        {/* ── Título ──────────────────────────────────────────────────── */}
+        <div style={{ marginBottom: 24 }}>
+          <h1 style={{ fontSize: 24, fontWeight: 800, color: D.ink, margin: '0 0 4px' }}>
+            Simulador de Financiamento Direto
+          </h1>
+          <p style={{ fontSize: 13, color: D.muted, margin: 0 }}>
+            Parcelas com a construtora — sem banco, sem burocracia.
+          </p>
         </div>
-        <div style={{display:'grid',gridTemplateColumns:'1fr 340px',gap:20,alignItems:'start'}} className="sim-grid">
-          <div>
-            <div style={card}>
-              <h2 style={h2s}>💰 Valores</h2>
-              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:14}}>
-                <div><label style={lbl}>Valor do Imóvel (R$)</label><input style={inp} type="number" value={f.valor_imovel} onChange={e=>sf('valor_imovel',+e.target.value)} step={10000} /></div>
-                <div><label style={lbl}>Entrada/Sinal (R$)</label><input style={inp} type="number" value={f.entrada} onChange={e=>sf('entrada',+e.target.value)} /></div>
-                <div><label style={lbl}>FGTS na Entrada (R$)</label><input style={inp} type="number" value={f.fgts} onChange={e=>sf('fgts',+e.target.value)} /></div>
-                <div><label style={lbl}>Parcela Chaves (%)</label><input style={inp} type="number" value={f.chaves_pct} onChange={e=>sf('chaves_pct',+e.target.value)} min={0} max={50} step={5} /></div>
-              </div>
-              <div style={{height:10,borderRadius:6,overflow:'hidden',display:'flex'}}>
-                <div style={{width:r.pe+'%',background:'#D24E22'}} /><div style={{width:r.pp+'%',background:'#3b82f6'}} />
-                <div style={{width:r.pr+'%',background:'#8b5cf6'}} /><div style={{width:f.chaves_pct+'%',background:'#f59e0b'}} />
-              </div>
-              <div style={{display:'flex',gap:10,marginTop:8,fontSize:11,flexWrap:'wrap'}}>
-                {[['#D24E22','Entrada'],['#3b82f6','Parcelas'],['#8b5cf6','Reforços'],['#f59e0b','Chaves']].map(([c2,l])=>(
-                  <span key={l} style={{display:'flex',alignItems:'center',gap:4,color:'#6b7280'}}><span style={{width:8,height:8,borderRadius:2,background:c2}}/>{l}</span>
-                ))}
-              </div>
-            </div>
-            <div style={card}>
-              <h2 style={h2s}>📅 Parcelas Mensais</h2>
-              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14}}>
-                <div><label style={lbl}>Qtd. Parcelas</label><input style={inp} type="number" value={f.parcelas_qtd} onChange={e=>sf('parcelas_qtd',+e.target.value)} min={1} max={240} /></div>
-                <div><label style={lbl}>Parcela Mensal</label><input style={{...inp,background:'#f3f4f6',fontWeight:700}} value={fmt(r.parcela)} readOnly /></div>
-              </div>
-            </div>
-            <div style={card}>
-              <h2 style={h2s}>💫 Reforços / Intermediárias</h2>
-              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14}}>
-                <div><label style={lbl}>Qtd. Reforços (anuais)</label><input style={inp} type="number" value={f.reforcos_qtd} onChange={e=>sf('reforcos_qtd',+e.target.value)} min={0} max={10} /></div>
-                <div><label style={lbl}>Valor/Reforço (R$)</label><input style={inp} type="number" value={f.reforcos_valor} onChange={e=>sf('reforcos_valor',+e.target.value)} step={5000} /></div>
-              </div>
-            </div>
-            <div style={card}>
-              <h2 style={h2s}>📊 Correção e Prazo</h2>
-              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14}}>
-                <div><label style={lbl}>Índice</label><select style={inp} value={f.indice} onChange={e=>sf('indice',e.target.value)}><option value="incc">INCC</option><option value="igpm">IGP-M</option><option value="ipca">IPCA</option><option value="sem">Sem correção</option></select></div>
-                <div><label style={lbl}>Juros a.m. (%)</label><input style={inp} type="number" value={f.taxa_juros_am} onChange={e=>sf('taxa_juros_am',+e.target.value)} min={0} max={5} step={0.1} /></div>
-                <div style={{gridColumn:'1/-1'}}><label style={lbl}>Prazo Obra (meses)</label><input style={inp} type="number" value={f.prazo_obra_meses} onChange={e=>sf('prazo_obra_meses',+e.target.value)} min={1} max={120} /></div>
-              </div>
-              <div style={{padding:'12px 16px',background:'#FFFBEB',border:'1px solid #FCD34D',borderRadius:8,marginTop:12}}>
-                <label style={{display:'flex',alignItems:'center',gap:8,cursor:'pointer'}}>
-                  <input type="checkbox" checked={f.cenario_repasse} onChange={e=>sf('cenario_repasse',e.target.checked)} style={{accentColor:'#D24E22'}} />
-                  <span style={{fontSize:13,fontWeight:600,color:'#92400e'}}>Quitar chaves via Caixa/FGTS na entrega — cenário opcional de repasse</span>
-                </label>
-                {f.cenario_repasse&&<p style={{fontSize:12,color:'#78350f',margin:'8px 0 0',lineHeight:1.5}}>⚠️ Saldo das chaves ({fmt(r.chaves)}) poderá ser quitado via FGTS/MCMV. Sujeito a análise de crédito. Não é o foco do plano direto.</p>}
-              </div>
-            </div>
-          </div>
-          <div style={{position:'sticky',top:72}}>
-            <div style={{background:'#1a1a2e',color:'#fff',borderRadius:12,padding:24,borderTop:'3px solid #D24E22'}}>
-              <div style={{fontSize:12,fontWeight:600,color:'rgba(255,255,255,0.5)',textTransform:'uppercase',marginBottom:16}}>Resumo · {fmt(f.valor_imovel)}</div>
-              {[
-                {l:'Entrada',v:f.entrada,sub:f.fgts>0?'+ '+fmt(f.fgts)+' FGTS':null,c:'#D24E22'},
-                {l:'Parcela Mensal',v:r.parcela,sub:f.parcelas_qtd+'x',c:'#3b82f6'},
-                {l:'Total Parcelas',v:r.parc_total,sub:null,c:'#3b82f6'},
-                {l:'Reforços ('+f.reforcos_qtd+'x)',v:r.tot_ref,sub:fmt(f.reforcos_valor)+' cada',c:'#8b5cf6'},
-                {l:'Parcela Chaves',v:r.chaves,sub:f.chaves_pct+'% do valor',c:'#f59e0b'},
-              ].map(it=>(
-                <div key={it.l} style={{borderBottom:'1px solid rgba(255,255,255,0.08)',paddingBottom:12,marginBottom:12}}>
-                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline'}}>
-                    <span style={{fontSize:12,color:'rgba(255,255,255,0.6)'}}>{it.l}</span>
-                    <span style={{fontSize:16,fontWeight:700,color:it.c}}>{fmt(it.v)}</span>
-                  </div>
-                  {it.sub&&<div style={{fontSize:11,color:'rgba(255,255,255,0.4)',marginTop:2}}>{it.sub}</div>}
-                </div>
+
+        {/* ── Card de Controles ────────────────────────────────────────── */}
+        <div style={card}>
+          <p style={sectionTitle}>Configurar simulação</p>
+
+          {/* Empreendimento */}
+          <div style={{ marginBottom: 16 }}>
+            <label style={lbl}>Empreendimento</label>
+            <select
+              value={slug}
+              onChange={e => setSlug(e.target.value)}
+              style={inp}
+            >
+              {imoveisAtivos.map(i => (
+                <option key={i.slug} value={i.slug}>
+                  {i.nome} — {i.cidade}/{i.uf}
+                </option>
               ))}
-              <div style={{borderTop:'2px solid rgba(255,255,255,0.15)',paddingTop:16,marginTop:4}}>
-                <div style={{display:'flex',justifyContent:'space-between',marginBottom:8}}>
-                  <span style={{fontSize:13,color:'rgba(255,255,255,0.7)'}}>Total nominal</span>
-                  <span style={{fontSize:18,fontWeight:800,color:'#fff'}}>{fmt(r.nominal)}</span>
-                </div>
-                <div style={{display:'flex',justifyContent:'space-between'}}>
-                  <span style={{fontSize:12,color:'rgba(255,255,255,0.5)'}}>Estimativa corrigida ({f.indice})</span>
-                  <span style={{fontSize:14,fontWeight:600,color:'#f59e0b'}}>{fmt(r.corr)}</span>
-                </div>
-                {!r.ok&&<div style={{marginTop:10,padding:'8px 10px',background:'#DC2626',borderRadius:6,fontSize:12}}>⚠️ Soma dos componentes difere do total — revise.</div>}
-              </div>
-              <div style={{display:'flex',flexDirection:'column',gap:8,marginTop:16}}>
-                <button onClick={()=>setShow(v=>!v)} style={{padding:'10px',borderRadius:8,border:'1px solid rgba(255,255,255,0.2)',background:'rgba(255,255,255,0.08)',color:'#fff',fontWeight:600,cursor:'pointer',fontSize:13}}>
-                  {show?'▲ Ocultar':'▼ Ver'} Cronograma
+            </select>
+          </div>
+
+          {/* Valor do imóvel */}
+          <div style={{ marginBottom: 16 }}>
+            <label style={lbl}>Valor do imóvel</label>
+            <input
+              style={inp}
+              type="text"
+              inputMode="numeric"
+              value={valorRaw}
+              onChange={e => setValorRaw(maskBRL(e.target.value))}
+              placeholder="R$ 0,00"
+            />
+          </div>
+
+          {/* Correção Parcela B */}
+          <div style={{ marginBottom: 16 }}>
+            <label style={lbl}>Correção Parcela B (pós-chaves)</label>
+            <div style={{ display: 'flex', gap: 10 }}>
+              {(['igpm', 'cub'] as CorrecaoB[]).map(op => (
+                <button
+                  key={op}
+                  onClick={() => setCorrecaoB(op)}
+                  style={{
+                    flex: 1, padding: '10px', borderRadius: 10, fontSize: 13, fontWeight: 700,
+                    cursor: 'pointer', border: '2px solid',
+                    borderColor: correcaoB === op ? D.bronze : D.line,
+                    background: correcaoB === op ? D.bronze : '#fff',
+                    color: correcaoB === op ? '#fff' : D.muted,
+                    transition: 'all .15s',
+                  }}
+                >
+                  {op === 'igpm' ? 'IGPM + 0,75% a.m.' : 'CUB/SC'}
                 </button>
-                <button onClick={save} style={{padding:'10px',borderRadius:8,border:'none',background:saved?'#16a34a':'#D24E22',color:'#fff',fontWeight:700,cursor:'pointer',fontSize:13}}>
-                  {saved?'✅ Salvo!':'💾 Salvar Simulação'}
+              ))}
+            </div>
+          </div>
+
+          {/* Personalizar condição — colapsável */}
+          <button
+            onClick={() => setShowOpcoes(v => !v)}
+            style={{
+              background: 'none', border: 'none', cursor: 'pointer',
+              color: D.bronze, fontSize: 13, fontWeight: 700, padding: 0,
+              display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12,
+            }}
+          >
+            {showOpcoes ? '▲' : '▼'} Personalizar condição (opcional)
+          </button>
+
+          {showOpcoes && (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, padding: '16px', background: D.bg, borderRadius: 12, marginBottom: 8 }}>
+              <div>
+                <label style={lbl}>Entrada %</label>
+                <input
+                  style={inp} type="number" min={0} max={100} step={1}
+                  value={opcEntrada} onChange={e => setOpcEntrada(e.target.value)}
+                  placeholder={planos[slug] ? Math.round(planos[slug].entradaPct * 100) + ' (padrão)' : ''}
+                />
+              </div>
+              <div>
+                <label style={lbl}>Qtd. mensais</label>
+                <input
+                  style={inp} type="number" min={0} max={240} step={1}
+                  value={opcMensais} onChange={e => setOpcMensais(e.target.value)}
+                  placeholder={planos[slug] ? planos[slug].mensais + ' (padrão)' : ''}
+                />
+              </div>
+              <div>
+                <label style={lbl}>Qtd. reforços</label>
+                <input
+                  style={inp} type="number" min={0} max={12} step={1}
+                  value={opcReforcos} onChange={e => setOpcReforcos(e.target.value)}
+                  placeholder={planos[slug] ? planos[slug].reforcos + ' (padrão)' : ''}
+                />
+              </div>
+              <div style={{ gridColumn: '1/-1' }}>
+                <button
+                  onClick={() => { setOpcEntrada(''); setOpcMensais(''); setOpcReforcos('') }}
+                  style={{ fontSize: 12, color: D.muted, background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+                >
+                  Limpar — usar plano padrão
                 </button>
               </div>
             </div>
-          </div>
+          )}
         </div>
-        {show&&(
-          <div style={card}>
-            <h2 style={h2s}>📋 Cronograma</h2>
-            <div style={{overflowX:'auto'}}>
-              <table style={{width:'100%',borderCollapse:'collapse',fontSize:13}}>
-                <thead><tr style={{background:'#f9fafb',borderBottom:'2px solid #e5e7eb'}}>
-                  {['Mês','Tipo','Descrição','Valor Nominal','Valor Corrigido'].map(h=>(
-                    <th key={h} style={{padding:'10px 12px',textAlign:h.includes('Valor')?'right':'left',fontWeight:600,color:'#374151',fontSize:12}}>{h}</th>
-                  ))}
-                </tr></thead>
-                <tbody>
-                  {fluxo.map((it,i)=>(
-                    <tr key={i} style={{borderBottom:'1px solid #f3f4f6'}}>
-                      <td style={{padding:'9px 12px',color:'#6b7280'}}>{it.mes}</td>
-                      <td style={{padding:'9px 12px'}}><span style={{display:'inline-block',padding:'2px 8px',borderRadius:999,background:TC[it.tipo]+'20',color:TC[it.tipo],fontWeight:700,fontSize:11,textTransform:'uppercase'}}>{it.tipo}</span></td>
-                      <td style={{padding:'9px 12px',color:'#374151'}}>{it.desc}</td>
-                      <td style={{padding:'9px 12px',textAlign:'right',fontWeight:600,color:it.val<0?'#16a34a':'#111827'}}>{fmt(Math.abs(it.val))}</td>
-                      <td style={{padding:'9px 12px',textAlign:'right',color:'#6b7280'}}>{fmt(Math.abs(it.valc))}</td>
-                    </tr>
-                  ))}
-                </tbody>
-                <tfoot><tr style={{background:'#f9fafb',borderTop:'2px solid #e5e7eb',fontWeight:700}}>
-                  <td colSpan={3} style={{padding:'10px 12px',color:'#374151'}}>TOTAL</td>
-                  <td style={{padding:'10px 12px',textAlign:'right'}}>{fmt(r.nominal)}</td>
-                  <td style={{padding:'10px 12px',textAlign:'right',color:'#f59e0b'}}>{fmt(r.corr)}</td>
-                </tr></tfoot>
-              </table>
+
+        {/* ── Sem plano cadastrado ─────────────────────────────────────── */}
+        {slug && !planos[slug] && (
+          <div style={{ ...card, borderLeft: '4px solid #f59e0b', background: '#FFFBEB' }}>
+            <p style={{ margin: 0, fontSize: 14, color: '#92400e' }}>
+              ⚠️ Plano de financiamento não cadastrado para este empreendimento.
+            </p>
+          </div>
+        )}
+
+        {/* ── Aviso prazo reduzido ─────────────────────────────────────── */}
+        {avisoPrazo && (
+          <div style={{ background: D.amberBg, border: '1px solid #FCD34D', borderRadius: 12, padding: '12px 16px', marginBottom: 16, display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+            <span style={{ fontSize: 18 }}>⚠️</span>
+            <span style={{ fontSize: 13, color: D.amber, fontWeight: 600 }}>{avisoPrazo}</span>
+          </div>
+        )}
+
+        {sim && (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
+
+            {/* ── Card 1 — PARCELA A ────────────────────────────────────── */}
+            <div style={{ ...card, marginBottom: 0, borderTop: '3px solid ' + D.bronze }}>
+              <p style={{ ...sectionTitle, marginBottom: 14 }}>🏗️ Parcela A — até as chaves</p>
+
+              <div style={{ marginBottom: 14 }}>
+                <div style={{ fontSize: 11, color: D.muted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 2 }}>Entrada</div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: D.ink }}>{fmtBRL(sim.parcelaA.entrada)}</div>
+                <div style={{ fontSize: 12, color: D.muted }}>{Math.round((sim.parcelaA.entrada / valorImovel) * 100)}% do valor total</div>
+              </div>
+
+              {sim.parcelaA.qtdMensais > 0 && (
+                <div style={{ background: D.bg, borderRadius: 10, padding: '12px 14px', marginBottom: 10 }}>
+                  <div style={{ fontSize: 11, color: D.muted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>Parcelas mensais</div>
+                  <div style={{ fontSize: 20, fontWeight: 800, color: D.bronze }}>
+                    {fmtBRL(sim.parcelaA.valorMensal)}
+                    <span style={{ fontSize: 13, fontWeight: 400, color: D.muted }}> / mês</span>
+                  </div>
+                  <div style={{ fontSize: 12, color: D.muted, marginTop: 2 }}>{sim.parcelaA.qtdMensais} parcelas mensais</div>
+                </div>
+              )}
+
+              {sim.parcelaA.qtdReforcos > 0 && (
+                <div style={{ background: D.bg, borderRadius: 10, padding: '12px 14px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div>
+                      <div style={{ fontSize: 11, color: D.muted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>Reforços anuais</div>
+                      <div style={{ fontSize: 20, fontWeight: 800, color: '#8b5cf6' }}>{fmtBRL(sim.parcelaA.valorReforco)}</div>
+                      <div style={{ fontSize: 12, color: D.muted, marginTop: 2 }}>{sim.parcelaA.qtdReforcos} reforço(s) ao ano</div>
+                    </div>
+                    <span style={{ fontSize: 11, background: '#ede9fe', color: '#6d28d9', borderRadius: 999, padding: '3px 8px', fontWeight: 700, whiteSpace: 'nowrap', marginTop: 2 }}>
+                      reforço = 5× a mensal
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {sim.parcelaA.qtdMensais === 0 && sim.parcelaA.qtdReforcos === 0 && (
+                <div style={{ fontSize: 13, color: D.muted, padding: '8px 0' }}>Imóvel pronto — sem parcelas durante a obra.</div>
+              )}
+            </div>
+
+            {/* ── Card 3 — À VISTA ─────────────────────────────────────── */}
+            <div style={{ ...card, marginBottom: 0, borderTop: '3px solid #22c55e', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <p style={{ ...sectionTitle, marginBottom: 14, color: '#16a34a' }}>💰 À vista</p>
+
+              <div style={{ marginBottom: 14 }}>
+                <div style={{ fontSize: 11, color: D.muted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 2 }}>Valor com desconto</div>
+                <div style={{ fontSize: 26, fontWeight: 800, color: '#15803d' }}>{fmtBRL(sim.valorAVista)}</div>
+              </div>
+
+              <div style={{ background: '#f0fdf4', borderRadius: 10, padding: '12px 14px' }}>
+                <div style={{ fontSize: 11, color: '#16a34a', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 2 }}>Economia</div>
+                <div style={{ fontSize: 20, fontWeight: 800, color: '#15803d' }}>{fmtBRL(sim.descontoAVista)}</div>
+                <div style={{ fontSize: 12, color: '#16a34a', marginTop: 2 }}>
+                  {Math.round((sim.descontoAVista / valorImovel) * 100)}% de desconto
+                </div>
+              </div>
+
+              {/* Botão copiar */}
+              <button
+                onClick={copiarProposta}
+                style={{
+                  marginTop: 16, width: '100%', padding: '12px', borderRadius: 10,
+                  border: 'none', background: copiado ? '#16a34a' : D.bronze,
+                  color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer',
+                  transition: 'background .2s',
+                }}
+              >
+                {copiado ? '✅ Copiado!' : '📋 Copiar proposta'}
+              </button>
             </div>
           </div>
         )}
-        <style>{`@media(max-width:767px){.sim-grid{grid-template-columns:1fr!important;}}`}</style>
+
+        {/* ── Card 2 — PARCELA B ───────────────────────────────────────── */}
+        {sim?.parcelaB && (
+          <div style={{ ...card, borderTop: '3px solid #3b82f6' }}>
+            <p style={{ ...sectionTitle, color: '#1d4ed8' }}>🏠 Parcela B — pós-chaves</p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 20 }}>
+              <div>
+                <div style={{ fontSize: 11, color: D.muted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 2 }}>Saldo devedor</div>
+                <div style={{ fontSize: 20, fontWeight: 800, color: D.ink }}>{fmtBRL(sim.parcelaB.saldoDevedor)}</div>
+                <div style={{ fontSize: 12, color: D.muted, marginTop: 2 }}>{sim.parcelaB.meses} meses</div>
+              </div>
+              <div>
+                <div style={{ fontSize: 11, color: D.muted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 2 }}>Correção</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: '#1d4ed8' }}>{sim.parcelaB.correcaoLabel}</div>
+                <div style={{ fontSize: 11, color: D.muted, marginTop: 2 }}>taxa mensal de referência</div>
+              </div>
+            </div>
+
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+              <thead>
+                <tr style={{ background: D.bg }}>
+                  <th style={{ padding: '10px 14px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: D.muted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Sistema</th>
+                  <th style={{ padding: '10px 14px', textAlign: 'right', fontSize: 11, fontWeight: 700, color: D.muted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>1ª parcela</th>
+                  <th style={{ padding: '10px 14px', textAlign: 'right', fontSize: 11, fontWeight: 700, color: D.muted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Última parcela</th>
+                  <th style={{ padding: '10px 14px', textAlign: 'right', fontSize: 11, fontWeight: 700, color: D.muted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Prazo</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style={{ borderTop: '1px solid ' + D.line }}>
+                  <td style={{ padding: '12px 14px', fontWeight: 700, color: D.ink }}>Price (parcela fixa)</td>
+                  <td style={{ padding: '12px 14px', textAlign: 'right', fontWeight: 700, color: '#1d4ed8' }}>{fmtBRL(sim.parcelaB.parcelaMensal)}</td>
+                  <td style={{ padding: '12px 14px', textAlign: 'right', color: D.muted }}>{fmtBRL(sim.parcelaB.parcelaMensal)}</td>
+                  <td style={{ padding: '12px 14px', textAlign: 'right', color: D.muted }}>{sim.parcelaB.meses} meses</td>
+                </tr>
+                <tr style={{ borderTop: '1px solid ' + D.line, background: D.bg }}>
+                  <td style={{ padding: '12px 14px', fontWeight: 700, color: D.ink }}>SAC (decrescente)</td>
+                  <td style={{ padding: '12px 14px', textAlign: 'right', fontWeight: 700, color: '#1d4ed8' }}>{fmtBRL(sim.parcelaB.parcelaSAC1)}</td>
+                  <td style={{ padding: '12px 14px', textAlign: 'right', color: D.muted }}>{fmtBRL(sim.parcelaB.parcelaSACn)}</td>
+                  <td style={{ padding: '12px 14px', textAlign: 'right', color: D.muted }}>{sim.parcelaB.meses} meses</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* ── Rodapé de avisos ─────────────────────────────────────────── */}
+        {avisosRodape.length > 0 && (
+          <div style={{ marginBottom: 24 }}>
+            {avisosRodape.map((a, i) => (
+              <p key={i} style={{ margin: '0 0 4px', fontSize: 12, color: D.muted, lineHeight: 1.5 }}>
+                * {a}
+              </p>
+            ))}
+          </div>
+        )}
+
+        {/* ── Seção: Financiamento Bancário (preservado) ───────────────── */}
+        <div style={{ ...card, borderTop: '3px solid #6b7280' }}>
+          <button
+            onClick={() => setShowBank(v => !v)}
+            style={{
+              width: '100%', background: 'none', border: 'none', cursor: 'pointer',
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 0,
+            }}
+          >
+            <span style={{ fontSize: 14, fontWeight: 700, color: '#374151' }}>🏦 Financiamento Bancário (simulação auxiliar)</span>
+            <span style={{ fontSize: 18, color: D.muted }}>{showBank ? '▲' : '▼'}</span>
+          </button>
+
+          {showBank && (
+            <div style={{ marginTop: 20 }}>
+              <p style={{ fontSize: 12, color: D.muted, marginBottom: 16, marginTop: 0 }}>
+                Simulação paramétrica avulsa — parcelas + reforços + chaves com correção por índice. Não integrado ao plano Fontana.
+              </p>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
+                <div><label style={lbl}>Valor do Imóvel (R$)</label><input style={inp} type="number" value={bf.valor_imovel} onChange={e => sbf('valor_imovel', +e.target.value)} step={10000} /></div>
+                <div><label style={lbl}>Entrada (R$)</label><input style={inp} type="number" value={bf.entrada} onChange={e => sbf('entrada', +e.target.value)} /></div>
+                <div><label style={lbl}>FGTS (R$)</label><input style={inp} type="number" value={bf.fgts} onChange={e => sbf('fgts', +e.target.value)} /></div>
+                <div><label style={lbl}>Parcela Chaves (%)</label><input style={inp} type="number" value={bf.chaves_pct} onChange={e => sbf('chaves_pct', +e.target.value)} min={0} max={50} step={5} /></div>
+                <div><label style={lbl}>Qtd. Parcelas</label><input style={inp} type="number" value={bf.parcelas_qtd} onChange={e => sbf('parcelas_qtd', +e.target.value)} min={1} max={240} /></div>
+                <div><label style={lbl}>Parcela Mensal</label><input style={{ ...inp, background: D.bg, fontWeight: 700 }} value={bCalc.parcela.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} readOnly /></div>
+                <div><label style={lbl}>Reforços (qtd)</label><input style={inp} type="number" value={bf.reforcos_qtd} onChange={e => sbf('reforcos_qtd', +e.target.value)} min={0} max={10} /></div>
+                <div><label style={lbl}>Valor/Reforço (R$)</label><input style={inp} type="number" value={bf.reforcos_valor} onChange={e => sbf('reforcos_valor', +e.target.value)} step={5000} /></div>
+                <div><label style={lbl}>Índice</label><select style={inp} value={bf.indice} onChange={e => sbf('indice', e.target.value)}><option value="incc">INCC</option><option value="igpm">IGP-M</option><option value="ipca">IPCA</option><option value="sem">Sem correção</option></select></div>
+                <div><label style={lbl}>Juros a.m. (%)</label><input style={inp} type="number" value={bf.taxa_juros_am} onChange={e => sbf('taxa_juros_am', +e.target.value)} min={0} max={5} step={0.1} /></div>
+                <div style={{ gridColumn: '1/-1' }}><label style={lbl}>Prazo Obra (meses)</label><input style={inp} type="number" value={bf.prazo_obra_meses} onChange={e => sbf('prazo_obra_meses', +e.target.value)} min={1} max={120} /></div>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 14, padding: '16px', background: '#1a1a2e', borderRadius: 12, color: '#fff' }}>
+                {[
+                  { l: 'Entrada', v: bf.entrada, c: '#D24E22' },
+                  { l: 'Total Parcelas', v: bCalc.parc_total, c: '#3b82f6' },
+                  { l: 'Total Reforços', v: bCalc.tot_ref, c: '#8b5cf6' },
+                  { l: 'Parcela Chaves', v: bCalc.chaves, c: '#f59e0b' },
+                  { l: 'Total Nominal', v: bCalc.nominal, c: '#fff' },
+                  { l: 'Estimativa Corrigida', v: bCalc.corr, c: '#f59e0b' },
+                ].map(it => (
+                  <div key={it.l}>
+                    <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', marginBottom: 4 }}>{it.l}</div>
+                    <div style={{ fontSize: 16, fontWeight: 800, color: it.c }}>{it.v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                  </div>
+                ))}
+              </div>
+              <button
+                onClick={() => setShowCronograma(v => !v)}
+                style={{ marginTop: 14, padding: '9px 16px', borderRadius: 8, border: '1px solid ' + D.line, background: '#fff', color: D.ink, fontWeight: 600, cursor: 'pointer', fontSize: 13 }}
+              >
+                {showCronograma ? '▲ Ocultar' : '▼ Ver'} Cronograma
+              </button>
+            </div>
+          )}
+        </div>
+
       </div>
     </div>
-  );
+  )
 }
