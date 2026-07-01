@@ -107,17 +107,18 @@ function NovoLeadModal({ onClose, onSaved }: { onClose: () => void; onSaved: () 
   )
 }
 
-function LeadCard({ lead, onDragStart, onToggleAtencao }: { lead: Lead; onDragStart: (id: string) => void; onToggleAtencao: (lead: Lead) => void }) {
+function LeadCard({ lead, onDragStart, onToggleAtencao, onSelect }: { lead: Lead; onDragStart: (id: string) => void; onToggleAtencao: (lead: Lead) => void; onSelect: (lead: Lead) => void }) {
   const whatsappLink = 'https://wa.me/' + (lead.whatsapp || '').replace(/\D/g, '')
   return (
     <div
       draggable
-      onDragStart={() => onDragStart(lead.id)}
+      onDragStart={(e) => { e.stopPropagation(); onDragStart(lead.id) }}
+      onClick={() => onSelect(lead)}
       style={{ background: '#fff', border: '1px solid ' + D.line, borderRadius: 12, padding: 12, marginBottom: 10, cursor: 'grab', boxShadow: '0 1px 2px rgba(0,0,0,0.04)' }}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
         <span style={{ fontWeight: 700, fontSize: 14, color: D.ink }}>{lead.nome || 'Sem nome'}</span>
-        <button onClick={() => onToggleAtencao(lead)} title='Requer atenção' style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 15, lineHeight: 1, color: lead.requer_atencao ? D.orange : D.line }}>★</button>
+        <button onClick={(e) => { e.stopPropagation(); onToggleAtencao(lead) }} title='Requer atenção' style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 15, lineHeight: 1, color: lead.requer_atencao ? D.orange : D.line }}>★</button>
       </div>
       {lead.empreendimentos?.nome && (
         <div style={{ fontSize: 12, color: D.muted, marginTop: 3 }}>{lead.empreendimentos.nome}</div>
@@ -130,7 +131,7 @@ function LeadCard({ lead, onDragStart, onToggleAtencao }: { lead: Lead; onDragSt
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
         <span style={{ fontSize: 11, color: D.muted }}>Score: {lead.lead_score ?? 0}</span>
-        <a href={whatsappLink} target='_blank' rel='noopener noreferrer' style={{ fontSize: 12, fontWeight: 600, color: D.green, textDecoration: 'none' }}>WhatsApp →</a>
+        <a href={whatsappLink} target='_blank' rel='noopener noreferrer' onClick={(e) => e.stopPropagation()} style={{ fontSize: 12, fontWeight: 600, color: D.green, textDecoration: 'none' }}>WhatsApp →</a>
       </div>
     </div>
   )
