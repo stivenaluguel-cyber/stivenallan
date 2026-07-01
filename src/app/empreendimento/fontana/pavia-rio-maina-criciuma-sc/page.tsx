@@ -199,8 +199,6 @@ export default function Page() {
             </div>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'flex-end' }}>
               <LeadCaptureButton slug="pavia-rio-maina-criciuma-sc" construtora_slug="fontana" className="pv-cta" />
-                Baixar Catálogo
-              </a>
             </div>
           </div>
           <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:16 }}>
