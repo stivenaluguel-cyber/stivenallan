@@ -21,19 +21,11 @@ lazer: 'https://estilofontana.com.br/images/empreendimento/slideshows/mar-di-atr
 const GALERIA = [
 { src: 'https://estilofontana.com.br/images/empreendimento/slideshows/mar-di-atrani-residencial-675c232fef052.jpg?fm=webp', alt: 'Mar di Atrani Residencial — fachada frontal', label: 'Fachada Frontal' },
 { src: 'https://lh3.googleusercontent.com/d/1PXeNqh6dhGqr5ZbJKqaqksqmhpA_vfK6', alt: 'Mar di Atrani — fachada angular', label: 'Fachada Angular' },
-{ src: 'https://lh3.googleusercontent.com/d/1yljufgsICyttisZjsUCM2Ec8lfYkEJ8d', alt: 'Mar di Atrani — vista aérea', label: 'Vista Aérea' },
-{ src: 'https://lh3.googleusercontent.com/d/1FMU-Fhr3XlK_YI2pzpLvfhfW2YacHTdK', alt: 'Mar di Atrani — fotomontagem vista mar', label: 'Vista Mar' },
 { src: 'https://lh3.googleusercontent.com/d/1fe9t2T0geSe3EUTdZn8yUVKIxXk6bbKk', alt: 'Salão de festas com deck Mar di Atrani', label: 'Salão de Festas com Deck' },
 { src: 'https://lh3.googleusercontent.com/d/1lKvi0RUjyT24pU2-PRjzOimweaQBdB3E', alt: 'Living integrado Mar di Atrani Residencial', label: 'Living Integrado' },
 { src: 'https://lh3.googleusercontent.com/d/1e73f1jF9WdoHRt-A-hknvYe_Am49-gio', alt: 'Suíte Mar di Atrani Residencial', label: 'Suíte' },
 { src: 'https://lh3.googleusercontent.com/d/1J28_ggDt6bN26U9RL4SpZgHv6Qx5nOPv', alt: 'Hall de entrada Mar di Atrani', label: 'Hall de Entrada' },
 { src: 'https://lh3.googleusercontent.com/d/1hFfRv1OPUESeryN9NODUfiLWLODRDFX8', alt: 'Acesso principal Mar di Atrani Residencial', label: 'Acesso Principal' },
-{ src: 'https://lh3.googleusercontent.com/d/1jSp-rX2cimKmIm8LHSRpk04CX_VgJLQR', alt: 'Mar di Atrani Residencial — perspectiva 01', label: 'Perspectiva' },
-{ src: 'https://lh3.googleusercontent.com/d/1yJ_zCKs5a0pZ7RM-PQSGKugvxEIcysPI', alt: 'Mar di Atrani Residencial — perspectiva 02', label: 'Fachada Noturna' },
-{ src: 'https://lh3.googleusercontent.com/d/1fRHZV3UGhY96ExMewERJ4MW-yiXnc7eX', alt: 'Mar di Atrani Residencial — perspectiva 03', label: 'Embasamento' },
-{ src: 'https://lh3.googleusercontent.com/d/1_CaF9vUcFtJ2CF0yMPYECn9ht0M76zt7', alt: 'Mar di Atrani Residencial — perspectiva 04', label: 'Terraço' },
-{ src: 'https://lh3.googleusercontent.com/d/1TfG-bUu1nE0NyU92gtwT515h8GPGeU_f', alt: 'Garagem Mar di Atrani Residencial', label: 'Garagem' },
-{ src: 'https://lh3.googleusercontent.com/d/1OnnhkTLvCPf0C9xm9rqrLbf-asetmdwr', alt: 'Térreo Mar di Atrani Residencial', label: 'Térreo' },
 ]
 const DIFERENCIAIS = [
 'Sacada com guarda-corpo em vidro e churrasqueira com exaustão',
