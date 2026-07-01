@@ -8,6 +8,7 @@ type Props = {
   construtora_slug: string
   className?: string
   label?: string
+  propertyDisplayName?: string
 }
 
 export function LeadCaptureButton({
@@ -15,6 +16,7 @@ export function LeadCaptureButton({
   construtora_slug,
   className = 'ml-cta ml-cta-light',
   label = 'Baixar Catálogo & Plantas',
+  propertyDisplayName,
 }: Props) {
   const [data, setData] = useState<{ id: string; bookPdfUrl: string | null } | null>(null)
   const [loading, setLoading] = useState(false)
@@ -42,6 +44,7 @@ export function LeadCaptureButton({
       <LeadCaptureModal
         propertyId={data.id}
         propertyName={slug}
+        propertyDisplayName={propertyDisplayName}
         bookPdfUrl={data.bookPdfUrl}
         autoOpen
       />
