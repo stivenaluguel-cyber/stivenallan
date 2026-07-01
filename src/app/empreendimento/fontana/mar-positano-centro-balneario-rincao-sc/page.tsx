@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import GalleryWithLightbox, { LightboxPhoto } from './gallery-lightbox'
+import { LeadCaptureButton } from '@/components/LeadCaptureButton'
 
 const WPP = "https://wa.me/5548991642332?text=Olá!%20Tenho%20interesse%20no%20Mar%20Positano%20Residencial%20em%20Balneário%20Rincão."
 const CATALOGO_PDF = "https://estilofontana.com.br/upload/empreendimento/catalogo/mar-positano-residencial-1761677677.pdf"
@@ -200,7 +201,7 @@ export default function Page() {
               </div>
             </div>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'flex-end' }}>
-              <a href={CATALOGO_PDF} target="_blank" rel="noopener noreferrer" className="mp-cta" style={{ color:t.onDark, borderColor:'rgba(245,242,237,0.4)', fontSize:11, textTransform:'uppercase' }}>
+              <LeadCaptureButton slug="mar-positano-centro-balneario-rincao-sc" construtora_slug="fontana" className="mp-cta" />
                 Baixar Catálogo
               </a>
             </div>
