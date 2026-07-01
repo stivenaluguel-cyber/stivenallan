@@ -19,6 +19,7 @@ export function getVisitas(): { slug: string; ts: string }[] {
   try { return JSON.parse(localStorage.getItem(KEY_VISITAS) ?? '[]') } catch { return [] }
 }
 
+// Rastreador de visitas por empreendimento
 export function VisitTracker() {
   const pathname = usePathname()
 
