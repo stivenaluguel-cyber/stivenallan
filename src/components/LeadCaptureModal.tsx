@@ -39,6 +39,11 @@ export function LeadCaptureModal({ propertyId, propertyName, bookPdfUrl, autoOpe
       source: 'book_download',
     })
     if (error) { setStatus('error'); return }
+    fetch('/api/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nome: name, whatsapp: phone.replace(/\D/g, ''), property_name: propertyName }),
+    }).catch(() => {})
     setStatus('done')
     setTimeout(() => {
       if (bookPdfUrl) window.open(bookPdfUrl, '_blank', 'noopener,noreferrer')
