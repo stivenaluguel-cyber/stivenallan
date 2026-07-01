@@ -241,7 +241,7 @@ No Centro da cidade, com tudo a poucos passos, o Thiene entrega espaço, sofisti
 ))}
 </div>
 <a href={WPP} target="_blank" rel="noopener noreferrer" className="th-cta th-cta-light" data-wpp="1">Solicitar Catálogo</a>
-<LeadCaptureButton slug="thiene-centro-criciuma-sc" construtora_slug="fontana" />
+<LeadCaptureButton slug="thiene-centro-criciuma-sc" construtora_slug="fontana"  propertyDisplayName="Thiene Residencial" />
 </div>
 </section>
 
