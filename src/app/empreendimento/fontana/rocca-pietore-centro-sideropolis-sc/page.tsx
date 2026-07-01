@@ -205,7 +205,7 @@ export default function Page() {
               </div>
             </div>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'flex-end' }}>
-              <LeadCaptureButton slug="rocca-pietore-centro-sideropolis-sc" construtora_slug="fontana" className="rc-cta" />
+              <LeadCaptureButton slug="rocca-pietore-centro-sideropolis-sc" construtora_slug="fontana" className="rc-cta"  propertyDisplayName="Rocca Pietore Residencial" />
             </div>
           </div>
         </div>
