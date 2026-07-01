@@ -189,7 +189,7 @@ export default function CallianoPage() {
                 </div>
               ))}
             </div>
-            <LeadCaptureButton slug="calliano-centro-criciuma-sc" construtora_slug="fontana" className="ca-cta-light" />
+            <LeadCaptureButton slug="calliano-centro-criciuma-sc" construtora_slug="fontana" className="ca-cta-light"  propertyDisplayName="Calliano Residencial" />
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div style={{ padding: '28px 32px', border: `1px solid rgba(246,237,232,0.12)`, borderRadius: 2 }}>
