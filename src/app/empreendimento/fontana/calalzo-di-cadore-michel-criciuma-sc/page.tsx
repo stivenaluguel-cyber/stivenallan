@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import GalleryWithLightbox, { LightboxPhoto } from './gallery-lightbox'
+import { LeadCaptureButton } from '@/components/LeadCaptureButton'
 
 const WPP = "https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Calalzo%20Di%20Cadore%20Residencial."
 const CATALOGO_PDF = "https://estilofontana.com.br/upload/empreendimento/catalogo/calalzo-di-cadore-residencial-1603739983.pdf"
@@ -159,7 +160,7 @@ export default function CalalzoDiCadorePage() {
               <div key={i}><div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 'clamp(34px,5vw,58px)', letterSpacing: '0.04em', lineHeight: 1 }}>{it.n}</div><div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDarkMuted, marginTop: 12 }}>{it.l}</div></div>
             ))}
           </div>
-          <a href={CATALOGO_PDF} target="_blank" rel="noopener noreferrer" className="cc-cta cc-cta-light">Baixar Catálogo &amp; Plantas</a>
+          <LeadCaptureButton slug="calalzo-di-cadore-michel-criciuma-sc" construtora_slug="fontana" className="cc-cta cc-cta-light" />
         </div>
       </section>
       <section id="diferenciais" style={{ padding: 'clamp(80px,14vh,160px) clamp(18px,5vw,56px)' }}>
