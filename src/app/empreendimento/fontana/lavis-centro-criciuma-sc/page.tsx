@@ -78,7 +78,7 @@ export default function LavisPage() {
       <style>{`
         .lavis-diff-card:hover { transform: translateY(-2px); border-left-color: ${c.orange} !important; transition: transform .22s ease, border-left-color .22s ease; }
         .lavis-cta-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,106,61,0.35); }
-        <LeadCaptureButton slug="lavis-centro-criciuma-sc" construtora_slug="fontana" />
+        <LeadCaptureButton slug="lavis-centro-criciuma-sc" construtora_slug="fontana"  propertyDisplayName="Lavis Residencial" />
         .lavis-img-thumb { transition: transform .3s ease; }
         .lavis-img-thumb:hover { transform: scale(1.03); }
       `}</style>
