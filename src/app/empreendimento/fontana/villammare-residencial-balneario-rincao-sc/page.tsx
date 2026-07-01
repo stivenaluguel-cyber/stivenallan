@@ -200,7 +200,7 @@ export default function Page() {
               </a>
             </div>
             <div style={{ position:'relative', aspectRatio:'4/3', overflow:'hidden', borderRadius:2 }}>
-              <Image src={D+'1jygmtIldn2YIuhY1tklnA7G1lrHAXth_'} alt="Apartamento tipo Villammare" fill sizes="(max-width:768px) 100vw, 50vw" style={{ objectFit:'cover' }} />
+              <Image src={D+'1fUHaA4u5lKVgpxEAJ_eQtBCUVDYkT_PU'} alt="Apartamento tipo Villammare" fill sizes="(max-width:768px) 100vw, 50vw" style={{ objectFit:'cover' }} />
             </div>
           </div>
         </div>
@@ -232,7 +232,7 @@ export default function Page() {
               ))}
             </div>
             <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
-              {[D+'1BvuDuEqG85Hpx-7pPJAdmW0TrTon1MaL',D+'1SNgqUnb-r6I7CRokuLE7LZg_9e6Qb4Xk',D+'1YKux4pgMm5ngUHkKFJDCNdMv3vqdlEjI',D+'1b7eq9CyJm7HlNm81RRFTRcBCY0q-PQAs'].map((src,i) => (
+              {[D+'1BvuDuEqG85Hpx-7pPJAdmW0TrTon1MaL',D+'1n7iquXjXrDP9FK-6xqmdWRuqB--vpUsr',D+'1kTxiR4Zbz5ttX73gnNq31-eMjkQEztYW',D+'1AeibHujGTQS_kPO_orU3manrdh42qYzS'].map((src,i) => (
                 <div key={i} style={{ position:'relative', aspectRatio:'1', overflow:'hidden', borderRadius:2 }}>
                   <Image src={src} alt={`Acabamento Villammare ${i+1}`} fill sizes="300px" style={{ objectFit:'cover' }} />
                 </div>
