@@ -13,6 +13,7 @@ type Lead = {
   lead_score?: number; requer_atencao?: boolean; origem?: string
   orcamento_max?: number; perfil?: string; email?: string
   empreendimentos?: { nome?: string; cidade?: string } | null
+anotacoes?: string | null; created_at?: string; property_name?: string | null
 }
 
 const ESTAGIOS = [
@@ -142,6 +143,9 @@ export default function LeadsPage() {
   const [modalAberto, setModalAberto] = useState(false)
   const [busca, setBusca] = useState('')
   const [dragId, setDragId] = useState<string | null>(null)
+const [selectedLead, setSelectedLead] = useState<Lead | null>(null)
+const [notes, setNotes] = useState('')
+const [savingNotes, setSavingNotes] = useState(false)
 
   const carregar = useCallback(async () => {
     setLoading(true); setErro('')
@@ -256,7 +260,7 @@ export default function LeadsPage() {
                   <p style={{ fontSize: 12, color: D.muted, textAlign: 'center', padding: '18px 0' }}>Arraste leads para cá</p>
                 ) : (
                   doEstagio.map((lead) => (
-                    <LeadCard key={lead.id} lead={lead} onDragStart={setDragId} onToggleAtencao={toggleAtencao} />
+                    <LeadCard key={lead.id} lead={lead} onDragStart={setDragId} onToggleAtencao={toggleAtencao} onSelect={(l) => { setSelectedLead(l); setNotes(l.anotacoes ?? '') }} />
                   ))
                 )}
               </div>
@@ -266,8 +270,106 @@ export default function LeadsPage() {
       )}
 
       {modalAberto && (
-        <NovoLeadModal onClose={() => setModalAberto(false)} onSaved={() => { setModalAberto(false); carregar() }} />
-      )}
-    </div>
-  )
+<NovoLeadModal onClose={() => setModalAberto(false)} onSaved={() => { setModalAberto(false); carregar() }} />
+)}
+
+{selectedLead && (
+<div
+onClick={(e) => { if (e.target === e.currentTarget) setSelectedLead(null) }}
+style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)', padding: '16px' }}
+>
+<div style={{ position: 'relative', width: '100%', maxWidth: '520px', maxHeight: '85vh', overflowY: 'auto', backgroundColor: '#ffffff', borderRadius: '16px', boxShadow: '0 20px 60px rgba(0,0,0,0.25)' }}>
+<div style={{ background: '#D24E22', padding: '20px 24px', borderRadius: '16px 16px 0 0' }}>
+<h2 style={{ color: '#fff', fontSize: '20px', fontWeight: 700, margin: 0 }}>{selectedLead.nome ?? 'Sem nome'}</h2>
+<p style={{ color: 'rgba(255,255,255,0.85)', fontSize: '13px', margin: '4px 0 0' }}>
+{selectedLead.estagio_funil?.replace(/_/g, ' ')} · {selectedLead.origem ?? 'origem desconhecida'}
+</p>
+</div>
+<button
+onClick={() => setSelectedLead(null)}
+aria-label="Fechar"
+style={{ position: 'absolute', top: '14px', right: '14px', width: '30px', height: '30px', borderRadius: '50%', background: 'rgba(255,255,255,0.25)', border: 'none', cursor: 'pointer', color: '#fff', fontSize: '18px', lineHeight: 1 }}
+>×</button>
+<div style={{ padding: '24px' }}>
+<table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '20px' }}>
+<tbody>
+<tr>
+<td style={{ color: '#8a8a85', padding: '8px 0', borderBottom: '1px solid #F3F2EE', fontSize: '13px', width: '38%' }}>WhatsApp</td>
+<td style={{ padding: '8px 0', borderBottom: '1px solid #F3F2EE', fontSize: '14px', fontWeight: 600 }}>
+<a href={`https://wa.me/55${selectedLead.whatsapp}`} target="_blank" rel="noopener noreferrer" style={{ color: '#25D366', textDecoration: 'none' }}>
+{selectedLead.whatsapp} ↗
+</a>
+</td>
+</tr>
+<tr>
+<td style={{ color: '#8a8a85', padding: '8px 0', borderBottom: '1px solid #F3F2EE', fontSize: '13px' }}>E-mail</td>
+<td style={{ padding: '8px 0', borderBottom: '1px solid #F3F2EE', fontSize: '14px', fontWeight: 600 }}>
+{selectedLead.email ? <a href={`mailto:${selectedLead.email}`} style={{ color: '#D24E22', textDecoration: 'none' }}>{selectedLead.email}</a> : '—'}
+</td>
+</tr>
+<tr>
+<td style={{ color: '#8a8a85', padding: '8px 0', borderBottom: '1px solid #F3F2EE', fontSize: '13px' }}>Empreendimento</td>
+<td style={{ padding: '8px 0', borderBottom: '1px solid #F3F2EE', fontSize: '14px', fontWeight: 600 }}>
+{selectedLead.empreendimentos?.nome ?? selectedLead.property_name ?? '—'}
+</td>
+</tr>
+<tr>
+<td style={{ color: '#8a8a85', padding: '8px 0', borderBottom: '1px solid #F3F2EE', fontSize: '13px' }}>Origem</td>
+<td style={{ padding: '8px 0', borderBottom: '1px solid #F3F2EE', fontSize: '14px', fontWeight: 600 }}>{selectedLead.origem ?? '—'}</td>
+</tr>
+<tr>
+<td style={{ color: '#8a8a85', padding: '8px 0', borderBottom: '1px solid #F3F2EE', fontSize: '13px' }}>Score</td>
+<td style={{ padding: '8px 0', borderBottom: '1px solid #F3F2EE', fontSize: '14px', fontWeight: 600 }}>{selectedLead.lead_score ?? '—'}</td>
+</tr>
+<tr>
+<td style={{ color: '#8a8a85', padding: '8px 0', fontSize: '13px' }}>Recebido em</td>
+<td style={{ padding: '8px 0', fontSize: '14px', fontWeight: 600 }}>
+{selectedLead.created_at ? new Date(selectedLead.created_at).toLocaleString('pt-BR') : '—'}
+</td>
+</tr>
+</tbody>
+</table>
+<label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#52525b', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '6px' }}>
+Anotações
+</label>
+<textarea
+value={notes}
+onChange={(e) => setNotes(e.target.value)}
+placeholder="Anote aqui o histórico de contato, preferências do cliente, próximos passos..."
+rows={5}
+style={{ width: '100%', border: '1.5px solid #e4e4e7', borderRadius: '10px', padding: '12px 14px', fontSize: '14px', color: '#18181b', backgroundColor: '#fff', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', resize: 'vertical' }}
+/>
+<div style={{ display: 'flex', gap: '10px', marginTop: '14px' }}>
+<button
+onClick={async () => {
+setSavingNotes(true)
+await fetch(`/api/admin/leads/${selectedLead.id}`, {
+method: 'PATCH',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify({ anotacoes: notes }),
+})
+setLeads(prev => prev.map(l => l.id === selectedLead.id ? { ...l, anotacoes: notes } : l))
+setSavingNotes(false)
+setSelectedLead(null)
+}}
+disabled={savingNotes}
+style={{ flex: 1, background: '#D24E22', color: '#fff', border: 'none', borderRadius: '10px', padding: '12px', fontSize: '14px', fontWeight: 700, cursor: savingNotes ? 'not-allowed' : 'pointer', opacity: savingNotes ? 0.6 : 1 }}
+>
+{savingNotes ? 'Aguarde...' : 'Salvar anotações'}
+</button>
+<a
+href={`https://wa.me/55${selectedLead.whatsapp}`}
+target="_blank"
+rel="noopener noreferrer"
+style={{ flex: 1, background: '#25D366', color: '#fff', borderRadius: '10px', padding: '12px', fontSize: '14px', fontWeight: 700, textAlign: 'center', textDecoration: 'none' }}
+>
+Chamar no WhatsApp
+</a>
+</div>
+</div>
+</div>
+</div>
+)}
+</div>
+)
 }
