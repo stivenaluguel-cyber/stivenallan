@@ -74,7 +74,7 @@ export default async function EmpreendimentoPage({ params }: PageProps) {
   let bookPdfUrl: string | null = null;
   let coverImageUrl: string | null = null;
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data } = await supabase
       .from('properties')
       .select('id, book_pdf_url, cover_image_url')
