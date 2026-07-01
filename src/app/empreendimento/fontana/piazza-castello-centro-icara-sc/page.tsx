@@ -200,7 +200,7 @@ export default function PiazzaCastelloPage() {
           <p className="pc-section-tag">Material</p>
           <h2 className="pc-section-title">Catálogo completo</h2>
           <p style={{color:'#666',margin:'0 0 1.5rem'}}>Plantas, especificações técnicas e detalhes do empreendimento.</p>
-          <LeadCaptureButton slug="piazza-castello-centro-icara-sc" construtora_slug="fontana" className="pc-catalogo-btn" />
+          <LeadCaptureButton slug="piazza-castello-centro-icara-sc" construtora_slug="fontana" className="pc-catalogo-btn"  propertyDisplayName="Piazza Castello Residencial" />
         </div>
       </section>
 
