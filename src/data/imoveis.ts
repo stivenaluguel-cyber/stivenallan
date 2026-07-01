@@ -49,6 +49,22 @@ export const imoveis = [
     img: 'https://estilofontana.com.br/images/empreendimento/slideshows/pavia-residencial-636b9e731f40c.jpg',
     ativo: true,
   },
+{
+  id: '22',
+  nome: 'Pianezze Residencial',
+  slug: 'pianezze-centro-icara-sc',
+  construtora_slug: 'fontana',
+  construtora: 'Construtora Fontana',
+  bairro: 'Centro',
+  cidade: 'Içara',
+  uf: 'SC',
+  status: 'pronto',
+  exibir_preco: false,
+  preco: null,
+  frase: 'Todas as suas paixões em um lugar só.',
+  img: 'https://estilofontana.com.br/images/empreendimento/slideshows/pianezze-residencial-69b2b42d573df.JPG',
+  ativo: true,
+},
 ]
 
 // Para adicionar novo empreendimento: inserir novo objeto neste array com ativo: true
