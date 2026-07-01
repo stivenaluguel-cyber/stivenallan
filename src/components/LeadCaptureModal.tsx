@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { getAnonId, getVisitas } from '@/components/VisitTracker'
 
 type Props = {
   propertyId: string
@@ -11,6 +12,8 @@ type Props = {
   autoOpen?: boolean
   buttonClassName?: string
 }
+
+const KEY_LEAD = 'sa_lead'
 
 function maskPhone(value: string) {
   return value
@@ -22,6 +25,8 @@ function maskPhone(value: string) {
 
 export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName, bookPdfUrl, autoOpen = false, buttonClassName = '' }: Props) {
   const [open, setOpen] = useState(autoOpen)
+  const storedLead = typeof window !== 'undefined' ? localStorage.getItem(KEY_LEAD) : null
+  const returningLead: { id: string; nome: string } | null = storedLead ? JSON.parse(storedLead) : null
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
   const [email, setEmail] = useState('')
@@ -32,7 +37,7 @@ export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName
     e.preventDefault()
     setStatus('loading')
     const supabase = createClient()
-    const { error } = await supabase.from('leads').insert({
+    const { data: leadData, error } = await supabase.from('leads').insert({
       nome: name,
       whatsapp: phone.replace(/\D/g, ''),
       email: email || null,
@@ -41,8 +46,20 @@ export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName
       origem: 'Site',
       estagio_funil: 'primeiro_contato',
       source: 'book_download',
-    })
+    }).select('id').single()
     if (error) { setStatus('error'); return }
+  try {
+    if (leadData?.id) {
+      localStorage.setItem(KEY_LEAD, JSON.stringify({ id: leadData.id, nome: name }))
+      const visitas = getVisitas()
+      if (visitas.length) {
+        await supabase.from('lead_eventos').insert(
+          visitas.map(v => ({ lead_id: leadData.id, anon_id: getAnonId(), tipo: 'visita', slug: v.slug, created_at: v.ts }))
+        )
+      }
+      await supabase.from('lead_eventos').insert({ lead_id: leadData.id, anon_id: getAnonId(), tipo: 'download', slug: propertyName })
+    }
+  } catch {}
     fetch('/api/notify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -94,7 +111,38 @@ export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName
 
             {/* Corpo */}
             <div style={{ padding: '24px', backgroundColor: '#ffffff' }}>
-              {status === 'done' ? (
+              {returningLead && status === 'idle' ? (
+                <div style={{ textAlign: 'center', padding: '12px 0' }}>
+                  <div style={{ fontSize: '32px', marginBottom: '10px' }}>👋</div>
+                  <p style={{ fontWeight: '700', color: '#18181b', fontSize: '17px', margin: '0 0 6px', fontFamily: 'inherit' }}>
+                    Olá, {returningLead.nome.split(' ')[0]}!
+                  </p>
+                  <p style={{ color: '#71717a', fontSize: '13px', margin: '0 0 20px', fontFamily: 'inherit' }}>
+                    Seu acesso já está liberado.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      try {
+                        const supabase = createClient()
+                        await supabase.from('lead_eventos').insert({ lead_id: returningLead.id, anon_id: getAnonId(), tipo: 'download', slug: propertyName })
+                      } catch {}
+                      if (bookPdfUrl) window.open(bookPdfUrl, '_blank', 'noopener,noreferrer')
+                      setOpen(false)
+                    }}
+                    style={{ width: '100%', background: '#18181b', color: '#fff', border: 'none', borderRadius: '10px', padding: '14px', fontSize: '15px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit', marginBottom: '12px' }}
+                  >
+                    Baixar material
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { localStorage.removeItem(KEY_LEAD); window.location.reload() }}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '12px', color: '#a1a1aa', textDecoration: 'underline', fontFamily: 'inherit' }}
+                  >
+                    Não é você? Cadastrar outro contato
+                  </button>
+                </div>
+              ) : status === 'done' ? (
                 <div style={{ textAlign: 'center', padding: '20px 0' }}>
                   <div style={{ fontSize: '36px', marginBottom: '10px', color: '#22c55e' }}>✓</div>
                   <p style={{ fontWeight: '700', color: '#18181b', fontSize: '17px', margin: '0 0 6px', fontFamily: 'inherit' }}>Pronto! Download iniciando...</p>
