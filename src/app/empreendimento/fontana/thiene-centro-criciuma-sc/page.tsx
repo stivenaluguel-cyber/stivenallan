@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import GalleryWithLightbox from './gallery-lightbox'
 import Link from 'next/link'
+import { LeadCaptureButton } from '@/components/LeadCaptureButton'
 
 // Hotsite premium Thiene Residencial (Fontana, Centro Criciúma/SC). Padrão EPIC.
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Thiene%20Residencial.'
@@ -240,6 +241,7 @@ No Centro da cidade, com tudo a poucos passos, o Thiene entrega espaço, sofisti
 ))}
 </div>
 <a href={WPP} target="_blank" rel="noopener noreferrer" className="th-cta th-cta-light" data-wpp="1">Solicitar Catálogo</a>
+<LeadCaptureButton slug="thiene-centro-criciuma-sc" construtora_slug="fontana" />
 </div>
 </section>
 
