@@ -189,7 +189,7 @@ export default function AvezzanoPage() {
           <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '1rem', lineHeight: 1.7, marginBottom: '2rem' }}>
             Plantas, acabamentos e todos os detalhes do Avezzano Residencial.
           </p>
-          <LeadCaptureButton slug="avezzano-centro-sideropolis-sc" construtora_slug="fontana" />
+          <LeadCaptureButton slug="avezzano-centro-sideropolis-sc" construtora_slug="fontana"  propertyDisplayName="Avezzano Residencial" />
         </div>
       </section>
 
