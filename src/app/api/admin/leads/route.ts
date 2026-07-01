@@ -24,11 +24,30 @@ export async function GET(req: NextRequest) {
 
   const { data, error } = await query
 
+  const { data: eventosData } = await supabase
+    .from('lead_eventos')
+    .select('lead_id, tipo')
+
+  const contadores = new Map<string, { visitas: number; downloads: number }>()
+  for (const e of eventosData ?? []) {
+    if (!e.lead_id) continue
+    const c = contadores.get(e.lead_id) ?? { visitas: 0, downloads: 0 }
+    if (e.tipo === 'visita') c.visitas++
+    if (e.tipo === 'download') c.downloads++
+    contadores.set(e.lead_id, c)
+  }
+
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  return NextResponse.json(data ?? [])
+  const leadsComContadores = (data ?? []).map((lead: Record<string, unknown>) => ({
+    ...lead,
+    visitas: contadores.get(lead.id as string)?.visitas ?? 0,
+    downloads: contadores.get(lead.id as string)?.downloads ?? 0,
+  }))
+
+  return NextResponse.json(leadsComContadores)
 }
 
 export async function POST(req: NextRequest) {
