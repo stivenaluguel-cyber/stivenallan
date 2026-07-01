@@ -172,7 +172,7 @@ export default function CastellanoPage() {
                 </div>
               ))}
             </div>
-            <LeadCaptureButton slug="castellano-centro-icara-sc" construtora_slug="fontana" className="cs-cta-light" />
+            <LeadCaptureButton slug="castellano-centro-icara-sc" construtora_slug="fontana" className="cs-cta-light"  propertyDisplayName="Castellano Residencial" />
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {[['Endereço','Rua Pio XII esq. Rua Duque de Caxias — Centro, Içara/SC'],['Status','Em obras'],['Preço','Sob consulta']].map(([k,v])=>(
