@@ -195,6 +195,29 @@ export default function LeadsPage() {
     ? leads.filter((l) => (l.nome || '').toLowerCase().includes(termo) || (l.whatsapp || '').includes(termo))
     : leads
 
+  function exportCSV() {
+    const rows = [
+      ['Nome', 'WhatsApp', 'Empreendimento', 'Estágio', 'Origem', 'Score', 'Data'],
+      ...leads.map((l: Lead) => [
+        l.nome ?? '',
+        l.whatsapp ?? '',
+        (l.empreendimentos as { nome?: string } | null)?.nome ?? '',
+        l.estagio_funil ?? '',
+        l.origem ?? '',
+        l.lead_score ?? '',
+        new Date((l as any).created_at).toLocaleDateString('pt-BR'),
+      ])
+    ]
+    const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '''''')}"`).join(',')).join('\n')
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `leads-${new Date().toISOString().slice(0,10)}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <div style={{ minHeight: '100vh', background: D.bg, padding: '24px 20px' }}>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
@@ -204,7 +227,8 @@ export default function LeadsPage() {
         </div>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
           <input value={busca} onChange={(e) => setBusca(e.target.value)} placeholder='Buscar nome ou WhatsApp...' style={{ padding: '10px 12px', borderRadius: 8, border: '1px solid ' + D.line, background: '#fff', color: D.ink, fontSize: 14, outline: 'none', minWidth: 220 }} />
-          <button onClick={() => setModalAberto(true)} style={{ padding: '10px 18px', borderRadius: 8, border: 'none', background: D.bronze, color: '#fff', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>+ Novo Lead</button>
+          <button onClick={exportCSV} style={{ padding: '10px 14px', borderRadius: 8, border: '1px solid ' + D.line, background: '#fff', color: D.ink, fontWeight: 600, cursor: 'pointer', fontSize: 13, whiteSpace: 'nowrap' }}>Exportar CSV</button>
+        <button onClick={() => setModalAberto(true)} style={{ padding: '10px 18px', borderRadius: 8, border: 'none', background: D.bronze, color: '#fff', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>+ Novo Lead</button>
         </div>
       </div>
 
