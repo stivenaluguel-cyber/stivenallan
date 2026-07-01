@@ -106,7 +106,12 @@ export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName
             </div>
 
             {/* Corpo */}
-            <div style={{ padding: '24px', background: '#ffffff' }}>
+            <div style={{
+              padding: '24px',
+              backgroundColor: '#ffffff',
+              isolation: 'isolate',
+              position: 'relative',
+            }}>
               {status === 'done' ? (
                 <div style={{ textAlign: 'center', padding: '16px 0' }}>
                   <div style={{ fontSize: '40px', marginBottom: '12px' }}>✓</div>
@@ -116,8 +121,8 @@ export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName
               ) : (
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
 
-                  <div>
-                    <label htmlFor="lcm-nome" style={{ display: 'block', fontSize: '11px', fontWeight: '600', color: '#3f3f46', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label htmlFor="lcm-nome" style={{ fontSize: '11px', fontWeight: '600', color: '#3f3f46', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                       Nome completo
                     </label>
                     <input
@@ -129,14 +134,14 @@ export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="Seu nome"
-                      style={{ width: '100%', border: '1.5px solid #e4e4e7', borderRadius: '10px', padding: '11px 14px', fontSize: '14px', color: '#18181b', backgroundColor: '#fafafa', outline: 'none', boxSizing: 'border-box' }}
-                      onFocus={e => e.currentTarget.style.borderColor = '#18181b'}
-                      onBlur={e => e.currentTarget.style.borderColor = '#e4e4e7'}
+                      style={{ width: '100%', border: '1.5px solid #d4d4d8', borderRadius: '10px', padding: '11px 14px', fontSize: '14px', color: '#18181b', backgroundColor: '#ffffff', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', appearance: 'none', WebkitAppearance: 'none' }}
+                      onFocus={e => (e.currentTarget.style.borderColor = '#18181b')}
+                      onBlur={e => (e.currentTarget.style.borderColor = '#d4d4d8')}
                     />
                   </div>
 
-                  <div>
-                    <label htmlFor="lcm-phone" style={{ display: 'block', fontSize: '11px', fontWeight: '600', color: '#3f3f46', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label htmlFor="lcm-phone" style={{ fontSize: '11px', fontWeight: '600', color: '#3f3f46', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                       WhatsApp
                     </label>
                     <input
@@ -149,15 +154,15 @@ export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName
                       onChange={(e) => setPhone(maskPhone(e.target.value))}
                       placeholder="(48) 99999-9999"
                       inputMode="numeric"
-                      style={{ width: '100%', border: '1.5px solid #e4e4e7', borderRadius: '10px', padding: '11px 14px', fontSize: '14px', color: '#18181b', backgroundColor: '#fafafa', outline: 'none', boxSizing: 'border-box' }}
-                      onFocus={e => e.currentTarget.style.borderColor = '#18181b'}
-                      onBlur={e => e.currentTarget.style.borderColor = '#e4e4e7'}
+                      style={{ width: '100%', border: '1.5px solid #d4d4d8', borderRadius: '10px', padding: '11px 14px', fontSize: '14px', color: '#18181b', backgroundColor: '#ffffff', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', appearance: 'none', WebkitAppearance: 'none' }}
+                      onFocus={e => (e.currentTarget.style.borderColor = '#18181b')}
+                      onBlur={e => (e.currentTarget.style.borderColor = '#d4d4d8')}
                     />
                   </div>
 
-                  <div>
-                    <label htmlFor="lcm-email" style={{ display: 'block', fontSize: '11px', fontWeight: '600', color: '#3f3f46', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px' }}>
-                      E-mail <span style={{ color: '#a1a1aa', fontWeight: '400', textTransform: 'none' }}>(opcional)</span>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label htmlFor="lcm-email" style={{ fontSize: '11px', fontWeight: '600', color: '#3f3f46', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                      E-mail <span style={{ color: '#a1a1aa', fontWeight: '400', textTransform: 'none', fontSize: '11px' }}>(opcional)</span>
                     </label>
                     <input
                       id="lcm-email"
@@ -167,9 +172,9 @@ export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="seu@email.com"
-                      style={{ width: '100%', border: '1.5px solid #e4e4e7', borderRadius: '10px', padding: '11px 14px', fontSize: '14px', color: '#18181b', backgroundColor: '#fafafa', outline: 'none', boxSizing: 'border-box' }}
-                      onFocus={e => e.currentTarget.style.borderColor = '#18181b'}
-                      onBlur={e => e.currentTarget.style.borderColor = '#e4e4e7'}
+                      style={{ width: '100%', border: '1.5px solid #d4d4d8', borderRadius: '10px', padding: '11px 14px', fontSize: '14px', color: '#18181b', backgroundColor: '#ffffff', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', appearance: 'none', WebkitAppearance: 'none' }}
+                      onFocus={e => (e.currentTarget.style.borderColor = '#18181b')}
+                      onBlur={e => (e.currentTarget.style.borderColor = '#d4d4d8')}
                     />
                   </div>
 
@@ -182,12 +187,7 @@ export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName
                   <button
                     type="submit"
                     disabled={status === 'loading'}
-                    style={{
-                      width: '100%', background: '#18181b', color: '#ffffff',
-                      border: 'none', borderRadius: '10px', padding: '13px',
-                      fontSize: '14px', fontWeight: '600', cursor: status === 'loading' ? 'not-allowed' : 'pointer',
-                      opacity: status === 'loading' ? 0.6 : 1, marginTop: '2px',
-                    }}
+                    style={{ width: '100%', background: '#18181b', color: '#ffffff', border: 'none', borderRadius: '10px', padding: '13px', fontSize: '14px', fontWeight: '600', cursor: status === 'loading' ? 'not-allowed' : 'pointer', opacity: status === 'loading' ? 0.6 : 1, fontFamily: 'inherit' }}
                   >
                     {status === 'loading' ? 'Aguarde...' : 'Receber material gratuitamente'}
                   </button>
@@ -197,6 +197,7 @@ export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName
                   </p>
                 </form>
               )}
+            </div>
             </div>
           </div>
         </div>
