@@ -249,7 +249,7 @@ No coração do bairro Santa Bárbara, com o Parque da Prefeitura como extensão
 ))}
 </div>
 <a href={WPP} target="_blank" rel="noopener noreferrer" className="ps-cta ps-cta-light" data-wpp="1">Solicitar Catálogo</a>
-<LeadCaptureButton slug="parco-savello-santa-barbara-criciuma-sc" construtora_slug="fontana" />
+<LeadCaptureButton slug="parco-savello-santa-barbara-criciuma-sc" construtora_slug="fontana"  propertyDisplayName="Parco Savello Residencial" />
 </div>
 </section>
 
