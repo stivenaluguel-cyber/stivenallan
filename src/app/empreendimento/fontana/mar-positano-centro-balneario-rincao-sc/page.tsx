@@ -201,7 +201,7 @@ export default function Page() {
               </div>
             </div>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'flex-end' }}>
-              <LeadCaptureButton slug="mar-positano-centro-balneario-rincao-sc" construtora_slug="fontana" className="mp-cta" />
+              <LeadCaptureButton slug="mar-positano-centro-balneario-rincao-sc" construtora_slug="fontana" className="mp-cta"  propertyDisplayName="Mar Positano Residencial" />
             </div>
           </div>
           <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:16 }}>
