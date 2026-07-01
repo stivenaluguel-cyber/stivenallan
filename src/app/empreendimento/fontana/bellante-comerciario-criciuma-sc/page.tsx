@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import GalleryWithLightbox from './gallery-lightbox';
+import { LeadCaptureButton } from '@/components/LeadCaptureButton'
 
 export const revalidate = 3600;
 
@@ -192,11 +193,7 @@ export default function BellantePage() {
           <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '1rem', lineHeight: 1.7, marginBottom: '2rem' }}>
             Plantas, acabamentos e todos os detalhes do Bellante Residencial.
           </p>
-          <a href="https://estilofontana.com.br/upload/empreendimento/catalogo/bellante-residencial-1681832793.pdf"
-            target="_blank" rel="noopener"
-            style={{ background: '#fff', color: ACCENT, padding: '1rem 2.5rem', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', borderRadius: '2px', display: 'inline-block' }}>
-            BAIXAR CATÁLOGO
-          </a>
+          <LeadCaptureButton slug="bellante-comerciario-criciuma-sc" construtora_slug="fontana" />
         </div>
       </section>
 
