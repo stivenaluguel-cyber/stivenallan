@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import GalleryWithLightbox, { LightboxPhoto } from './gallery-lightbox'
+import { LeadCaptureButton } from '@/components/LeadCaptureButton'
 
 const WPP = "https://wa.me/5548991642332?text=Olá!%20Tenho%20interesse%20no%20Pavia%20Residencial%20em%20Criciúma."
 const CATALOGO_PDF = "https://estilofontana.com.br/upload/empreendimento/catalogo/pavia-residencial-1691610313.pdf"
@@ -197,7 +198,7 @@ export default function Page() {
               </div>
             </div>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'flex-end' }}>
-              <a href={CATALOGO_PDF} target="_blank" rel="noopener noreferrer" className="pv-cta" style={{ color:t.onDark, borderColor:'rgba(245,242,237,0.4)', fontSize:11, textTransform:'uppercase' }}>
+              <LeadCaptureButton slug="pavia-rio-maina-criciuma-sc" construtora_slug="fontana" className="pv-cta" />
                 Baixar Catálogo
               </a>
             </div>
