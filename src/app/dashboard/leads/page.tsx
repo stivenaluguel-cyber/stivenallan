@@ -14,6 +14,7 @@ type Lead = {
   orcamento_max?: number; perfil?: string; email?: string
   empreendimentos?: { nome?: string; cidade?: string } | null
 anotacoes?: string | null; created_at?: string; property_name?: string | null
+visitas?: number; downloads?: number
 }
 
 const ESTAGIOS = [
@@ -129,7 +130,7 @@ function LeadCard({ lead, onDragStart, onToggleAtencao, onSelect }: { lead: Lead
           <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 999, background: D.bg, color: D.muted }}>{fmt(lead.orcamento_max)}</span>
         )}
       </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
+      {(lead.visitas ?? 0) > 0 || (lead.downloads ?? 0) > 0 ? (<div style={{ display: 'flex', gap: '6px', marginTop: '6px' }}>{(lead.visitas ?? 0) > 0 && (<span style={{ fontSize: '11px', background: '#EFF6FF', color: '#1D4ED8', padding: '2px 8px', borderRadius: '999px', fontWeight: 600 }}>👁 {lead.visitas} {lead.visitas === 1 ? 'visita' : 'visitas'}</span>)}{(lead.downloads ?? 0) > 0 && (<span style={{ fontSize: '11px', background: '#FFF7ED', color: '#C2410C', padding: '2px 8px', borderRadius: '999px', fontWeight: 600 }}>⬇ {lead.downloads} {lead.downloads === 1 ? 'catálogo' : 'catálogos'}</span>)}</div>) : null}<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
         <span style={{ fontSize: 11, color: D.muted }}>Score: {lead.lead_score ?? 0}</span>
         <a href={whatsappLink} target='_blank' rel='noopener noreferrer' onClick={(e) => e.stopPropagation()} style={{ fontSize: 12, fontWeight: 600, color: D.green, textDecoration: 'none' }}>WhatsApp →</a>
       </div>
@@ -147,6 +148,10 @@ export default function LeadsPage() {
 const [selectedLead, setSelectedLead] = useState<Lead | null>(null)
 const [notes, setNotes] = useState('')
 const [savingNotes, setSavingNotes] = useState(false)
+  const [editing, setEditing] = useState(false)
+  const [editForm, setEditForm] = useState({ nome: '', whatsapp: '', email: '', origem: '', orcamento_max: '' })
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const [eventos, setEventos] = useState<{tipo: string; slug: string; created_at: string}[]>([])
 
   const carregar = useCallback(async () => {
     setLoading(true); setErro('')
@@ -261,7 +266,7 @@ const [savingNotes, setSavingNotes] = useState(false)
                   <p style={{ fontSize: 12, color: D.muted, textAlign: 'center', padding: '18px 0' }}>Arraste leads para cá</p>
                 ) : (
                   doEstagio.map((lead) => (
-                    <LeadCard key={lead.id} lead={lead} onDragStart={setDragId} onToggleAtencao={toggleAtencao} onSelect={(l) => { setSelectedLead(l); setNotes(l.anotacoes ?? '') }} />
+                    <LeadCard key={lead.id} lead={lead} onDragStart={setDragId} onToggleAtencao={toggleAtencao} onSelect={(l) => { setSelectedLead(l); setNotes(l.anotacoes ?? ''); setEditForm({ nome: l.nome??'', whatsapp: l.whatsapp??'', email: l.email??'', origem: l.origem??'', orcamento_max: l.orcamento_max!=null?String(l.orcamento_max):'' }); setEditing(false); setConfirmDelete(false); setEventos([]); fetch('/api/admin/leads/'+l.id+'/eventos').then(r=>r.json()).then(d=>setEventos(d.eventos??[])).catch(()=>setEventos([])) }} />
                   ))
                 )}
               </div>
@@ -286,13 +291,15 @@ style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems:
 {selectedLead.estagio_funil?.replace(/_/g, ' ')} · {selectedLead.origem ?? 'origem desconhecida'}
 </p>
 </div>
+<div style={{ position: 'absolute', top: '14px', right: '52px', display: 'flex', gap: '6px' }}><button onClick={() => { setEditing(true); setConfirmDelete(false) }} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: '8px', padding: '6px 12px', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>Editar</button><button onClick={() => { setConfirmDelete(true); setEditing(false) }} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#FCA5A5', borderRadius: '8px', padding: '6px 12px', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>Excluir</button></div>
 <button
-onClick={() => setSelectedLead(null)}
+OnClick={() => setSelectedLead(null)}
 aria-label="Fechar"
 style={{ position: 'absolute', top: '14px', right: '14px', width: '30px', height: '30px', borderRadius: '50%', background: 'rgba(255,255,255,0.25)', border: 'none', cursor: 'pointer', color: '#fff', fontSize: '18px', lineHeight: 1 }}
 >×</button>
 <div style={{ padding: '24px' }}>
-<table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '20px' }}>
+{confirmDelete && (<div style={{ background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: '10px', padding: '12px', marginBottom: '16px' }}><p style={{ margin: '0 0 10px', fontSize: '14px', color: '#991B1B', fontWeight: 600 }}>Excluir este lead permanentemente? Essa ação não pode ser desfeita.</p><div style={{ display: 'flex', gap: '8px' }}><button onClick={async () => { await fetch('/api/admin/leads/'+selectedLead.id, { method: 'DELETE' }); setLeads(prev => prev.filter(l => l.id !== selectedLead.id)); setSelectedLead(null) }} style={{ flex: 1, background: '#DC2626', color: '#fff', border: 'none', borderRadius: '8px', padding: '10px', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>Sim, excluir</button><button onClick={() => setConfirmDelete(false)} style={{ flex: 1, background: '#fff', color: '#374151', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '10px', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}>Cancelar</button></div></div>)}
+            {editing ? (<div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>{(['nome','whatsapp','email'] as const).map(key => (<div key={key}><label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#52525b', textTransform: 'uppercase' as const, letterSpacing: '0.07em', marginBottom: '4px' }}>{key.charAt(0).toUpperCase()+key.slice(1)}</label><input type={key==='email'?'email':key==='whatsapp'?'tel':'text'} value={editForm[key]} onChange={e => setEditForm(prev => ({ ...prev, [key]: e.target.value }))} style={{ width: '100%', border: '1.5px solid #e4e4e7', borderRadius: '10px', padding: '10px 12px', fontSize: '14px', color: '#18181b', backgroundColor: '#fff', outline: 'none', boxSizing: 'border-box' as const, fontFamily: 'inherit' }} /></div>))}<div><label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#52525b', textTransform: 'uppercase' as const, letterSpacing: '0.07em', marginBottom: '4px' }}>Origem</label><select value={editForm.origem} onChange={e => setEditForm(prev=>({...prev,origem:e.target.value}))} style={{ width: '100%', border: '1.5px solid #e4e4e7', borderRadius: '10px', padding: '10px 12px', fontSize: '14px', color: '#18181b', backgroundColor: '#fff', outline: 'none', boxSizing: 'border-box' as const, fontFamily: 'inherit' }}>{['Site','Instagram','Indicacao','Portal','Anuncio','Evento','Whatsapp','Outro'].map(o=><option key={o} value={o}>{o}</option>)}</select></div><div><label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#52525b', textTransform: 'uppercase' as const, letterSpacing: '0.07em', marginBottom: '4px' }}>Orçamento máx (R$)</label><input type="number" value={editForm.orcamento_max} onChange={e=>setEditForm(prev=>({...prev,orcamento_max:e.target.value}))} style={{ width: '100%', border: '1.5px solid #e4e4e7', borderRadius: '10px', padding: '10px 12px', fontSize: '14px', color: '#18181b', backgroundColor: '#fff', outline: 'none', boxSizing: 'border-box' as const, fontFamily: 'inherit' }} /></div><div style={{ display: 'flex', gap: '10px' }}><button onClick={async () => { const res = await fetch('/api/admin/leads/'+selectedLead.id, { method: 'PATCH', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ nome: editForm.nome, whatsapp: editForm.whatsapp, email: editForm.email||null, origem: editForm.origem, orcamento_max: editForm.orcamento_max ? Number(editForm.orcamento_max) : null }) }); if (res.ok) { const updated = { ...selectedLead, nome: editForm.nome, whatsapp: editForm.whatsapp, email: editForm.email||null, origem: editForm.origem, orcamento_max: editForm.orcamento_max ? Number(editForm.orcamento_max) : null }; setLeads(prev => prev.map(l => l.id === selectedLead.id ? updated : l)); setSelectedLead(updated); setEditing(false) } }} style={{ flex: 1, background: '#D24E22', color: '#fff', border: 'none', borderRadius: '10px', padding: '12px', fontSize: '14px', fontWeight: 700, cursor: 'pointer' }}>Salvar alterações</button><button onClick={() => setEditing(false)} style={{ flex: 1, background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: '10px', padding: '12px', fontSize: '14px', fontWeight: 600, cursor: 'pointer' }}>Cancelar</button></div></div>) : (<table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '20px' }}>
 <tbody>
 <tr>
 <td style={{ color: '#8a8a85', padding: '8px 0', borderBottom: '1px solid #F3F2EE', fontSize: '13px', width: '38%' }}>WhatsApp</td>
@@ -330,6 +337,9 @@ style={{ position: 'absolute', top: '14px', right: '14px', width: '30px', height
 </tr>
 </tbody>
 </table>
+)}
+<label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#52525b', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '6px', marginTop: '16px' }}>Radar de navegação</label>
+{eventos.length === 0 ? (<p style={{ fontSize: '13px', color: '#8a8a85', marginBottom: '16px' }}>Nenhuma atividade registrada.</p>) : (<div style={{ maxHeight: '160px', overflowY: 'auto', marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '4px' }}>{eventos.map((ev, i) => (<div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 8px', borderRadius: '6px', background: ev.tipo === 'download' ? '#FFF7ED' : 'transparent' }}><span>{ev.tipo === 'download' ? '⬇' : '👁'}</span><span style={{ fontSize: '13px', color: '#18181b', flex: 1 }}>{(ev.slug||'').replace(/-/g,' ')}</span><span style={{ fontSize: '11px', color: '#8a8a85', whiteSpace: 'nowrap' }}>{ev.created_at ? new Date(ev.created_at).toLocaleString('pt-BR') : ''}</span></div>))}</div>)}
 <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#52525b', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '6px' }}>
 Anotações
 </label>
