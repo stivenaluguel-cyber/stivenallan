@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import GalleryWithLightbox from './gallery-lightbox'
+import GalleryWithLightbox, { LightboxPhoto } from './gallery-lightbox'
 
 const WPP = "https://wa.me/5548991642332?text=Olá!%20Tenho%20interesse%20no%20Rocca%20Pietore%20Residencial%20em%20Siderópolis."
 
@@ -18,29 +18,47 @@ const t = {
   body: "'Inter', system-ui, sans-serif"
 }
 
+const D = 'https://lh3.googleusercontent.com/d/'
+
 const IMG = {
-  hero: 'https://estilofontana.com.br/images/empreendimento/slideshows/rocca-pietore-residencial-5f99ae8db7681.jpg',
-  mapa: 'https://estilofontana.com.br/images/2020/10/20/localizacao-5f8f1080066a5.png',
+  hero:  D + '1KSAQZxT2-vTIMRXxOUtUmUqtfLECIZuq',
+  hero2: D + '1W-Xo_llBhK6P6bMl4xNBAp7fKbhRzGCM',
+  mapa:  'https://estilofontana.com.br/images/2020/10/20/localizacao-5f8f1080066a5.png',
 }
 
 const GALERIA = [
-  { src: 'https://estilofontana.com.br/images/empreendimento/slideshows/rocca-pietore-residencial-5f99ae8db7681.jpg', alt: 'Fachada Rocca Pietore Residencial Siderópolis', label: 'Fachada' },
+  { src: D+'1KSAQZxT2-vTIMRXxOUtUmUqtfLECIZuq', alt: 'Fachada Rocca Pietore Residencial Siderópolis', label: 'Fachada' },
+  { src: D+'1W-Xo_llBhK6P6bMl4xNBAp7fKbhRzGCM', alt: 'Fachada Rocca Pietore entrada', label: 'Fachada 2' },
+  { src: D+'1s7gu7UmCu4cO-5Nd5SeAFhDMwgkGvtvu', alt: 'Hall de entrada Rocca Pietore', label: 'Hall de Entrada' },
+  { src: D+'1Q1Kn8MfN35Fc1erB712IKw9DFVW2UgDu', alt: 'Hall social Rocca Pietore', label: 'Hall Social' },
+  { src: D+'1CCHK0c5mn-C0ryA9b_Wkngmg9rcGaxl_', alt: 'Lobby Rocca Pietore', label: 'Lobby' },
+  { src: D+'1MiQB_pP46Ny9lkNYlet7nC3W88dkgIpK', alt: 'Recepção Rocca Pietore', label: 'Recepção' },
+  { src: D+'1W1RiR-FNN9cangaZKzT8yPP0c7smXaOL', alt: 'Estar coletivo Rocca Pietore', label: 'Estar' },
+  { src: D+'19y4TUIAuLr0YduVmmNfP9h8c2tCnmTka', alt: 'Playground Rocca Pietore', label: 'Playground' },
+  { src: D+'1ktbUBNO7YduWpIDhRrVn74SPjymzpfld', alt: 'Playground kids Rocca Pietore', label: 'Playground 2' },
+  { src: D+'1l9ZD6j7bmNOdHXhkKYmU5LBi2YesAAUz', alt: 'área externa Rocca Pietore', label: 'área Externa' },
+  { src: D+'1gAfhfPCENqCar6fGEii9hFfgp2rBe83p', alt: 'Salão de festas Rocca Pietore', label: 'Salão de Festas' },
+  { src: D+'1H5ym5YbxiJY0i07y4NBtYIlj8vsQ-Min', alt: 'Salão gourmet Rocca Pietore', label: 'Salão Gourmet' },
+  { src: D+'1ZhQFywZY91asVdrngA-FtV7qGtofJ9yx', alt: 'Cozinha gourmet Rocca Pietore', label: 'Cozinha Gourmet' },
+  { src: D+'1PkYXmGlrxapIvwg6ikmLIuYVpqG0TckM', alt: 'Espaço de convivência Rocca Pietore', label: 'Convívio' },
+  { src: D+'1xceXrZxrztAXK9ZhCfBAGIQupa0mENut', alt: 'Jantar coletivo Rocca Pietore', label: 'Jantar' },
+  { src: D+'1sVJB6swi-OIobVkFJClr-lFwiqSleM_f', alt: 'Vista interna Rocca Pietore', label: 'Vista Interna' },
 ]
 
 const DIFERENCIAIS = [
   '2 ou 3 dormitórios com 1 suíte — 71 a 91 m²',
   'Plantas amplas que equilibram funcionalidade e beleza',
-  'Churrasqueira e salão de festas para momentos especiais',
+  'Hall de entrada sofisticado com acabamento de alto padrão',
+  'Salão de festas e cozinha gourmet completos',
   'Playground para a família toda',
-  'Salas comerciais integradas ao empreendimento',
+  'Elevador e salas comerciais integradas',
   'Centro de Siderópolis — próximo a tudo que importa',
-  'Construtora Fontana — solidez e qualidade comprovadas',
   'Financiamento direto com a Construtora Fontana',
 ]
 
 const AMENIDADES = [
-  'Churrasqueira',
   'Salão de festas',
+  'Cozinha gourmet',
   'Playground',
   'Hall de entrada sofisticado',
   'Elevador',
@@ -49,13 +67,13 @@ const AMENIDADES = [
 
 export const metadata: Metadata = {
   title: 'Rocca Pietore Residencial | Apartamentos em Siderópolis SC | Fontana',
-  description: 'Rocca Pietore Residencial: apartamentos de 2 ou 3 dormitórios (1 suíte), 71 a 91 m², no Centro de Siderópolis/SC. Churrasqueira, playground, salão de festas e financiamento direto.',
+  description: 'Rocca Pietore Residencial: apartamentos de 2 ou 3 dormitórios (1 suíte), 71 a 91 m², no Centro de Siderópolis/SC. Hall sofisticado, salão de festas, playground e financiamento direto.',
   alternates: { canonical: `${SITE_URL}/empreendimento/fontana/rocca-pietore-centro-sideropolis-sc` },
   openGraph: {
     title: 'Rocca Pietore Residencial | Centro de Siderópolis SC',
     description: 'Apartamentos 2 ou 3 dorms (1 suíte), 71—91 m², no Centro de Siderópolis. Lazer completo e financiamento direto com a Construtora Fontana.',
     url: `${SITE_URL}/empreendimento/fontana/rocca-pietore-centro-sideropolis-sc`,
-    images: [{ url: 'https://estilofontana.com.br/images/empreendimento/slideshows/rocca-pietore-residencial-5f99ae8db7681.jpg', width: 1200, height: 630, alt: 'Rocca Pietore Residencial' }],
+    images: [{ url: 'https://lh3.googleusercontent.com/d/1KSAQZxT2-vTIMRXxOUtUmUqtfLECIZuq', width: 1200, height: 630, alt: 'Rocca Pietore Residencial' }],
     type: 'website',
   },
   twitter: { card: 'summary_large_image', title: 'Rocca Pietore Residencial | Siderópolis SC', description: 'Aptos 2 ou 3 dorms · 71—91 m² · Centro de Siderópolis' },
@@ -70,7 +88,7 @@ const SCHEMA = {
       name: 'Rocca Pietore Residencial',
       description: 'Apartamentos de 2 ou 3 dormitórios (1 suíte), 71 a 91 m², no Centro de Siderópolis/SC.',
       url: `${SITE_URL}/empreendimento/fontana/rocca-pietore-centro-sideropolis-sc`,
-      image: 'https://estilofontana.com.br/images/empreendimento/slideshows/rocca-pietore-residencial-5f99ae8db7681.jpg',
+      image: 'https://lh3.googleusercontent.com/d/1KSAQZxT2-vTIMRXxOUtUmUqtfLECIZuq',
       address: {
         '@type': 'PostalAddress',
         streetAddress: 'Rua Siderúrgica',
@@ -103,7 +121,6 @@ export default function Page() {
         .rc-gcard { position:relative; overflow:hidden; }
         .rc-amen { display:flex; align-items:center; gap:12px; padding:14px 0; border-bottom:1px solid rgba(0,0,0,0.08); }
         .rc-amen::before { content:''; width:6px; height:6px; background:${t.navy}; border-radius:50%; flex-shrink:0; }
-        .rc-lazer-card { position:relative; overflow:hidden; }
         .rc-wa { position:fixed; right:20px; bottom:20px; width:56px; height:56px; border-radius:50%; background:#25D366; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 16px rgba(0,0,0,0.25); z-index:200; }
         details.rc-menu > summary { list-style:none; }
         details.rc-menu > summary::-webkit-details-marker { display:none; }
@@ -139,10 +156,10 @@ export default function Page() {
           <p className="rc-eyebrow" style={{ color:t.navy, marginBottom:20 }}>O Empreendimento</p>
           <h2 className="rc-h2" style={{ color:t.ink, margin:'0 0 28px' }}>As Residências</h2>
           <p style={{ color:t.muted, lineHeight:1.8, marginBottom:24 }}>
-            O Rocca Pietore Residencial prioriza conforto e bem-estar com apartamentos de <strong>2 ou 3 dormitórios</strong> com 1 suíte, em plantas de <strong>71 a 91 m²</strong>, no Centro de Siderópolis. Um projeto arquitetónico que equilibra funcionalidade e beleza para você e sua família.
+            O Rocca Pietore Residencial prioriza conforto e bem-estar com apartamentos de <strong>2 ou 3 dormitórios</strong> com 1 suíte, em plantas de <strong>71 a 91 m²</strong>, no Centro de Siderópolis. Hall de entrada sofisticado, salão de festas e playground completam a infraestrutura.
           </p>
           <ul style={{ listStyle:'none', padding:0, margin:'0 0 36px', display:'flex', flexDirection:'column', gap:10 }}>
-            {['2 ou 3 dormitórios · 1 suíte master','71 a 91 m² de área privativa','Churrasqueira e salão de festas','Playground para a família','Elevador e salas comerciais','Centro de Siderópolis — tudo perto'].map((f,i) => (
+            {['2 ou 3 dormitórios · 1 suíte master','71 a 91 m² de área privativa','Hall de entrada sofisticado','Salão de festas e cozinha gourmet','Playground e elevador','Centro de Siderópolis — tudo perto'].map((f,i) => (
               <li key={i} style={{ display:'flex', alignItems:'center', gap:10, fontSize:14, color:t.ink }}>
                 <span style={{ width:6, height:6, borderRadius:'50%', background:t.navy, flexShrink:0, display:'inline-block' }} />
                 {f}
@@ -154,7 +171,7 @@ export default function Page() {
           </a>
         </div>
         <div style={{ position:'relative', aspectRatio:'3/4', borderRadius:2, overflow:'hidden' }}>
-          <Image src={IMG.hero} alt="Rocca Pietore Residencial fachada" fill sizes="(max-width:768px) 100vw, 50vw" style={{ objectFit:'cover' }} />
+          <Image src={IMG.hero2} alt="Rocca Pietore Residencial fachada" fill sizes="(max-width:768px) 100vw, 50vw" style={{ objectFit:'cover' }} />
         </div>
       </section>
 
@@ -162,7 +179,7 @@ export default function Page() {
         <div style={{ maxWidth:1100, margin:'0 auto' }}>
           <p className="rc-eyebrow" style={{ color:t.navy, marginBottom:20 }}>Galeria</p>
           <h2 className="rc-h2" style={{ color:t.ink, margin:'0 0 48px' }}>Perspectivas</h2>
-          <div style={{ display:'grid', gridTemplateColumns:'1fr', gap:16, maxWidth:700 }}>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:16 }}>
             <GalleryWithLightbox galeria={GALERIA} prefix="rc" gradient="rgba(13,27,42,0.55)" />
           </div>
         </div>
@@ -220,8 +237,11 @@ export default function Page() {
                 </div>
               ))}
             </div>
-            <div style={{ position:'relative', aspectRatio:'4/3', overflow:'hidden', borderRadius:2 }}>
-              <Image src={IMG.hero} alt="Lazer Rocca Pietore Residencial" fill sizes="(max-width:768px) 100vw, 50vw" style={{ objectFit:'cover' }} />
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+              <LightboxPhoto src={D+'1gAfhfPCENqCar6fGEii9hFfgp2rBe83p'} alt="Salão de festas Rocca Pietore" label="Salão de Festas" cardClass="rc-gcard" imgSizes="300px" />
+              <LightboxPhoto src={D+'1H5ym5YbxiJY0i07y4NBtYIlj8vsQ-Min'} alt="Salão gourmet Rocca Pietore" label="Salão Gourmet" cardClass="rc-gcard" imgSizes="300px" />
+              <LightboxPhoto src={D+'19y4TUIAuLr0YduVmmNfP9h8c2tCnmTka'} alt="Playground Rocca Pietore" label="Playground" cardClass="rc-gcard" imgSizes="300px" />
+              <LightboxPhoto src={D+'1s7gu7UmCu4cO-5Nd5SeAFhDMwgkGvtvu'} alt="Hall de entrada Rocca Pietore" label="Hall" cardClass="rc-gcard" imgSizes="300px" />
             </div>
           </div>
         </div>
