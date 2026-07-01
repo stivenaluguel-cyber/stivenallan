@@ -1,22 +1,32 @@
 // Regras de financiamento direto Construtora Fontana (tabelas jun/2026)
 
 // CUB/SC jun/2026: R$ 3.096,25 — atualizar mensalmente
-
 export const CUB_ATUAL = 3096.25
+
+// Taxa mensal IGPM estimada para simulação da Parcela B (pós-chaves)
+// IGPM real varia; usar 0,5% a.m. como referência conservadora + 0,75% a.m. contratual = 1,25% a.m.
+export const IGPM_MENSAL_REF = 0.005    // 0,5% a.m.
+export const TAXA_POS_CHAVES_IGPM = 0.0075 // 0,75% a.m. contratual sobre saldo
+
+// CUB mensal estimado para simulação da Parcela B pós-chaves (histórico ~0,6% a.m.)
+export const CUB_MENSAL_REF = 0.006     // 0,6% a.m.
+
+export type CorrecaoB = 'igpm' | 'cub'
 
 export type PlanoFinanciamento = {
   tipo: 'obra' | 'pronto' | 'quase_pronto' | 'loteamento'
   entrega: string | null           // ISO date; null = pronto
-  entradaPct: number               // fração do valor total
-  reforcos: number                 // qtd reforços anuais (plano padrão)
-  mensais: number                  // qtd parcelas mensais (plano padrão)
+  entradaPct: number               // fração do valor total (Parcela A — ato)
+  reforcos: number                 // qtd reforços anuais durante a obra (Parcela A)
+  mensais: number                  // qtd parcelas mensais durante a obra (Parcela A)
   descontoAVistaPct: number        // desconto p/ pagamento à vista
-  saldoDireto?: { meses: number; correcao: string }  // financiamento direto pós-chaves
+  saldoDireto?: { meses: number; correcao: string }  // Parcela B — financiamento direto pós-chaves
   politicaExtra?: string
 }
 
 // Regra geral Fontana: reforço anual = 5x a parcela mensal.
-// Durante a obra: correção CUB/SC. Pós-chaves: IGPM + 0,75% a.m. OU CUB/SC.
+// Parcela A (durante a obra): correção CUB/SC.
+// Parcela B (pós-chaves / saldo direto): IGPM + 0,75% a.m. OU CUB/SC, à escolha do comprador.
 
 const PADRAO_OBRA: Omit<PlanoFinanciamento, 'entrega'> = {
   tipo: 'obra', entradaPct: 0.20, reforcos: 6, mensais: 72, descontoAVistaPct: 0.15,
@@ -55,65 +65,146 @@ export const planos: Record<string, PlanoFinanciamento> = {
   'villammare-residencial-balneario-rincao-sc': { ...PADRAO_OBRA, entrega: null },
 }
 
+// Opções customizáveis para simulação da Parcela A
+export type OpcoesParcela = {
+  entradaPct?: number    // sobrescreve plano.entradaPct
+  reforcos?: number      // sobrescreve plano.reforcos
+  mensais?: number       // sobrescreve plano.mensais
+}
+
+export type ParcelaB = {
+  meses: number
+  taxaMensal: number          // taxa efetiva usada (IGPM ref + 0,75% ou CUB ref)
+  correcaoLabel: string       // ex: "IGPM + 0,75% a.m." ou "CUB/SC"
+  // Parcela Price (juros compostos) — estimativa
+  parcelaMensal: number       // valor da parcela Price sobre o saldo devedor B
+  // Parcela SAC — estimativa (1ª parcela / maior)
+  parcelaSAC1: number
+  // Parcela SAC — estimativa (última parcela / menor)
+  parcelaSACn: number
+  saldoDevedor: number        // saldo B = valorImovel - entrada (pré-chaves)
+}
+
 export type Simulacao = {
   valorImovel: number
-  entrada: number
-  qtdMensais: number
-  valorMensal: number
-  qtdReforcos: number
-  valorReforco: number
+  // Parcela A — durante a obra
+  parcelaA: {
+    entrada: number
+    qtdMensais: number
+    valorMensal: number
+    qtdReforcos: number
+    valorReforco: number
+  }
+  // À vista
   valorAVista: number
   descontoAVista: number
-  saldoDireto: { meses: number; valorParcela: number; correcao: string } | null
+  // Parcela B — pós-chaves (saldo direto); null se não aplicável
+  parcelaB: ParcelaB | null
   avisos: string[]
 }
 
-export function simular(slug: string, valorImovel: number, hoje = new Date()): Simulacao | null {
+// ─── função principal ───────────────────────────────────────────────────────
+
+export function simular(
+  slug: string,
+  valorImovel: number,
+  opcoes: OpcoesParcela = {},
+  correcaoB: CorrecaoB = 'igpm',
+  hoje = new Date()
+): Simulacao | null {
   const plano = planos[slug]
   if (!plano || valorImovel <= 0) return null
 
   const avisos: string[] = []
 
-  const entrada = valorImovel * plano.entradaPct
-  const descontoAVista = valorImovel * plano.descontoAVistaPct
-  const valorAVista = valorImovel - descontoAVista
+  // ── Parcela A ──────────────────────────────────────────────────────────────
+  const entradaPct  = opcoes.entradaPct ?? plano.entradaPct
+  let qtdMensais    = opcoes.mensais    ?? plano.mensais
+  let qtdReforcos   = opcoes.reforcos   ?? plano.reforcos
 
-  let qtdMensais = plano.mensais
-  let qtdReforcos = plano.reforcos
+  const entrada      = valorImovel * entradaPct
+  const saldoA       = valorImovel - entrada   // saldo a pagar durante a obra
 
-  // Parcela A dinâmica: prazo limitado pela entrega
+  // Limitar prazo pelo tempo restante até a entrega
   if (plano.entrega) {
     const entrega = new Date(plano.entrega)
     const mesesAteEntrega = Math.max(0,
       (entrega.getFullYear() - hoje.getFullYear()) * 12 + (entrega.getMonth() - hoje.getMonth()))
-    if (mesesAteEntrega < plano.mensais) {
+    if (mesesAteEntrega < qtdMensais) {
       qtdMensais = mesesAteEntrega
       avisos.push(`Prazo reduzido: restam ${mesesAteEntrega} meses até a entrega (${entrega.toLocaleDateString('pt-BR')}).`)
     }
     const anosAteEntrega = Math.floor(mesesAteEntrega / 12)
-    if (anosAteEntrega < plano.reforcos) {
+    if (anosAteEntrega < qtdReforcos) {
       qtdReforcos = anosAteEntrega
       avisos.push(`Reforços anuais reduzidos para ${anosAteEntrega} (prazo até a entrega).`)
     }
   }
 
-  // Saldo a parcelar = total - entrada; reforço = 5x mensal (regra Fontana)
-  const saldo = valorImovel - entrada
-  let valorMensal = 0
+  // Cálculo da mensalidade (reforço = 5x mensal, regra Fontana)
+  // saldoA = mensal × qtdMensais + (5 × mensal) × qtdReforcos
+  let valorMensal  = 0
   let valorReforco = 0
   if (qtdMensais > 0) {
-    // saldo = mensal*qtdMensais + (5*mensal)*qtdReforcos
-    valorMensal = saldo / (qtdMensais + 5 * qtdReforcos)
+    valorMensal  = saldoA / (qtdMensais + 5 * qtdReforcos)
     valorReforco = valorMensal * 5
   }
 
-  const saldoDireto = plano.saldoDireto
-    ? { meses: plano.saldoDireto.meses, valorParcela: saldo / plano.saldoDireto.meses, correcao: plano.saldoDireto.correcao }
-    : null
+  // ── À vista ────────────────────────────────────────────────────────────────
+  const descontoAVista = valorImovel * plano.descontoAVistaPct
+  const valorAVista    = valorImovel - descontoAVista
 
-  avisos.push('Parcelas e reforços corrigidos mensalmente pelo CUB/Sinduscon-SC durante a obra.')
-  if (plano.entrega) avisos.push('Pós-entrega: correção IGPM + 0,75% a.m. ou CUB/SC, à escolha do comprador.')
+  // ── Parcela B (pós-chaves / saldo direto) ──────────────────────────────────
+  let parcelaB: ParcelaB | null = null
+  if (plano.saldoDireto) {
+    const mesesB = plano.saldoDireto.meses
+    // saldoB: imóveis em obra = saldo remanescente pós-chaves (aqui consideramos
+    // que a Parcela A quita o valor durante a obra; para pronto/quase_pronto
+    // o saldo B é o valor total menos a entrada paga no ato)
+    const saldoB = valorImovel - entrada
+
+    // Taxa efetiva mensal para Parcela B
+    let taxaMensal: number
+    let correcaoLabel: string
+    if (correcaoB === 'cub') {
+      taxaMensal    = CUB_MENSAL_REF
+      correcaoLabel = 'CUB/SC (ref. ' + (CUB_MENSAL_REF * 100).toFixed(2) + '% a.m.)'
+    } else {
+      // IGPM + 0,75% a.m. — soma simples de taxas (simplificação contratual)
+      taxaMensal    = IGPM_MENSAL_REF + TAXA_POS_CHAVES_IGPM
+      correcaoLabel = 'IGPM + 0,75% a.m. (ref. ' + (taxaMensal * 100).toFixed(2) + '% a.m.)'
+    }
+
+    // Parcela Price: PMT = PV × i / (1 − (1+i)^−n)
+    let parcelaMensal: number
+    if (taxaMensal === 0 || mesesB === 0) {
+      parcelaMensal = mesesB > 0 ? saldoB / mesesB : 0
+    } else {
+      parcelaMensal = saldoB * taxaMensal / (1 - Math.pow(1 + taxaMensal, -mesesB))
+    }
+
+    // Parcela SAC: amortização constante = saldoB / mesesB; juros decrescem
+    const amortSAC  = mesesB > 0 ? saldoB / mesesB : 0
+    const parcelaSAC1 = amortSAC + saldoB * taxaMensal              // maior (1ª)
+    const parcelaSACn = amortSAC + amortSAC * taxaMensal            // menor (última)
+
+    parcelaB = { meses: mesesB, taxaMensal, correcaoLabel, parcelaMensal, parcelaSAC1, parcelaSACn, saldoDevedor: saldoB }
+  }
+
+  // ── Avisos ─────────────────────────────────────────────────────────────────
+  avisos.push('Parcela A corrigida mensalmente pelo CUB/Sinduscon-SC durante a obra.')
+  if (parcelaB) {
+    avisos.push(`Parcela B (${parcelaB.correcaoLabel}): estimativa — taxa real varia conforme índice contratual.`)
+  }
+  if (plano.politicaExtra) avisos.push(plano.politicaExtra)
   avisos.push('Valores estimados com base na tabela vigente — sujeitos a alteração sem aviso prévio.')
 
-  return { valorImovel, entrada, qtdMensais, valorMensal, qtdReforcos, valorReforco, valorAVista, descontoAVista, saldoDireto, avisos }
+  return {
+    valorImovel,
+    parcelaA: { entrada, qtdMensais, valorMensal, qtdReforcos, valorReforco },
+    valorAVista,
+    descontoAVista,
+    parcelaB,
+    avisos,
+  }
 }
