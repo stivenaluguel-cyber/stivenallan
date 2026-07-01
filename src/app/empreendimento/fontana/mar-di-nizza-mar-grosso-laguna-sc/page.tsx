@@ -93,7 +93,7 @@ export default function MarDiNizzaPage() {
         <header style={{ position:'absolute', top:0, left:0, right:0, zIndex:10, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'20px 32px' }}>
           <a href="/" style={{ color:'#E2F4F2', textDecoration:'none', fontFamily:t.display, fontSize:'1.1rem', fontWeight:600, letterSpacing:'.04em' }}>Stiven Allan</a>
           <nav style={{ display:'flex', gap:24 }}>
-            <LeadCaptureButton slug="mar-di-nizza-mar-grosso-laguna-sc" construtora_slug="fontana" className="mn-cta" />
+            <LeadCaptureButton slug="mar-di-nizza-mar-grosso-laguna-sc" construtora_slug="fontana" className="mn-cta"  propertyDisplayName="Mar di Nizza Residencial" />
             <a href={WA} target="_blank" rel="noopener noreferrer" style={{ color:'rgba(226,244,242,0.82)', textDecoration:'none', fontSize:'.8rem', letterSpacing:'.12em', textTransform:'uppercase' }}>Contato</a>
           </nav>
         </header>
