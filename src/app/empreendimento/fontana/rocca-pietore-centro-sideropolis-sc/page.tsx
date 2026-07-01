@@ -206,8 +206,6 @@ export default function Page() {
             </div>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'flex-end' }}>
               <LeadCaptureButton slug="rocca-pietore-centro-sideropolis-sc" construtora_slug="fontana" className="rc-cta" />
-                Baixar Catálogo
-              </a>
             </div>
           </div>
         </div>
