@@ -33,6 +33,21 @@ export const imoveis = [
     destaque: false,
     imagem: 'https://estilofontana.com.br/images/empreendimento/slideshows/mar-positano-residencial-676db4dfc93f5.jpg',
   }
+  {
+    id: '21',
+    nome: 'Pavia Residencial',
+    slug: 'pavia-rio-maina-criciuma-sc',
+    construtora: 'Fontana',
+    cidade: 'Criciúma',
+    estado: 'SC',
+    bairro: 'Rio Maina',
+    dormitorios: 3,
+    areaMin: 52,
+    areaMax: 79,
+    status: 'lancamento',
+    destaque: false,
+    imagem: 'https://estilofontana.com.br/images/empreendimento/slideshows/pavia-residencial-636b9e731f40c.jpg',
+  },
 ]
 
 // Para adicionar novo empreendimento: inserir novo objeto neste array com ativo: true
