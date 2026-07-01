@@ -146,7 +146,7 @@ export default function HubSmartHomePage() {
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, marginTop: 32 }}>
               <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="hub-cta"
                 style={{ ...ui.btnConvert, minHeight: 48 }}>SOLICITAR INFORMAÇÕES</a>
-              <LeadCaptureButton slug="hub-smart-home-criciuma-sc" construtora_slug="fontana" />
+              <LeadCaptureButton slug="hub-smart-home-criciuma-sc" construtora_slug="fontana"  propertyDisplayName="Hub Smart Home Residencial" />
               <a href="#diferenciais"
                 style={{ background: 'transparent', color: c.onDark, padding: '14px 26px', borderRadius: 2, fontWeight: 600, fontSize: 15, textDecoration: 'none', border: '1px solid rgba(255,255,255,0.2)', display: 'inline-flex', alignItems: 'center', minHeight: 48 }}>VER DIFERENCIAIS</a>
             </div>
