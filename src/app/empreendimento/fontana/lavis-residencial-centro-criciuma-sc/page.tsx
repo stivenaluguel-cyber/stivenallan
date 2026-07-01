@@ -261,7 +261,7 @@ export default function LavisPage() {
               </div>
             ))}
           </div>
-          <LeadCaptureButton slug="lavis-residencial-centro-criciuma-sc" construtora_slug="fontana" className="lv-cta lv-cta-light" />
+          <LeadCaptureButton slug="lavis-residencial-centro-criciuma-sc" construtora_slug="fontana" className="lv-cta lv-cta-light"  propertyDisplayName="Lavis Residencial" />
         </div>
       </section>
 
