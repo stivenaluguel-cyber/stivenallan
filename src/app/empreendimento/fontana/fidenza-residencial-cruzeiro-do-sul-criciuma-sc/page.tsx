@@ -298,7 +298,7 @@ export default function FidenzaPage() {
             <span style={{ width: 32, height: 1, background: t.onDark, display: 'inline-block' }} />
             <span style={{ fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: t.onDarkMuted }}>Entrega prevista</span>
           </div>
-          <LeadCaptureButton slug="fidenza-residencial-cruzeiro-do-sul-criciuma-sc" construtora_slug="fontana" className="fz-cta fz-cta-light" />
+          <LeadCaptureButton slug="fidenza-residencial-cruzeiro-do-sul-criciuma-sc" construtora_slug="fontana" className="fz-cta fz-cta-light"  propertyDisplayName="Fidenza Residencial" />
         </div>
       </section>
 
