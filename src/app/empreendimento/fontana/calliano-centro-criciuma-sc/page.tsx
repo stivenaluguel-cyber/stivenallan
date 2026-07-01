@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import GalleryWithLightbox, { LightboxPhoto } from './gallery-lightbox'
+import { LeadCaptureButton } from '@/components/LeadCaptureButton'
 
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Calliano%20Residencial.'
 const CATALOGO_PDF = 'https://estilofontana.com.br/upload/empreendimento/catalogo/calliano-residencial-1603223885.pdf'
@@ -188,7 +189,7 @@ export default function CallianoPage() {
                 </div>
               ))}
             </div>
-            <a href={CATALOGO_PDF} target="_blank" rel="noopener noreferrer" className="ca-cta-light">Baixar catálogo</a>
+            <LeadCaptureButton slug="calliano-centro-criciuma-sc" construtora_slug="fontana" className="ca-cta-light" />
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div style={{ padding: '28px 32px', border: `1px solid rgba(246,237,232,0.12)`, borderRadius: 2 }}>
