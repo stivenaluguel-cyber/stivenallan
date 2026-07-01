@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import GalleryWithLightbox, { LightboxPhoto } from './gallery-lightbox'
 import Link from 'next/link'
+import { LeadCaptureButton } from '@/components/LeadCaptureButton'
 
 // Hotsite premium Fidenza Residencial (Fontana, Cruzeiro do Sul, Criciuma/SC). Padrao EPIC — benchmark Aguas de Marano.
 // Acento: grafite #2B2B2B com detalhe azul #1E3A8A discreto (motivo Mondrian).
@@ -297,7 +298,7 @@ export default function FidenzaPage() {
             <span style={{ width: 32, height: 1, background: t.onDark, display: 'inline-block' }} />
             <span style={{ fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: t.onDarkMuted }}>Entrega prevista</span>
           </div>
-          <a href={CATALOGO_PDF} target="_blank" rel="noopener noreferrer" className="fz-cta fz-cta-light">Baixar Catálogo &amp; Plantas</a>
+          <LeadCaptureButton slug="fidenza-residencial-cruzeiro-do-sul-criciuma-sc" construtora_slug="fontana" className="fz-cta fz-cta-light" />
         </div>
       </section>
 
