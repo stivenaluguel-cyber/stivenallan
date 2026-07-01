@@ -163,7 +163,7 @@ details.mt-menu > summary::-webkit-details-marker { display: none; }
 <div key={i}><div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 'clamp(34px,5vw,58px)', letterSpacing: '0.04em', lineHeight: 1 }}>{it.n}</div><div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDarkMuted, marginTop: 12 }}>{it.l}</div></div>
 ))}
 </div>
-<LeadCaptureButton slug="mar-di-atrani-centro-balneario-rincao-sc" construtora_slug="fontana" className="mt-cta mt-cta-light" />
+<LeadCaptureButton slug="mar-di-atrani-centro-balneario-rincao-sc" construtora_slug="fontana" className="mt-cta mt-cta-light"  propertyDisplayName="Mar di Atrani Residencial" />
 </div>
 </section>
 <section id="diferenciais" style={{ padding: 'clamp(80px,14vh,160px) clamp(18px,5vw,56px)' }}>
