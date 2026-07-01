@@ -30,10 +30,12 @@ export function LeadCaptureModal({ propertyId, propertyName, bookPdfUrl, autoOpe
     setStatus('loading')
     const supabase = createClient()
     const { error } = await supabase.from('leads').insert({
-      name,
-      phone: phone.replace(/\D/g, ''),
+      nome: name,
+      whatsapp: phone.replace(/\D/g, ''),
       property_id: propertyId,
       property_name: propertyName,
+      origem: 'Site',
+      estagio_funil: 'primeiro_contato',
       source: 'book_download',
     })
     if (error) { setStatus('error'); return }
