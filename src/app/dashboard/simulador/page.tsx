@@ -1,7 +1,7 @@
 'use client'
 import { useState, useMemo } from 'react'
 import { imoveis } from '@/data/imoveis'
-import { simular, planos } from '@/data/financiamento'
+import { simular, planos, tabelaCorbetta, construtoras } from '@/data/financiamento'
 import type { CorrecaoB, OpcoesParcela } from '@/data/financiamento'
 
 // ─── helpers ────────────────────────────────────────────────────────────────
@@ -13,12 +13,6 @@ const D = {
 
 function fmtBRL(v: number) {
   return 'R$\u00a0' + v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-}
-
-function parseBRL(s: string): number {
-  // Remove tudo exceto dígitos e vírgula
-  const clean = s.replace(/[^\d,]/g, '').replace(',', '.')
-  return parseFloat(clean) || 0
 }
 
 function maskBRL(raw: string): string {
@@ -61,6 +55,13 @@ export default function SimuladorPage() {
   const [opcReforcos, setOpcReforcos] = useState('')
   const [copiado, setCopiado] = useState(false)
 
+  // ── Estado Tabela Corbetta ───────────────────────────────────────────────
+  const [corbEntradaRaw, setCorbEntradaRaw] = useState('')
+  const [corbMensalRaw, setCorbMensalRaw] = useState('')
+  const [corbReforcoRaw, setCorbReforcoRaw] = useState('')
+  const [corbConstrutora, setCorbConstrutora] = useState<keyof typeof construtoras>('fontana')
+  const [corbLinhaAtiva, setCorbLinhaAtiva] = useState<{ prazo: number; modo: string } | null>(null)
+
   // ── Estado Simulador Bancário ────────────────────────────────────────────
   const [showBank, setShowBank] = useState(false)
   const [bf, setBf] = useState<BankForm>(defBank)
@@ -92,6 +93,37 @@ export default function SimuladorPage() {
     [slug]
   )
 
+  // ── Cálculo Corbetta ─────────────────────────────────────────────────────
+  const corbEntrada = useMemo(() => {
+    const digits = corbEntradaRaw.replace(/\D/g, '')
+    if (!digits) return 0
+    return parseInt(digits, 10) / 100
+  }, [corbEntradaRaw])
+
+  const corbMensal = useMemo(() => {
+    const digits = corbMensalRaw.replace(/\D/g, '')
+    if (!digits) return 0
+    return parseInt(digits, 10) / 100
+  }, [corbMensalRaw])
+
+  const corbReforco = useMemo(() => {
+    const digits = corbReforcoRaw.replace(/\D/g, '')
+    if (!digits) return 0
+    return parseInt(digits, 10) / 100
+  }, [corbReforcoRaw])
+
+  const corbSaldo = useMemo(() => {
+    if (valorImovel <= 0) return 0
+    return Math.max(0, valorImovel - corbEntrada)
+  }, [valorImovel, corbEntrada])
+
+  const corbTaxa = useMemo(() => construtoras[corbConstrutora].taxaMensal, [corbConstrutora])
+
+  const corbTabela = useMemo(() => {
+    if (corbSaldo <= 0) return []
+    return tabelaCorbetta(corbSaldo, corbTaxa, corbMensal, corbReforco)
+  }, [corbSaldo, corbTaxa, corbMensal, corbReforco])
+
   // ── Cálculo bancário ─────────────────────────────────────────────────────
   const bCalc = useMemo(() => {
     const taxa = bf.taxa_juros_am > 0 ? bf.taxa_juros_am : TAXAS[bf.indice]
@@ -117,33 +149,38 @@ export default function SimuladorPage() {
   }, [sim])
 
   // ── Copiar proposta ──────────────────────────────────────────────────────
-  async function copiarProposta() {
-    if (!sim || !imovelSelecionado) return
-    const { parcelaA, parcelaB, valorAVista, descontoAVista } = sim
+  async function copiarProposta(condicaoCorb?: { prazo: number; modo: string; mensal: number; reforco: number }) {
+    if (!imovelSelecionado) return
     const nome = imovelSelecionado.nome
-    const linhas = [
-      '📋 *Simulação — ' + nome + '*',
-      'Valor do imóvel: ' + fmtBRL(valorImovel),
-      '',
-      '🏗️ *Parcela A — durante a obra*',
-      '• Entrada: ' + fmtBRL(parcelaA.entrada) + ' (' + Math.round((parcelaA.entrada / valorImovel) * 100) + '%)',
-    ]
-    if (parcelaA.qtdMensais > 0) {
-      linhas.push('• ' + parcelaA.qtdMensais + 'x mensais de ' + fmtBRL(parcelaA.valorMensal))
-    }
-    if (parcelaA.qtdReforcos > 0) {
-      linhas.push('• ' + parcelaA.qtdReforcos + ' reforço(s) anual(is) de ' + fmtBRL(parcelaA.valorReforco))
-    }
-    if (parcelaB) {
+    const linhas: string[] = ['📋 *Simulação — ' + nome + '*', 'Valor do imóvel: ' + fmtBRL(valorImovel), '']
+
+    if (condicaoCorb) {
+      // Proposta da tabela Corbetta
+      linhas.push('🏗️ *Condição SPC-JS (' + construtoras[corbConstrutora].nome + ')*')
+      linhas.push('• Entrada / Ato: ' + fmtBRL(corbEntrada))
+      linhas.push('• Saldo a financiar: ' + fmtBRL(corbSaldo))
+      linhas.push('• Prazo: ' + condicaoCorb.prazo + ' meses')
+      if (condicaoCorb.mensal > 0) linhas.push('• Parcela mensal: ' + fmtBRL(condicaoCorb.mensal))
+      if (condicaoCorb.reforco > 0) linhas.push('• Reforço anual: ' + fmtBRL(condicaoCorb.reforco))
+    } else if (sim) {
+      const { parcelaA, parcelaB, valorAVista, descontoAVista } = sim
+      linhas.push('🏗️ *Parcela A — durante a obra*')
+      linhas.push('• Entrada: ' + fmtBRL(parcelaA.entrada) + ' (' + Math.round((parcelaA.entrada / valorImovel) * 100) + '%)')
+      if (parcelaA.qtdMensais > 0) linhas.push('• ' + parcelaA.qtdMensais + 'x mensais de ' + fmtBRL(parcelaA.valorMensal))
+      if (parcelaA.qtdReforcos > 0) linhas.push('• ' + parcelaA.qtdReforcos + ' reforço(s) anual(is) de ' + fmtBRL(parcelaA.valorReforco))
+      if (parcelaB) {
+        linhas.push('')
+        linhas.push('🏠 *Parcela B — pós-chaves (' + parcelaB.correcaoLabel + ')*')
+        linhas.push('• Saldo: ' + fmtBRL(parcelaB.saldoDevedor))
+        linhas.push('• SPC-JS: ' + parcelaB.meses + 'x de ' + fmtBRL(parcelaB.spcMensal ?? parcelaB.parcelaMensal))
+        linhas.push('• Price: ' + parcelaB.meses + 'x de ' + fmtBRL(parcelaB.parcelaMensal))
+        linhas.push('• SAC: 1ª ' + fmtBRL(parcelaB.parcelaSAC1) + ' → última ' + fmtBRL(parcelaB.parcelaSACn))
+      }
       linhas.push('')
-      linhas.push('🏠 *Parcela B — pós-chaves (' + parcelaB.correcaoLabel + ')*')
-      linhas.push('• Saldo: ' + fmtBRL(parcelaB.saldoDevedor))
-      linhas.push('• Price: ' + parcelaB.meses + 'x de ' + fmtBRL(parcelaB.parcelaMensal))
-      linhas.push('• SAC: 1ª ' + fmtBRL(parcelaB.parcelaSAC1) + ' → última ' + fmtBRL(parcelaB.parcelaSACn))
+      linhas.push('💰 *À vista*')
+      linhas.push('• ' + fmtBRL(valorAVista) + ' (economia de ' + fmtBRL(descontoAVista) + ')')
     }
-    linhas.push('')
-    linhas.push('💰 *À vista*')
-    linhas.push('• ' + fmtBRL(valorAVista) + ' (economia de ' + fmtBRL(descontoAVista) + ')')
+
     linhas.push('')
     linhas.push('_Valores estimados, sujeitos à tabela vigente. Corrigidos pelo CUB/Sinduscon-SC._')
     await navigator.clipboard.writeText(linhas.join('\n'))
@@ -173,7 +210,7 @@ export default function SimuladorPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: D.bg, fontFamily: 'system-ui, sans-serif', padding: '28px 20px 64px' }}>
-      <div style={{ maxWidth: 860, margin: '0 auto' }}>
+      <div style={{ maxWidth: 960, margin: '0 auto' }}>
 
         {/* ── Título ──────────────────────────────────────────────────── */}
         <div style={{ marginBottom: 24 }}>
@@ -192,15 +229,9 @@ export default function SimuladorPage() {
           {/* Empreendimento */}
           <div style={{ marginBottom: 16 }}>
             <label style={lbl}>Empreendimento</label>
-            <select
-              value={slug}
-              onChange={e => setSlug(e.target.value)}
-              style={inp}
-            >
+            <select value={slug} onChange={e => setSlug(e.target.value)} style={inp}>
               {imoveisAtivos.map(i => (
-                <option key={i.slug} value={i.slug}>
-                  {i.nome} — {i.cidade}/{i.uf}
-                </option>
+                <option key={i.slug} value={i.slug}>{i.nome} — {i.cidade}/{i.uf}</option>
               ))}
             </select>
           </div>
@@ -208,14 +239,9 @@ export default function SimuladorPage() {
           {/* Valor do imóvel */}
           <div style={{ marginBottom: 16 }}>
             <label style={lbl}>Valor do imóvel</label>
-            <input
-              style={inp}
-              type="text"
-              inputMode="numeric"
-              value={valorRaw}
-              onChange={e => setValorRaw(maskBRL(e.target.value))}
-              placeholder="R$ 0,00"
-            />
+            <input style={inp} type="text" inputMode="numeric"
+              value={valorRaw} onChange={e => setValorRaw(maskBRL(e.target.value))}
+              placeholder="R$ 0,00" />
           </div>
 
           {/* Correção Parcela B */}
@@ -223,18 +249,14 @@ export default function SimuladorPage() {
             <label style={lbl}>Correção Parcela B (pós-chaves)</label>
             <div style={{ display: 'flex', gap: 10 }}>
               {(['igpm', 'cub'] as CorrecaoB[]).map(op => (
-                <button
-                  key={op}
-                  onClick={() => setCorrecaoB(op)}
-                  style={{
-                    flex: 1, padding: '10px', borderRadius: 10, fontSize: 13, fontWeight: 700,
-                    cursor: 'pointer', border: '2px solid',
-                    borderColor: correcaoB === op ? D.bronze : D.line,
-                    background: correcaoB === op ? D.bronze : '#fff',
-                    color: correcaoB === op ? '#fff' : D.muted,
-                    transition: 'all .15s',
-                  }}
-                >
+                <button key={op} onClick={() => setCorrecaoB(op)} style={{
+                  flex: 1, padding: '10px', borderRadius: 10, fontSize: 13, fontWeight: 700,
+                  cursor: 'pointer', border: '2px solid',
+                  borderColor: correcaoB === op ? D.bronze : D.line,
+                  background: correcaoB === op ? D.bronze : '#fff',
+                  color: correcaoB === op ? '#fff' : D.muted,
+                  transition: 'all .15s',
+                }}>
                   {op === 'igpm' ? 'IGPM + 0,75% a.m.' : 'CUB/SC'}
                 </button>
               ))}
@@ -242,14 +264,11 @@ export default function SimuladorPage() {
           </div>
 
           {/* Personalizar condição — colapsável */}
-          <button
-            onClick={() => setShowOpcoes(v => !v)}
-            style={{
-              background: 'none', border: 'none', cursor: 'pointer',
-              color: D.bronze, fontSize: 13, fontWeight: 700, padding: 0,
-              display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12,
-            }}
-          >
+          <button onClick={() => setShowOpcoes(v => !v)} style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            color: D.bronze, fontSize: 13, fontWeight: 700, padding: 0,
+            display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12,
+          }}>
             {showOpcoes ? '▲' : '▼'} Personalizar condição (opcional)
           </button>
 
@@ -257,33 +276,25 @@ export default function SimuladorPage() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, padding: '16px', background: D.bg, borderRadius: 12, marginBottom: 8 }}>
               <div>
                 <label style={lbl}>Entrada %</label>
-                <input
-                  style={inp} type="number" min={0} max={100} step={1}
+                <input style={inp} type="number" min={0} max={100} step={1}
                   value={opcEntrada} onChange={e => setOpcEntrada(e.target.value)}
-                  placeholder={planos[slug] ? Math.round(planos[slug].entradaPct * 100) + ' (padrão)' : ''}
-                />
+                  placeholder={planos[slug] ? Math.round(planos[slug].entradaPct * 100) + ' (padrão)' : ''} />
               </div>
               <div>
                 <label style={lbl}>Qtd. mensais</label>
-                <input
-                  style={inp} type="number" min={0} max={240} step={1}
+                <input style={inp} type="number" min={0} max={240} step={1}
                   value={opcMensais} onChange={e => setOpcMensais(e.target.value)}
-                  placeholder={planos[slug] ? planos[slug].mensais + ' (padrão)' : ''}
-                />
+                  placeholder={planos[slug] ? planos[slug].mensais + ' (padrão)' : ''} />
               </div>
               <div>
                 <label style={lbl}>Qtd. reforços</label>
-                <input
-                  style={inp} type="number" min={0} max={12} step={1}
+                <input style={inp} type="number" min={0} max={12} step={1}
                   value={opcReforcos} onChange={e => setOpcReforcos(e.target.value)}
-                  placeholder={planos[slug] ? planos[slug].reforcos + ' (padrão)' : ''}
-                />
+                  placeholder={planos[slug] ? planos[slug].reforcos + ' (padrão)' : ''} />
               </div>
               <div style={{ gridColumn: '1/-1' }}>
-                <button
-                  onClick={() => { setOpcEntrada(''); setOpcMensais(''); setOpcReforcos('') }}
-                  style={{ fontSize: 12, color: D.muted, background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
-                >
+                <button onClick={() => { setOpcEntrada(''); setOpcMensais(''); setOpcReforcos('') }}
+                  style={{ fontSize: 12, color: D.muted, background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}>
                   Limpar — usar plano padrão
                 </button>
               </div>
@@ -314,13 +325,11 @@ export default function SimuladorPage() {
             {/* ── Card 1 — PARCELA A ────────────────────────────────────── */}
             <div style={{ ...card, marginBottom: 0, borderTop: '3px solid ' + D.bronze }}>
               <p style={{ ...sectionTitle, marginBottom: 14 }}>🏗️ Parcela A — até as chaves</p>
-
               <div style={{ marginBottom: 14 }}>
                 <div style={{ fontSize: 11, color: D.muted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 2 }}>Entrada</div>
                 <div style={{ fontSize: 22, fontWeight: 800, color: D.ink }}>{fmtBRL(sim.parcelaA.entrada)}</div>
                 <div style={{ fontSize: 12, color: D.muted }}>{Math.round((sim.parcelaA.entrada / valorImovel) * 100)}% do valor total</div>
               </div>
-
               {sim.parcelaA.qtdMensais > 0 && (
                 <div style={{ background: D.bg, borderRadius: 10, padding: '12px 14px', marginBottom: 10 }}>
                   <div style={{ fontSize: 11, color: D.muted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>Parcelas mensais</div>
@@ -331,7 +340,6 @@ export default function SimuladorPage() {
                   <div style={{ fontSize: 12, color: D.muted, marginTop: 2 }}>{sim.parcelaA.qtdMensais} parcelas mensais</div>
                 </div>
               )}
-
               {sim.parcelaA.qtdReforcos > 0 && (
                 <div style={{ background: D.bg, borderRadius: 10, padding: '12px 14px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -346,7 +354,6 @@ export default function SimuladorPage() {
                   </div>
                 </div>
               )}
-
               {sim.parcelaA.qtdMensais === 0 && sim.parcelaA.qtdReforcos === 0 && (
                 <div style={{ fontSize: 13, color: D.muted, padding: '8px 0' }}>Imóvel pronto — sem parcelas durante a obra.</div>
               )}
@@ -355,30 +362,21 @@ export default function SimuladorPage() {
             {/* ── Card 3 — À VISTA ─────────────────────────────────────── */}
             <div style={{ ...card, marginBottom: 0, borderTop: '3px solid #22c55e', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               <p style={{ ...sectionTitle, marginBottom: 14, color: '#16a34a' }}>💰 À vista</p>
-
               <div style={{ marginBottom: 14 }}>
                 <div style={{ fontSize: 11, color: D.muted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 2 }}>Valor com desconto</div>
                 <div style={{ fontSize: 26, fontWeight: 800, color: '#15803d' }}>{fmtBRL(sim.valorAVista)}</div>
               </div>
-
               <div style={{ background: '#f0fdf4', borderRadius: 10, padding: '12px 14px' }}>
                 <div style={{ fontSize: 11, color: '#16a34a', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 2 }}>Economia</div>
                 <div style={{ fontSize: 20, fontWeight: 800, color: '#15803d' }}>{fmtBRL(sim.descontoAVista)}</div>
-                <div style={{ fontSize: 12, color: '#16a34a', marginTop: 2 }}>
-                  {Math.round((sim.descontoAVista / valorImovel) * 100)}% de desconto
-                </div>
+                <div style={{ fontSize: 12, color: '#16a34a', marginTop: 2 }}>{Math.round((sim.descontoAVista / valorImovel) * 100)}% de desconto</div>
               </div>
-
-              {/* Botão copiar */}
-              <button
-                onClick={copiarProposta}
-                style={{
-                  marginTop: 16, width: '100%', padding: '12px', borderRadius: 10,
-                  border: 'none', background: copiado ? '#16a34a' : D.bronze,
-                  color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer',
-                  transition: 'background .2s',
-                }}
-              >
+              <button onClick={() => copiarProposta()} style={{
+                marginTop: 16, width: '100%', padding: '12px', borderRadius: 10,
+                border: 'none', background: copiado ? '#16a34a' : D.bronze,
+                color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer',
+                transition: 'background .2s',
+              }}>
                 {copiado ? '✅ Copiado!' : '📋 Copiar proposta'}
               </button>
             </div>
@@ -389,7 +387,6 @@ export default function SimuladorPage() {
         {sim?.parcelaB && (
           <div style={{ ...card, borderTop: '3px solid #3b82f6' }}>
             <p style={{ ...sectionTitle, color: '#1d4ed8' }}>🏠 Parcela B — pós-chaves</p>
-
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 20 }}>
               <div>
                 <div style={{ fontSize: 11, color: D.muted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 2 }}>Saldo devedor</div>
@@ -402,7 +399,6 @@ export default function SimuladorPage() {
                 <div style={{ fontSize: 11, color: D.muted, marginTop: 2 }}>taxa mensal de referência</div>
               </div>
             </div>
-
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
               <thead>
                 <tr style={{ background: D.bg }}>
@@ -413,8 +409,16 @@ export default function SimuladorPage() {
                 </tr>
               </thead>
               <tbody>
+                {sim.parcelaB.spcMensal != null && (
+                  <tr style={{ borderTop: '1px solid ' + D.line, background: '#FFF3EC' }}>
+                    <td style={{ padding: '12px 14px', fontWeight: 700, color: D.bronze }}>SPC-JS (juros simples) ★</td>
+                    <td style={{ padding: '12px 14px', textAlign: 'right', fontWeight: 700, color: D.bronze }}>{fmtBRL(sim.parcelaB.spcMensal)}</td>
+                    <td style={{ padding: '12px 14px', textAlign: 'right', color: D.bronze }}>{fmtBRL(sim.parcelaB.spcMensal)}</td>
+                    <td style={{ padding: '12px 14px', textAlign: 'right', color: D.muted }}>{sim.parcelaB.meses} meses</td>
+                  </tr>
+                )}
                 <tr style={{ borderTop: '1px solid ' + D.line }}>
-                  <td style={{ padding: '12px 14px', fontWeight: 700, color: D.ink }}>Price (parcela fixa)</td>
+                  <td style={{ padding: '12px 14px', fontWeight: 700, color: D.ink }}>Price (juros compostos)</td>
                   <td style={{ padding: '12px 14px', textAlign: 'right', fontWeight: 700, color: '#1d4ed8' }}>{fmtBRL(sim.parcelaB.parcelaMensal)}</td>
                   <td style={{ padding: '12px 14px', textAlign: 'right', color: D.muted }}>{fmtBRL(sim.parcelaB.parcelaMensal)}</td>
                   <td style={{ padding: '12px 14px', textAlign: 'right', color: D.muted }}>{sim.parcelaB.meses} meses</td>
@@ -434,22 +438,164 @@ export default function SimuladorPage() {
         {avisosRodape.length > 0 && (
           <div style={{ marginBottom: 24 }}>
             {avisosRodape.map((a, i) => (
-              <p key={i} style={{ margin: '0 0 4px', fontSize: 12, color: D.muted, lineHeight: 1.5 }}>
-                * {a}
-              </p>
+              <p key={i} style={{ margin: '0 0 4px', fontSize: 12, color: D.muted, lineHeight: 1.5 }}>* {a}</p>
             ))}
           </div>
         )}
 
+        {/* ═══════════════════════════════════════════════════════════════
+            TABELA DE PRAZOS — ESTILO CORBETTA (SPC-JS)
+        ═══════════════════════════════════════════════════════════════ */}
+        <div style={{ ...card, borderTop: '3px solid ' + D.bronze }}>
+          <p style={{ ...sectionTitle }}>📊 Tabela de Prazos — SPC-JS (estilo Corbetta)</p>
+
+          {/* Controles Corbetta */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 12, marginBottom: 16 }}>
+            <div>
+              <label style={lbl}>Entrada / Ato (R$)</label>
+              <input style={inp} type="text" inputMode="numeric"
+                value={corbEntradaRaw} onChange={e => setCorbEntradaRaw(maskBRL(e.target.value))}
+                placeholder="R$ 0,00" />
+            </div>
+            <div>
+              <label style={lbl}>Mensal desejada (R$)</label>
+              <input style={inp} type="text" inputMode="numeric"
+                value={corbMensalRaw} onChange={e => setCorbMensalRaw(maskBRL(e.target.value))}
+                placeholder="Opcional" />
+            </div>
+            <div>
+              <label style={lbl}>Reforço anual desejado (R$)</label>
+              <input style={inp} type="text" inputMode="numeric"
+                value={corbReforcoRaw} onChange={e => setCorbReforcoRaw(maskBRL(e.target.value))}
+                placeholder="Opcional" />
+            </div>
+            <div>
+              <label style={lbl}>Construtora</label>
+              <select style={inp} value={corbConstrutora} onChange={e => setCorbConstrutora(e.target.value as keyof typeof construtoras)}>
+                {(Object.keys(construtoras) as Array<keyof typeof construtoras>).map(k => (
+                  <option key={k} value={k}>{construtoras[k].nome} — {(construtoras[k].taxaMensal * 100).toFixed(4)}% a.m.</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {corbSaldo > 0 && (
+            <div style={{ fontSize: 13, color: D.muted, marginBottom: 12 }}>
+              Saldo a financiar: <strong style={{ color: D.ink }}>{fmtBRL(corbSaldo)}</strong>
+              {' '}| Taxa: <strong style={{ color: D.ink }}>{(corbTaxa * 100).toFixed(4)}% a.m.</strong>
+            </div>
+          )}
+
+          {/* Tabela */}
+          {corbTabela.length > 0 ? (
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, minWidth: 600 }}>
+                <thead>
+                  <tr style={{ background: D.bronze, color: '#fff' }}>
+                    <th style={{ padding: '10px 12px', textAlign: 'left', fontWeight: 700, fontSize: 12, whiteSpace: 'nowrap' }}>Prazo</th>
+                    <th style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 700, fontSize: 12, whiteSpace: 'nowrap' }}>Sem Reforço</th>
+                    {corbMensal > 0 && <th style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 700, fontSize: 12, whiteSpace: 'nowrap' }}>Mensal Pré<br/><span style={{ fontSize: 10, fontWeight: 400, opacity: 0.85 }}>reforço necessário</span></th>}
+                    {corbReforco > 0 && <th style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 700, fontSize: 12, whiteSpace: 'nowrap' }}>Reforço Pré<br/><span style={{ fontSize: 10, fontWeight: 400, opacity: 0.85 }}>mensal necessária</span></th>}
+                    <th style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 700, fontSize: 12, whiteSpace: 'nowrap' }}>Máximo<br/><span style={{ fontSize: 10, fontWeight: 400, opacity: 0.85 }}>mensal + reforço 5×</span></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {corbTabela.map((row, idx) => {
+                    const isActive = corbLinhaAtiva?.prazo === row.prazoMeses
+                    const zebra = idx % 2 === 0 ? '#fff' : D.bg
+                    return (
+                      <tr key={row.prazoMeses} style={{ background: isActive ? '#FFF3EC' : zebra, cursor: 'pointer', transition: 'background .1s' }}
+                        onClick={() => setCorbLinhaAtiva(isActive ? null : { prazo: row.prazoMeses, modo: 'sem_reforco' })}>
+                        <td style={{ padding: '9px 12px', fontWeight: 700, color: D.ink, whiteSpace: 'nowrap', borderBottom: '1px solid ' + D.line }}>
+                          {row.prazoMeses} meses
+                          {isActive && <span style={{ marginLeft: 6, fontSize: 10, background: D.bronze, color: '#fff', borderRadius: 4, padding: '1px 5px' }}>✓</span>}
+                        </td>
+                        <td style={{ padding: '9px 12px', textAlign: 'right', borderBottom: '1px solid ' + D.line }}>
+                          <div style={{ fontWeight: 700, color: D.ink }}>{fmtBRL(row.semReforco.mensal)}/mês</div>
+                          <div style={{ fontSize: 11, color: D.muted }}>Total: {fmtBRL(row.semReforco.totalPago)}</div>
+                        </td>
+                        {corbMensal > 0 && (
+                          <td style={{ padding: '9px 12px', textAlign: 'right', borderBottom: '1px solid ' + D.line }}>
+                            {row.mensalFixa ? (
+                              row.mensalFixa.reforcoAnual < 0 ? (
+                                <div style={{ fontSize: 12, color: '#16a34a', fontWeight: 600 }}>mensal já cobre</div>
+                              ) : (
+                                <>
+                                  <div style={{ fontWeight: 700, color: D.ink }}>{fmtBRL(row.mensalFixa.mensal)}/mês</div>
+                                  <div style={{ fontSize: 11, color: D.bronze }}>+ {fmtBRL(row.mensalFixa.reforcoAnual)}/ano</div>
+                                </>
+                              )
+                            ) : '—'}
+                          </td>
+                        )}
+                        {corbReforco > 0 && (
+                          <td style={{ padding: '9px 12px', textAlign: 'right', borderBottom: '1px solid ' + D.line }}>
+                            {row.reforcoFixo ? (
+                              <>
+                                <div style={{ fontWeight: 700, color: D.ink }}>{fmtBRL(row.reforcoFixo.mensal)}/mês</div>
+                                <div style={{ fontSize: 11, color: '#8b5cf6' }}>+ {fmtBRL(row.reforcoFixo.reforcoAnual)}/ano</div>
+                              </>
+                            ) : '—'}
+                          </td>
+                        )}
+                        <td style={{ padding: '9px 12px', textAlign: 'right', borderBottom: '1px solid ' + D.line }}>
+                          <div style={{ fontWeight: 700, color: D.ink }}>{fmtBRL(row.maximo.mensal)}/mês</div>
+                          {row.maximo.qtdReforcos > 0 && (
+                            <div style={{ fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 4 }}>
+                              <span style={{ color: '#8b5cf6' }}>+ {fmtBRL(row.maximo.reforcoAnual)}/ano</span>
+                              <span style={{ fontSize: 10, background: '#ede9fe', color: '#6d28d9', borderRadius: 4, padding: '1px 4px', fontWeight: 700 }}>5×</span>
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div style={{ textAlign: 'center', padding: '32px 0', color: D.muted, fontSize: 14 }}>
+              Informe o valor do imóvel acima para gerar a tabela de prazos.
+            </div>
+          )}
+
+          {/* Linha selecionada — copiar proposta */}
+          {corbLinhaAtiva && corbTabela.length > 0 && (() => {
+            const row = corbTabela.find(r => r.prazoMeses === corbLinhaAtiva.prazo)
+            if (!row) return null
+            const sr = row.semReforco
+            return (
+              <div style={{ marginTop: 16, padding: '14px 16px', background: '#FFF3EC', borderRadius: 12, border: '1px solid #F9C4B1', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
+                <div>
+                  <div style={{ fontWeight: 700, color: D.ink, fontSize: 14 }}>
+                    Condição selecionada: {corbLinhaAtiva.prazo} meses — {fmtBRL(sr.mensal)}/mês
+                  </div>
+                  <div style={{ fontSize: 12, color: D.muted, marginTop: 2 }}>
+                    Total pago: {fmtBRL(sr.totalPago)} | Juros embutidos: {fmtBRL(sr.jurosEmbutidos)}
+                  </div>
+                </div>
+                <button onClick={() => copiarProposta({ prazo: corbLinhaAtiva.prazo, modo: 'sem_reforco', mensal: sr.mensal, reforco: sr.reforcoAnual })}
+                  style={{ padding: '10px 18px', borderRadius: 10, border: 'none', background: D.bronze, color: '#fff', fontWeight: 700, cursor: 'pointer', fontSize: 13 }}>
+                  {copiado ? '✅ Copiado!' : '📋 Copiar proposta'}
+                </button>
+              </div>
+            )
+          })()}
+
+          {/* Rodapé informativo */}
+          <p style={{ margin: '16px 0 0', fontSize: 11, color: D.muted, lineHeight: 1.6 }}>
+            Cálculo pelo sistema de parcelas constantes a juros simples (SPC-JS), idêntico às planilhas das construtoras.
+            VP = valor / (1 + i·t), somatório discreto exato. Parcelas corrigidas pelo índice contratual
+            (CUB/SC, IGPM ou INCC conforme empreendimento). Clique em uma linha para selecionar e copiar a proposta.
+          </p>
+        </div>
+
         {/* ── Seção: Financiamento Bancário (preservado) ───────────────── */}
         <div style={{ ...card, borderTop: '3px solid #6b7280' }}>
-          <button
-            onClick={() => setShowBank(v => !v)}
-            style={{
-              width: '100%', background: 'none', border: 'none', cursor: 'pointer',
-              display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 0,
-            }}
-          >
+          <button onClick={() => setShowBank(v => !v)} style={{
+            width: '100%', background: 'none', border: 'none', cursor: 'pointer',
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 0,
+          }}>
             <span style={{ fontSize: 14, fontWeight: 700, color: '#374151' }}>🏦 Financiamento Bancário (simulação auxiliar)</span>
             <span style={{ fontSize: 18, color: D.muted }}>{showBank ? '▲' : '▼'}</span>
           </button>
@@ -487,10 +633,7 @@ export default function SimuladorPage() {
                   </div>
                 ))}
               </div>
-              <button
-                onClick={() => setShowCronograma(v => !v)}
-                style={{ marginTop: 14, padding: '9px 16px', borderRadius: 8, border: '1px solid ' + D.line, background: '#fff', color: D.ink, fontWeight: 600, cursor: 'pointer', fontSize: 13 }}
-              >
+              <button onClick={() => setShowCronograma(v => !v)} style={{ marginTop: 14, padding: '9px 16px', borderRadius: 8, border: '1px solid ' + D.line, background: '#fff', color: D.ink, fontWeight: 600, cursor: 'pointer', fontSize: 13 }}>
                 {showCronograma ? '▲ Ocultar' : '▼ Ver'} Cronograma
               </button>
             </div>
