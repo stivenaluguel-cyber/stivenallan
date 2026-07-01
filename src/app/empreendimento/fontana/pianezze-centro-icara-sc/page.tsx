@@ -200,7 +200,7 @@ export default function Page() {
               </div>
             </div>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'flex-end' }}>
-              <LeadCaptureButton slug="pianezze-centro-icara-sc" construtora_slug="fontana" className="pz-cta" />
+              <LeadCaptureButton slug="pianezze-centro-icara-sc" construtora_slug="fontana" className="pz-cta"  propertyDisplayName="Pianezze Residencial" />
             </div>
           </div>
           <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:16 }}>
