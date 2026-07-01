@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import GalleryWithLightbox, { LightboxPhoto } from './gallery-lightbox'
+import { LeadCaptureButton } from '@/components/LeadCaptureButton'
 
 const WPP = "https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Mar%20di%20Arienzo%20Residencial."
 const CATALOGO_PDF = "https://estilofontana.com.br/upload/empreendimento/catalogo/mar-di-arienzo-residencial-1775575547.pdf"
@@ -164,7 +165,7 @@ details.ma-menu > summary::-webkit-details-marker { display: none; }
 <div key={i}><div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 'clamp(34px,5vw,58px)', letterSpacing: '0.04em', lineHeight: 1 }}>{it.n}</div><div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDarkMuted, marginTop: 12 }}>{it.l}</div></div>
 ))}
 </div>
-<a href={CATALOGO_PDF} target="_blank" rel="noopener noreferrer" className="ma-cta ma-cta-light">Baixar Catálogo &amp; Plantas</a>
+<LeadCaptureButton slug="mar-di-arienzo-centro-balneario-rincao-sc" construtora_slug="fontana" className="ma-cta ma-cta-light" />
 </div>
 </section>
 <section id="diferenciais" style={{ padding: 'clamp(80px,14vh,160px) clamp(18px,5vw,56px)' }}>
