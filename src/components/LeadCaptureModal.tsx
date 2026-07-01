@@ -7,6 +7,7 @@ type Props = {
   propertyId: string
   propertyName: string
   bookPdfUrl: string | null
+  autoOpen?: boolean
 }
 
 function maskPhone(value: string) {
@@ -17,8 +18,8 @@ function maskPhone(value: string) {
     .replace(/(\d{5})(\d{1,4})$/, '$1-$2')
 }
 
-export function LeadCaptureModal({ propertyId, propertyName, bookPdfUrl }: Props) {
-  const [open, setOpen] = useState(false)
+export function LeadCaptureModal({ propertyId, propertyName, bookPdfUrl, autoOpen = false }: Props) {
+  const [open, setOpen] = useState(autoOpen)
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
