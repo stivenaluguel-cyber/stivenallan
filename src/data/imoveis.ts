@@ -17,7 +17,22 @@ export const imoveis = [
 { id: '16', nome: 'Mar di Arienzo Residencial', slug: 'mar-di-arienzo-centro-balneario-rincao-sc', construtora_slug: 'fontana', construtora: 'Construtora Fontana', bairro: 'Centro', cidade: 'Balneário Rincão', uf: 'SC', status: 'em obras', exibir_preco: false, preco: null, frase: 'Amplie seu horizonte.', img: 'https://estilofontana.com.br/images/empreendimento/slideshows/mar-di-arienzo-residencial-69d2e834c59ea.jpg?fm=webp', ativo: true },
 { id: '17', nome: 'Mar di Atrani Residencial', slug: 'mar-di-atrani-centro-balneario-rincao-sc', construtora_slug: 'fontana', construtora: 'Construtora Fontana', bairro: 'Centro', cidade: 'Balneário Rincão', uf: 'SC', status: 'em obras', exibir_preco: false, preco: null, frase: 'A vida no agora.', img: 'https://estilofontana.com.br/images/empreendimento/slideshows/mar-di-atrani-residencial-675c232fef052.jpg?fm=webp', ativo: true },
   { id:'18', nome:'Mar di Licata Residencial', slug:'mar-di-licata-mar-grosso-laguna-sc', construtora_slug:'fontana', construtora:'Construtora Fontana', bairro:'Mar Grosso', cidade:'Laguna', uf:'SC', status:'em obras', exibir_preco:false, preco:null, frase:'Bem-vindo ao seu novo horizonte particular.', img:'https://estilofontana.com.br/images/empreendimento/slideshows/mar-di-licata-residencial-655b9b64e5d33.jpg?fm=webp', ativo:true },,
-  { id:'19', nome:'Mar di Nizza Residencial', slug:'mar-di-nizza-mar-grosso-laguna-sc', construtora_slug:'fontana', construtora:'Construtora Fontana', bairro:'Mar Grosso', cidade:'Laguna', uf:'SC', status:'em obras', exibir_preco:false, preco:null, frase:'Sinta a leveza do litoral de Laguna no seu dia a dia.', img:'https://estilofontana.com.br/images/empreendimento/slideshows/mar-di-nizza-residencial-64e74bef1ceb6.jpg?fm=webp', ativo:true }
+  { id:'19', nome:'Mar di Nizza Residencial', slug:'mar-di-nizza-mar-grosso-laguna-sc', construtora_slug:'fontana', construtora:'Construtora Fontana', bairro:'Mar Grosso', cidade:'Laguna', uf:'SC', status:'em obras', exibir_preco:false, preco:null, frase:'Sinta a leveza do litoral de Laguna no seu dia a dia.', img:'https://estilofontana.com.br/images/empreendimento/slideshows/mar-di-nizza-residencial-64e74bef1ceb6.jpg?fm=webp', ativo:true },
+  {
+    id: '20',
+    nome: 'Mar Positano Residencial',
+    slug: 'mar-positano-centro-balneario-rincao-sc',
+    construtora: 'Fontana',
+    cidade: 'Balneário Rincão',
+    estado: 'SC',
+    bairro: 'Centro',
+    dormitorios: 3,
+    areaMin: 107,
+    areaMax: 126,
+    status: 'lancamento',
+    destaque: false,
+    imagem: 'https://estilofontana.com.br/images/empreendimento/slideshows/mar-positano-residencial-676db4dfc93f5.jpg',
+  }
 ]
 
 // Para adicionar novo empreendimento: inserir novo objeto neste array com ativo: true
