@@ -22,41 +22,42 @@ export async function POST(req: NextRequest) {
         to: ['stiven.aluguel@gmail.com'],
         subject: `Novo lead: ${nome}`,
         html: `
-          <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px;background:#121315;color:#fff;border-radius:16px">
-            <div style="text-align:center;margin-bottom:24px">
-              <div style="background:#c9a24b;color:#121315;font-size:24px;font-weight:800;width:64px;height:64px;border-radius:16px;display:inline-flex;align-items:center;justify-content:center">SA</div>
-            </div>
-            <h2 style="color:#c9a24b;text-align:center;margin-top:0">Novo Lead Recebido</h2>
-            <table style="width:100%;border-collapse:collapse;margin-bottom:24px">
-              <tr>
-                <td style="color:#a7adb4;padding:8px 0;border-bottom:1px solid #1e2023;width:40%">Nome</td>
-                <td style="padding:8px 0;border-bottom:1px solid #1e2023;font-weight:600">${nome}</td>
-              </tr>
-              <tr>
-                <td style="color:#a7adb4;padding:8px 0;border-bottom:1px solid #1e2023">WhatsApp</td>
-                <td style="padding:8px 0;border-bottom:1px solid #1e2023;font-weight:600">${whatsapp}</td>
-              </tr>
-              <tr>
-                <td style="color:#a7adb4;padding:8px 0;border-bottom:1px solid #1e2023">Empreendimento</td>
-                <td style="padding:8px 0;border-bottom:1px solid #1e2023">${property_name ?? '-'}</td>
-              </tr>
-            </table>
-            <div style="text-align:center">
-              <a href="https://wa.me/55${whatsapp}"
-                style="background:#25D366;color:#fff;padding:12px 28px;border-radius:10px;text-decoration:none;font-weight:700;font-size:15px;display:inline-block;margin-right:8px">
-                Abrir WhatsApp
-              </a>
-              <a href="https://stivenallan.vercel.app/dashboard/leads"
-                style="background:#c9a24b;color:#121315;padding:12px 28px;border-radius:10px;text-decoration:none;font-weight:700;font-size:15px;display:inline-block">
-                Ver Dashboard
-              </a>
-            </div>
-            <p style="color:#a7adb4;font-size:12px;text-align:center;margin-top:24px">
-              SA Imóveis · Notificação automática
-            </p>
-          </div>
-        `,
-      }),
+  <div style="background:#F3F2EE;padding:32px 16px;font-family:system-ui,-apple-system,sans-serif">
+    <div style="max-width:480px;margin:0 auto;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06)">
+      <div style="background:#D24E22;padding:24px;text-align:center">
+        <div style="display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;background:#ffffff;border-radius:14px;font-size:22px;font-weight:800;color:#D24E22;margin-bottom:12px">SA</div>
+        <h1 style="color:#ffffff;font-size:20px;font-weight:700;margin:0">Novo Lead Recebido</h1>
+      </div>
+      <div style="padding:28px 24px">
+        <table style="width:100%;border-collapse:collapse">
+          <tr>
+            <td style="color:#8a8a85;padding:10px 0;border-bottom:1px solid #F3F2EE;font-size:13px;width:40%">Nome</td>
+            <td style="color:#1a1a1a;padding:10px 0;border-bottom:1px solid #F3F2EE;font-weight:600;font-size:14px">${nome}</td>
+          </tr>
+          <tr>
+            <td style="color:#8a8a85;padding:10px 0;border-bottom:1px solid #F3F2EE;font-size:13px">WhatsApp</td>
+            <td style="color:#1a1a1a;padding:10px 0;border-bottom:1px solid #F3F2EE;font-weight:600;font-size:14px">${whatsapp}</td>
+          </tr>
+          ${body.email ? `<tr>
+            <td style="color:#8a8a85;padding:10px 0;border-bottom:1px solid #F3F2EE;font-size:13px">E-mail</td>
+            <td style="color:#1a1a1a;padding:10px 0;border-bottom:1px solid #F3F2EE;font-weight:600;font-size:14px">${body.email}</td>
+          </tr>` : ''}
+          <tr>
+            <td style="color:#8a8a85;padding:10px 0;font-size:13px">Empreendimento</td>
+            <td style="color:#1a1a1a;padding:10px 0;font-weight:600;font-size:14px">${property_name ?? '-'}</td>
+          </tr>
+        </table>
+        <div style="text-align:center;margin-top:24px">
+          <a href="https://wa.me/55${whatsapp}" style="display:inline-block;background:#25D366;color:#ffffff;padding:12px 24px;border-radius:10px;text-decoration:none;font-weight:700;font-size:14px;margin:0 4px 8px">Abrir WhatsApp</a>
+          <a href="https://stivenallan.vercel.app/dashboard/leads" style="display:inline-block;background:#D24E22;color:#ffffff;padding:12px 24px;border-radius:10px;text-decoration:none;font-weight:700;font-size:14px;margin:0 4px 8px">Ver Dashboard</a>
+        </div>
+      </div>
+      <div style="background:#F3F2EE;padding:14px;text-align:center">
+        <p style="color:#8a8a85;font-size:11px;margin:0">SA Imóveis · Notificação automática de lead</p>
+      </div>
+    </div>
+  </div>
+`,      }),
     })
 
     if (!emailRes.ok) {
