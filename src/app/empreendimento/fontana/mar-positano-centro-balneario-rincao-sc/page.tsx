@@ -202,8 +202,6 @@ export default function Page() {
             </div>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'flex-end' }}>
               <LeadCaptureButton slug="mar-positano-centro-balneario-rincao-sc" construtora_slug="fontana" className="mp-cta" />
-                Baixar Catálogo
-              </a>
             </div>
           </div>
           <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:16 }}>
