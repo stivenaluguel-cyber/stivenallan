@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import GalleryWithLightbox, { LightboxPhoto } from './gallery-lightbox'
 import Link from 'next/link'
+import { LeadCaptureButton } from '@/components/LeadCaptureButton'
 
 // Hotsite premium Monte Leone Residencial (Fontana, Centro Criciuma/SC). Padrao EPIC — benchmark Aguas de Marano.
 // WhatsApp do corretor Stiven (NAO usar numeros internos da Fontana).
@@ -271,7 +272,7 @@ style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 
 </div>
 ))}
 </div>
-<a href={CATALOGO_PDF} target="_blank" rel="noopener noreferrer" className="ml-cta ml-cta-light">Baixar Catálogo &amp; Plantas</a>
+<LeadCaptureButton slug="monte-leone-centro-criciuma-sc" construtora_slug="fontana" className="ml-cta ml-cta-light" />
 </div>
 </section>
 
