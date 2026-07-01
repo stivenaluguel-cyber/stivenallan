@@ -4,90 +4,190 @@
 export const CUB_ATUAL = 3096.25
 
 // Taxa mensal IGPM estimada para simulação da Parcela B (pós-chaves)
-// IGPM real varia; usar 0,5% a.m. como referência conservadora + 0,75% a.m. contratual = 1,25% a.m.
-export const IGPM_MENSAL_REF = 0.005    // 0,5% a.m.
+export const IGPM_MENSAL_REF = 0.005 // 0,5% a.m.
 export const TAXA_POS_CHAVES_IGPM = 0.0075 // 0,75% a.m. contratual sobre saldo
 
 // CUB mensal estimado para simulação da Parcela B pós-chaves (histórico ~0,6% a.m.)
-export const CUB_MENSAL_REF = 0.006     // 0,6% a.m.
+export const CUB_MENSAL_REF = 0.006 // 0,6% a.m.
 
 export type CorrecaoB = 'igpm' | 'cub'
 
 export type PlanoFinanciamento = {
   tipo: 'obra' | 'pronto' | 'quase_pronto' | 'loteamento'
-  entrega: string | null           // ISO date; null = pronto
-  entradaPct: number               // fração do valor total (Parcela A — ato)
-  reforcos: number                 // qtd reforços anuais durante a obra (Parcela A)
-  mensais: number                  // qtd parcelas mensais durante a obra (Parcela A)
-  descontoAVistaPct: number        // desconto p/ pagamento à vista
-  saldoDireto?: { meses: number; correcao: string }  // Parcela B — financiamento direto pós-chaves
+  entrega: string | null // ISO date; null = pronto
+  entradaPct: number // fração do valor total (Parcela A — ato)
+  reforcos: number // qtd reforços anuais durante a obra (Parcela A)
+  mensais: number // qtd parcelas mensais durante a obra (Parcela A)
+  descontoAVistaPct: number // desconto p/ pagamento à vista
+  saldoDireto?: { meses: number; correcao: string } // Parcela B — financiamento direto pós-chaves
   politicaExtra?: string
 }
-
-// Regra geral Fontana: reforço anual = 5x a parcela mensal.
-// Parcela A (durante a obra): correção CUB/SC.
-// Parcela B (pós-chaves / saldo direto): IGPM + 0,75% a.m. OU CUB/SC, à escolha do comprador.
 
 const PADRAO_OBRA: Omit<PlanoFinanciamento, 'entrega'> = {
   tipo: 'obra', entradaPct: 0.20, reforcos: 6, mensais: 72, descontoAVistaPct: 0.15,
 }
 
 export const planos: Record<string, PlanoFinanciamento> = {
-  'monte-leone-centro-criciuma-sc':        { ...PADRAO_OBRA, entrega: '2030-08-30' },
+  'monte-leone-centro-criciuma-sc': { ...PADRAO_OBRA, entrega: '2030-08-30' },
   'fidenza-residencial-cruzeiro-do-sul-criciuma-sc': { ...PADRAO_OBRA, entrega: '2027-12-31' },
-  'mar-di-nizza-mar-grosso-laguna-sc':     { ...PADRAO_OBRA, entrega: '2026-12-31' },
-  'thiene-centro-criciuma-sc':             { tipo: 'quase_pronto', entrega: '2026-09-30', entradaPct: 0.10, reforcos: 0, mensais: 0, descontoAVistaPct: 0.15, saldoDireto: { meses: 180, correcao: 'IGPM + 0,75% a.m.' }, politicaExtra: '10% de desconto pagando 40% até as chaves (ato mínimo 10%) + saldo em até 180 meses.' },
-  'pavia-rio-maina-criciuma-sc':           { tipo: 'pronto', entrega: null, entradaPct: 0.15, reforcos: 0, mensais: 0, descontoAVistaPct: 0.05, saldoDireto: { meses: 240, correcao: 'IGPM + 0,75% a.m.' } },
-  // Demais empreendimentos: padrão obra — CONFIRMAR data de entrega na tabela de vendas
-  'lavis-residencial-centro-criciuma-sc':  { ...PADRAO_OBRA, entrega: null },
+  'mar-di-nizza-mar-grosso-laguna-sc': { ...PADRAO_OBRA, entrega: '2026-12-31' },
+  'thiene-centro-criciuma-sc': { tipo: 'quase_pronto', entrega: '2026-09-30', entradaPct: 0.10, reforcos: 0, mensais: 0, descontoAVistaPct: 0.15, saldoDireto: { meses: 180, correcao: 'IGPM + 0,75% a.m.' }, politicaExtra: '10% de desconto pagando 40% até as chaves (ato mínimo 10%) + saldo em até 180 meses.' },
+  'pavia-rio-maina-criciuma-sc': { tipo: 'pronto', entrega: null, entradaPct: 0.15, reforcos: 0, mensais: 0, descontoAVistaPct: 0.05, saldoDireto: { meses: 240, correcao: 'IGPM + 0,75% a.m.' } },
+  'lavis-residencial-centro-criciuma-sc': { ...PADRAO_OBRA, entrega: null },
   'aguas-de-marano-frente-mar-balneario-picarras-sc': { ...PADRAO_OBRA, entrega: null },
   'tremezzo-residencial-centro-criciuma-sc': { ...PADRAO_OBRA, entrega: null },
   'parco-savello-santa-barbara-criciuma-sc': { ...PADRAO_OBRA, entrega: null },
-  'avezzano-centro-sideropolis-sc':        { ...PADRAO_OBRA, entrega: null },
-  'bellante-comerciario-criciuma-sc':      { ...PADRAO_OBRA, entrega: null },
+  'avezzano-centro-sideropolis-sc': { ...PADRAO_OBRA, entrega: null },
+  'bellante-comerciario-criciuma-sc': { ...PADRAO_OBRA, entrega: null },
   'bosco-del-montello-centro-criciuma-sc': { ...PADRAO_OBRA, entrega: null },
-  'calalzo-di-cadore-michel-criciuma-sc':  { ...PADRAO_OBRA, entrega: null },
-  'calliano-centro-criciuma-sc':           { ...PADRAO_OBRA, entrega: null },
+  'calalzo-di-cadore-michel-criciuma-sc': { ...PADRAO_OBRA, entrega: null },
+  'calliano-centro-criciuma-sc': { ...PADRAO_OBRA, entrega: null },
   'campos-da-montanha-bom-jardim-da-serra-sc': { ...PADRAO_OBRA, entrega: null },
-  'castellano-centro-icara-sc':            { ...PADRAO_OBRA, entrega: null },
-  'due-fratelli-centro-criciuma-sc':       { ...PADRAO_OBRA, entrega: null },
-  'hub-smart-home-criciuma-sc':            { ...PADRAO_OBRA, entrega: null },
-  'lavis-centro-criciuma-sc':              { ...PADRAO_OBRA, entrega: null },
+  'castellano-centro-icara-sc': { ...PADRAO_OBRA, entrega: null },
+  'due-fratelli-centro-criciuma-sc': { ...PADRAO_OBRA, entrega: null },
+  'hub-smart-home-criciuma-sc': { ...PADRAO_OBRA, entrega: null },
+  'lavis-centro-criciuma-sc': { ...PADRAO_OBRA, entrega: null },
   'mar-di-arienzo-centro-balneario-rincao-sc': { ...PADRAO_OBRA, entrega: null },
   'mar-di-atrani-centro-balneario-rincao-sc': { ...PADRAO_OBRA, entrega: null },
-  'mar-di-licata-mar-grosso-laguna-sc':    { ...PADRAO_OBRA, entrega: null },
+  'mar-di-licata-mar-grosso-laguna-sc': { ...PADRAO_OBRA, entrega: null },
   'mar-positano-centro-balneario-rincao-sc': { ...PADRAO_OBRA, entrega: null },
-  'pianezze-centro-icara-sc':              { ...PADRAO_OBRA, entrega: null },
-  'piazza-castello-centro-icara-sc':       { ...PADRAO_OBRA, entrega: null },
-  'pineto-centro-criciuma-sc':             { ...PADRAO_OBRA, entrega: null },
-  'rocca-pietore-centro-sideropolis-sc':   { ...PADRAO_OBRA, entrega: null },
+  'pianezze-centro-icara-sc': { ...PADRAO_OBRA, entrega: null },
+  'piazza-castello-centro-icara-sc': { ...PADRAO_OBRA, entrega: null },
+  'pineto-centro-criciuma-sc': { ...PADRAO_OBRA, entrega: null },
+  'rocca-pietore-centro-sideropolis-sc': { ...PADRAO_OBRA, entrega: null },
   'villaggio-verde-residenziale-grande-prospera-criciuma-sc': { tipo: 'loteamento', entrega: null, entradaPct: 0.25, reforcos: 4, mensais: 48, descontoAVistaPct: 0.05 },
   'villammare-residencial-balneario-rincao-sc': { ...PADRAO_OBRA, entrega: null },
 }
 
-// Opções customizáveis para simulação da Parcela A
+// ─── Motor SPC-JS (Sistema de Parcelas Constantes a Juros Simples) ──────────
+
+// Taxa padrão: 0,75% a.m.
+export const TAXA_PADRAO_JS = 0.0075
+
+/**
+ * Fator de valor presente das mensais — juros simples, somatório exato.
+ * FM(n) = Σ[k=1..n] 1/(1 + i·k)
+ */
+export function fatorMensal(n: number, i = TAXA_PADRAO_JS): number {
+  let s = 0
+  for (let k = 1; k <= n; k++) s += 1 / (1 + i * k)
+  return s
+}
+
+/**
+ * Fator de VP dos reforços anuais (pagos nos meses 12, 24, ..., 12m).
+ * FR(m) = Σ[j=1..m] 1/(1 + i·12·j)
+ */
+export function fatorReforco(m: number, i = TAXA_PADRAO_JS): number {
+  let s = 0
+  for (let j = 1; j <= m; j++) s += 1 / (1 + i * 12 * j)
+  return s
+}
+
+export type ModoSimulacao = 'sem_reforco' | 'mensal_fixa' | 'reforco_fixo' | 'maximo'
+
+export type LinhaSimulacao = {
+  prazoMeses: number
+  qtdReforcos: number   // reforços anuais que cabem no prazo: floor(prazo/12)
+  mensal: number
+  reforcoAnual: number
+  totalPago: number     // mensal*prazo + reforcoAnual*qtdReforcos
+  jurosEmbutidos: number // totalPago - saldo
+}
+
+/**
+ * Resolve uma linha da tabela estilo Corbetta para um prazo dado.
+ * Usa VP a juros simples: VP = valor / (1 + i·t)
+ */
+export function resolverLinha(
+  saldo: number,
+  prazoMeses: number,
+  modo: ModoSimulacao,
+  i = TAXA_PADRAO_JS,
+  valorFixo = 0
+): LinhaSimulacao {
+  const m = Math.floor(prazoMeses / 12)
+  const FM = fatorMensal(prazoMeses, i)
+  const FR = fatorReforco(m, i)
+
+  let mensal = 0
+  let reforcoAnual = 0
+
+  if (modo === 'sem_reforco') {
+    mensal = saldo / FM
+  } else if (modo === 'mensal_fixa') {
+    mensal = valorFixo
+    reforcoAnual = m > 0 ? (saldo - mensal * FM) / FR : 0
+  } else if (modo === 'reforco_fixo') {
+    reforcoAnual = valorFixo
+    mensal = (saldo - reforcoAnual * FR) / FM
+  } else {
+    // 'maximo': reforço = 5× mensal
+    mensal = saldo / (FM + 5 * FR)
+    reforcoAnual = mensal * 5
+  }
+
+  const totalPago = mensal * prazoMeses + reforcoAnual * m
+  return {
+    prazoMeses,
+    qtdReforcos: m,
+    mensal,
+    reforcoAnual,
+    totalPago,
+    jurosEmbutidos: totalPago - saldo,
+  }
+}
+
+/**
+ * Tabela completa estilo Corbetta: prazos de 12 a 240 meses (de 12 em 12).
+ */
+export function tabelaCorbetta(
+  saldo: number,
+  i = TAXA_PADRAO_JS,
+  mensalFixa = 0,
+  reforcoFixo = 0
+) {
+  const prazos = Array.from({ length: 20 }, (_, k) => (k + 1) * 12)
+  return prazos.map(p => ({
+    prazoMeses: p,
+    semReforco: resolverLinha(saldo, p, 'sem_reforco', i),
+    mensalFixa: mensalFixa > 0 ? resolverLinha(saldo, p, 'mensal_fixa', i, mensalFixa) : null,
+    reforcoFixo: reforcoFixo > 0 ? resolverLinha(saldo, p, 'reforco_fixo', i, reforcoFixo) : null,
+    maximo: resolverLinha(saldo, p, 'maximo', i),
+  }))
+}
+
+/** Presets de construtoras da região */
+export const construtoras = {
+  fontana:  { nome: 'Fontana',  taxaMensal: 0.0075, sistema: 'juros_simples' as const },
+  corbetta: { nome: 'Corbetta', taxaMensal: 0.0075, sistema: 'juros_simples' as const },
+  locks:    { nome: 'Locks',    taxaMensal: 0.0075, sistema: 'juros_simples' as const },
+  giassi:   { nome: 'Giassi',   taxaMensal: Math.pow(1.095, 1/12) - 1, sistema: 'juros_compostos' as const, obs: '9,5% a.a.' },
+  perego:   { nome: 'Perego',   taxaMensal: 0.0075, sistema: 'price_sac' as const },
+} as const
+
+// ─── Tipos legados (compatibilidade com simulador/page.tsx) ─────────────────
+
 export type OpcoesParcela = {
-  entradaPct?: number    // sobrescreve plano.entradaPct
-  reforcos?: number      // sobrescreve plano.reforcos
-  mensais?: number       // sobrescreve plano.mensais
+  entradaPct?: number
+  reforcos?: number
+  mensais?: number
 }
 
 export type ParcelaB = {
   meses: number
-  taxaMensal: number          // taxa efetiva usada (IGPM ref + 0,75% ou CUB ref)
-  correcaoLabel: string       // ex: "IGPM + 0,75% a.m." ou "CUB/SC"
-  // Parcela Price (juros compostos) — estimativa
-  parcelaMensal: number       // valor da parcela Price sobre o saldo devedor B
-  // Parcela SAC — estimativa (1ª parcela / maior)
+  taxaMensal: number
+  correcaoLabel: string
+  parcelaMensal: number   // Price (juros compostos) — estimativa
   parcelaSAC1: number
-  // Parcela SAC — estimativa (última parcela / menor)
   parcelaSACn: number
-  saldoDevedor: number        // saldo B = valorImovel - entrada (pré-chaves)
+  saldoDevedor: number
+  // SPC-JS (juros simples) — adicionado
+  spcMensal?: number      // sem_reforco SPC-JS
 }
 
 export type Simulacao = {
   valorImovel: number
-  // Parcela A — durante a obra
   parcelaA: {
     entrada: number
     qtdMensais: number
@@ -95,15 +195,13 @@ export type Simulacao = {
     qtdReforcos: number
     valorReforco: number
   }
-  // À vista
   valorAVista: number
   descontoAVista: number
-  // Parcela B — pós-chaves (saldo direto); null se não aplicável
   parcelaB: ParcelaB | null
   avisos: string[]
 }
 
-// ─── função principal ───────────────────────────────────────────────────────
+// ─── função principal ────────────────────────────────────────────────────────
 
 export function simular(
   slug: string,
@@ -117,13 +215,13 @@ export function simular(
 
   const avisos: string[] = []
 
-  // ── Parcela A ──────────────────────────────────────────────────────────────
-  const entradaPct  = opcoes.entradaPct ?? plano.entradaPct
-  let qtdMensais    = opcoes.mensais    ?? plano.mensais
-  let qtdReforcos   = opcoes.reforcos   ?? plano.reforcos
+  // ── Parcela A ────────────────────────────────────────────────────────────
+  const entradaPct = opcoes.entradaPct ?? plano.entradaPct
+  let qtdMensais = opcoes.mensais ?? plano.mensais
+  let qtdReforcos = opcoes.reforcos ?? plano.reforcos
 
-  const entrada      = valorImovel * entradaPct
-  const saldoA       = valorImovel - entrada   // saldo a pagar durante a obra
+  const entrada = valorImovel * entradaPct
+  const saldoA = valorImovel - entrada
 
   // Limitar prazo pelo tempo restante até a entrega
   if (plano.entrega) {
@@ -141,41 +239,42 @@ export function simular(
     }
   }
 
-  // Cálculo da mensalidade (reforço = 5x mensal, regra Fontana)
-  // saldoA = mensal × qtdMensais + (5 × mensal) × qtdReforcos
-  let valorMensal  = 0
+  // Cálculo SPC-JS da Parcela A (reforço = 5× mensal, regra Fontana/Corbetta)
+  // saldoA = mensal·FM + reforco·FR = mensal·(FM + 5·FR)
+  let valorMensal = 0
   let valorReforco = 0
   if (qtdMensais > 0) {
-    valorMensal  = saldoA / (qtdMensais + 5 * qtdReforcos)
+    const FM = fatorMensal(qtdMensais, TAXA_PADRAO_JS)
+    const FR = qtdReforcos > 0 ? fatorReforco(qtdReforcos, TAXA_PADRAO_JS) : 0
+    valorMensal = saldoA / (FM + 5 * FR)
     valorReforco = valorMensal * 5
   }
 
-  // ── À vista ────────────────────────────────────────────────────────────────
+  // ── À vista ──────────────────────────────────────────────────────────────
   const descontoAVista = valorImovel * plano.descontoAVistaPct
-  const valorAVista    = valorImovel - descontoAVista
+  const valorAVista = valorImovel - descontoAVista
 
-  // ── Parcela B (pós-chaves / saldo direto) ──────────────────────────────────
+  // ── Parcela B (pós-chaves / saldo direto) ─────────────────────────────────
   let parcelaB: ParcelaB | null = null
   if (plano.saldoDireto) {
     const mesesB = plano.saldoDireto.meses
-    // saldoB: imóveis em obra = saldo remanescente pós-chaves (aqui consideramos
-    // que a Parcela A quita o valor durante a obra; para pronto/quase_pronto
-    // o saldo B é o valor total menos a entrada paga no ato)
     const saldoB = valorImovel - entrada
 
     // Taxa efetiva mensal para Parcela B
     let taxaMensal: number
     let correcaoLabel: string
     if (correcaoB === 'cub') {
-      taxaMensal    = CUB_MENSAL_REF
+      taxaMensal = CUB_MENSAL_REF
       correcaoLabel = 'CUB/SC (ref. ' + (CUB_MENSAL_REF * 100).toFixed(2) + '% a.m.)'
     } else {
-      // IGPM + 0,75% a.m. — soma simples de taxas (simplificação contratual)
-      taxaMensal    = IGPM_MENSAL_REF + TAXA_POS_CHAVES_IGPM
+      taxaMensal = IGPM_MENSAL_REF + TAXA_POS_CHAVES_IGPM
       correcaoLabel = 'IGPM + 0,75% a.m. (ref. ' + (taxaMensal * 100).toFixed(2) + '% a.m.)'
     }
 
-    // Parcela Price: PMT = PV × i / (1 − (1+i)^−n)
+    // Parcela B SPC-JS (juros simples, sem reforço)
+    const spcMensal = resolverLinha(saldoB, mesesB, 'sem_reforco', taxaMensal).mensal
+
+    // Parcela Price (juros compostos) — mantida como alternativa (Perego/bancos)
     let parcelaMensal: number
     if (taxaMensal === 0 || mesesB === 0) {
       parcelaMensal = mesesB > 0 ? saldoB / mesesB : 0
@@ -183,15 +282,15 @@ export function simular(
       parcelaMensal = saldoB * taxaMensal / (1 - Math.pow(1 + taxaMensal, -mesesB))
     }
 
-    // Parcela SAC: amortização constante = saldoB / mesesB; juros decrescem
-    const amortSAC  = mesesB > 0 ? saldoB / mesesB : 0
-    const parcelaSAC1 = amortSAC + saldoB * taxaMensal              // maior (1ª)
-    const parcelaSACn = amortSAC + amortSAC * taxaMensal            // menor (última)
+    // Parcela SAC
+    const amortSAC = mesesB > 0 ? saldoB / mesesB : 0
+    const parcelaSAC1 = amortSAC + saldoB * taxaMensal
+    const parcelaSACn = amortSAC + amortSAC * taxaMensal
 
-    parcelaB = { meses: mesesB, taxaMensal, correcaoLabel, parcelaMensal, parcelaSAC1, parcelaSACn, saldoDevedor: saldoB }
+    parcelaB = { meses: mesesB, taxaMensal, correcaoLabel, parcelaMensal, parcelaSAC1, parcelaSACn, saldoDevedor: saldoB, spcMensal }
   }
 
-  // ── Avisos ─────────────────────────────────────────────────────────────────
+  // ── Avisos ────────────────────────────────────────────────────────────────
   avisos.push('Parcela A corrigida mensalmente pelo CUB/Sinduscon-SC durante a obra.')
   if (parcelaB) {
     avisos.push(`Parcela B (${parcelaB.correcaoLabel}): estimativa — taxa real varia conforme índice contratual.`)
