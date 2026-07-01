@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import GalleryWithLightbox from './gallery-lightbox'
+import { LeadCaptureButton } from '@/components/LeadCaptureButton'
 
 const WPP = "https://wa.me/5548991642332?text=Olá!%20Tenho%20interesse%20no%20Villaggio%20Verde%20Residenziale%20em%20Criciúma."
 
@@ -135,6 +136,7 @@ export default function Page() {
           <a href={WPP} target="_blank" rel="noopener noreferrer" className="vv-cta" style={{ color:'#fff', borderColor:'rgba(255,255,255,0.6)' }}>
             Quero Saber Mais
           </a>
+          <LeadCaptureButton slug="villaggio-verde-residenziale-grande-prospera-criciuma-sc" construtora_slug="fontana" />
         </div>
       </section>
 
