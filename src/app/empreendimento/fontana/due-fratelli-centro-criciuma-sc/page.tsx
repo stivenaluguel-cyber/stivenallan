@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import GalleryWithLightbox, { LightboxPhoto } from './gallery-lightbox'
+import { LeadCaptureButton } from '@/components/LeadCaptureButton'
 
 const WPP = "https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Due%20Fratelli%20Residencial."
 const CATALOGO_PDF = "https://estilofontana.com.br/upload/empreendimento/catalogo/due-fratelli-residencial-1602177598.pdf"
@@ -179,7 +180,7 @@ details.df-menu > summary::-webkit-details-marker { display: none; }
 <div key={i}><div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 'clamp(34px,5vw,58px)', letterSpacing: '0.04em', lineHeight: 1 }}>{it.n}</div><div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDarkMuted, marginTop: 12 }}>{it.l}</div></div>
 ))}
 </div>
-<a href={CATALOGO_PDF} target="_blank" rel="noopener noreferrer" className="df-cta df-cta-light">Baixar Catálogo</a>
+<LeadCaptureButton slug="due-fratelli-centro-criciuma-sc" construtora_slug="fontana" className="df-cta df-cta-light" />
 </div>
 </section>
 <section id="diferenciais" style={{ padding: 'clamp(80px,14vh,160px) clamp(18px,5vw,56px)' }}>
