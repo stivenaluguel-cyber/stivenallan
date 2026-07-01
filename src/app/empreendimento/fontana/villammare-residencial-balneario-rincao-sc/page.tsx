@@ -142,7 +142,7 @@ export default function Page() {
           <a href={WPP} target="_blank" rel="noopener noreferrer" className="vm-cta" style={{ color:'#fff', borderColor:'rgba(255,255,255,0.6)' }}>
             Quero Saber Mais
           </a>
-          <LeadCaptureButton slug="villammare-residencial-balneario-rincao-sc" construtora_slug="fontana" />
+          <LeadCaptureButton slug="villammare-residencial-balneario-rincao-sc" construtora_slug="fontana"  propertyDisplayName="Villammare Residencial" />
         </div>
       </section>
 
