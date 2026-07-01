@@ -186,7 +186,7 @@ html { scroll-behavior: smooth; }
 <section style={{ background:t.forest, padding:'80px 32px', textAlign:'center' }}>
 <p className="cm-eyebrow" style={{ color:t.onDarkMuted, marginBottom:16 }}>Material Completo</p>
 <h2 className="cm-h2" style={{ color:t.onDark, marginBottom:32 }}>Baixe o Catálogo</h2>
-<LeadCaptureButton slug="campos-da-montanha-bom-jardim-da-serra-sc" construtora_slug="fontana" className="cm-cta cm-cta-light" />
+<LeadCaptureButton slug="campos-da-montanha-bom-jardim-da-serra-sc" construtora_slug="fontana" className="cm-cta cm-cta-light"  propertyDisplayName="Campos da Montanha Residencial" />
 </section>
 <section id="localizacao" style={{ padding:'96px 32px', background:t.bg }}>
 <div style={{ maxWidth:1100, margin:'0 auto' }}>
