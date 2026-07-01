@@ -193,7 +193,7 @@ export default function BellantePage() {
           <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '1rem', lineHeight: 1.7, marginBottom: '2rem' }}>
             Plantas, acabamentos e todos os detalhes do Bellante Residencial.
           </p>
-          <LeadCaptureButton slug="bellante-comerciario-criciuma-sc" construtora_slug="fontana" />
+          <LeadCaptureButton slug="bellante-comerciario-criciuma-sc" construtora_slug="fontana"  propertyDisplayName="Bellante Residencial" />
         </div>
       </section>
 
