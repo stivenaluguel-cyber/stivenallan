@@ -38,7 +38,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     title: `Lançamentos no ${nomeBairro}, ${nomeCidade}/SC | Stiven Allan Corretor`,
-    description: `Encontre os melhores lançamentos imobiliários no bairro ${nomeBairro} em ${nomeCidade}/SC. Apartamentos, casas e terrenos com Stiven Allan, CRECI/RS 60.275.`,
+    description: `Encontre os melhores lançamentos imobiliários no bairro ${nomeBairro} em ${nomeCidade}/SC. Apartamentos, casas e terrenos com Stiven Allan, CRECI 60.275.`,
     alternates: {
       canonical: `https://stivenallan.com.br/lancamentos/${cidade}/${bairro}`,
     },
