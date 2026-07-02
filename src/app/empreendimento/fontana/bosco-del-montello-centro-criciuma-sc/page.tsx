@@ -2,10 +2,13 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import GalleryWithLightbox, { LightboxPhoto } from './gallery-lightbox'
 import { LeadCaptureButton } from '@/components/LeadCaptureButton'
+import { PropertySchema } from '@/components/PropertySchema'
+import { PropertyFAQ } from '@/components/PropertyFAQ'
+import { RelatedProperties } from '@/components/RelatedProperties'
+import { SITE_URL } from '@/lib/site'
 
 const WPP = "https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Bosco%20Del%20Montello%20Residencial."
 const CATALOGO_PDF = "https://estilofontana.com.br/upload/empreendimento/catalogo/bosco-del-montello-1602177950.pdf"
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://stivenallan.vercel.app'
 
 const t = {
   bg: '#FAFAF8', ink: '#16201A', brown: '#5C3D2E', brownDark: '#3A2419', muted: '#6A5A50',
@@ -80,7 +83,7 @@ const SCHEMA = {
 export default function BoscoDelMontelloPage() {
   return (
     <main style={{ background: t.bg, color: t.ink, fontFamily: t.body, overflowX: 'hidden' }}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHEMA) }} />
+      
       <style>{`
         html { scroll-behavior: smooth; }
         .bm-eyebrow { font-size: 11px; letter-spacing: 0.42em; text-transform: uppercase; color: ${t.brown}; font-family: ${t.body}; font-weight: 500; }
