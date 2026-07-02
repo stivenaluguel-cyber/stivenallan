@@ -159,7 +159,7 @@ export default function HomePage() {
         <Image src="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/monte-leone-centro-criciuma-sc.jpg" alt="Vista aérea de empreendimento Fontana — Sul de Santa Catarina" fill priority sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center 30%' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.40) 60%, rgba(0,0,0,0.50) 100%)' }} />
         <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 clamp(24px,6vw,80px)', paddingTop: 68 }}>
-          <p className="home-eyebrow fade-in" style={{ color: 'rgba(184,155,94,0.85)', marginBottom: 24, textShadow: '0 1px 8px rgba(0,0,0,0.5)' }}>Stiven Allan · CRECI/RS 60.275</p>
+          <p className="home-eyebrow fade-in" style={{ color: 'rgba(184,155,94,0.85)', marginBottom: 24, textShadow: '0 1px 8px rgba(0,0,0,0.5)' }}>Stiven Allan · CRECI 60.275</p>
           <h1 className="home-h1 fade-in fade-in-1" style={{ fontSize: 'clamp(36px,7vw,88px)', color: '#FFFFFF', textShadow: '0 2px 8px rgba(0,0,0,0.5), 0 2px 32px rgba(0,0,0,0.60)', maxWidth: 900 }}>
             Apartamentos na planta com financiamento direto — sem banco, sem burocracia
           </h1>
@@ -291,7 +291,7 @@ export default function HomePage() {
             <div>
               <p style={{ fontFamily: t.display, fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.22em', fontSize: 16, color: t.onDark, margin: '0 0 16px' }}>Stiven Allan</p>
               <p style={{ fontFamily: t.body, fontSize: 13, color: t.onDarkMuted, lineHeight: 1.7, margin: '0 0 12px', maxWidth: 280 }}>Corretor de imóveis especializado em empreendimentos Fontana com financiamento direto.</p>
-              <p style={{ fontFamily: t.body, fontSize: 11, letterSpacing: '0.16em', color: 'rgba(245,241,234,0.35)', margin: 0 }}>CRECI/RS 60.275</p>
+              <p style={{ fontFamily: t.body, fontSize: 11, letterSpacing: '0.16em', color: 'rgba(245,241,234,0.35)', margin: 0 }}>CRECI 60.275</p>
             </div>
             <div>
               <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.25em', textTransform: 'uppercase', color: t.champagne, marginBottom: 20 }}>Menu</div>
@@ -317,7 +317,7 @@ export default function HomePage() {
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
             <p style={{ fontFamily: t.body, fontSize: 12, color: 'rgba(245,241,234,0.25)', margin: 0 }}>© {new Date().getFullYear()} Stiven Allan. Todos os direitos reservados.</p>
-            <p style={{ fontFamily: t.body, fontSize: 12, color: 'rgba(245,241,234,0.25)', margin: 0 }}>Sul de Santa Catarina · CRECI/RS 60.275</p>
+            <p style={{ fontFamily: t.body, fontSize: 12, color: 'rgba(245,241,234,0.25)', margin: 0 }}>Sul de Santa Catarina · CRECI 60.275</p>
           </div>
         </div>
       </footer>
