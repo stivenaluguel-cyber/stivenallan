@@ -215,7 +215,7 @@ export default async function BlogPostPage({ params }: Props) {
       '@type': 'Person',
       name: post.autor,
       jobTitle: 'Corretor de Imóveis',
-      hasCredential: 'CRECI/RS 60.275',
+      hasCredential: 'CRECI 60.275',
       url: 'https://stivenallan.com.br',
     },
     publisher: {
@@ -279,7 +279,7 @@ export default async function BlogPostPage({ params }: Props) {
                   SA
                 </div>
                 <span className="text-white font-medium">{post.autor}</span>
-                <span className="text-[#a7adb4]">· CRECI/RS 60.275</span>
+                <span className="text-[#a7adb4]">· CRECI 60.275</span>
               </div>
               <span>·</span>
               <time dateTime={post.data}>{formatData(post.data)}</time>
@@ -336,7 +336,7 @@ export default async function BlogPostPage({ params }: Props) {
           <div className="mt-10 bg-[#202327] border border-[#c9a24b]/20 rounded-2xl p-8">
             <h2 className="text-xl font-bold text-white mb-2">Precisa de ajuda para encontrar seu imóvel?</h2>
             <p className="text-[#a7adb4] mb-4">
-              Sou Stiven Allan, corretor CRECI/RS 60.275, especialista em lançamentos e imóveis no sul catarinense. 
+              Sou Stiven Allan, corretor CRECI 60.275, especialista em lançamentos e imóveis no sul catarinense. 
               Posso te ajudar a encontrar a melhor oportunidade.
             </p>
             <a
