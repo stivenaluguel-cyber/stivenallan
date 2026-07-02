@@ -3,10 +3,13 @@ import Image from 'next/image'
 import Link from 'next/link'
 import GalleryWithLightbox, { LightboxPhoto } from './gallery-lightbox'
 import { LeadCaptureButton } from '@/components/LeadCaptureButton'
+import { PropertySchema } from '@/components/PropertySchema'
+import { PropertyFAQ } from '@/components/PropertyFAQ'
+import { RelatedProperties } from '@/components/RelatedProperties'
+import { SITE_URL } from '@/lib/site'
 
 const WPP = "https://wa.me/5548991642332?text=Olá!%20Tenho%20interesse%20no%20Mar%20Positano%20Residencial%20em%20Balneário%20Rincão."
 const CATALOGO_PDF = "https://estilofontana.com.br/upload/empreendimento/catalogo/mar-positano-residencial-1761677677.pdf"
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://stivenallan.vercel.app'
 
 const t = {
   bg: '#F5F2ED', ink: '#1A1A1A', navy: '#1B3A5B', navyDark: '#13293F',
@@ -102,7 +105,8 @@ const SCHEMA = {
 export default function Page() {
   return (
     <main style={{ fontFamily: t.body, background: t.bg, color: t.ink, overflowX: 'hidden' }}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHEMA) }} />
+<PropertySchema nome="Mar Positano Residencial" slug="mar-positano-centro-balneario-rincao-sc" construtora_slug="fontana" cidade="Balneário Rincão" uf="SC" bairro="Centro" descricao="Mar Positano Residencial — apartamentos 3 dormitórios com suíte, 107 a 126 m² privativos no Centro de Balneário Rincão/SC. Financiamento direto Fontana." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/mar-positano-centro-balneario-rincao-sc.jpg" faq={[{"pergunta":"Como funciona o financiamento direto do Mar Positano Residencial?","resposta":"Entrada de 20%, saldo em até 72 parcelas mensais e 6 reforços anuais (cada reforço equivale a 5 parcelas mensais), com correção pelo CUB/SC durante a obra. Sem análise de banco."},{"pergunta":"Qual a previsão de entrega do Mar Positano Residencial?","resposta":"A previsão de entrega é agosto de 2029, em Centro, Balneário Rincão/SC."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Sim. Além do financiamento direto com a construtora, é possível optar por financiamento bancário. Fale com o Stiven pelo WhatsApp para simular as duas opções."},{"pergunta":"Onde fica o Mar Positano Residencial?","resposta":"O Mar Positano Residencial está localizado na Rua Waldemar Carlos Petrini, esq. Rua Espírito Santo, no Centro de Balneário Rincão/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"O empreendimento oferece apartamentos com 3 dormitórios (1 suíte), de 107 a 126 m² privativos, com sacada."}]} />
+
       <style>{`
         html { scroll-behavior: smooth; }
         .mp-eyebrow { font-size:11px; letter-spacing:0.42em; text-transform:uppercase; }
@@ -312,6 +316,12 @@ export default function Page() {
           <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.528 5.855L.057 23.117a.75.75 0 0 0 .917.913l5.352-1.483A11.95 11.95 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.952 9.952 0 0 1-5.127-1.416l-.367-.217-3.785 1.048 1.015-3.7-.239-.381A9.953 9.953 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
         </svg>
       </a>
+
+{/* SEO FAQ */}
+<PropertyFAQ items={[{"pergunta":"Como funciona o financiamento direto do Mar Positano Residencial?","resposta":"Entrada de 20%, saldo em até 72 parcelas mensais e 6 reforços anuais (cada reforço equivale a 5 parcelas mensais), com correção pelo CUB/SC durante a obra. Sem análise de banco."},{"pergunta":"Qual a previsão de entrega do Mar Positano Residencial?","resposta":"A previsão de entrega é agosto de 2029, em Centro, Balneário Rincão/SC."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Sim. Além do financiamento direto com a construtora, é possível optar por financiamento bancário. Fale com o Stiven pelo WhatsApp para simular as duas opções."},{"pergunta":"Onde fica o Mar Positano Residencial?","resposta":"O Mar Positano Residencial está localizado na Rua Waldemar Carlos Petrini, esq. Rua Espírito Santo, no Centro de Balneário Rincão/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"O empreendimento oferece apartamentos com 3 dormitórios (1 suíte), de 107 a 126 m² privativos, com sacada."}]} accent="#1B3A5B" />
+<RelatedProperties atualSlug="mar-positano-centro-balneario-rincao-sc" cidade="Balneário Rincão" />
+
+
     </main>
   )
 }
