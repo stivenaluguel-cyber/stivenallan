@@ -39,7 +39,7 @@ export default function Footer() {
               </span>
             </Link>
             <p style={{ color: C.muted, fontSize: '11px', letterSpacing: '3px', marginBottom: '20px' }}>
-              CRECI/RS 60.275 · CORRETOR DE IMÓVEIS
+              CRECI 60.275 · CORRETOR DE IMÓVEIS
             </p>
             <p style={{ color: C.muted, fontSize: '13px', lineHeight: 1.7, maxWidth: '320px' }}>
               Especialista em lançamentos e empreendimentos de construtoras em Criciúma e região do Sul Catarinense.
@@ -122,7 +122,7 @@ export default function Footer() {
           gap: '12px',
         }}>
           <p style={{ color: C.muted, fontSize: '12px' }}>
-            © {new Date().getFullYear()} Stiven Allan. CRECI/RS 60.275. Todos os direitos reservados.
+            © {new Date().getFullYear()} Stiven Allan. CRECI 60.275. Todos os direitos reservados.
           </p>
           <p style={{ color: C.muted, fontSize: '12px' }}>
             Criciúma, Santa Catarina
