@@ -9,7 +9,7 @@ export const revalidate = 3600
 
 export const metadata: Metadata = {
   title: 'Blog Imobiliário | Dicas e Tendências do Mercado | Stiven Allan Corretor',
-  description: 'Fique por dentro do mercado imobiliário em Criciúma e região sul catarinense. Dicas de compra, financiamento, valorização e lançamentos com Stiven Allan, CRECI/RS 60.275.',
+  description: 'Fique por dentro do mercado imobiliário em Criciúma e região sul catarinense. Dicas de compra, financiamento, valorização e lançamentos com Stiven Allan, CRECI 60.275.',
   alternates: {
     canonical: 'https://stivenallan.com.br/blog',
   },
@@ -117,7 +117,7 @@ export default function BlogPage() {
       '@type': 'Person',
       name: 'Stiven Allan',
       jobTitle: 'Corretor de Imóveis',
-      hasCredential: 'CRECI/RS 60.275',
+      hasCredential: 'CRECI 60.275',
     },
   }
 
@@ -141,7 +141,7 @@ export default function BlogPage() {
           </h1>
           <p className="text-[#a7adb4] text-lg max-w-2xl">
             Dicas, guias e novidades do mercado imobiliário em Criciúma e no sul catarinense. 
-            Conteúdo criado por Stiven Allan, CRECI/RS 60.275.
+            Conteúdo criado por Stiven Allan, CRECI 60.275.
           </p>
         </div>
       </section>
