@@ -84,14 +84,14 @@ export function fatorReforco(m: number, i = TAXA_PADRAO_JS): number {
   return s
 }
 
-export type ModoSimulacao = 'sem_reforco' | 'mensal_fixa' | 'reforco_fixo' | 'maximo'
+export type ModoSimulacao = 'sem_reforco' | 'mensal_fixa' | 'reforco_fixo' | 'maximo' | 'split_fixo'
 
 export type LinhaSimulacao = {
   prazoMeses: number
-  qtdReforcos: number   // reforços anuais que cabem no prazo: floor(prazo/12)
+  qtdReforcos: number // reforços anuais que cabem no prazo: floor(prazo/12)
   mensal: number
   reforcoAnual: number
-  totalPago: number     // mensal*prazo + reforcoAnual*qtdReforcos
+  totalPago: number // mensal*prazo + reforcoAnual*qtdReforcos
   jurosEmbutidos: number // totalPago - saldo
 }
 
@@ -122,10 +122,41 @@ export function resolverLinha(
     reforcoAnual = valorFixo
     mensal = (saldo - reforcoAnual * FR) / FM
   } else {
-    // 'maximo': reforço = 5× mensal
+    // 'maximo': reforço = 5× mensal — validado para Fontana, NÃO alterar
     mensal = saldo / (FM + 5 * FR)
     reforcoAnual = mensal * 5
   }
+
+  const totalPago = mensal * prazoMeses + reforcoAnual * m
+  return {
+    prazoMeses,
+    qtdReforcos: m,
+    mensal,
+    reforcoAnual,
+    totalPago,
+    jurosEmbutidos: totalPago - saldo,
+  }
+}
+
+/**
+ * Modo Split Fixo — modelo específico da Corbetta (engenharia reversa da planilha real).
+ * Divide o saldo em duas parcelas independentes amortizadas pelo seu próprio fator de VP:
+ *   Mensal  = saldo × proporcaoMensal / FM
+ *   Reforço = saldo × (1 - proporcaoMensal) / FR
+ * Validado: saldo=72077.75, prazo=12, proporcao=0.715 → mensal≈4501,86 / reforço≈22.391
+ */
+export function resolverSplit(
+  saldo: number,
+  prazoMeses: number,
+  proporcaoMensal: number, // 0 a 1, ex: 0.715
+  i = TAXA_PADRAO_JS
+): LinhaSimulacao {
+  const m = Math.floor(prazoMeses / 12)
+  const FM = fatorMensal(prazoMeses, i)
+  const FR = fatorReforco(m, i)
+
+  const mensal = (saldo * proporcaoMensal) / FM
+  const reforcoAnual = m > 0 && FR > 0 ? (saldo * (1 - proporcaoMensal)) / FR : 0
 
   const totalPago = mensal * prazoMeses + reforcoAnual * m
   return {
@@ -157,13 +188,26 @@ export function tabelaCorbetta(
   }))
 }
 
+/**
+ * Tabela split — usa resolverSplit() para cada prazo.
+ * Modelo específico Corbetta: cada track amortizado pelo seu próprio fator de VP.
+ */
+export function tabelaSplit(
+  saldo: number,
+  proporcaoMensal: number,
+  i = TAXA_PADRAO_JS
+) {
+  const prazos = Array.from({ length: 20 }, (_, k) => (k + 1) * 12)
+  return prazos.map(p => resolverSplit(saldo, p, proporcaoMensal, i))
+}
+
 /** Presets de construtoras da região */
 export const construtoras = {
-  fontana:  { nome: 'Fontana',  taxaMensal: 0.0075, sistema: 'juros_simples' as const },
-  corbetta: { nome: 'Corbetta', taxaMensal: 0.0075, sistema: 'juros_simples' as const },
-  locks:    { nome: 'Locks',    taxaMensal: 0.0075, sistema: 'juros_simples' as const },
-  giassi:   { nome: 'Giassi',   taxaMensal: Math.pow(1.095, 1/12) - 1, sistema: 'juros_compostos' as const, obs: '9,5% a.a.' },
-  perego:   { nome: 'Perego',   taxaMensal: 0.0075, sistema: 'price_sac' as const },
+  fontana: { nome: 'Fontana', taxaMensal: 0.0075, sistema: 'juros_simples' as const },
+  corbetta: { nome: 'Corbetta', taxaMensal: 0.0075, sistema: 'juros_simples' as const, proporcaoMensalPadrao: 0.715 },
+  locks: { nome: 'Locks', taxaMensal: 0.0075, sistema: 'juros_simples' as const },
+  giassi: { nome: 'Giassi', taxaMensal: Math.pow(1.095, 1/12) - 1, sistema: 'juros_compostos' as const, obs: '9,5% a.a.' },
+  perego: { nome: 'Perego', taxaMensal: 0.0075, sistema: 'price_sac' as const },
 } as const
 
 // ─── Tipos legados (compatibilidade com simulador/page.tsx) ─────────────────
@@ -178,12 +222,12 @@ export type ParcelaB = {
   meses: number
   taxaMensal: number
   correcaoLabel: string
-  parcelaMensal: number   // Price (juros compostos) — estimativa
+  parcelaMensal: number // Price (juros compostos) — estimativa
   parcelaSAC1: number
   parcelaSACn: number
   saldoDevedor: number
   // SPC-JS (juros simples) — adicionado
-  spcMensal?: number      // sem_reforco SPC-JS
+  spcMensal?: number // sem_reforco SPC-JS
 }
 
 export type Simulacao = {
