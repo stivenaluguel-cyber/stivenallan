@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     template: '%s | Stiven Allan',
   },
   description:
-    'Stiven Allan, corretor CRECI/RS 60.275. Lançamentos e empreendimentos de construtoras em Criciúma e região. Financiamento direto sem banco.',
+    'Stiven Allan, corretor CRECI 60.275. Lançamentos e empreendimentos de construtoras em Criciúma e região. Financiamento direto sem banco.',
   keywords: ['corretor de imóveis criciúma', 'lançamentos imobiliários criciúma', 'apartamentos na planta criciúma', 'empreendimentos criciúma sc', 'stiven allan corretor', 'creci 60275', 'financiamento direto imóveis'],
   authors: [{ name: 'Stiven Allan', url: SITE_URL }],
   creator: 'Stiven Allan',
@@ -67,7 +67,7 @@ const schemaAgent = {
     { '@type': 'City', name: 'Siderópolis' },
     { '@type': 'City', name: 'Balneário Piçarras' },
   ],
-  hasCredential: 'CRECI/RS 60.275',
+  hasCredential: 'CRECI 60.275',
   sameAs: ['https://wa.me/5548991642332', 'https://www.instagram.com/stivenallan.ofc'],
 }
 
