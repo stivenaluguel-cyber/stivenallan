@@ -371,7 +371,7 @@ const CSS = `
         <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
           <div>
             <p style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.22em', fontSize: 14, color: '#F5EEF0' }}>Stiven Allan</p>
-            <p style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 12, color: 'rgba(245,238,240,0.65)', marginTop: 4 }}>CRECI/RS 60.275 · Imóveis no Sul de Santa Catarina</p>
+            <p style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 12, color: 'rgba(245,238,240,0.65)', marginTop: 4 }}>CRECI 60.275 · Imóveis no Sul de Santa Catarina</p>
           </div>
           <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
             <Link href="/" style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 12, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(245,238,240,0.65)', textDecoration: 'none' }}>Início</Link>
