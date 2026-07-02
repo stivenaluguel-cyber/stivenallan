@@ -1,7 +1,7 @@
 'use client'
 import { useState, useMemo } from 'react'
 import { imoveis } from '@/data/imoveis'
-import { simular, planos, tabelaCorbetta, construtoras } from '@/data/financiamento'
+import { simular, planos, tabelaCorbetta, tabelaSplit, construtoras } from '@/data/financiamento'
 import type { CorrecaoB, OpcoesParcela } from '@/data/financiamento'
 
 // ─── helpers ────────────────────────────────────────────────────────────────
@@ -61,6 +61,8 @@ export default function SimuladorPage() {
   const [corbReforcoRaw, setCorbReforcoRaw] = useState('')
   const [corbConstrutora, setCorbConstrutora] = useState<keyof typeof construtoras>('fontana')
   const [corbLinhaAtiva, setCorbLinhaAtiva] = useState<{ prazo: number; modo: string } | null>(null)
+  // Proporção mensal para modo Split Corbetta (0-100, padrão 71.5)
+  const [corbProporcao, setCorbProporcao] = useState(71.5)
 
   // ── Estado Simulador Bancário ────────────────────────────────────────────
   const [showBank, setShowBank] = useState(false)
@@ -119,10 +121,18 @@ export default function SimuladorPage() {
 
   const corbTaxa = useMemo(() => construtoras[corbConstrutora].taxaMensal, [corbConstrutora])
 
+  // Tabela principal (tabelaCorbetta — para todas as construtoras)
   const corbTabela = useMemo(() => {
     if (corbSaldo <= 0) return []
     return tabelaCorbetta(corbSaldo, corbTaxa, corbMensal, corbReforco)
   }, [corbSaldo, corbTaxa, corbMensal, corbReforco])
+
+  // Tabela Split — só calculada quando construtora = corbetta
+  const isCorbetta = corbConstrutora === 'corbetta'
+  const corbSplitTabela = useMemo(() => {
+    if (!isCorbetta || corbSaldo <= 0) return []
+    return tabelaSplit(corbSaldo, corbProporcao / 100, corbTaxa)
+  }, [isCorbetta, corbSaldo, corbProporcao, corbTaxa])
 
   // ── Cálculo bancário ─────────────────────────────────────────────────────
   const bCalc = useMemo(() => {
@@ -442,10 +452,9 @@ export default function SimuladorPage() {
             ))}
           </div>
         )}
-
         {/* ═══════════════════════════════════════════════════════════════
             TABELA DE PRAZOS — ESTILO CORBETTA (SPC-JS)
-        ═══════════════════════════════════════════════════════════════ */}
+            ═══════════════════════════════════════════════════════════════ */}
         <div style={{ ...card, borderTop: '3px solid ' + D.bronze }}>
           <p style={{ ...sectionTitle }}>📊 Tabela de Prazos — SPC-JS (estilo Corbetta)</p>
 
@@ -479,10 +488,46 @@ export default function SimuladorPage() {
             </div>
           </div>
 
+          {/* Controle de proporção — só aparece quando Corbetta selecionada */}
+          {isCorbetta && (
+            <div style={{ background: '#FFF8F5', border: '1px solid #F9C4B1', borderRadius: 12, padding: '14px 16px', marginBottom: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+                <div style={{ flex: 1, minWidth: 200 }}>
+                  <label style={{ ...lbl, marginBottom: 8 }}>
+                    % via mensal — <strong style={{ color: D.bronze }}>{corbProporcao.toFixed(1)}%</strong>
+                    {' '}/ % via reforço — <strong style={{ color: '#8b5cf6' }}>{(100 - corbProporcao).toFixed(1)}%</strong>
+                  </label>
+                  <input
+                    type="range" min={1} max={99} step={0.5}
+                    value={corbProporcao}
+                    onChange={e => setCorbProporcao(parseFloat(e.target.value))}
+                    style={{ width: '100%', accentColor: D.bronze }}
+                  />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: D.muted, marginTop: 2 }}>
+                    <span>1% mensal</span>
+                    <span>71,5% (padrão planilha Corbetta)</span>
+                    <span>99% mensal</span>
+                  </div>
+                </div>
+                <button onClick={() => setCorbProporcao(71.5)} style={{
+                  padding: '7px 14px', borderRadius: 8, border: '1.5px solid ' + D.bronze,
+                  background: 'transparent', color: D.bronze, fontSize: 12, fontWeight: 700, cursor: 'pointer',
+                }}>
+                  Reset 71,5%
+                </button>
+              </div>
+            </div>
+          )}
+
           {corbSaldo > 0 && (
             <div style={{ fontSize: 13, color: D.muted, marginBottom: 12 }}>
               Saldo a financiar: <strong style={{ color: D.ink }}>{fmtBRL(corbSaldo)}</strong>
               {' '}| Taxa: <strong style={{ color: D.ink }}>{(corbTaxa * 100).toFixed(4)}% a.m.</strong>
+              {isCorbetta && (
+                <span style={{ marginLeft: 12, fontSize: 12, background: '#FFF3EC', color: D.bronze, borderRadius: 6, padding: '2px 8px', fontWeight: 700 }}>
+                  Split {corbProporcao.toFixed(1)}% / {(100 - corbProporcao).toFixed(1)}%
+                </span>
+              )}
             </div>
           )}
 
@@ -496,16 +541,24 @@ export default function SimuladorPage() {
                     <th style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 700, fontSize: 12, whiteSpace: 'nowrap' }}>Sem Reforço</th>
                     {corbMensal > 0 && <th style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 700, fontSize: 12, whiteSpace: 'nowrap' }}>Mensal Pré<br/><span style={{ fontSize: 10, fontWeight: 400, opacity: 0.85 }}>reforço necessário</span></th>}
                     {corbReforco > 0 && <th style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 700, fontSize: 12, whiteSpace: 'nowrap' }}>Reforço Pré<br/><span style={{ fontSize: 10, fontWeight: 400, opacity: 0.85 }}>mensal necessária</span></th>}
-                    <th style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 700, fontSize: 12, whiteSpace: 'nowrap' }}>Máximo<br/><span style={{ fontSize: 10, fontWeight: 400, opacity: 0.85 }}>mensal + reforço 5×</span></th>
+                    {isCorbetta ? (
+                      <th style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 700, fontSize: 12, whiteSpace: 'nowrap', background: 'rgba(255,255,255,0.15)' }}>
+                        Split Corbetta<br/>
+                        <span style={{ fontSize: 10, fontWeight: 400, opacity: 0.85 }}>{corbProporcao.toFixed(0)}% mensal + {(100-corbProporcao).toFixed(0)}% reforço</span>
+                      </th>
+                    ) : (
+                      <th style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 700, fontSize: 12, whiteSpace: 'nowrap' }}>Máximo<br/><span style={{ fontSize: 10, fontWeight: 400, opacity: 0.85 }}>mensal + reforço 5×</span></th>
+                    )}
                   </tr>
                 </thead>
                 <tbody>
                   {corbTabela.map((row, idx) => {
                     const isActive = corbLinhaAtiva?.prazo === row.prazoMeses
                     const zebra = idx % 2 === 0 ? '#fff' : D.bg
+                    const splitRow = isCorbetta ? corbSplitTabela.find(s => s.prazoMeses === row.prazoMeses) : null
                     return (
                       <tr key={row.prazoMeses} style={{ background: isActive ? '#FFF3EC' : zebra, cursor: 'pointer', transition: 'background .1s' }}
-                        onClick={() => setCorbLinhaAtiva(isActive ? null : { prazo: row.prazoMeses, modo: 'sem_reforco' })}>
+                        onClick={() => setCorbLinhaAtiva(isActive ? null : { prazo: row.prazoMeses, modo: isCorbetta ? 'split_corbetta' : 'sem_reforco' })}>
                         <td style={{ padding: '9px 12px', fontWeight: 700, color: D.ink, whiteSpace: 'nowrap', borderBottom: '1px solid ' + D.line }}>
                           {row.prazoMeses} meses
                           {isActive && <span style={{ marginLeft: 6, fontSize: 10, background: D.bronze, color: '#fff', borderRadius: 4, padding: '1px 5px' }}>✓</span>}
@@ -538,15 +591,30 @@ export default function SimuladorPage() {
                             ) : '—'}
                           </td>
                         )}
-                        <td style={{ padding: '9px 12px', textAlign: 'right', borderBottom: '1px solid ' + D.line }}>
-                          <div style={{ fontWeight: 700, color: D.ink }}>{fmtBRL(row.maximo.mensal)}/mês</div>
-                          {row.maximo.qtdReforcos > 0 && (
-                            <div style={{ fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 4 }}>
-                              <span style={{ color: '#8b5cf6' }}>+ {fmtBRL(row.maximo.reforcoAnual)}/ano</span>
-                              <span style={{ fontSize: 10, background: '#ede9fe', color: '#6d28d9', borderRadius: 4, padding: '1px 4px', fontWeight: 700 }}>5×</span>
-                            </div>
-                          )}
-                        </td>
+                        {isCorbetta ? (
+                          <td style={{ padding: '9px 12px', textAlign: 'right', borderBottom: '1px solid ' + D.line, background: isActive ? '#FFF3EC' : 'rgba(210,78,34,0.04)' }}>
+                            {splitRow ? (
+                              <>
+                                <div style={{ fontWeight: 700, color: D.bronze }}>{fmtBRL(splitRow.mensal)}/mês</div>
+                                {splitRow.qtdReforcos > 0 && (
+                                  <div style={{ fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 4 }}>
+                                    <span style={{ color: '#8b5cf6' }}>+ {fmtBRL(splitRow.reforcoAnual)}/ano</span>
+                                  </div>
+                                )}
+                              </>
+                            ) : '—'}
+                          </td>
+                        ) : (
+                          <td style={{ padding: '9px 12px', textAlign: 'right', borderBottom: '1px solid ' + D.line }}>
+                            <div style={{ fontWeight: 700, color: D.ink }}>{fmtBRL(row.maximo.mensal)}/mês</div>
+                            {row.maximo.qtdReforcos > 0 && (
+                              <div style={{ fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 4 }}>
+                                <span style={{ color: '#8b5cf6' }}>+ {fmtBRL(row.maximo.reforcoAnual)}/ano</span>
+                                <span style={{ fontSize: 10, background: '#ede9fe', color: '#6d28d9', borderRadius: 4, padding: '1px 4px', fontWeight: 700 }}>5×</span>
+                              </div>
+                            )}
+                          </td>
+                        )}
                       </tr>
                     )
                   })}
@@ -563,18 +631,26 @@ export default function SimuladorPage() {
           {corbLinhaAtiva && corbTabela.length > 0 && (() => {
             const row = corbTabela.find(r => r.prazoMeses === corbLinhaAtiva.prazo)
             if (!row) return null
+            const splitRow = isCorbetta ? corbSplitTabela.find(s => s.prazoMeses === corbLinhaAtiva.prazo) : null
             const sr = row.semReforco
+            const displayMensal = splitRow ? splitRow.mensal : (isCorbetta ? sr.mensal : row.maximo.mensal)
+            const displayReforco = splitRow ? splitRow.reforcoAnual : (isCorbetta ? 0 : row.maximo.reforcoAnual)
             return (
               <div style={{ marginTop: 16, padding: '14px 16px', background: '#FFF3EC', borderRadius: 12, border: '1px solid #F9C4B1', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
                 <div>
                   <div style={{ fontWeight: 700, color: D.ink, fontSize: 14 }}>
-                    Condição selecionada: {corbLinhaAtiva.prazo} meses — {fmtBRL(sr.mensal)}/mês
+                    Condição selecionada: {corbLinhaAtiva.prazo} meses
+                    {isCorbetta && splitRow ? (
+                      <span> — {fmtBRL(splitRow.mensal)}/mês {splitRow.qtdReforcos > 0 ? '+ ' + fmtBRL(splitRow.reforcoAnual) + '/ano' : ''}</span>
+                    ) : (
+                      <span> — {fmtBRL(sr.mensal)}/mês</span>
+                    )}
                   </div>
                   <div style={{ fontSize: 12, color: D.muted, marginTop: 2 }}>
-                    Total pago: {fmtBRL(sr.totalPago)} | Juros embutidos: {fmtBRL(sr.jurosEmbutidos)}
+                    Total pago: {fmtBRL(splitRow ? splitRow.totalPago : sr.totalPago)} | Juros embutidos: {fmtBRL(splitRow ? splitRow.jurosEmbutidos : sr.jurosEmbutidos)}
                   </div>
                 </div>
-                <button onClick={() => copiarProposta({ prazo: corbLinhaAtiva.prazo, modo: 'sem_reforco', mensal: sr.mensal, reforco: sr.reforcoAnual })}
+                <button onClick={() => copiarProposta({ prazo: corbLinhaAtiva.prazo, modo: corbLinhaAtiva.modo, mensal: displayMensal, reforco: displayReforco })}
                   style={{ padding: '10px 18px', borderRadius: 10, border: 'none', background: D.bronze, color: '#fff', fontWeight: 700, cursor: 'pointer', fontSize: 13 }}>
                   {copiado ? '✅ Copiado!' : '📋 Copiar proposta'}
                 </button>
@@ -582,12 +658,21 @@ export default function SimuladorPage() {
             )
           })()}
 
-          {/* Rodapé informativo */}
-          <p style={{ margin: '16px 0 0', fontSize: 11, color: D.muted, lineHeight: 1.6 }}>
-            Cálculo pelo sistema de parcelas constantes a juros simples (SPC-JS), idêntico às planilhas das construtoras.
-            VP = valor / (1 + i·t), somatório discreto exato. Parcelas corrigidas pelo índice contratual
-            (CUB/SC, IGPM ou INCC conforme empreendimento). Clique em uma linha para selecionar e copiar a proposta.
-          </p>
+          {/* Nota explicativa — muda conforme construtora */}
+          {isCorbetta ? (
+            <p style={{ margin: '16px 0 0', fontSize: 11, color: D.muted, lineHeight: 1.6, borderTop: '1px solid ' + D.line, paddingTop: 12 }}>
+              <strong style={{ color: D.bronze }}>Modelo específico Corbetta:</strong> divide o saldo em duas parcelas independentes (mensal e reforço anual),
+              cada uma amortizada pelo seu próprio fator de valor presente — diferente do modelo Fontana (reforço travado em 5× a mensal).
+              Proporção padrão da planilha: 71,5% via mensal / 28,5% via reforço anual.
+              Cálculo pelo sistema de parcelas constantes a juros simples (SPC-JS). VP = valor / (1 + i·t), somatório discreto exato.
+            </p>
+          ) : (
+            <p style={{ margin: '16px 0 0', fontSize: 11, color: D.muted, lineHeight: 1.6 }}>
+              Cálculo pelo sistema de parcelas constantes a juros simples (SPC-JS), idêntico às planilhas das construtoras.
+              VP = valor / (1 + i·t), somatório discreto exato. Parcelas corrigidas pelo índice contratual
+              (CUB/SC, IGPM ou INCC conforme empreendimento). Clique em uma linha para selecionar e copiar a proposta.
+            </p>
+          )}
         </div>
 
         {/* ── Seção: Financiamento Bancário (preservado) ───────────────── */}
