@@ -6,10 +6,10 @@ import { LeadCaptureButton } from '@/components/LeadCaptureButton'
 import { PropertySchema } from '@/components/PropertySchema'
 import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
+import { SITE_URL } from '@/lib/site'
 
 const WPP = "https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20%C3%81guas%20de%20Marano%20Residencial."
 const CATALOGO_PDF = "https://estilofontana.com.br/upload/empreendimento/catalogo/Aguas-de-marano-residencial-1707323527.pdf"
-import { SITE_URL } from '@/lib/site'
 const t = {
 bg: '#FAFAF8', ink: '#16202B', navy: '#1B3A5B', navyDark: '#13293F', muted: '#5E6973',
 line: 'rgba(22,32,43,0.12)', dark: '#0F1E2D', onDark: '#EAF1F6', onDarkMuted: 'rgba(234,241,246,0.66)',
