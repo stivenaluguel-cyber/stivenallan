@@ -3,18 +3,35 @@ import { SITE_URL } from '@/lib/site'
 type FaqItem = { pergunta: string; resposta: string }
 
 type Props = {
-  nome: string
-  slug: string
-  construtora_slug: string
-  cidade: string
-  uf: string
+  schema?: object | null
+  nome?: string
+  slug?: string
+  construtora_slug?: string
+  cidade?: string
+  uf?: string
   bairro?: string
-  descricao: string
+  descricao?: string
   imagem?: string
   faq?: FaqItem[]
 }
 
-export function PropertySchema({ nome, slug, construtora_slug, cidade, uf, bairro, descricao, imagem, faq }: Props) {
+export function PropertySchema({ schema, nome, slug, construtora_slug, cidade, uf, bairro, descricao, imagem, faq }: Props) {
+  // Modo direto: schema object passado diretamente
+  if (schema) {
+    const s = schema as Record<string, unknown>
+    if (Array.isArray(s)) {
+      return (
+        <>
+          {s.map((item: object, i: number) => (
+            <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }} />
+          ))}
+        </>
+      )
+    }
+    return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(s) }} />
+  }
+
+  // Modo props: gera schema ApartmentComplex + Breadcrumb + FAQPage
   const url = `${SITE_URL}/empreendimento/${construtora_slug}/${slug}`
   const schemas: object[] = [
     {
