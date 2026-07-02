@@ -49,3 +49,5 @@ export function RelatedProperties({ atualSlug, cidade }: Props) {
     </section>
   )
 }
+
+export default RelatedProperties
