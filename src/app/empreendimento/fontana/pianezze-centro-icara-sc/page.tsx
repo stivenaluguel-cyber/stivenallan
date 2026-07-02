@@ -3,10 +3,13 @@ import Image from 'next/image'
 import Link from 'next/link'
 import GalleryWithLightbox, { LightboxPhoto } from './gallery-lightbox'
 import { LeadCaptureButton } from '@/components/LeadCaptureButton'
+import { PropertySchema } from '@/components/PropertySchema'
+import { PropertyFAQ } from '@/components/PropertyFAQ'
+import { RelatedProperties } from '@/components/RelatedProperties'
+import { SITE_URL } from '@/lib/site'
 
 const WPP = "https://wa.me/5548991642332?text=Olá!%20Tenho%20interesse%20no%20Pianezze%20Residencial%20em%20Içara."
 const CATALOGO_PDF = "https://estilofontana.com.br/upload/empreendimento/catalogo/pianezze-residencial-1668427993.pdf"
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://stivenallan.vercel.app'
 
 const t = {
   bg: '#F5F2ED', ink: '#1A1A1A', navy: '#3A5068', navyDark: '#243347',
@@ -106,7 +109,9 @@ const SCHEMA = {
 export default function Page() {
   return (
     <main style={{ fontFamily: t.body, background: t.bg, color: t.ink, overflowX: 'hidden' }}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHEMA) }} />
+<PropertySchema nome="Pianezze Residencial" slug="pianezze-centro-icara-sc" construtora_slug="fontana" cidade="Içara" uf="SC" bairro="Centro" descricao="Pianezze Residencial — 2 e 3 dormitórios (1 suíte), 66 a 86 m² privativos no Centro de Içara/SC. Financiamento direto Fontana." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/pianezze-centro-icara-sc.jpg" faq={[{"pergunta":"Como funciona o pagamento do Pianezze Residencial?","resposta":"Entrada de 20%, saldo parcelado diretamente com a construtora em até 180 meses, com correção IGPM + 0,75% a.m."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Sim. Além do financiamento direto com a construtora, é possível optar por financiamento bancário. Fale com o Stiven pelo WhatsApp para simular as duas opções."},{"pergunta":"Onde fica o Pianezze Residencial?","resposta":"O Pianezze Residencial está localizado na Av. Dilcio Esmael da Silva, esq. R. João Bonomo, no Centro de Içara/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"O empreendimento oferece apartamentos com 2 e 3 dormitórios (1 suíte), de 66 a 86 m² privativos, com piscina, academia e salão de festas."}]} />
+
+      
       <style>{`
         html { scroll-behavior: smooth; }
         .pz-eyebrow { font-size:11px; letter-spacing:0.42em; text-transform:uppercase; }
