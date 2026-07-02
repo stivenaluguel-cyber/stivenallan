@@ -2,10 +2,13 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import GalleryWithLightbox, { LightboxPhoto } from './gallery-lightbox'
 import { LeadCaptureButton } from '@/components/LeadCaptureButton'
+import { PropertySchema } from '@/components/PropertySchema'
+import { PropertyFAQ } from '@/components/PropertyFAQ'
+import { RelatedProperties } from '@/components/RelatedProperties'
+import { SITE_URL } from '@/lib/site'
 
 const WPP = "https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Calalzo%20Di%20Cadore%20Residencial."
 const CATALOGO_PDF = "https://estilofontana.com.br/upload/empreendimento/catalogo/calalzo-di-cadore-residencial-1603739983.pdf"
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://stivenallan.vercel.app'
 
 const t = {
   bg: '#FAFAF8', ink: '#16201A', green: '#3D5C38', greenDark: '#263A23', muted: '#5A6858',
@@ -71,7 +74,7 @@ const SCHEMA = {
 export default function CalalzoDiCadorePage() {
   return (
     <main style={{ background: t.bg, color: t.ink, fontFamily: t.body, overflowX: 'hidden' }}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHEMA) }} />
+      
       <style>{`
         html { scroll-behavior: smooth; }
         .cc-eyebrow { font-size: 11px; letter-spacing: 0.42em; text-transform: uppercase; color: ${t.green}; font-family: ${t.body}; font-weight: 500; }
