@@ -58,7 +58,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!info) return {}
   return {
     title: `Lançamentos Imobiliários em ${info.nome}/${info.uf} | Stiven Allan`,
-    description: `${info.descricao} Confira os melhores empreendimentos com Stiven Allan, CRECI/RS 60.275.`,
+    description: `${info.descricao} Confira os melhores empreendimentos com Stiven Allan, CRECI 60.275.`,
     alternates: { canonical: `https://stivenallan.vercel.app/lancamentos/${cidade}` },
     openGraph: {
       title: `Lançamentos em ${info.nome}/${info.uf} | Stiven Allan`,
@@ -109,7 +109,7 @@ export default async function LancamentosCidadePage({ params }: Props) {
           <span style={{ color: '#c9a24b' }}>{info.nome}, {info.uf}</span>
         </h1>
         <p style={{ fontSize: 17, color: '#a7adb4', lineHeight: 1.7, maxWidth: 600, marginBottom: 40 }}>
-          {info.descricao} Atendimento exclusivo do corretor Stiven Allan, CRECI/RS 60.275.
+          {info.descricao} Atendimento exclusivo do corretor Stiven Allan, CRECI 60.275.
         </p>
 
         {empreendimentos.length > 0 ? (
