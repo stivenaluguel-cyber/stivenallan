@@ -28,7 +28,7 @@ function getSupabase(): ReturnType<typeof createClient> {
 // ============================================
 // SYSTEM PROMPT MASTER - Allan IA
 // ============================================
-const SYSTEM_PROMPT = `Voce e Allan IA, o assistente digital exclusivo de Stiven Allan, corretor de imoveis CRECI/RS 60.275,
+const SYSTEM_PROMPT = `Voce e Allan IA, o assistente digital exclusivo de Stiven Allan, corretor de imoveis CRECI 60.275,
 especializado em lancamentos e empreendimentos de construtoras em Criciuma/SC e regiao sul de Santa Catarina.
 
 IDENTIDADE
