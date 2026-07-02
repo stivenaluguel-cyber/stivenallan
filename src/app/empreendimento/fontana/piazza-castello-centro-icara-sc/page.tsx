@@ -2,6 +2,9 @@ import Image from 'next/image'
 import type { Metadata } from 'next'
 import GalleryWithLightbox from './gallery-lightbox'
 import { LeadCaptureButton } from '@/components/LeadCaptureButton'
+import { PropertySchema } from '@/components/PropertySchema'
+import { PropertyFAQ } from '@/components/PropertyFAQ'
+import { RelatedProperties } from '@/components/RelatedProperties'
 
 const COR = '#5B2333'
 const CDN = 'https://estilofontana.com.br/images/empreendimento/slideshows/'
@@ -48,7 +51,7 @@ export default function PiazzaCastelloPage() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      
 
       <style>{`
         .pc-hero{position:relative;height:100svh;min-height:560px;display:flex;flex-direction:column;justify-content:flex-end}
@@ -93,7 +96,9 @@ export default function PiazzaCastelloPage() {
         @media(max-width:768px){.pc-loc-grid{grid-template-columns:1fr}.pc-spec{flex:1 1 120px}}
       `}</style>
 
-      <header style={{position:'absolute',top:0,left:0,right:0,zIndex:10,padding:'1.5rem'}}>
+      
+<PropertySchema nome="Piazza Castello Residencial" slug="piazza-castello-centro-icara-sc" construtora_slug="fontana" cidade="Içara" uf="SC" bairro="Centro" descricao="Piazza Castello Residencial — 3 dormitórios (3 suítes), até 172 m² privativos, apenas 2 unidades por andar, no Centro de Içara/SC." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/piazza-castello-centro-icara-sc.jpg" faq={[{"pergunta":"Como funciona o pagamento do Piazza Castello Residencial?","resposta":"Entrada de 20%, saldo parcelado diretamente com a construtora em até 180 meses, com correção IGPM + 0,75% a.m."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Sim. Além do financiamento direto com a construtora, é possível optar por financiamento bancário. Fale com o Stiven pelo WhatsApp para simular as duas opções."},{"pergunta":"Onde fica o Piazza Castello Residencial?","resposta":"O Piazza Castello Residencial está localizado na Praça Presidente João Goulart, frente à Praça Castelo Branco, no Centro de Içara/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"O empreendimento oferece apartamentos exclusivos com 3 dormitórios (3 suítes) e até 172 m² privativos, com apenas 2 unidades por andar."}]} />
+<header style={{position:'absolute',top:0,left:0,right:0,zIndex:10,padding:'1.5rem'}}>
         <a href="/" style={{color:'#fff',fontSize:'1rem',fontWeight:700,textDecoration:'none',letterSpacing:'.04em'}}>
           Stiven Allan
         </a>
@@ -215,7 +220,7 @@ export default function PiazzaCastelloPage() {
 
       <footer className="pc-footer">
         <p className="pc-footer-logo">Stiven Allan · Corretor de Imóveis</p>
-        <p>CRECI RS 60.275 · Parceiro Oficial Construtora Fontana</p>
+        <p>CRECI 60.275 · Parceiro Oficial Construtora Fontana</p>
         <p style={{marginTop:'.5rem'}}><a href={WA} target="_blank" rel="noopener noreferrer" style={{color:'#25D366',textDecoration:'none'}}>WhatsApp: (48) 99164-2332</a></p>
         <p style={{marginTop:'.5rem',fontSize:'.75rem'}}><a href="/" style={{color:'#666',textDecoration:'none'}}>← Ver todos os empreendimentos</a></p>
       </footer>
