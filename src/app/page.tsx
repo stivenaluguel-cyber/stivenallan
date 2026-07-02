@@ -1,22 +1,22 @@
 import Link from 'next/link'
 import { imoveis } from '@/data/imoveis'
 import Image from 'next/image'
+import { SITE_URL } from '@/lib/site'
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://stivenallan.vercel.app'
 const WPP = 'https://wa.me/5548991642332'
 const WPP_MSG = WPP + '?text=Ol%C3%A1+Stiven!+Vi+seu+site+e+quero+conhecer+as+condi%C3%A7%C3%B5es+de+financiamento+direto.'
 
 export const metadata = {
-  title: 'Imóveis no Sul de Santa Catarina | Stiven Allan CRECI/RS 60.275',
+  title: 'Apartamentos na Planta com Financiamento Direto em Criciúma/SC | Stiven Allan',
   description: 'Empreendimentos com financiamento direto da construtora, sem burocracia bancária. Sul de SC: Criciúma, Laguna, Rincão, Nova Veneza.',
   alternates: { canonical: SITE_URL },
   openGraph: {
     title: 'Morar bem não deveria depender de um banco. | Stiven Allan',
     description: 'Empreendimentos com financiamento direto da construtora. Sul de Santa Catarina.',
     url: SITE_URL, siteName: 'Stiven Allan — Imóveis', locale: 'pt_BR', type: 'website',
-    images: [{ url: 'https://estilofontana.com.br/images/2025/08/28/f-ml-voo-passaro-ef-web-68b0986133a09.jpg?fm=webp', width: 1200, height: 630 }],
+    images: [{ url: 'https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/monte-leone-centro-criciuma-sc.jpg', width: 1200, height: 630 }],
   },
-  twitter: { card: 'summary_large_image', title: 'Morar bem não deveria depender de um banco.', images: ['https://estilofontana.com.br/images/2025/08/28/f-ml-voo-passaro-ef-web-68b0986133a09.jpg?fm=webp'] },
+  twitter: { card: 'summary_large_image', title: 'Morar bem não deveria depender de um banco.', images: ['https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/monte-leone-centro-criciuma-sc.jpg'] },
   robots: { index: true, follow: true },
 }
 
@@ -48,8 +48,6 @@ const METRICAS = [
   { valor: '+', label: 'Construtoras parceiras' },
   { valor: 'SC', label: 'Sul de Santa Catarina' },
 ]
-
-const SCHEMA = JSON.stringify({ '@context': 'https://schema.org', '@type': 'RealEstateAgent', name: 'Stiven Allan', url: 'https://stivenallan.vercel.app', telephone: '+5548991642332', areaServed: { '@type': 'State', name: 'Santa Catarina' } })
 
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, { label: string; bg: string; color: string }> = {
@@ -102,7 +100,6 @@ function EmpCard({ emp }: { emp: typeof imoveis[0] }) {
 export default function HomePage() {
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: SCHEMA }} />
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,400;1,300;1,400&family=Hanken+Grotesk:wght@300;400;500&display=swap');
         html { scroll-behavior: smooth; }
@@ -159,16 +156,19 @@ export default function HomePage() {
 
       {/* HERO */}
       <section style={{ position: 'relative', height: '100svh', minHeight: 580, overflow: 'hidden', background: '#1a1814' }}>
-        <Image src="https://estilofontana.com.br/images/2025/08/28/f-ml-voo-passaro-ef-web-68b0986133a09.jpg?fm=webp" alt="Vista aérea de empreendimento Fontana — Sul de Santa Catarina" fill priority sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center 30%' }} />
+        <Image src="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/monte-leone-centro-criciuma-sc.jpg" alt="Vista aérea de empreendimento Fontana — Sul de Santa Catarina" fill priority sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center 30%' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.40) 60%, rgba(0,0,0,0.50) 100%)' }} />
         <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 clamp(24px,6vw,80px)', paddingTop: 68 }}>
           <p className="home-eyebrow fade-in" style={{ color: 'rgba(184,155,94,0.85)', marginBottom: 24, textShadow: '0 1px 8px rgba(0,0,0,0.5)' }}>Stiven Allan · CRECI/RS 60.275</p>
           <h1 className="home-h1 fade-in fade-in-1" style={{ fontSize: 'clamp(36px,7vw,88px)', color: '#FFFFFF', textShadow: '0 2px 8px rgba(0,0,0,0.5), 0 2px 32px rgba(0,0,0,0.60)', maxWidth: 900 }}>
-            Morar bem não deveria depender de um banco.
+            Apartamentos na planta com financiamento direto — sem banco, sem burocracia
           </h1>
           <hr className="home-rule fade-in fade-in-2" style={{ margin: '28px auto' }} />
-          <p className="home-serif fade-in fade-in-2" style={{ fontSize: 'clamp(16px,2.2vw,22px)', color: '#FFFFFF', maxWidth: 560, margin: '0 0 40px', lineHeight: 1.6, textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
-            Empreendimentos de alto padrão com financiamento direto da construtora. Sem banco, sem burocracia.
+          <p className="home-serif fade-in fade-in-2" style={{ fontSize: 'clamp(16px,2.2vw,22px)', color: '#FFFFFF', maxWidth: 560, margin: '0 0 20px', lineHeight: 1.6, textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
+            Morar bem não deveria depender de um banco.
+          </p>
+          <p className="fade-in fade-in-2" style={{ fontFamily: t.body, fontSize: 'clamp(13px,1.6vw,16px)', color: 'rgba(245,241,234,0.82)', maxWidth: 620, margin: '0 0 40px', lineHeight: 1.7, textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
+            Empreendimentos de alto padrão com financiamento direto da construtora em Criciúma, Balneário Rincão, Laguna e todo o Sul de Santa Catarina. Sem banco, sem burocracia.
           </p>
           <div className="fade-in fade-in-3" style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
             <Link href="/#empreendimentos" className="home-btn" style={{ background: 'rgba(245,241,234,0.12)', borderColor: 'rgba(245,241,234,0.40)', color: '#FFFFFF', backdropFilter: 'blur(8px)' }}>Explorar empreendimentos</Link>
