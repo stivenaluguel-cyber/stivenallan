@@ -3,9 +3,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import GalleryWithLightbox, { LightboxPhoto } from './gallery-lightbox'
 import { LeadCaptureButton } from '@/components/LeadCaptureButton'
-import PropertySchema from '@/components/PropertySchema'
-import PropertyFAQ from '@/components/PropertyFAQ'
-import RelatedProperties from '@/components/RelatedProperties'
+import { PropertySchema } from '@/components/PropertySchema'
+import { PropertyFAQ } from '@/components/PropertyFAQ'
+import { RelatedProperties } from '@/components/RelatedProperties'
 
 const WPP = "https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20%C3%81guas%20de%20Marano%20Residencial."
 const CATALOGO_PDF = "https://estilofontana.com.br/upload/empreendimento/catalogo/Aguas-de-marano-residencial-1707323527.pdf"
@@ -72,7 +72,7 @@ const SCHEMA = {
 export default function AguasDeMaranoPage() {
 return (
 <main style={{ background: t.bg, color: t.ink, fontFamily: t.body, overflowX: 'hidden' }}>
-      <PropertySchema nome="Águas de Marano" slug="aguas-de-marano-frente-mar-balneario-picarras-sc" construtora_slug="fontana" cidade="Balneário Piçarras" uf="SC" bairro="Frente Mar" descricao="Tenha o mar como seu vizinho. Apartamentos frente mar de alto padrão no Centro de Balneário Piçarras/SC. Atendimento exclusivo com Stiven Allan." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/aguas-de-marano-frente-mar-balneario-picarras-sc.jpg" canonical="https://stivenallan.com.br/empreendimento/fontana/aguas-de-marano-frente-mar-balneario-picarras-sc" faq={[{"pergunta":"Como funciona o financiamento direto do Águas de Marano?","resposta":"Entrada de 20%, saldo em até 72 parcelas mensais e 6 reforços anuais (cada reforço equivale a 5 parcelas mensais), com correção pelo CUB/SC durante a obra. Sem análise de banco."},{"pergunta":"Qual a previsão de entrega do Águas de Marano?","resposta":"A previsão de entrega é julho de 2028, em Frente Mar, Balneário Piçarras/SC."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Sim. Além do financiamento direto com a construtora, é possível optar por financiamento bancário. Fale com o Stiven pelo WhatsApp para simular as duas opções."},{"pergunta":"Onde fica o Águas de Marano?","resposta":"O Águas de Marano está localizado no Frente Mar, Balneário Piçarras/SC."}]} />
+      <PropertySchema nome="Águas de Marano" slug="aguas-de-marano-frente-mar-balneario-picarras-sc" construtora_slug="fontana" cidade="Balneário Piçarras" uf="SC" bairro="Frente Mar" descricao="Tenha o mar como seu vizinho. Apartamentos frente mar de alto padrão no Centro de Balneário Piçarras/SC. Atendimento exclusivo com Stiven Allan." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/aguas-de-marano-frente-mar-balneario-picarras-sc.jpg" faq={[{"pergunta":"Como funciona o financiamento direto do Águas de Marano?","resposta":"Entrada de 20%, saldo em até 72 parcelas mensais e 6 reforços anuais (cada reforço equivale a 5 parcelas mensais), com correção pelo CUB/SC durante a obra. Sem análise de banco."},{"pergunta":"Qual a previsão de entrega do Águas de Marano?","resposta":"A previsão de entrega é julho de 2028, em Frente Mar, Balneário Piçarras/SC."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Sim. Além do financiamento direto com a construtora, é possível optar por financiamento bancário. Fale com o Stiven pelo WhatsApp para simular as duas opções."},{"pergunta":"Onde fica o Águas de Marano?","resposta":"O Águas de Marano está localizado no Frente Mar, Balneário Piçarras/SC."}]} />
 
 <style>{`
 html { scroll-behavior: smooth; }
