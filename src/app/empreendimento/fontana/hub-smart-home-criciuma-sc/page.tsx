@@ -9,16 +9,16 @@ const WHATSAPP = 'https://api.whatsapp.com/send?phone=5548991455522&text=Ol%C3%A
 
 export const metadata: Metadata = {
   title: 'Hub Smart Home | Apartamentos Inteligentes Centro Criciúma SC | Stiven Allan',
-  description: 'Hub Smart Home em Criciúma SC — Apartamentos com automação residencial, design contemporâneo e localização privilegiada no Centro. Fontana Construtora. Consulte Stiven Allan CRECI/RS 60.275.',
+  description: 'Hub Smart Home em Criciúma SC — Apartamentos com automação residencial, design contemporâneo e localização privilegiada no Centro. Fontana Construtora. Consulte Stiven Allan CRECI 60.275.',
   keywords: ['Hub Smart Home Criciúma','apartamento smart home Criciúma','automação residencial Criciúma SC','apartamento inteligente Criciúma','Fontana Construtora Criciúma','lançamento imobiliário Criciúma centro','comprar apartamento Criciúma SC','Stiven Allan corretor Criciúma','imóvel novo Centro Criciúma','Hub Smart Home lançamento'],
   authors: [{ name: 'Stiven Allan', url: 'https://stivenallan.vercel.app' }],
-  creator: 'Stiven Allan — CRECI/RS 60.275',
+  creator: 'Stiven Allan — CRECI 60.275',
   alternates: { canonical: 'https://stivenallan.vercel.app/empreendimento/fontana/hub-smart-home-criciuma-sc' },
   openGraph: {
     title: 'Hub Smart Home | Apartamentos Inteligentes em Criciúma SC',
     description: 'Tecnologia e conforto integrados. Hub Smart Home oferece apartamentos com automação residencial completa no coração de Criciúma.',
     url: 'https://stivenallan.vercel.app/empreendimento/fontana/hub-smart-home-criciuma-sc',
-    siteName: 'Stiven Allan — CRECI/RS 60.275',
+    siteName: 'Stiven Allan — CRECI 60.275',
     locale: 'pt_BR',
     type: 'website',
   },
@@ -33,7 +33,7 @@ const schema = {
       name: 'Hub Smart Home',
       description: 'Apartamentos com automação residencial completa no Centro de Criciúma SC. Condomínio inteligente com tecnologia integrada, lazer completo e design contemporâneo. Fontana Construtora.',
       url: 'https://stivenallan.vercel.app/empreendimento/fontana/hub-smart-home-criciuma-sc',
-      offers: { '@type': 'Offer', priceCurrency: 'BRL', availability: 'https://schema.org/InStock', seller: { '@type': 'RealEstateAgent', name: 'Stiven Allan', identifier: 'CRECI/RS 60.275', telephone: '+5548991455522', url: 'https://stivenallan.vercel.app' } },
+      offers: { '@type': 'Offer', priceCurrency: 'BRL', availability: 'https://schema.org/InStock', seller: { '@type': 'RealEstateAgent', name: 'Stiven Allan', identifier: 'CRECI 60.275', telephone: '+5548991455522', url: 'https://stivenallan.vercel.app' } },
       address: { '@type': 'PostalAddress', streetAddress: 'Centro', addressLocality: 'Criciúma', addressRegion: 'SC', addressCountry: 'BR' },
       geo: { '@type': 'GeoCoordinates', latitude: -28.678, longitude: -49.370 },
     },
@@ -50,7 +50,7 @@ const schema = {
       mainEntity: [
         { '@type': 'Question', name: 'O que é o Hub Smart Home em Criciúma?', acceptedAnswer: { '@type': 'Answer', text: 'Hub Smart Home é um empreendimento residencial da Fontana Construtora localizado no Centro de Criciúma SC, com apartamentos dotados de automação residencial integrada, design contemporâneo e infraestrutura de condomínio completa.' } },
         { '@type': 'Question', name: 'Quais são os diferenciais do Hub Smart Home?', acceptedAnswer: { '@type': 'Answer', text: 'O Hub Smart Home oferece automação residencial (controle de iluminação, climatização e segurança pelo smartphone), acabamentos de alto padrão, área de lazer completa e localização central em Criciúma SC.' } },
-        { '@type': 'Question', name: 'Como entrar em contato para saber mais sobre o Hub Smart Home?', acceptedAnswer: { '@type': 'Answer', text: 'Entre em contato com Stiven Allan, CRECI/RS 60.275, pelo WhatsApp (48) 99145-5522. Atendimento personalizado para tirar dúvidas, agendar visita ao decorado e conhecer as condições de pagamento.' } },
+        { '@type': 'Question', name: 'Como entrar em contato para saber mais sobre o Hub Smart Home?', acceptedAnswer: { '@type': 'Answer', text: 'Entre em contato com Stiven Allan, CRECI 60.275, pelo WhatsApp (48) 99145-5522. Atendimento personalizado para tirar dúvidas, agendar visita ao decorado e conhecer as condições de pagamento.' } },
       ],
     },
   ],
@@ -272,7 +272,7 @@ export default function HubSmartHomePage() {
               QUERO SABER MAIS — WHATSAPP
             </a>
             <div style={{ marginTop: 20, color: c.onDarkMuted, fontSize: 13 }}>
-              Stiven Allan • CRECI/RS 60.275 • (48) 99145-5522
+              Stiven Allan • CRECI 60.275 • (48) 99145-5522
             </div>
           </div>
         </section>
@@ -282,7 +282,7 @@ export default function HubSmartHomePage() {
           <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', flexWrap: 'wrap', gap: '2rem', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
               <div style={{ fontFamily: font.display, color: c.bronze, fontWeight: 800, fontSize: '1rem', letterSpacing: '0.05em', marginBottom: 6 }}>STIVEN ALLAN</div>
-              <div style={{ color: c.onDarkMuted, fontSize: 13 }}>CRECI/RS 60.275</div>
+              <div style={{ color: c.onDarkMuted, fontSize: 13 }}>CRECI 60.275</div>
               <div style={{ color: c.onDarkMuted, fontSize: 13, marginTop: 2 }}>Criciúma e região — SC</div>
             </div>
             <div style={{ textAlign: 'right' }}>
