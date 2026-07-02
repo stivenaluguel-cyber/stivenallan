@@ -10,7 +10,7 @@ export const revalidate = 3600
 
 export const metadata: Metadata = {
   title: 'Lavis Residencial | Apartamentos 2 e 3 Suítes Centro Criciúma SC | Stiven Allan',
-  description: 'Lavis Residencial: apartamentos 2 e 3 dormitórios com suíte no Centro de Criciúma/SC. Piscina, fitness, deck, hall sofisticado. Lançamento Fontana. Consultoria Stiven Allan CRECI/RS 60.275.',
+  description: 'Lavis Residencial: apartamentos 2 e 3 dormitórios com suíte no Centro de Criciúma/SC. Piscina, fitness, deck, hall sofisticado. Lançamento Fontana. Consultoria Stiven Allan CRECI 60.275.',
   keywords: ['Lavis Residencial', 'apartamento Centro Criciúma', 'lançamento Fontana Criciúma', 'apartamento 3 suítes Criciúma SC', 'Stiven Allan corretor'],
   alternates: { canonical: 'https://stivenallan.vercel.app/empreendimento/fontana/lavis-centro-criciuma-sc' },
   openGraph: {
@@ -281,7 +281,7 @@ export default function LavisPage() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 40, alignItems: 'center' }}>
           <div>
             <div style={{ ...ui.eyebrow, marginBottom: 12 }}>Consultor Exclusivo</div>
-            <h2 style={{ fontFamily: font.display, fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', fontWeight: 800, margin: '0 0 12px', lineHeight: 1.2, color: c.onDark }}>Stiven Allan — CRECI/RS 60.275</h2>
+            <h2 style={{ fontFamily: font.display, fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', fontWeight: 800, margin: '0 0 12px', lineHeight: 1.2, color: c.onDark }}>Stiven Allan — CRECI 60.275</h2>
             <p style={{ fontSize: 15, color: c.onDarkMuted, lineHeight: 1.7, margin: '0 0 28px' }}>
               Especialista em lançamentos Fontana em Criciúma e região sul de SC. Atendimento personalizado, análise financeira e acompanhamento completo do processo de compra.
             </p>
@@ -307,7 +307,7 @@ export default function LavisPage() {
       <footer style={{ borderTop: `1px solid ${c.line}`, padding: '32px 5%', textAlign: 'center', color: c.muted, fontSize: 13 }}>
         <p style={{ margin: 0 }}>
           Lavis Residencial · Fontana Construtora · Centro, Criciúma/SC<br />
-          Consultor: Stiven Allan · CRECI/RS 60.275 · (48) 99145-5522
+          Consultor: Stiven Allan · CRECI 60.275 · (48) 99145-5522
         </p>
         <p style={{ margin: '8px 0 0', fontSize: 12, color: c.muted }}>
           As imagens são ilustrativas. Informações sujeitas a alterações sem aviso prévio.
