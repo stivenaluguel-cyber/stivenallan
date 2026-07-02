@@ -4,7 +4,7 @@ import Image from 'next/image'
 export const revalidate = 3600
 
 export const metadata: Metadata = {
-  title: 'Lançamentos Imobiliários em Criciúma SC | Stiven Allan CRECI/RS 60.275',
+  title: 'Lançamentos Imobiliários em Criciúma SC | Stiven Allan CRECI 60.275',
   description: 'Todos os lançamentos e empreendimentos da Fontana Construtora em Criciúma e região SC. Apartamentos de 1, 2 e 3 suítes com plantas modernas. Consulte Stiven Allan, especialista em lançamentos.',
   keywords: [
     'lançamentos imobiliários Criciúma',
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     'Hub Smart Home Criciúma',
   ],
   authors: [{ name: 'Stiven Allan', url: 'https://stivenallan.vercel.app' }],
-  creator: 'Stiven Allan — CRECI/RS 60.275',
+  creator: 'Stiven Allan — CRECI 60.275',
   alternates: {
     canonical: 'https://stivenallan.vercel.app/empreendimentos',
   },
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     title: 'Lançamentos Imobiliários em Criciúma SC | Stiven Allan',
     description: 'Descubra os melhores lançamentos da Fontana Construtora em Criciúma SC. Apartamentos modernos, lazer completo e localização privilegiada.',
     url: 'https://stivenallan.vercel.app/empreendimentos',
-    siteName: 'Stiven Allan — CRECI/RS 60.275',
+    siteName: 'Stiven Allan — CRECI 60.275',
     locale: 'pt_BR',
     type: 'website',
   },
@@ -49,12 +49,12 @@ const schema = {
     {
       '@type': 'CollectionPage',
       name: 'Lançamentos Imobiliários em Criciúma SC',
-      description: 'Todos os lançamentos e empreendimentos da Fontana Construtora em Criciúma e região SC, apresentados por Stiven Allan, corretor CRECI/RS 60.275.',
+      description: 'Todos os lançamentos e empreendimentos da Fontana Construtora em Criciúma e região SC, apresentados por Stiven Allan, corretor CRECI 60.275.',
       url: 'https://stivenallan.vercel.app/empreendimentos',
       author: {
         '@type': 'RealEstateAgent',
         name: 'Stiven Allan',
-        identifier: 'CRECI/RS 60.275',
+        identifier: 'CRECI 60.275',
         telephone: '+5548991455522',
         url: 'https://stivenallan.vercel.app',
         areaServed: { '@type': 'City', name: 'Criciúma', containedInPlace: { '@type': 'State', name: 'Santa Catarina' } },
@@ -83,7 +83,7 @@ const schema = {
           name: 'Como comprar um apartamento nos lançamentos da Fontana em Criciúma?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Entre em contato com Stiven Allan, CRECI/RS 60.275, pelo WhatsApp (48) 99145-5522. Como corretor especializado nos empreendimentos da Fontana em Criciúma, ofereço atendimento personalizado, informações sobre plantas, valores e condições de pagamento.',
+            text: 'Entre em contato com Stiven Allan, CRECI 60.275, pelo WhatsApp (48) 99145-5522. Como corretor especializado nos empreendimentos da Fontana em Criciúma, ofereço atendimento personalizado, informações sobre plantas, valores e condições de pagamento.',
           },
         },
       ],
@@ -225,7 +225,7 @@ export default function EmpreendimentosPage() {
               {[
                 { valor: '4', label: 'Lançamentos ativos' },
                 { valor: '1', label: 'Construtora parceira' },
-                { valor: 'CRECI/RS', label: '60.275 — Corretor Stiven' },
+                { valor: 'CRECI', label: '60.275 — Corretor Stiven' },
                 { valor: 'SC', label: 'Criciúma e região' },
               ].map(s => (
                 <div key={s.label}>
@@ -323,7 +323,7 @@ export default function EmpreendimentosPage() {
               Não sabe qual lançamento escolher?
             </h2>
             <p style={{ color: '#a7adb4', fontSize: 'clamp(0.9rem,2vw,1rem)', lineHeight: 1.8, margin: '0 auto 2rem', maxWidth: '580px' }}>
-              Stiven Allan é especialista nos empreendimentos da Fontana Construtora em Criciúma. Com CRECI/RS 60.275, oferece atendimento personalizado para ajudar você a encontrar o imóvel ideal dentro do seu perfil e orçamento.
+              Stiven Allan é especialista nos empreendimentos da Fontana Construtora em Criciúma. Com CRECI 60.275, oferece atendimento personalizado para ajudar você a encontrar o imóvel ideal dentro do seu perfil e orçamento.
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent: 'center' }}>
               <a
@@ -336,7 +336,7 @@ export default function EmpreendimentosPage() {
               </a>
             </div>
             <div style={{ marginTop: '1.25rem', color: '#6b7280', fontSize: '0.8rem' }}>
-              CRECI/RS 60.275 • (48) 99145-5522 • Criciúma e região SC
+              CRECI 60.275 • (48) 99145-5522 • Criciúma e região SC
             </div>
           </div>
         </section>
@@ -346,7 +346,7 @@ export default function EmpreendimentosPage() {
           <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexWrap: 'wrap', gap: '2rem', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
               <div style={{ color: '#c9a24b', fontWeight: 800, fontSize: '1rem', letterSpacing: '0.05em', marginBottom: '0.4rem' }}>STIVEN ALLAN</div>
-              <div style={{ color: '#a7adb4', fontSize: '0.8rem' }}>CRECI/RS 60.275</div>
+              <div style={{ color: '#a7adb4', fontSize: '0.8rem' }}>CRECI 60.275</div>
               <div style={{ color: '#a7adb4', fontSize: '0.8rem', marginTop: '0.2rem' }}>Criciúma e região — SC</div>
             </div>
             <div style={{ textAlign: 'right' }}>
