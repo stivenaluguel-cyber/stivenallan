@@ -30,3 +30,5 @@ export function PropertyFAQ({ items, accent = '#18181b' }: { items: FaqItem[]; a
     </section>
   )
 }
+
+export default PropertyFAQ
