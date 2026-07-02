@@ -63,3 +63,5 @@ export function PropertySchema({ nome, slug, construtora_slug, cidade, uf, bairr
     </>
   )
 }
+
+export default PropertySchema
