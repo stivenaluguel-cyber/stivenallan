@@ -3,13 +3,15 @@ import Image from 'next/image'
 import GalleryWithLightbox, { LightboxPhoto } from './gallery-lightbox'
 import Link from 'next/link'
 import { LeadCaptureButton } from '@/components/LeadCaptureButton'
+import PropertySchema from '@/components/PropertySchema'
+import PropertyFAQ from '@/components/PropertyFAQ'
+import RelatedProperties from '@/components/RelatedProperties'
 
 // Hotsite premium Monte Leone Residencial (Fontana, Centro Criciuma/SC). Padrao EPIC — benchmark Aguas de Marano.
 // WhatsApp do corretor Stiven (NAO usar numeros internos da Fontana).
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Monte%20Leone%20Residencial.'
 const CATALOGO_PDF = 'https://estilofontana.com.br/upload/empreendimento/catalogo/monte-leone-residencial-1756387346.pdf'
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://stivenallan.vercel.app'
-
+// SITE_URL via @/lib/site
 const t = {
 bg: '#FAFAF8',
 ink: '#16201A',
@@ -135,7 +137,8 @@ itemListElement: [
 export default function MonteLeonePage() {
 return (
 <main style={{ background: t.bg, color: t.ink, fontFamily: t.body, overflowX: 'hidden' }}>
-<script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHEMA) }} />
+      <PropertySchema nome="Monte Leone Residencial" slug="monte-leone-centro-criciuma-sc" construtora_slug="fontana" cidade="Criciúma" uf="SC" bairro="Centro" descricao="Monte Leone Residencial (Construtora Fontana): 4 dormitórios (3 suítes), 230 a 253 m², no Centro de Criciúma/SC. Vista para a Serra. Atendimento exclusivo com Stiven Allan." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/monte-leone-centro-criciuma-sc.jpg" canonical="https://stivenallan.com.br/empreendimento/fontana/monte-leone-centro-criciuma-sc" faq={[{"pergunta":"Como funciona o financiamento direto do Monte Leone Residencial?","resposta":"Entrada de 20%, saldo em até 72 parcelas mensais e 6 reforços anuais (cada reforço equivale a 5 parcelas mensais), com correção pelo CUB/SC durante a obra. Sem análise de banco."},{"pergunta":"Qual a previsão de entrega do Monte Leone Residencial?","resposta":"A previsão de entrega é agosto de 2030, em Centro, Criciúma/SC."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Sim. Além do financiamento direto com a construtora, é possível optar por financiamento bancário. Fale com o Stiven pelo WhatsApp para simular as duas opções."},{"pergunta":"Onde fica o Monte Leone Residencial?","resposta":"O Monte Leone Residencial está localizado no Centro, Criciúma/SC."}]} />
+
 
 <style>{`
 html { scroll-behavior: smooth; }
@@ -370,6 +373,10 @@ No coração nobre de Criciúma, a poucos passos de comércio premium, gastronom
 </section>
 
 {/* FOOTER */}
+      {/* SEO FAQ */}
+      <PropertyFAQ items={[{"pergunta":"Como funciona o financiamento direto do Monte Leone Residencial?","resposta":"Entrada de 20%, saldo em até 72 parcelas mensais e 6 reforços anuais (cada reforço equivale a 5 parcelas mensais), com correção pelo CUB/SC durante a obra. Sem análise de banco."},{"pergunta":"Qual a previsão de entrega do Monte Leone Residencial?","resposta":"A previsão de entrega é agosto de 2030, em Centro, Criciúma/SC."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Sim. Além do financiamento direto com a construtora, é possível optar por financiamento bancário. Fale com o Stiven pelo WhatsApp para simular as duas opções."},{"pergunta":"Onde fica o Monte Leone Residencial?","resposta":"O Monte Leone Residencial está localizado no Centro, Criciúma/SC."}]} accent="#33503F" />
+      <RelatedProperties atualSlug="monte-leone-centro-criciuma-sc" cidade="Criciúma" />
+
 <footer style={{ background: t.greenDark, color: t.onDarkMuted, padding: 'clamp(56px,9vh,96px) clamp(18px,5vw,56px)' }}>
 <div style={{ maxWidth: 1180, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px,1fr))', gap: 'clamp(28px,5vw,56px)' }}>
 <div>
