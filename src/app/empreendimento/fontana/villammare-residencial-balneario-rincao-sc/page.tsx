@@ -3,10 +3,13 @@ import Image from 'next/image'
 import Link from 'next/link'
 import GalleryWithLightbox from './gallery-lightbox'
 import { LeadCaptureButton } from '@/components/LeadCaptureButton'
+import { PropertySchema } from '@/components/PropertySchema'
+import { PropertyFAQ } from '@/components/PropertyFAQ'
+import { RelatedProperties } from '@/components/RelatedProperties'
+import { SITE_URL } from '@/lib/site'
 
 const WPP = "https://wa.me/5548991642332?text=Olá!%20Tenho%20interesse%20no%20Villammare%20Residencial%20em%20Balneário%20Rincão."
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://stivenallan.vercel.app'
 
 const t = {
   bg: '#F4F6F8', ink: '#1A1A1A', navy: '#1A3A5C', navyDark: '#0D2039',
@@ -110,7 +113,7 @@ const SCHEMA = {
 export default function Page() {
   return (
     <main style={{ fontFamily: t.body, background: t.bg, color: t.ink, overflowX: 'hidden' }}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHEMA) }} />
+      <PropertySchema schema={SCHEMA} />
       <style>{`
         html { scroll-behavior: smooth; }
         .vm-eyebrow { font-size:11px; letter-spacing:0.42em; text-transform:uppercase; }
@@ -294,6 +297,15 @@ export default function Page() {
         </svg>
       </a>
 
+      <PropertyFAQ items={[
+        {pergunta:"Como funciona o financiamento direto do Villammare Residencial?",resposta:"Entrada de 20%, saldo em até 72 parcelas mensais e 6 reforços anuais (cada reforço = 5 mensais), correção pelo CUB/SC durante a obra. Entrega prevista setembro de 2029. Sem banco."},
+        {pergunta:"Qual a previsão de entrega do Villammare Residencial?",resposta:"Previsão de entrega setembro de 2029, em Balneário Rincão/SC."},
+        {pergunta:"Quais são as plantas do Villammare Residencial?",resposta:"4 dormitórios (2 suítes e 2 demi suites), de 172 a 275 m² privativos, a passos da praia em Balneário Rincão/SC."},
+        {pergunta:"O Villammare tem vista para o mar?",resposta:"Sim. O Villammare fica a passos da praia em Balneário Rincão com sacada e vista privilegiada para o mar."},
+        {pergunta:"Posso usar FGTS ou financiamento bancário no Villammare?",resposta:"Sim. Além do financiamento direto Fontana, é possível financiamento bancário ou FGTS. Consulte Stiven pelo WhatsApp."},
+      ]} accent="#1B3A4B" />
+
+      <RelatedProperties atualSlug="villammare-residencial-balneario-rincao-sc" cidade="Balneário Rincão" />
     </main>
   )
 }
