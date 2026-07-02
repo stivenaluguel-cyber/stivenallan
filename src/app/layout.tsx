@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { SITE_URL } from '@/lib/site'
 import Script from 'next/script'
 import { VisitTracker } from '@/components/VisitTracker'
 import { Bricolage_Grotesque, Hanken_Grotesk } from 'next/font/google'
@@ -18,12 +19,10 @@ const hanken = Hanken_Grotesk({
   weight: ['400', '500', '600', '700'],
 })
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://stivenallan.vercel.app'
-
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'Stiven Allan — Imóveis de Alto Padrão em Criciúma/SC | CRECI/RS 60.275',
+    default: 'Stiven Allan — Imóveis de Alto Padrão em Criciúma/SC',
     template: '%s | Stiven Allan',
   },
   description:
@@ -56,20 +55,22 @@ const schemaAgent = {
   '@context': 'https://schema.org',
   '@type': 'RealEstateAgent',
   name: 'Stiven Allan',
-  description: 'Corretor de imóveis especialista em lançamentos e empreendimentos de construtoras em Criciúma/SC. Financiamento direto. CRECI/RS 60.275.',
   url: SITE_URL,
   telephone: '+5548991642332',
+  description: 'Corretor de imóveis especialista em lançamentos com financiamento direto da construtora em Criciúma e Sul de Santa Catarina.',
   email: 'contato@stivenallan.com.br',
   areaServed: [
-    { '@type': 'City', name: 'Criciúma', containedInPlace: { '@type': 'State', name: 'Santa Catarina' } },
-    { '@type': 'City', name: 'Içara', containedInPlace: { '@type': 'State', name: 'Santa Catarina' } },
-    { '@type': 'City', name: 'Nova Veneza', containedInPlace: { '@type': 'State', name: 'Santa Catarina' } },
-    { '@type': 'City', name: 'Forquilhinha', containedInPlace: { '@type': 'State', name: 'Santa Catarina' } },
-    { '@type': 'City', name: 'Cocal do Sul', containedInPlace: { '@type': 'State', name: 'Santa Catarina' } },
+    { '@type': 'City', name: 'Criciúma' },
+    { '@type': 'City', name: 'Balneário Rincão' },
+    { '@type': 'City', name: 'Laguna' },
+    { '@type': 'City', name: 'Içara' },
+    { '@type': 'City', name: 'Siderópolis' },
+    { '@type': 'City', name: 'Balneário Piçarras' },
   ],
   hasCredential: 'CRECI/RS 60.275',
   sameAs: ['https://wa.me/5548991642332', 'https://www.instagram.com/stivenallan.ofc'],
 }
+
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
