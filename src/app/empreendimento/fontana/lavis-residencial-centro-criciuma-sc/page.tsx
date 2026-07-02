@@ -2,9 +2,9 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import GalleryWithLightbox, { LightboxPhoto } from './gallery-lightbox'
 import { LeadCaptureButton } from '@/components/LeadCaptureButton'
-import PropertySchema from '@/components/PropertySchema'
-import PropertyFAQ from '@/components/PropertyFAQ'
-import RelatedProperties from '@/components/RelatedProperties'
+import { PropertySchema } from '@/components/PropertySchema'
+import { PropertyFAQ } from '@/components/PropertyFAQ'
+import { RelatedProperties } from '@/components/RelatedProperties'
 
 // Hotsite premium Lavis Residencial (Fontana, Centro de Criciuma/SC). Padrao EPIC — benchmark Aguas de Marano.
 // WhatsApp do corretor Stiven (NAO usar numeros internos da Fontana).
@@ -132,7 +132,7 @@ const SCHEMA = {
 export default function LavisPage() {
   return (
     <main style={{ background: t.bg, color: t.ink, fontFamily: t.body, overflowX: 'hidden' }}>
-      <PropertySchema nome="Lavis Residencial" slug="lavis-residencial-centro-criciuma-sc" construtora_slug="fontana" cidade="Criciúma" uf="SC" bairro="Centro" descricao="Lavis Residencial (Construtora Fontana): apartamentos de alto padrão no Centro de Criciúma/SC. 3 suítes, 125 a 132 m², financiamento direto com a construtora. Atendimento exclusivo com Stiven Allan." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/lavis-residencial-centro-criciuma-sc.jpg" canonical="https://stivenallan.com.br/empreendimento/fontana/lavis-residencial-centro-criciuma-sc" faq={[{"pergunta":"Como funciona o financiamento direto do Lavis Residencial?","resposta":"Entrada de 20%, saldo em até 72 parcelas mensais e 6 reforços anuais (cada reforço equivale a 5 parcelas mensais), com correção pelo CUB/SC durante a obra. Sem análise de banco."},{"pergunta":"Qual a previsão de entrega do Lavis Residencial?","resposta":"A previsão de entrega é dezembro de 2030, em Centro, Criciúma/SC."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Sim. Além do financiamento direto com a construtora, é possível optar por financiamento bancário. Fale com o Stiven pelo WhatsApp para simular as duas opções."},{"pergunta":"Onde fica o Lavis Residencial?","resposta":"O Lavis Residencial está localizado no Centro, Criciúma/SC."}]} />
+      <PropertySchema nome="Lavis Residencial" slug="lavis-residencial-centro-criciuma-sc" construtora_slug="fontana" cidade="Criciúma" uf="SC" bairro="Centro" descricao="Lavis Residencial (Construtora Fontana): apartamentos de alto padrão no Centro de Criciúma/SC. 3 suítes, 125 a 132 m², financiamento direto com a construtora. Atendimento exclusivo com Stiven Allan." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/lavis-residencial-centro-criciuma-sc.jpg" faq={[{"pergunta":"Como funciona o financiamento direto do Lavis Residencial?","resposta":"Entrada de 20%, saldo em até 72 parcelas mensais e 6 reforços anuais (cada reforço equivale a 5 parcelas mensais), com correção pelo CUB/SC durante a obra. Sem análise de banco."},{"pergunta":"Qual a previsão de entrega do Lavis Residencial?","resposta":"A previsão de entrega é dezembro de 2030, em Centro, Criciúma/SC."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Sim. Além do financiamento direto com a construtora, é possível optar por financiamento bancário. Fale com o Stiven pelo WhatsApp para simular as duas opções."},{"pergunta":"Onde fica o Lavis Residencial?","resposta":"O Lavis Residencial está localizado no Centro, Criciúma/SC."}]} />
       
 
       <style>{`
