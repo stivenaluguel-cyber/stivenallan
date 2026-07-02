@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
 import GalleryWithLightbox from './gallery-lightbox';
 import { LeadCaptureButton } from '@/components/LeadCaptureButton'
+import PropertySchema from '@/components/PropertySchema'
+import PropertyFAQ from '@/components/PropertyFAQ'
+import RelatedProperties from '@/components/RelatedProperties'
 
 export const revalidate = 3600;
 
@@ -36,6 +39,7 @@ export const metadata: Metadata = {
 export default function AvezzanoPage() {
   return (
     <main style={{ fontFamily: "'Inter', sans-serif", color: '#1a1a1a', overflowX: 'hidden' }}>
+      <PropertySchema nome="Avezzano" slug="avezzano-centro-sideropolis-sc" construtora_slug="fontana" cidade="Siderópolis" uf="SC" bairro="Centro" descricao="Avezzano Residencial — 3 dormitórios (3 suítes), até 127 m², Centro de Siderópolis/SC. Financiamento direto Fontana, sem bancos. Conheça com Stiven Allan." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/avezzano-centro-sideropolis-sc.jpg" canonical="https://stivenallan.com.br/empreendimento/fontana/avezzano-centro-sideropolis-sc" faq={[{"pergunta":"Como funciona o pagamento do Avezzano?","resposta":"Entrada e saldo por financiamento bancário ou parcelado direto com a construtora em até 240 meses, com correção IGPM + 0,75% a.m."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Sim. Além do financiamento direto com a construtora, é possível optar por financiamento bancário. Fale com o Stiven pelo WhatsApp para simular as duas opções."},{"pergunta":"Onde fica o Avezzano?","resposta":"O Avezzano está localizado no Centro, Siderópolis/SC."}]} />
 
       {/* NAV */}
       <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 2rem', height: '64px' }}>
