@@ -1,6 +1,9 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import { c, font, ui } from '@/lib/theme'
+import { PropertySchema } from '@/components/PropertySchema'
+import { PropertyFAQ } from '@/components/PropertyFAQ'
+import { RelatedProperties } from '@/components/RelatedProperties'
 import Simulador from '@/components/Simulador'
 import { LeadCaptureButton } from '@/components/LeadCaptureButton'
 
@@ -82,7 +85,7 @@ export default function LavisPage() {
         .lavis-img-thumb { transition: transform .3s ease; }
         .lavis-img-thumb:hover { transform: scale(1.03); }
       `}</style>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHEMA) }} />
+      
 
       {/* BREADCRUMB NAV */}
       <nav aria-label="Breadcrumb" style={{ background: c.charcoal, borderBottom: `1px solid ${c.lineDark}`, padding: '12px 5%' }}>
