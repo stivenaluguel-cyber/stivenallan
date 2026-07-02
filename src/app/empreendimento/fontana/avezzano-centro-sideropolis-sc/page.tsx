@@ -4,6 +4,7 @@ import { LeadCaptureButton } from '@/components/LeadCaptureButton'
 import { PropertySchema } from '@/components/PropertySchema'
 import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
+import { SITE_URL } from '@/lib/site'
 
 export const revalidate = 3600;
 
