@@ -28,35 +28,52 @@ const PADRAO_OBRA: Omit<PlanoFinanciamento, 'entrega'> = {
 }
 
 export const planos: Record<string, PlanoFinanciamento> = {
+  // ── Entradas já validadas (preservadas) ──────────────────────────────────
   'monte-leone-centro-criciuma-sc': { ...PADRAO_OBRA, entrega: '2030-08-30' },
   'fidenza-residencial-cruzeiro-do-sul-criciuma-sc': { ...PADRAO_OBRA, entrega: '2027-12-31' },
   'mar-di-nizza-mar-grosso-laguna-sc': { ...PADRAO_OBRA, entrega: '2026-12-31' },
   'thiene-centro-criciuma-sc': { tipo: 'quase_pronto', entrega: '2026-09-30', entradaPct: 0.10, reforcos: 0, mensais: 0, descontoAVistaPct: 0.15, saldoDireto: { meses: 180, correcao: 'IGPM + 0,75% a.m.' }, politicaExtra: '10% de desconto pagando 40% até as chaves (ato mínimo 10%) + saldo em até 180 meses.' },
   'pavia-rio-maina-criciuma-sc': { tipo: 'pronto', entrega: null, entradaPct: 0.15, reforcos: 0, mensais: 0, descontoAVistaPct: 0.05, saldoDireto: { meses: 240, correcao: 'IGPM + 0,75% a.m.' } },
-  'lavis-residencial-centro-criciuma-sc': { ...PADRAO_OBRA, entrega: null },
-  'aguas-de-marano-frente-mar-balneario-picarras-sc': { ...PADRAO_OBRA, entrega: null },
-  'tremezzo-residencial-centro-criciuma-sc': { ...PADRAO_OBRA, entrega: null },
-  'parco-savello-santa-barbara-criciuma-sc': { ...PADRAO_OBRA, entrega: null },
-  'avezzano-centro-sideropolis-sc': { ...PADRAO_OBRA, entrega: null },
-  'bellante-comerciario-criciuma-sc': { ...PADRAO_OBRA, entrega: null },
-  'bosco-del-montello-centro-criciuma-sc': { ...PADRAO_OBRA, entrega: null },
-  'calalzo-di-cadore-michel-criciuma-sc': { ...PADRAO_OBRA, entrega: null },
-  'calliano-centro-criciuma-sc': { ...PADRAO_OBRA, entrega: null },
-  'campos-da-montanha-bom-jardim-da-serra-sc': { ...PADRAO_OBRA, entrega: null },
-  'castellano-centro-icara-sc': { ...PADRAO_OBRA, entrega: null },
-  'due-fratelli-centro-criciuma-sc': { ...PADRAO_OBRA, entrega: null },
+
+  // ── Empreendimentos com data de entrega confirmada — padrão obra (1x entrada / 6x reforço / 72x mensal) ──
+  'lavis-residencial-centro-criciuma-sc': { ...PADRAO_OBRA, entrega: '2030-12-31' },
+  'lavis-centro-criciuma-sc': { ...PADRAO_OBRA, entrega: '2030-12-31' },
+  'mar-di-atrani-centro-balneario-rincao-sc': { ...PADRAO_OBRA, entrega: '2028-10-30' },
+  'mar-di-licata-mar-grosso-laguna-sc': { ...PADRAO_OBRA, entrega: '2027-10-30' },
+  'mar-di-arienzo-centro-balneario-rincao-sc': { ...PADRAO_OBRA, entrega: '2030-08-31' },
+  'mar-positano-centro-balneario-rincao-sc': { ...PADRAO_OBRA, entrega: '2029-08-31' },
+  'pineto-centro-criciuma-sc': { ...PADRAO_OBRA, entrega: '2029-11-30' },
+  'tremezzo-residencial-centro-criciuma-sc': { ...PADRAO_OBRA, entrega: '2027-03-31' },
+  'villammare-residencial-balneario-rincao-sc': { ...PADRAO_OBRA, entrega: '2029-09-30' },
+  'parco-savello-santa-barbara-criciuma-sc': { ...PADRAO_OBRA, entrega: '2028-05-31' },
+  'aguas-de-marano-frente-mar-balneario-picarras-sc': { ...PADRAO_OBRA, entrega: '2028-07-31' },
+
+  // ── Bellante: padrão diferente — reforço 2x/ano, mensal 60x ──
+  'bellante-comerciario-criciuma-sc': {
+    tipo: 'obra', entrega: '2026-11-30', entradaPct: 0.20, reforcos: 2, mensais: 60, descontoAVistaPct: 0.05,
+    politicaExtra: 'Financiamento bancário ou até 240 meses direto com construtora, IGPM + 0,75% a.m.',
+  },
+
+  // ── Empreendimentos "pronto" — sem previsão de entrega, financiamento direto pós-venda ──
+  'avezzano-centro-sideropolis-sc': { tipo: 'pronto', entrega: null, entradaPct: 0.20, reforcos: 0, mensais: 0, descontoAVistaPct: 0, saldoDireto: { meses: 240, correcao: 'IGPM + 0,75% a.m.' } },
+  'bosco-del-montello-centro-criciuma-sc': { tipo: 'pronto', entrega: null, entradaPct: 0.20, reforcos: 0, mensais: 0, descontoAVistaPct: 0, saldoDireto: { meses: 180, correcao: 'IGPM + 0,75% a.m.' } },
+  'calalzo-di-cadore-michel-criciuma-sc': { tipo: 'pronto', entrega: null, entradaPct: 0.20, reforcos: 0, mensais: 0, descontoAVistaPct: 0, saldoDireto: { meses: 180, correcao: 'IGPM + 0,75% a.m.' } },
+  'calliano-centro-criciuma-sc': { tipo: 'pronto', entrega: null, entradaPct: 0.20, reforcos: 0, mensais: 0, descontoAVistaPct: 0, saldoDireto: { meses: 180, correcao: 'IGPM + 0,75% a.m.' } },
+  'castellano-centro-icara-sc': { tipo: 'pronto', entrega: null, entradaPct: 0.20, reforcos: 0, mensais: 0, descontoAVistaPct: 0, saldoDireto: { meses: 180, correcao: 'IGPM + 0,75% a.m.' } },
+  'due-fratelli-centro-criciuma-sc': { tipo: 'pronto', entrega: null, entradaPct: 0.20, reforcos: 0, mensais: 0, descontoAVistaPct: 0, saldoDireto: { meses: 180, correcao: 'IGPM + 0,75% a.m.' } },
+  'pianezze-centro-icara-sc': { tipo: 'pronto', entrega: null, entradaPct: 0.20, reforcos: 0, mensais: 0, descontoAVistaPct: 0, saldoDireto: { meses: 180, correcao: 'IGPM + 0,75% a.m.' } },
+  'piazza-castello-centro-icara-sc': { tipo: 'pronto', entrega: null, entradaPct: 0.20, reforcos: 0, mensais: 0, descontoAVistaPct: 0, saldoDireto: { meses: 180, correcao: 'IGPM + 0,75% a.m.' } },
+  'rocca-pietore-centro-sideropolis-sc': { tipo: 'pronto', entrega: null, entradaPct: 0.20, reforcos: 0, mensais: 0, descontoAVistaPct: 0, saldoDireto: { meses: 180, correcao: 'IGPM + 0,75% a.m.' } },
+
+  // ── Loteamentos — sem previsão de entrega (venda de terreno), parâmetros próprios ──
+  'campos-da-montanha-bom-jardim-da-serra-sc': { tipo: 'loteamento', entrega: null, entradaPct: 0.20, reforcos: 5, mensais: 60, descontoAVistaPct: 0 },
+  'villaggio-verde-residenziale-grande-prospera-criciuma-sc': {
+    tipo: 'loteamento', entrega: null, entradaPct: 0.253, reforcos: 6, mensais: 72, descontoAVistaPct: 0,
+    politicaExtra: 'Correção monetária pelo IPCA (não CUB/SC). Vencimentos dias 05, 10 e 15 de cada mês.',
+  },
+
+  // ── Demais entradas preservadas (sem dados novos confirmados) ──
   'hub-smart-home-criciuma-sc': { ...PADRAO_OBRA, entrega: null },
-  'lavis-centro-criciuma-sc': { ...PADRAO_OBRA, entrega: null },
-  'mar-di-arienzo-centro-balneario-rincao-sc': { ...PADRAO_OBRA, entrega: null },
-  'mar-di-atrani-centro-balneario-rincao-sc': { ...PADRAO_OBRA, entrega: null },
-  'mar-di-licata-mar-grosso-laguna-sc': { ...PADRAO_OBRA, entrega: null },
-  'mar-positano-centro-balneario-rincao-sc': { ...PADRAO_OBRA, entrega: null },
-  'pianezze-centro-icara-sc': { ...PADRAO_OBRA, entrega: null },
-  'piazza-castello-centro-icara-sc': { ...PADRAO_OBRA, entrega: null },
-  'pineto-centro-criciuma-sc': { ...PADRAO_OBRA, entrega: null },
-  'rocca-pietore-centro-sideropolis-sc': { ...PADRAO_OBRA, entrega: null },
-  'villaggio-verde-residenziale-grande-prospera-criciuma-sc': { tipo: 'loteamento', entrega: null, entradaPct: 0.25, reforcos: 4, mensais: 48, descontoAVistaPct: 0.05 },
-  'villammare-residencial-balneario-rincao-sc': { ...PADRAO_OBRA, entrega: null },
 }
 
 // ─── Motor SPC-JS (Sistema de Parcelas Constantes a Juros Simples) ──────────
