@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 import GalleryWithLightbox from './gallery-lightbox';
 import { LeadCaptureButton } from '@/components/LeadCaptureButton'
-import PropertySchema from '@/components/PropertySchema'
-import PropertyFAQ from '@/components/PropertyFAQ'
-import RelatedProperties from '@/components/RelatedProperties'
+import { PropertySchema } from '@/components/PropertySchema'
+import { PropertyFAQ } from '@/components/PropertyFAQ'
+import { RelatedProperties } from '@/components/RelatedProperties'
 
 export const revalidate = 3600;
 
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
 export default function BellantePage() {
   return (
     <main style={{ fontFamily: "'Inter', sans-serif", color: '#1a1a1a', overflowX: 'hidden' }}>
-      <PropertySchema nome="Bellante" slug="bellante-comerciario-criciuma-sc" construtora_slug="fontana" cidade="Criciúma" uf="SC" bairro="Comerciário" descricao="Bellante Residencial — 2 dormitórios (1 suíte), 62–66 m², Comerciário em Criciúma/SC. Em obras. Financiamento direto Fontana. Conheça com Stiven Allan." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/bellante-comerciario-criciuma-sc.jpg" canonical="https://stivenallan.com.br/empreendimento/fontana/bellante-comerciario-criciuma-sc" faq={[{"pergunta":"Como funciona o financiamento direto do Bellante?","resposta":"Entrada de 20%, saldo em até 60 parcelas mensais e 2 reforços anuais (cada reforço equivale a 5 parcelas mensais), com correção pelo CUB/SC durante a obra. Sem análise de banco."},{"pergunta":"Qual a previsão de entrega do Bellante?","resposta":"A previsão de entrega é novembro de 2026, em Comerciário, Criciúma/SC."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Sim. Além do financiamento direto com a construtora, é possível optar por financiamento bancário. Fale com o Stiven pelo WhatsApp para simular as duas opções."},{"pergunta":"Onde fica o Bellante?","resposta":"O Bellante está localizado no Comerciário, Criciúma/SC."}]} />
+      <PropertySchema nome="Bellante" slug="bellante-comerciario-criciuma-sc" construtora_slug="fontana" cidade="Criciúma" uf="SC" bairro="Comerciário" descricao="Bellante Residencial — 2 dormitórios (1 suíte), 62–66 m², Comerciário em Criciúma/SC. Em obras. Financiamento direto Fontana. Conheça com Stiven Allan." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/bellante-comerciario-criciuma-sc.jpg" faq={[{"pergunta":"Como funciona o financiamento direto do Bellante?","resposta":"Entrada de 20%, saldo em até 60 parcelas mensais e 2 reforços anuais (cada reforço equivale a 5 parcelas mensais), com correção pelo CUB/SC durante a obra. Sem análise de banco."},{"pergunta":"Qual a previsão de entrega do Bellante?","resposta":"A previsão de entrega é novembro de 2026, em Comerciário, Criciúma/SC."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Sim. Além do financiamento direto com a construtora, é possível optar por financiamento bancário. Fale com o Stiven pelo WhatsApp para simular as duas opções."},{"pergunta":"Onde fica o Bellante?","resposta":"O Bellante está localizado no Comerciário, Criciúma/SC."}]} />
 
       {/* NAV */}
       <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 2rem', height: '64px' }}>
