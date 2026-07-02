@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Pagina nao encontrada — Stiven Allan Corretor de Imoveis',
-  description: 'A pagina que voce procura nao existe. Explore os lancamentos imobiliarios em Criciuma com Stiven Allan, CRECI/RS 60.275.',
+  description: 'A pagina que voce procura nao existe. Explore os lancamentos imobiliarios em Criciuma com Stiven Allan, CRECI 60.275.',
 }
 
 export default function NotFound() {
