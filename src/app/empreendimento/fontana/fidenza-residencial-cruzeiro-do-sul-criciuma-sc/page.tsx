@@ -3,12 +3,15 @@ import Image from 'next/image'
 import GalleryWithLightbox, { LightboxPhoto } from './gallery-lightbox'
 import Link from 'next/link'
 import { LeadCaptureButton } from '@/components/LeadCaptureButton'
+import { PropertySchema } from '@/components/PropertySchema'
+import { PropertyFAQ } from '@/components/PropertyFAQ'
+import { RelatedProperties } from '@/components/RelatedProperties'
+import { SITE_URL } from '@/lib/site'
 
 // Hotsite premium Fidenza Residencial (Fontana, Cruzeiro do Sul, Criciuma/SC). Padrao EPIC — benchmark Aguas de Marano.
 // Acento: grafite #2B2B2B com detalhe azul #1E3A8A discreto (motivo Mondrian).
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Fidenza%20Residencial.'
 const CATALOGO_PDF = 'https://estilofontana.com.br/upload/empreendimento/catalogo/fidenza-residencial-1725383545.pdf'
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://stivenallan.vercel.app'
 
 const t = {
   bg: '#FAFAF8',
@@ -132,7 +135,7 @@ const SCHEMA = {
 export default function FidenzaPage() {
   return (
     <main lang="pt-BR" style={{ background: t.bg, color: t.ink, fontFamily: t.body, overflowX: 'hidden' }}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHEMA) }} />
+      
 
       <style>{`
         html { scroll-behavior: smooth; }
