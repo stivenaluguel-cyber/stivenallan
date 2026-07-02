@@ -3,10 +3,12 @@ import Image from 'next/image'
 import Link from 'next/link'
 import GalleryWithLightbox from './gallery-lightbox'
 import { LeadCaptureButton } from '@/components/LeadCaptureButton'
+import { PropertySchema } from '@/components/PropertySchema'
+import { PropertyFAQ } from '@/components/PropertyFAQ'
+import { RelatedProperties } from '@/components/RelatedProperties'
+import { SITE_URL } from '@/lib/site'
 
 const WPP = "https://wa.me/5548991642332?text=Olá!%20Tenho%20interesse%20no%20Villaggio%20Verde%20Residenziale%20em%20Criciúma."
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://stivenallan.vercel.app'
 
 const t = {
   bg: '#F5F2ED', ink: '#1A1A1A', green: '#2D4A2D', greenDark: '#1A2E1A',
@@ -102,7 +104,7 @@ const SCHEMA = {
 export default function Page() {
   return (
     <main style={{ fontFamily: t.body, background: t.bg, color: t.ink, overflowX: 'hidden' }}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHEMA) }} />
+      <PropertySchema schema={SCHEMA} />
       <style>{`
         html { scroll-behavior: smooth; }
         .vv-eyebrow { font-size:11px; letter-spacing:0.42em; text-transform:uppercase; }
@@ -299,6 +301,16 @@ export default function Page() {
           <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.528 5.855L.057 23.117a.75.75 0 0 0 .917.913l5.352-1.483A11.95 11.95 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.952 9.952 0 0 1-5.127-1.416l-.367-.217-3.785 1.048 1.015-3.7-.239-.381A9.953 9.953 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
         </svg>
       </a>
+
+      <PropertyFAQ items={[
+        {pergunta:"Como funciona o financiamento do Villaggio Verde Residenziale?",resposta:"Entrada de 25,3%, saldo em até 72 parcelas mensais e 6 reforços anuais, correção pelo IPCA. Vencimentos nos dias 05, 10 ou 15 de cada mês. Negociação direta com a Fontana, sem banco."},
+        {pergunta:"Quais os tamanhos de terreno disponíveis no Villaggio Verde?",resposta:"Terrenos de 794 a 1.038 m² em condomínio fechado na Grande Próspera, Criciúma/SC."},
+        {pergunta:"O que inclui a área de lazer do Villaggio Verde?",resposta:"12.000 m² de lazer exclusivo com academia, piscina, campo de golfe e mais, dentro do condomínio fechado."},
+        {pergunta:"Qual a localização do Villaggio Verde Residenziale?",resposta:"Rodovia Leonardo Bialeck, 525, Grande Próspera, Criciúma/SC — fácil acesso pela Av. do Estado."},
+        {pergunta:"Posso construir o que quiser no terreno do Villaggio Verde?",resposta:"Há regulamento construtivo do condomínio. Consulte Stiven pelo WhatsApp para detalhes das diretrizes e aprovação de projetos."},
+      ]} accent="#2D4A2D" />
+
+      <RelatedProperties atualSlug="villaggio-verde-residenziale-grande-prospera-criciuma-sc" cidade="Criciúma" />
     </main>
   )
 }
