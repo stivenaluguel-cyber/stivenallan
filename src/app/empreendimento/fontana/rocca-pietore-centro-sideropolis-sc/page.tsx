@@ -101,7 +101,7 @@ const SCHEMA = {
     },
     {
       '@type': 'LocalBusiness',
-      name: 'Stiven Allan — Correspondente Caixa',
+      name: 'Stiven Allan',
       url: SITE_URL,
       telephone: '+5548991642332',
       address: { '@type': 'PostalAddress', addressLocality: 'Criciúma', addressRegion: 'SC', addressCountry: 'BR' },
@@ -282,7 +282,7 @@ export default function Page() {
 
       <footer style={{ background:t.navyDark, padding:'48px 32px', textAlign:'center' }}>
         <p style={{ color:t.onDarkMuted, fontSize:12, letterSpacing:'0.2em', textTransform:'uppercase', margin:'0 0 8px' }}>Stiven Allan</p>
-        <p style={{ color:t.onDarkMuted, fontSize:11, margin:'0 0 4px' }}>Correspondente Caixa · CRECI RS 60.275</p>
+        <p style={{ color:t.onDarkMuted, fontSize:11, margin:'0 0 4px' }}>CRECI 60.275</p>
         <p style={{ color:t.onDarkMuted, fontSize:11, margin:0 }}>Siderópolis · SC</p>
         <div style={{ marginTop:24 }}>
           <Link href="/" style={{ color:t.onDarkMuted, fontSize:11, letterSpacing:'0.2em', textTransform:'uppercase', textDecoration:'none' }}>← Todos os Empreendimentos</Link>
