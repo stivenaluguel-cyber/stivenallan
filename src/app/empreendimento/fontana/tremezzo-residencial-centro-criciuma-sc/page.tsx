@@ -10,7 +10,7 @@ import { SITE_URL } from '@/lib/site'
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Tremezzo%20Residencial%20em%20Crici%C3%BAma.%20Pode%20me%20passar%20mais%20informa%C3%A7%C3%B5es%3F'
 
 export const metadata: Metadata = {
-  title: 'Tremezzo Residencial | Centro Criciúma | Stiven Allan',
+  title: 'Tremezzo Residencial | Centro Criciúma',
   description: 'Tremezzo Residencial — 3 dormitórios, 125 m², decorado disponível para visitação. 18 andares no Centro de Criciúma. Financiamento direto Fontana, sem banco.',
   alternates: { canonical: SITE_URL + '/empreendimento/fontana/tremezzo-residencial-centro-criciuma-sc' },
   openGraph: {
@@ -69,17 +69,6 @@ const GALERIA = [
 
 const LAZER_IMGS = RENDERS.slice(6)
 
-const SCHEMA = {
-  '@context': 'https://schema.org',
-  '@type': 'Apartment',
-  name: 'Tremezzo Residencial',
-  description: 'Apartamentos 3 dormitórios, 125 m², 18 andares no Centro de Criciúma/SC. Decorado disponível. Financiamento direto Fontana.',
-  image: 'https://lh3.googleusercontent.com/d/1zwMSHa-Ja6MGdlC2lq9fxQU7plgxHBLo',
-  numberOfRooms: 3,
-  numberOfBathroomsTotal: 2,
-  floorSize: { '@type': 'QuantitativeValue', value: 125, unitCode: 'MTK' },
-  address: { '@type': 'PostalAddress', streetAddress: 'Av. Vítor Meireles c/ Rua Domingos Bristot', addressLocality: 'Criciúma', addressRegion: 'SC', addressCountry: 'BR' },
-}
 export default function TremezzoPage() {
 const CSS = `
   @import url('https://fonts.googleapis.com/css2?family=Jost:wght@200;300;400&family=Cormorant+Garamond:ital,wght@0,300;1,300;1,400&family=Hanken+Grotesk:wght@300;400;500&display=swap');
@@ -119,7 +108,23 @@ const CSS = `
 `
   return (
     <>
-      <PropertySchema schema={SCHEMA} />
+      <PropertySchema
+      nome="Tremezzo Residencial"
+      slug="tremezzo-residencial-centro-criciuma-sc"
+      construtora_slug="fontana"
+      cidade="Criciuma"
+      uf="SC"
+      bairro="Centro"
+      descricao="Apartamentos 3 dormitorios, 125 m2, 18 andares no Centro de Criciuma/SC. Decorado disponivel. Financiamento direto Fontana."
+      imagem="https://lh3.googleusercontent.com/d/1zwMSHa-Ja6MGdlC2lq9fxQU7plgxHBLo"
+      faq={[
+        {pergunta:"Como funciona o financiamento direto do Tremezzo Residencial?",resposta:"Entrada de 20%, saldo em ate 72 parcelas mensais e 6 reforos anuais (cada reforo = 5 mensais), correcao pelo CUB/SC durante a obra. Entrega prevista marco 2027. Sem banco."},
+        {pergunta:"Qual a previsao de entrega do Tremezzo Residencial?",resposta:"Previsao de entrega marco de 2027, no Centro de Criciuma/SC."},
+        {pergunta:"O Tremezzo tem apartamento decorado para visitar?",resposta:"Sim. O apartamento decorado esta disponivel para visitacao. Agende com Stiven pelo WhatsApp (48) 99164-2332."},
+        {pergunta:"Quantos andares e qual a metragem do Tremezzo?",resposta:"18 andares, apartamentos de 3 dormitorios com 125 m2 privativos, no Centro de Criciuma/SC."},
+        {pergunta:"Posso usar FGTS ou financiamento bancario no Tremezzo?",resposta:"Sim. Alem do financiamento direto Fontana, e possivel financiamento bancario ou FGTS. Consulte Stiven pelo WhatsApp."},
+      ]}
+    />
       <style>{`${CSS}`}</style>
 
       {/* NAV */}
