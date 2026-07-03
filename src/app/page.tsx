@@ -11,7 +11,7 @@ export const metadata = {
   description: 'Empreendimentos com financiamento direto da construtora, sem burocracia bancária. Sul de SC: Criciúma, Laguna, Rincão, Nova Veneza.',
   alternates: { canonical: SITE_URL },
   openGraph: {
-    title: 'Morar bem não deveria depender de um banco.',
+    title: 'Morar bem não deveria depender de um banco. | Stiven Allan',
     description: 'Empreendimentos com financiamento direto da construtora. Sul de Santa Catarina.',
     url: SITE_URL, siteName: 'Stiven Allan — Imóveis', locale: 'pt_BR', type: 'website',
     images: [{ url: 'https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/monte-leone-centro-criciuma-sc.jpg', width: 1200, height: 630 }],

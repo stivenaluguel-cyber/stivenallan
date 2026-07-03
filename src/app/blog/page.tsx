@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     canonical: 'https://stivenallan.com.br/blog',
   },
   openGraph: {
-    title: 'Blog Imobiliário',
+    title: 'Blog Imobiliário | Stiven Allan',
     description: 'Dicas, tendências e notícias do mercado imobiliário no sul de Santa Catarina.',
   },
 }

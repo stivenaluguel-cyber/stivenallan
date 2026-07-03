@@ -61,7 +61,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: `${info.descricao} Confira os melhores empreendimentos com Stiven Allan, CRECI 60.275.`,
     alternates: { canonical: `https://stivenallan.vercel.app/lancamentos/${cidade}` },
     openGraph: {
-      title: `Lançamentos em ${info.nome}/${info.uf}`,
+      title: `Lançamentos em ${info.nome}/${info.uf} | Stiven Allan`,
       description: info.descricao,
     },
   }

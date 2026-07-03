@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   title: 'Bellante Residencial | Comerciário Criciúma SC',
   description: 'Bellante Residencial — 2 dormitórios (1 suíte), 62–66 m², Comerciário em Criciúma/SC. Em obras. Financiamento direto Fontana. Conheça com Stiven Allan.',
   openGraph: {
-    title: 'Bellante Residencial | Comerciário Criciúma SC',
+    title: 'Bellante Residencial | Comerciário Criciúma SC | Stiven Allan',
     description: 'Feito para você. Apartamentos com 2 dorms (1 suíte) de 62–66 m² no Comerciário de Criciúma.',
     images: [{ url: HERO }],
   },
