@@ -64,6 +64,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: `Lançamentos em ${info.nome}/${info.uf} | Stiven Allan`,
       description: info.descricao,
     },
+        twitter: { card: 'summary_large_image', title: `Lançamentos em ${info.nome}/${info.uf} | Stiven Allan`, description: info.descricao },
   }
 }
 

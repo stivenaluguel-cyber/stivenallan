@@ -43,9 +43,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       canonical: `https://stivenallan.com.br/lancamentos/${cidade}/${bairro}`,
     },
     openGraph: {
-      title: `Lançamentos no ${nomeBairro}, ${nomeCidade}/SC`,
+      title: `Lançamentos no ${nomeBairro}, ${nomeCidade}/SC | Stiven Allan`,
       description: `Imóveis e lançamentos no ${nomeBairro} em ${nomeCidade}. Consulte Stiven Allan, seu corretor especialista.`,
     },
+        twitter: { card: 'summary_large_image', title: `Lançamentos no ${nomeBairro}, ${nomeCidade}/SC | Stiven Allan` },
   }
 }
 
