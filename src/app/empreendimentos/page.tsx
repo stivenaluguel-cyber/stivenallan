@@ -6,11 +6,11 @@ import { EMPREENDIMENTOS } from '@/lib/empreendimentos'
 export const revalidate = 3600
 
 export const metadata: Metadata = {
-  title: 'Empreendimentos em Criciúma SC e região | Stiven Allan CRECI 60.275',
+  title: 'Empreendimentos em Criciúma SC e região',
   description: 'Todos os empreendimentos da Fontana Construtora em Criciúma e região SC. Apartamentos e terrenos com financiamento direto. Atendimento exclusivo com Stiven Allan.',
   alternates: { canonical: 'https://stivenallan.vercel.app/empreendimentos' },
   openGraph: {
-    title: 'Empreendimentos em Criciúma SC e região | Stiven Allan',
+    title: 'Empreendimentos em Criciúma SC e região',
     description: 'Descubra os empreendimentos da Fontana Construtora em Criciúma SC. Financiamento direto, sem banco.',
     url: 'https://stivenallan.vercel.app/empreendimentos',
     type: 'website',
