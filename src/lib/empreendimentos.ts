@@ -1,6 +1,8 @@
 // Fonte única de dados dos empreendimentos — todos os 29 ativos.
 // Usada pela home, /empreendimentos, /empreendimento/[construtora]/[slug] e sitemap.
 
+export type StatusObra = 'na planta' | 'em obras' | 'pronto';
+
 export interface Empreendimento {
   slug: string;
   nome: string;
@@ -10,6 +12,15 @@ export interface Empreendimento {
   uf: string;
   imagem: string;
   oculto?: boolean;
+  // campos legados (opcionais)
+  statusObra?: StatusObra;
+  dorms?: string;
+  areaMin?: number;
+  areaMax?: number;
+  exibirPreco?: boolean;
+  precoAPartirDe?: number;
+  frase?: string;
+  descricao?: string;
 }
 
 export const EMPREENDIMENTOS: Empreendimento[] = [
@@ -48,6 +59,27 @@ export function getEmpreendimentosVisiveis(): Empreendimento[] {
   return EMPREENDIMENTOS.filter((e) => !e.oculto);
 }
 
+export function getEmpreendimento(
+  construtoraSlug: string,
+  slug: string,
+): Empreendimento | undefined {
+  return EMPREENDIMENTOS.find(
+    (e) => e.construtoraSlug === construtoraSlug && e.slug === slug,
+  );
+}
+
 export function hrefEmpreendimento(e: Empreendimento): string {
   return '/empreendimento/' + e.construtoraSlug + '/' + e.slug;
+}
+
+export function precoLabel(e: Empreendimento): string {
+  if (!e.exibirPreco || !e.precoAPartirDe) return 'Sob consulta';
+  return 'A partir de R$ ' + e.precoAPartirDe.toLocaleString('pt-BR');
+}
+
+export function statusLabel(s?: StatusObra): string {
+  if (s === 'na planta') return 'Na planta';
+  if (s === 'em obras') return 'Em obras';
+  if (s === 'pronto') return 'Pronto para morar';
+  return 'Sob consulta';
 }
