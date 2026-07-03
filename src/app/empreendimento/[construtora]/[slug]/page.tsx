@@ -41,12 +41,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     emp.nome + ' em ' + emp.bairro + ', ' + emp.cidade + '/' + emp.uf +
     '. ' + emp.descricao;
   const url = SITE_URL + '/empreendimento/' + emp.construtoraSlug + '/' + emp.slug;
+    const titleBrand = title + ' | Stiven Allan';
   return {
     title,
     description,
     alternates: { canonical: url },
     openGraph: {
-      title,
+          title: titleBrand,
       description,
       url,
       siteName: 'Stiven Allan',
@@ -54,6 +55,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       type: 'website',
       images: emp.imagens[0] ? [{ url: emp.imagens[0] }] : undefined,
     },
+            twitter: { card: 'summary_large_image', title: titleBrand, description },
   };
 }
 
