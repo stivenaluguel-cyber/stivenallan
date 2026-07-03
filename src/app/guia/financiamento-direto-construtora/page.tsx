@@ -11,11 +11,12 @@ export const metadata: Metadata = {
   description: 'Entenda como funciona o financiamento direto Fontana em Criciuma/SC: entrada 20%, parcelas corrigidas pelo CUB/SC, reforcos anuais e sem necessidade de aprovacao bancaria.',
   alternates: { canonical: CANONICAL },
   openGraph: {
-    title: 'Financiamento Direto com a Construtora - Guia Completo',
+    title: 'Financiamento Direto com a Construtora - Guia Completo | Stiven Allan',
     description: 'Tudo sobre o financiamento direto da Construtora Fontana em Criciuma/SC. Sem banco, sem burocracia.',
     url: CANONICAL,
     type: 'article',
   },
+    twitter: { card: 'summary_large_image', title: 'Financiamento Direto com a Construtora — Guia Completo | Stiven Allan' },
 }
 
 const SCHEMA = {

@@ -16,7 +16,7 @@ export const metadata = {
     url: SITE_URL, siteName: 'Stiven Allan — Imóveis', locale: 'pt_BR', type: 'website',
     images: [{ url: 'https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/monte-leone-centro-criciuma-sc.jpg', width: 1200, height: 630 }],
   },
-  twitter: { card: 'summary_large_image', title: 'Morar bem não deveria depender de um banco.', images: ['https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/monte-leone-centro-criciuma-sc.jpg'] },
+  twitter: { card: 'summary_large_image', title: 'Morar bem não deveria depender de um banco. | Stiven Allan', images: ['https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/monte-leone-centro-criciuma-sc.jpg'] },
   robots: { index: true, follow: true },
 }
 

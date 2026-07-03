@@ -11,11 +11,12 @@ export const metadata: Metadata = {
   description: 'Guia completo para comprar apartamento na planta em Criciuma/SC: etapas, riscos, vantagens e como funciona o financiamento direto com a Construtora Fontana.',
   alternates: { canonical: CANONICAL },
   openGraph: {
-    title: 'Como Comprar Apartamento na Planta em Criciuma/SC',
+    title: 'Como Comprar Apartamento na Planta em Criciuma/SC | Stiven Allan',
     description: 'Tudo o que voce precisa saber antes de comprar um apartamento na planta em Criciuma.',
     url: CANONICAL,
     type: 'article',
   },
+    twitter: { card: 'summary_large_image', title: 'Como Comprar Apartamento na Planta em Criciuma/SC | Stiven Allan' },
 }
 
 const SCHEMA = {

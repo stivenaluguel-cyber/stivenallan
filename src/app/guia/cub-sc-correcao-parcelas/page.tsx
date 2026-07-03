@@ -13,11 +13,12 @@ export const metadata: Metadata = {
   description: 'Entenda o que e o CUB/SC, como ele corrige as parcelas do financiamento direto Fontana e como calcular o impacto na sua prestacao. CUB/SC jun/2026: R$ 3.096,25/m2.',
   alternates: { canonical: CANONICAL },
   openGraph: {
-    title: 'CUB/SC e Correcao de Parcelas no Financiamento Direto',
+    title: 'CUB/SC e Correcao de Parcelas no Financiamento Direto | Stiven Allan',
     description: 'Guia completo sobre o CUB/SC e como ele afeta as parcelas do financiamento direto com construtoras em Criciuma.',
     url: CANONICAL,
     type: 'article',
   },
+    twitter: { card: 'summary_large_image', title: 'CUB/SC e Correcao de Parcelas no Financiamento Direto | Stiven Allan' },
 }
 
 const SCHEMA = {
