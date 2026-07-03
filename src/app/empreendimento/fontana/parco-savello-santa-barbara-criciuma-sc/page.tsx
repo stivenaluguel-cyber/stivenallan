@@ -75,7 +75,7 @@ const AMENIDADES: string[] = [
 export const revalidate = 3600
 
 export const metadata: Metadata = {
-title: 'Parco Savello Residencial | Santa Bárbara Criciúma | Stiven Allan',
+title: 'Parco Savello Residencial | Santa Bárbara Criciúma',
 description: 'Parco Savello Residencial (Construtora Fontana): 3 dormitórios (2 suítes), 93 a 94 m², no bairro Santa Bárbara, Criciúma/SC. Financiamento direto com a construtora. Atendimento exclusivo com Stiven Allan.',
 keywords: ['Parco Savello Residencial', 'apartamento Santa Bárbara Criciúma', 'lançamento Fontana', 'Stiven Allan corretor SC'],
 alternates: { canonical: `${SITE_URL}/empreendimento/fontana/parco-savello-santa-barbara-criciuma-sc` },

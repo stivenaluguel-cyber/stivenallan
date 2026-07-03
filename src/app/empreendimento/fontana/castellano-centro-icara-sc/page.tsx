@@ -54,7 +54,7 @@ const AMENIDADES = [
 ]
 
 export const metadata: Metadata = {
-  title: 'Castellano Residencial | Centro Içara SC | Stiven Allan',
+  title: 'Castellano Residencial | Centro Içara SC',
   description: 'Castellano Residencial — 3 dormitórios com 109 a 112 m² privativos no Centro de Içara/SC. Inspirado em um castelo italiano. Sob consulta.',
   alternates: { canonical: `${SITE_URL}/empreendimento/fontana/castellano-centro-icara-sc` },
   openGraph: {

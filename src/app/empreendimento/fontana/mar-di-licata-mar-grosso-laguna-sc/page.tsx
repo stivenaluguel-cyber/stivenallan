@@ -49,7 +49,7 @@ const AMENIDADES = [
 ]
 
 export const metadata: Metadata = {
-title: 'Mar di Licata Residencial | Mar Grosso Laguna SC | Stiven Allan',
+title: 'Mar di Licata Residencial | Mar Grosso Laguna SC',
 description: 'Mar di Licata Residencial (Construtora Fontana): apartamentos 3 dorm com suíte, 120 a 122 m² privativos, rooftop com vista para o mar no Mar Grosso em Laguna/SC. Atendimento exclusivo com Stiven Allan.',
 alternates: { canonical: SITE_URL + '/empreendimento/fontana/mar-di-licata-mar-grosso-laguna-sc' },
 openGraph: {

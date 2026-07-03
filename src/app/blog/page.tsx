@@ -8,13 +8,13 @@ import WppFloat from '@/components/WppFloat'
 export const revalidate = 3600
 
 export const metadata: Metadata = {
-  title: 'Blog Imobiliário | Dicas e Tendências do Mercado | Stiven Allan Corretor',
+  title: 'Blog Imobiliário | Dicas e Tendências do Mercado',
   description: 'Fique por dentro do mercado imobiliário em Criciúma e região sul catarinense. Dicas de compra, financiamento, valorização e lançamentos com Stiven Allan, CRECI 60.275.',
   alternates: {
     canonical: 'https://stivenallan.com.br/blog',
   },
   openGraph: {
-    title: 'Blog Imobiliário | Stiven Allan Corretor em Criciúma/SC',
+    title: 'Blog Imobiliário',
     description: 'Dicas, tendências e notícias do mercado imobiliário no sul de Santa Catarina.',
   },
 }

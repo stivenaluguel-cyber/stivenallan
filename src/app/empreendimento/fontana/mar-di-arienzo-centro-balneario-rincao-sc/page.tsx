@@ -49,7 +49,7 @@ const AMENIDADES = [
 ]
 
 export const metadata: Metadata = {
-title: 'Mar di Arienzo Residencial | Balneário Rincão SC | Stiven Allan',
+title: 'Mar di Arienzo Residencial | Balneário Rincão SC',
 description: 'Mar di Arienzo Residencial (Construtora Fontana): apartamentos 3 dormitórios com suíte, 97 a 109 m² privativos no Centro de Balneário Rincão/SC. Atendimento exclusivo com Stiven Allan.',
 alternates: { canonical: SITE_URL + '/empreendimento/fontana/mar-di-arienzo-centro-balneario-rincao-sc' },
 openGraph: {

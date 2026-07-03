@@ -7,11 +7,11 @@ const WPP = 'https://wa.me/5548991642332'
 const WPP_MSG = WPP + '?text=Ol%C3%A1+Stiven!+Vi+seu+site+e+quero+conhecer+as+condi%C3%A7%C3%B5es+de+financiamento+direto.'
 
 export const metadata = {
-  title: 'Apartamentos na Planta com Financiamento Direto em Criciúma/SC | Stiven Allan',
+  title: 'Apartamentos na Planta com Financiamento Direto em Criciúma/SC',
   description: 'Empreendimentos com financiamento direto da construtora, sem burocracia bancária. Sul de SC: Criciúma, Laguna, Rincão, Nova Veneza.',
   alternates: { canonical: SITE_URL },
   openGraph: {
-    title: 'Morar bem não deveria depender de um banco. | Stiven Allan',
+    title: 'Morar bem não deveria depender de um banco.',
     description: 'Empreendimentos com financiamento direto da construtora. Sul de Santa Catarina.',
     url: SITE_URL, siteName: 'Stiven Allan — Imóveis', locale: 'pt_BR', type: 'website',
     images: [{ url: 'https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/monte-leone-centro-criciuma-sc.jpg', width: 1200, height: 630 }],

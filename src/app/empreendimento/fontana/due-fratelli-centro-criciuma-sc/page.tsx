@@ -64,7 +64,7 @@ const AMENIDADES = [
 ]
 
 export const metadata: Metadata = {
-title: 'Due Fratelli Residencial — Centro Criciúma/SC | Stiven Allan',
+title: 'Due Fratelli Residencial — Centro Criciúma/SC',
 description: 'Due Fratelli Residencial (Construtora Fontana): 2 e 3 dormítórios com até 92 m² privativos no Centro de Criciúma/SC. Sacada com churrasqueira, 2 elevadores. Atendimento exclusivo com Stiven Allan.',
 alternates: { canonical: SITE_URL + '/empreendimento/fontana/due-fratelli-centro-criciuma-sc' },
 openGraph: {

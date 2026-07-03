@@ -12,7 +12,7 @@ const WPP = 'https://api.whatsapp.com/send?phone=5548991455522&text=Ol%C3%A1%20S
 export const revalidate = 3600
 
 export const metadata: Metadata = {
-  title: 'Lavis Residencial | Apartamentos 2 e 3 Suítes Centro Criciúma SC | Stiven Allan',
+  title: 'Lavis Residencial | Apartamentos 2 e 3 Suítes Centro Criciúma SC',
   description: 'Lavis Residencial: apartamentos 2 e 3 dormitórios com suíte no Centro de Criciúma/SC. Piscina, fitness, deck, hall sofisticado. Lançamento Fontana. Consultoria Stiven Allan CRECI 60.275.',
   keywords: ['Lavis Residencial', 'apartamento Centro Criciúma', 'lançamento Fontana Criciúma', 'apartamento 3 suítes Criciúma SC', 'Stiven Allan corretor'],
   alternates: { canonical: 'https://stivenallan.vercel.app/empreendimento/fontana/lavis-centro-criciuma-sc' },

@@ -70,7 +70,7 @@ const AMENIDADES: string[] = [
 export const revalidate = 3600
 
 export const metadata: Metadata = {
-title: 'Thiene Residencial | Centro Criciúma | Stiven Allan',
+title: 'Thiene Residencial | Centro Criciúma',
 description: 'Thiene Residencial (Construtora Fontana): 3 dormitórios (1 suíte), 101 a 102 m², no Centro de Criciúma/SC. Financiamento direto com a construtora. Atendimento exclusivo com Stiven Allan.',
 keywords: ['Thiene Residencial', 'apartamento Centro Criciúma', 'lançamento Fontana', 'Stiven Allan corretor SC'],
 alternates: { canonical: `${SITE_URL}/empreendimento/fontana/thiene-centro-criciuma-sc` },

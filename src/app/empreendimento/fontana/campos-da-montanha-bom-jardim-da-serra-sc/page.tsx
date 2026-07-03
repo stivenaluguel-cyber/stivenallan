@@ -74,7 +74,7 @@ floorSize: { '@type': 'QuantitativeValue', minValue: 850, maxValue: 1369, unitCo
 }
 
 export const metadata: Metadata = {
-title: 'Campos da Montanha Residencial | Bom Jardim da Serra SC | Stiven Allan',
+title: 'Campos da Montanha Residencial | Bom Jardim da Serra SC',
 description: 'Terreno em condomínio na Serra Catarinense. Lotes de 850 a 1.369 m² com infraestrutura completa em Bom Jardim da Serra/SC.',
 openGraph: {
 title: 'Campos da Montanha Residencial | Bom Jardim da Serra SC',

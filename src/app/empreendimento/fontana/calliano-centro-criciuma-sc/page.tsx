@@ -51,7 +51,7 @@ const AMENIDADES = [
 ]
 
 export const metadata: Metadata = {
-  title: 'Calliano Residencial | Centro Criciúma SC | Stiven Allan',
+  title: 'Calliano Residencial | Centro Criciúma SC',
   description: 'Calliano Residencial — 2 ou 3 dormitórios com até 92 m² privativos no Centro de Criciúma/SC. Acabamento refinado, sacada privativa e design italiano. Sob consulta.',
   alternates: { canonical: `${SITE_URL}/empreendimento/fontana/calliano-centro-criciuma-sc` },
   openGraph: {

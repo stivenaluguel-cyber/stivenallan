@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { construtora, slug } = await params;
   const emp = getEmpreendimento(construtora, slug);
   if (!emp) {
-    return { title: 'Empreendimento não encontrado | Stiven Allan' };
+    return { title: 'Empreendimento não encontrado' };
   }
   const title = emp.nome + ' — apartamentos em ' + emp.cidade + ' com financiamento direto';
   const description =

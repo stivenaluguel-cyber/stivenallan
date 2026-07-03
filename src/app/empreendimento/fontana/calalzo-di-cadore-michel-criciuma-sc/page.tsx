@@ -52,17 +52,17 @@ const AMENIDADES = [
 ]
 
 export const metadata: Metadata = {
-  title: 'Calalzo Di Cadore Residencial | Michel Criciúma SC | Stiven Allan',
+  title: 'Calalzo Di Cadore Residencial | Michel Criciúma SC',
   description: 'Calalzo Di Cadore Residencial — 2 dormitórios (1 suíte), até 70 m², Michel, Criciúma/SC. Em obras. Financiamento direto Fontana. Conheça com Stiven Allan CRECI 60.275.',
   alternates: { canonical: SITE_URL + '/empreendimento/fontana/calalzo-di-cadore-michel-criciuma-sc' },
   openGraph: {
-    title: 'Calalzo Di Cadore Residencial | Michel Criciúma SC | Stiven Allan',
+    title: 'Calalzo Di Cadore Residencial | Michel Criciúma SC',
     description: 'Para completar sua vida. Apartamentos com 1 suíte até 70 m² no Michel, Criciúma/SC.',
     url: SITE_URL + '/empreendimento/fontana/calalzo-di-cadore-michel-criciuma-sc',
     type: 'website',
     images: [{ url: IMG.hero, width: 1200, height: 800, alt: 'Fachada do Calalzo Di Cadore Residencial' }],
   },
-  twitter: { card: 'summary_large_image', title: 'Calalzo Di Cadore Residencial | Michel Criciúma SC | Stiven Allan', description: 'Para completar sua vida. Apartamentos com 1 suíte até 70 m² no Michel, Criciúma/SC.', images: [IMG.hero] },
+  twitter: { card: 'summary_large_image', title: 'Calalzo Di Cadore Residencial | Michel Criciúma SC', description: 'Para completar sua vida. Apartamentos com 1 suíte até 70 m² no Michel, Criciúma/SC.', images: [IMG.hero] },
   robots: { index: true, follow: true },
 }
 

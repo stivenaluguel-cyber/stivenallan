@@ -11,7 +11,7 @@ export const revalidate = 3600
 const WHATSAPP = 'https://api.whatsapp.com/send?phone=5548991455522&text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Hub%20Smart%20Home!'
 
 export const metadata: Metadata = {
-  title: 'Hub Smart Home | Apartamentos Inteligentes Centro Criciúma SC | Stiven Allan',
+  title: 'Hub Smart Home | Apartamentos Inteligentes Centro Criciúma SC',
   description: 'Hub Smart Home em Criciúma SC — Apartamentos com automação residencial, design contemporâneo e localização privilegiada no Centro. Fontana Construtora. Consulte Stiven Allan CRECI 60.275.',
   keywords: ['Hub Smart Home Criciúma','apartamento smart home Criciúma','automação residencial Criciúma SC','apartamento inteligente Criciúma','Fontana Construtora Criciúma','lançamento imobiliário Criciúma centro','comprar apartamento Criciúma SC','Stiven Allan corretor Criciúma','imóvel novo Centro Criciúma','Hub Smart Home lançamento'],
   authors: [{ name: 'Stiven Allan', url: 'https://stivenallan.vercel.app' }],
