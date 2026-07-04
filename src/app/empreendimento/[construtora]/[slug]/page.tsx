@@ -36,6 +36,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!emp) {
     return { title: 'Empreendimento não encontrado' };
   }
+  try {
   const title = emp.nome + ' — apartamentos em ' + emp.cidade + ' com financiamento direto';
   const description =
     emp.nome + ' em ' + emp.bairro + ', ' + emp.cidade + '/' + emp.uf +
@@ -53,10 +54,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       siteName: 'Stiven Allan',
       locale: 'pt_BR',
       type: 'website',
-      images: emp.imagens[0] ? [{ url: emp.imagens[0] }] : undefined,
+      images: emp.imagem ? [{ url: emp.imagem }] : undefined,
     },
             twitter: { card: 'summary_large_image', title: titleBrand, description },
   };
+  } catch {
+  const fb = emp.nome + ' — ' + emp.cidade + ' | Stiven Allan';
+  return { title: fb, openGraph: { title: fb }, twitter: { card: 'summary_large_image', title: fb } };
+}
 }
 
 function waLink(emp: Empreendimento): string {
@@ -98,9 +103,9 @@ export default async function EmpreendimentoPage({ params }: PageProps) {
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/\s+/g, '-') + '-sc';
   const cidadeHref = '/lancamentos/' + cidadeSlug;
-  const temFotos = emp.imagens.length > 0;
+  const temFotos = (emp.imagens?.length ?? 0) > 0;
   // Hero image: prefer Supabase cover_image_url, fallback to local imagens[0]
-  const heroSrc = coverImageUrl || (temFotos ? emp.imagens[0] : null);
+  const heroSrc = coverImageUrl || (temFotos ? emp.imagens?.[0] : null);
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -179,7 +184,7 @@ export default async function EmpreendimentoPage({ params }: PageProps) {
             </div>
           </div>
         )}
-        {heroSrc && emp.imagens.length > 1 && (
+        {heroSrc && (emp.imagens?.length ?? 0) > 1 && (
           <div
             style={{
               display: 'grid',
@@ -188,7 +193,7 @@ export default async function EmpreendimentoPage({ params }: PageProps) {
               marginTop: 12,
             }}
           >
-            {emp.imagens.slice(heroSrc === emp.imagens[0] ? 1 : 0).map((img, i) => (
+            {(emp.imagens ?? []).slice(heroSrc === emp.imagens?.[0] ? 1 : 0).map((img, i) => (
               <div
                 key={i}
                 style={{
@@ -264,7 +269,7 @@ export default async function EmpreendimentoPage({ params }: PageProps) {
 
           <h2 style={{ fontSize: 22, margin: '32px 0 12px' }}>Diferenciais</h2>
           <ul style={{ paddingLeft: 0, listStyle: 'none', display: 'grid', gap: 10 }}>
-            {emp.diferenciais.map((d, i) => (
+            {(emp.diferenciais ?? []).map((d, i) => (
               <li key={i} style={{ display: 'flex', gap: 10, fontSize: 16, color: '#2a2620' }}>
                 <span style={{ color: '#d9803f', fontWeight: 700 }}>✓</span>
                 {d}

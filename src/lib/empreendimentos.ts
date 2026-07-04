@@ -21,6 +21,11 @@ export interface Empreendimento {
   precoAPartirDe?: number;
   frase?: string;
   descricao?: string;
+  imagens?: string[];
+  diferenciais?: string[];
+  videoUrl?: string;
+  catalogoUrl?: string;
+  construtoraNome?: string;
 }
 
 export const EMPREENDIMENTOS: Empreendimento[] = [
