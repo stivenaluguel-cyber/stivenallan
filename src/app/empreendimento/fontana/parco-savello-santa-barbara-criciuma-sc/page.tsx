@@ -80,7 +80,7 @@ description: 'Parco Savello Residencial (Construtora Fontana): 3 dormitórios (2
 keywords: ['Parco Savello Residencial', 'apartamento Santa Bárbara Criciúma', 'lançamento Fontana', 'Stiven Allan corretor SC'],
 alternates: { canonical: `${SITE_URL}/empreendimento/fontana/parco-savello-santa-barbara-criciuma-sc` },
 openGraph: {
-title: 'Parco Savello Residencial — Vivi la Vita',
+title: 'Parco Savello Residencial — Vivi la Vita | Stiven Allan',
 description: 'Parco Savello Residencial (Construtora Fontana): 3 dormitórios (2 suítes), 93 a 94 m², Santa Bárbara Criciúma/SC. Financiamento direto Fontana.',
 url: `${SITE_URL}/empreendimento/fontana/parco-savello-santa-barbara-criciuma-sc`,
 images: [{ url: IMG.aerea, width: 1200, height: 630, alt: 'Parco Savello Residencial — vista aérea' }],
@@ -89,7 +89,7 @@ locale: 'pt_BR',
 },
 twitter: {
 card: 'summary_large_image',
-title: 'Parco Savello Residencial — Vivi la Vita',
+title: 'Parco Savello Residencial — Vivi la Vita | Stiven Allan',
 description: 'Parco Savello Residencial (Construtora Fontana): 3 dormitórios (2 suítes), 93 a 94 m², Santa Bárbara Criciúma/SC.',
 images: [IMG.aerea],
 },

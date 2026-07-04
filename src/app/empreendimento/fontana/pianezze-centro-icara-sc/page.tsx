@@ -68,13 +68,13 @@ export const metadata: Metadata = {
   description: 'Pianezze Residencial: apartamentos de 2 e 3 dormitórios (1 suíte), 66 a 86 m², no Centro de Içara/SC. Piscina, academia, playground, espaço pet e financiamento direto com a construtora.',
   alternates: { canonical: `${SITE_URL}/empreendimento/fontana/pianezze-centro-icara-sc` },
   openGraph: {
-    title: 'Pianezze Residencial | Centro de Içara SC',
+    title: 'Pianezze Residencial | Centro de Içara SC | Stiven Allan',
     description: 'Apartamentos 2 e 3 dorms (1 suíte), 66–86 m², no Centro de Içara. Lazer completo e financiamento direto com a Construtora Fontana.',
     url: `${SITE_URL}/empreendimento/fontana/pianezze-centro-icara-sc`,
     images: [{ url: 'https://estilofontana.com.br/images/empreendimento/slideshows/pianezze-residencial-69b2b42d573df.JPG', width: 1200, height: 630, alt: 'Pianezze Residencial' }],
     type: 'website',
   },
-  twitter: { card: 'summary_large_image', title: 'Pianezze Residencial | Içara SC', description: 'Aptos 2 e 3 dorms · 66–86 m² · Centro de Içara' },
+  twitter: { card: 'summary_large_image', title: 'Pianezze Residencial | Içara SC | Stiven Allan', description: 'Aptos 2 e 3 dorms · 66–86 m² · Centro de Içara' },
   robots: { index: true, follow: true },
 }
 

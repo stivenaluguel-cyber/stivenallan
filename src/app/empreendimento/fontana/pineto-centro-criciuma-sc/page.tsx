@@ -59,13 +59,13 @@ export const metadata: Metadata = {
   description: 'Pineto Residencial: apartamentos de 2 dormitórios (1 suíte), 75 a 76 m², no Centro de Criciúma/SC. Academia, coworking, espaço ioga e financiamento direto com a construtora.',
   alternates: { canonical: `${SITE_URL}/empreendimento/fontana/pineto-centro-criciuma-sc` },
   openGraph: {
-    title: 'Pineto Residencial | Centro de Criciúma SC',
+    title: 'Pineto Residencial | Centro de Criciúma SC | Stiven Allan',
     description: 'Apartamentos 2 dorms (1 suíte), 75–76 m², no Centro de Criciúma. Academia, coworking, espaço ioga e financiamento direto com a Construtora Fontana.',
     url: `${SITE_URL}/empreendimento/fontana/pineto-centro-criciuma-sc`,
     images: [{ url: 'https://estilofontana.com.br/images/empreendimento/slideshows/pineto-residencial-68249cd5dfc70.jpg', width: 1200, height: 630, alt: 'Pineto Residencial' }],
     type: 'website',
   },
-  twitter: { card: 'summary_large_image', title: 'Pineto Residencial | Criciúma SC', description: 'Aptos 2 dorms (1 suíte) · 75–76 m² · Centro de Criciúma' },
+  twitter: { card: 'summary_large_image', title: 'Pineto Residencial | Criciúma SC | Stiven Allan', description: 'Aptos 2 dorms (1 suíte) · 75–76 m² · Centro de Criciúma' },
   robots: { index: true, follow: true },
 }
 

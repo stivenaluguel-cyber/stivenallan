@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   description: 'Tremezzo Residencial — 3 dormitórios, 125 m², decorado disponível para visitação. 18 andares no Centro de Criciúma. Financiamento direto Fontana, sem banco.',
   alternates: { canonical: SITE_URL + '/empreendimento/fontana/tremezzo-residencial-centro-criciuma-sc' },
   openGraph: {
-    title: 'Tremezzo Residencial | Criciúma',
+    title: 'Tremezzo Residencial | Criciúma | Stiven Allan',
     description: 'Apartamento decorado disponível. 3 dormitórios, 125 m², Centro Criciúma. Financiamento direto Fontana.',
     url: SITE_URL + '/empreendimento/fontana/tremezzo-residencial-centro-criciuma-sc',
     siteName: 'Stiven Allan — Imóveis',
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Tremezzo Residencial | Centro Criciúma',
+    title: 'Tremezzo Residencial | Centro Criciúma | Stiven Allan',
     description: 'Decorado disponível para visita. 125 m², 18 andares. Financiamento direto da construtora.',
     images: ['https://lh3.googleusercontent.com/d/1zwMSHa-Ja6MGdlC2lq9fxQU7plgxHBLo'],
   },

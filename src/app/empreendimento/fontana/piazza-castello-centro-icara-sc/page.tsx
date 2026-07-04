@@ -16,7 +16,13 @@ export const metadata: Metadata = {
   title: 'Piazza Castello Residencial — Centro · Içara/SC | Construtora Fontana',
   description: '3 dormítórios (3 suítes), até 172 m², apenas 2 apartamentos por andar. Centro de Içara/SC. Financiamento direto com a Construtora Fontana.',
   openGraph: {
-    title: 'Piazza Castello Residencial — Centro · Içara/SC',
+    title: 'Piazza Castello Residencial — Centro · Içara/SC | Stiven Allan',
+    description: 'Exclusividade no coração de Içara: apenas 2 apartamentos por andar, 3 suítes, até 172 m².',
+    images: [`${CDN}piazza-castello-residencial-5f8dcbdd18ee4.jpg`],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Piazza Castello Residencial — Centro · Içara/SC | Stiven Allan',
     description: 'Exclusividade no coração de Içara: apenas 2 apartamentos por andar, 3 suítes, até 172 m².',
     images: [`${CDN}piazza-castello-residencial-5f8dcbdd18ee4.jpg`],
   },

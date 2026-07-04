@@ -74,13 +74,13 @@ export const metadata: Metadata = {
   description: 'Rocca Pietore Residencial: apartamentos de 2 ou 3 dormitórios (1 suíte), 71 a 91 m², no Centro de Siderópolis/SC. Hall sofisticado, salão de festas, playground e financiamento direto.',
   alternates: { canonical: `${SITE_URL}/empreendimento/fontana/rocca-pietore-centro-sideropolis-sc` },
   openGraph: {
-    title: 'Rocca Pietore Residencial | Centro de Siderópolis SC',
+    title: 'Rocca Pietore Residencial | Centro de Siderópolis SC | Stiven Allan',
     description: 'Apartamentos 2 ou 3 dorms (1 suíte), 71—91 m², no Centro de Siderópolis. Lazer completo e financiamento direto com a Construtora Fontana.',
     url: `${SITE_URL}/empreendimento/fontana/rocca-pietore-centro-sideropolis-sc`,
     images: [{ url: 'https://lh3.googleusercontent.com/d/1KSAQZxT2-vTIMRXxOUtUmUqtfLECIZuq', width: 1200, height: 630, alt: 'Rocca Pietore Residencial' }],
     type: 'website',
   },
-  twitter: { card: 'summary_large_image', title: 'Rocca Pietore Residencial | Siderópolis SC', description: 'Aptos 2 ou 3 dorms · 71—91 m² · Centro de Siderópolis' },
+  twitter: { card: 'summary_large_image', title: 'Rocca Pietore Residencial | Siderópolis SC | Stiven Allan', description: 'Aptos 2 ou 3 dorms · 71—91 m² · Centro de Siderópolis' },
   robots: { index: true, follow: true },
 }
 

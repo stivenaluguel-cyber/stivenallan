@@ -66,13 +66,13 @@ export const metadata: Metadata = {
   description: 'Pavia Residencial: apartamentos de 1, 2 ou 3 dormitórios, 52 a 79 m², no Rio Maina em Criciúma/SC. 4 torres, lazer completo, playground, espaço pet e financiamento direto com a construtora.',
   alternates: { canonical: `${SITE_URL}/empreendimento/fontana/pavia-rio-maina-criciuma-sc` },
   openGraph: {
-    title: 'Pavia Residencial | Rio Maina · Criciúma SC',
+    title: 'Pavia Residencial | Rio Maina · Criciúma SC | Stiven Allan',
     description: 'Apartamentos de 1, 2 ou 3 dorms, 52–79 m², no Rio Maina em Criciúma. 4 torres, lazer completo e financiamento direto com a construtora.',
     url: `${SITE_URL}/empreendimento/fontana/pavia-rio-maina-criciuma-sc`,
     images: [{ url: 'https://estilofontana.com.br/images/empreendimento/slideshows/pavia-residencial-636b9e731f40c.jpg', width: 1200, height: 630, alt: 'Pavia Residencial' }],
     type: 'website',
   },
-  twitter: { card: 'summary_large_image', title: 'Pavia Residencial | Criciúma SC', description: 'Aptos 1, 2 ou 3 dorms · 52–79 m² · Rio Maina · Criciúma' },
+  twitter: { card: 'summary_large_image', title: 'Pavia Residencial | Criciúma SC | Stiven Allan', description: 'Aptos 1, 2 ou 3 dorms · 52–79 m² · Rio Maina · Criciúma' },
   robots: { index: true, follow: true },
 }
 

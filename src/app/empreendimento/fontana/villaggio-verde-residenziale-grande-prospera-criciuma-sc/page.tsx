@@ -63,13 +63,13 @@ export const metadata: Metadata = {
   description: 'Villaggio Verde Residenziale: condomínio fechado de terrenos de 794 a 1.038 m² na Grande Próspera, Criciúma/SC. 12.000 m² de lazer, academia, piscina, campo de golfe e financiamento direto.',
   alternates: { canonical: `${SITE_URL}/empreendimento/fontana/villaggio-verde-residenziale-grande-prospera-criciuma-sc` },
   openGraph: {
-    title: 'Villaggio Verde Residenziale | Condomínio em Criciúma SC',
+    title: 'Villaggio Verde Residenziale | Condomínio em Criciúma SC | Stiven Allan',
     description: 'Terrenos de 794—1.038 m² em condomínio fechado. 12.000 m² de lazer exclusivo. Grande Próspera · Criciúma.',
     url: `${SITE_URL}/empreendimento/fontana/villaggio-verde-residenziale-grande-prospera-criciuma-sc`,
     images: [{ url: CDN+'villaggio-verde-residenziale-646388473855e.JPG', width: 1200, height: 630, alt: 'Villaggio Verde Residenziale' }],
     type: 'website',
   },
-  twitter: { card: 'summary_large_image', title: 'Villaggio Verde Residenziale | Criciúma SC', description: 'Terrenos 794—1.038 m² · Condomínio fechado · Grande Próspera · Criciúma' },
+  twitter: { card: 'summary_large_image', title: 'Villaggio Verde Residenziale | Criciúma SC | Stiven Allan', description: 'Terrenos 794—1.038 m² · Condomínio fechado · Grande Próspera · Criciúma' },
   robots: { index: true, follow: true },
 }
 

@@ -75,7 +75,7 @@ description: 'Thiene Residencial (Construtora Fontana): 3 dormitórios (1 suíte
 keywords: ['Thiene Residencial', 'apartamento Centro Criciúma', 'lançamento Fontana', 'Stiven Allan corretor SC'],
 alternates: { canonical: `${SITE_URL}/empreendimento/fontana/thiene-centro-criciuma-sc` },
 openGraph: {
-title: 'Thiene Residencial — Grandioso como a sua história.',
+title: 'Thiene Residencial — Grandioso como a sua história. | Stiven Allan',
 description: 'Thiene Residencial (Construtora Fontana): 3 dormitórios (1 suíte), 101 a 102 m², Centro Criciúma/SC. Financiamento direto Fontana.',
 url: `${SITE_URL}/empreendimento/fontana/thiene-centro-criciuma-sc`,
 images: [{ url: IMG.hero, width: 1200, height: 630, alt: 'Thiene Residencial — Centro, Criciúma/SC' }],
@@ -84,7 +84,7 @@ locale: 'pt_BR',
 },
 twitter: {
 card: 'summary_large_image',
-title: 'Thiene Residencial — Grandioso como a sua história.',
+title: 'Thiene Residencial — Grandioso como a sua história. | Stiven Allan',
 description: 'Thiene Residencial (Construtora Fontana): 3 dormitórios (1 suíte), 101 a 102 m², Centro Criciúma/SC.',
 images: [IMG.hero],
 },
