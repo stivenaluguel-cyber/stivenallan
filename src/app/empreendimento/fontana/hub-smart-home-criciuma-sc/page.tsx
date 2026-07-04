@@ -18,12 +18,17 @@ export const metadata: Metadata = {
   creator: 'Stiven Allan — CRECI 60.275',
   alternates: { canonical: 'https://stivenallan.vercel.app/empreendimento/fontana/hub-smart-home-criciuma-sc' },
   openGraph: {
-    title: 'Hub Smart Home | Apartamentos Inteligentes em Criciúma SC',
+    title: 'Hub Smart Home | Apartamentos Inteligentes em Criciúma SC | Stiven Allan',
     description: 'Tecnologia e conforto integrados. Hub Smart Home oferece apartamentos com automação residencial completa no coração de Criciúma.',
     url: 'https://stivenallan.vercel.app/empreendimento/fontana/hub-smart-home-criciuma-sc',
     siteName: 'Stiven Allan — CRECI 60.275',
     locale: 'pt_BR',
     type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Hub Smart Home | Apartamentos Inteligentes em Criciúma SC | Stiven Allan',
+    description: 'Tecnologia e conforto integrados. Hub Smart Home oferece apartamentos com automação residencial completa no coração de Criciúma.',
   },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large' } },
 }

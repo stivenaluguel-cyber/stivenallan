@@ -88,7 +88,7 @@ description: 'Monte Leone Residencial (Construtora Fontana): 4 dormitórios (3 s
 keywords: ['Monte Leone Residencial', 'apartamento alto padrão Criciúma', 'lançamento Fontana', 'Centro Criciúma', 'Stiven Allan corretor SC'],
 alternates: { canonical: `${SITE_URL}/empreendimento/fontana/monte-leone-centro-criciuma-sc` },
 openGraph: {
-title: 'Monte Leone Residencial — Magnífico por essência',
+title: 'Monte Leone Residencial — Magnífico por essência | Stiven Allan',
 description: 'Monte Leone Residencial (Construtora Fontana): 4 dormitórios (3 suítes), 230 a 253 m², no Centro de Criciúma/SC. Vista para a Serra. Atendimento exclusivo com Stiven Allan.',
 url: `${SITE_URL}/empreendimento/fontana/monte-leone-centro-criciuma-sc`,
 images: [{ url: IMG.heroAerea, width: 1200, height: 630, alt: 'Monte Leone Residencial — fachada' }],
@@ -97,7 +97,7 @@ locale: 'pt_BR',
 },
 twitter: {
 card: 'summary_large_image',
-title: 'Monte Leone Residencial — Magnífico por essência',
+title: 'Monte Leone Residencial — Magnífico por essência | Stiven Allan',
 description: 'Monte Leone Residencial (Construtora Fontana): 4 dormitórios (3 suítes), 230 a 253 m², no Centro de Criciúma/SC. Vista para a Serra. Atendimento exclusivo com Stiven Allan.',
 images: [IMG.heroAerea],
 },

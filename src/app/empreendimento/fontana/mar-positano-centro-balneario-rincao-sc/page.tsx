@@ -64,13 +64,13 @@ export const metadata: Metadata = {
   description: 'Mar Positano Residencial: apartamentos de 3 dormíitórios (1 suíte), 107 a 126 m², no Centro de Balneário Rincão/SC. Sacada com churrasqueira, piscina e lazer completo. Consulte condições.',
   alternates: { canonical: `${SITE_URL}/empreendimento/fontana/mar-positano-centro-balneario-rincao-sc` },
   openGraph: {
-    title: 'Mar Positano Residencial | Balneário Rincão SC',
+    title: 'Mar Positano Residencial | Balneário Rincão SC | Stiven Allan',
     description: 'Apartamentos de 3 dormíitórios com suíte, 107 a 126 m², no Centro de Balneário Rincão. Lazer completo e financiamento facilitado.',
     url: `${SITE_URL}/empreendimento/fontana/mar-positano-centro-balneario-rincao-sc`,
     images: [{ url: 'https://estilofontana.com.br/images/empreendimento/slideshows/mar-positano-residencial-676db4dfc93f5.jpg', width: 1200, height: 630, alt: 'Mar Positano Residencial' }],
     type: 'website',
   },
-  twitter: { card: 'summary_large_image', title: 'Mar Positano Residencial | Balneário Rincão SC', description: 'Apartamentos 3 dorms (1 suíte), 107–126 m². Centro de Balneário Rincão.' },
+  twitter: { card: 'summary_large_image', title: 'Mar Positano Residencial | Balneário Rincão SC | Stiven Allan', description: 'Apartamentos 3 dorms (1 suíte), 107–126 m². Centro de Balneário Rincão.' },
   robots: { index: true, follow: true },
 }
 

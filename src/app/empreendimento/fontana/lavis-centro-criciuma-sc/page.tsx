@@ -17,12 +17,18 @@ export const metadata: Metadata = {
   keywords: ['Lavis Residencial', 'apartamento Centro Criciúma', 'lançamento Fontana Criciúma', 'apartamento 3 suítes Criciúma SC', 'Stiven Allan corretor'],
   alternates: { canonical: 'https://stivenallan.vercel.app/empreendimento/fontana/lavis-centro-criciuma-sc' },
   openGraph: {
-    title: 'Lavis Residencial — Sofisticação no Centro de Criciúma/SC',
+    title: 'Lavis Residencial — Sofisticação no Centro de Criciúma/SC | Stiven Allan',
     description: 'Apartamentos 2 e 3 dorm. com suíte, piscina, deck externo, fitness e hall de entrada premium. Lançamento Fontana. Consulte Stiven Allan.',
     url: 'https://stivenallan.vercel.app/empreendimento/fontana/lavis-centro-criciuma-sc',
     images: [{ url: 'https://lh3.googleusercontent.com/d/1pB-4sxYVrSqMmyIbbEeeGwcQMcOTS015', width: 1200, height: 630 }],
     type: 'website',
     locale: 'pt_BR',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Lavis Residencial — Sofisticação no Centro de Criciúma/SC | Stiven Allan',
+    description: 'Apartamentos 2 e 3 dorm. com suíte, piscina, deck externo, fitness e hall de entrada premium. Lançamento Fontana. Consulte Stiven Allan.',
+    images: ['https://lh3.googleusercontent.com/d/1pB-4sxYVrSqMmyIbbEeeGwcQMcOTS015'],
   },
 }
 

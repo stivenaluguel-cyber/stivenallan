@@ -11,7 +11,13 @@ export const metadata: Metadata = {
   description: 'Mar di Nizza Residencial em Mar Grosso, Laguna/SC. 2 e 3 dormíitórios (1 suíte), 65 a 92 m² privativos. Salão de Festas com Deck Externo, Espaço Fitness com Terraço, Living Integrado. Preço sob consulta.',
   keywords: ['Mar di Nizza Residencial', 'Mar Grosso', 'Laguna SC', 'apartamento Laguna', 'Construtora Fontana', 'Stiven Allan', 'imóvel litoral SC'],
   openGraph: {
-    title: 'Mar di Nizza Residencial | Mar Grosso Laguna SC',
+    title: 'Mar di Nizza Residencial | Mar Grosso Laguna SC | Stiven Allan',
+    description: 'Sinta a leveza do litoral de Laguna no seu dia a dia. 2 e 3 dormíitórios, 65 a 92 m² privativos.',
+    images: ['https://estilofontana.com.br/images/empreendimento/slideshows/mar-di-nizza-residencial-64e74bef1ceb6.jpg?fm=webp'],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Mar di Nizza Residencial | Mar Grosso Laguna SC | Stiven Allan',
     description: 'Sinta a leveza do litoral de Laguna no seu dia a dia. 2 e 3 dormíitórios, 65 a 92 m² privativos.',
     images: ['https://estilofontana.com.br/images/empreendimento/slideshows/mar-di-nizza-residencial-64e74bef1ceb6.jpg?fm=webp'],
   },

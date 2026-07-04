@@ -83,7 +83,7 @@ export const metadata: Metadata = {
   keywords: ['Lavis Residencial', 'apartamento alto padrão Criciúma', 'lançamento Fontana', 'Centro Criciúma', 'Stiven Allan corretor SC'],
   alternates: { canonical: `${SITE_URL}/empreendimento/fontana/lavis-residencial-centro-criciuma-sc` },
   openGraph: {
-    title: 'Lavis Residencial — Sofisticação em movimento',
+    title: 'Lavis Residencial — Sofisticação em movimento | Stiven Allan',
     description: 'Lavis Residencial (Construtora Fontana): apartamentos de alto padrão no Centro de Criciúma/SC. 3 suítes, 125 a 132 m², financiamento direto com a construtora. Atendimento exclusivo com Stiven Allan.',
     url: `${SITE_URL}/empreendimento/fontana/lavis-residencial-centro-criciuma-sc`,
     images: [{ url: IMG.fotomontagem, width: 1200, height: 630, alt: 'Lavis Residencial — fachada' }],
@@ -92,7 +92,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Lavis Residencial — Sofisticação em movimento',
+    title: 'Lavis Residencial — Sofisticação em movimento | Stiven Allan',
     description: 'Lavis Residencial (Construtora Fontana): apartamentos de alto padrão no Centro de Criciúma/SC. 3 suítes, 125 a 132 m², financiamento direto com a construtora. Atendimento exclusivo com Stiven Allan.',
     images: [IMG.fotomontagem],
   },

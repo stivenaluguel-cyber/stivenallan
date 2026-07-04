@@ -53,7 +53,7 @@ title: 'Mar di Licata Residencial | Mar Grosso Laguna SC',
 description: 'Mar di Licata Residencial (Construtora Fontana): apartamentos 3 dorm com suíte, 120 a 122 m² privativos, rooftop com vista para o mar no Mar Grosso em Laguna/SC. Atendimento exclusivo com Stiven Allan.',
 alternates: { canonical: SITE_URL + '/empreendimento/fontana/mar-di-licata-mar-grosso-laguna-sc' },
 openGraph: {
-title: 'Mar di Licata Residencial — Mar Grosso, Laguna/SC',
+title: 'Mar di Licata Residencial — Mar Grosso, Laguna/SC | Stiven Allan',
 description: 'Bem-vindo ao seu novo horizonte particular. Rooftop com vista para o mar, 120 a 122 m² privativos em Laguna/SC. Atendimento exclusivo com Stiven Allan.',
 url: SITE_URL + '/empreendimento/fontana/mar-di-licata-mar-grosso-laguna-sc',
 type: 'website',
@@ -61,7 +61,7 @@ images: [{ url: 'https://estilofontana.com.br/images/empreendimento/slideshows/m
 },
 twitter: {
 card: 'summary_large_image',
-title: 'Mar di Licata Residencial — Mar Grosso, Laguna/SC',
+title: 'Mar di Licata Residencial — Mar Grosso, Laguna/SC | Stiven Allan',
 description: 'Bem-vindo ao seu novo horizonte particular. Rooftop com vista para o mar, 120 a 122 m² privativos em Laguna/SC.',
 images: ['https://estilofontana.com.br/images/empreendimento/slideshows/mar-di-licata-residencial-655b9b64e5d33.jpg?fm=webp'],
 },

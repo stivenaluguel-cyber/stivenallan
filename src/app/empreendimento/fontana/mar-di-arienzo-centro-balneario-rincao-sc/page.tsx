@@ -53,7 +53,7 @@ title: 'Mar di Arienzo Residencial | Balneário Rincão SC',
 description: 'Mar di Arienzo Residencial (Construtora Fontana): apartamentos 3 dormitórios com suíte, 97 a 109 m² privativos no Centro de Balneário Rincão/SC. Atendimento exclusivo com Stiven Allan.',
 alternates: { canonical: SITE_URL + '/empreendimento/fontana/mar-di-arienzo-centro-balneario-rincao-sc' },
 openGraph: {
-title: 'Mar di Arienzo Residencial — Centro, Balneário Rincão/SC',
+title: 'Mar di Arienzo Residencial — Centro, Balneário Rincão/SC | Stiven Allan',
 description: 'Amplie seu horizonte. Apartamentos 3 dormitórios com suíte, 97 a 109 m² privativos no Centro de Balneário Rincão/SC. Atendimento exclusivo com Stiven Allan.',
 url: SITE_URL + '/empreendimento/fontana/mar-di-arienzo-centro-balneario-rincao-sc',
 type: 'website',
@@ -61,7 +61,7 @@ images: [{ url: 'https://estilofontana.com.br/images/empreendimento/slideshows/m
 },
 twitter: {
 card: 'summary_large_image',
-title: 'Mar di Arienzo Residencial — Centro, Balneário Rincão/SC',
+title: 'Mar di Arienzo Residencial — Centro, Balneário Rincão/SC | Stiven Allan',
 description: 'Amplie seu horizonte. Apartamentos 3 dormitórios com suíte, 97 a 109 m² privativos no Centro de Balneário Rincão/SC. Atendimento exclusivo com Stiven Allan.',
 images: ['https://estilofontana.com.br/images/empreendimento/slideshows/mar-di-arienzo-residencial-69d2e834c59ea.jpg?fm=webp'],
 },

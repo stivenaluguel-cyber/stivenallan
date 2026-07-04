@@ -51,7 +51,7 @@ title: 'Mar di Atrani Residencial | Balneário Rincão SC',
 description: 'Mar di Atrani Residencial (Construtora Fontana): apartamentos 3 dormitórios com suíte, 100 a 101 m² privativos, a 250 metros da beira-mar no Centro de Balneário Rincão/SC. Atendimento exclusivo com Stiven Allan.',
 alternates: { canonical: SITE_URL + '/empreendimento/fontana/mar-di-atrani-centro-balneario-rincao-sc' },
 openGraph: {
-title: 'Mar di Atrani Residencial — Centro, Balneário Rincão/SC',
+title: 'Mar di Atrani Residencial — Centro, Balneário Rincão/SC | Stiven Allan',
 description: 'A vida no agora. Apartamentos 3 dormitórios com suíte, 100 a 101 m² privativos, a 250 metros da beira-mar em Balneário Rincão/SC. Atendimento exclusivo com Stiven Allan.',
 url: SITE_URL + '/empreendimento/fontana/mar-di-atrani-centro-balneario-rincao-sc',
 type: 'website',
@@ -59,7 +59,7 @@ images: [{ url: 'https://estilofontana.com.br/images/empreendimento/slideshows/m
 },
 twitter: {
 card: 'summary_large_image',
-title: 'Mar di Atrani Residencial — Centro, Balneário Rincão/SC',
+title: 'Mar di Atrani Residencial — Centro, Balneário Rincão/SC | Stiven Allan',
 description: 'A vida no agora. Apartamentos 3 dormitórios com suíte, 100 a 101 m² privativos, a 250 metros da beira-mar em Balneário Rincão/SC. Atendimento exclusivo com Stiven Allan.',
 images: ['https://estilofontana.com.br/images/empreendimento/slideshows/mar-di-atrani-residencial-675c232fef052.jpg?fm=webp'],
 },
