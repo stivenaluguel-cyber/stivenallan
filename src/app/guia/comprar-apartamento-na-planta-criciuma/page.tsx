@@ -101,13 +101,13 @@ export default function GuiaComprarNaPlantaPage() {
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Etapas para comprar na planta</h2>
         <ol style={{ fontSize: 15, lineHeight: 2.2, color: '#333', paddingLeft: 24 }}>
-          <li><strong>Escolha o empreendimento:</strong> Verifique localizacao, construtora, tipologia e previsao de entrega.</li>
-          <li><strong>Conheca o plano de financiamento:</strong> Entrada de 20%, parcelas mensais corrigidas pelo CUB/SC e reforos anuais.</li>
-          <li><strong>Analise o contrato:</strong> O contrato deve ser registrado em cartorio para sua protecao juridica.</li>
-          <li><strong>Pague a entrada:</strong> 20% do valor no ato da assinatura do contrato.</li>
-          <li><strong>Pague as parcelas durante a obra:</strong> Mensais corrigidas pelo CUB/SC mais reforos anuais equivalentes a 5 parcelas cada.</li>
-          <li><strong>Receba as chaves:</strong> Faca a vistoria, confirme o acabamento e assine o auto de entrega.</li>
-          <li><strong>Registre o imovel:</strong> Quite o saldo devedor e registre o imovel em seu nome no cartorio de registro de imoveis.</li>
+          <li><strong>Escolha o empreendimento:</strong> Verifique a localizacao, a construtora, a tipologia e a previsao de entrega do imovel. Em Criciuma e no Sul Catarinense, os lancamentos Fontana vao de bairros como Michel e Centro ate empreendimentos de veraneio no litoral. Compare a planta, o padrao de acabamento e a data prevista de conclusao antes de decidir.</li>
+          <li><strong>Conheca o plano de financiamento:</strong> O plano padrao Fontana tem entrada de 20%, ate 72 parcelas mensais corrigidas pelo CUB/SC e ate 6 reforos anuais. Cada reforo anual equivale a 5 parcelas mensais. Como o financiamento e direto com a construtora, nao ha necessidade de aprovacao bancaria, o que agiliza o processo.</li>
+          <li><strong>Analise o contrato (reserva):</strong> Feita a reserva da unidade, analise o contrato com atencao antes de assinar. O contrato deve ser registrado em cartorio para sua protecao juridica e precisa trazer a clausula de correcao pelo CUB/SC, o prazo de entrega e a tolerancia previstos. Confira tambem a especificacao tecnica do acabamento.</li>
+          <li><strong>Pague a entrada:</strong> A entrada corresponde a 20% do valor do imovel e e paga no ato da assinatura do contrato. Num apartamento de R$ 500.000, por exemplo, isso equivale a R$ 100.000. E esse pagamento inicial que garante a reserva da unidade escolhida.</li>
+          <li><strong>Pague as parcelas durante a obra:</strong> Durante a construcao, voce paga parcelas mensais corrigidas pelo CUB/SC, alem dos reforos anuais equivalentes a 5 parcelas cada. As parcelas menores durante a obra sao uma das principais vantagens de comprar na planta. O saldo de 80% e diluido ao longo de ate 72 meses.</li>
+          <li><strong>Receba as chaves:</strong> Concluida a obra, faca a vistoria da unidade, confirme se o acabamento corresponde a especificacao do contrato e assine o auto de entrega. E o momento de checar todos os itens antes de receber o imovel. Eventuais ajustes devem ser registrados na propria vistoria.</li>
+          <li><strong>Quite o saldo e registre o imovel:</strong> Apos as chaves, quite o saldo devedor remanescente, seja pelo saldo direto com a Fontana ou por financiamento bancario. Em seguida, registre o imovel em seu nome no cartorio de registro de imoveis. Somente com o registro a propriedade passa oficialmente para o comprador.</li>
         </ol>
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Como funciona o financiamento direto na planta?</h2>
@@ -121,6 +121,7 @@ export default function GuiaComprarNaPlantaPage() {
             <li><strong>Saldo (80%):</strong> R$ 400.000 dividido em parcelas mais reforos</li>
             <li><strong>Parcelas mensais base:</strong> aproximadamente R$ 3.330/mes por 72 meses</li>
             <li><strong>Reforos anuais (5x parcela):</strong> aproximadamente R$ 16.650/ano por 6 anos</li>
+            <li><strong>Como chegamos a esses valores:</strong> a entrada de 20% sobre R$ 500.000 resulta em R$ 100.000, deixando um saldo de R$ 400.000 (80%). Diluido em 72 meses, o saldo daria cerca de R$ 5.556 por mes; como parte do valor migra para os 6 reforos anuais (cerca de R$ 16.650 cada), a parcela mensal base cai para aproximadamente R$ 3.330.</li>
           </ul>
         </div>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
@@ -133,6 +134,9 @@ export default function GuiaComprarNaPlantaPage() {
         </p>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
           Para imoveis de alto padrao, os bairros Michel e Centro de Criciuma concentram os lancamentos mais sofisticados, com apartamentos de 3 e 4 suites, rooftops exclusivos e areas de lazer completas. Para quem busca custo-beneficio, os bairros Rio Maina e Santa Barbara oferecem boas opcoes com financiamento direto acessivel.
+        </p>
+        <p style={{ fontSize: 16, lineHeight: 1.7, color: '#333', marginTop: 12 }}>
+          Vale considerar tambem o perfil de cada regiao ao comprar na planta. O Centro e o bairro Michel reunem os empreendimentos de alto padrao, com apartamentos de 3 e 4 suites e areas de lazer completas, enquanto Rio Maina e Santa Barbara concentram opcoes de melhor custo-beneficio com financiamento direto acessivel. Ja Balneario Rincao, Balneario Picarras e Laguna sao voltados a quem busca imoveis de veraneio no litoral sul catarinense. Definir a regiao ajuda a alinhar o investimento ao seu objetivo, seja moradia ou valorizacao.
         </p>
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Vantagens e atencoes ao comprar na planta</h2>
