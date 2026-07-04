@@ -119,7 +119,7 @@ export default function GuiaCubScPage() {
           O impacto acumulado do CUB ao longo de 72 meses de obra pode ser significativo. Assumindo uma variacao media mensal de 0,5%, o CUB acumularia cerca de 43% em 72 meses. Isso significa que uma parcela que comeca em R$ 2.000 pode chegar proxima de R$ 2.860 ao final da obra. Por isso e importante planejar o fluxo de caixa com essa correcao em mente.
         <h3 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: 'clamp(16px,2vw,20px)', marginTop: 32, marginBottom: 12 }}>Como acompanhar o CUB mes a mes</h3>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-          Acompanhar a correcao evita surpresas no boleto e ajuda a conferir se o valor cobrado esta correto. O processo e simples e pode ser feito todo mes:
+          Acompanhar a correcao evita surpresas no boleto e ajuda a conferir se o valor cobrado esta correto. Como o CUB/SC (Custo Unitario Basico do Sinduscon-SC) e divulgado mensalmente, da para prever a proxima parcela com boa precisao. O processo e simples e pode ser feito todo mes:
         </p>
         <ol style={{ fontSize: 16, lineHeight: 1.8, color: '#333', paddingLeft: 20 }}>
           <li>Consulte o valor atualizado do CUB/SC no site do Sinduscon-SC, que divulga o indice de cada mes. Foi la que saiu o valor de junho de 2026, de R$ 3.096,25 por metro quadrado.</li>
@@ -157,6 +157,9 @@ export default function GuiaCubScPage() {
         <h3 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: 'clamp(16px,2vw,20px)', marginTop: 32, marginBottom: 12 }}>Passo a passo da simulacao</h3>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
           Veja como a formula acima gera os valores da tabela, partindo de uma parcela inicial de R$ 2.000 com variacao de 0,5% ao mes. No mes 1, a parcela e de R$ 2.000. No mes 2, multiplicamos R$ 2.000 por 1,005 (o equivalente a +0,5%), chegando a cerca de R$ 2.010. No mes 3, aplicamos 0,5% de novo sobre R$ 2.010, alcancando aproximadamente R$ 2.020. Repetindo esse calculo mes a mes, a correcao se acumula: por volta do mes 12 a parcela chega perto de R$ 2.124, no mes 24 fica proxima de R$ 2.254 e no mes 36 alcanca cerca de R$ 2.393, exatamente como mostra a tabela. Note que cada aumento incide sobre a parcela ja corrigida, por isso o efeito e composto ao longo da obra.
+        </p>
+        <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
+          Esse mesmo mecanismo explica por que o impacto acumulado importa tanto: assumindo uma variacao media de 0,5% ao mes, o CUB/SC pode acumular cerca de 43% em 72 meses de obra. Por isso vale simular o cenario completo antes de fechar o contrato, para dimensionar quanto a parcela pode crescer da primeira ate a ultima prestacao e planejar o orcamento com folga.
         </p>
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>CUB/SC vs INCC vs IGPM</h2>
