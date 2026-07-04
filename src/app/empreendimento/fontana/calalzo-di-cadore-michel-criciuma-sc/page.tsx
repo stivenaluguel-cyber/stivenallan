@@ -62,7 +62,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [{ url: IMG.hero, width: 1200, height: 800, alt: 'Fachada do Calalzo Di Cadore Residencial' }],
   },
-  twitter: { card: 'summary_large_image', title: 'Calalzo Di Cadore Residencial | Michel Criciúma SC', description: 'Para completar sua vida. Apartamentos com 1 suíte até 70 m² no Michel, Criciúma/SC.', images: [IMG.hero] },
+  twitter: { card: 'summary_large_image', title: 'Calalzo Di Cadore Residencial | Michel Criciúma SC | Stiven Allan', description: 'Para completar sua vida. Apartamentos com 1 suíte até 70 m² no Michel, Criciúma/SC.', images: [IMG.hero] },
   robots: { index: true, follow: true },
 }
 

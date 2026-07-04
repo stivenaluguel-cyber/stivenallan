@@ -48,7 +48,7 @@ title: 'Águas de Marano — Frente Mar Balneário Piçarras/SC',
 description: 'Águas de Marano Residencial (Construtora Fontana): apartamentos frente mar de alto padrão no Centro de Balneário Piçarras/SC. 3 e 4 dormitórios, até 3 suítes, 196 a 199 m² privativos. Atendimento exclusivo com Stiven Allan.',
 alternates: { canonical: SITE_URL + '/empreendimento/fontana/aguas-de-marano-frente-mar-balneario-picarras-sc' },
 openGraph: {
-title: 'Águas de Marano Residencial — frente mar em Balneário Piçarras/SC',
+title: 'Águas de Marano Residencial — frente mar em Balneário Piçarras/SC | Stiven Allan',
 description: 'Tenha o mar como seu vizinho. Apartamentos frente mar de alto padrão no Centro de Balneário Piçarras/SC. Atendimento exclusivo com Stiven Allan.',
 url: SITE_URL + '/empreendimento/fontana/aguas-de-marano-frente-mar-balneario-picarras-sc',
 type: 'website',
@@ -56,7 +56,7 @@ images: [{ url: "https://estilofontana.com.br/images/2024/01/15/f-adm-fachada-02
 },
 twitter: {
 card: 'summary_large_image',
-title: 'Águas de Marano Residencial — frente mar em Balneário Piçarras/SC',
+title: 'Águas de Marano Residencial — frente mar em Balneário Piçarras/SC | Stiven Allan',
 description: 'Tenha o mar como seu vizinho. Apartamentos frente mar de alto padrão no Centro de Balneário Piçarras/SC. Atendimento exclusivo com Stiven Allan.',
 images: ["https://estilofontana.com.br/images/2024/01/15/f-adm-fachada-02-ef-web-65a588a03d4c8.jpg?fm=webp"],
 },

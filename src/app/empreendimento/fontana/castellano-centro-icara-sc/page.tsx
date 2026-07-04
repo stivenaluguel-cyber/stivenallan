@@ -58,13 +58,13 @@ export const metadata: Metadata = {
   description: 'Castellano Residencial — 3 dormitórios com 109 a 112 m² privativos no Centro de Içara/SC. Inspirado em um castelo italiano. Sob consulta.',
   alternates: { canonical: `${SITE_URL}/empreendimento/fontana/castellano-centro-icara-sc` },
   openGraph: {
-    title: 'Castellano Residencial | Centro Içara SC',
+    title: 'Castellano Residencial | Centro Içara SC | Stiven Allan',
     description: 'Para viver momentos únicos — 3 dorms · 109–112 m² · Centro Içara/SC.',
     url: `${SITE_URL}/empreendimento/fontana/castellano-centro-icara-sc`,
     images: [{ url: IMG.hero, width: 1200, height: 630, alt: 'Castellano Residencial — Içara SC' }],
     type: 'website',
   },
-  twitter: { card: 'summary_large_image', title: 'Castellano Residencial | Centro Içara SC', description: '109–112 m² no Centro de Içara. Sob consulta.', images: [IMG.hero] },
+  twitter: { card: 'summary_large_image', title: 'Castellano Residencial | Centro Içara SC | Stiven Allan', description: '109–112 m² no Centro de Içara. Sob consulta.', images: [IMG.hero] },
   robots: { index: true, follow: true },
 }
 

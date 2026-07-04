@@ -55,13 +55,13 @@ export const metadata: Metadata = {
   description: 'Calliano Residencial — 2 ou 3 dormitórios com até 92 m² privativos no Centro de Criciúma/SC. Acabamento refinado, sacada privativa e design italiano. Sob consulta.',
   alternates: { canonical: `${SITE_URL}/empreendimento/fontana/calliano-centro-criciuma-sc` },
   openGraph: {
-    title: 'Calliano Residencial | Centro Criciúma SC',
+    title: 'Calliano Residencial | Centro Criciúma SC | Stiven Allan',
     description: 'Idealizado para oferecer o melhor — 2 ou 3 dorms · até 92 m² · Centro de Criciúma/SC.',
     url: `${SITE_URL}/empreendimento/fontana/calliano-centro-criciuma-sc`,
     images: [{ url: IMG.hero, width: 1200, height: 630, alt: 'Calliano Residencial — Criciúma SC' }],
     type: 'website',
   },
-  twitter: { card: 'summary_large_image', title: 'Calliano Residencial | Centro Criciúma SC', description: 'Até 92 m² privativos no Centro de Criciúma. Sob consulta.', images: [IMG.hero] },
+  twitter: { card: 'summary_large_image', title: 'Calliano Residencial | Centro Criciúma SC | Stiven Allan', description: 'Até 92 m² privativos no Centro de Criciúma. Sob consulta.', images: [IMG.hero] },
   robots: { index: true, follow: true },
 }
 

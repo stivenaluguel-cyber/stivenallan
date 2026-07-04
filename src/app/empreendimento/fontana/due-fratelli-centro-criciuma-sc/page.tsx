@@ -68,7 +68,7 @@ title: 'Due Fratelli Residencial — Centro Criciúma/SC',
 description: 'Due Fratelli Residencial (Construtora Fontana): 2 e 3 dormítórios com até 92 m² privativos no Centro de Criciúma/SC. Sacada com churrasqueira, 2 elevadores. Atendimento exclusivo com Stiven Allan.',
 alternates: { canonical: SITE_URL + '/empreendimento/fontana/due-fratelli-centro-criciuma-sc' },
 openGraph: {
-title: 'Due Fratelli Residencial — Centro Criciúma/SC',
+title: 'Due Fratelli Residencial — Centro Criciúma/SC | Stiven Allan',
 description: 'Qualidade de vida e praticidade no Centro de Criciúma. 2 e 3 dormítórios, até 92 m² privativos, sacada com churrasqueira.',
 url: SITE_URL + '/empreendimento/fontana/due-fratelli-centro-criciuma-sc',
 type: 'website',
@@ -76,7 +76,7 @@ images: [{ url: 'https://estilofontana.com.br/images/empreendimento/slideshows/d
 },
 twitter: {
 card: 'summary_large_image',
-title: 'Due Fratelli Residencial — Centro Criciúma/SC',
+title: 'Due Fratelli Residencial — Centro Criciúma/SC | Stiven Allan',
 description: 'Qualidade de vida e praticidade no Centro de Criciúma. 2 e 3 dormítórios, até 92 m² privativos.',
 images: ['https://estilofontana.com.br/images/empreendimento/slideshows/due-fratelli-residencial-5f889c789761e.jpg?fm=webp'],
 },

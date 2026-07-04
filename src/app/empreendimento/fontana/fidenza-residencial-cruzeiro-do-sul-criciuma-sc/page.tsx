@@ -85,7 +85,7 @@ export const metadata: Metadata = {
   keywords: ['Fidenza Residencial', 'apartamento alto padrão Criciúma', 'lançamento Fontana', 'Cruzeiro do Sul Criciúma', 'Stiven Allan corretor SC'],
   alternates: { canonical: `${SITE_URL}/empreendimento/fontana/fidenza-residencial-cruzeiro-do-sul-criciuma-sc` },
   openGraph: {
-    title: 'Fidenza Residencial — Sua autenticidade em cada detalhe.',
+    title: 'Fidenza Residencial — Sua autenticidade em cada detalhe. | Stiven Allan',
     description: 'Fidenza Residencial (Construtora Fontana): apartamentos de alto padrão no Cruzeiro do Sul, Criciúma/SC. 3 suítes, 149 a 161 m², 2 aptos por andar. Financiamento direto. Atendimento exclusivo com Stiven Allan.',
     url: `${SITE_URL}/empreendimento/fontana/fidenza-residencial-cruzeiro-do-sul-criciuma-sc`,
     images: [{ url: IMG.aerea, width: 1200, height: 630, alt: 'Fidenza Residencial — fachada' }],
@@ -94,7 +94,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Fidenza Residencial — Sua autenticidade em cada detalhe.',
+    title: 'Fidenza Residencial — Sua autenticidade em cada detalhe. | Stiven Allan',
     description: 'Fidenza Residencial (Construtora Fontana): apartamentos de alto padrão no Cruzeiro do Sul, Criciúma/SC. 3 suítes, 149 a 161 m², 2 aptos por andar. Financiamento direto. Atendimento exclusivo com Stiven Allan.',
     images: [IMG.aerea],
   },

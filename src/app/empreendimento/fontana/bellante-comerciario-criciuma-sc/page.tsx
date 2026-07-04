@@ -34,6 +34,12 @@ export const metadata: Metadata = {
     description: 'Feito para você. Apartamentos com 2 dorms (1 suíte) de 62–66 m² no Comerciário de Criciúma.',
     images: [{ url: HERO }],
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Bellante Residencial | Comerciário Criciúma SC | Stiven Allan',
+    description: 'Feito para você. Apartamentos com 2 dorms (1 suíte) de 62–66 m² no Comerciário de Criciúma.',
+    images: [HERO],
+  },
 };
 
 export default function BellantePage() {

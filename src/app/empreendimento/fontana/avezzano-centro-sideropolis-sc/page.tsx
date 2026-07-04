@@ -35,6 +35,12 @@ export const metadata: Metadata = {
     description: 'Permita-se viver no melhor. Apartamentos com 3 suítes até 127 m² no coração de Siderópolis.',
     images: [{ url: HERO }],
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Avezzano Residencial | Centro Siderópolis SC | Stiven Allan',
+    description: 'Permita-se viver no melhor. Apartamentos com 3 suítes até 127 m² no coração de Siderópolis.',
+    images: [HERO],
+  },
 };
 
 export default function AvezzanoPage() {
