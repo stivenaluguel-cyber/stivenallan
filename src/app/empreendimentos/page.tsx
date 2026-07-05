@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { EMPREENDIMENTOS } from '@/lib/empreendimentos'
+import { getVitrineEmpreendimentos } from '@/lib/vitrine'
 
 export const revalidate = 3600
 
@@ -21,8 +22,9 @@ export const metadata: Metadata = {
 
 const WHATSAPP = 'https://api.whatsapp.com/send?phone=5548991642332&text=Ol%C3%A1%20Stiven%2C%20gostaria%20de%20conhecer%20os%20empreendimentos%20Fontana!'
 
-export default function EmpreendimentosPage() {
-  const lista = EMPREENDIMENTOS.filter((e) => !e.oculto)
+export default async function EmpreendimentosPage() {
+  const listaEmp = await getVitrineEmpreendimentos();
+  const lista = listaEmp.filter((e) => !e.oculto)
 
   return (
     <main style={{ background: '#121315', color: '#e8eaed', fontFamily: 'system-ui, -apple-system, sans-serif', minHeight: '100vh' }}>
