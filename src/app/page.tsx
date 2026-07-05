@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { imoveis } from '@/data/imoveis'
 import Image from 'next/image'
 import { SITE_URL } from '@/lib/site'
+import RegionFilter from '@/components/RegionFilter'
 
 const WPP = 'https://wa.me/5548991642332'
 const WPP_MSG = WPP + '?text=Ol%C3%A1+Stiven!+Vi+seu+site+e+quero+conhecer+as+condi%C3%A7%C3%B5es+de+financiamento+direto.'
@@ -129,7 +130,7 @@ export default function HomePage() {
         .home-btn--cham:hover { background: #B89B5E; color: #FAFAF8; }
         .home-step-n { font-family: 'Jost', system-ui, sans-serif; font-weight: 300; font-size: clamp(40px,6vw,64px); color: rgba(184,155,94,0.18); letter-spacing: 0.04em; line-height: 1; }
         .home-dep-card { background: #fff; padding: 36px 32px; border-top: 2px solid #B89B5E; }
-        .home-region-btn { font-family: 'Hanken Grotesk', system-ui, sans-serif; font-size: 10px; letter-spacing: 0.30em; text-transform: uppercase; color: #6B655B; border: 1px solid rgba(26,24,20,0.15); padding: 10px 22px; background: transparent; text-decoration: none; display: inline-block; transition: border-color .25s, color .25s; }
+        .home-region-btn { font-family: 'Hanken Grotesk', system-ui, sans-serif; font-size: 10px; letter-spacing: 0.30em; text-transform: uppercase; color: #6B655B; border: 1px solid rgba(26,24,20,0.15); padding: 10px 22px; background: transparent; text-decoration: none; display: inline-block; cursor: pointer; transition: border-color .25s, color .25s; }
         .home-region-btn:hover { border-color: #B89B5E; color: #B89B5E; }
         .home-wa-float { position: fixed; right: 22px; bottom: 22px; z-index: 60; width: 54px; height: 54px; border-radius: 50%; background: #25D366; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(37,211,102,0.35); transition: transform .2s ease; }
         .home-wa-float:hover { transform: scale(1.08); }
@@ -157,10 +158,10 @@ export default function HomePage() {
       <script dangerouslySetInnerHTML={{ __html: `(function(){var n=document.querySelector('.home-nav');if(!n)return;function u(){n.classList.toggle('home-nav--solid',window.scrollY>40);}window.addEventListener('scroll',u,{passive:true});u();})();` }} />
 
       {/* HERO */}
-      <section style={{ position: 'relative', minHeight: '100svh', overflow: 'hidden', display: 'flex', flexDirection: 'column', justifyContent: 'center', background: '#1a1814' }}>
+      <section style={{ position: 'relative', height: '100svh', minHeight: 580, overflow: 'hidden', background: '#1a1814' }}>
         <Image src="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/monte-leone-centro-criciuma-sc.jpg" alt="Vista aérea de empreendimento Fontana — Sul de Santa Catarina" fill priority sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center 30%' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.40) 60%, rgba(0,0,0,0.50) 100%)' }} />
-        <div style={{ position: 'relative', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: 'calc(68px + 5vh) clamp(24px,6vw,80px) 6vh' }}>
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 clamp(24px,6vw,80px)', paddingTop: 68 }}>
           <p className="home-eyebrow fade-in" style={{ color: 'rgba(184,155,94,0.85)', marginBottom: 24, textShadow: '0 1px 8px rgba(0,0,0,0.5)' }}>Stiven Allan · CRECI 60.275</p>
           <h1 className="home-h1 fade-in fade-in-1" style={{ fontSize: 'clamp(32px,5.2vw,72px)', lineHeight: 1.05, color: '#FFFFFF', textShadow: '0 2px 8px rgba(0,0,0,0.5), 0 2px 32px rgba(0,0,0,0.60)', maxWidth: '14ch' }}>
             Apartamentos na planta com financiamento direto — sem banco, sem burocracia
@@ -194,14 +195,10 @@ export default function HomePage() {
             <h2 className="home-h2">Empreendimentos</h2>
             <hr className="home-rule" style={{ margin: '20px auto 0' }} />
           </div>
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 48 }}>
-            <span className="home-region-btn">Todos</span>
-            <span className="home-region-btn">Criciúma</span>
-            <span className="home-region-btn">Balneário Piçarras</span>
-          </div>
+          <RegionFilter cidades={[...new Set(imoveis.filter(e => e.ativo).map(e => e.cidade))].sort()} />
           <div className="home-cards-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(300px,1fr))', gap: 'clamp(16px,2.5vw,28px)' }}>
             {imoveis.filter(e => e.ativo).map((emp, i) => (
-              <div key={emp.id} className={'fade-in fade-in-' + ((i % 4) + 1)}>
+              <div key={emp.id} data-cidade={emp.cidade} className={'fade-in fade-in-' + ((i % 4) + 1)}>
                 <EmpCard emp={emp} />
               </div>
             ))}
