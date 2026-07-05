@@ -13,6 +13,7 @@ import { PropertyCardImage } from '@/components/PropertyCardImage';
 import { LeadCaptureModal } from '@/components/LeadCaptureModal';
 import FormContato from './FormContato';
 import Image from 'next/image';
+import PropertyPageTemplate from '@/components/PropertyPageTemplate';
 
 const SITE_URL = 'https://stivenallan.vercel.app';
 const WHATSAPP = '5548991642332';
@@ -74,7 +75,24 @@ function waLink(emp: Empreendimento): string {
 export default async function EmpreendimentoPage({ params }: PageProps) {
   const { construtora, slug } = await params;
   const emp = getEmpreendimento(construtora, slug);
-  if (!emp) notFound();
+  if (!emp) {
+    // Slug sem página estática: tenta renderizar via PropertyPageTemplate lendo properties.
+    try {
+      const supabaseDb = await createClient();
+      const { data: dbProp } = await supabaseDb
+        .from('properties')
+        .select('*')
+        .eq('slug', slug)
+        .eq('construtora_slug', construtora)
+        .maybeSingle();
+      if (dbProp && dbProp.oculto !== true && dbProp.ativo !== false) {
+        return <PropertyPageTemplate data={dbProp as any} relacionados={[]} />;
+      }
+    } catch {
+      // tabela/coluna ausente ou erro de conexão: cai no notFound abaixo
+    }
+    notFound();
+  }
 
   // Supabase: busca dados complementares (book_pdf_url, id) sem quebrar se tabela não existir
   let supabaseId: string | null = null;
