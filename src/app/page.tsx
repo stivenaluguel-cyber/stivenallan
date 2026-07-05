@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { imoveis } from '@/data/imoveis'
+import { getVitrineImoveis } from '@/lib/vitrine'
 import Image from 'next/image'
 import { SITE_URL } from '@/lib/site'
 import RegionFilter from '@/components/RegionFilter'
@@ -98,7 +99,8 @@ function EmpCard({ emp }: { emp: typeof imoveis[0] }) {
   )
 }
 
-export default function HomePage() {
+export default async function HomePage() {
+  const imoveisVitrine = await getVitrineImoveis();
   return (
     <>
       <style>{`
@@ -195,9 +197,9 @@ export default function HomePage() {
             <h2 className="home-h2">Empreendimentos</h2>
             <hr className="home-rule" style={{ margin: '20px auto 0' }} />
           </div>
-          <RegionFilter cidades={[...new Set(imoveis.filter(e => e.ativo).map(e => e.cidade))].sort()} />
+          <RegionFilter cidades={[...new Set(imoveisVitrine.filter(e => e.ativo).map(e => e.cidade))].sort()} />
           <div className="home-cards-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(300px,1fr))', gap: 'clamp(16px,2.5vw,28px)' }}>
-            {imoveis.filter(e => e.ativo).map((emp, i) => (
+            {imoveisVitrine.filter(e => e.ativo).map((emp, i) => (
               <div key={emp.id} data-cidade={emp.cidade} className={'fade-in fade-in-' + ((i % 4) + 1)}>
                 <EmpCard emp={emp} />
               </div>
@@ -302,7 +304,7 @@ export default function HomePage() {
             </div>
             <div>
               <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.25em', textTransform: 'uppercase', color: t.champagne, marginBottom: 20 }}>Empreendimentos</div>
-              {imoveis.filter(e => e.ativo).map(emp => (
+              {imoveisVitrine.filter(e => e.ativo).map(emp => (
                 <div key={emp.id} style={{ marginBottom: 10 }}>
                   <Link href={'/empreendimento/' + emp.construtora_slug + '/' + emp.slug} style={{ fontSize: 13, color: 'rgba(245,241,234,0.55)', textDecoration: 'none' }}>{emp.nome}</Link>
                 </div>
