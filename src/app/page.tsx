@@ -136,6 +136,8 @@ export default function HomePage() {
         @keyframes fadein { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:none; } }
         .fade-in { animation: fadein .7s ease both; }
         .fade-in-1 { animation-delay: .10s; } .fade-in-2 { animation-delay: .22s; } .fade-in-3 { animation-delay: .34s; } .fade-in-4 { animation-delay: .46s; }
+        @media (max-width: 1200px) { section { padding-left: clamp(16px,4vw,32px) !important; padding-right: clamp(16px,4vw,32px) !important; } }
+        @media (max-width: 900px) { .home-how-grid, .home-metrics-grid { grid-template-columns: 1fr 1fr !important; } }
         @media (max-width: 768px) { .home-cards-grid { grid-template-columns: 1fr !important; } .home-how-grid { grid-template-columns: 1fr 1fr !important; } .home-metrics-grid { grid-template-columns: 1fr 1fr !important; } .home-footer-grid { grid-template-columns: 1fr !important; gap: 40px !important; } .home-dep-grid { grid-template-columns: 1fr !important; } }
         @media (max-width: 480px) { .home-how-grid { grid-template-columns: 1fr !important; } }
       `}</style>
@@ -160,7 +162,7 @@ export default function HomePage() {
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.40) 60%, rgba(0,0,0,0.50) 100%)' }} />
         <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 clamp(24px,6vw,80px)', paddingTop: 68 }}>
           <p className="home-eyebrow fade-in" style={{ color: 'rgba(184,155,94,0.85)', marginBottom: 24, textShadow: '0 1px 8px rgba(0,0,0,0.5)' }}>Stiven Allan · CRECI 60.275</p>
-          <h1 className="home-h1 fade-in fade-in-1" style={{ fontSize: 'clamp(36px,7vw,88px)', color: '#FFFFFF', textShadow: '0 2px 8px rgba(0,0,0,0.5), 0 2px 32px rgba(0,0,0,0.60)', maxWidth: 900 }}>
+          <h1 className="home-h1 fade-in fade-in-1" style={{ fontSize: 'clamp(32px,5.2vw,72px)', lineHeight: 1.05, color: '#FFFFFF', textShadow: '0 2px 8px rgba(0,0,0,0.5), 0 2px 32px rgba(0,0,0,0.60)', maxWidth: '14ch' }}>
             Apartamentos na planta com financiamento direto — sem banco, sem burocracia
           </h1>
           <hr className="home-rule fade-in fade-in-2" style={{ margin: '28px auto' }} />
@@ -197,7 +199,7 @@ export default function HomePage() {
             <span className="home-region-btn">Criciúma</span>
             <span className="home-region-btn">Balneário Piçarras</span>
           </div>
-          <div className="home-cards-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 'clamp(16px,2.5vw,28px)' }}>
+          <div className="home-cards-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(300px,1fr))', gap: 'clamp(16px,2.5vw,28px)' }}>
             {imoveis.filter(e => e.ativo).map((emp, i) => (
               <div key={emp.id} className={'fade-in fade-in-' + ((i % 4) + 1)}>
                 <EmpCard emp={emp} />
@@ -217,7 +219,7 @@ export default function HomePage() {
               Financiamento negociado diretamente com a construtora, sem intermediação bancária.
             </p>
           </div>
-          <div className="home-how-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 'clamp(24px,3vw,40px)' }}>
+          <div className="home-how-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 'clamp(24px,3vw,40px)' }}>
             {COMO_FUNCIONA.map((step, i) => (
               <div key={step.n} className={'fade-in fade-in-' + (i + 1)} style={{ borderTop: '1px solid rgba(245,241,234,0.12)', paddingTop: 28 }}>
                 <div className="home-step-n">{step.n}</div>
@@ -232,7 +234,7 @@ export default function HomePage() {
       {/* MÉTRICAS */}
       <section style={{ padding: 'clamp(56px,10vh,96px) clamp(18px,4vw,40px)', borderBottom: `1px solid ${t.line}` }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-          <div className="home-metrics-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 'clamp(24px,3vw,40px)', textAlign: 'center' }}>
+          <div className="home-metrics-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 'clamp(24px,3vw,40px)', textAlign: 'center' }}>
             {METRICAS.map((m, i) => (
               <div key={m.label} className={'fade-in fade-in-' + (i + 1)} style={{ borderTop: `2px solid ${t.champagne}`, paddingTop: 24 }}>
                 <div style={{ fontFamily: t.display, fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: 'clamp(36px,5vw,56px)', color: t.ink, lineHeight: 1 }}>{m.valor}</div>
@@ -250,7 +252,7 @@ export default function HomePage() {
             <p className="home-eyebrow" style={{ marginBottom: 16 }}>Depoimentos</p>
             <h2 className="home-h2">Quem já realizou</h2>
           </div>
-          <div className="home-dep-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 'clamp(16px,2.5vw,24px)' }}>
+          <div className="home-dep-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: 'clamp(16px,2.5vw,24px)' }}>
             {DEPOIMENTOS.map((d, i) => (
               <div key={d.nome} className={'home-dep-card fade-in fade-in-' + (i + 1)}>
                 <p style={{ fontFamily: t.serif, fontStyle: 'italic', fontSize: 'clamp(16px,1.7vw,19px)', color: t.ink, lineHeight: 1.65, margin: '0 0 24px' }}>“{d.texto}”</p>
