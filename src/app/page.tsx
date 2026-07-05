@@ -159,11 +159,11 @@ export default function HomePage() {
 
       {/* HERO */}
       <section style={{ position: 'relative', minHeight: '100svh', overflow: 'hidden', display: 'flex', flexDirection: 'column', justifyContent: 'center', background: '#1a1814' }}>
-        <Image src="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/monte-leone-centro-criciuma-sc.jpg" alt="Vista aérea de empreendimento Fontana — Sul de Santa Catarina" fill priority sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center 30%' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.32) 0%, rgba(0,0,0,0.20) 45%, rgba(0,0,0,0.58) 100%)' }} />
-        <div style={{ position: 'relative', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: 'calc(68px + 5vh) clamp(24px,6vw,80px) 6vh' }}>
+        <Image src="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/due-fratelli-centro-criciuma-sc.jpg" alt="Hall de entrada iluminado de empreendimento de alto padrão — Sul de Santa Catarina" fill priority sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center center' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.10) 40%, rgba(0,0,0,0.65) 100%)' }} />
+        <div style={{ position: 'relative', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: 'calc(68px + 2vh) clamp(24px,6vw,80px) 4vh' }}>
           <p className="home-eyebrow fade-in" style={{ color: 'rgba(184,155,94,0.85)', marginBottom: 24, textShadow: '0 1px 8px rgba(0,0,0,0.5)' }}>Stiven Allan · CRECI 60.275</p>
-          <h1 className="home-h1 fade-in fade-in-1" style={{ fontSize: 'clamp(30px,4vw,58px)', lineHeight: 1.08, color: '#FFFFFF', textShadow: '0 2px 8px rgba(0,0,0,0.5), 0 2px 32px rgba(0,0,0,0.60)', maxWidth: '22ch' }}>
+          <h1 className="home-h1 fade-in fade-in-1" style={{ fontSize: 'clamp(30px,3.6vw,52px)', lineHeight: 1.08, color: '#FFFFFF', textShadow: '0 2px 8px rgba(0,0,0,0.5), 0 2px 32px rgba(0,0,0,0.60)', maxWidth: '28ch' }}>
             Apartamentos na planta com financiamento direto — sem banco, sem burocracia
           </h1>
           <hr className="home-rule fade-in fade-in-2" style={{ margin: '28px auto' }} />
