@@ -72,7 +72,7 @@ function EmpCard({ emp }: { emp: typeof imoveis[0] }) {
     <article className="home-card">
       <Link href={href} style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
         <div style={{ position: 'relative', aspectRatio: '4/3', overflow: 'hidden', background: '#e8e4dc' }}>
-          <Image unoptimized src={emp.img} alt={emp.nome} fill sizes="(max-width:768px)100vw,50vw" style={{ objectFit: 'cover' }} />
+          <Image src={emp.img} alt={emp.nome} fill sizes="(max-width:768px)100vw,50vw" style={{ objectFit: 'cover' }} />
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(26,24,20,0.55), transparent 50%)' }} />
           <div style={{ position: 'absolute', top: 16, left: 16, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             <StatusBadge status={emp.status} />
@@ -84,7 +84,7 @@ function EmpCard({ emp }: { emp: typeof imoveis[0] }) {
           </div>
         </div>
         <div style={{ padding: '20px 22px 22px', background: t.bg, borderBottom: `1px solid ${t.line}` }}>
-          <p style={{ margin: '0 0 8px', fontFamily: t.body, fontSize: 12, color: t.champagne, letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 500 }}>{emp.bairro} · {emp.cidade}/{emp.uf}</p>
+          <p style={{ margin: '0 0 8px', fontFamily: t.body, fontSize: 12, color: t.chamDark, letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 500 }}>{emp.bairro} · {emp.cidade}/{emp.uf}</p>
           <p style={{ margin: '0 0 16px', fontFamily: t.serif, fontStyle: 'italic', fontSize: 'clamp(15px,1.6vw,17px)', color: t.ink, lineHeight: 1.5 }}>{emp.frase}</p>
           <p style={{ margin: '0 0 18px', fontFamily: t.body, fontSize: 13, color: t.muted, fontWeight: 500 }}>{emp.exibir_preco && emp.preco ? `A partir de R$ ${emp.preco.toLocaleString('pt-BR')}` : 'Sob consulta'}</p>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -193,7 +193,7 @@ export default async function HomePage() {
       <section id="empreendimentos" style={{ padding: 'clamp(72px,12vh,120px) clamp(18px,4vw,40px)' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 'clamp(48px,8vh,72px)' }}>
-            <p className="home-eyebrow" style={{ marginBottom: 16 }}>Portfólio</p>
+            <p className="home-eyebrow" style={{ marginBottom: 16, color: '#8A7240' }}>Portfólio</p>
             <h2 className="home-h2">Empreendimentos</h2>
             <hr className="home-rule" style={{ margin: '20px auto 0' }} />
           </div>
@@ -248,7 +248,7 @@ export default async function HomePage() {
       <section style={{ padding: 'clamp(72px,12vh,120px) clamp(18px,4vw,40px)', background: '#F5F1EA' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 'clamp(48px,8vh,72px)' }}>
-            <p className="home-eyebrow" style={{ marginBottom: 16 }}>Depoimentos</p>
+            <p className="home-eyebrow" style={{ marginBottom: 16, color: '#8A7240' }}>Depoimentos</p>
             <h2 className="home-h2">Quem já realizou</h2>
           </div>
           <div className="home-dep-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: 'clamp(16px,2.5vw,24px)' }}>
