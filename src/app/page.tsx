@@ -84,7 +84,7 @@ function EmpCard({ emp }: { emp: typeof imoveis[0] }) {
           </div>
         </div>
         <div style={{ padding: '20px 22px 22px', background: t.bg, borderBottom: `1px solid ${t.line}` }}>
-          <p style={{ margin: '0 0 8px', fontFamily: t.body, fontSize: 12, color: t.chamDark, letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 500 }}>{emp.bairro} · {emp.cidade}/{emp.uf}</p>
+          <p style={{ margin: '0 0 8px', fontFamily: t.body, fontSize: 12, color: '#6B5A3A', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 500 }}>{emp.bairro} · {emp.cidade}/{emp.uf}</p>
           <p style={{ margin: '0 0 16px', fontFamily: t.serif, fontStyle: 'italic', fontSize: 'clamp(15px,1.6vw,17px)', color: t.ink, lineHeight: 1.5 }}>{emp.frase}</p>
           <p style={{ margin: '0 0 18px', fontFamily: t.body, fontSize: 13, color: t.muted, fontWeight: 500 }}>{emp.exibir_preco && emp.preco ? `A partir de R$ ${emp.preco.toLocaleString('pt-BR')}` : 'Sob consulta'}</p>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -193,7 +193,7 @@ export default async function HomePage() {
       <section id="empreendimentos" style={{ padding: 'clamp(72px,12vh,120px) clamp(18px,4vw,40px)' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 'clamp(48px,8vh,72px)' }}>
-            <p className="home-eyebrow" style={{ marginBottom: 16, color: '#8A7240' }}>Portfólio</p>
+            <p className="home-eyebrow" style={{ marginBottom: 16, color: '#6B5A3A' }}>Portfólio</p>
             <h2 className="home-h2">Empreendimentos</h2>
             <hr className="home-rule" style={{ margin: '20px auto 0' }} />
           </div>
@@ -221,7 +221,7 @@ export default async function HomePage() {
           <div className="home-how-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 'clamp(24px,3vw,40px)' }}>
             {COMO_FUNCIONA.map((step, i) => (
               <div key={step.n} className={'fade-in fade-in-' + (i + 1)} style={{ borderTop: '1px solid rgba(245,241,234,0.12)', paddingTop: 28 }}>
-                <div className="home-step-n">{step.n}</div>
+                <div className="home-step-n" aria-hidden="true">{step.n}</div>
                 <h3 style={{ fontFamily: t.display, fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.12em', fontSize: 14, color: t.onDark, margin: '16px 0 10px' }}>{step.titulo}</h3>
                 <p style={{ fontFamily: t.body, fontSize: 14, color: t.onDarkMuted, lineHeight: 1.65, margin: 0 }}>{step.desc}</p>
               </div>
@@ -248,7 +248,7 @@ export default async function HomePage() {
       <section style={{ padding: 'clamp(72px,12vh,120px) clamp(18px,4vw,40px)', background: '#F5F1EA' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 'clamp(48px,8vh,72px)' }}>
-            <p className="home-eyebrow" style={{ marginBottom: 16, color: '#8A7240' }}>Depoimentos</p>
+            <p className="home-eyebrow" style={{ marginBottom: 16, color: '#6B5A3A' }}>Depoimentos</p>
             <h2 className="home-h2">Quem já realizou</h2>
           </div>
           <div className="home-dep-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: 'clamp(16px,2.5vw,24px)' }}>
