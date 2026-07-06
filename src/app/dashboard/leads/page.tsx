@@ -293,7 +293,7 @@ style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems:
 </div>
 <div style={{ position: 'absolute', top: '14px', right: '52px', display: 'flex', gap: '6px' }}><button onClick={() => { setEditing(true); setConfirmDelete(false) }} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', borderRadius: '8px', padding: '6px 12px', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>Editar</button><button onClick={() => { setConfirmDelete(true); setEditing(false) }} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#FCA5A5', borderRadius: '8px', padding: '6px 12px', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>Excluir</button></div>
 <button
-OnClick={() => setSelectedLead(null)}
+onClick={() => setSelectedLead(null)}
 aria-label="Fechar"
 style={{ position: 'absolute', top: '14px', right: '14px', width: '30px', height: '30px', borderRadius: '50%', background: 'rgba(255,255,255,0.25)', border: 'none', cursor: 'pointer', color: '#fff', fontSize: '18px', lineHeight: 1 }}
 >×</button>
