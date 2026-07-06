@@ -76,12 +76,24 @@ export default function EditarEmpreendimento() {
     if (!form.nome.trim()) { setError('Nome do empreendimento é obrigatório.'); return; }
     setSaving(true); setError('');
     try {
-      const stored = localStorage.getItem('empreendimentos');
-      const list = stored ? JSON.parse(stored) : [];
-      const idx = list.findIndex((e: { id: string }) => e.id === id);
-      if (idx >= 0) list[idx] = { ...list[idx], ...form };
-      else list.push({ ...form, id });
-      localStorage.setItem('empreendimentos', JSON.stringify(list));
+      const res = await fetch(`/api/admin/empreendimentos/${id}`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error(j.error || 'Falha ao salvar');
+      }
+      try {
+        const stored = localStorage.getItem('empreendimentos');
+        const list = stored ? JSON.parse(stored) : [];
+        const idx = list.findIndex((e: { id: string }) => e.id === id);
+        if (idx >= 0) list[idx] = { ...list[idx], ...form };
+        else list.push({ ...form, id });
+        localStorage.setItem('empreendimentos', JSON.stringify(list));
+      } catch {}
       setSuccess(true);
       setTimeout(() => router.push('/dashboard/empreendimentos'), 1200);
     } catch {
