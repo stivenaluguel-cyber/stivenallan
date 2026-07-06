@@ -32,13 +32,28 @@ export default function EditarEmpreendimento() {
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem('empreendimentos');
-    if (stored) {
-      const list = JSON.parse(stored);
-      const item = list.find((e: { id: string }) => e.id === id);
-      if (item) setForm({ ...defaultForm, ...item });
-    }
-    setLoading(false);
+    // Fast-path: cache local para render imediato (nao autoritativo)
+    try {
+      const stored = localStorage.getItem('empreendimentos');
+      if (stored) {
+        const list = JSON.parse(stored);
+        const item = list.find((e: { id: string }) => e.id === id);
+        if (item) setForm((f) => ({ ...defaultForm, ...item, ...f }));
+      }
+    } catch {}
+    // Fonte da verdade: sempre buscar o registro fresco na API
+    (async () => {
+      try {
+        const res = await fetch('/api/admin/empreendimentos', { credentials: 'include' });
+        if (res.ok) {
+          const json = await res.json();
+          const list = Array.isArray(json) ? json : (json.data || []);
+          const item = list.find((e: { id: string }) => e.id === id);
+          if (item) setForm({ ...defaultForm, ...item });
+        }
+      } catch {}
+      setLoading(false);
+    })();
   }, [id]);
 
   const setField = (k: keyof EmpreendimentoForm, v: string) =>
