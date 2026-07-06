@@ -2,6 +2,7 @@ import Image from 'next/image'
 import PropertySchema from '@/components/PropertySchema'
 import PropertyFAQ from '@/components/PropertyFAQ'
 import RelatedProperties from '@/components/RelatedProperties'
+import { LeadCaptureModal } from '@/components/LeadCaptureModal'
 
 const WPP = 'https://wa.me/5548991642332'
 
@@ -87,6 +88,9 @@ export default function PropertyPageTemplate({ data, relacionados }: { data: Pro
           <h1 style={{ fontFamily: t.display, fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.01em', lineHeight: 1.05, fontSize: 'clamp(34px,5.4vw,76px)', color: '#FFFFFF', margin: 0, maxWidth: '18ch' }}>{data.nome}</h1>
           {local && <p style={{ fontFamily: t.serif, fontStyle: 'italic', fontSize: 'clamp(16px,2vw,24px)', color: t.onDark, marginTop: 16 }}>{local}</p>}
           <a href={wppNome} target="_blank" rel="noopener" style={{ display: 'inline-block', marginTop: 28, padding: '14px 34px', background: acento, color: t.dark, fontFamily: t.body, fontSize: 13, letterSpacing: '0.16em', textTransform: 'uppercase', textDecoration: 'none' }}>Falar no WhatsApp</a>
+          <div style={{ marginTop: 12 }}>
+            <LeadCaptureModal propertyId={data.id} propertyName={data.nome} />
+          </div>
         </div>
       </section>
 
