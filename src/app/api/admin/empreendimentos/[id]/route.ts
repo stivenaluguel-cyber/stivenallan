@@ -119,7 +119,6 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     preco: form.preco_a_partir_de ?? form.preco_a_partir ?? null,
     oculto: form.oculto ?? false,
     ativo: form.ativo ?? true,
-    updated_at: new Date().toISOString(),
   }
   const _capa = form.imagem_principal || form.imagem_capa_url
   if (_capa) row.cover_image_url = _capa
