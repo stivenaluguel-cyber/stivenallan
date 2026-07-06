@@ -38,27 +38,38 @@ function toFormShape(p: any) {
     endereco: p.endereco,
     descricao_curta: p.descricao_curta,
     descricao_completa: p.descricao,
+    // status/tipo: properties tem uma unica coluna status
+    status: p.status,
+    tipo: p.status,
     status_obra: p.status,
     status_venda: p.status,
     exibir_preco: p.exibir_preco,
     preco_a_partir: p.preco,
     preco_a_partir_de: p.preco,
+    preco_ate: '',
     whatsapp: null,
     video_url: p.video_url,
+    // imagens: emitir ambos os vocabularios
     imagens_urls: p.galeria || [],
     imagem_capa_url: p.cover_image_url,
+    imagem_principal: p.cover_image_url,
     cor_acento: p.cor_acento,
+    // dormitorios/metragem: mapear para os campos do form
     dormitorios: p.dormitorios,
+    dormitorios_min: p.dormitorios,
+    dormitorios_max: '',
     suites: p.suites,
     vagas: p.vagas,
     metragem: p.metragem,
+    area_privativa_m2: p.metragem,
+    area_total_m2: '',
     previsao_entrega: p.previsao_entrega,
     faq: p.faq || [],
     diferenciais: (p.diferenciais || []).map((d: any) => ({ descricao: d })),
     oculto: p.oculto,
     ativo: p.ativo,
     tipologias: [],
-  }
+  };
 }
 
 export async function GET(request: NextRequest) {
@@ -101,10 +112,10 @@ export async function POST(request: NextRequest) {
       ? diferenciais.map((d: any) => (typeof d === 'string' ? d : d?.descricao)).filter(Boolean)
       : [],
     faq: Array.isArray(form.faq) ? form.faq : [],
-    dormitorios: form.dormitorios ?? (t0 && t0.dormitorios != null ? String(t0.dormitorios) : null),
+    dormitorios: form.dormitorios_min || form.dormitorios || (t0 && t0.dormitorios != null ? String(t0.dormitorios) : null),
     suites: form.suites ?? (t0 && t0.suites != null ? String(t0.suites) : null),
     vagas: form.vagas ?? (t0 && t0.vagas != null ? String(t0.vagas) : null),
-    metragem: form.metragem ?? (t0 && t0.area_privativa_m2 != null ? String(t0.area_privativa_m2) : null),
+    metragem: form.area_privativa_m2 || form.metragem || (t0 && t0.area_privativa_m2 != null ? String(t0.area_privativa_m2) : null),
     previsao_entrega: form.previsao_entrega ?? null,
     status: form.status_venda ?? form.status_obra ?? null,
     exibir_preco: form.exibir_preco ?? false,
@@ -113,7 +124,7 @@ export async function POST(request: NextRequest) {
     ativo: form.ativo ?? true,
     origem: 'dashboard',
   }
-  if (form.imagem_capa_url) row.cover_image_url = form.imagem_capa_url
+    const _capa = form.imagem_principal || form.imagem_capa_url; if (_capa) row.cover_image_url = _capa;
   Object.keys(row).forEach((k) => { if (row[k] === undefined) delete row[k] })
 
   const { data: emp, error: empError } = await supabase
