@@ -366,7 +366,7 @@ export default async function EmpreendimentoPage({ params }: PageProps) {
           <p style={{ fontSize: 13, color: '#8a6d3b', textAlign: 'center', margin: '16px 0 8px' }}>
             ou deixe seu contato
           </p>
-          <FormContato empreendimento={emp.nome} />
+          <FormContato empreendimento={emp.nome} propertyId={supabaseId} />
         </aside>
       </section>
 
