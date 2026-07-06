@@ -14,6 +14,7 @@ import { LeadCaptureModal } from '@/components/LeadCaptureModal';
 import FormContato from './FormContato';
 import Image from 'next/image';
 import PropertyPageTemplate from '@/components/PropertyPageTemplate';
+export const dynamic = 'force-dynamic';
 
 const SITE_URL = 'https://stivenallan.vercel.app';
 const WHATSAPP = '5548991642332';
