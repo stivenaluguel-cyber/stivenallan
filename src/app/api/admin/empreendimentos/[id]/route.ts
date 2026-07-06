@@ -14,7 +14,7 @@ function getSupabase() {
 
 async function checkAuth() {
   const cookieStore = await cookies()
-  const token = cookieStore.get('session')?.value
+  const token = cookieStore.get('dashboard_token')?.value
   if (!token) return false
   try {
     const secret = new TextEncoder().encode(process.env.JWT_SECRET!)
