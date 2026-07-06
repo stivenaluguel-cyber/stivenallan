@@ -14,20 +14,10 @@ export async function POST(req: NextRequest) {
 
     const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey)
     const body = await req.json()
-    const { nome, telefone, email, mensagem, canal_preferido, empreendimento_slug, pagina_origem } = body
+    const { nome, telefone, email, mensagem, canal_preferido, empreendimento_slug, pagina_origem, property_id } = body
 
     if (!nome || !telefone) {
       return NextResponse.json({ error: 'Nome e telefone obrigatorios' }, { status: 400 })
-    }
-
-    let empreendimento_id: string | null = null
-    if (empreendimento_slug) {
-      const { data: emp } = await supabaseAdmin
-        .from('empreendimentos')
-        .select('id')
-        .eq('slug', empreendimento_slug)
-        .single()
-      if (emp) empreendimento_id = emp.id
     }
 
     const { error } = await supabaseAdmin.from('leads').insert({
@@ -36,7 +26,7 @@ export async function POST(req: NextRequest) {
       email: email || null,
       mensagem: mensagem || null,
       canal_preferido: canal_preferido || 'whatsapp',
-      empreendimento_id,
+      property_id: property_id || null,
       pagina_origem: pagina_origem || null,
       status: 'novo',
     })
