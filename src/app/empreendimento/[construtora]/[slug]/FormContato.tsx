@@ -4,9 +4,10 @@ import { useState } from 'react';
 
 interface Props {
   empreendimento: string;
+  propertyId?: string | null;
 }
 
-export default function FormContato({ empreendimento }: Props) {
+export default function FormContato({ empreendimento, propertyId }: Props) {
   const [nome, setNome] = useState('');
   const [telefone, setTelefone] = useState('');
   const [email, setEmail] = useState('');
@@ -25,6 +26,7 @@ export default function FormContato({ empreendimento }: Props) {
           telefone,
           email: email || null,
           mensagem: 'Interesse no empreendimento ' + empreendimento,
+          property_id: propertyId || null,
           canal_preferido: 'whatsapp',
           pagina_origem: typeof window !== 'undefined' ? window.location.pathname : null,
         }),
