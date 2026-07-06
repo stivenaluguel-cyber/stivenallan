@@ -46,7 +46,7 @@ export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName
       origem: 'Site',
       estagio_funil: 'primeiro_contato',
       source: 'book_download',
-    }).select('id').single()
+    })
     if (error) { setStatus('error'); return }
   try {
     if (leadData?.id) {
