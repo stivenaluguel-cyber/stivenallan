@@ -25,22 +25,53 @@ async function checkAuth() {
   }
 }
 
+// Remonta o shape que o formulario do Dashboard espera, a partir de uma linha de properties
+function toFormShape(p: any) {
+  return {
+    id: p.id,
+    nome: p.nome,
+    slug: p.slug,
+    construtora: p.construtora_slug,
+    cidade: p.cidade,
+    uf: p.uf,
+    bairro: p.bairro,
+    endereco: p.endereco,
+    descricao_curta: p.descricao_curta,
+    descricao_completa: p.descricao,
+    status_obra: p.status,
+    status_venda: p.status,
+    exibir_preco: p.exibir_preco,
+    preco_a_partir: p.preco,
+    preco_a_partir_de: p.preco,
+    whatsapp: null,
+    video_url: p.video_url,
+    imagens_urls: p.galeria || [],
+    imagem_capa_url: p.cover_image_url,
+    cor_acento: p.cor_acento,
+    dormitorios: p.dormitorios,
+    suites: p.suites,
+    vagas: p.vagas,
+    metragem: p.metragem,
+    previsao_entrega: p.previsao_entrega,
+    faq: p.faq || [],
+    diferenciais: (p.diferenciais || []).map((d: any) => ({ descricao: d })),
+    oculto: p.oculto,
+    ativo: p.ativo,
+    tipologias: [],
+  }
+}
+
 export async function GET(request: NextRequest) {
   const auth = await checkAuth()
   if (!auth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const supabase = getSupabase()
   const { data, error } = await supabase
-    .from('empreendimentos')
-    .select(`
-      id, nome, construtora, cidade, uf, slug, status_obra, status_venda,
-      descricao_curta, preco_a_partir, preco_a_partir_de, whatsapp, imagens_urls, video_url,
-      bairro, endereco, descricao_completa, created_at,
-      tipologias(id, dormitorios, suites, vagas, area_privativa_m2, area_total_m2, preco_a_partir_de, preco_ate),
-      diferenciais_empreendimento(id, icone, descricao, categoria)
-    `)
-    .order('created_at', { ascending: false })
+    .from('properties')
+    .select('*')
+    .order('ordem', { ascending: true })
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json({ data })
+  const mapped = (data || []).map(toFormShape)
+  return NextResponse.json({ data: mapped })
 }
 
 export async function POST(request: NextRequest) {
@@ -49,42 +80,48 @@ export async function POST(request: NextRequest) {
   const body = await request.json()
   const supabase = getSupabase()
 
-  const { tipologias, diferenciais, ...empreendimentoData } = body
+  const { tipologias, diferenciais, ...form } = body
 
-  // Normaliza campo de preço
-  if (empreendimentoData.preco_a_partir && !empreendimentoData.preco_a_partir_de) {
-    empreendimentoData.preco_a_partir_de = empreendimentoData.preco_a_partir
-  }
+  const t0 = Array.isArray(tipologias) && tipologias.length ? tipologias[0] : null
 
-  // Gera slug automaticamente se não fornecido
-  if (!empreendimentoData.slug && empreendimentoData.nome && empreendimentoData.cidade && empreendimentoData.uf) {
-    const base = `${empreendimentoData.nome} ${empreendimentoData.cidade} ${empreendimentoData.uf}`
-    empreendimentoData.slug = base
-      .toLowerCase()
-      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '')
+  const row: any = {
+    slug: form.slug,
+    construtora_slug: form.construtora ?? form.construtora_slug ?? null,
+    nome: form.nome ?? null,
+    descricao: form.descricao_completa ?? null,
+    descricao_curta: form.descricao_curta ?? null,
+    cidade: form.cidade ?? null,
+    uf: form.uf ?? null,
+    bairro: form.bairro ?? null,
+    endereco: form.endereco ?? null,
+    cor_acento: form.cor_acento ?? null,
+    video_url: form.video_url ?? null,
+    galeria: Array.isArray(form.imagens_urls) ? form.imagens_urls : [],
+    diferenciais: Array.isArray(diferenciais)
+      ? diferenciais.map((d: any) => (typeof d === 'string' ? d : d?.descricao)).filter(Boolean)
+      : [],
+    faq: Array.isArray(form.faq) ? form.faq : [],
+    dormitorios: form.dormitorios ?? (t0 ? String(t0.dormitorios ?? '') : null) || null,
+    suites: form.suites ?? (t0 ? String(t0.suites ?? '') : null) || null,
+    vagas: form.vagas ?? (t0 ? String(t0.vagas ?? '') : null) || null,
+    metragem: form.metragem ?? (t0 ? String(t0.area_privativa_m2 ?? '') : null) || null,
+    previsao_entrega: form.previsao_entrega ?? null,
+    status: form.status_venda ?? form.status_obra ?? null,
+    exibir_preco: form.exibir_preco ?? false,
+    preco: form.preco_a_partir_de ?? form.preco_a_partir ?? null,
+    oculto: form.oculto ?? false,
+    ativo: form.ativo ?? true,
+    origem: 'dashboard',
   }
+  if (form.imagem_capa_url) row.cover_image_url = form.imagem_capa_url
+  Object.keys(row).forEach((k) => { if (row[k] === undefined) delete row[k] })
 
   const { data: emp, error: empError } = await supabase
-    .from('empreendimentos')
-    .insert(empreendimentoData)
+    .from('properties')
+    .upsert(row, { onConflict: 'slug' })
     .select()
     .single()
-
   if (empError) return NextResponse.json({ error: empError.message }, { status: 500 })
 
-  // Insere tipologias
-  if (tipologias && tipologias.length > 0) {
-    const tiposData = tipologias.map((t: any) => ({ ...t, empreendimento_id: emp.id }))
-    await supabase.from('tipologias').insert(tiposData)
-  }
-
-  // Insere diferenciais
-  if (diferenciais && diferenciais.length > 0) {
-    const difData = diferenciais.map((d: any) => ({ ...d, empreendimento_id: emp.id }))
-    await supabase.from('diferenciais_empreendimento').insert(difData)
-  }
-
-  return NextResponse.json({ data: emp }, { status: 201 })
+  return NextResponse.json({ data: toFormShape(emp) })
 }
