@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
 
     const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey)
     const body = await req.json()
-    const { nome, telefone, email, mensagem, canal_preferido, empreendimento_slug, pagina_origem, property_id } = body
+    const { nome, telefone, email, mensagem, canal_preferido, pagina_origem, property_id } = body
 
     if (!nome || !telefone) {
       return NextResponse.json({ error: 'Nome e telefone obrigatorios' }, { status: 400 })
@@ -22,12 +22,12 @@ export async function POST(req: NextRequest) {
 
     const { error } = await supabaseAdmin.from('leads').insert({
       nome,
-      telefone,
+      whatsapp: telefone,
       email: email || null,
-      mensagem: mensagem || null,
-      canal_preferido: canal_preferido || 'whatsapp',
+      anotacoes: [mensagem, canal_preferido ? `Canal preferido: ${canal_preferido}` : null].filter(Boolean).join(' | ') || null,
+      source: pagina_origem || null,
       property_id: property_id || null,
-      pagina_origem: pagina_origem || null,
+      origem: 'Site',
       status: 'novo',
     })
 
