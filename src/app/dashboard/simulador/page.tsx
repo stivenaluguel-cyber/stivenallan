@@ -1,7 +1,7 @@
 'use client'
 import { useState, useMemo } from 'react'
 import { imoveis } from '@/data/imoveis'
-import { simular, planos, tabelaCorbetta, tabelaSplit, construtoras } from '@/data/financiamento'
+import { simular, planos, tabelaCorbetta, tabelaSplit, tabelaGiassi, construtoras } from '@/data/financiamento'
 import type { CorrecaoB, OpcoesParcela } from '@/data/financiamento'
 
 // ─── helpers ────────────────────────────────────────────────────────────────
@@ -124,11 +124,13 @@ export default function SimuladorPage() {
   // Tabela principal (tabelaCorbetta — para todas as construtoras)
   const corbTabela = useMemo(() => {
     if (corbSaldo <= 0) return []
+    if (corbConstrutora === 'giassi') return tabelaGiassi(corbSaldo) // motor Price puro
     return tabelaCorbetta(corbSaldo, corbTaxa, corbMensal, corbReforco)
-  }, [corbSaldo, corbTaxa, corbMensal, corbReforco])
+  }, [corbSaldo, corbTaxa, corbMensal, corbReforco, corbConstrutora])
 
   // Tabela Split — só calculada quando construtora = corbetta
   const isCorbetta = corbConstrutora === 'corbetta'
+  const isGiassi = corbConstrutora === 'giassi' // Giassi usa motor Price puro (juros compostos)
   const corbSplitTabela = useMemo(() => {
     if (!isCorbetta || corbSaldo <= 0) return []
     return tabelaSplit(corbSaldo, corbProporcao / 100, corbTaxa)
@@ -546,6 +548,8 @@ export default function SimuladorPage() {
                         Split Corbetta<br/>
                         <span style={{ fontSize: 10, fontWeight: 400, opacity: 0.85 }}>{corbProporcao.toFixed(0)}% mensal + {(100-corbProporcao).toFixed(0)}% reforço</span>
                       </th>
+                    ) : isGiassi ? (
+                      <th style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 700, fontSize: 12, whiteSpace: 'nowrap' }}>Price (Juros Compostos)<br/><span style={{ fontSize: 10, fontWeight: 400, opacity: 0.85 }}>mensal fixa, sem reforço</span></th>
                     ) : (
                       <th style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 700, fontSize: 12, whiteSpace: 'nowrap' }}>Máximo<br/><span style={{ fontSize: 10, fontWeight: 400, opacity: 0.85 }}>mensal + reforço 5×</span></th>
                     )}
@@ -665,6 +669,11 @@ export default function SimuladorPage() {
               cada uma amortizada pelo seu próprio fator de valor presente — diferente do modelo Fontana (reforço travado em 5× a mensal).
               Proporção padrão da planilha: 71,5% via mensal / 28,5% via reforço anual.
               Cálculo pelo sistema de parcelas constantes a juros simples (SPC-JS). VP = valor / (1 + i·t), somatório discreto exato.
+            </p>
+          ) : isGiassi ? (
+            <p style={{ margin: '16px 0 0', fontSize: 11, color: D.muted, lineHeight: 1.6 }}>
+              <strong style={{ color: D.bronze }}>Giassi — sistema de juros compostos:</strong> parcela fixa pelo sistema Price (PMT = PV × i / (1-(1+i)⁻ⁿ)),
+              taxa de 9,5% a.a. Diferente do modelo SPC-JS (juros simples) usado por Fontana, Corbetta e Locks — não há reforço anual neste preset.
             </p>
           ) : (
             <p style={{ margin: '16px 0 0', fontSize: 11, color: D.muted, lineHeight: 1.6 }}>
