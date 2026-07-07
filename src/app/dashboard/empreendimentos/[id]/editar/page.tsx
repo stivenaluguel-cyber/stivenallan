@@ -32,13 +32,28 @@ export default function EditarEmpreendimento() {
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem('empreendimentos');
-    if (stored) {
-      const list = JSON.parse(stored);
-      const item = list.find((e: { id: string }) => e.id === id);
-      if (item) setForm({ ...defaultForm, ...item });
-    }
-    setLoading(false);
+    // Fast-path: cache local para render imediato (nao autoritativo)
+    try {
+      const stored = localStorage.getItem('empreendimentos');
+      if (stored) {
+        const list = JSON.parse(stored);
+        const item = list.find((e: { id: string }) => e.id === id);
+        if (item) setForm((f) => ({ ...defaultForm, ...item, ...f }));
+      }
+    } catch {}
+    // Fonte da verdade: sempre buscar o registro fresco na API
+    (async () => {
+      try {
+        const res = await fetch('/api/admin/empreendimentos', { credentials: 'include' });
+        if (res.ok) {
+          const json = await res.json();
+          const list = Array.isArray(json) ? json : (json.data || []);
+          const item = list.find((e: { id: string }) => e.id === id);
+          if (item) setForm({ ...defaultForm, ...item });
+        }
+      } catch {}
+      setLoading(false);
+    })();
   }, [id]);
 
   const setField = (k: keyof EmpreendimentoForm, v: string) =>
@@ -61,12 +76,24 @@ export default function EditarEmpreendimento() {
     if (!form.nome.trim()) { setError('Nome do empreendimento é obrigatório.'); return; }
     setSaving(true); setError('');
     try {
-      const stored = localStorage.getItem('empreendimentos');
-      const list = stored ? JSON.parse(stored) : [];
-      const idx = list.findIndex((e: { id: string }) => e.id === id);
-      if (idx >= 0) list[idx] = { ...list[idx], ...form };
-      else list.push({ ...form, id });
-      localStorage.setItem('empreendimentos', JSON.stringify(list));
+      const res = await fetch(`/api/admin/empreendimentos/${id}`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error(j.error || 'Falha ao salvar');
+      }
+      try {
+        const stored = localStorage.getItem('empreendimentos');
+        const list = stored ? JSON.parse(stored) : [];
+        const idx = list.findIndex((e: { id: string }) => e.id === id);
+        if (idx >= 0) list[idx] = { ...list[idx], ...form };
+        else list.push({ ...form, id });
+        localStorage.setItem('empreendimentos', JSON.stringify(list));
+      } catch {}
       setSuccess(true);
       setTimeout(() => router.push('/dashboard/empreendimentos'), 1200);
     } catch {

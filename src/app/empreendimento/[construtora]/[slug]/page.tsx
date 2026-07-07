@@ -14,6 +14,7 @@ import { LeadCaptureModal } from '@/components/LeadCaptureModal';
 import FormContato from './FormContato';
 import Image from 'next/image';
 import PropertyPageTemplate from '@/components/PropertyPageTemplate';
+export const dynamic = 'force-dynamic';
 
 const SITE_URL = 'https://stivenallan.vercel.app';
 const WHATSAPP = '5548991642332';
@@ -35,6 +36,40 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { construtora, slug } = await params;
   const emp = getEmpreendimento(construtora, slug);
   if (!emp) {
+    try {
+      const supabaseDb = await createClient();
+      const { data: dbProp } = await supabaseDb
+        .from('properties')
+        .select('*')
+        .eq('slug', slug)
+        .eq('construtora_slug', construtora)
+        .maybeSingle();
+      if (dbProp && dbProp.oculto !== true && dbProp.ativo !== false) {
+        const dTitle = dbProp.nome + ' — apartamentos em ' + dbProp.cidade + ' com financiamento direto';
+        const dTitleBrand = dTitle + ' | Stiven Allan';
+        const dDesc =
+          dbProp.nome + (dbProp.bairro ? ' em ' + dbProp.bairro + ', ' : ' em ') +
+          dbProp.cidade + '/' + dbProp.uf + '. ' + (dbProp.descricao_curta || dbProp.descricao || '');
+        const dUrl = SITE_URL + '/empreendimento/' + dbProp.construtora_slug + '/' + dbProp.slug;
+        return {
+          title: dTitle,
+          description: dDesc,
+          alternates: { canonical: dUrl },
+          openGraph: {
+            title: dTitleBrand,
+            description: dDesc,
+            url: dUrl,
+            siteName: 'Stiven Allan',
+            locale: 'pt_BR',
+            type: 'website',
+            images: dbProp.cover_image_url ? [{ url: dbProp.cover_image_url }] : undefined,
+          },
+          twitter: { card: 'summary_large_image', title: dTitleBrand, description: dDesc },
+        };
+      }
+    } catch {
+      // sem registro no banco: cai no fallback abaixo
+    }
     return { title: 'Empreendimento não encontrado' };
   }
   try {

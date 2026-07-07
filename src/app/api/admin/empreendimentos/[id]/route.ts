@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
-import { jwtVerify } from 'jose'
-import { createClient } from '@supabase/supabase-js'
+import { NextRequest, NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+import { jwtVerify } from 'jose';
+import { createClient } from '@supabase/supabase-js';
 
-export const dynamic = 'force-dynamic'
+export const dynamic = 'force-dynamic';
 
 function getSupabase() {
   return createClient(
@@ -25,68 +25,123 @@ async function checkAuth() {
   }
 }
 
+function toFormShape(p: any) {
+  return {
+    id: p.id,
+    nome: p.nome,
+    slug: p.slug,
+    construtora: p.construtora_slug,
+    cidade: p.cidade,
+    uf: p.uf,
+    bairro: p.bairro,
+    endereco: p.endereco,
+    descricao_curta: p.descricao_curta,
+    descricao_completa: p.descricao,
+    status: p.status,
+    tipo: p.status,
+    status_obra: p.status,
+    status_venda: p.status,
+    exibir_preco: p.exibir_preco,
+    preco_a_partir: p.preco,
+    preco_a_partir_de: p.preco,
+    preco_ate: '',
+    whatsapp: null,
+    video_url: p.video_url,
+    imagens_urls: p.galeria || [],
+    imagem_capa_url: p.cover_image_url,
+    imagem_principal: p.cover_image_url,
+    cor_acento: p.cor_acento,
+    dormitorios: p.dormitorios,
+    dormitorios_min: p.dormitorios,
+    dormitorios_max: '',
+    suites: p.suites,
+    vagas: p.vagas,
+    metragem: p.metragem,
+    area_privativa_m2: p.metragem,
+    area_total_m2: '',
+    previsao_entrega: p.previsao_entrega,
+    faq: p.faq || [],
+    diferenciais: (p.diferenciais || []).map((d: any) => ({ descricao: d })),
+    oculto: p.oculto,
+    ativo: p.ativo,
+    tipologias: [],
+  };
+}
+
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const auth = await checkAuth()
-  if (!auth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!auth) return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
   const { id } = await params
   const supabase = getSupabase()
   const { data, error } = await supabase
-    .from('empreendimentos')
-    .select(`*, tipologias(*), diferenciais_empreendimento(*)`)
+    .from('properties')
+    .select('*')
     .eq('id', id)
     .single()
   if (error) return NextResponse.json({ error: error.message }, { status: 404 })
-  return NextResponse.json({ data })
+  return NextResponse.json({ data: toFormShape(data) })
 }
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const auth = await checkAuth()
-  if (!auth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!auth) return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
   const { id } = await params
   const body = await request.json()
   const supabase = getSupabase()
-  const { tipologias, diferenciais, ...empreendimentoData } = body
+  const { tipologias, diferenciais, ...form } = body
+
+  const t0 = Array.isArray(tipologias) && tipologias.length ? tipologias[0] : null
+
+  const row: any = {
+    slug: form.slug,
+    construtora_slug: form.construtora ?? form.construtora_slug ?? null,
+    nome: form.nome ?? null,
+    descricao: form.descricao_completa ?? null,
+    descricao_curta: form.descricao_curta ?? null,
+    cidade: form.cidade ?? null,
+    uf: form.uf ?? null,
+    bairro: form.bairro ?? null,
+    endereco: form.endereco ?? null,
+    cor_acento: form.cor_acento ?? null,
+    video_url: form.video_url ?? null,
+    galeria: Array.isArray(form.imagens_urls) ? form.imagens_urls : [],
+    diferenciais: Array.isArray(diferenciais)
+      ? diferenciais.map((d: any) => (typeof d === 'string' ? d : d?.descricao)).filter(Boolean)
+      : [],
+    faq: Array.isArray(form.faq) ? form.faq : [],
+    dormitorios: form.dormitorios_min || form.dormitorios || (t0 && t0.dormitorios != null ? String(t0.dormitorios) : null),
+    suites: form.suites ?? (t0 && t0.suites != null ? String(t0.suites) : null),
+    vagas: form.vagas ?? (t0 && t0.vagas != null ? String(t0.vagas) : null),
+    metragem: form.area_privativa_m2 || form.metragem || (t0 && t0.area_privativa_m2 != null ? String(t0.area_privativa_m2) : null),
+    previsao_entrega: form.previsao_entrega ?? null,
+    status: form.status_venda ?? form.status_obra ?? null,
+    exibir_preco: form.exibir_preco ?? false,
+    preco: form.preco_a_partir_de ?? form.preco_a_partir ?? null,
+    oculto: form.oculto ?? false,
+    ativo: form.ativo ?? true,
+  }
+  const _capa = form.imagem_principal || form.imagem_capa_url
+  if (_capa) row.cover_image_url = _capa
+
+  Object.keys(row).forEach((k) => { if (row[k] === undefined) delete row[k] })
 
   const { data: emp, error: empError } = await supabase
-    .from('empreendimentos')
-    .update({ ...empreendimentoData, updated_at: new Date().toISOString() })
+    .from('properties')
+    .update(row)
     .eq('id', id)
     .select()
     .single()
 
   if (empError) return NextResponse.json({ error: empError.message }, { status: 500 })
-
-  if (tipologias !== undefined) {
-    await supabase.from('tipologias').delete().eq('empreendimento_id', id)
-    if (tipologias.length > 0) {
-      const tiposData = tipologias.map((t: any) => {
-        const { id: _id, empreendimento_id: _eid, ...rest } = t
-        return { ...rest, empreendimento_id: id }
-      })
-      await supabase.from('tipologias').insert(tiposData)
-    }
-  }
-
-  if (diferenciais !== undefined) {
-    await supabase.from('diferenciais_empreendimento').delete().eq('empreendimento_id', id)
-    if (diferenciais.length > 0) {
-      const difData = diferenciais.map((d: any) => {
-        const { id: _id, empreendimento_id: _eid, ...rest } = d
-        return { ...rest, empreendimento_id: id }
-      })
-      await supabase.from('diferenciais_empreendimento').insert(difData)
-    }
-  }
-
-  return NextResponse.json({ data: emp })
+  return NextResponse.json({ data: toFormShape(emp) })
 }
 
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const auth = await checkAuth()
-  if (!auth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!auth) return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
   const { id } = await params
   const supabase = getSupabase()
-  const { error } = await supabase.from('empreendimentos').delete().eq('id', id)
+  const { error } = await supabase.from('properties').delete().eq('id', id)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ success: true })
 }
