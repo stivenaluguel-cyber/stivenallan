@@ -36,28 +36,37 @@ export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setStatus('loading')
-    const supabase = createClient()
-    const { data: leadData, error } = await supabase.from('leads').insert({
-      nome: name,
-      whatsapp: phone.replace(/\D/g, ''),
-      email: email || null,
-      property_id: propertyId,
-      property_name: propertyName,
-      origem: 'Site',
-      estagio_funil: 'primeiro_contato',
-      source: 'book_download',
-    })
-    if (error) { setStatus('error'); return }
+    let leadId: string | null = null
+    try {
+      const res = await fetch('/api/lead-capture', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nome: name,
+          whatsapp: phone.replace(/\D/g, ''),
+          email: email || null,
+          property_id: propertyId,
+          property_name: propertyName,
+        }),
+      })
+      if (!res.ok) { setStatus('error'); return }
+      const json = await res.json()
+      leadId = json?.id ?? null
+    } catch {
+      setStatus('error')
+      return
+    }
   try {
-    if (leadData?.id) {
-      localStorage.setItem(KEY_LEAD, JSON.stringify({ id: leadData.id, nome: name }))
+    if (leadId) {
+      localStorage.setItem(KEY_LEAD, JSON.stringify({ id: leadId, nome: name }))
+      const supabase = createClient()
       const visitas = getVisitas()
       if (visitas.length) {
         await supabase.from('lead_eventos').insert(
-          visitas.map(v => ({ lead_id: leadData.id, anon_id: getAnonId(), tipo: 'visita', slug: v.slug, created_at: v.ts }))
+          visitas.map(v => ({ lead_id: leadId, anon_id: getAnonId(), tipo: 'visita', slug: v.slug, created_at: v.ts }))
         )
       }
-      await supabase.from('lead_eventos').insert({ lead_id: leadData.id, anon_id: getAnonId(), tipo: 'download', slug: propertyName })
+      await supabase.from('lead_eventos').insert({ lead_id: leadId, anon_id: getAnonId(), tipo: 'download', slug: propertyName })
     }
   } catch {}
     fetch('/api/notify', {
