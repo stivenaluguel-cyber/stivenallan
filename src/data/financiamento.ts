@@ -368,3 +368,23 @@ export function simular(
     avisos,
   }
 }
+
+
+// ─── Locks — reaproveita motor SPC-JS (identico a Fontana) ─────────────────
+// Confirmado (sessao anterior): planilha "CALCULADORA FINANCIAMENTOS 2024
+// CONSTRUTORA LOCKS.xlsx" usa o mesmo calculo de Valor Presente Total do
+// Reforco que a Fontana -- SPC-JS, juros simples, 0,75% a.m. Nao requer motor
+// proprio: resolverLinha/tabelaCorbetta ja cobrem a Locks nativamente via
+// parametro de taxa. Mantidos aqui como wrappers explicitos (modo 'maximo':
+// reforco = 5x mensal) para deixar a decisao documentada e testavel
+// isoladamente, sem alterar resolverLinha/tabelaCorbetta (Fontana/Corbetta).
+
+/** Resolve uma linha da tabela de prazos da Locks -- modo 'maximo' (reforco = 5x mensal), SPC-JS. */
+export function resolverLinhaLocks(saldo: number, prazoMeses: number): LinhaSimulacao {
+  return resolverLinha(saldo, prazoMeses, 'maximo', construtoras.locks.taxaMensal)
+}
+
+/** Tabela completa de prazos da Locks (12 a 240 meses) -- mesmo motor SPC-JS da Fontana. */
+export function tabelaLocks(saldo: number) {
+  return tabelaCorbetta(saldo, construtoras.locks.taxaMensal)
+}
