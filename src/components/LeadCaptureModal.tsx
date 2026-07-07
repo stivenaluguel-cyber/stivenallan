@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { getAnonId, getVisitas } from '@/components/VisitTracker'
+import { getAttribution, trackLeadEvent, sendLeadToCapi } from '@/lib/tracking'
 
 type Props = {
   propertyId: string
@@ -47,11 +48,15 @@ export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName
           email: email || null,
           property_id: propertyId,
           property_name: propertyName,
+          ...getAttribution(),
         }),
       })
       if (!res.ok) { setStatus('error'); return }
       const json = await res.json()
       leadId = json?.id ?? null
+      const eventId = crypto.randomUUID()
+      trackLeadEvent(`Catálogo ${propertyName}`, eventId)
+      sendLeadToCapi({ event_id: eventId, nome: name, telefone: phone.replace(/\D/g, ''), email: email || null, content_name: `Catálogo ${propertyName}` })
     } catch {
       setStatus('error')
       return
