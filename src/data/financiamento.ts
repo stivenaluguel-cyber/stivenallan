@@ -388,3 +388,38 @@ export function resolverLinhaLocks(saldo: number, prazoMeses: number): LinhaSimu
 export function tabelaLocks(saldo: number) {
   return tabelaCorbetta(saldo, construtoras.locks.taxaMensal)
 }
+
+
+// ─── Motor Price puro (juros compostos) -- Giassi ──────────────────────────
+// Giassi usa sistema diferente (juros compostos, 9,5% a.a.), nao SPC-JS.
+// PMT = PV x i / (1 - (1+i)^-n). Mantem o mesmo formato de LinhaSimulacao
+// para reaproveitar a UI da tabela de prazos. Nao ha conceito de reforco
+// anual neste preset -- reforcoAnual e qtdReforcos sempre 0.
+
+/** Resolve uma linha pelo sistema Price (juros compostos) -- construtoras tipo Giassi. */
+export function resolverLinhaPrice(saldo: number, prazoMeses: number, i: number): LinhaSimulacao {
+  const mensal = (i === 0 || prazoMeses === 0)
+    ? (prazoMeses > 0 ? saldo / prazoMeses : 0)
+    : saldo * i / (1 - Math.pow(1 + i, -prazoMeses))
+  const totalPago = mensal * prazoMeses
+  return {
+    prazoMeses,
+    qtdReforcos: 0,
+    mensal,
+    reforcoAnual: 0,
+    totalPago,
+    jurosEmbutidos: totalPago - saldo,
+  }
+}
+
+/** Tabela completa de prazos da Giassi (12 a 240 meses) -- motor Price puro. */
+export function tabelaGiassi(saldo: number) {
+  const prazos = Array.from({ length: 20 }, (_, k) => (k + 1) * 12)
+  return prazos.map(p => ({
+    prazoMeses: p,
+    semReforco: resolverLinhaPrice(saldo, p, construtoras.giassi.taxaMensal),
+    mensalFixa: null,
+    reforcoFixo: null,
+    maximo: resolverLinhaPrice(saldo, p, construtoras.giassi.taxaMensal),
+  }))
+}
