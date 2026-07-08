@@ -238,6 +238,8 @@ export default function BellantePage() {
         </div>
       </section>
 
+      <RelatedProperties atualSlug="bellante-comerciario-criciuma-sc" cidade="Criciúma" />
+
       {/* CTA FINAL */}
       <section style={{ position: 'relative', height: '60vh', minHeight: '400px', overflow: 'hidden' }}>
         <img src={HERO} alt="Bellante Residencial"

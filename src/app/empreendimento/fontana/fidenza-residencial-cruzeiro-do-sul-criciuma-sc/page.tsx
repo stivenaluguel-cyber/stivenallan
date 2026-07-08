@@ -388,6 +388,8 @@ export default function FidenzaPage() {
         </div>
       </section>
 
+      <RelatedProperties atualSlug="fidenza-residencial-cruzeiro-do-sul-criciuma-sc" cidade="Criciúma" />
+
       {/* 10 CTA FINAL */}
       <section style={{ position: 'relative', minHeight: '78vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
         <Image src={IMG.fachadaAngular} alt="Fidenza Residencial — perspectiva angular, Cruzeiro do Sul, Criciúma/SC" fill loading="lazy" sizes="100vw" style={{ objectFit: 'cover' }} />

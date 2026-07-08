@@ -324,7 +324,7 @@ export default function HubSmartHomePage() {
 
 {/* SEO FAQ */}
 <PropertyFAQ items={[{"pergunta":"Como funciona o financiamento direto do Hub Smart Home?","resposta":"Entrada de 20%, saldo em até 72 parcelas mensais e 6 reforços anuais (cada reforço equivale a 5 parcelas mensais), com correção pelo CUB/SC durante a obra. Sem análise de banco."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Sim. Além do financiamento direto com a construtora, é possível optar por financiamento bancário. Fale com o Stiven pelo WhatsApp para simular as duas opções."},{"pergunta":"Onde fica o Hub Smart Home?","resposta":"O Hub Smart Home está localizado no Centro de Criciúma/SC."},{"pergunta":"Quais são os diferenciais do Hub Smart Home?","resposta":"O empreendimento oferece automação residencial completa (controle de iluminação, climatização e segurança pelo smartphone), espaço fitness, salão de festas e vagas de garagem cobertas com infraestrutura para veículos elétricos."}]} accent="#FF6A3D" />
-<RelatedProperties atualSlug="hub-smart-home-criciuma-sc" cidade="Criciúma" />
+<RelatedProperties atualSlug="hub-smart-home-criciuma-sc" cidade="Criciúma" nomeAtual="Hub Smart Home" />
 
 
 </main>

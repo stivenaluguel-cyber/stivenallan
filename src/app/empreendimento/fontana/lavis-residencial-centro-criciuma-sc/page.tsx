@@ -346,6 +346,8 @@ export default function LavisPage() {
         </div>
       </section>
 
+      <RelatedProperties atualSlug="lavis-residencial-centro-criciuma-sc" cidade="Criciúma" />
+
       {/* 10 CTA FINAL */}
       <section style={{ position: 'relative', minHeight: '78vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
         <Image src={IMG.fotomontagem} alt="Lavis Residencial — fotomontagem no Centro de Criciúma/SC" fill loading="lazy" sizes="100vw" style={{ objectFit: 'cover' }} />

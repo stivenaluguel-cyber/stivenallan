@@ -267,6 +267,8 @@ export default function CastellanoPage() {
         </div>
       </section>
 
+      <RelatedProperties atualSlug="castellano-centro-icara-sc" cidade="Içara" />
+
       <footer style={{ background: t.purpleDark, padding: 'clamp(48px,8vw,80px) 6vw' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 48 }}>
           <div>

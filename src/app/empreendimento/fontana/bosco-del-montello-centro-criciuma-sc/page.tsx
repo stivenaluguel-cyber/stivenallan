@@ -258,6 +258,8 @@ export default function BoscoDelMontelloPage() {
         </div>
       </section>
 
+      <RelatedProperties atualSlug="bosco-del-montello-centro-criciuma-sc" cidade="Criciúma" />
+
       {/* CTA FINAL */}
       <section style={{ position: 'relative', minHeight: '78vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
         <Image src={IMG.hero} alt="Bosco Del Montello Residencial — Fachada" fill loading="lazy" sizes="100vw" style={{ objectFit: 'cover' }} />

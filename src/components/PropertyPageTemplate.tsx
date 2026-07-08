@@ -222,7 +222,7 @@ export default function PropertyPageTemplate({ data, relacionados }: { data: Pro
       {relacionados !== false && data.cidade && (
         <section style={{ padding: '0 clamp(20px,5vw,48px) clamp(72px,12vh,120px)' }}>
           <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-            <RelatedProperties atualSlug={data.slug} cidade={data.cidade} />
+            <RelatedProperties atualSlug={data.slug} cidade={data.cidade} nomeAtual={data.nome} propertyIdAtual={data.id} />
           </div>
         </section>
       )}

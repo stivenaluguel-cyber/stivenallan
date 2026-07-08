@@ -31,10 +31,17 @@ export async function POST(req: NextRequest) {
 
     const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey)
     const body = await req.json()
-    const { nome, telefone, email, mensagem, canal_preferido, pagina_origem, property_id } = body
+    const { nome, telefone, email, mensagem, canal_preferido, pagina_origem, property_id, property_slug } = body
 
     if (!nome || !telefone) {
       return NextResponse.json({ error: 'Nome e telefone obrigatorios' }, { status: 400 })
+    }
+
+    // Páginas estáticas não conhecem o UUID: resolve pelo slug
+    let resolvedPropertyId = property_id || null
+    if (!resolvedPropertyId && property_slug) {
+      const { data: prop } = await supabaseAdmin.from('properties').select('id').eq('slug', property_slug).maybeSingle()
+      resolvedPropertyId = prop?.id ?? null
     }
 
     const base: Record<string, unknown> = {
@@ -43,7 +50,7 @@ export async function POST(req: NextRequest) {
       email: email || null,
       anotacoes: [mensagem, canal_preferido ? `Canal preferido: ${canal_preferido}` : null].filter(Boolean).join(' | ') || null,
       source: pagina_origem || null,
-      property_id: property_id || null,
+      property_id: resolvedPropertyId,
       origem: 'Site',
       status: 'novo',
     }

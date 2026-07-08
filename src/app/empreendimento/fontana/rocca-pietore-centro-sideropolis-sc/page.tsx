@@ -285,6 +285,8 @@ export default function Page() {
         </div>
       </section>
 
+      <RelatedProperties atualSlug="rocca-pietore-centro-sideropolis-sc" cidade="Siderópolis" />
+
       <footer style={{ background:t.navyDark, padding:'48px 32px', textAlign:'center' }}>
         <p style={{ color:t.onDarkMuted, fontSize:12, letterSpacing:'0.2em', textTransform:'uppercase', margin:'0 0 8px' }}>Stiven Allan</p>
         <p style={{ color:t.onDarkMuted, fontSize:11, margin:'0 0 4px' }}>CRECI 60.275</p>

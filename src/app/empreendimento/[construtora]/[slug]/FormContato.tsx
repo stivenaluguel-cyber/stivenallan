@@ -6,11 +6,12 @@ import { getAttribution, trackLeadEvent, sendLeadToCapi } from '@/lib/tracking';
 interface Props {
   empreendimento: string;
   propertyId?: string | null;
+  propertySlug?: string | null;
 }
 
 const WHATSAPP = '5548991642332';
 
-export default function FormContato({ empreendimento, propertyId }: Props) {
+export default function FormContato({ empreendimento, propertyId, propertySlug }: Props) {
   const [nome, setNome] = useState('');
   const [telefone, setTelefone] = useState('');
   const [email, setEmail] = useState('');
@@ -37,6 +38,7 @@ export default function FormContato({ empreendimento, propertyId }: Props) {
           email: email || null,
           mensagem: 'Interesse no empreendimento ' + empreendimento,
           property_id: propertyId || null,
+          property_slug: propertySlug || null,
           canal_preferido: 'whatsapp',
           pagina_origem: typeof window !== 'undefined' ? window.location.pathname : null,
           faixa_investimento: faixaInvestimento,
