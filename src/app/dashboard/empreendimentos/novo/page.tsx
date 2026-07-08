@@ -21,7 +21,7 @@ export default function NovoEmpreendimentoPage() {
     nome: '', construtora: '', cidade: '', uf: 'SC', slug: '',
     bairro: '', endereco: '', descricao_curta: '', descricao_completa: '',
     status_obra: 'lancamento', status_venda: 'ativo',
-    preco_a_partir: '', whatsapp: '5548916423321',
+    preco_a_partir: '', whatsapp: '5548991642332',
     imagens_urls: '', video_url: '',
   })
   const [tipologias, setTipologias] = useState<Tipologia[]>([
