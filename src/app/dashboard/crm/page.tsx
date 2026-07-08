@@ -163,7 +163,7 @@ function SimuladorFluxo({ cub }: { cub: Cub | null }) {
               </div>
             )}
           </div>
-          <a href={'https://api.whatsapp.com/send?phone=5548991455522&text=Ol%C3%A1!%20Simulei%20e%20cabe%20' + encodeURIComponent(fmt(parcela)) + '%20por%20m%C3%AAs.%20Quero%20saber%20mais!'} target="_blank" rel="noopener noreferrer"
+          <a href={'https://api.whatsapp.com/send?phone=5548991642332&text=Ol%C3%A1!%20Simulei%20e%20cabe%20' + encodeURIComponent(fmt(parcela)) + '%20por%20m%C3%AAs.%20Quero%20saber%20mais!'} target="_blank" rel="noopener noreferrer"
             style={{ marginTop: 20, background: '#25d366', color: '#fff', borderRadius: 2, padding: '11px', textAlign: 'center', textDecoration: 'none', fontWeight: 700, fontSize: 14, minHeight: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             Enviar simulação p/ cliente
           </a>
@@ -192,7 +192,7 @@ function TabelaUnidades({ emp, cub }: { emp: Emp; cub: Cub | null }) {
   }
 
   const msg = (u: Unidade) => encodeURIComponent('Olá! Tenho interesse na Unidade ' + u.unidade + ' do ' + emp.nome + ' — ' + u.metragem + 'm², R$' + (u.valor_tabela?.toLocaleString('pt-BR') ?? '?'))
-  const wppUrl = (u: Unidade) => 'https://api.whatsapp.com/send?phone=5548991455522&text=' + msg(u)
+  const wppUrl = (u: Unidade) => 'https://api.whatsapp.com/send?phone=5548991642332&text=' + msg(u)
 
   return (
     <div style={{ background: D.surface, border: '1px solid ' + D.line, borderRadius: 3 }}>

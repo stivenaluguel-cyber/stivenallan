@@ -7,7 +7,7 @@ import { RelatedProperties } from '@/components/RelatedProperties'
 import Simulador from '@/components/Simulador'
 import { LeadCaptureButton } from '@/components/LeadCaptureButton'
 
-const WPP = 'https://api.whatsapp.com/send?phone=5548991455522&text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Lavis%20Residencial!'
+const WPP = 'https://api.whatsapp.com/send?phone=5548991642332&text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Lavis%20Residencial!'
 
 export const revalidate = 3600
 
@@ -299,9 +299,9 @@ export default function LavisPage() {
                 style={{ background: '#25d366', color: '#fff', borderRadius: 2, padding: '14px 24px', fontWeight: 700, fontSize: 15, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 8, minHeight: 48 }}>
                 Chamar no WhatsApp
               </a>
-              <a href="tel:+5548991455522"
+              <a href="tel:+5548991642332"
                 style={{ background: 'transparent', color: c.onDark, border: `1px solid ${c.lineDark}`, borderRadius: 2, padding: '14px 20px', fontWeight: 600, fontSize: 15, textDecoration: 'none', minHeight: 48, display: 'inline-flex', alignItems: 'center' }}>
-                (48) 99145-5522
+                (48) 99164-2332
               </a>
             </div>
           </div>
@@ -316,7 +316,7 @@ export default function LavisPage() {
       <footer style={{ borderTop: `1px solid ${c.line}`, padding: '32px 5%', textAlign: 'center', color: c.muted, fontSize: 13 }}>
         <p style={{ margin: 0 }}>
           Lavis Residencial · Fontana Construtora · Centro, Criciúma/SC<br />
-          Consultor: Stiven Allan · CRECI 60.275 · (48) 99145-5522
+          Consultor: Stiven Allan · CRECI 60.275 · (48) 99164-2332
         </p>
         <p style={{ margin: '8px 0 0', fontSize: 12, color: c.muted }}>
           As imagens são ilustrativas. Informações sujeitas a alterações sem aviso prévio.
@@ -330,7 +330,7 @@ export default function LavisPage() {
           style={{ flex: 1, ...ui.btnConvert, borderRadius: 2, textAlign: 'center', minHeight: 48, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 700, textDecoration: 'none' }}>
           Falar com Stiven
         </a>
-        <a href="tel:+5548991455522"
+        <a href="tel:+5548991642332"
           style={{ flex: 1, ...ui.btnPrimary, borderRadius: 2, textAlign: 'center', minHeight: 48, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 600, textDecoration: 'none' }}>
           Ligar agora
         </a>

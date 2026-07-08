@@ -6,7 +6,7 @@ const API_KEY  = process.env.EVOLUTION_API_KEY!
 const INSTANCE = process.env.EVOLUTION_INSTANCE!     // ex: 'stiven'
 
 // Numero do Stiven para alertas de escalada
-const STIVEN_NUMBER = '5548991455522'
+const STIVEN_NUMBER = '5548991642332'
 
 // ============================================
 // ENVIAR MENSAGEM DE TEXTO

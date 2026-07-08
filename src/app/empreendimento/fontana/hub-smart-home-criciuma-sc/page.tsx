@@ -8,7 +8,7 @@ import { LeadCaptureButton } from '@/components/LeadCaptureButton'
 
 export const revalidate = 3600
 
-const WHATSAPP = 'https://api.whatsapp.com/send?phone=5548991455522&text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Hub%20Smart%20Home!'
+const WHATSAPP = 'https://api.whatsapp.com/send?phone=5548991642332&text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Hub%20Smart%20Home!'
 
 export const metadata: Metadata = {
   title: 'Hub Smart Home | Apartamentos Inteligentes Centro Criciúma SC',
@@ -41,7 +41,7 @@ const schema = {
       name: 'Hub Smart Home',
       description: 'Apartamentos com automação residencial completa no Centro de Criciúma SC. Condomínio inteligente com tecnologia integrada, lazer completo e design contemporâneo. Fontana Construtora.',
       url: 'https://stivenallan.vercel.app/empreendimento/fontana/hub-smart-home-criciuma-sc',
-      offers: { '@type': 'Offer', priceCurrency: 'BRL', availability: 'https://schema.org/InStock', seller: { '@type': 'RealEstateAgent', name: 'Stiven Allan', identifier: 'CRECI 60.275', telephone: '+5548991455522', url: 'https://stivenallan.vercel.app' } },
+      offers: { '@type': 'Offer', priceCurrency: 'BRL', availability: 'https://schema.org/InStock', seller: { '@type': 'RealEstateAgent', name: 'Stiven Allan', identifier: 'CRECI 60.275', telephone: '+5548991642332', url: 'https://stivenallan.vercel.app' } },
       address: { '@type': 'PostalAddress', streetAddress: 'Centro', addressLocality: 'Criciúma', addressRegion: 'SC', addressCountry: 'BR' },
       geo: { '@type': 'GeoCoordinates', latitude: -28.678, longitude: -49.370 },
     },
@@ -58,7 +58,7 @@ const schema = {
       mainEntity: [
         { '@type': 'Question', name: 'O que é o Hub Smart Home em Criciúma?', acceptedAnswer: { '@type': 'Answer', text: 'Hub Smart Home é um empreendimento residencial da Fontana Construtora localizado no Centro de Criciúma SC, com apartamentos dotados de automação residencial integrada, design contemporâneo e infraestrutura de condomínio completa.' } },
         { '@type': 'Question', name: 'Quais são os diferenciais do Hub Smart Home?', acceptedAnswer: { '@type': 'Answer', text: 'O Hub Smart Home oferece automação residencial (controle de iluminação, climatização e segurança pelo smartphone), acabamentos de alto padrão, área de lazer completa e localização central em Criciúma SC.' } },
-        { '@type': 'Question', name: 'Como entrar em contato para saber mais sobre o Hub Smart Home?', acceptedAnswer: { '@type': 'Answer', text: 'Entre em contato com Stiven Allan, CRECI 60.275, pelo WhatsApp (48) 99145-5522. Atendimento personalizado para tirar dúvidas, agendar visita ao decorado e conhecer as condições de pagamento.' } },
+        { '@type': 'Question', name: 'Como entrar em contato para saber mais sobre o Hub Smart Home?', acceptedAnswer: { '@type': 'Answer', text: 'Entre em contato com Stiven Allan, CRECI 60.275, pelo WhatsApp (48) 99164-2332. Atendimento personalizado para tirar dúvidas, agendar visita ao decorado e conhecer as condições de pagamento.' } },
       ],
     },
   ],
@@ -280,7 +280,7 @@ export default function HubSmartHomePage() {
               QUERO SABER MAIS — WHATSAPP
             </a>
             <div style={{ marginTop: 20, color: c.onDarkMuted, fontSize: 13 }}>
-              Stiven Allan • CRECI 60.275 • (48) 99145-5522
+              Stiven Allan • CRECI 60.275 • (48) 99164-2332
             </div>
           </div>
         </section>
@@ -295,7 +295,7 @@ export default function HubSmartHomePage() {
             </div>
             <div style={{ textAlign: 'right' }}>
               <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" style={{ color: c.bronze, textDecoration: 'none', fontSize: 14, fontWeight: 600 }}>
-                (48) 99145-5522
+                (48) 99164-2332
               </a>
               <div style={{ color: c.muted, fontSize: 12, marginTop: 6 }}>
                 © {new Date().getFullYear()} Stiven Allan. Todos os direitos reservados.
@@ -314,7 +314,7 @@ export default function HubSmartHomePage() {
             style={{ flex: 1, ...ui.btnConvert, borderRadius: 2, textAlign: 'center', minHeight: 48, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 700, textDecoration: 'none' }}>
             Falar com Stiven
           </a>
-          <a href="tel:+5548991455522"
+          <a href="tel:+5548991642332"
             style={{ flex: 1, ...ui.btnPrimary, borderRadius: 2, textAlign: 'center', minHeight: 48, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 600, textDecoration: 'none' }}>
             Ligar agora
           </a>
