@@ -38,6 +38,8 @@ export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName
     e.preventDefault()
     setStatus('loading')
     let leadId: string | null = null
+    // Aba aberta ainda dentro do gesto de clique — Safari bloqueia window.open() chamado após um await
+    const pdfTab = bookPdfUrl ? window.open('', '_blank') : null
     try {
       const res = await fetch('/api/lead-capture', {
         method: 'POST',
@@ -51,13 +53,14 @@ export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName
           ...getAttribution(),
         }),
       })
-      if (!res.ok) { setStatus('error'); return }
+      if (!res.ok) { pdfTab?.close(); setStatus('error'); return }
       const json = await res.json()
       leadId = json?.id ?? null
       const eventId = crypto.randomUUID()
       trackLeadEvent(`Catálogo ${propertyName}`, eventId)
       sendLeadToCapi({ event_id: eventId, nome: name, telefone: phone.replace(/\D/g, ''), email: email || null, content_name: `Catálogo ${propertyName}` })
     } catch {
+      pdfTab?.close()
       setStatus('error')
       return
     }
@@ -80,8 +83,8 @@ export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName
       body: JSON.stringify({ nome: name, whatsapp: phone.replace(/\D/g, ''), property_name: propertyName, email: email || null }),
     }).catch(() => {})
     setStatus('done')
+    if (pdfTab && bookPdfUrl) pdfTab.location.href = bookPdfUrl
     setTimeout(() => {
-      if (bookPdfUrl) window.open(bookPdfUrl, '_blank', 'noopener,noreferrer')
       setOpen(false)
       setStatus('idle')
       setName('')
@@ -136,13 +139,12 @@ export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName
                   </p>
                   <button
                     type="button"
-                    onClick={async () => {
-                      try {
-                        const supabase = createClient()
-                        await supabase.from('lead_eventos').insert({ lead_id: returningLead.id, anon_id: getAnonId(), tipo: 'download', slug: propertyName })
-                      } catch {}
+                    onClick={() => {
+                      // Abre já no clique (URL já conhecida) — evita bloqueio de popup do Safari por causa do await abaixo
                       if (bookPdfUrl) window.open(bookPdfUrl, '_blank', 'noopener,noreferrer')
                       setOpen(false)
+                      const supabase = createClient()
+                      supabase.from('lead_eventos').insert({ lead_id: returningLead.id, anon_id: getAnonId(), tipo: 'download', slug: propertyName }).then(() => {})
                     }}
                     style={{ width: '100%', background: '#18181b', color: '#fff', border: 'none', borderRadius: '10px', padding: '14px', fontSize: '15px', fontWeight: '700', cursor: 'pointer', fontFamily: 'inherit', marginBottom: '12px' }}
                   >

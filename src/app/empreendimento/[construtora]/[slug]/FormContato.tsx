@@ -28,6 +28,8 @@ export default function FormContato({ empreendimento, propertyId, propertySlug }
     e.preventDefault();
     if (!nome || !telefone || !faixaInvestimento || !prazoCompra || !entradaDisponivel) return;
     setStatus('enviando');
+    // Aba aberta ainda dentro do gesto de clique — Safari bloqueia window.open() chamado após um await
+    const waTab = window.open('', '_blank');
     try {
       const res = await fetch('/api/leads', {
         method: 'POST',
@@ -47,7 +49,7 @@ export default function FormContato({ empreendimento, propertyId, propertySlug }
           ...getAttribution(),
         }),
       });
-      if (!res.ok) throw new Error('falha');
+      if (!res.ok) { waTab?.close(); throw new Error('falha'); }
       fetch('/api/notify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -57,8 +59,10 @@ export default function FormContato({ empreendimento, propertyId, propertySlug }
       trackLeadEvent(empreendimento, eventId);
       sendLeadToCapi({ event_id: eventId, nome, telefone, email: email || null, content_name: empreendimento });
       setStatus('ok');
-      window.open(waLink, '_blank', 'noopener,noreferrer');
+      if (waTab) waTab.location.href = waLink;
+      else window.open(waLink, '_blank', 'noopener,noreferrer');
     } catch {
+      waTab?.close();
       setStatus('erro');
     }
   }
