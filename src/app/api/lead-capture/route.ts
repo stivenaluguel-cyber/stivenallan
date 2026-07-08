@@ -20,20 +20,34 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Nome e whatsapp obrigatorios' }, { status: 400 })
     }
 
-    const { data, error } = await supabaseAdmin
+    const base = {
+      nome,
+      whatsapp,
+      email: email || null,
+      property_id: property_id || null,
+      property_name: property_name || null,
+      origem: 'Site',
+      estagio_funil: 'primeiro_contato',
+      source: 'book_download',
+    }
+
+    const growthFields = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'gclid', 'fbclid'] as const
+    const extras: Record<string, unknown> = {}
+    for (const field of growthFields) {
+      if (typeof body[field] === 'string' && body[field]) extras[field] = body[field]
+    }
+
+    let { data, error } = await supabaseAdmin
       .from('leads')
-      .insert({
-        nome,
-        whatsapp,
-        email: email || null,
-        property_id: property_id || null,
-        property_name: property_name || null,
-        origem: 'Site',
-        estagio_funil: 'primeiro_contato',
-        source: 'book_download',
-      })
+      .insert({ ...base, ...extras })
       .select('id')
       .single()
+
+    // Colunas de growth ainda sem migração: não pode derrubar a captação
+    if (error && Object.keys(extras).length > 0 && (error.code === 'PGRST204' || /column/i.test(error.message ?? ''))) {
+      console.error('Colunas de growth ausentes (rodar 0002_leads_growth.sql):', error.message)
+      ;({ data, error } = await supabaseAdmin.from('leads').insert(base).select('id').single())
+    }
 
     if (error) {
       console.error('Supabase error:', error)

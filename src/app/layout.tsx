@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { SITE_URL } from '@/lib/site'
 import Script from 'next/script'
 import { VisitTracker } from '@/components/VisitTracker'
+import { TrackingProvider } from '@/components/TrackingProvider'
 import { Bricolage_Grotesque, Hanken_Grotesk } from 'next/font/google'
 import './globals.css'
 
@@ -82,11 +83,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://xpkznaqgctfkoonqpcye.supabase.co" crossOrigin="anonymous" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
       </head>
-      <body><VisitTracker />{children}
+      <body><VisitTracker /><TrackingProvider />{children}
 <Script src="https://www.googletagmanager.com/gtag/js?id=G-5TWF0JTG8H" strategy="afterInteractive"/>
 <Script id="ga4" strategy="afterInteractive">{`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-5TWF0JTG8H');`}</Script>
 <Script id="meta-pixel" strategy="afterInteractive">{`!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','364836344657445');fbq('track','PageView');`}</Script>
-<Script id="wpp-track" strategy="afterInteractive">{`document.addEventListener('click',function(e){var a=e.target.closest('[data-wpp]');if(!a)return;if(typeof fbq!=='undefined')fbq('track','Lead',{content_name:'WhatsApp'});if(typeof gtag!=='undefined')gtag('event','generate_lead',{method:'whatsapp'});});`}</Script>
+<Script id="wpp-track" strategy="afterInteractive">{`document.addEventListener('click',function(e){var a=e.target.closest('[data-wpp]');if(!a)return;if(typeof fbq!=='undefined')fbq('track','Contact',{content_name:'WhatsApp'});if(typeof gtag!=='undefined')gtag('event','contact_whatsapp',{method:'whatsapp'});});`}</Script>
+{process.env.NEXT_PUBLIC_GADS_ID && (
+  <Script id="gads" strategy="afterInteractive">{`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('config','${process.env.NEXT_PUBLIC_GADS_ID}');`}</Script>
+)}
 </body>
     </html>
   )

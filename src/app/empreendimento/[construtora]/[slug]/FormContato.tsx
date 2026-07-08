@@ -1,21 +1,31 @@
 'use client';
 
 import { useState } from 'react';
+import { getAttribution, trackLeadEvent, sendLeadToCapi } from '@/lib/tracking';
 
 interface Props {
   empreendimento: string;
   propertyId?: string | null;
 }
 
+const WHATSAPP = '5548991642332';
+
 export default function FormContato({ empreendimento, propertyId }: Props) {
   const [nome, setNome] = useState('');
   const [telefone, setTelefone] = useState('');
   const [email, setEmail] = useState('');
+  const [faixaInvestimento, setFaixaInvestimento] = useState('');
+  const [prazoCompra, setPrazoCompra] = useState('');
+  const [entradaDisponivel, setEntradaDisponivel] = useState('');
   const [status, setStatus] = useState<'idle' | 'enviando' | 'ok' | 'erro'>('idle');
+
+  const waLink = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(
+    `Olá Stiven! Me cadastrei sobre o ${empreendimento}. Pode me enviar as condições?`
+  )}`;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!nome || !telefone) return;
+    if (!nome || !telefone || !faixaInvestimento || !prazoCompra || !entradaDisponivel) return;
     setStatus('enviando');
     try {
       const res = await fetch('/api/leads', {
@@ -29,13 +39,18 @@ export default function FormContato({ empreendimento, propertyId }: Props) {
           property_id: propertyId || null,
           canal_preferido: 'whatsapp',
           pagina_origem: typeof window !== 'undefined' ? window.location.pathname : null,
+          faixa_investimento: faixaInvestimento,
+          prazo_compra: prazoCompra,
+          entrada_disponivel: entradaDisponivel,
+          ...getAttribution(),
         }),
       });
       if (!res.ok) throw new Error('falha');
+      const eventId = crypto.randomUUID();
+      trackLeadEvent(empreendimento, eventId);
+      sendLeadToCapi({ event_id: eventId, nome, telefone, email: email || null, content_name: empreendimento });
       setStatus('ok');
-      setNome('');
-      setTelefone('');
-      setEmail('');
+      window.open(waLink, '_blank', 'noopener,noreferrer');
     } catch {
       setStatus('erro');
     }
@@ -52,11 +67,38 @@ export default function FormContato({ empreendimento, propertyId }: Props) {
     boxSizing: 'border-box',
   };
 
+  const selectStyle: React.CSSProperties = {
+    ...inputStyle,
+    color: '#1a1a1a',
+    appearance: 'auto',
+  };
+
   if (status === 'ok') {
     return (
-      <p style={{ fontSize: 14, color: '#2a7d4f', textAlign: 'center', margin: 0 }}>
-        Recebido! Em breve o Stiven entra em contato.
-      </p>
+      <div style={{ textAlign: 'center' }}>
+        <p style={{ fontSize: 14, color: '#2a7d4f', margin: '0 0 12px' }}>
+          Recebido! Continue no WhatsApp para receber as condições.
+        </p>
+        <a
+          href={waLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            display: 'block',
+            width: '100%',
+            padding: '12px 16px',
+            borderRadius: 8,
+            background: '#1a1a1a',
+            color: '#f5f1ea',
+            fontWeight: 700,
+            fontSize: 15,
+            textDecoration: 'none',
+            boxSizing: 'border-box',
+          }}
+        >
+          Continuar no WhatsApp
+        </a>
+      </div>
     );
   }
 
@@ -88,6 +130,51 @@ export default function FormContato({ empreendimento, propertyId }: Props) {
         style={inputStyle}
         aria-label="E-mail"
       />
+      <select
+        value={faixaInvestimento}
+        onChange={(e) => setFaixaInvestimento(e.target.value)}
+        required
+        style={selectStyle}
+        aria-label="Faixa de investimento"
+      >
+        <option value="" disabled>
+          Faixa de investimento
+        </option>
+        <option value="Até R$ 600 mil">Até R$ 600 mil</option>
+        <option value="R$ 600 mil a R$ 1 milhão">R$ 600 mil a R$ 1 milhão</option>
+        <option value="R$ 1 a 2 milhões">R$ 1 a 2 milhões</option>
+        <option value="Acima de R$ 2 milhões">Acima de R$ 2 milhões</option>
+      </select>
+      <select
+        value={prazoCompra}
+        onChange={(e) => setPrazoCompra(e.target.value)}
+        required
+        style={selectStyle}
+        aria-label="Quando pretende comprar"
+      >
+        <option value="" disabled>
+          Quando pretende comprar?
+        </option>
+        <option value="Imediato">Imediato</option>
+        <option value="3 a 6 meses">3 a 6 meses</option>
+        <option value="6 a 12 meses">6 a 12 meses</option>
+        <option value="Apenas pesquisando">Apenas pesquisando</option>
+      </select>
+      <select
+        value={entradaDisponivel}
+        onChange={(e) => setEntradaDisponivel(e.target.value)}
+        required
+        style={selectStyle}
+        aria-label="Entrada disponível"
+      >
+        <option value="" disabled>
+          Entrada disponível
+        </option>
+        <option value="Até 20% do valor">Até 20% do valor</option>
+        <option value="20% a 50%">20% a 50%</option>
+        <option value="Mais de 50%">Mais de 50%</option>
+        <option value="Prefiro falar no WhatsApp">Prefiro falar no WhatsApp</option>
+      </select>
       <button
         type="submit"
         disabled={status === 'enviando'}
