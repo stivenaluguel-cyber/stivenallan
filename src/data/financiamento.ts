@@ -37,7 +37,6 @@ export const planos: Record<string, PlanoFinanciamento> = {
 
   // ── Empreendimentos com data de entrega confirmada — padrão obra (1x entrada / 6x reforço / 72x mensal) ──
   'lavis-residencial-centro-criciuma-sc': { ...PADRAO_OBRA, entrega: '2030-12-31' },
-  'lavis-centro-criciuma-sc': { ...PADRAO_OBRA, entrega: '2030-12-31' },
   'mar-di-atrani-centro-balneario-rincao-sc': { ...PADRAO_OBRA, entrega: '2028-10-30' },
   'mar-di-licata-mar-grosso-laguna-sc': { ...PADRAO_OBRA, entrega: '2027-10-30' },
   'mar-di-arienzo-centro-balneario-rincao-sc': { ...PADRAO_OBRA, entrega: '2030-08-31' },
@@ -72,8 +71,6 @@ export const planos: Record<string, PlanoFinanciamento> = {
     politicaExtra: 'Correção monetária pelo IPCA (não CUB/SC). Vencimentos dias 05, 10 e 15 de cada mês.',
   },
 
-  // ── Demais entradas preservadas (sem dados novos confirmados) ──
-  'hub-smart-home-criciuma-sc': { ...PADRAO_OBRA, entrega: null },
 }
 
 // ─── Motor SPC-JS (Sistema de Parcelas Constantes a Juros Simples) ──────────

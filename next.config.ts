@@ -48,6 +48,16 @@ const nextConfig: NextConfig = {
       destination: '/empreendimento/fontana/monte-leone-centro-criciuma-sc',
       permanent: true,
     },
+    {
+      source: '/empreendimento/fontana/lavis-centro-criciuma-sc',
+      destination: '/empreendimento/fontana/lavis-residencial-centro-criciuma-sc',
+      permanent: true,
+    },
+    {
+      source: '/empreendimento/fontana/hub-smart-home-criciuma-sc',
+      destination: '/empreendimentos',
+      permanent: true,
+    },
   ],
 }
 
