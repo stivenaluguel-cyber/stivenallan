@@ -313,6 +313,8 @@ export default function LavisPage() {
       </section>
 
       {/* FOOTER */}
+      <RelatedProperties atualSlug="lavis-centro-criciuma-sc" cidade="Criciúma" nomeAtual="Lavis Residencial" />
+
       <footer style={{ borderTop: `1px solid ${c.line}`, padding: '32px 5%', textAlign: 'center', color: c.muted, fontSize: 13 }}>
         <p style={{ margin: 0 }}>
           Lavis Residencial · Fontana Construtora · Centro, Criciúma/SC<br />

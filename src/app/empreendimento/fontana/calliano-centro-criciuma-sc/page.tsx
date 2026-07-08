@@ -294,6 +294,8 @@ export default function CallianoPage() {
         </div>
       </section>
 
+      <RelatedProperties atualSlug="calliano-centro-criciuma-sc" cidade="Criciúma" />
+
       {/* CTA FINAL */}
       <section style={{ position: 'relative', minHeight: 480, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
         <Image src={IMG.hero} alt="Calliano Residencial — Criciúma" fill sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center' }} />

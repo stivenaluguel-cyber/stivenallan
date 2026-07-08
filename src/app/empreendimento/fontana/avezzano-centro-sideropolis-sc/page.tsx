@@ -234,6 +234,8 @@ export default function AvezzanoPage() {
         </div>
       </section>
 
+      <RelatedProperties atualSlug="avezzano-centro-sideropolis-sc" cidade="Siderópolis" />
+
       {/* CTA FINAL */}
       <section style={{ position: 'relative', height: '60vh', minHeight: '400px', overflow: 'hidden' }}>
         <img src={HERO} alt="Avezzano Residencial"
