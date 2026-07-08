@@ -4,11 +4,11 @@ import Link from 'next/link'
 export const metadata: Metadata = {
   title: 'Contato - Stiven Allan Corretor de Imoveis | WhatsApp (48) 99164-2332',
   description: 'Entre em contato com Stiven Allan, corretor de imoveis CRECI 60.275 em Criciuma SC. Atendimento via WhatsApp e Instagram.',
-  alternates: { canonical: 'https://stivenallan.vercel.app/contato' },
+  alternates: { canonical: 'https://stivenallan.com.br/contato' },
   openGraph: {
     title: 'Contato - Stiven Allan Corretor de Imoveis | Stiven Allan',
     description: 'Fale com Stiven via WhatsApp (48) 99164-2332. CRECI 60.275.',
-    url: 'https://stivenallan.vercel.app/contato',
+    url: 'https://stivenallan.com.br/contato',
     type: 'website',
   },
     twitter: { card: 'summary_large_image', title: 'Contato — Stiven Allan Corretor de Imoveis | Stiven Allan' },

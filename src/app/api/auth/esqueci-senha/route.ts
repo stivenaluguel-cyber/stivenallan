@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     })
 
     // Enviar email via Resend
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://stivenallan.vercel.app'
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://stivenallan.com.br'
     const resetUrl = `${siteUrl}/dashboard/redefinir-senha?token=${token}`
 
     const emailRes = await fetch('https://api.resend.com/emails', {

@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
         </table>
         <div style="text-align:center;margin-top:24px">
           <a href="https://wa.me/55${whatsapp}" style="display:inline-block;background:#25D366;color:#ffffff;padding:12px 24px;border-radius:10px;text-decoration:none;font-weight:700;font-size:14px;margin:0 4px 8px">Abrir WhatsApp</a>
-          <a href="https://stivenallan.vercel.app/dashboard/leads" style="display:inline-block;background:#D24E22;color:#ffffff;padding:12px 24px;border-radius:10px;text-decoration:none;font-weight:700;font-size:14px;margin:0 4px 8px">Ver Dashboard</a>
+          <a href="https://stivenallan.com.br/dashboard/leads" style="display:inline-block;background:#D24E22;color:#ffffff;padding:12px 24px;border-radius:10px;text-decoration:none;font-weight:700;font-size:14px;margin:0 4px 8px">Ver Dashboard</a>
         </div>
       </div>
       <div style="background:#F3F2EE;padding:14px;text-align:center">

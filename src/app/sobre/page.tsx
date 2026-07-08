@@ -4,11 +4,11 @@ import Link from 'next/link'
 export const metadata: Metadata = {
   title: 'Sobre Stiven Allan — Corretor de Imóveis CRECI/RS 60.275 | Criciúma SC',
     description: 'Conheça Stiven Allan, corretor de imóveis especializado em lançamentos e empreendimentos em Criciúma e região. CRECI/RS 60.275. Atendimento premium e personalizado.',
-      alternates: { canonical: 'https://stivenallan.vercel.app/sobre' },
+      alternates: { canonical: 'https://stivenallan.com.br/sobre' },
         openGraph: {
             title: 'Sobre Stiven Allan — Corretor CRECI/RS 60.275 | Stiven Allan',
                 description: 'Especialista em lançamentos imobiliários em Criciúma e região sul catarinense.',
-                    url: 'https://stivenallan.vercel.app/sobre',
+                    url: 'https://stivenallan.com.br/sobre',
                         siteName: 'Stiven Allan — Corretor de Imóveis',
                             locale: 'pt_BR',
                                 type: 'profile',
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
                                         name: 'Stiven Allan',
                                           jobTitle: 'Corretor de Imóveis',
                                             description: 'Especialista em lançamentos e empreendimentos imobiliários em Criciúma e região sul catarinense. CRECI/RS 60.275.',
-                                              url: 'https://stivenallan.vercel.app/sobre',
+                                              url: 'https://stivenallan.com.br/sobre',
                                                 telephone: '+5548991642332',
                                                   email: 'contato@stivenallan.com.br',
                                                     address: {

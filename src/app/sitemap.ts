@@ -1,5 +1,5 @@
 import { MetadataRoute } from 'next'
-import { imoveis } from '@/data/imoveis'
+import { getVitrineImoveis } from '@/lib/vitrine'
 import { SITE_URL } from '@/lib/site'
 
 function cidadeSlug(cidade: string): string {
@@ -12,9 +12,13 @@ function cidadeSlug(cidade: string): string {
   )
 }
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date()
-  const ativos = imoveis.filter((i) => i.ativo === true)
+  // Mesma fonte da vitrine da home: estáticos + properties do banco (ativos/não-ocultos)
+  // que ainda não têm página em @/data/imoveis — sem isso, empreendimentos cadastrados
+  // só pelo dashboard ficam visíveis no site mas invisíveis para o Google.
+  const imoveisVitrine = await getVitrineImoveis()
+  const ativos = imoveisVitrine.filter((i) => i.ativo === true)
 
   // Rotas estáticas
   const staticPages: MetadataRoute.Sitemap = [

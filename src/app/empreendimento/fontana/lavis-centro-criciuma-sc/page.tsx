@@ -15,11 +15,11 @@ export const metadata: Metadata = {
   title: 'Lavis Residencial | Apartamentos 2 e 3 Suítes Centro Criciúma SC',
   description: 'Lavis Residencial: apartamentos 2 e 3 dormitórios com suíte no Centro de Criciúma/SC. Piscina, fitness, deck, hall sofisticado. Lançamento Fontana. Consultoria Stiven Allan CRECI 60.275.',
   keywords: ['Lavis Residencial', 'apartamento Centro Criciúma', 'lançamento Fontana Criciúma', 'apartamento 3 suítes Criciúma SC', 'Stiven Allan corretor'],
-  alternates: { canonical: 'https://stivenallan.vercel.app/empreendimento/fontana/lavis-centro-criciuma-sc' },
+  alternates: { canonical: 'https://stivenallan.com.br/empreendimento/fontana/lavis-centro-criciuma-sc' },
   openGraph: {
     title: 'Lavis Residencial — Sofisticação no Centro de Criciúma/SC | Stiven Allan',
     description: 'Apartamentos 2 e 3 dorm. com suíte, piscina, deck externo, fitness e hall de entrada premium. Lançamento Fontana. Consulte Stiven Allan.',
-    url: 'https://stivenallan.vercel.app/empreendimento/fontana/lavis-centro-criciuma-sc',
+    url: 'https://stivenallan.com.br/empreendimento/fontana/lavis-centro-criciuma-sc',
     images: [{ url: 'https://lh3.googleusercontent.com/d/1pB-4sxYVrSqMmyIbbEeeGwcQMcOTS015', width: 1200, height: 630 }],
     type: 'website',
     locale: 'pt_BR',
@@ -64,7 +64,7 @@ const SCHEMA = {
       '@type': 'RealEstateListing',
       name: 'Lavis Residencial',
       description: 'Lançamento residencial no Centro de Criciúma/SC com apartamentos de 2 e 3 dormitórios, piscina, deck, fitness e salão gourmet. Construtora Fontana.',
-      url: 'https://stivenallan.vercel.app/empreendimento/fontana/lavis-centro-criciuma-sc',
+      url: 'https://stivenallan.com.br/empreendimento/fontana/lavis-centro-criciuma-sc',
       image: 'https://lh3.googleusercontent.com/d/1pB-4sxYVrSqMmyIbbEeeGwcQMcOTS015',
       offers: { '@type': 'Offer', priceCurrency: 'BRL', price: '420000', availability: 'https://schema.org/InStock' },
       address: { '@type': 'PostalAddress', addressLocality: 'Criciúma', addressRegion: 'SC', postalCode: '88802-300', addressCountry: 'BR' },
@@ -73,8 +73,8 @@ const SCHEMA = {
     {
       '@type': 'BreadcrumbList',
       itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Início', item: 'https://stivenallan.vercel.app' },
-        { '@type': 'ListItem', position: 2, name: 'Lançamentos Criciúma', item: 'https://stivenallan.vercel.app/lancamentos/criciuma-sc' },
+        { '@type': 'ListItem', position: 1, name: 'Início', item: 'https://stivenallan.com.br' },
+        { '@type': 'ListItem', position: 2, name: 'Lançamentos Criciúma', item: 'https://stivenallan.com.br/lancamentos/criciuma-sc' },
         { '@type': 'ListItem', position: 3, name: 'Lavis Residencial' },
       ],
     },
