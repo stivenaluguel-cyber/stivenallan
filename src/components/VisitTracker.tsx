@@ -24,7 +24,7 @@ export function VisitTracker() {
   const pathname = usePathname()
 
   useEffect(() => {
-    const m = pathname?.match(/^\/empreendimento\/[^\/]+\/([^\/]+)\//)
+    const m = pathname?.match(/^\/empreendimento\/[^\/]+\/([^\/]+)/)
     if (!m) return
     const slug = m[1]
     const visitas = getVisitas()

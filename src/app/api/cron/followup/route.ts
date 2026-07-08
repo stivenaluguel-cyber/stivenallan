@@ -15,9 +15,9 @@ function getSupabase() {
 // Mensagens de follow-up por estagio_funil
 const MENSAGENS_FOLLOWUP: Record<string, string[]> = {
   primeiro_contato: [
-    'Oi {nome}! Vi que voce demonstrou interesse em um dos nossos empreendimentos. Posso te contar mais sobre as opcoes disponiveis?',
-    'Ola {nome}, tudo bem? Queria saber se voce ainda tem interesse. As unidades estao se esgotando rapido.',
-    '{nome}, ultima mensagem minha por aqui. Se quiser conversar, estou a disposicao. Abraco!',
+    'Oi {nome}! Aqui é o Stiven 😊 Recebi seu interesse no {empreendimento}. Já separei as plantas e as condições direto com a construtora — prefere que eu envie por aqui, ou marcamos 10 minutinhos para eu te mostrar o que cabe no seu plano?',
+    'Oi {nome}! Uma informação importante sobre o {empreendimento}: quando a obra avança de fase, a tabela sobe. Se fizer sentido, te passo as condições de hoje, sem compromisso.',
+    '{nome}, prometo que é minha última mensagem 😄 Se o momento não é agora, tudo bem. Quer que eu te avise quando houver novidade de obra ou condição especial no {empreendimento}? É só responder AVISA.',
   ],
   qualificado: [
     'Oi {nome}! Com base no seu perfil, tenho condicoes especiais para {empreendimento}. Podemos conversar hoje?',
@@ -46,10 +46,17 @@ function getMensagemFollowUp(estagio: string, tentativa: number, nome: string, e
 
 async function processarLeadFollowUp(lead: any) {
   const supabase = getSupabase();
-  const { id, nome, whatsapp, estagio_funil, tentativas_followup = 0, empreendimento_interesse, lead_score = 0 } = lead;
+  const { id, nome, whatsapp, estagio_funil, tentativas_followup = 0, empreendimento_interesse, property_id, property_name, lead_score = 0 } = lead;
 
-  let nomeEmpreendimento = 'nosso empreendimento';
-  if (empreendimento_interesse) {
+  let nomeEmpreendimento = property_name || 'nosso empreendimento';
+  if (!property_name && property_id) {
+    const { data: prop } = await supabase
+      .from('properties')
+      .select('nome')
+      .eq('id', property_id)
+      .maybeSingle();
+    if (prop?.nome) nomeEmpreendimento = prop.nome;
+  } else if (!property_name && !property_id && empreendimento_interesse) {
     const { data: emp } = await supabase
       .from('empreendimentos')
       .select('nome')
@@ -113,7 +120,7 @@ export async function GET(req: NextRequest) {
 
     const { data: leads, error } = await supabase
       .from('leads')
-      .select('id, nome, whatsapp, estagio_funil, tentativas_followup, empreendimento_interesse, lead_score')
+      .select('id, nome, whatsapp, estagio_funil, tentativas_followup, empreendimento_interesse, property_id, property_name, lead_score')
       .lte('proximo_followup', agora)
       .eq('requer_atencao', false)
       .in('status', ['novo', 'ativo', 'qualificado'])

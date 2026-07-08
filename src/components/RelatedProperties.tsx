@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { imoveis } from '@/data/imoveis'
 import FormContato from '@/app/empreendimento/[construtora]/[slug]/FormContato'
+import MobileInterestBar from '@/components/MobileInterestBar'
 
 type Props = { atualSlug: string; cidade: string; nomeAtual?: string; propertyIdAtual?: string | null }
 
@@ -17,8 +18,9 @@ export function RelatedProperties({ atualSlug, cidade, nomeAtual, propertyIdAtua
 
   return (
     <>
+      {nome && <MobileInterestBar />}
       {nome && (
-        <section style={{ maxWidth: '560px', margin: '0 auto', padding: '48px 20px 16px' }}>
+        <section id="interesse" style={{ maxWidth: '560px', margin: '0 auto', padding: '48px 20px 16px', scrollMarginTop: '24px' }}>
           <h2 style={{ fontSize: '24px', fontWeight: 700, textAlign: 'center', marginBottom: '8px', color: '#18181b' }}>
             Tenho interesse
           </h2>

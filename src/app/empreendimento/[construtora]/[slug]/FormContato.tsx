@@ -48,6 +48,11 @@ export default function FormContato({ empreendimento, propertyId, propertySlug }
         }),
       });
       if (!res.ok) throw new Error('falha');
+      fetch('/api/notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome, whatsapp: telefone.replace(/\D/g, ''), property_name: empreendimento, email: email || null }),
+      }).catch(() => {});
       const eventId = crypto.randomUUID();
       trackLeadEvent(empreendimento, eventId);
       sendLeadToCapi({ event_id: eventId, nome, telefone, email: email || null, content_name: empreendimento });

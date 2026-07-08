@@ -29,6 +29,8 @@ export async function POST(req: NextRequest) {
       origem: 'Site',
       estagio_funil: 'primeiro_contato',
       source: 'book_download',
+      requer_atencao: false,
+      proximo_followup: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
     }
 
     const growthFields = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'gclid', 'fbclid'] as const

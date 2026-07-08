@@ -53,6 +53,9 @@ export async function POST(req: NextRequest) {
       property_id: resolvedPropertyId,
       origem: 'Site',
       status: 'novo',
+      estagio_funil: 'primeiro_contato',
+      requer_atencao: false,
+      proximo_followup: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
     }
 
     const extras: Record<string, unknown> = {}
