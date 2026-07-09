@@ -88,16 +88,16 @@ export default function Page() {
         nome="Villammare Residencial"
         slug="villammare-residencial-balneario-rincao-sc"
         construtora_slug="fontana"
-        cidade="Balneario Rincao"
+        cidade="Balneário Rincão"
         uf="SC"
         bairro="Centro"
-        descricao="Apartamentos de 4 dormitorios (2 suites e 2 demi suites), 172 a 275 m2, em Balneario Rincao/SC, a passos da praia."
+        descricao="Apartamentos de 4 dormitorios (2 suites e 2 demi suites), 172 a 275 m2, em Balneário Rincão/SC, a passos da praia."
         imagem={CDN+'villammare-residencial-68ff86c8ba6ce.jpg'}
         faq={[
           {pergunta:"Como funciona o financiamento direto do Villammare Residencial?",resposta:"Entrada de 20%, saldo em ate 72 parcelas mensais e 6 reforos anuais (cada reforo = 5 mensais), correcao pelo CUB/SC durante a obra. Entrega prevista setembro de 2029. Sem banco."},
-          {pergunta:"Qual a previsao de entrega do Villammare Residencial?",resposta:"Previsao de entrega setembro de 2029, em Balneario Rincao/SC."},
-          {pergunta:"Quais sao as plantas do Villammare Residencial?",resposta:"4 dormitorios (2 suites e 2 demi suites), de 172 a 275 m2 privativos, a passos da praia em Balneario Rincao/SC."},
-          {pergunta:"O Villammare tem vista para o mar?",resposta:"Sim. O Villammare fica a passos da praia em Balneario Rincao com sacada e vista privilegiada para o mar."},
+          {pergunta:"Qual a previsao de entrega do Villammare Residencial?",resposta:"Previsao de entrega setembro de 2029, em Balneário Rincão/SC."},
+          {pergunta:"Quais sao as plantas do Villammare Residencial?",resposta:"4 dormitorios (2 suites e 2 demi suites), de 172 a 275 m2 privativos, a passos da praia em Balneário Rincão/SC."},
+          {pergunta:"O Villammare tem vista para o mar?",resposta:"Sim. O Villammare fica a passos da praia em Balneário Rincão com sacada e vista privilegiada para o mar."},
           {pergunta:"Posso usar FGTS ou financiamento bancario no Villammare?",resposta:"Sim. Alem do financiamento direto Fontana, e possivel financiamento bancario ou FGTS. Consulte Stiven pelo WhatsApp."},
         ]}
       />
@@ -286,9 +286,9 @@ export default function Page() {
 
       <PropertyFAQ items={[
         {pergunta:"Como funciona o financiamento direto do Villammare Residencial?",resposta:"Entrada de 20%, saldo em ate 72 parcelas mensais e 6 reforos anuais (cada reforo = 5 mensais), correcao pelo CUB/SC durante a obra. Entrega prevista setembro de 2029. Sem banco."},
-        {pergunta:"Qual a previsao de entrega do Villammare Residencial?",resposta:"Previsao de entrega setembro de 2029, em Balneario Rincao/SC."},
-        {pergunta:"Quais sao as plantas do Villammare Residencial?",resposta:"4 dormitorios (2 suites e 2 demi suites), de 172 a 275 m2 privativos, a passos da praia em Balneario Rincao/SC."},
-        {pergunta:"O Villammare tem vista para o mar?",resposta:"Sim. O Villammare fica a passos da praia em Balneario Rincao com sacada e vista privilegiada para o mar."},
+        {pergunta:"Qual a previsao de entrega do Villammare Residencial?",resposta:"Previsao de entrega setembro de 2029, em Balneário Rincão/SC."},
+        {pergunta:"Quais sao as plantas do Villammare Residencial?",resposta:"4 dormitorios (2 suites e 2 demi suites), de 172 a 275 m2 privativos, a passos da praia em Balneário Rincão/SC."},
+        {pergunta:"O Villammare tem vista para o mar?",resposta:"Sim. O Villammare fica a passos da praia em Balneário Rincão com sacada e vista privilegiada para o mar."},
         {pergunta:"Posso usar FGTS ou financiamento bancario no Villammare?",resposta:"Sim. Alem do financiamento direto Fontana, e possivel financiamento bancario ou FGTS. Consulte Stiven pelo WhatsApp."},
       ]} accent="#1B3A4B" />
 
