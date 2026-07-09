@@ -43,6 +43,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     'comprar-apartamento-na-planta-criciuma',
     'cub-sc-correcao-parcelas',
     'apartamento-frente-mar-rincao-ou-laguna',
+    'financiamento-direto-vs-bancario',
+    'apartamento-na-planta-vs-pronto',
+    'onde-investir-sul-santa-catarina',
   ]
   const guiaPages: MetadataRoute.Sitemap = guias.map((slug) => ({
     url: SITE_URL + '/guia/' + slug,
