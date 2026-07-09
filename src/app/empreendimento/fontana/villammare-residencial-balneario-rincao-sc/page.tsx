@@ -121,10 +121,10 @@ export default function Page() {
       </header>
 
       <section style={{ position:'relative', height:'100vh', minHeight:560, display:'flex', alignItems:'flex-end' }}>
-        <Image src={IMG.hero} alt="Villammare Residencial - Balneario Rincao SC, a beira-mar" fill priority sizes="100vw" style={{ objectFit:'cover', objectPosition:'center' }} />
+        <Image src={IMG.hero} alt="Villammare Residencial - Balneário Rincão SC, a beira-mar" fill priority sizes="100vw" style={{ objectFit:'cover', objectPosition:'center' }} />
         <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top, rgba(9,24,40,0.78) 0%, rgba(9,24,40,0.20) 55%, transparent 100%)' }} />
         <div style={{ position:'relative', padding:'0 32px 64px', maxWidth:800 }}>
-          <p className="vm-eyebrow" style={{ color:'rgba(255,255,255,0.7)', marginBottom:16 }}>Balneario Rincao / SC</p>
+          <p className="vm-eyebrow" style={{ color:'rgba(255,255,255,0.7)', marginBottom:16 }}>Balneário Rincão / SC</p>
           <h1 className="vm-h1" style={{ color:'#fff', fontSize:'clamp(28px,4.5vw,60px)', lineHeight:1.1, margin:'0 0 16px' }}>Villammare<br/>Residencial</h1>
           <p style={{ color:'rgba(255,255,255,0.8)', fontSize:'clamp(15px,2vw,18px)', fontFamily:t.serif, fontStyle:'italic', marginBottom:36 }}>
             Onde o mar habita, estar perto e o melhor destino.
