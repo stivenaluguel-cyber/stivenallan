@@ -206,7 +206,7 @@ O estagio de obra tambem varia por regiao. Em Icara, os tres estagios convivem: 
                             <div style={{ borderTop: '1px solid rgba(0,0,0,0.10)' }} />
 
                             <p style={{ fontSize: 14, lineHeight: 1.8, color: '#666', marginTop: 32 }}>
-                            Veja tambem: <Link href="/guia/comprar-apartamento-na-planta-criciuma" style={{ color: '#B89B5E' }}>Como Comprar Apartamento na Planta em Criciuma</Link> e <Link href="/guia/apartamento-na-planta-vs-pronto" style={{ color: '#B89B5E' }}>Apartamento na Planta vs. Pronto</Link>.
+                            Veja tambem: <Link href="/guia/comprar-apartamento-na-planta-criciuma" style={{ color: '#B89B5E' }}>Como Comprar Apartamento na Planta em Criciuma</Link>, <Link href="/guia/apartamento-na-planta-vs-pronto" style={{ color: '#B89B5E' }}>Apartamento na Planta vs. Pronto</Link> e <Link href="/guia/apartamento-frente-mar-rincao-ou-laguna" style={{ color: '#B89B5E' }}>Rincão ou Laguna: Onde Comprar Frente Mar</Link>.
                             </p>
 
                             {/* CTA */}
