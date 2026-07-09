@@ -186,6 +186,10 @@ export const metadata: Metadata = {
                             <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
                             Quem busca parcelas menores durante um periodo mais longo, quer personalizar o acabamento ou nao tem FGTS disponivel pode se beneficiar de comprar na planta, como no Lavis Residencial ou no Fidenza Residencial. Quem quer morar ou alugar imediatamente, ou prefere usar o FGTS no financiamento, pode considerar um imovel pronto, como o Pavia Residencial. O Thiene Residencial, quase pronto, e uma opcao intermediaria para quem quer um prazo de entrega mais curto com condicoes especiais de desconto. Fale com Stiven Allan, CRECI 60.275, para avaliar qual estagio se encaixa melhor no seu momento de vida e planejamento financeiro.
                             </p>
+                            <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
+                            Vale lembrar que o prazo de entrega e as condicoes de pagamento sao definidos em contrato e podem mudar conforme o empreendimento escolhido. Antes de decidir entre planta, quase pronto ou pronto, vale simular o valor total de cada opcao, incluindo entrada, parcelas, reforcos e eventual saldo pos-chaves, para comparar o esforco financeiro real de cada alternativa ao longo do tempo. Essa comparacao ajuda a evitar surpresas no fluxo de caixa e a escolher a opcao mais alinhada ao seu momento de vida, seja para moradia, veraneio ou diversificacao de patrimonio.
+                            </p>
+                            
 
                             <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Perguntas Frequentes</h2>
 
@@ -233,4 +237,3 @@ export const metadata: Metadata = {
                             </main>
                             )
                             }
-                            
