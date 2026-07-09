@@ -58,6 +58,11 @@ const GUIAS = [
         titulo: 'Onde Investir no Sul de Santa Catarina',
         resumo: 'Conheca as cidades com empreendimentos ativos no Sul de Santa Catarina e o perfil de cada regiao.',
     },
+    {
+        slug: 'apartamento-frente-mar-rincao-ou-laguna',
+        titulo: 'Balneario Rincao ou Laguna: Onde Comprar Frente Mar',
+        resumo: 'Compare Balneario Rincao e Laguna (Mar Grosso) para comprar apartamento frente mar na planta, com valorizacao, perfil de cada praia e financiamento direto com a construtora.',
+    },
 ]
 
 export default function GuiaIndexPage() {
