@@ -292,7 +292,7 @@ export default function Page() {
         {pergunta:"Posso usar FGTS ou financiamento bancario no Villammare?",resposta:"Sim. Alem do financiamento direto Fontana, e possivel financiamento bancario ou FGTS. Consulte Stiven pelo WhatsApp."},
       ]} accent="#1B3A4B" />
 
-      <RelatedProperties atualSlug="villammare-residencial-balneario-rincao-sc" cidade="Balneario Rincao" />
+      <RelatedProperties atualSlug="villammare-residencial-balneario-rincao-sc" cidade="Balneário Rincão" />
     </main>
   )
 }
