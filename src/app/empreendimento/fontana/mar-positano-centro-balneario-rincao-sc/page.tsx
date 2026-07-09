@@ -61,11 +61,11 @@ const AMENIDADES = [
 
 export const metadata: Metadata = {
   title: 'Mar Positano Residencial | Apartamentos em Balneário Rincão SC | Fontana',
-  description: 'Mar Positano Residencial: apartamentos de 3 dormíitórios (1 suíte), 107 a 126 m², no Centro de Balneário Rincão/SC. Sacada com churrasqueira, piscina e lazer completo. Consulte condições.',
+  description: 'Mar Positano Residencial: apartamentos de 3 dormitórios (1 suíte), 107 a 126 m², no Centro de Balneário Rincão/SC. Sacada com churrasqueira, piscina e lazer completo. Consulte condições.',
   alternates: { canonical: `${SITE_URL}/empreendimento/fontana/mar-positano-centro-balneario-rincao-sc` },
   openGraph: {
     title: 'Mar Positano Residencial | Balneário Rincão SC | Stiven Allan',
-    description: 'Apartamentos de 3 dormíitórios com suíte, 107 a 126 m², no Centro de Balneário Rincão. Lazer completo e financiamento facilitado.',
+    description: 'Apartamentos de 3 dormitórios com suíte, 107 a 126 m², no Centro de Balneário Rincão. Lazer completo e financiamento facilitado.',
     url: `${SITE_URL}/empreendimento/fontana/mar-positano-centro-balneario-rincao-sc`,
     images: [{ url: 'https://estilofontana.com.br/images/empreendimento/slideshows/mar-positano-residencial-676db4dfc93f5.jpg', width: 1200, height: 630, alt: 'Mar Positano Residencial' }],
     type: 'website',
@@ -80,7 +80,7 @@ const SCHEMA = {
     {
       '@type': 'RealEstateListing',
       name: 'Mar Positano Residencial',
-      description: 'Apartamentos de 3 dormíitórios (1 suíte), 107 a 126 m², no Centro de Balneário Rincão/SC. Sacada com churrasqueira, piscina e lazer completo.',
+      description: 'Apartamentos de 3 dormitórios (1 suíte), 107 a 126 m², no Centro de Balneário Rincão/SC. Sacada com churrasqueira, piscina e lazer completo.',
       url: `${SITE_URL}/empreendimento/fontana/mar-positano-centro-balneario-rincao-sc`,
       image: 'https://estilofontana.com.br/images/empreendimento/slideshows/mar-positano-residencial-676db4dfc93f5.jpg',
       address: {
@@ -155,10 +155,10 @@ export default function Page() {
           <p className="mp-eyebrow" style={{ color:t.navy, marginBottom:20 }}>O Empreendimento</p>
           <h2 className="mp-h2" style={{ color:t.ink, margin:'0 0 28px' }}>As Residências</h2>
           <p style={{ color:t.muted, lineHeight:1.8, marginBottom:24 }}>
-            O Mar Positano entrega apartamentos de <strong>3 dormíitórios</strong> com 1 suíte, em plantas de <strong>107 a 126 m²</strong>, no coração do Centro de Balneário Rincão. Cada unidade conta com sacada com churrasqueira, cozinha integrada ao living e acabamentos criteriosamente selecionados.
+            O Mar Positano entrega apartamentos de <strong>3 dormitórios</strong> com 1 suíte, em plantas de <strong>107 a 126 m²</strong>, no coração do Centro de Balneário Rincão. Cada unidade conta com sacada com churrasqueira, cozinha integrada ao living e acabamentos criteriosamente selecionados.
           </p>
           <ul style={{ listStyle:'none', padding:0, margin:'0 0 36px', display:'flex', flexDirection:'column', gap:10 }}>
-            {['3 dormíitórios · 1 suíte master com closet','107 a 126 m² de área privativa','Sacada com churrasqueira','Cozinha integrada ao living','2 vagas de garagem','Área de serviço completa'].map((f,i) => (
+            {['3 dormitórios · 1 suíte master com closet','107 a 126 m² de área privativa','Sacada com churrasqueira','Cozinha integrada ao living','2 vagas de garagem','Área de serviço completa'].map((f,i) => (
               <li key={i} style={{ display:'flex', alignItems:'center', gap:10, fontSize:14, color:t.ink }}>
                 <span style={{ width:6, height:6, borderRadius:'50%', background:t.navy, flexShrink:0, display:'inline-block' }} />
                 {f}
@@ -196,7 +196,7 @@ export default function Page() {
                 Dois tipos de apartamento — <strong style={{ color:t.onDark }}>107 m²</strong> e <strong style={{ color:t.onDark }}>126 m²</strong> — com layouts que integram ambientes e maximizam a luminosidade natural.
               </p>
               <div style={{ display:'flex', gap:32 }}>
-                {[['3', 'Dormíitórios'],['1', 'Suíte'],['126', 'm² máx']].map(([n, l]) => (
+                {[['3', 'dormitórios'],['1', 'Suíte'],['126', 'm² máx']].map(([n, l]) => (
                   <div key={l}>
                     <p style={{ fontFamily:t.display, fontSize:40, fontWeight:300, color:t.onDark, margin:0 }}>{n}</p>
                     <p style={{ fontSize:11, letterSpacing:'0.3em', textTransform:'uppercase', color:t.onDarkMuted, margin:0 }}>{l}</p>
