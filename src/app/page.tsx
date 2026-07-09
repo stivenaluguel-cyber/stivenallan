@@ -257,7 +257,7 @@ export default async function HomePage() {
                 <p style={{ fontFamily: t.serif, fontStyle: 'italic', fontSize: 'clamp(16px,1.7vw,19px)', color: t.ink, lineHeight: 1.65, margin: '0 0 24px' }}>“{d.texto}”</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <div style={{ width: 36, height: 36, borderRadius: '50%', background: t.champagne, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <span style={{ fontFamily: t.display, fontWeight: 300, fontSize: 14, color: '#fff', textTransform: 'uppercase' }}>{d.nome[0]}</span>
+                    <span style={{ fontFamily: t.display, fontWeight: 300, fontSize: 14, color: t.ink, textTransform: 'uppercase' }}>{d.nome[0]}</span>
                   </div>
                   <div>
                     <p style={{ margin: 0, fontFamily: t.body, fontWeight: 500, fontSize: 13, color: t.ink }}>{d.nome}</p>
@@ -279,7 +279,7 @@ export default async function HomePage() {
             Empreendimentos que valorizam antes mesmo das chaves. Fale com Stiven e descubra como fazer seu capital trabalhar com inteligência.
           </p>
           <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href={WPP_MSG} data-wpp="1" target="_blank" rel="noopener noreferrer" className="home-btn" style={{ background: t.champagne, borderColor: t.champagne, color: '#fff' }}>Falar com Stiven</a>
+            <a href={WPP_MSG} data-wpp="1" target="_blank" rel="noopener noreferrer" className="home-btn" style={{ background: t.champagne, borderColor: t.champagne, color: t.ink }}>Falar com Stiven</a>
             <Link href="/#empreendimentos" className="home-btn home-btn--cham">Ver empreendimentos</Link>
           </div>
         </div>
