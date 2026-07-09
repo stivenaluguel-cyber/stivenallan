@@ -183,6 +183,10 @@ export const metadata: Metadata = {
                             <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
                             Fale com Stiven Allan, CRECI 60.275, para conhecer os detalhes de cada empreendimento e encontrar a regiao mais alinhada ao seu objetivo, seja moradia, veraneio ou diversificacao de patrimonio.
                             </p>
+                            <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
+                            Cada regiao tem sua propria dinamica: Criciuma reune a maior diversidade de bairros e tipologias, enquanto as cidades litoraneas concentram empreendimentos voltados a segunda residencia e a valorizacao de longo prazo junto ao mar. Ja Icara e Sideropolis funcionam como extensao natural do polo criciumense, com opcoes de bom custo-beneficio em municipios proprios. Bom Jardim da Serra, por sua vez, atende quem busca algo bem diferente do litoral e do centro urbano, com clima ameno e paisagem de montanha. Antes de decidir, vale considerar nao apenas o perfil da regiao, mas tambem o estagio do empreendimento (planta, quase pronto ou pronto) e as condicoes de pagamento de cada lancamento.
+                            </p>
+                            
 
                             <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Perguntas Frequentes</h2>
 
