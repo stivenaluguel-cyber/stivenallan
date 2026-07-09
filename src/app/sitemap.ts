@@ -37,6 +37,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }))
 
+    // Indice de guias
+      const guiaIndexPage: MetadataRoute.Sitemap = [
+          { url: SITE_URL + '/guia', lastModified: now, changeFrequency: 'monthly' as const, priority: 0.6 },
+            ]
+
   // Guias SEO
   const guias = [
     'financiamento-direto-construtora',
@@ -62,5 +67,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }))
 
-  return [...staticPages, ...cidadePages, ...guiaPages, ...empPages]
+  return [...staticPages, ...guiaIndexPage, ...cidadePages, ...guiaPages, ...empPages]
 }
