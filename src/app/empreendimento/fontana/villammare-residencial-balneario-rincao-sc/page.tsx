@@ -29,12 +29,12 @@ const IMG = {
 }
 
 const GALERIA = [
-  { src: D+'1Za3ySDHQ7ATPR4LC7Oap8JTQkpZw8_9V', alt: 'Fachada Angular Villammare Balneario Rincao', label: 'Fachada Angular' },
-  { src: D+'1xw1KBEiOP9YNaZPEfCaqOG0pPcHWrfWL', alt: 'Fachada Frontal Villammare Balneario Rincao', label: 'Fachada Frontal' },
-  { src: D+'1gRjiv9hbdTFXA1P6x8YVIQF-AeoNTeYY', alt: 'Vista aerea Villammare Balneario Rincao', label: 'Vista Aerea' },
+  { src: D+'1Za3ySDHQ7ATPR4LC7Oap8JTQkpZw8_9V', alt: 'Fachada Angular Villammare Balneário Rincão', label: 'Fachada Angular' },
+  { src: D+'1xw1KBEiOP9YNaZPEfCaqOG0pPcHWrfWL', alt: 'Fachada Frontal Villammare Balneário Rincão', label: 'Fachada Frontal' },
+  { src: D+'1gRjiv9hbdTFXA1P6x8YVIQF-AeoNTeYY', alt: 'Vista aerea Villammare Balneário Rincão', label: 'Vista Aerea' },
   { src: D+'13pJY132EO7r7M-LhNWu1NTvPWWHDj_7R', alt: 'Living Villammare Residencial', label: 'Living Integrado' },
   { src: D+'1iNzubghH01mMk-UZFIHfWp9mj105tgR9', alt: 'Suite Master Villammare Residencial', label: 'Suite Master' },
-  { src: D+'1majsObnc_JPIyALmPj8JfwziIYLwTeB8', alt: 'Sacada Villammare Balneario Rincao', label: 'Sacada com Vista' },
+  { src: D+'1majsObnc_JPIyALmPj8JfwziIYLwTeB8', alt: 'Sacada Villammare Balneário Rincão', label: 'Sacada com Vista' },
   { src: D+'1QJ57JHgyLwUdsdx4DRsvDydMIFFxr76h', alt: 'Salao de Festas Villammare', label: 'Salao de Festas' },
   { src: D+'1WXRYSvnWTcuDulZu11fjOxSuriNjgbb0', alt: 'Hall de Entrada Villammare', label: 'Hall de Entrada' },
   { src: D+'1UCviOdRGtl1lXT2QEgOzChrPGT7RG5gR', alt: 'Acesso Principal Villammare', label: 'Acesso Principal' },
@@ -61,7 +61,7 @@ const DIFERENCIAIS = [
   'Sacada com churrasqueira e guarda-corpo em vidro com vista para o mar',
   'Living integrado em conceito aberto - espaco e fluidez',
   'Acabamentos premium: porcelanato, fechadura digital e persianas automatizadas',
-  'A passos da praia - Balneario Rincao, o litoral mais exclusivo de SC',
+  'A passos da praia - Balneário Rincão, o litoral mais exclusivo de SC',
   'Construtora Fontana - solidez e qualidade comprovadas',
   'Financiamento direto com a Construtora Fontana',
 ]
@@ -141,10 +141,10 @@ export default function Page() {
           <p className="vm-eyebrow" style={{ color:t.navy, marginBottom:20 }}>O Empreendimento</p>
           <h2 className="vm-h2" style={{ color:t.ink, margin:'0 0 28px' }}>Elegancia Singular<br/>A Beira-Mar</h2>
           <p style={{ color:t.muted, lineHeight:1.8, marginBottom:24 }}>
-            O Villammare Residencial redefine o padrao do morar a beira-mar em Balneario Rincao. Com <strong>4 dormitorios</strong>, 2 suites e 2 demi suites, em plantas de <strong>172 a 275 m2</strong>, cada detalhe foi pensado para proporcionar conforto, elegancia e a incomparavel experiencia de viver com o mar como vizinho.
+            O Villammare Residencial redefine o padrao do morar a beira-mar em Balneário Rincão. Com <strong>4 dormitorios</strong>, 2 suites e 2 demi suites, em plantas de <strong>172 a 275 m2</strong>, cada detalhe foi pensado para proporcionar conforto, elegancia e a incomparavel experiencia de viver com o mar como vizinho.
           </p>
           <ul style={{ listStyle:'none', padding:0, margin:'0 0 36px', display:'flex', flexDirection:'column', gap:10 }}>
-            {['4 dormitorios - 2 suites + 2 demi suites','172 a 275 m2 de area privativa','Sacada com churrasqueira e vista para o mar','Living integrado em conceito aberto','2 elevadores - Fechadura digital','A passos da praia de Balneario Rincao'].map((f,i) => (
+            {['4 dormitorios - 2 suites + 2 demi suites','172 a 275 m2 de area privativa','Sacada com churrasqueira e vista para o mar','Living integrado em conceito aberto','2 elevadores - Fechadura digital','A passos da praia de Balneário Rincão'].map((f,i) => (
               <li key={i} style={{ display:'flex', alignItems:'center', gap:10, fontSize:14, color:t.ink }}>
                 <span style={{ width:6, height:6, borderRadius:'50%', background:t.navy, flexShrink:0, display:'inline-block' }} />
                 {f}
@@ -236,10 +236,10 @@ export default function Page() {
 
       <section style={{ padding:'96px 32px', maxWidth:1100, margin:'0 auto' }}>
         <p className="vm-eyebrow" style={{ color:t.navy, marginBottom:20 }}>Localizacao</p>
-        <h2 className="vm-h2" style={{ color:t.ink, margin:'0 0 12px' }}>Balneario Rincao - SC</h2>
-        <p style={{ color:t.muted, marginBottom:40 }}>Rua Manoel Jose Mage, No 15 - esquina com Av. Waldemar Carlos Petrini - Balneario Rincao/SC</p>
+        <h2 className="vm-h2" style={{ color:t.ink, margin:'0 0 12px' }}>Balneário Rincão - SC</h2>
+        <p style={{ color:t.muted, marginBottom:40 }}>Rua Manoel Jose Mage, No 15 - esquina com Av. Waldemar Carlos Petrini - Balneário Rincão/SC</p>
         <div style={{ position:'relative', aspectRatio:'16/7', overflow:'hidden', borderRadius:2 }}>
-          <Image src={IMG.fotomont} alt="Localizacao Villammare Balneario Rincao" fill sizes="(max-width:768px) 100vw, 1100px" style={{ objectFit:'cover' }} />
+          <Image src={IMG.fotomont} alt="Localizacao Villammare Balneário Rincão" fill sizes="(max-width:768px) 100vw, 1100px" style={{ objectFit:'cover' }} />
         </div>
       </section>
 
@@ -257,11 +257,11 @@ export default function Page() {
       </section>
 
       <section style={{ position:'relative', minHeight:480, display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden' }}>
-        <Image src={IMG.hero} alt="Villammare Residencial Balneario Rincao" fill sizes="100vw" style={{ objectFit:'cover' }} />
+        <Image src={IMG.hero} alt="Villammare Residencial Balneário Rincão" fill sizes="100vw" style={{ objectFit:'cover' }} />
         <div style={{ position:'absolute', inset:0, background:'rgba(9,24,40,0.72)' }} />
         <div style={{ position:'relative', textAlign:'center', padding:'0 32px' }}>
           <h2 className="vm-h2" style={{ color:'#fff', margin:'0 0 16px' }}>Villammare Residencial</h2>
-          <p style={{ color:'rgba(255,255,255,0.75)', marginBottom:40, fontFamily:t.serif, fontStyle:'italic', fontSize:18 }}>Preco sob consulta - Balneario Rincao / SC</p>
+          <p style={{ color:'rgba(255,255,255,0.75)', marginBottom:40, fontFamily:t.serif, fontStyle:'italic', fontSize:18 }}>Preco sob consulta - Balneário Rincão / SC</p>
           <a href={WPP} target="_blank" rel="noopener noreferrer" className="vm-cta" style={{ color:'#fff', borderColor:'rgba(255,255,255,0.6)' }}>
             Falar com Stiven Allan
           </a>
@@ -271,7 +271,7 @@ export default function Page() {
       <footer style={{ background:t.navyDark, padding:'48px 32px', textAlign:'center' }}>
         <p style={{ color:t.onDarkMuted, fontSize:12, letterSpacing:'0.2em', textTransform:'uppercase', margin:'0 0 8px' }}>Stiven Allan</p>
         <p style={{ color:t.onDarkMuted, fontSize:11, margin:'0 0 4px' }}>CRECI 60.275</p>
-        <p style={{ color:t.onDarkMuted, fontSize:11, margin:0 }}>Balneario Rincao - SC</p>
+        <p style={{ color:t.onDarkMuted, fontSize:11, margin:0 }}>Balneário Rincão - SC</p>
         <div style={{ marginTop:24 }}>
           <Link href="/" style={{ color:t.onDarkMuted, fontSize:11, letterSpacing:'0.2em', textTransform:'uppercase', textDecoration:'none' }}>Todos os Empreendimentos</Link>
         </div>
