@@ -190,6 +190,10 @@ export const metadata: Metadata = {
                             <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
                             Empreendimentos como o <Link href="/empreendimento/fontana/bellante-comerciario-criciuma-sc" style={{ color: '#C1682E' }}>Bellante Residencial</Link>, com plano de 2 reforcos anuais e 60 parcelas mensais, o <Link href="/empreendimento/fontana/thiene-centro-criciuma-sc" style={{ color: '#C1682E' }}>Thiene Residencial</Link>, com entrada reduzida de 10%, e o <Link href="/empreendimento/fontana/pavia-rio-maina-criciuma-sc" style={{ color: '#C1682E' }}>Pavia Residencial</Link>, ja pronto e com entrada de 15%, mostram como as condicoes variam conforme o estagio e o plano de cada lancamento. Fale com Stiven Allan, CRECI 60.275, para simular o cenario mais adequado ao seu perfil.
                             </p>
+                            <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
+                            Vale reforcar que a escolha do sistema de calculo tambem influencia o planejamento financeiro ao longo do contrato. No SPC-JS (juros simples), usado por Fontana, Corbetta e Locks, o crescimento da divida e mais previsivel porque os juros nao incidem sobre juros ja pagos. Ja nos sistemas Price e SAC, usados pela Giassi e pela Perego, o calculo por juros compostos pode gerar um custo total diferente dependendo do prazo contratado, o que reforca a importancia de comparar simulacoes completas antes de assinar qualquer contrato, seja com a construtora ou com um banco.
+                            </p>
+                            
 
                             <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Perguntas Frequentes</h2>
 
@@ -237,4 +241,4 @@ export const metadata: Metadata = {
                             </main>
                             )
                             }
-                            
+
