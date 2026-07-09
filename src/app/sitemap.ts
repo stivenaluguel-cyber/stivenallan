@@ -42,6 +42,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     'financiamento-direto-construtora',
     'comprar-apartamento-na-planta-criciuma',
     'cub-sc-correcao-parcelas',
+    'apartamento-frente-mar-rincao-ou-laguna',
   ]
   const guiaPages: MetadataRoute.Sitemap = guias.map((slug) => ({
     url: SITE_URL + '/guia/' + slug,
