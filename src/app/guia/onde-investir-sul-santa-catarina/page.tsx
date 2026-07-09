@@ -7,7 +7,7 @@ const CANONICAL = `${SITE_URL}/guia/${SLUG}`
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20quero%20saber%20mais%20sobre%20as%20regi%C3%B5es%20com%20empreendimentos%20no%20Sul%20de%20SC.'
 
 export const metadata: Metadata = {
-  title: 'Onde Investir no Sul de Santa Catarina: Guia por Regiao',
+  title: 'Onde Investir no Sul de Santa Catarina: Guia por Região',
     description: 'Conheca as cidades com empreendimentos Fontana ativos no Sul de Santa Catarina: Criciuma, Balneario Rincao, Laguna, Icara, Sideropolis, Balneario Picarras e Bom Jardim da Serra.',
       alternates: { canonical: CANONICAL },
         openGraph: {
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
                             const SCHEMA = {
                             '@context': 'https://schema.org',
                             '@type': 'Article',
-                            headline: 'Onde Investir no Sul de Santa Catarina: Guia por Regiao',
+                            headline: 'Onde Investir no Sul de Santa Catarina: Guia por Região',
                             description: 'Guia regional factual das cidades com empreendimentos ativos da Construtora Fontana no Sul de Santa Catarina.',
                             url: CANONICAL,
                             author: { '@type': 'Person', name: 'Stiven Allan', url: SITE_URL },
@@ -107,7 +107,7 @@ export const metadata: Metadata = {
                             Criciuma e o maior polo economico do sul catarinense e concentra o maior numero de lancamentos Fontana da regiao, distribuidos pelos bairros Centro, Cruzeiro do Sul, Santa Barbara, Comerciario, Michel, Rio Maina e Grande Prospera. E a cidade certa para quem busca vida urbana, comercio, servicos e proximidade do trabalho.
                             </p>
                             <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
-                            Entre os empreendimentos ativos em Criciuma estao o <Link href="/empreendimento/fontana/monte-leone-centro-criciuma-sc" style={{ color: '#B89B5E' }}>Monte Leone Residencial</Link> e o <Link href="/empreendimento/fontana/lavis-residencial-centro-criciuma-sc" style={{ color: '#B89B5E' }}>Lavis Residencial</Link>, ambos no Centro, o Fidenza Residencial no Cruzeiro do Sul, o Parco Savello Residencial em Santa Barbara, o Bellante Residencial no Comerciario, o Calalzo Di Cadore Residencial no Michel, o <Link href="/empreendimento/fontana/pavia-rio-maina-criciuma-sc" style={{ color: '#B89B5E' }}>Pavia Residencial</Link> em Rio Maina e o Villaggio Verde Residenziale em Grande Prospera.
+                            Entre os empreendimentos ativos em Criciuma estao o <Link href="/empreendimento/fontana/monte-leone-centro-criciuma-sc" style={{ color: '#B89B5E' }}>Monte Leone Residencial</Link> e o <Link href="/empreendimento/fontana/lavis-residencial-centro-criciuma-sc" style={{ color: '#B89B5E' }}>Lavis Residencial</Link>, ambos no Centro, o Fidenza Residencial no Cruzeiro do Sul, o Parco Savello Residencial em Santa Barbara, o Bellante Residencial no Comerciario, o Calalzo Di Cadore Residencial no Michel, o <Link href="/empreendimento/fontana/pavia-rio-maina-criciuma-sc" style={{ color: '#B89B5E' }}>Pavia Residencial</Link> em Rio Maina e o Villaggio Verde Residenziale em Grande Prospera. Tambem estao ativos na cidade o Tremezzo Residencial e o Thiene Residencial, ambos no Centro, o Bosco Del Montello Residencial, tambem no Centro, e o Pineto Residencial, no mesmo bairro, alem do Calliano Residencial e do Due Fratelli Residencial, ja entregues no Centro.
                             </p>
 
                             <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Balneario Rincao - vida litoranea</h2>
@@ -186,7 +186,11 @@ export const metadata: Metadata = {
                             <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
                             Cada regiao tem sua propria dinamica: Criciuma reune a maior diversidade de bairros e tipologias, enquanto as cidades litoraneas concentram empreendimentos voltados a segunda residencia e a valorizacao de longo prazo junto ao mar. Ja Icara e Sideropolis funcionam como extensao natural do polo criciumense, com opcoes de bom custo-beneficio em municipios proprios. Bom Jardim da Serra, por sua vez, atende quem busca algo bem diferente do litoral e do centro urbano, com clima ameno e paisagem de montanha. Antes de decidir, vale considerar nao apenas o perfil da regiao, mas tambem o estagio do empreendimento (planta, quase pronto ou pronto) e as condicoes de pagamento de cada lancamento.
                             </p>
-                            
+
+<p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
+O estagio de obra tambem varia por regiao. Em Icara, os tres estagios convivem: o Castellano Residencial esta em obras, enquanto o Pianezze Residencial e o Piazza Castello Residencial ja estao prontos. Em Sideropolis, o Avezzano Residencial e o Rocca Pietore Residencial estao na planta. Ja em Balneario Rincao e em Laguna, os lancamentos ativos estao concentrados na fase de obras, assim como o Aguas de Marano Residencial em Balneario Picarras e o Campos da Montanha Residencial em Bom Jardim da Serra. Essa diversidade de estagios entre as regioes reforca a importancia de conversar com Stiven Allan antes de decidir, para alinhar o momento da compra ao perfil de cada empreendimento.
+</p>
+
 
                             <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Perguntas Frequentes</h2>
 
