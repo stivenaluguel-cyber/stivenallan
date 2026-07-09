@@ -296,7 +296,7 @@ export default async function HomePage() {
             </div>
             <div>
               <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.25em', textTransform: 'uppercase', color: t.champagne, marginBottom: 20 }}>Menu</div>
-              {[['/', 'Início'], ['/#empreendimentos', 'Empreendimentos'], ['/#como-funciona', 'Financiamento direto']].map(([href, label]) => (
+              {[['/', 'Início'], ['/#empreendimentos', 'Empreendimentos'], ['/#como-funciona', 'Financiamento direto'], ['/guia', 'Guias']].map(([href, label]) => (
                 <div key={href} style={{ marginBottom: 10 }}>
                   <Link href={href} style={{ fontSize: 13, color: 'rgba(245,241,234,0.55)', textDecoration: 'none', letterSpacing: '0.04em' }}>{label}</Link>
                 </div>
