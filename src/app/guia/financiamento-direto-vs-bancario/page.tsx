@@ -8,7 +8,7 @@ const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20quero%20ent
 
 export const metadata: Metadata = {
   title: 'Financiamento Direto vs. Bancario: Qual Escolher?',
-    description: 'Compare o financiamento direto com a construtora e o financiamento bancario tradicional: sistemas SPC-JS, Price e SAC, com exemplos reais das construtoras da regiao.',
+    description: 'Compare o financiamento direto com a construtora e o financiamento bancario tradicional: sistemas SPC-JS, Price e SAC, com exemplos reais das construtoras da região.',
       alternates: { canonical: CANONICAL },
         openGraph: {
             title: 'Financiamento Direto vs. Bancario | Stiven Allan',

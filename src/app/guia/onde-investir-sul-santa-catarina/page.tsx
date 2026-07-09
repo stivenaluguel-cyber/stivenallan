@@ -8,11 +8,11 @@ const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20quero%20sab
 
 export const metadata: Metadata = {
   title: 'Onde Investir no Sul de Santa Catarina: Guia por Região',
-    description: 'Conheca as cidades com empreendimentos Fontana ativos no Sul de Santa Catarina: Criciuma, Balneario Rincao, Laguna, Icara, Sideropolis, Balneario Picarras e Bom Jardim da Serra.',
+    description: 'Conheca as cidades com empreendimentos Fontana ativos no Sul de Santa Catarina: Criciuma, Balneário Rincão, Laguna, Icara, Sideropolis, Balneario Picarras e Bom Jardim da Serra.',
       alternates: { canonical: CANONICAL },
         openGraph: {
             title: 'Onde Investir no Sul de Santa Catarina | Stiven Allan',
-                description: 'Perfil real de cada regiao com lancamentos ativos: cidade, praia ou serra.',
+                description: 'Perfil real de cada região com lançamentos ativos: cidade, praia ou serra.',
                     url: CANONICAL,
                         type: 'article',
                           },

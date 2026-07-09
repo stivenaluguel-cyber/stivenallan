@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   alternates: { canonical: CANONICAL },
   openGraph: {
     title: 'Como Comprar Apartamento na Planta em Criciuma/SC | Stiven Allan',
-    description: 'Tudo o que voce precisa saber antes de comprar um apartamento na planta em Criciuma.',
+    description: 'Tudo o que você precisa saber antes de comprar um apartamento na planta em Criciuma.',
     url: CANONICAL,
     type: 'article',
   },
@@ -83,7 +83,7 @@ export default function GuiaComprarNaPlantaPage() {
             Comprar Apartamento na Planta em Criciuma
           </h1>
           <p style={{ fontSize: 'clamp(16px,2vw,20px)', color: 'rgba(234,242,232,0.75)', marginTop: 24, lineHeight: 1.6 }}>
-            Tudo o que voce precisa saber antes de assinar o contrato: etapas, vantagens, riscos e como funciona o financiamento direto.
+            Tudo o que você precisa saber antes de assinar o contrato: etapas, vantagens, riscos e como funciona o financiamento direto.
           </p>
         </div>
       </section>

@@ -67,17 +67,17 @@ const DIFERENCIAIS = [
 ]
 
 export const metadata: Metadata = {
-  title: 'Villammare Residencial | Apartamentos em Balneario Rincao SC | Fontana',
-  description: 'Villammare Residencial: apartamentos de 4 dormitorios (2 suites + 2 demi suites), 172 a 275 m2, a passos da praia em Balneario Rincao/SC. Sacada com vista para o mar e financiamento direto.',
+  title: 'Villammare Residencial | Apartamentos em Balneário Rincão SC | Fontana',
+  description: 'Villammare Residencial: apartamentos de 4 dormitorios (2 suites + 2 demi suites), 172 a 275 m2, a passos da praia em Balneário Rincão/SC. Sacada com vista para o mar e financiamento direto.',
   alternates: { canonical: SITE_URL + '/empreendimento/fontana/villammare-residencial-balneario-rincao-sc' },
   openGraph: {
-    title: 'Villammare Residencial | Balneario Rincao SC | Stiven Allan',
-    description: '4 dorms (2 suites + 2 demi suites) - 172-275 m2 - Vista para o mar - Balneario Rincao/SC.',
+    title: 'Villammare Residencial | Balneário Rincão SC | Stiven Allan',
+    description: '4 dorms (2 suites + 2 demi suites) - 172-275 m2 - Vista para o mar - Balneário Rincão/SC.',
     url: SITE_URL + '/empreendimento/fontana/villammare-residencial-balneario-rincao-sc',
     images: [{ url: CDN+'villammare-residencial-68ff86c8ba6ce.jpg', width: 1200, height: 630, alt: 'Villammare Residencial' }],
     type: 'website',
   },
-  twitter: { card: 'summary_large_image', title: 'Villammare Residencial | Balneario Rincao SC | Stiven Allan', description: '4 dorms - 172-275 m2 - A beira-mar - Balneario Rincao' },
+  twitter: { card: 'summary_large_image', title: 'Villammare Residencial | Balneário Rincão SC | Stiven Allan', description: '4 dorms - 172-275 m2 - A beira-mar - Balneário Rincão' },
   robots: { index: true, follow: true },
 }
 

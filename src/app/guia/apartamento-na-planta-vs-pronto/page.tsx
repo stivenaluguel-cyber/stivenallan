@@ -8,7 +8,7 @@ const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20quero%20ent
 
 export const metadata: Metadata = {
   title: 'Apartamento na Planta vs. Pronto: Qual Comprar?',
-    description: 'Compare vantagens, condicoes de pagamento e prazos entre comprar um apartamento na planta (em obra) e um imovel pronto na regiao Sul de Santa Catarina.',
+    description: 'Compare vantagens, condições de pagamento e prazos entre comprar um apartamento na planta (em obra) e um imóvel pronto na região Sul de Santa Catarina.',
       alternates: { canonical: CANONICAL },
         openGraph: {
             title: 'Apartamento na Planta vs. Pronto | Stiven Allan',

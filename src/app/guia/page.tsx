@@ -6,16 +6,16 @@ const CANONICAL = `${SITE_URL}/guia`
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20quero%20saber%20mais%20sobre%20os%20guias%20de%20financiamento%20e%20compra.'
 
 export const metadata: Metadata = {
-    title: 'Guias sobre Financiamento e Compra de Imoveis',
+    title: 'Guias sobre Financiamento e Compra de Imóveis',
     description: 'Guias completos sobre financiamento direto, CUB/SC, compra na planta e onde investir no Sul de Santa Catarina.',
     alternates: { canonical: CANONICAL },
     openGraph: {
-        title: 'Guias sobre Financiamento e Compra de Imoveis | Stiven Allan',
+        title: 'Guias sobre Financiamento e Compra de Imóveis | Stiven Allan',
         description: 'Conteudo completo sobre financiamento direto, CUB/SC, planta vs. pronto e onde investir no Sul de Santa Catarina.',
         url: CANONICAL,
         type: 'website',
     },
-    twitter: { card: 'summary_large_image', title: 'Guias sobre Financiamento e Compra de Imoveis | Stiven Allan' },
+    twitter: { card: 'summary_large_image', title: 'Guias sobre Financiamento e Compra de Imóveis | Stiven Allan' },
 }
 
 const BREADCRUMB_SCHEMA = {
@@ -83,7 +83,7 @@ export default function GuiaIndexPage() {
                 <div style={{ maxWidth: 1080, margin: '0 auto' }}>
                     <p style={{ fontSize: 11, letterSpacing: '0.42em', textTransform: 'uppercase', color: 'rgba(245,241,234,0.55)', marginBottom: 20 }}>Central de Conteudo</p>
                     <h1 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.12em', fontSize: 'clamp(28px,5vw,52px)', lineHeight: 1.1, margin: 0 }}>
-                        Guias sobre Financiamento e Compra de Imoveis
+                        Guias sobre Financiamento e Compra de Imóveis
                     </h1>
                     <p style={{ fontSize: 'clamp(16px,2vw,20px)', color: 'rgba(245,241,234,0.75)', marginTop: 24, lineHeight: 1.6, maxWidth: 640 }}>
                         Conteudo completo e factual sobre financiamento direto, CUB/SC, compra na planta e as regioes com empreendimentos ativos no Sul de Santa Catarina.
