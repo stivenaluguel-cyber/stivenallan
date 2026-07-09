@@ -130,7 +130,7 @@ export default async function HomePage() {
         .home-btn:hover { background: #1A1814; color: #FAFAF8; }
         .home-btn--cham { border-color: #B89B5E; color: #B89B5E; }
         .home-btn--cham:hover { background: #B89B5E; color: #FAFAF8; }
-        .home-step-n { font-family: 'Jost', system-ui, sans-serif; font-weight: 300; font-size: clamp(40px,6vw,64px); color: rgba(184,155,94,0.18); letter-spacing: 0.04em; line-height: 1; }
+        .home-step-n { font-family: 'Jost', system-ui, sans-serif; font-weight: 300; font-size: clamp(40px,6vw,64px); color: rgba(184,155,94,0.62); letter-spacing: 0.04em; line-height: 1; }
         .home-dep-card { background: #fff; padding: 36px 32px; border-top: 2px solid #B89B5E; }
         .home-region-btn { font-family: 'Hanken Grotesk', system-ui, sans-serif; font-size: 10px; letter-spacing: 0.30em; text-transform: uppercase; color: #6B655B; border: 1px solid rgba(26,24,20,0.15); padding: 10px 22px; background: transparent; text-decoration: none; display: inline-block; cursor: pointer; transition: border-color .25s, color .25s; }
         .home-region-btn:hover { border-color: #B89B5E; color: #B89B5E; }
@@ -292,7 +292,7 @@ export default async function HomePage() {
             <div>
               <p style={{ fontFamily: t.display, fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.22em', fontSize: 16, color: t.onDark, margin: '0 0 16px' }}>Stiven Allan</p>
               <p style={{ fontFamily: t.body, fontSize: 13, color: t.onDarkMuted, lineHeight: 1.7, margin: '0 0 12px', maxWidth: 280 }}>Corretor de imóveis especializado em empreendimentos Fontana com financiamento direto.</p>
-              <p style={{ fontFamily: t.body, fontSize: 11, letterSpacing: '0.16em', color: 'rgba(245,241,234,0.35)', margin: 0 }}>CRECI 60.275</p>
+              <p style={{ fontFamily: t.body, fontSize: 11, letterSpacing: '0.16em', color: 'rgba(245,241,234,0.5)', margin: 0 }}>CRECI 60.275</p>
             </div>
             <div>
               <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.25em', textTransform: 'uppercase', color: t.champagne, marginBottom: 20 }}>Menu</div>
@@ -313,12 +313,12 @@ export default async function HomePage() {
             <div>
               <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.25em', textTransform: 'uppercase', color: t.champagne, marginBottom: 20 }}>Contato</div>
               <a href={WPP} data-wpp="1" target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: 'rgba(245,241,234,0.55)', textDecoration: 'none', display: 'block', marginBottom: 10 }}>WhatsApp</a>
-              <p style={{ fontSize: 13, color: 'rgba(245,241,234,0.35)', margin: '16px 0 0', lineHeight: 1.6 }}>Sul de Santa Catarina</p>
+              <p style={{ fontSize: 13, color: 'rgba(245,241,234,0.5)', margin: '16px 0 0', lineHeight: 1.6 }}>Sul de Santa Catarina</p>
             </div>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
-            <p style={{ fontFamily: t.body, fontSize: 12, color: 'rgba(245,241,234,0.25)', margin: 0 }}>© {new Date().getFullYear()} Stiven Allan. Todos os direitos reservados.</p>
-            <p style={{ fontFamily: t.body, fontSize: 12, color: 'rgba(245,241,234,0.25)', margin: 0 }}>Sul de Santa Catarina · CRECI 60.275</p>
+            <p style={{ fontFamily: t.body, fontSize: 12, color: 'rgba(245,241,234,0.5)', margin: 0 }}>© {new Date().getFullYear()} Stiven Allan. Todos os direitos reservados.</p>
+            <p style={{ fontFamily: t.body, fontSize: 12, color: 'rgba(245,241,234,0.5)', margin: 0 }}>Sul de Santa Catarina · CRECI 60.275</p>
           </div>
         </div>
       </footer>
