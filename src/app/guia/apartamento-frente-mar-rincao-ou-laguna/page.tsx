@@ -29,6 +29,16 @@ const SCHEMA = {
   publisher: { '@type': 'Organization', name: 'Stiven Allan Imóveis', url: SITE_URL },
 }
 
+const BREADCRUMB_SCHEMA = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Início', item: SITE_URL },
+    { '@type': 'ListItem', position: 2, name: 'Guias', item: `${SITE_URL}/guia/comprar-apartamento-na-planta-criciuma` },
+    { '@type': 'ListItem', position: 3, name: 'Balneário Rincão ou Laguna: Onde Comprar Apartamento Frente Mar', item: CANONICAL },
+  ],
+}
+
 const FAQ_SCHEMA = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -69,6 +79,7 @@ export default function GuiaRincaoOuLagunaPage() {
     <main style={{ background: '#FAFAF8', color: '#1A1A1A', fontFamily: "'Hanken Grotesk', system-ui, sans-serif" }}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHEMA) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_SCHEMA) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB_SCHEMA) }} />
 
       {/* HEADER */}
       <header style={{ background: '#fff', borderBottom: '1px solid rgba(0,0,0,0.08)', padding: '16px clamp(18px,5vw,64px)' }}>
@@ -108,6 +119,9 @@ export default function GuiaRincaoOuLagunaPage() {
         <p style={{ ...P, marginTop: 16 }}>
           O Rincão tem 13 km de praia, as lagoas de Esteves e do Faxinal para esportes náuticos, e a proximidade de Criciúma (35 minutos) que garante demanda de locação de veraneio da própria região. A Construtora Fontana concentra ali quatro empreendimentos: <Link href="/empreendimento/fontana/mar-di-arienzo-centro-balneario-rincao-sc" style={{ color: '#1A5C3A' }}>Mar di Arienzo</Link>, <Link href="/empreendimento/fontana/mar-di-atrani-centro-balneario-rincao-sc" style={{ color: '#1A5C3A' }}>Mar di Atrani</Link>, <Link href="/empreendimento/fontana/mar-positano-centro-balneario-rincao-sc" style={{ color: '#1A5C3A' }}>Mar Positano</Link> e <Link href="/empreendimento/fontana/villammare-residencial-balneario-rincao-sc" style={{ color: '#1A5C3A' }}>Villammare</Link> — todos em obras, todos com financiamento direto.
         </p>
+        <p style={{ ...P, marginTop: 16 }}>
+          Cada um desses quatro lançamentos tem sua própria data de entrega prevista, o que ajuda a escolher o prazo de obra mais adequado ao seu planejamento: o Mar di Atrani está previsto para outubro de 2028, o Mar Positano para agosto de 2029, o Villammare para setembro de 2029 e o Mar di Arienzo para agosto de 2030. As próprias frases de marketing reforçam a proposta de cada um: "Amplie seu horizonte" no Mar di Arienzo, "A vida no agora" no Mar di Atrani e "Um verdadeiro mergulho em sensações únicas" no Mar Positano.
+        </p>
 
         <h2 style={H2}>Laguna (Mar Grosso): a praia consolidada</h2>
         <p style={P}>
@@ -115,6 +129,9 @@ export default function GuiaRincaoOuLagunaPage() {
         </p>
         <p style={{ ...P, marginTop: 16 }}>
           A Fontana tem dois empreendimentos na quadra do mar: <Link href="/empreendimento/fontana/mar-di-licata-mar-grosso-laguna-sc" style={{ color: '#1A5C3A' }}>Mar di Licata</Link> e <Link href="/empreendimento/fontana/mar-di-nizza-mar-grosso-laguna-sc" style={{ color: '#1A5C3A' }}>Mar di Nizza</Link>, ambos em obras. Laguna também está a caminho do encontro entre a BR-101 duplicada e as praias do Rosa e Ibiraquera — o eixo turístico que mais cresce no estado passa na porta.
+        </p>
+        <p style={{ ...P, marginTop: 16 }}>
+          O Mar di Nizza tem entrega prevista para dezembro de 2026 — a mais próxima entre os seis empreendimentos do litoral sul —, enquanto o Mar di Licata está previsto para outubro de 2027. As frases de marketing seguem o mesmo convite: o Mar di Licata promete "Bem-vindo ao seu novo horizonte particular" e o Mar di Nizza resume a proposta em "Sinta a leveza do litoral de Laguna no seu dia a dia".
         </p>
 
         <h2 style={H2}>Comparativo direto</h2>
@@ -152,6 +169,12 @@ export default function GuiaRincaoOuLagunaPage() {
         </p>
         <p style={{ ...P, marginTop: 16 }}>
           O plano padrão Fontana é entrada de 20%, até 72 parcelas mensais corrigidas pelo CUB/SC e reforços anuais. Os detalhes de como funciona a correção estão no nosso <Link href="/guia/financiamento-direto-construtora" style={{ color: '#1A5C3A' }}>guia completo de financiamento direto</Link>.
+        </p>
+        <p style={{ ...P, marginTop: 16 }}>
+          Todos os seis empreendimentos seguem o mesmo plano de obra padrão da Fontana: entrada de 20%, até 72 parcelas mensais corrigidas pelo CUB/SC e 6 reforços anuais ao longo da construção. Para quem prefere quitar à vista, a construtora oferece desconto de 15% sobre o valor de tabela em qualquer um dos seis — Mar di Arienzo, Mar di Atrani, Mar Positano e Villammare em Balneário Rincão, Mar di Licata e Mar di Nizza em Laguna.
+        </p>
+        <p style={{ ...P, marginTop: 16 }}>
+          Para conhecer as demais regiões onde a Construtora Fontana tem empreendimentos ativos — como Criciúma, Içara, Sideropolis e Bom Jardim da Serra —, veja também o guia <Link href="/guia/onde-investir-sul-santa-catarina" style={{ color: '#1A5C3A' }}>Onde Investir no Sul de Santa Catarina</Link>.
         </p>
 
         <h2 style={H2}>Perguntas frequentes</h2>
