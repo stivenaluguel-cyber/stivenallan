@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { SITE_URL } from '@/lib/site'
 
-const SLUG = 'cub-sc-correção-parcelas'
+const SLUG = 'cub-sc-correcao-parcelas'
 const CANONICAL = `${SITE_URL}/guia/${SLUG}`
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20quero%20entender%20como%20o%20CUB%2FSC%20afeta%20minhas%20parcelas.'
 
