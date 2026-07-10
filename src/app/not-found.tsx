@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Pagina nao encontrada — Stiven Allan Corretor de Imoveis',
-  description: 'A pagina que voce procura nao existe. Explore os lancamentos imobiliarios em Criciuma com Stiven Allan, CRECI 60.275.',
+  description: 'A pagina que você procura nao existe. Explore os lançamentos imobiliarios em Criciuma com Stiven Allan, CRECI 60.275.',
 }
 
 export default function NotFound() {
@@ -16,14 +16,14 @@ export default function NotFound() {
           Pagina nao encontrada
         </h1>
         <p style={{ fontSize: 15, color: '#6B655B', lineHeight: 1.7, marginBottom: 40 }}>
-          A pagina que voce procura nao existe ou foi removida. Mas temos varios lancamentos incriveis esperando por voce!
+          A pagina que você procura nao existe ou foi removida. Mas temos varios lançamentos incriveis esperando por você!
         </p>
         <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
           <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#D24E22', color: '#fff', fontWeight: 700, fontSize: 14, padding: '13px 26px', borderRadius: 3, textDecoration: 'none', minHeight: 44 }}>
             Ir para o inicio
           </Link>
           <Link href="/empreendimentos" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'transparent', border: '1px solid rgba(26,24,21,0.25)', color: '#161512', fontWeight: 600, fontSize: 14, padding: '13px 26px', borderRadius: 3, textDecoration: 'none', minHeight: 44 }}>
-            Ver lancamentos
+            Ver lançamentos
           </Link>
           <Link href="/dashboard" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#131211', color: '#F3F2EE', fontWeight: 600, fontSize: 14, padding: '13px 26px', borderRadius: 3, textDecoration: 'none', minHeight: 44 }}>
             Painel CRM
