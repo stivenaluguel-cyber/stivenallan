@@ -242,7 +242,7 @@ export default function Page() {
       {/* LAZER */}
       <section style={{ background:'#fff', padding:'96px 32px' }}>
         <div style={{ maxWidth:1100, margin:'0 auto' }}>
-          <p className="mp-eyebrow" style={{ color:t.navy, marginBottom:20 }}>Area de Lazer</p>
+          <p className="mp-eyebrow" style={{ color:t.navy, marginBottom:20 }}>Área de Lazer</p>
           <h2 className="mp-h2" style={{ color:t.ink, margin:'0 0 48px' }}>Infraestrutura Completa</h2>
           <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:48, alignItems:'start' }}>
             <div>

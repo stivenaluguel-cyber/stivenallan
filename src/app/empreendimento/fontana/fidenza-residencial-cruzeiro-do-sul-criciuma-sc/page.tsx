@@ -8,7 +8,7 @@ import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
 
-// Hotsite premium Fidenza Residencial (Fontana, Cruzeiro do Sul, Criciuma/SC). Padrao EPIC — benchmark Aguas de Marano.
+// Hotsite premium Fidenza Residencial (Fontana, Cruzeiro do Sul, Criciúma/SC). Padrão EPIC — benchmark Aguas de Marano.
 // Acento: grafite #2B2B2B com detalhe azul #1E3A8A discreto (motivo Mondrian).
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Fidenza%20Residencial.'
 const CATALOGO_PDF = 'https://estilofontana.com.br/upload/empreendimento/catalogo/fidenza-residencial-1725383545.pdf'

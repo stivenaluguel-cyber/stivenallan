@@ -7,7 +7,7 @@ import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
 
-// Hotsite premium Lavis Residencial (Fontana, Centro de Criciuma/SC). Padrao EPIC — benchmark Aguas de Marano.
+// Hotsite premium Lavis Residencial (Fontana, Centro de Criciúma/SC). Padrão EPIC — benchmark Aguas de Marano.
 // WhatsApp do corretor Stiven (NAO usar numeros internos da Fontana).
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Lavis%20Residencial.'
 const CATALOGO_PDF = 'https://estilofontana.com.br/upload/empreendimento/catalogo/lavis-residencial-1764352426.pdf'

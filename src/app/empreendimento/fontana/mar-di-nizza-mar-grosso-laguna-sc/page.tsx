@@ -8,17 +8,17 @@ import { RelatedProperties } from '@/components/RelatedProperties'
 
 export const metadata: Metadata = {
   title: 'Mar di Nizza Residencial | Mar Grosso Laguna SC',
-  description: 'Mar di Nizza Residencial em Mar Grosso, Laguna/SC. 2 e 3 dormíitórios (1 suíte), 65 a 92 m² privativos. Salão de Festas com Deck Externo, Espaço Fitness com Terraço, Living Integrado. Preço sob consulta.',
+  description: 'Mar di Nizza Residencial em Mar Grosso, Laguna/SC. 2 e 3 dormitórios (1 suíte), 65 a 92 m² privativos. Salão de Festas com Deck Externo, Espaço Fitness com Terraço, Living Integrado. Preço sob consulta.',
   keywords: ['Mar di Nizza Residencial', 'Mar Grosso', 'Laguna SC', 'apartamento Laguna', 'Construtora Fontana', 'Stiven Allan', 'imóvel litoral SC'],
   openGraph: {
     title: 'Mar di Nizza Residencial | Mar Grosso Laguna SC | Stiven Allan',
-    description: 'Sinta a leveza do litoral de Laguna no seu dia a dia. 2 e 3 dormíitórios, 65 a 92 m² privativos.',
+    description: 'Sinta a leveza do litoral de Laguna no seu dia a dia. 2 e 3 dormitórios, 65 a 92 m² privativos.',
     images: ['https://estilofontana.com.br/images/empreendimento/slideshows/mar-di-nizza-residencial-64e74bef1ceb6.jpg?fm=webp'],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Mar di Nizza Residencial | Mar Grosso Laguna SC | Stiven Allan',
-    description: 'Sinta a leveza do litoral de Laguna no seu dia a dia. 2 e 3 dormíitórios, 65 a 92 m² privativos.',
+    description: 'Sinta a leveza do litoral de Laguna no seu dia a dia. 2 e 3 dormitórios, 65 a 92 m² privativos.',
     images: ['https://estilofontana.com.br/images/empreendimento/slideshows/mar-di-nizza-residencial-64e74bef1ceb6.jpg?fm=webp'],
   },
 }
@@ -52,7 +52,7 @@ const DIFERENCIAIS = [
   'Espaço Fitness com Terraço',
   'Churrasqueira com sistema de exaustão e dumper',
   'Hall de Entrada com pé-direito duplo',
-  'Persianas nos dormíitórios e rebaixo em gesso',
+  'Persianas nos dormitórios e rebaixo em gesso',
   'Possibilidade de personalização de planta',
 ]
 
@@ -63,7 +63,7 @@ const AMENIDADES = [
 ]
 
 const STATS = [
-  {n:'2 e 3',l:'Dormíitórios'},
+  {n:'2 e 3',l:'dormitórios'},
   {n:'1',l:'Suíte'},
   {n:'65 a 92',l:'m² privativos'},
   {n:'2',l:'Elevadores'},
@@ -76,7 +76,7 @@ const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Apartment',
   name: 'Mar di Nizza Residencial',
-  description: 'Residencial com 2 e 3 dormíitórios (1 suíte), 65 a 92 m² privativos em Mar Grosso, Laguna/SC.',
+  description: 'Residencial com 2 e 3 dormitórios (1 suíte), 65 a 92 m² privativos em Mar Grosso, Laguna/SC.',
   numberOfRooms: 3,
   floorSize: { '@type': 'QuantitativeValue', value: 92, unitCode: 'MTK' },
   address: {
@@ -129,7 +129,7 @@ export default function MarDiNizzaPage() {
         <section className="mn-section">
           <p className="mn-label" style={{ color:t.teal }}>O Empreendimento</p>
           <h2 className="mn-h2" style={{ fontFamily:t.serif }}>Mar di Nizza Residencial</h2>
-          <p className="mn-copy">A poucos minutos do mar e tudo que você precisa. O Mar di Nizza foi pensado para acolher bem os seus sonhos — com infraestrutura moderna e apartamentos de 2 e 3 dormíitórios, ele é capaz de abrigar tudo que faz parte de você. Venha aproveitar ao máximo o seu jeito leve de viver.</p>
+          <p className="mn-copy">A poucos minutos do mar e tudo que você precisa. O Mar di Nizza foi pensado para acolher bem os seus sonhos — com infraestrutura moderna e apartamentos de 2 e 3 dormitórios, ele é capaz de abrigar tudo que faz parte de você. Venha aproveitar ao máximo o seu jeito leve de viver.</p>
           <div className="mn-stats">
             {STATS.map((s,i) => (
               <div key={i} className="mn-stat">
