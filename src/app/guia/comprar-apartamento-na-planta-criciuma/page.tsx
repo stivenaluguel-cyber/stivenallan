@@ -35,28 +35,28 @@ const FAQ_SCHEMA = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: 'Quais construtoras tem lancamentos na planta em Criciuma?',
-      acceptedAnswer: { '@type': 'Answer', text: 'A Construtora Fontana e uma das principais com lancamentos na planta em Criciuma e regiao, com empreendimentos nos bairros Centro, Michel, Rio Maina, Santa Barbara, e tambem nas praias de Balneario Rincao e Balneario Picarras.' },
+      name: 'Quais construtoras tem lançamentos na planta em Criciuma?',
+      acceptedAnswer: { '@type': 'Answer', text: 'A Construtora Fontana e uma das principais com lançamentos na planta em Criciuma e região, com empreendimentos nos bairros Centro, Michel, Rio Maina, Santa Barbara, e também nas praias de Balneario Rincao e Balneario Picarras.' },
     },
     {
       '@type': 'Question',
-      name: 'Qual a diferenca entre comprar na planta e pronto?',
-      acceptedAnswer: { '@type': 'Answer', text: 'Na planta, voce paga durante a obra com parcelas menores e corrigidas pelo CUB/SC. Ao final da obra, pode refinanciar com banco ou quitar direto. Um imovel pronto pode ser habitado imediatamente, mas geralmente exige mais capital inicial.' },
+      name: 'Qual a diferença entre comprar na planta e pronto?',
+      acceptedAnswer: { '@type': 'Answer', text: 'Na planta, você paga durante a obra com parcelas menores e corrigidas pelo CUB/SC. Ao final da obra, pode refinanciar com banco ou quitar direto. Um imóvel pronto pode ser habitado imediatamente, mas geralmente exige mais capital inicial.' },
     },
     {
       '@type': 'Question',
-      name: 'E seguro comprar na planta em Criciuma?',
-      acceptedAnswer: { '@type': 'Answer', text: 'Sim, desde que a construtora seja registrada no CRECI, o empreendimento esteja registrado em cartorio e o contrato seja registrado. A Construtora Fontana atua ha decadas na regiao sul catarinense com historico de entregas.' },
+      name: 'É seguro comprar na planta em Criciuma?',
+      acceptedAnswer: { '@type': 'Answer', text: 'Sim, desde que a construtora seja registrada no CRECI, o empreendimento esteja registrado em cartório e o contrato seja registrado. A Construtora Fontana atua há décadas na região sul catarinense com histórico de entregas.' },
     },
     {
       '@type': 'Question',
       name: 'Como funciona o pagamento de apartamento na planta?',
-      acceptedAnswer: { '@type': 'Answer', text: 'No financiamento direto Fontana: entrada de 20% no ato, saldo dividido em parcelas mensais e reforos anuais, todos corrigidos pelo CUB/SC durante a obra. Sem necessidade de aprovacao bancaria.' },
+      acceptedAnswer: { '@type': 'Answer', text: 'No financiamento direto Fontana: entrada de 20% no ato, saldo dividido em parcelas mensais e reforos anuais, todos corrigidos pelo CUB/SC durante a obra. Sem necessidade de aprovação bancária.' },
     },
     {
       '@type': 'Question',
       name: 'Quando recebo o apartamento comprado na planta?',
-      acceptedAnswer: { '@type': 'Answer', text: 'Depende do empreendimento. Os lancamentos Fontana tem prazos de entrega entre 2026 e 2030, dependendo do estagio atual da obra. Cada empreendimento tem sua data de previsao de entrega em contrato.' },
+      acceptedAnswer: { '@type': 'Answer', text: 'Depende do empreendimento. Os lançamentos Fontana tem prazos de entrega entre 2026 e 2030, dependendo do estagio atual da obra. Cada empreendimento tem sua data de previsao de entrega em contrato.' },
     },
   ],
 }
@@ -88,67 +88,67 @@ export default function GuiaComprarNaPlantaPage() {
         </div>
       </section>
 
-      {/* CONTEUDO */}
+      {/* CONTEÚDO */}
       <article style={{ maxWidth: 800, margin: '0 auto', padding: 'clamp(48px,8vh,96px) clamp(18px,5vw,64px)' }}>
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Por que comprar na planta em Criciuma?</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-          Comprar na planta permite pagar o imovel em parcelas menores durante a obra, com possibilidade de ganho de valorizacao ate a entrega. Em Criciuma, os empreendimentos Fontana tem entregado imoveis com valorizacao relevante em relacao ao preco de lancamento. Alem disso, o financiamento direto da Fontana dispensa aprovacao bancaria, o que agiliza muito o processo de aquisicao.
+          Comprar na planta permite pagar o imóvel em parcelas menores durante a obra, com possibilidade de ganho de valorização até a entrega. Em Criciuma, os empreendimentos Fontana tem entregado imóveis com valorização relevante em relação ao preco de lançamento. Além disso, o financiamento direto da Fontana dispensa aprovação bancária, o que agiliza muito o processo de aquisição.
         </p>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
-          Criciuma e o maior polo economico do sul catarinense, com mercado imobiliario aquecido e crescente demanda por apartamentos modernos. A Construtora Fontana, com decadas de atuacao na regiao, e a principal construtora com lancamentos em varios bairros da cidade e no litoral sul catarinense.
+          Criciuma e o maior polo econômico do sul catarinense, com mercado imobiliário aquecido e crescente demanda por apartamentos modernos. A Construtora Fontana, com décadas de atuação na região, e a principal construtora com lançamentos em varios bairros da cidade e no litoral sul catarinense.
         </p>
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Etapas para comprar na planta</h2>
         <ol style={{ fontSize: 15, lineHeight: 2.2, color: '#333', paddingLeft: 24 }}>
-          <li><strong>Escolha o empreendimento:</strong> Verifique a localizacao, a construtora, a tipologia e a previsao de entrega do imovel. Em Criciuma e no Sul Catarinense, os lancamentos Fontana vao de bairros como Michel e Centro ate empreendimentos de veraneio no litoral. Compare a planta, o padrao de acabamento e a data prevista de conclusao antes de decidir.</li>
-          <li><strong>Conheca o plano de financiamento:</strong> O plano padrao Fontana tem entrada de 20%, ate 72 parcelas mensais corrigidas pelo CUB/SC e ate 6 reforos anuais. Cada reforo anual equivale a 5 parcelas mensais. Como o financiamento e direto com a construtora, nao ha necessidade de aprovacao bancaria, o que agiliza o processo.</li>
-          <li><strong>Analise o contrato (reserva):</strong> Feita a reserva da unidade, analise o contrato com atencao antes de assinar. O contrato deve ser registrado em cartorio para sua protecao juridica e precisa trazer a clausula de correcao pelo CUB/SC, o prazo de entrega e a tolerancia previstos. Confira tambem a especificacao tecnica do acabamento.</li>
-          <li><strong>Pague a entrada:</strong> A entrada corresponde a 20% do valor do imovel e e paga no ato da assinatura do contrato. Num apartamento de R$ 500.000, por exemplo, isso equivale a R$ 100.000. E esse pagamento inicial que garante a reserva da unidade escolhida.</li>
-          <li><strong>Pague as parcelas durante a obra:</strong> Durante a construcao, voce paga parcelas mensais corrigidas pelo CUB/SC, alem dos reforos anuais equivalentes a 5 parcelas cada. As parcelas menores durante a obra sao uma das principais vantagens de comprar na planta. O saldo de 80% e diluido ao longo de ate 72 meses.</li>
-          <li><strong>Receba as chaves:</strong> Concluida a obra, faca a vistoria da unidade, confirme se o acabamento corresponde a especificacao do contrato e assine o auto de entrega. E o momento de checar todos os itens antes de receber o imovel. Eventuais ajustes devem ser registrados na propria vistoria.</li>
-          <li><strong>Quite o saldo e registre o imovel:</strong> Apos as chaves, quite o saldo devedor remanescente, seja pelo saldo direto com a Fontana ou por financiamento bancario. Em seguida, registre o imovel em seu nome no cartorio de registro de imoveis. Somente com o registro a propriedade passa oficialmente para o comprador.</li>
+          <li><strong>Escolha o empreendimento:</strong> Verifique a localização, a construtora, a tipologia e a previsao de entrega do imóvel. Em Criciuma e no Sul Catarinense, os lançamentos Fontana vao de bairros como Michel e Centro até empreendimentos de veraneio no litoral. Compare a planta, o padrão de acabamento e a data prevista de conclusao antes de decidir.</li>
+          <li><strong>Conheca o plano de financiamento:</strong> O plano padrão Fontana tem entrada de 20%, até 72 parcelas mensais corrigidas pelo CUB/SC e até 6 reforos anuais. Cada reforo anual equivale a 5 parcelas mensais. Como o financiamento e direto com a construtora, não há necessidade de aprovação bancária, o que agiliza o processo.</li>
+          <li><strong>Análise o contrato (reserva):</strong> Feita a reserva da unidade, análise o contrato com atenção antes de assinar. O contrato deve ser registrado em cartório para sua proteção juridica e precisa trazer a cláusula de correção pelo CUB/SC, o prazo de entrega e a tolerância previstos. Confira também a especificação técnica do acabamento.</li>
+          <li><strong>Pague a entrada:</strong> A entrada corresponde a 20% do valor do imóvel e e paga no ato da assinatura do contrato. Num apartamento de R$ 500.000, por exemplo, isso equivale a R$ 100.000. E esse pagamento inicial que garante a reserva da unidade escolhida.</li>
+          <li><strong>Pague as parcelas durante a obra:</strong> Durante a construção, você paga parcelas mensais corrigidas pelo CUB/SC, além dos reforos anuais equivalentes a 5 parcelas cada. As parcelas menores durante a obra são uma das principais vantagens de comprar na planta. O saldo de 80% e diluido ao longo de até 72 meses.</li>
+          <li><strong>Receba as chaves:</strong> Concluida a obra, faca a vistoria da unidade, confirme se o acabamento corresponde a especificação do contrato e assine o auto de entrega. E o momento de checar todos os itens antes de receber o imóvel. Eventuais ajustes devem ser registrados na própria vistoria.</li>
+          <li><strong>Quite o saldo e registre o imóvel:</strong> Após as chaves, quite o saldo devedor remanescente, seja pelo saldo direto com a Fontana ou por financiamento bancário. Em seguida, registre o imóvel em seu nome no cartório de registro de imóveis. Somente com o registro a propriedade passa oficialmente para o comprador.</li>
         </ol>
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Como funciona o financiamento direto na planta?</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-          O plano padrao Fontana divide o pagamento em entrada de 20%, ate 72 parcelas mensais corrigidas pelo CUB/SC e ate 6 reforos anuais (cada reforo equivale a 5 parcelas mensais). Nao e necessario aprovacao bancaria.
+          O plano padrão Fontana divide o pagamento em entrada de 20%, até 72 parcelas mensais corrigidas pelo CUB/SC e até 6 reforos anuais (cada reforo equivale a 5 parcelas mensais). Não é necessário aprovação bancária.
         </p>
         <div style={{ background: '#F0F7F0', borderRadius: 2, padding: '24px 28px', margin: '24px 0' }}>
           <p style={{ fontSize: 14, fontWeight: 600, color: '#1A5C3A', marginTop: 0, marginBottom: 8 }}>Exemplo: apartamento de R$ 500.000</p>
           <ul style={{ fontSize: 14, lineHeight: 2, color: '#333', paddingLeft: 20, margin: 0 }}>
             <li><strong>Entrada (20%):</strong> R$ 100.000 no ato</li>
             <li><strong>Saldo (80%):</strong> R$ 400.000 dividido em parcelas mais reforos</li>
-            <li><strong>Parcelas mensais base:</strong> aproximadamente R$ 3.330/mes por 72 meses</li>
+            <li><strong>Parcelas mensais base:</strong> aproximadamente R$ 3.330/mês por 72 meses</li>
             <li><strong>Reforos anuais (5x parcela):</strong> aproximadamente R$ 16.650/ano por 6 anos</li>
-            <li><strong>Como chegamos a esses valores:</strong> a entrada de 20% sobre R$ 500.000 resulta em R$ 100.000, deixando um saldo de R$ 400.000 (80%). Diluido em 72 meses, o saldo daria cerca de R$ 5.556 por mes; como parte do valor migra para os 6 reforos anuais (cerca de R$ 16.650 cada), a parcela mensal base cai para aproximadamente R$ 3.330.</li>
+            <li><strong>Como chegamos a esses valores:</strong> a entrada de 20% sobre R$ 500.000 resulta em R$ 100.000, deixando um saldo de R$ 400.000 (80%). Diluido em 72 meses, o saldo daria cerca de R$ 5.556 por mês; como parte do valor migra para os 6 reforos anuais (cerca de R$ 16.650 cada), a parcela mensal base cai para aproximadamente R$ 3.330.</li>
           </ul>
         </div>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-          O CUB/SC (Custo Unitario Basico do Sinduscon-SC) corrige as parcelas todo mes. Em junho de 2026, o CUB/SC estava em R$ 3.096,25/m2. A variacao historica fica entre 0,4% e 0,8% ao mes.
+          O CUB/SC (Custo Unitário Básico do Sinduscon-SC) corrige as parcelas todo mês. Em junho de 2026, o CUB/SC estava em R$ 3.096,25/m2. A variação historica fica entre 0,4% e 0,8% ao mês.
         </p>
 
-        <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Principais bairros e regioes com lancamentos em Criciuma</h2>
+        <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Principais bairros e regiões com lançamentos em Criciuma</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-          A Construtora Fontana tem lancamentos em diversas regioes de Criciuma e Sul Catarinense: <strong>Centro</strong>, <strong>Michel</strong>, <strong>Rio Maina</strong>, <strong>Santa Barbara</strong>, <strong>Cruzeiro do Sul</strong>, alem de empreendimentos de veraneio em <strong>Balneario Rincao</strong>, <strong>Balneario Picarras</strong> e <strong>Laguna</strong>.
+          A Construtora Fontana tem lançamentos em diversas regiões de Criciuma e Sul Catarinense: <strong>Centro</strong>, <strong>Michel</strong>, <strong>Rio Maina</strong>, <strong>Santa Barbara</strong>, <strong>Cruzeiro do Sul</strong>, além de empreendimentos de veraneio em <strong>Balneario Rincao</strong>, <strong>Balneario Picarras</strong> e <strong>Laguna</strong>.
         </p>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
-          Para imoveis de alto padrao, os bairros Michel e Centro de Criciuma concentram os lancamentos mais sofisticados, com apartamentos de 3 e 4 suites, rooftops exclusivos e areas de lazer completas. Para quem busca custo-beneficio, os bairros Rio Maina e Santa Barbara oferecem boas opcoes com financiamento direto acessivel.
+          Para imóveis de alto padrão, os bairros Michel e Centro de Criciuma concentram os lançamentos mais sofisticados, com apartamentos de 3 e 4 suites, rooftops exclusivos e areas de lazer completas. Para quem busca custo-benefício, os bairros Rio Maina e Santa Barbara oferecem boas opções com financiamento direto acessível.
         </p>
         <p style={{ fontSize: 16, lineHeight: 1.7, color: '#333', marginTop: 12 }}>
-          Vale considerar tambem o perfil de cada regiao ao comprar na planta. O Centro e o bairro Michel reunem os empreendimentos de alto padrao, com apartamentos de 3 e 4 suites e areas de lazer completas, enquanto Rio Maina e Santa Barbara concentram opcoes de melhor custo-beneficio com financiamento direto acessivel. Ja Balneario Rincao, Balneario Picarras e Laguna sao voltados a quem busca imoveis de veraneio no litoral sul catarinense. Definir a regiao ajuda a alinhar o investimento ao seu objetivo, seja moradia ou valorizacao.
+          Vale considerar também o perfil de cada região ao comprar na planta. O Centro e o bairro Michel reunem os empreendimentos de alto padrão, com apartamentos de 3 e 4 suites e areas de lazer completas, enquanto Rio Maina e Santa Barbara concentram opções de melhor custo-benefício com financiamento direto acessível. Ja Balneario Rincao, Balneario Picarras e Laguna são voltados a quem busca imóveis de veraneio no litoral sul catarinense. Definir a região ajuda a alinhar o investimento ao seu objetivo, seja moradia ou valorização.
         </p>
 
-        <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Vantagens e atencoes ao comprar na planta</h2>
+        <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Vantagens e atenções ao comprar na planta</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px,1fr))', gap: 24, marginTop: 16 }}>
           <div style={{ background: '#F0F7F0', padding: 24, borderRadius: 2 }}>
             <h3 style={{ fontSize: 14, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#1A5C3A', marginTop: 0 }}>Vantagens</h3>
             <ul style={{ fontSize: 14, lineHeight: 2, color: '#333', paddingLeft: 20, margin: 0 }}>
-              <li>Preco de lancamento geralmente menor</li>
+              <li>Preco de lançamento geralmente menor</li>
               <li>Parcelas menores durante a obra</li>
-              <li>Sem aprovacao bancaria (financiamento direto)</li>
-              <li>Possibilidade de personalizacao do acabamento</li>
-              <li>Potencial de valorizacao ate a entrega</li>
+              <li>Sem aprovação bancária (financiamento direto)</li>
+              <li>Possibilidade de personalização do acabamento</li>
+              <li>Potencial de valorização até a entrega</li>
             </ul>
           </div>
           <div style={{ background: '#FFF8F0', padding: 24, borderRadius: 2 }}>
@@ -156,16 +156,16 @@ export default function GuiaComprarNaPlantaPage() {
             <ul style={{ fontSize: 14, lineHeight: 2, color: '#333', paddingLeft: 20, margin: 0 }}>
               <li>Parcelas corrigidas pelo CUB/SC podem subir</li>
               <li>Prazo de entrega pode ser prorrogado</li>
-              <li>Nao da para morar durante a obra</li>
-              <li>Verificar registro do contrato em cartorio</li>
-              <li>Pesquisar historico de entregas da construtora</li>
+              <li>Não da para morar durante a obra</li>
+              <li>Verificar registro do contrato em cartório</li>
+              <li>Pesquisar histórico de entregas da construtora</li>
             </ul>
           </div>
         </div>
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>O que verificar antes de assinar?</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-          Antes de assinar o contrato de compra de um apartamento na planta, verifique: registro do empreendimento na prefeitura e cartorio; CRECI do corretor (Stiven Allan: CRECI 60.275); clausulas de correcao das parcelas (deve ser CUB/SC na Fontana); prazo de entrega e tolerancia prevista no contrato; especificacao tecnica do acabamento e dos materiais; forma de quitacao do saldo pos-chaves via saldo direto ou financiamento bancario.
+          Antes de assinar o contrato de compra de um apartamento na planta, verifique: registro do empreendimento na prefeitura e cartório; CRECI do corretor (Stiven Allan: CRECI 60.275); cláusulas de correção das parcelas (deve ser CUB/SC na Fontana); prazo de entrega e tolerância prevista no contrato; especificação técnica do acabamento e dos materiais; forma de quitação do saldo pos-chaves via saldo direto ou financiamento bancário.
         </p>
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Perguntas Frequentes</h2>
@@ -183,9 +183,9 @@ export default function GuiaComprarNaPlantaPage() {
 
         {/* CTA */}
         <div style={{ background: '#1A2E1A', color: '#EAF2E8', borderRadius: 2, padding: 'clamp(32px,5vw,56px)', marginTop: 64, textAlign: 'center' }}>
-          <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,28px)', margin: 0 }}>Veja os lancamentos</h2>
+          <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,28px)', margin: 0 }}>Veja os lançamentos</h2>
           <p style={{ color: 'rgba(234,242,232,0.8)', marginTop: 16, marginBottom: 32, fontSize: 15, lineHeight: 1.6 }}>
-            Empreendimentos Fontana disponíveis em Criciuma e regiao. Atendimento exclusivo com Stiven Allan, CRECI 60.275.
+            Empreendimentos Fontana disponíveis em Criciuma e região. Atendimento exclusivo com Stiven Allan, CRECI 60.275.
           </p>
           <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
             <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', fontSize: 12, letterSpacing: '0.3em', textTransform: 'uppercase', color: '#EAF2E8', border: '1px solid rgba(234,242,232,0.55)', padding: '14px 28px', textDecoration: 'none' }}>
@@ -202,7 +202,7 @@ export default function GuiaComprarNaPlantaPage() {
       <footer style={{ background: '#111', color: 'rgba(255,255,255,0.4)', padding: 'clamp(32px,5vh,56px) clamp(18px,5vw,64px)', textAlign: 'center', fontSize: 12 }}>
         <p style={{ margin: 0 }}>© {new Date().getFullYear()} Stiven Allan - CRECI 60.275 - Imoveis em Criciuma e Sul de SC</p>
         <p style={{ margin: '8px 0 0' }}>
-          <Link href="/" style={{ color: 'rgba(255,255,255,0.4)', textDecoration: 'none', marginRight: 16 }}>Inicio</Link>
+          <Link href="/" style={{ color: 'rgba(255,255,255,0.4)', textDecoration: 'none', marginRight: 16 }}>Início</Link>
           <Link href="/empreendimentos" style={{ color: 'rgba(255,255,255,0.4)', textDecoration: 'none', marginRight: 16 }}>Empreendimentos</Link>
           <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ color: 'rgba(255,255,255,0.4)', textDecoration: 'none' }}>WhatsApp</a>
         </p>
