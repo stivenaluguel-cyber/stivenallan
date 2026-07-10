@@ -80,16 +80,16 @@ export default function Page() {
         nome="Villaggio Verde Residenziale"
         slug="villaggio-verde-residenziale-grande-prospera-criciuma-sc"
         construtora_slug="fontana"
-        cidade="Criciuma"
+        cidade="Criciúma"
         uf="SC"
         bairro="Grande Prospera"
-        descricao="Condominio fechado de terrenos de 794 a 1.038 m2 na Grande Prospera, Criciuma/SC."
+        descricao="Condominio fechado de terrenos de 794 a 1.038 m2 na Grande Prospera, Criciúma/SC."
         imagem={CDN+'villaggio-verde-residenziale-646388473855e.JPG'}
         faq={[
-          {pergunta:"Como funciona o financiamento do Villaggio Verde?",resposta:"Entrada de 25,3%, saldo em ate 72 parcelas mensais e 6 reforos anuais, correcao pelo IPCA. Sem banco."},
-          {pergunta:"Quais os tamanhos de terreno no Villaggio Verde?",resposta:"Terrenos de 794 a 1.038 m2 em condominio fechado na Grande Prospera, Criciuma/SC."},
-          {pergunta:"O que inclui a area de lazer do Villaggio Verde?",resposta:"12.000 m2 de lazer com academia, piscina, campo de golfe e mais."},
-          {pergunta:"Qual a localizacao do Villaggio Verde?",resposta:"Rodovia Leonardo Bialeck, 525, Grande Prospera, Criciuma/SC."},
+          {pergunta:"Como funciona o financiamento do Villaggio Verde?",resposta:"Entrada de 25,3%, saldo em até 72 parcelas mensais e 6 reforos anuais, correcao pelo IPCA. Sem banco."},
+          {pergunta:"Quais os tamanhos de terreno no Villaggio Verde?",resposta:"Terrenos de 794 a 1.038 m2 em condominio fechado na Grande Prospera, Criciúma/SC."},
+          {pergunta:"O que inclui a área de lazer do Villaggio Verde?",resposta:"12.000 m2 de lazer com academia, piscina, campo de golfe e mais."},
+          {pergunta:"Qual a localizacao do Villaggio Verde?",resposta:"Rodovia Leonardo Bialeck, 525, Grande Prospera, Criciúma/SC."},
           {pergunta:"Posso construir qualquer projeto no terreno?",resposta:"Ha regulamento construtivo. Consulte Stiven pelo WhatsApp."},
         ]}
       />

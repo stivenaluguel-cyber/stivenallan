@@ -112,16 +112,16 @@ const CSS = `
       nome="Tremezzo Residencial"
       slug="tremezzo-residencial-centro-criciuma-sc"
       construtora_slug="fontana"
-      cidade="Criciuma"
+      cidade="Criciúma"
       uf="SC"
       bairro="Centro"
-      descricao="Apartamentos 3 dormitorios, 125 m2, 18 andares no Centro de Criciuma/SC. Decorado disponivel. Financiamento direto Fontana."
+      descricao="Apartamentos 3 dormitórios, 125 m2, 18 andares no Centro de Criciúma/SC. Decorado disponivel. Financiamento direto Fontana."
       imagem="https://lh3.googleusercontent.com/d/1zwMSHa-Ja6MGdlC2lq9fxQU7plgxHBLo"
       faq={[
-        {pergunta:"Como funciona o financiamento direto do Tremezzo Residencial?",resposta:"Entrada de 20%, saldo em ate 72 parcelas mensais e 6 reforos anuais (cada reforo = 5 mensais), correcao pelo CUB/SC durante a obra. Entrega prevista marco 2027. Sem banco."},
-        {pergunta:"Qual a previsao de entrega do Tremezzo Residencial?",resposta:"Previsao de entrega marco de 2027, no Centro de Criciuma/SC."},
+        {pergunta:"Como funciona o financiamento direto do Tremezzo Residencial?",resposta:"Entrada de 20%, saldo em até 72 parcelas mensais e 6 reforos anuais (cada reforo = 5 mensais), correcao pelo CUB/SC durante a obra. Entrega prevista marco 2027. Sem banco."},
+        {pergunta:"Qual a previsao de entrega do Tremezzo Residencial?",resposta:"Previsao de entrega marco de 2027, no Centro de Criciúma/SC."},
         {pergunta:"O Tremezzo tem apartamento decorado para visitar?",resposta:"Sim. O apartamento decorado esta disponivel para visitacao. Agende com Stiven pelo WhatsApp (48) 99164-2332."},
-        {pergunta:"Quantos andares e qual a metragem do Tremezzo?",resposta:"18 andares, apartamentos de 3 dormitorios com 125 m2 privativos, no Centro de Criciuma/SC."},
+        {pergunta:"Quantos andares e qual a metragem do Tremezzo?",resposta:"18 andares, apartamentos de 3 dormitórios com 125 m2 privativos, no Centro de Criciúma/SC."},
         {pergunta:"Posso usar FGTS ou financiamento bancario no Tremezzo?",resposta:"Sim. Alem do financiamento direto Fontana, e possivel financiamento bancario ou FGTS. Consulte Stiven pelo WhatsApp."},
       ]}
     />

@@ -33,7 +33,7 @@ const GALERIA = [
   { src: D+'1xw1KBEiOP9YNaZPEfCaqOG0pPcHWrfWL', alt: 'Fachada Frontal Villammare Balneário Rincão', label: 'Fachada Frontal' },
   { src: D+'1gRjiv9hbdTFXA1P6x8YVIQF-AeoNTeYY', alt: 'Vista aerea Villammare Balneário Rincão', label: 'Vista Aerea' },
   { src: D+'13pJY132EO7r7M-LhNWu1NTvPWWHDj_7R', alt: 'Living Villammare Residencial', label: 'Living Integrado' },
-  { src: D+'1iNzubghH01mMk-UZFIHfWp9mj105tgR9', alt: 'Suite Master Villammare Residencial', label: 'Suite Master' },
+  { src: D+'1iNzubghH01mMk-UZFIHfWp9mj105tgR9', alt: 'Suíte Master Villammare Residencial', label: 'Suíte Master' },
   { src: D+'1majsObnc_JPIyALmPj8JfwziIYLwTeB8', alt: 'Sacada Villammare Balneário Rincão', label: 'Sacada com Vista' },
   { src: D+'1QJ57JHgyLwUdsdx4DRsvDydMIFFxr76h', alt: 'Salao de Festas Villammare', label: 'Salao de Festas' },
   { src: D+'1WXRYSvnWTcuDulZu11fjOxSuriNjgbb0', alt: 'Hall de Entrada Villammare', label: 'Hall de Entrada' },
@@ -56,8 +56,8 @@ const AMENIDADES = [
 ]
 
 const DIFERENCIAIS = [
-  '4 dormitorios - 2 suites e 2 demi suites de alto padrao',
-  '172 a 275 m2 de area privativa com plantas flexiveis',
+  '4 dormitórios - 2 suítes e 2 demi suítes de alto padrão',
+  '172 a 275 m2 de área privativa com plantas flexiveis',
   'Sacada com churrasqueira e guarda-corpo em vidro com vista para o mar',
   'Living integrado em conceito aberto - espaco e fluidez',
   'Acabamentos premium: porcelanato, fechadura digital e persianas automatizadas',
@@ -68,11 +68,11 @@ const DIFERENCIAIS = [
 
 export const metadata: Metadata = {
   title: 'Villammare Residencial | Apartamentos em Balneário Rincão SC | Fontana',
-  description: 'Villammare Residencial: apartamentos de 4 dormitorios (2 suites + 2 demi suites), 172 a 275 m2, a passos da praia em Balneário Rincão/SC. Sacada com vista para o mar e financiamento direto.',
+  description: 'Villammare Residencial: apartamentos de 4 dormitórios (2 suítes + 2 demi suítes), 172 a 275 m2, a passos da praia em Balneário Rincão/SC. Sacada com vista para o mar e financiamento direto.',
   alternates: { canonical: SITE_URL + '/empreendimento/fontana/villammare-residencial-balneario-rincao-sc' },
   openGraph: {
     title: 'Villammare Residencial | Balneário Rincão SC | Stiven Allan',
-    description: '4 dorms (2 suites + 2 demi suites) - 172-275 m2 - Vista para o mar - Balneário Rincão/SC.',
+    description: '4 dorms (2 suítes + 2 demi suítes) - 172-275 m2 - Vista para o mar - Balneário Rincão/SC.',
     url: SITE_URL + '/empreendimento/fontana/villammare-residencial-balneario-rincao-sc',
     images: [{ url: CDN+'villammare-residencial-68ff86c8ba6ce.jpg', width: 1200, height: 630, alt: 'Villammare Residencial' }],
     type: 'website',
@@ -91,12 +91,12 @@ export default function Page() {
         cidade="Balneário Rincão"
         uf="SC"
         bairro="Centro"
-        descricao="Apartamentos de 4 dormitorios (2 suites e 2 demi suites), 172 a 275 m2, em Balneário Rincão/SC, a passos da praia."
+        descricao="Apartamentos de 4 dormitórios (2 suítes e 2 demi suítes), 172 a 275 m2, em Balneário Rincão/SC, a passos da praia."
         imagem={CDN+'villammare-residencial-68ff86c8ba6ce.jpg'}
         faq={[
-          {pergunta:"Como funciona o financiamento direto do Villammare Residencial?",resposta:"Entrada de 20%, saldo em ate 72 parcelas mensais e 6 reforos anuais (cada reforo = 5 mensais), correcao pelo CUB/SC durante a obra. Entrega prevista setembro de 2029. Sem banco."},
+          {pergunta:"Como funciona o financiamento direto do Villammare Residencial?",resposta:"Entrada de 20%, saldo em até 72 parcelas mensais e 6 reforos anuais (cada reforo = 5 mensais), correcao pelo CUB/SC durante a obra. Entrega prevista setembro de 2029. Sem banco."},
           {pergunta:"Qual a previsao de entrega do Villammare Residencial?",resposta:"Previsao de entrega setembro de 2029, em Balneário Rincão/SC."},
-          {pergunta:"Quais sao as plantas do Villammare Residencial?",resposta:"4 dormitorios (2 suites e 2 demi suites), de 172 a 275 m2 privativos, a passos da praia em Balneário Rincão/SC."},
+          {pergunta:"Quais sao as plantas do Villammare Residencial?",resposta:"4 dormitórios (2 suítes e 2 demi suítes), de 172 a 275 m2 privativos, a passos da praia em Balneário Rincão/SC."},
           {pergunta:"O Villammare tem vista para o mar?",resposta:"Sim. O Villammare fica a passos da praia em Balneário Rincão com sacada e vista privilegiada para o mar."},
           {pergunta:"Posso usar FGTS ou financiamento bancario no Villammare?",resposta:"Sim. Alem do financiamento direto Fontana, e possivel financiamento bancario ou FGTS. Consulte Stiven pelo WhatsApp."},
         ]}
@@ -141,10 +141,10 @@ export default function Page() {
           <p className="vm-eyebrow" style={{ color:t.navy, marginBottom:20 }}>O Empreendimento</p>
           <h2 className="vm-h2" style={{ color:t.ink, margin:'0 0 28px' }}>Elegancia Singular<br/>A Beira-Mar</h2>
           <p style={{ color:t.muted, lineHeight:1.8, marginBottom:24 }}>
-            O Villammare Residencial redefine o padrao do morar a beira-mar em Balneário Rincão. Com <strong>4 dormitorios</strong>, 2 suites e 2 demi suites, em plantas de <strong>172 a 275 m2</strong>, cada detalhe foi pensado para proporcionar conforto, elegancia e a incomparavel experiencia de viver com o mar como vizinho.
+            O Villammare Residencial redefine o padrão do morar a beira-mar em Balneário Rincão. Com <strong>4 dormitórios</strong>, 2 suítes e 2 demi suítes, em plantas de <strong>172 a 275 m2</strong>, cada detalhe foi pensado para proporcionar conforto, elegancia e a incomparavel experiencia de viver com o mar como vizinho.
           </p>
           <ul style={{ listStyle:'none', padding:0, margin:'0 0 36px', display:'flex', flexDirection:'column', gap:10 }}>
-            {['4 dormitorios - 2 suites + 2 demi suites','172 a 275 m2 de area privativa','Sacada com churrasqueira e vista para o mar','Living integrado em conceito aberto','2 elevadores - Fechadura digital','A passos da praia de Balneário Rincão'].map((f,i) => (
+            {['4 dormitórios - 2 suítes + 2 demi suítes','172 a 275 m2 de área privativa','Sacada com churrasqueira e vista para o mar','Living integrado em conceito aberto','2 elevadores - Fechadura digital','A passos da praia de Balneário Rincão'].map((f,i) => (
               <li key={i} style={{ display:'flex', alignItems:'center', gap:10, fontSize:14, color:t.ink }}>
                 <span style={{ width:6, height:6, borderRadius:'50%', background:t.navy, flexShrink:0, display:'inline-block' }} />
                 {f}
@@ -152,7 +152,7 @@ export default function Page() {
             ))}
           </ul>
           <a href={WPP} target="_blank" rel="noopener noreferrer" className="vm-cta" style={{ color:t.navy, borderColor:t.navy }}>
-            Consultar Condicoes
+            Consultar Condições
           </a>
         </div>
         <div style={{ position:'relative', aspectRatio:'3/4', borderRadius:2, overflow:'hidden' }}>
@@ -177,10 +177,10 @@ export default function Page() {
           <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:48, alignItems:'center' }}>
             <div>
               <p style={{ color:t.onDarkMuted, lineHeight:1.8, marginBottom:32 }}>
-                Duas opcoes de plantas de <strong style={{ color:t.onDark }}>172 a 275 m2</strong> com <strong style={{ color:t.onDark }}>4 dormitorios</strong>, sendo 2 suites completas e 2 demi suites, living integrado e sacada gourmet com vista privilegiada.
+                Duas opcoes de plantas de <strong style={{ color:t.onDark }}>172 a 275 m2</strong> com <strong style={{ color:t.onDark }}>4 dormitórios</strong>, sendo 2 suítes completas e 2 demi suítes, living integrado e sacada gourmet com vista privilegiada.
               </p>
               <div style={{ display:'flex', gap:40, marginBottom:40 }}>
-                {[['4','Dorm.'],['2','Suites'],['275','m2 max']].map(([n,l]) => (
+                {[['4','Dorm.'],['2','suítes'],['275','m2 max']].map(([n,l]) => (
                   <div key={l}>
                     <p style={{ fontFamily:t.display, fontSize:40, fontWeight:300, color:t.onDark, margin:0, lineHeight:1 }}>{n}</p>
                     <p style={{ fontSize:11, letterSpacing:'0.3em', textTransform:'uppercase', color:t.onDarkMuted, margin:'6px 0 0' }}>{l}</p>
@@ -214,7 +214,7 @@ export default function Page() {
       <section style={{ background:'#fff', padding:'96px 32px' }}>
         <div style={{ maxWidth:1100, margin:'0 auto' }}>
           <p className="vm-eyebrow" style={{ color:t.navy, marginBottom:20 }}>Acabamentos e Lazer</p>
-          <h2 className="vm-h2" style={{ color:t.ink, margin:'0 0 48px' }}>Alto Padrao em Cada Detalhe</h2>
+          <h2 className="vm-h2" style={{ color:t.ink, margin:'0 0 48px' }}>Alto padrão em Cada Detalhe</h2>
           <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:48, alignItems:'start' }}>
             <div>
               {AMENIDADES.map((a,i) => (
@@ -248,10 +248,10 @@ export default function Page() {
           <p className="vm-eyebrow" style={{ color:t.onDarkMuted, marginBottom:20 }}>Financiamento</p>
           <h2 className="vm-h2" style={{ color:t.onDark, margin:'0 0 24px' }}>Direto com a Construtora</h2>
           <p style={{ color:t.onDarkMuted, fontSize:16, lineHeight:1.8, maxWidth:640, margin:'0 auto 48px' }}>
-            O Villammare oferece financiamento direto com a Construtora Fontana - condicoes especiais, entrada facilitada e processo simplificado. Fale comigo para uma proposta personalizada.
+            O Villammare oferece financiamento direto com a Construtora Fontana - Condições especiais, entrada facilitada e processo simplificado. Fale comigo para uma proposta personalizada.
           </p>
           <a href={WPP} target="_blank" rel="noopener noreferrer" className="vm-cta" style={{ color:t.onDark, borderColor:'rgba(244,246,248,0.4)' }}>
-            Consultar Condicoes
+            Consultar Condições
           </a>
         </div>
       </section>
@@ -261,7 +261,7 @@ export default function Page() {
         <div style={{ position:'absolute', inset:0, background:'rgba(9,24,40,0.72)' }} />
         <div style={{ position:'relative', textAlign:'center', padding:'0 32px' }}>
           <h2 className="vm-h2" style={{ color:'#fff', margin:'0 0 16px' }}>Villammare Residencial</h2>
-          <p style={{ color:'rgba(255,255,255,0.75)', marginBottom:40, fontFamily:t.serif, fontStyle:'italic', fontSize:18 }}>Preco sob consulta - Balneário Rincão / SC</p>
+          <p style={{ color:'rgba(255,255,255,0.75)', marginBottom:40, fontFamily:t.serif, fontStyle:'italic', fontSize:18 }}>Preço sob consulta - Balneário Rincão / SC</p>
           <a href={WPP} target="_blank" rel="noopener noreferrer" className="vm-cta" style={{ color:'#fff', borderColor:'rgba(255,255,255,0.6)' }}>
             Falar com Stiven Allan
           </a>
@@ -285,9 +285,9 @@ export default function Page() {
       </a>
 
       <PropertyFAQ items={[
-        {pergunta:"Como funciona o financiamento direto do Villammare Residencial?",resposta:"Entrada de 20%, saldo em ate 72 parcelas mensais e 6 reforos anuais (cada reforo = 5 mensais), correcao pelo CUB/SC durante a obra. Entrega prevista setembro de 2029. Sem banco."},
+        {pergunta:"Como funciona o financiamento direto do Villammare Residencial?",resposta:"Entrada de 20%, saldo em até 72 parcelas mensais e 6 reforos anuais (cada reforo = 5 mensais), correcao pelo CUB/SC durante a obra. Entrega prevista setembro de 2029. Sem banco."},
         {pergunta:"Qual a previsao de entrega do Villammare Residencial?",resposta:"Previsao de entrega setembro de 2029, em Balneário Rincão/SC."},
-        {pergunta:"Quais sao as plantas do Villammare Residencial?",resposta:"4 dormitorios (2 suites e 2 demi suites), de 172 a 275 m2 privativos, a passos da praia em Balneário Rincão/SC."},
+        {pergunta:"Quais sao as plantas do Villammare Residencial?",resposta:"4 dormitórios (2 suítes e 2 demi suítes), de 172 a 275 m2 privativos, a passos da praia em Balneário Rincão/SC."},
         {pergunta:"O Villammare tem vista para o mar?",resposta:"Sim. O Villammare fica a passos da praia em Balneário Rincão com sacada e vista privilegiada para o mar."},
         {pergunta:"Posso usar FGTS ou financiamento bancario no Villammare?",resposta:"Sim. Alem do financiamento direto Fontana, e possivel financiamento bancario ou FGTS. Consulte Stiven pelo WhatsApp."},
       ]} accent="#1B3A4B" />
