@@ -33,7 +33,7 @@ export const metadata: Metadata = {
                             '@context': 'https://schema.org',
                             '@type': 'BreadcrumbList',
                             itemListElement: [
-                            { '@type': 'ListItem', position: 1, name: 'Inicio', item: SITE_URL },
+                            { '@type': 'ListItem', position: 1, name: 'Início', item: SITE_URL },
                             { '@type': 'ListItem', position: 2, name: 'Guias', item: `${SITE_URL}/guia/comprar-apartamento-na-planta-criciuma` },
                             { '@type': 'ListItem', position: 3, name: 'Onde Investir no Sul de Santa Catarina', item: CANONICAL },
                             ],
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
                             mainEntity: [
                             {
                             '@type': 'Question',
-                            name: 'Quais cidades tem empreendimentos Fontana disponiveis hoje?',
+                            name: 'Quais cidades tem empreendimentos Fontana disponíveis hoje?',
                             acceptedAnswer: { '@type': 'Answer', text: 'A Construtora Fontana tem empreendimentos ativos em Criciuma, Balneario Rincao, Laguna, Icara, Sideropolis, Balneario Picarras e Bom Jardim da Serra.' },
                             },
                             {
@@ -55,18 +55,18 @@ export const metadata: Metadata = {
                             },
                             {
                             '@type': 'Question',
-                            name: 'Existe empreendimento de frente mar na regiao?',
+                            name: 'Existe empreendimento de frente mar na região?',
                             acceptedAnswer: { '@type': 'Answer', text: 'Sim, o Aguas de Marano Residencial em Balneario Picarras tem a frase de marketing "Frente mar", assim como os empreendimentos Mar di Arienzo, Mar di Atrani e Mar Positano em Balneario Rincao e Mar di Licata e Mar di Nizza em Laguna.' },
                             },
                             {
                             '@type': 'Question',
-                            name: 'Ha empreendimento na serra catarinense?',
+                            name: 'Há empreendimento na serra catarinense?',
                             acceptedAnswer: { '@type': 'Answer', text: 'Sim, o Campos da Montanha Residencial fica em Bom Jardim da Serra, com a frase de marketing "Sinta o bem-estar da serra em todos os seus dias".' },
                             },
                             {
                             '@type': 'Question',
-                            name: 'Qual a diferenca entre os empreendimentos de Balneario Rincao e Laguna?',
-                            acceptedAnswer: { '@type': 'Answer', text: 'Balneario Rincao concentra o Mar di Arienzo, o Mar di Atrani, o Mar Positano no bairro Centro, alem do Villammare Residencial. Laguna concentra o Mar di Licata e o Mar di Nizza, ambos no bairro Mar Grosso.' },
+                            name: 'Qual a diferença entre os empreendimentos de Balneario Rincao e Laguna?',
+                            acceptedAnswer: { '@type': 'Answer', text: 'Balneario Rincao concentra o Mar di Arienzo, o Mar di Atrani, o Mar Positano no bairro Centro, além do Villammare Residencial. Laguna concentra o Mar di Licata e o Mar di Nizza, ambos no bairro Mar Grosso.' },
                             },
                             ],
                             }
@@ -94,56 +94,56 @@ export const metadata: Metadata = {
                             Onde Investir no Sul de Santa Catarina
                             </h1>
                             <p style={{ fontSize: 'clamp(16px,2vw,20px)', color: 'rgba(245,241,234,0.75)', marginTop: 24, lineHeight: 1.6 }}>
-                            Conheca as cidades onde a Construtora Fontana tem empreendimentos ativos hoje, com o perfil real de cada regiao.
+                            Conheca as cidades onde a Construtora Fontana tem empreendimentos ativos hoje, com o perfil real de cada região.
                             </p>
                             </div>
                             </section>
 
-                            {/* CONTEUDO */}
+                            {/* CONTEÚDO */}
                             <article style={{ maxWidth: 800, margin: '0 auto', padding: 'clamp(48px,8vh,96px) clamp(18px,5vw,64px)' }}>
 
                             <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Criciuma - o polo urbano central</h2>
                             <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-                            Criciuma e o maior polo economico do sul catarinense e concentra o maior numero de lancamentos Fontana da regiao, distribuidos pelos bairros Centro, Cruzeiro do Sul, Santa Barbara, Comerciario, Michel, Rio Maina e Grande Prospera. E a cidade certa para quem busca vida urbana, comercio, servicos e proximidade do trabalho.
+                            Criciuma é o maior polo econômico do sul catarinense e concentra o maior numero de lancamentos Fontana da região, distribuidos pelos bairros Centro, Cruzeiro do Sul, Santa Barbara, Comerciario, Michel, Rio Maina e Grande Prospera. É a cidade certa para quem busca vida urbana, comercio, serviços e proximidade do trabalho.
                             </p>
                             <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
-                            Entre os empreendimentos ativos em Criciuma estao o <Link href="/empreendimento/fontana/monte-leone-centro-criciuma-sc" style={{ color: '#B89B5E' }}>Monte Leone Residencial</Link> e o <Link href="/empreendimento/fontana/lavis-residencial-centro-criciuma-sc" style={{ color: '#B89B5E' }}>Lavis Residencial</Link>, ambos no Centro, o Fidenza Residencial no Cruzeiro do Sul, o Parco Savello Residencial em Santa Barbara, o Bellante Residencial no Comerciario, o Calalzo Di Cadore Residencial no Michel, o <Link href="/empreendimento/fontana/pavia-rio-maina-criciuma-sc" style={{ color: '#B89B5E' }}>Pavia Residencial</Link> em Rio Maina e o Villaggio Verde Residenziale em Grande Prospera. Tambem estao ativos na cidade o Tremezzo Residencial e o Thiene Residencial, ambos no Centro, o Bosco Del Montello Residencial, tambem no Centro, e o Pineto Residencial, no mesmo bairro, alem do Calliano Residencial e do Due Fratelli Residencial, ja entregues no Centro.
+                            Entre os empreendimentos ativos em Criciuma estao o <Link href="/empreendimento/fontana/monte-leone-centro-criciuma-sc" style={{ color: '#B89B5E' }}>Monte Leone Residencial</Link> e o <Link href="/empreendimento/fontana/lavis-residencial-centro-criciuma-sc" style={{ color: '#B89B5E' }}>Lavis Residencial</Link>, ambos no Centro, o Fidenza Residencial no Cruzeiro do Sul, o Parco Savello Residencial em Santa Barbara, o Bellante Residencial no Comerciario, o Calalzo Di Cadore Residencial no Michel, o <Link href="/empreendimento/fontana/pavia-rio-maina-criciuma-sc" style={{ color: '#B89B5E' }}>Pavia Residencial</Link> em Rio Maina e o Villaggio Verde Residenziale em Grande Prospera. Tambem estao ativos na cidade o Tremezzo Residencial e o Thiene Residencial, ambos no Centro, o Bosco Del Montello Residencial, também no Centro, e o Pineto Residencial, no mesmo bairro, além do Calliano Residencial e do Due Fratelli Residencial, já entregues no Centro.
                             </p>
 
-                            <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Balneario Rincao - vida litoranea</h2>
+                            <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Balneario Rincao - vida litorânea</h2>
                             <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-                            Balneario Rincao e um municipio litoraneo, com empreendimentos concentrados no bairro Centro, proximos a orla. E a opcao para quem busca um imovel de veraneio ou moradia com acesso direto a praia.
+                            Balneario Rincao é um município litorâneo, com empreendimentos concentrados no bairro Centro, proximos a orla. É a opção para quem busca um imóvel de veraneio ou moradia com acesso direto a praia.
                             </p>
                             <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
-                            Os lancamentos ativos sao o Mar di Arienzo Residencial, o Mar di Atrani Residencial, o Mar Positano Residencial e o Villammare Residencial. Os proprios nomes e frases de marketing desses empreendimentos, como "Onde o mar habita, estar perto e o melhor destino", reforcam o posicionamento litoraneo da regiao.
+                            Os lancamentos ativos são o Mar di Arienzo Residencial, o Mar di Atrani Residencial, o Mar Positano Residencial e o Villammare Residencial. Os proprios nomes e frases de marketing desses empreendimentos, como "Onde o mar habita, estar perto e o melhor destino", reforcam o posicionamento litorâneo da região.
                             </p>
 
                             <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Laguna - litoral no bairro Mar Grosso</h2>
                             <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-                            Laguna e outro municipio litoraneo do Sul de Santa Catarina, com os lancamentos Fontana concentrados no bairro Mar Grosso. Os empreendimentos ativos sao o Mar di Licata Residencial e o Mar di Nizza Residencial, ambos com apelo de veraneio junto ao litoral.
+                            Laguna e outro município litorâneo do Sul de Santa Catarina, com os lancamentos Fontana concentrados no bairro Mar Grosso. Os empreendimentos ativos são o Mar di Licata Residencial e o Mar di Nizza Residencial, ambos com apelo de veraneio junto ao litoral.
                             </p>
 
                             <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Icara - cidade vizinha a Criciuma</h2>
                             <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-                            Icara e um municipio vizinho a Criciuma, com os lancamentos Fontana concentrados no bairro Centro. E uma opcao para quem busca proximidade com o polo economico regional em um municipio proprio.
+                            Icara é um município vizinho a Criciuma, com os lancamentos Fontana concentrados no bairro Centro. É uma opção para quem busca proximidade com o polo econômico regional em um município próprio.
                             </p>
                             <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
-                            Os empreendimentos ativos em Icara sao o Castellano Residencial, o Pianezze Residencial e o Piazza Castello Residencial, este ultimo com apenas 2 apartamentos por andar, segundo sua propria frase de marketing.
+                            Os empreendimentos ativos em Icara são o Castellano Residencial, o Pianezze Residencial e o Piazza Castello Residencial, este último com apenas 2 apartamentos por andar, segundo sua propria frase de marketing.
                             </p>
 
                             <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Sideropolis - cidade do interior</h2>
                             <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-                            Sideropolis e um municipio do interior proximo a Criciuma, com lancamentos concentrados no bairro Centro. Os empreendimentos ativos sao o Avezzano Residencial e o Rocca Pietore Residencial.
+                            Sideropolis é um município do interior próximo a Criciuma, com lancamentos concentrados no bairro Centro. Os empreendimentos ativos são o Avezzano Residencial e o Rocca Pietore Residencial.
                             </p>
 
                             <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Balneario Picarras - frente mar</h2>
                             <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-                            Balneario Picarras e um municipio litoraneo de Santa Catarina onde a Fontana tem um lancamento no bairro Centro: o <Link href="/empreendimento/fontana/aguas-de-marano-frente-mar-balneario-picarras-sc" style={{ color: '#B89B5E' }}>Aguas de Marano Residencial</Link>, com a propria frase de marketing "Frente mar - mergulhe em cada detalhe", reforcando a proximidade direta com a praia.
+                            Balneario Picarras é um município litorâneo de Santa Catarina onde a Fontana tem um lançamento no bairro Centro: o <Link href="/empreendimento/fontana/aguas-de-marano-frente-mar-balneario-picarras-sc" style={{ color: '#B89B5E' }}>Aguas de Marano Residencial</Link>, com a propria frase de marketing "Frente mar - mergulhe em cada detalhe", reforcando a proximidade direta com a praia.
                             </p>
 
                             <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Bom Jardim da Serra - natureza e serra</h2>
                             <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-                            Bom Jardim da Serra e o unico municipio de serra com lancamento Fontana ativo: o Campos da Montanha Residencial, cuja propria frase de marketing e "Sinta o bem-estar da serra em todos os seus dias". E a opcao para quem busca contato com a natureza e um ritmo de vida diferente do litoral ou do centro urbano.
+                            Bom Jardim da Serra é o único município de serra com lançamento Fontana ativo: o Campos da Montanha Residencial, cuja propria frase de marketing e "Sinta o bem-estar da serra em todos os seus dias". É a opção para quem busca contato com a natureza e um ritmo de vida diferente do litoral ou do centro urbano.
                             </p>
 
                             <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Resumo das regioes</h2>
@@ -163,8 +163,8 @@ export const metadata: Metadata = {
                             ['Laguna', 'Litoral', '2 lancamentos no Mar Grosso'],
                             ['Icara', 'Cidade vizinha', '3 lancamentos no Centro'],
                             ['Sideropolis', 'Interior', '2 lancamentos no Centro'],
-                            ['Balneario Picarras', 'Litoral', '1 lancamento no Centro'],
-                            ['Bom Jardim da Serra', 'Serra', '1 lancamento'],
+                            ['Balneario Picarras', 'Litoral', '1 lançamento no Centro'],
+                            ['Bom Jardim da Serra', 'Serra', '1 lançamento'],
                             ].map((row, i) => (
                             <tr key={i} style={{ background: i % 2 === 0 ? '#F5EFE0' : '#fff', borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
                             {row.map((cell, j) => (
@@ -176,19 +176,19 @@ export const metadata: Metadata = {
                             </table>
                             </div>
 
-                            <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Como escolher a regiao certa</h2>
+                            <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Como escolher a região certa</h2>
                             <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-                            A escolha da regiao depende do objetivo de cada comprador. Para vida urbana e proximidade de comercio e servicos, Criciuma concentra a maior variedade de lancamentos. Para quem busca um imovel de veraneio ou moradia junto a praia, Balneario Rincao, Laguna e Balneario Picarras sao as opcoes litoraneas. Para quem prefere contato com a natureza e clima de serra, Bom Jardim da Serra e a unica opcao disponivel hoje. Ja Icara e Sideropolis oferecem alternativas em municipios vizinhos a Criciuma, com lancamentos proprios no bairro Centro.
+                            A escolha da região depende do objetivo de cada comprador. Para vida urbana e proximidade de comercio e serviços, Criciuma concentra a maior variedade de lancamentos. Para quem busca um imóvel de veraneio ou moradia junto a praia, Balneario Rincao, Laguna e Balneario Picarras são as opções litoraneas. Para quem prefere contato com a natureza e clima de serra, Bom Jardim da Serra é a única opção disponível hoje. Já Icara e Sideropolis oferecem alternativas em municípios vizinhos a Criciuma, com lancamentos proprios no bairro Centro.
                             </p>
                             <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
-                            Fale com Stiven Allan, CRECI 60.275, para conhecer os detalhes de cada empreendimento e encontrar a regiao mais alinhada ao seu objetivo, seja moradia, veraneio ou diversificacao de patrimonio.
+                            Fale com Stiven Allan, CRECI 60.275, para conhecer os detalhes de cada empreendimento e encontrar a região mais alinhada ao seu objetivo, seja moradia, veraneio ou diversificação de patrimônio.
                             </p>
                             <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
-                            Cada regiao tem sua propria dinamica: Criciuma reune a maior diversidade de bairros e tipologias, enquanto as cidades litoraneas concentram empreendimentos voltados a segunda residencia e a valorizacao de longo prazo junto ao mar. Ja Icara e Sideropolis funcionam como extensao natural do polo criciumense, com opcoes de bom custo-beneficio em municipios proprios. Bom Jardim da Serra, por sua vez, atende quem busca algo bem diferente do litoral e do centro urbano, com clima ameno e paisagem de montanha. Antes de decidir, vale considerar nao apenas o perfil da regiao, mas tambem o estagio do empreendimento (planta, quase pronto ou pronto) e as condicoes de pagamento de cada lancamento.
+                            Cada região tem sua propria dinamica: Criciuma reune a maior diversidade de bairros e tipologias, enquanto as cidades litoraneas concentram empreendimentos voltados a segunda residência e a valorização de longo prazo junto ao mar. Já Icara e Sideropolis funcionam como extensao natural do polo criciumense, com opções de bom custo-benefício em municípios proprios. Bom Jardim da Serra, por sua vez, atende quem busca algo bem diferente do litoral e do centro urbano, com clima ameno e paisagem de montanha. Antes de decidir, vale considerar não apenas o perfil da região, mas também o estágio do empreendimento (planta, quase pronto ou pronto) e as condições de pagamento de cada lançamento.
                             </p>
 
 <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
-O estagio de obra tambem varia por regiao. Em Icara, os tres estagios convivem: o Castellano Residencial esta em obras, enquanto o Pianezze Residencial e o Piazza Castello Residencial ja estao prontos. Em Sideropolis, o Avezzano Residencial e o Rocca Pietore Residencial estao na planta. Ja em Balneario Rincao e em Laguna, os lancamentos ativos estao concentrados na fase de obras, assim como o Aguas de Marano Residencial em Balneario Picarras e o Campos da Montanha Residencial em Bom Jardim da Serra. Essa diversidade de estagios entre as regioes reforca a importancia de conversar com Stiven Allan antes de decidir, para alinhar o momento da compra ao perfil de cada empreendimento.
+O estágio de obra também varia por região. Em Icara, os tres estágios convivem: o Castellano Residencial está em obras, enquanto o Pianezze Residencial e o Piazza Castello Residencial já estao prontos. Em Sideropolis, o Avezzano Residencial e o Rocca Pietore Residencial estao na planta. Já em Balneario Rincao e em Laguna, os lancamentos ativos estao concentrados na fase de obras, assim como o Aguas de Marano Residencial em Balneario Picarras e o Campos da Montanha Residencial em Bom Jardim da Serra. Essa diversidade de estágios entre as regioes reforca a importância de conversar com Stiven Allan antes de decidir, para alinhar o momento da compra ao perfil de cada empreendimento.
 </p>
 
 
@@ -206,14 +206,14 @@ O estagio de obra tambem varia por regiao. Em Icara, os tres estagios convivem: 
                             <div style={{ borderTop: '1px solid rgba(0,0,0,0.10)' }} />
 
                             <p style={{ fontSize: 14, lineHeight: 1.8, color: '#666', marginTop: 32 }}>
-                            Veja tambem: <Link href="/guia/comprar-apartamento-na-planta-criciuma" style={{ color: '#B89B5E' }}>Como Comprar Apartamento na Planta em Criciuma</Link>, <Link href="/guia/apartamento-na-planta-vs-pronto" style={{ color: '#B89B5E' }}>Apartamento na Planta vs. Pronto</Link> e <Link href="/guia/apartamento-frente-mar-rincao-ou-laguna" style={{ color: '#B89B5E' }}>Rincão ou Laguna: Onde Comprar Frente Mar</Link>.
+                            Veja também: <Link href="/guia/comprar-apartamento-na-planta-criciuma" style={{ color: '#B89B5E' }}>Como Comprar Apartamento na Planta em Criciuma</Link>, <Link href="/guia/apartamento-na-planta-vs-pronto" style={{ color: '#B89B5E' }}>Apartamento na Planta vs. Pronto</Link> e <Link href="/guia/apartamento-frente-mar-rincao-ou-laguna" style={{ color: '#B89B5E' }}>Rincão ou Laguna: Onde Comprar Frente Mar</Link>.
                             </p>
 
                             {/* CTA */}
                             <div style={{ background: '#1A1814', color: '#F5F1EA', borderRadius: 2, padding: 'clamp(32px,5vw,56px)', marginTop: 64, textAlign: 'center' }}>
-                            <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,28px)', margin: 0 }}>Encontre a regiao ideal</h2>
+                            <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,28px)', margin: 0 }}>Encontre a região ideal</h2>
                             <p style={{ color: 'rgba(245,241,234,0.8)', marginTop: 16, marginBottom: 32, fontSize: 15, lineHeight: 1.6 }}>
-                            Empreendimentos Fontana disponiveis em 7 cidades do Sul de Santa Catarina. Stiven Allan, CRECI 60.275.
+                            Empreendimentos Fontana disponíveis em 7 cidades do Sul de Santa Catarina. Stiven Allan, CRECI 60.275.
                             </p>
                             <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
                             <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', fontSize: 12, letterSpacing: '0.3em', textTransform: 'uppercase', color: '#F5F1EA', border: '1px solid rgba(245,241,234,0.55)', padding: '14px 28px', textDecoration: 'none' }}>
@@ -230,7 +230,7 @@ O estagio de obra tambem varia por regiao. Em Icara, os tres estagios convivem: 
                             <footer style={{ background: '#111', color: 'rgba(255,255,255,0.4)', padding: 'clamp(32px,5vh,56px) clamp(18px,5vw,64px)', textAlign: 'center', fontSize: 12 }}>
                             <p style={{ margin: 0 }}>&copy; {new Date().getFullYear()} Stiven Allan - CRECI 60.275 - Imoveis em Criciuma e Sul de SC</p>
                             <p style={{ margin: '8px 0 0' }}>
-                            <Link href="/" style={{ color: 'rgba(255,255,255,0.4)', textDecoration: 'none', marginRight: 16 }}>Inicio</Link>
+                            <Link href="/" style={{ color: 'rgba(255,255,255,0.4)', textDecoration: 'none', marginRight: 16 }}>Início</Link>
                             <Link href="/empreendimentos" style={{ color: 'rgba(255,255,255,0.4)', textDecoration: 'none', marginRight: 16 }}>Empreendimentos</Link>
                             <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ color: 'rgba(255,255,255,0.4)', textDecoration: 'none' }}>WhatsApp</a>
                             </p>
