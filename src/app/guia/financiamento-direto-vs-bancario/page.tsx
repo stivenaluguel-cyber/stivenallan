@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { SITE_URL } from '@/lib/site'
 
-const SLUG = 'financiamento-direto-vs-bancário'
+const SLUG = 'financiamento-direto-vs-bancario'
 const CANONICAL = `${SITE_URL}/guia/${SLUG}`
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20quero%20entender%20a%20diferen%C3%A7a%20entre%20financiamento%20direto%20e%20banc%C3%A1rio.'
 
@@ -209,7 +209,7 @@ export const metadata: Metadata = {
                             <div style={{ borderTop: '1px solid rgba(0,0,0,0.10)' }} />
 
                             <p style={{ fontSize: 14, lineHeight: 1.8, color: '#666', marginTop: 32 }}>
-                            Veja também: <Link href="/guia/financiamento-direto-construtora" style={{ color: '#C1682E' }}>Financiamento Direto com a Construtora</Link> e <Link href="/guia/cub-sc-correção-parcelas" style={{ color: '#C1682E' }}>CUB/SC e Correção de Parcelas</Link>.
+                            Veja também: <Link href="/guia/financiamento-direto-construtora" style={{ color: '#C1682E' }}>Financiamento Direto com a Construtora</Link> e <Link href="/guia/cub-sc-correcao-parcelas" style={{ color: '#C1682E' }}>CUB/SC e Correção de Parcelas</Link>.
                             </p>
 
                             {/* CTA */}
