@@ -180,7 +180,7 @@ export default function Page() {
                 Duas opcoes de plantas de <strong style={{ color:t.onDark }}>172 a 275 m2</strong> com <strong style={{ color:t.onDark }}>4 dormitórios</strong>, sendo 2 suítes completas e 2 demi suítes, living integrado e sacada gourmet com vista privilegiada.
               </p>
               <div style={{ display:'flex', gap:40, marginBottom:40 }}>
-                {[['4','Dorm.'],['2','suítes'],['275','m2 max']].map(([n,l]) => (
+                {[['4','Dorm.'],['2','Suítes'],['275','m2 max']].map(([n,l]) => (
                   <div key={l}>
                     <p style={{ fontFamily:t.display, fontSize:40, fontWeight:300, color:t.onDark, margin:0, lineHeight:1 }}>{n}</p>
                     <p style={{ fontSize:11, letterSpacing:'0.3em', textTransform:'uppercase', color:t.onDarkMuted, margin:'6px 0 0' }}>{l}</p>
@@ -214,7 +214,7 @@ export default function Page() {
       <section style={{ background:'#fff', padding:'96px 32px' }}>
         <div style={{ maxWidth:1100, margin:'0 auto' }}>
           <p className="vm-eyebrow" style={{ color:t.navy, marginBottom:20 }}>Acabamentos e Lazer</p>
-          <h2 className="vm-h2" style={{ color:t.ink, margin:'0 0 48px' }}>Alto padrão em Cada Detalhe</h2>
+          <h2 className="vm-h2" style={{ color:t.ink, margin:'0 0 48px' }}>Alto Padrão em Cada Detalhe</h2>
           <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:48, alignItems:'start' }}>
             <div>
               {AMENIDADES.map((a,i) => (
@@ -248,7 +248,7 @@ export default function Page() {
           <p className="vm-eyebrow" style={{ color:t.onDarkMuted, marginBottom:20 }}>Financiamento</p>
           <h2 className="vm-h2" style={{ color:t.onDark, margin:'0 0 24px' }}>Direto com a Construtora</h2>
           <p style={{ color:t.onDarkMuted, fontSize:16, lineHeight:1.8, maxWidth:640, margin:'0 auto 48px' }}>
-            O Villammare oferece financiamento direto com a Construtora Fontana - Condições especiais, entrada facilitada e processo simplificado. Fale comigo para uma proposta personalizada.
+            O Villammare oferece financiamento direto com a Construtora Fontana - condições especiais, entrada facilitada e processo simplificado. Fale comigo para uma proposta personalizada.
           </p>
           <a href={WPP} target="_blank" rel="noopener noreferrer" className="vm-cta" style={{ color:t.onDark, borderColor:'rgba(244,246,248,0.4)' }}>
             Consultar Condições

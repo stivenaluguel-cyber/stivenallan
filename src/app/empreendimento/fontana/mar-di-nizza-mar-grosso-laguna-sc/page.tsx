@@ -63,7 +63,7 @@ const AMENIDADES = [
 ]
 
 const STATS = [
-  {n:'2 e 3',l:'dormitórios'},
+  {n:'2 e 3',l:'Dormitórios'},
   {n:'1',l:'Suíte'},
   {n:'65 a 92',l:'m² privativos'},
   {n:'2',l:'Elevadores'},
