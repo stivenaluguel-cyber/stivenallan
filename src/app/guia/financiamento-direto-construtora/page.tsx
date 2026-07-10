@@ -35,8 +35,8 @@ const FAQ_SCHEMA = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: 'O que e financiamento direto com a construtora?',
-      acceptedAnswer: { '@type': 'Answer', text: 'E quando você compra o imóvel pagando diretamente a construtora, sem passar por banco. Você paga uma entrada, parcelas mensais e reforos anuais. As parcelas são corrigidas pelo CUB/SC durante a obra.' },
+      name: 'O que é financiamento direto com a construtora?',
+      acceptedAnswer: { '@type': 'Answer', text: 'É quando você compra o imóvel pagando diretamente a construtora, sem passar por banco. Você paga uma entrada, parcelas mensais e reforos anuais. As parcelas são corrigidas pelo CUB/SC durante a obra.' },
     },
     {
       '@type': 'Question',
@@ -45,7 +45,7 @@ const FAQ_SCHEMA = {
     },
     {
       '@type': 'Question',
-      name: 'O que e o CUB/SC e como afeta minhas parcelas?',
+      name: 'O que é o CUB/SC e como afeta minhas parcelas?',
       acceptedAnswer: { '@type': 'Answer', text: 'O CUB (Custo Unitário Básico) do Sinduscon-SC e o índice que corrige as parcelas durante a obra. Em junho/2026, o CUB/SC estava em R$ 3.096,25/m2. As parcelas sobem mensalmente de acordo com a variação do CUB.' },
     },
     {
@@ -91,7 +91,7 @@ export default function GuiaFinanciamentoDiretoPage() {
       {/* CONTEÚDO */}
       <article style={{ maxWidth: 800, margin: '0 auto', padding: 'clamp(48px,8vh,96px) clamp(18px,5vw,64px)' }}>
 
-        <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>O que e financiamento direto?</h2>
+        <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>O que é financiamento direto?</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
           No financiamento direto, você compra o imóvel pagando diretamente a construtora sem passar por banco, sem aprovação de crédito bancária, sem análise de renda. As parcelas são corrigidas pelo <strong>CUB/SC (Custo Unitário Básico do Sinduscon-SC)</strong> durante a obra. Ao contrário do financiamento bancário, não há IOF, não há tarifa de abertura de crédito e não há seguro obrigatório embutido na prestação.
         </p>
@@ -128,7 +128,7 @@ export default function GuiaFinanciamentoDiretoPage() {
           Note que o saldo restante ao final da obra pode ser quitado com recursos próprios, com FGTS via financiamento bancário, ou financiado diretamente com a Fontana pelo saldo direto corrigido por IGPM mais 0,75% a.m., em prazos de até 180 ou 240 meses.
         </p>
 
-        <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>O que e o CUB/SC?</h2>
+        <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>O que é o CUB/SC?</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
           O CUB (Custo Unitário Básico) e publicado mensalmente pelo Sinduscon-SC e reflete o custo de construção civil no estado de Santa Catarina. Em junho de 2026, o CUB/SC estava em <strong>R$ 3.096,25/m2</strong>. As parcelas do financiamento direto Fontana sobem mensalmente de acordo com a variação do CUB: se o CUB subir 0,6% no mês, suas parcelas também sobem 0,6%.
         </p>
