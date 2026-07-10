@@ -41,7 +41,7 @@ const FAQ_SCHEMA = {
     {
       '@type': 'Question',
       name: 'Qual a entrada para financiamento direto na Construtora Fontana?',
-      acceptedAnswer: { '@type': 'Answer', text: 'Na maioria dos empreendimentos Fontana, a entrada e de 20% do valor do imóvel, paga no ato. Alguns empreendimentos tem condições especiais.' },
+      acceptedAnswer: { '@type': 'Answer', text: 'Na maioria dos empreendimentos Fontana, a entrada é de 20% do valor do imóvel, paga no ato. Alguns empreendimentos tem condições especiais.' },
     },
     {
       '@type': 'Question',
@@ -96,7 +96,7 @@ export default function GuiaFinanciamentoDiretoPage() {
           No financiamento direto, você compra o imóvel pagando diretamente a construtora sem passar por banco, sem aprovação de crédito bancária, sem análise de renda. As parcelas são corrigidas pelo <strong>CUB/SC (Custo Unitário Básico do Sinduscon-SC)</strong> durante a obra. Ao contrário do financiamento bancário, não há IOF, não há tarifa de abertura de crédito e não há seguro obrigatório embutido na prestação.
         </p>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
-          O modelo e especialmente atrativo para quem ainda não tem score bancário suficiente para financiamento convencional, para investidores que querem maximizar o retorno sobre o capital investido durante a obra, ou para quem prefere negociar condições personalizadas diretamente com a construtora. Em Criciuma e região, a Construtora Fontana e referência nesse modelo há décadas.
+          O modelo é especialmente atrativo para quem ainda não tem score bancário suficiente para financiamento convencional, para investidores que querem maximizar o retorno sobre o capital investido durante a obra, ou para quem prefere negociar condições personalizadas diretamente com a construtora. Em Criciuma e região, a Construtora Fontana é referência nesse modelo há décadas.
         </p>
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Como funciona o plano padrão Fontana?</h2>
@@ -130,17 +130,17 @@ export default function GuiaFinanciamentoDiretoPage() {
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>O que é o CUB/SC?</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-          O CUB (Custo Unitário Básico) e publicado mensalmente pelo Sinduscon-SC e reflete o custo de construção civil no estado de Santa Catarina. Em junho de 2026, o CUB/SC estava em <strong>R$ 3.096,25/m2</strong>. As parcelas do financiamento direto Fontana sobem mensalmente de acordo com a variação do CUB: se o CUB subir 0,6% no mês, suas parcelas também sobem 0,6%.
+          O CUB (Custo Unitário Básico) é publicado mensalmente pelo Sinduscon-SC e reflete o custo de construção civil no estado de Santa Catarina. Em junho de 2026, o CUB/SC estava em <strong>R$ 3.096,25/m2</strong>. As parcelas do financiamento direto Fontana sobem mensalmente de acordo com a variação do CUB: se o CUB subir 0,6% no mês, suas parcelas também sobem 0,6%.
         </p>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
-          É importante distinguir o CUB/SC do INCC (nacional, calculado pela FGV) e do IGPM. Na Fontana, as parcelas durante a obra são corrigidas pelo CUB/SC, e o saldo direto pos-chaves e corrigido pelo IGPM mais 0,75% a.m. Essa previsibilidade permite ao comprador planejar seu fluxo de caixa com mais clareza do que em contratos indexados a índices de inflação geral.
+          É importante distinguir o CUB/SC do INCC (nacional, calculado pela FGV) e do IGPM. Na Fontana, as parcelas durante a obra são corrigidas pelo CUB/SC, e o saldo direto pós-chaves é corrigido pelo IGPM mais 0,75% a.m. Essa previsibilidade permite ao comprador planejar seu fluxo de caixa com mais clareza do que em contratos indexados a índices de inflação geral.
         </p>
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Passo a passo para comprar com financiamento direto</h2>
         <ol style={{ fontSize: 15, lineHeight: 2.2, color: '#333', paddingLeft: 24 }}>
           <li><strong>Escolha o empreendimento:</strong> Verifique localização, tipologia, prazo de entrega e valores de partida.</li>
           <li><strong>Simulação personalizada:</strong> Stiven calcula as parcelas mensais e reforos anuais de acordo com o imóvel e seu perfil de pagamento.</li>
-          <li><strong>Análise do contrato:</strong> O contrato e registrado em cartório para sua segurança. Verifique cláusulas de correção, prazo de entrega e multas.</li>
+          <li><strong>Análise do contrato:</strong> O contrato é registrado em cartório para sua segurança. Verifique cláusulas de correção, prazo de entrega e multas.</li>
           <li><strong>Pagamento da entrada (20%):</strong> Paga no ato da assinatura do contrato de compra e venda.</li>
           <li><strong>Parcelas durante a obra:</strong> Mensais corrigidas pelo CUB/SC mais reforos anuais pagos ao longo da construção.</li>
           <li><strong>Entrega das chaves:</strong> Ao concluir a obra, você faz a vistoria e recebe as chaves. O saldo devedor pode ser quitado com recursos próprios, FGTS ou financiamento bancário.</li>
@@ -162,7 +162,7 @@ export default function GuiaFinanciamentoDiretoPage() {
           A Construtora Fontana tem empreendimentos com financiamento direto em Criciuma (bairros Centro, Michel, Rio Maina, Santa Barbara, Cruzeiro do Sul), Icara, Sideropolis, Laguna, Balneario Rincao e Balneario Picarras. Cada empreendimento tem seu próprio plano de pagamento: alguns com entrega mais próxima e parcelas menores, outros em fase inicial com mais prazo e condições diferenciadas de entrada.
         </p>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
-          Para saber qual empreendimento tem a melhor combinação de localização, prazo de entrega e condições de pagamento para o seu perfil, o ideal e conversar diretamente com Stiven Allan, CRECI 60.275, que acompanha todos os lançamentos Fontana e monta simulações personalizadas sem custo.
+          Para saber qual empreendimento tem a melhor combinação de localização, prazo de entrega e condições de pagamento para o seu perfil, o ideal é conversar diretamente com Stiven Allan, CRECI 60.275, que acompanha todos os lançamentos Fontana e monta simulações personalizadas sem custo.
         </p>
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Perguntas Frequentes</h2>
