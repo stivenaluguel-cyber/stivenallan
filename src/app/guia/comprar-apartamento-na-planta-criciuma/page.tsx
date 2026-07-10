@@ -7,16 +7,16 @@ const CANONICAL = `${SITE_URL}/guia/${SLUG}`
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20quero%20saber%20mais%20sobre%20apartamentos%20na%20planta%20em%20Crici%C3%BAma.'
 
 export const metadata: Metadata = {
-  title: 'Como Comprar Apartamento na Planta em Criciuma/SC: Guia Completo',
-  description: 'Guia completo para comprar apartamento na planta em Criciuma/SC: etapas, riscos, vantagens e como funciona o financiamento direto com a Construtora Fontana.',
+    title: 'Comprar Apartamento na Planta em Criciúma | Stiven Allan',
+  description: 'Guia completo para comprar apartamento na planta em Criciúma/SC: etapas, riscos, vantagens e como funciona o financiamento direto com a Construtora Fontana.',
   alternates: { canonical: CANONICAL },
   openGraph: {
-    title: 'Como Comprar Apartamento na Planta em Criciuma/SC | Stiven Allan',
+    title: 'Comprar Apartamento na Planta em Criciúma | Stiven Allan',
     description: 'Tudo o que você precisa saber antes de comprar um apartamento na planta em Criciuma.',
     url: CANONICAL,
     type: 'article',
   },
-    twitter: { card: 'summary_large_image', title: 'Como Comprar Apartamento na Planta em Criciuma/SC | Stiven Allan' },
+  twitter: { card: 'summary_large_image', title: 'Comprar Apartamento na Planta em Criciúma | Stiven Allan' },
 }
 
 const SCHEMA = {
@@ -80,7 +80,7 @@ export default function GuiaComprarNaPlantaPage() {
         <div style={{ maxWidth: 800, margin: '0 auto' }}>
           <p style={{ fontSize: 11, letterSpacing: '0.42em', textTransform: 'uppercase', color: 'rgba(234,242,232,0.55)', marginBottom: 20 }}>Guia - Compra na Planta</p>
           <h1 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.12em', fontSize: 'clamp(28px,5vw,52px)', lineHeight: 1.1, margin: 0 }}>
-            Comprar Apartamento na Planta em Criciuma
+            Comprar Apartamento na Planta em Criciúma
           </h1>
           <p style={{ fontSize: 'clamp(16px,2vw,20px)', color: 'rgba(234,242,232,0.75)', marginTop: 24, lineHeight: 1.6 }}>
             Tudo o que você precisa saber antes de assinar o contrato: etapas, vantagens, riscos e como funciona o financiamento direto.
