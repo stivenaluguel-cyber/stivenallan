@@ -46,7 +46,7 @@ export default async function EmpreendimentosPage() {
             </ol>
           </nav>
           <h1 style={{ fontSize: 'clamp(2rem,5vw,3.5rem)', fontWeight: 900, margin: '0 0 1rem', lineHeight: 1.1 }}>
-            Empreendimentos em<span style={{ display: 'block', color: '#c9a24b' }}>Criciúma e região</span>
+            Empreendimentos em <span style={{ display: 'block', color: '#c9a24b' }}>Criciúma e região</span>
           </h1>
           <p style={{ color: '#a7adb4', fontSize: 'clamp(0.95rem,2.2vw,1.1rem)', maxWidth: '600px', margin: '0 0 2rem', lineHeight: 1.7 }}>
             {lista.length} empreendimentos da Fontana Construtora. Financiamento direto com a construtora, sem banco, sem burocracia.
