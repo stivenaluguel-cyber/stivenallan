@@ -1,7 +1,7 @@
 // Fonte única de dados dos empreendimentos — todos os 29 ativos.
 // Usada pela home, /empreendimentos, /empreendimento/[construtora]/[slug] e sitemap.
 
-export type StatusObra = 'na planta' | 'em obras' | 'pronto';
+export type StatusObra = 'na planta' | 'em obras' | 'pronto' | 'entregue';
 
 export interface Empreendimento {
   slug: string;
