@@ -211,7 +211,6 @@ export default async function LancamentosCidadePage({ params }: Props) {
           </section>
         )}
 
-        130
         <div style={{ background: 'linear-gradient(135deg, #c9a24b15, #c9a24b05)', borderRadius: 16, padding: '48px 32px', border: '1px solid #c9a24b30', textAlign: 'center' }}>
           <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2rem)', fontWeight: 800, marginBottom: 12 }}>
             Quer saber mais sobre lançamentos em {info.nome}?
