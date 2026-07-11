@@ -7,7 +7,7 @@ const CANONICAL = `${SITE_URL}/guia/${SLUG}`
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20quero%20saber%20mais%20sobre%20apartamentos%20na%20planta%20em%20Crici%C3%BAma.'
 
 export const metadata: Metadata = {
-    title: 'Comprar Apartamento na Planta em Criciúma | Stiven Allan',
+    title: 'Comprar Apartamento na Planta em Criciúma',
   description: 'Guia completo para comprar apartamento na planta em Criciúma/SC: etapas, riscos, vantagens e como funciona o financiamento direto com a Construtora Fontana.',
   alternates: { canonical: CANONICAL },
   openGraph: {
