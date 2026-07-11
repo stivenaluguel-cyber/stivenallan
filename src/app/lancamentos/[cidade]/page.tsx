@@ -83,6 +83,99 @@ const DORMS_POR_SLUG: Record<string, string> = {
   'rocca-pietore-centro-sideropolis-sc': '2 ou 3 dorms · 1 suíte',
 }
 
+// Conteúdo de contexto de mercado para cidades com poucos empreendimentos (1 bairro
+// cada, ao contrário de Criciúma que tem 7) — por isso não têm seção de "bairros
+// ativos" própria, diferente do bloco cityKey === 'criciuma' abaixo. Fatos extraídos
+// das páginas estáticas reais de cada empreendimento (meta description/FAQ), não
+// inventados.
+const CONTEUDO_POR_CIDADE: Record<
+  string,
+  { mercado: string; faqs: { pergunta: string; resposta: string }[] }
+> = {
+  'icara': {
+    mercado:
+      'Içara concentra hoje três empreendimentos ativos da Construtora Fontana, todos no Centro da cidade: o Castellano Residencial, com apartamentos de 3 dormitórios e 109 a 112 m² privativos, em obras; o Pianezze Residencial, com unidades de 2 e 3 dormitórios (1 suíte) e 66 a 86 m², já pronto para morar; e o Piazza Castello Residencial, com apenas 2 apartamentos por andar, 3 dormitórios (3 suítes) e até 172 m² privativos, também pronto para morar. A combinação de um lançamento em obras com dois empreendimentos já prontos dá a quem procura imóvel em Içara a opção de comprar na planta com parcelas menores ou mudar em pouco tempo para um apartamento pronto.',
+    faqs: [
+      {
+        pergunta: 'Quais empreendimentos da Fontana estão ativos em Içara hoje?',
+        resposta:
+          'Castellano Residencial (em obras), Pianezze Residencial (pronto para morar) e Piazza Castello Residencial (pronto para morar), todos no Centro de Içara/SC.',
+      },
+      {
+        pergunta: 'Como funciona o financiamento direto da Fontana em Içara?',
+        resposta:
+          'O modelo prevê entrada de 20% no ato da assinatura, saldo parcelado mensalmente com reforços anuais e correção pelo CUB/SC durante a obra, sem necessidade de aprovação bancária.',
+      },
+      {
+        pergunta: 'Qual a diferença entre o Castellano e os outros dois empreendimentos em Içara?',
+        resposta:
+          'O Castellano Residencial ainda está em obras, com parcelas menores durante a construção. O Pianezze Residencial e o Piazza Castello Residencial já estão prontos para morar, no mesmo bairro Centro.',
+      },
+    ],
+  },
+  'balneario-rincao': {
+    mercado:
+      'Balneário Rincão, o litoral mais exclusivo do sul catarinense, concentra hoje quatro empreendimentos ativos da Fontana, todos no Centro e em obras: o Mar di Arienzo Residencial (3 dormitórios com suíte, 97 a 109 m²), o Mar di Atrani Residencial (3 dormitórios com suíte, 100 a 101 m², a 250 metros da beira-mar), o Mar Positano Residencial (3 dormitórios com 1 suíte, 107 a 126 m², sacada com churrasqueira) e o Villammare Residencial (4 dormitórios — 2 suítes e 2 demi suítes —, 172 a 275 m², a passos da praia). É a cidade com a maior concentração de lançamentos da Fontana no litoral, reforçando o Centro de Balneário Rincão como destino de apartamentos próximos à praia.',
+    faqs: [
+      {
+        pergunta: 'Quais empreendimentos da Fontana estão ativos em Balneário Rincão hoje?',
+        resposta:
+          'Mar di Arienzo Residencial, Mar di Atrani Residencial, Mar Positano Residencial e Villammare Residencial, todos no Centro de Balneário Rincão/SC e em obras.',
+      },
+      {
+        pergunta: 'Como funciona o financiamento direto da Fontana em Balneário Rincão?',
+        resposta:
+          'O modelo prevê entrada de 20% no ato da assinatura, saldo parcelado mensalmente com reforços anuais e correção pelo CUB/SC durante a obra, sem necessidade de aprovação bancária.',
+      },
+      {
+        pergunta: 'Os empreendimentos da Fontana em Balneário Rincão são frente mar?',
+        resposta:
+          'O Mar di Atrani Residencial fica a 250 metros da beira-mar e o Villammare Residencial é a passos da praia; o Mar di Arienzo Residencial e o Mar Positano Residencial ficam no Centro de Balneário Rincão, próximos à orla.',
+      },
+    ],
+  },
+  'laguna': {
+    mercado:
+      'Em Laguna, a Fontana constrói dois empreendimentos no bairro Mar Grosso, ambos em obras: o Mar di Licata Residencial, com apartamentos de 3 dormitórios e suíte, 120 a 122 m² privativos e rooftop com vista para o mar, e o Mar di Nizza Residencial, com unidades de 2 e 3 dormitórios (1 suíte) e 65 a 92 m² privativos. Os dois lançamentos reforçam o Mar Grosso como um dos bairros mais procurados de Laguna para quem busca um apartamento perto do litoral com financiamento direto da construtora.',
+    faqs: [
+      {
+        pergunta: 'Quais empreendimentos da Fontana estão ativos em Laguna hoje?',
+        resposta:
+          'Mar di Licata Residencial e Mar di Nizza Residencial, os dois no bairro Mar Grosso, em Laguna/SC, e em obras.',
+      },
+      {
+        pergunta: 'Como funciona o financiamento direto da Fontana em Laguna?',
+        resposta:
+          'O modelo prevê entrada de 20% no ato da assinatura, saldo parcelado mensalmente com reforços anuais e correção pelo CUB/SC durante a obra, sem necessidade de aprovação bancária.',
+      },
+      {
+        pergunta: 'Onde ficam os empreendimentos da Fontana em Laguna?',
+        resposta: 'Os dois lançamentos ativos da Fontana em Laguna ficam no bairro Mar Grosso.',
+      },
+    ],
+  },
+  'balneario-picarras': {
+    mercado:
+      'Em Balneário Piçarras, a Fontana constrói o Águas de Marano Residencial, no Frente Mar, com apartamentos de 3 e 4 dormitórios (até 3 suítes) e 196 a 199 m² privativos, atualmente em obras, com previsão de entrega em julho de 2028. É o único lançamento ativo da construtora na cidade até o momento, com localização frente mar.',
+    faqs: [
+      {
+        pergunta: 'Qual empreendimento da Fontana está ativo em Balneário Piçarras hoje?',
+        resposta:
+          'O Águas de Marano Residencial, no Frente Mar de Balneário Piçarras/SC, atualmente em obras.',
+      },
+      {
+        pergunta: 'Como funciona o financiamento direto da Fontana em Balneário Piçarras?',
+        resposta:
+          'O modelo prevê entrada de 20% no ato da assinatura, saldo parcelado mensalmente com reforços anuais e correção pelo CUB/SC durante a obra, sem necessidade de aprovação bancária.',
+      },
+      {
+        pergunta: 'Qual a previsão de entrega do Águas de Marano Residencial?',
+        resposta: 'A previsão de entrega é julho de 2028, no Frente Mar de Balneário Piçarras/SC.',
+      },
+    ],
+  },
+}
+
 function statusParaFase(status: string): string {
   if (status === 'na planta') return 'Na planta'
   if (status === 'em obras') return 'Em obras'
@@ -272,6 +365,34 @@ export default async function LancamentosCidadePage({ params }: Props) {
 
             <p style={{ fontSize: 16, color: '#a7adb4', lineHeight: 1.8, maxWidth: 760 }}>
               Se você está pesquisando lançamentos em Criciúma, vale considerar não só a localização e o bairro, mas também a fase de obra de cada empreendimento e as condições de pagamento oferecidas pela construtora. Do Centro ao Grande Próspera, os empreendimentos da Fontana cobrem diferentes perfis de compra, de quem busca um apartamento ainda na planta com parcelas menores a quem prefere um imóvel pronto para morar. Fale com o corretor Stiven Allan, CRECI 60.275, para saber qual empreendimento em Criciúma se encaixa melhor no seu momento e orçamento.
+            </p>
+          </section>
+        )}
+
+        {CONTEUDO_POR_CIDADE[cityKey] && (
+          <section style={{ marginBottom: 60 }}>
+            <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 16 }}>O mercado de lançamentos em {info.nome}</h2>
+            <p style={{ fontSize: 16, color: '#a7adb4', lineHeight: 1.8, marginBottom: 40, maxWidth: 760 }}>
+              {CONTEUDO_POR_CIDADE[cityKey].mercado}
+            </p>
+
+            <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 16 }}>Por que financiamento direto com a construtora</h2>
+            <p style={{ fontSize: 16, color: '#a7adb4', lineHeight: 1.8, marginBottom: 40, maxWidth: 760 }}>
+              A maior parte dos lançamentos da Fontana em {info.nome} é comercializada com financiamento direto com a construtora, sem depender da aprovação de um banco. Na prática, o modelo funciona com entrada de 20% no ato da assinatura do contrato, saldo dividido em parcelas mensais e reforços anuais, todos corrigidos pelo CUB/SC ao longo da obra. Para quem tem restrição de crédito, renda informal ou simplesmente prefere não esperar meses por uma análise bancária, esse formato reduz a burocracia e agiliza o processo de compra. Ao final da obra, o comprador pode optar por quitar o saldo devedor à vista ou migrar para um financiamento bancário tradicional, conforme sua necessidade.
+            </p>
+
+            <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 16 }}>Perguntas frequentes sobre lançamentos em {info.nome}</h2>
+            <div style={{ display: 'grid', gap: 24, maxWidth: 760, marginBottom: 40 }}>
+              {CONTEUDO_POR_CIDADE[cityKey].faqs.map((faq, i) => (
+                <div key={i}>
+                  <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>{faq.pergunta}</h3>
+                  <p style={{ fontSize: 15, color: '#a7adb4', lineHeight: 1.7 }}>{faq.resposta}</p>
+                </div>
+              ))}
+            </div>
+
+            <p style={{ fontSize: 16, color: '#a7adb4', lineHeight: 1.8, maxWidth: 760 }}>
+              Fale com o corretor Stiven Allan, CRECI 60.275, para saber qual empreendimento em {info.nome} se encaixa melhor no seu momento e orçamento.
             </p>
           </section>
         )}
