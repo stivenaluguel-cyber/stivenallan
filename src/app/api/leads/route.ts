@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { normalizeEmail, normalizePhone, normalizeString } from '@/lib/leads/normalize'
 
 export const dynamic = 'force-dynamic'
 
@@ -31,25 +32,44 @@ export async function POST(req: NextRequest) {
 
     const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey)
     const body = await req.json()
-    const { nome, telefone, email, mensagem, canal_preferido, pagina_origem, property_id, property_slug } = body
 
-    if (!nome || !telefone) {
+    const nome = normalizeString(body.nome)
+    const whatsapp = normalizePhone(body.telefone)
+    const email = normalizeEmail(body.email)
+    const mensagem = normalizeString(body.mensagem)
+    const canalPreferido = normalizeString(body.canal_preferido)
+    const paginaOrigem = normalizeString(body.pagina_origem)
+    const propertySlug = normalizeString(body.property_slug)
+    const propertyIdInput = normalizeString(body.property_id)
+
+    if (!nome || !whatsapp) {
       return NextResponse.json({ error: 'Nome e telefone obrigatorios' }, { status: 400 })
     }
 
-    // Páginas estáticas não conhecem o UUID: resolve pelo slug
-    let resolvedPropertyId = property_id || null
-    if (!resolvedPropertyId && property_slug) {
-      const { data: prop } = await supabaseAdmin.from('properties').select('id').eq('slug', property_slug).maybeSingle()
+    // Páginas estáticas não conhecem o UUID: resolve pelo slug e aproveita o nome do imóvel
+    let resolvedPropertyId = propertyIdInput
+    let resolvedPropertyName: string | null = null
+    if (!resolvedPropertyId && propertySlug) {
+      const { data: prop } = await supabaseAdmin
+        .from('properties')
+        .select('id, nome')
+        .eq('slug', propertySlug)
+        .maybeSingle()
       resolvedPropertyId = prop?.id ?? null
+      resolvedPropertyName = prop?.nome ?? null
     }
+
+    const anotacoes =
+      [mensagem, canalPreferido ? `Canal preferido: ${canalPreferido}` : null]
+        .filter(Boolean)
+        .join(' | ') || null
 
     const base: Record<string, unknown> = {
       nome,
-      whatsapp: telefone,
-      email: email || null,
-      anotacoes: [mensagem, canal_preferido ? `Canal preferido: ${canal_preferido}` : null].filter(Boolean).join(' | ') || null,
-      source: pagina_origem || null,
+      whatsapp,
+      email,
+      anotacoes,
+      source: paginaOrigem,
       property_id: resolvedPropertyId,
       origem: 'Site',
       status: 'novo',
@@ -58,17 +78,24 @@ export async function POST(req: NextRequest) {
       proximo_followup: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
     }
 
+    // property_name entra em `extras` — se a coluna não existir no schema, o fallback
+    // insert-sem-extras ainda captura o lead (mesmo padrão das colunas de growth).
     const extras: Record<string, unknown> = {}
+    if (resolvedPropertyName) extras.property_name = resolvedPropertyName
     for (const field of GROWTH_FIELDS) {
       if (typeof body[field] === 'string' && body[field]) extras[field] = body[field]
     }
 
-    let { error } = await supabaseAdmin.from('leads').insert({ ...base, ...extras })
+    let { data, error } = await supabaseAdmin
+      .from('leads')
+      .insert({ ...base, ...extras })
+      .select('id')
+      .single()
 
-    // Colunas de growth ainda sem migração: não pode derrubar a captação
+    // Colunas de growth / property_name ainda sem migração: não pode derrubar a captação
     if (error && Object.keys(extras).length > 0 && isMissingColumnError(error)) {
-      console.error('Colunas de growth ausentes (rodar 0002_leads_growth.sql):', error.message)
-      ;({ error } = await supabaseAdmin.from('leads').insert(base))
+      console.error('Colunas extras ausentes (rodar 0002_leads_growth.sql):', error.message)
+      ;({ data, error } = await supabaseAdmin.from('leads').insert(base).select('id').single())
     }
 
     if (error) {
@@ -76,7 +103,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Erro ao salvar lead' }, { status: 500 })
     }
 
-    return NextResponse.json({ success: true }, { status: 201 })
+    return NextResponse.json({ success: true, id: data?.id ?? null }, { status: 201 })
   } catch (err) {
     console.error('Route error:', err)
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 })

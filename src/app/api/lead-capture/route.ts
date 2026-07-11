@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { normalizeEmail, normalizePhone, normalizeString } from '@/lib/leads/normalize'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,7 +15,12 @@ export async function POST(req: NextRequest) {
 
     const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey)
     const body = await req.json()
-    const { nome, whatsapp, email, property_id, property_name } = body
+
+    const nome = normalizeString(body.nome)
+    const whatsapp = normalizePhone(body.whatsapp)
+    const email = normalizeEmail(body.email)
+    const propertyId = normalizeString(body.property_id)
+    const propertyName = normalizeString(body.property_name)
 
     if (!nome || !whatsapp) {
       return NextResponse.json({ error: 'Nome e whatsapp obrigatorios' }, { status: 400 })
@@ -23,9 +29,9 @@ export async function POST(req: NextRequest) {
     const base = {
       nome,
       whatsapp,
-      email: email || null,
-      property_id: property_id || null,
-      property_name: property_name || null,
+      email,
+      property_id: propertyId,
+      property_name: propertyName,
       origem: 'Site',
       estagio_funil: 'primeiro_contato',
       source: 'book_download',

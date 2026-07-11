@@ -24,7 +24,8 @@ export function captureAttribution() {
     }
     if (Object.keys(found).length === 0) return
     const existing = getAttribution()
-    sessionStorage.setItem(KEY_ATTRIB, JSON.stringify({ ...existing, ...found }))
+    // First-touch: chaves já gravadas vencem — `existing` vem por último no spread para sobrescrever `found`.
+    sessionStorage.setItem(KEY_ATTRIB, JSON.stringify({ ...found, ...existing }))
   } catch {}
 }
 
