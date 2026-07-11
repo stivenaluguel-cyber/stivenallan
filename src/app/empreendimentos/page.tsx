@@ -25,9 +25,13 @@ const WHATSAPP = 'https://api.whatsapp.com/send?phone=5548991642332&text=Ol%C3%A
 export default async function EmpreendimentosPage() {
   const listaEmp = await getVitrineEmpreendimentos();
   const lista = listaEmp.filter((e) => !e.oculto)
+  const breadcrumbSchema = { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [ { '@type': 'ListItem', position: 1, name: 'Início', item: 'https://stivenallan.com.br' }, { '@type': 'ListItem', position: 2, name: 'Empreendimentos', item: 'https://stivenallan.com.br/empreendimentos' } ] };
+  const itemListSchema = { '@context': 'https://schema.org', '@type': 'ItemList', itemListElement: lista.map((emp, i) => ({ '@type': 'ListItem', position: i + 1, name: emp.nome, url: 'https://stivenallan.com.br/empreendimento/' + emp.construtoraSlug + '/' + emp.slug })) };
 
   return (
     <main style={{ background: '#121315', color: '#e8eaed', fontFamily: 'system-ui, -apple-system, sans-serif', minHeight: '100vh' }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }} />
 
       <header style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, background: 'rgba(18,19,21,0.95)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(201,162,75,0.2)', padding: '0 clamp(1rem,4vw,2rem)' }}>
         <nav style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '64px' }}>
