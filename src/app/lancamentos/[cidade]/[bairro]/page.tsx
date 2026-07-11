@@ -4,27 +4,31 @@ import Image from 'next/image'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import WppFloat from '@/components/WppFloat'
-import { createClient } from '@supabase/supabase-js'
+import { imoveis } from '@/data/imoveis'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-
+// Cidades com pelo menos 1 combinação cidade+bairro com 2+ empreendimentos reais
+// (ver BAIRROS_POR_CIDADE) — chaves consistentes com /lancamentos/[cidade].
 const CIDADES: Record<string, { nome: string; uf: string }> = {
-  'criciuma': { nome: 'Criciúma', uf: 'SC' },
-  'icara': { nome: 'Içara', uf: 'SC' },
-  'nova-veneza': { nome: 'Nova Veneza', uf: 'SC' },
-  'forquilhinha': { nome: 'Forquilhinha', uf: 'SC' },
-  'cocal-do-sul': { nome: 'Cocal do Sul', uf: 'SC' },
+  'criciuma-sc': { nome: 'Criciúma', uf: 'SC' },
+  'icara-sc': { nome: 'Içara', uf: 'SC' },
+  'balneario-rincao-sc': { nome: 'Balneário Rincão', uf: 'SC' },
+  'laguna-sc': { nome: 'Laguna', uf: 'SC' },
+  'sideropolis-sc': { nome: 'Siderópolis', uf: 'SC' },
+}
+
+// Só geramos página para combinações cidade+bairro com 2+ empreendimentos reais —
+// bairros com 1 único empreendimento renderizariam conteúdo quase idêntico à própria
+// página do empreendimento (risco de conteúdo fino/duplicado para o Google).
+// slug do bairro -> nome real (bate com o campo `bairro` de @/data/imoveis).
+const BAIRROS_POR_CIDADE: Record<string, Record<string, string>> = {
+  'criciuma-sc': { centro: 'Centro' },
+  'icara-sc': { centro: 'Centro' },
+  'balneario-rincao-sc': { centro: 'Centro' },
+  'laguna-sc': { 'mar-grosso': 'Mar Grosso' },
+  'sideropolis-sc': { centro: 'Centro' },
 }
 
 type Props = { params: Promise<{ cidade: string; bairro: string }> }
-
-function formatBairro(slug: string): string {
-  return slug
-    .split('-')
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(' ')
-}
 
 function formatPreco(valor: number): string {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(valor)
@@ -33,12 +37,13 @@ function formatPreco(valor: number): string {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { cidade, bairro } = await params
   const cidadeInfo = CIDADES[cidade]
-  const nomeBairro = formatBairro(bairro)
-  const nomeCidade = cidadeInfo?.nome ?? cidade
+  const nomeBairro = BAIRROS_POR_CIDADE[cidade]?.[bairro]
+  if (!cidadeInfo || !nomeBairro) return {}
+  const nomeCidade = cidadeInfo.nome
 
   return {
     title: `Lançamentos no ${nomeBairro}, ${nomeCidade}/SC`,
-    description: `Encontre os melhores lançamentos imobiliários no bairro ${nomeBairro} em ${nomeCidade}/SC. Apartamentos, casas e terrenos com Stiven Allan, CRECI 60.275.`,
+    description: `Encontre os melhores lançamentos imobiliários no bairro ${nomeBairro} em ${nomeCidade}/SC. Apartamentos com financiamento direto da Construtora Fontana, com Stiven Allan, CRECI 60.275.`,
     alternates: {
       canonical: `https://stivenallan.com.br/lancamentos/${cidade}/${bairro}`,
     },
@@ -46,96 +51,57 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: `Lançamentos no ${nomeBairro}, ${nomeCidade}/SC | Stiven Allan`,
       description: `Imóveis e lançamentos no ${nomeBairro} em ${nomeCidade}. Consulte Stiven Allan, seu corretor especialista.`,
     },
-        twitter: { card: 'summary_large_image', title: `Lançamentos no ${nomeBairro}, ${nomeCidade}/SC | Stiven Allan` },
+    twitter: { card: 'summary_large_image', title: `Lançamentos no ${nomeBairro}, ${nomeCidade}/SC | Stiven Allan` },
   }
 }
 
-export const revalidate = 3600
-
-interface Construtora {
-  nome: string
-  slug: string
-}
-
-interface Empreendimento {
-  id: string
-  nome: string
-  slug: string
-  cidade: string
-  bairro: string | null
-  uf: string
-  tipo: string
-  status: string
-  preco_min: number | null
-  preco_max: number | null
-  fotos: string[]
-  construtoras: Construtora | null
-}
-
-interface SupabaseEmpreendimento {
-  id: string
-  nome: string
-  slug: string
-  cidade: string
-  bairro: string | null
-  uf: string
-  tipo: string
-  status: string
-  preco_min: number | null
-  preco_max: number | null
-  fotos: string[]
-  construtoras: Construtora | Construtora[] | null
-}
-
-function normalizeConstrutora(c: Construtora | Construtora[] | null): Construtora | null {
-  if (!c) return null
-  if (Array.isArray(c)) return c[0] ?? null
-  return c
-}
-
-async function getEmpreendimentosPorBairro(cidade: string, bairro: string): Promise<Empreendimento[]> {
-  try {
-    const supabase = createClient(supabaseUrl, supabaseKey)
-    const nomeBairro = formatBairro(bairro)
-    const { data } = await supabase
-      .from('empreendimentos')
-      .select('id, nome, slug, cidade, bairro, uf, tipo, status, preco_min, preco_max, fotos, construtoras(nome, slug)')
-      .eq('cidade', cidade)
-      .ilike('bairro', nomeBairro)
-      .order('destaque', { ascending: false })
-      .order('created_at', { ascending: false })
-
-    if (!data) return []
-    return (data as unknown as SupabaseEmpreendimento[]).map((emp) => ({
-      ...emp,
-      construtoras: normalizeConstrutora(emp.construtoras),
-    }))
-  } catch {
-    return []
-  }
+export async function generateStaticParams() {
+  return Object.entries(BAIRROS_POR_CIDADE).flatMap(([cidade, bairros]) =>
+    Object.keys(bairros).map((bairro) => ({ cidade, bairro })),
+  )
 }
 
 const STATUS_LABELS: Record<string, string> = {
-  lancamento: 'Lançamento',
-  em_obras: 'Em Obras',
-  pronto: 'Pronto para Morar',
-  breve_lancamento: 'Breve Lançamento',
+  'na planta': 'Na Planta',
+  'em obras': 'Em Obras',
+  'pronto': 'Pronto para Morar',
+  'entregue': 'Entregue',
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  lancamento: 'bg-[#c9a24b] text-[#121315]',
-  em_obras: 'bg-blue-500/20 text-blue-400',
-  pronto: 'bg-green-500/20 text-green-400',
-  breve_lancamento: 'bg-purple-500/20 text-purple-400',
+  'na planta': 'bg-[#c9a24b] text-[#121315]',
+  'em obras': 'bg-blue-500/20 text-blue-400',
+  'pronto': 'bg-green-500/20 text-green-400',
+  'entregue': 'bg-white/10 text-white',
+}
+
+function getEmpreendimentosPorBairro(nomeCidade: string, nomeBairro: string) {
+  return imoveis.filter((im) => im.cidade === nomeCidade && im.bairro === nomeBairro && im.ativo)
 }
 
 export default async function BairroPage({ params }: Props) {
   const { cidade, bairro } = await params
   const cidadeInfo = CIDADES[cidade]
-  const nomeBairro = formatBairro(bairro)
-  const nomeCidade = cidadeInfo?.nome ?? cidade
+  const nomeBairro = BAIRROS_POR_CIDADE[cidade]?.[bairro]
 
-  const empreendimentos = await getEmpreendimentosPorBairro(cidade, bairro)
+  if (!cidadeInfo || !nomeBairro) {
+    return (
+      <>
+        <Header />
+        <section className="pt-32 pb-16 bg-[#1a1c1f] text-center">
+          <div className="container mx-auto px-6">
+            <h1 className="text-3xl font-extrabold mb-4">Bairro não encontrado</h1>
+            <Link href="/empreendimentos" className="text-[#c9a24b]">Ver todos os empreendimentos</Link>
+          </div>
+        </section>
+        <Footer />
+        <WppFloat />
+      </>
+    )
+  }
+
+  const nomeCidade = cidadeInfo.nome
+  const empreendimentos = getEmpreendimentosPorBairro(nomeCidade, nomeBairro)
 
   const schemaBreadcrumb = {
     '@context': 'https://schema.org',
@@ -158,7 +124,7 @@ export default async function BairroPage({ params }: Props) {
       item: {
         '@type': 'RealEstateListing',
         name: emp.nome,
-        url: `https://stivenallan.com.br/empreendimento/${emp.construtoras?.slug ?? 'construtora'}/${emp.slug}`,
+        url: `https://stivenallan.com.br/empreendimento/${emp.construtora_slug}/${emp.slug}`,
         address: {
           '@type': 'PostalAddress',
           addressLocality: nomeCidade,
@@ -169,6 +135,8 @@ export default async function BairroPage({ params }: Props) {
       },
     })),
   } : null
+
+  const outrosBairros = Object.entries(BAIRROS_POR_CIDADE[cidade] ?? {}).filter(([slug]) => slug !== bairro)
 
   return (
     <>
@@ -204,9 +172,9 @@ export default async function BairroPage({ params }: Props) {
             <span className="text-white">{nomeCidade}/SC</span>
           </h1>
           <p className="text-[#a7adb4] text-lg max-w-2xl">
-            Encontre os melhores imóveis no bairro {nomeBairro} em {nomeCidade}.
-            Lançamentos, apartamentos, casas e terrenos com Stiven Allan,
-            seu corretor especialista na região sul catarinense.
+            Encontre os melhores apartamentos no bairro {nomeBairro} em {nomeCidade}.
+            Lançamentos da Construtora Fontana com financiamento direto, sem banco,
+            com Stiven Allan, CRECI 60.275.
           </p>
           {empreendimentos.length > 0 && (
             <p className="mt-4 text-[#c9a24b] font-semibold">
@@ -242,21 +210,15 @@ export default async function BairroPage({ params }: Props) {
                   key={emp.id}
                   className="bg-[#202327] border border-[#2c3035] rounded-2xl overflow-hidden hover:border-[#c9a24b]/30 transition-all group"
                 >
-                  <Link href={`/empreendimento/${emp.construtoras?.slug ?? 'construtora'}/${emp.slug}`}>
+                  <Link href={`/empreendimento/${emp.construtora_slug}/${emp.slug}`}>
                     <div className="relative h-52 bg-[#2c3035] overflow-hidden">
-                      {emp.fotos && emp.fotos.length > 0 ? (
-                        <Image
-                          src={emp.fotos[0]}
-                          alt={`${emp.nome} — ${nomeBairro}, ${nomeCidade}/SC`}
-                          fill
-                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                          className="object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                      ) : (
-                        <div className="flex items-center justify-center h-full">
-                          <span className="text-[#a7adb4] text-sm">Sem foto</span>
-                        </div>
-                      )}
+                      <Image
+                        src={emp.img}
+                        alt={`${emp.nome} — ${nomeBairro}, ${nomeCidade}/SC`}
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
                       <span
                         className={`absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold ${STATUS_COLORS[emp.status] ?? 'bg-white/10 text-white'}`}
                       >
@@ -264,17 +226,13 @@ export default async function BairroPage({ params }: Props) {
                       </span>
                     </div>
                     <div className="p-5">
-                      <p className="text-[#a7adb4] text-xs mb-1">{emp.tipo} · {nomeBairro}</p>
+                      <p className="text-[#a7adb4] text-xs mb-1">Apartamento · {nomeBairro}</p>
                       <h2 className="text-white font-bold text-lg mb-2 group-hover:text-[#c9a24b] transition-colors line-clamp-2">
                         {emp.nome}
                       </h2>
-                      {(emp.preco_min || emp.preco_max) && (
-                        <p className="text-[#c9a24b] font-semibold text-sm">
-                          {emp.preco_min
-                            ? `A partir de ${formatPreco(emp.preco_min)}`
-                            : `Até ${formatPreco(emp.preco_max!)}`}
-                        </p>
-                      )}
+                      <p className="text-[#c9a24b] font-semibold text-sm">
+                        {emp.exibir_preco && emp.preco ? `A partir de ${formatPreco(emp.preco)}` : 'Sob consulta'}
+                      </p>
                     </div>
                   </Link>
                 </article>
@@ -300,24 +258,23 @@ export default async function BairroPage({ params }: Props) {
             </a>
           </div>
 
-          {/* Internal linking */}
-          <div className="mt-12">
-            <h3 className="text-white font-semibold mb-4">Outros bairros em {nomeCidade}</h3>
-            <div className="flex flex-wrap gap-2">
-              {['centro', 'universitario', 'santa-barbara', 'mina-do-mato', 'pio-correia', 'comerciario', 'michel', 'nossa-senhora-da-saude'].map(
-                (b) =>
-                  b !== bairro ? (
-                    <Link
-                      key={b}
-                      href={`/lancamentos/${cidade}/${b}`}
-                      className="px-4 py-2 bg-[#202327] border border-[#2c3035] rounded-full text-[#a7adb4] text-sm hover:border-[#c9a24b]/40 hover:text-[#c9a24b] transition-colors"
-                    >
-                      {formatBairro(b)}
-                    </Link>
-                  ) : null
-              )}
+          {/* Internal linking — só bairros reais desta cidade, gerados de fato */}
+          {outrosBairros.length > 0 && (
+            <div className="mt-12">
+              <h3 className="text-white font-semibold mb-4">Outros bairros em {nomeCidade}</h3>
+              <div className="flex flex-wrap gap-2">
+                {outrosBairros.map(([slug, nome]) => (
+                  <Link
+                    key={slug}
+                    href={`/lancamentos/${cidade}/${slug}`}
+                    className="px-4 py-2 bg-[#202327] border border-[#2c3035] rounded-full text-[#a7adb4] text-sm hover:border-[#c9a24b]/40 hover:text-[#c9a24b] transition-colors"
+                  >
+                    {nome}
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </section>
 

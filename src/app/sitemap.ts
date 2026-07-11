@@ -37,6 +37,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }))
 
+  // Páginas de bairro (/lancamentos/[cidade]/[bairro]) — só as combinações
+  // cidade+bairro com 2+ empreendimentos reais (ver BAIRROS_POR_CIDADE em
+  // src/app/lancamentos/[cidade]/[bairro]/page.tsx), curadoria manual para
+  // evitar conteúdo fino em bairros com 1 único empreendimento.
+  const bairroCombos = [
+    { cidade: 'criciuma-sc', bairro: 'centro' },
+    { cidade: 'icara-sc', bairro: 'centro' },
+    { cidade: 'balneario-rincao-sc', bairro: 'centro' },
+    { cidade: 'laguna-sc', bairro: 'mar-grosso' },
+    { cidade: 'sideropolis-sc', bairro: 'centro' },
+  ]
+  const bairroPages: MetadataRoute.Sitemap = bairroCombos.map(({ cidade, bairro }) => ({
+    url: SITE_URL + '/lancamentos/' + cidade + '/' + bairro,
+    lastModified: now,
+    changeFrequency: 'weekly' as const,
+    priority: 0.65,
+  }))
+
     // Indice de guias
       const guiaIndexPage: MetadataRoute.Sitemap = [
           { url: SITE_URL + '/guia', lastModified: now, changeFrequency: 'monthly' as const, priority: 0.6 },
@@ -67,5 +85,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }))
 
-  return [...staticPages, ...guiaIndexPage, ...cidadePages, ...guiaPages, ...empPages]
+  return [...staticPages, ...guiaIndexPage, ...cidadePages, ...bairroPages, ...guiaPages, ...empPages]
 }

@@ -176,6 +176,14 @@ const CONTEUDO_POR_CIDADE: Record<
   },
 }
 
+// Link para a página de bairro (só existe para as combinações com 2+
+// empreendimentos reais — ver BAIRROS_POR_CIDADE em [bairro]/page.tsx).
+const BAIRRO_LINK_POR_CIDADE: Record<string, { slug: string; nome: string }> = {
+  'icara': { slug: 'centro', nome: 'Centro' },
+  'balneario-rincao': { slug: 'centro', nome: 'Centro' },
+  'laguna': { slug: 'mar-grosso', nome: 'Mar Grosso' },
+}
+
 function statusParaFase(status: string): string {
   if (status === 'na planta') return 'Na planta'
   if (status === 'em obras') return 'Em obras'
@@ -334,7 +342,7 @@ export default async function LancamentosCidadePage({ params }: Props) {
               Veja abaixo os bairros de Criciúma que concentram lançamentos ativos da Construtora Fontana atualmente, com o nome de cada empreendimento e o status da obra:
             </p>
             <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 40px', display: 'grid', gap: 12, maxWidth: 760 }}>
-              <li style={{ background: '#202327', border: '1px solid #2e3338', borderRadius: 10, padding: '16px 20px', fontSize: 15, color: '#a7adb4', lineHeight: 1.7 }}><strong style={{ color: '#fff' }}>Centro:</strong> Monte Leone Residencial (na planta), Lavis Residencial (em obras), Tremezzo Residencial (em obras), Thiene Residencial (na planta), Bosco Del Montello Residencial (na planta) e Pineto Residencial (em obras), além do Calliano Residencial e do Due Fratelli Residencial, já entregues.</li>
+              <li style={{ background: '#202327', border: '1px solid #2e3338', borderRadius: 10, padding: '16px 20px', fontSize: 15, color: '#a7adb4', lineHeight: 1.7 }}><strong style={{ color: '#fff' }}><Link href="/lancamentos/criciuma-sc/centro" style={{ color: '#fff', textDecoration: 'underline' }}>Centro</Link>:</strong> Monte Leone Residencial (na planta), Lavis Residencial (em obras), Tremezzo Residencial (em obras), Thiene Residencial (na planta), Bosco Del Montello Residencial (na planta) e Pineto Residencial (em obras), além do Calliano Residencial e do Due Fratelli Residencial, já entregues.</li>
               <li style={{ background: '#202327', border: '1px solid #2e3338', borderRadius: 10, padding: '16px 20px', fontSize: 15, color: '#a7adb4', lineHeight: 1.7 }}><strong style={{ color: '#fff' }}>Cruzeiro do Sul:</strong> Fidenza Residencial, em obras.</li>
               <li style={{ background: '#202327', border: '1px solid #2e3338', borderRadius: 10, padding: '16px 20px', fontSize: 15, color: '#a7adb4', lineHeight: 1.7 }}><strong style={{ color: '#fff' }}>Santa Bárbara:</strong> Parco Savello Residencial, na planta.</li>
               <li style={{ background: '#202327', border: '1px solid #2e3338', borderRadius: 10, padding: '16px 20px', fontSize: 15, color: '#a7adb4', lineHeight: 1.7 }}><strong style={{ color: '#fff' }}>Comerciário:</strong> Bellante Residencial, em obras.</li>
@@ -372,9 +380,16 @@ export default async function LancamentosCidadePage({ params }: Props) {
         {CONTEUDO_POR_CIDADE[cityKey] && (
           <section style={{ marginBottom: 60 }}>
             <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 16 }}>O mercado de lançamentos em {info.nome}</h2>
-            <p style={{ fontSize: 16, color: '#a7adb4', lineHeight: 1.8, marginBottom: 40, maxWidth: 760 }}>
+            <p style={{ fontSize: 16, color: '#a7adb4', lineHeight: 1.8, marginBottom: 16, maxWidth: 760 }}>
               {CONTEUDO_POR_CIDADE[cityKey].mercado}
             </p>
+            {BAIRRO_LINK_POR_CIDADE[cityKey] && (
+              <p style={{ fontSize: 15, marginBottom: 40 }}>
+                <Link href={`/lancamentos/${cidade}/${BAIRRO_LINK_POR_CIDADE[cityKey].slug}`} style={{ color: '#c9a24b', fontWeight: 600, textDecoration: 'underline' }}>
+                  Ver todos os lançamentos no {BAIRRO_LINK_POR_CIDADE[cityKey].nome} →
+                </Link>
+              </p>
+            )}
 
             <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 16 }}>Por que financiamento direto com a construtora</h2>
             <p style={{ fontSize: 16, color: '#a7adb4', lineHeight: 1.8, marginBottom: 40, maxWidth: 760 }}>
