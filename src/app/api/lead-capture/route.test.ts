@@ -57,6 +57,8 @@ describe('POST /api/lead-capture', () => {
     process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://test'
     process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-key'
     resetRateLimit()
+    vi.spyOn(console, 'log').mockImplementation(() => {})
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
     vi.spyOn(console, 'error').mockImplementation(() => {})
   })
 

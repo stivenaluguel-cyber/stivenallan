@@ -3,8 +3,11 @@ import { createClient } from '@supabase/supabase-js'
 import { normalizeEmail, normalizePhone, normalizeString } from '@/lib/leads/normalize'
 import { extractIp, isBotSubmission } from '@/lib/leads/anti-spam'
 import { checkRateLimit } from '@/lib/leads/rate-limit'
+import { logError, logWarn } from '@/lib/log'
 
 export const dynamic = 'force-dynamic'
+
+const SOURCE = 'api/leads'
 
 const GROWTH_FIELDS = [
   'faixa_investimento',
@@ -115,18 +118,18 @@ export async function POST(req: NextRequest) {
 
     // Colunas de growth / property_name ainda sem migração: não pode derrubar a captação
     if (error && Object.keys(extras).length > 0 && isMissingColumnError(error)) {
-      console.error('Colunas extras ausentes (rodar 0002_leads_growth.sql):', error.message)
+      logWarn(SOURCE, 'columns pending — rodar 0002_leads_growth.sql', { db_message: error.message ?? '' })
       ;({ data, error } = await supabaseAdmin.from('leads').insert(base).select('id').single())
     }
 
     if (error) {
-      console.error('Supabase error:', error)
+      logError(SOURCE, 'supabase insert failed', error)
       return NextResponse.json({ error: 'Erro ao salvar lead' }, { status: 500 })
     }
 
     return NextResponse.json({ success: true, id: data?.id ?? null }, { status: 201 })
   } catch (err) {
-    console.error('Route error:', err)
+    logError(SOURCE, 'route exception', err)
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
   }
 }

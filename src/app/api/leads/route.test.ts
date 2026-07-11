@@ -73,7 +73,9 @@ describe('POST /api/leads', () => {
     process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://test'
     process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-key'
     resetRateLimit()
-    // Silencia console.error nos paths de erro esperados
+    // Silencia logs estruturados nos paths de erro esperados
+    vi.spyOn(console, 'log').mockImplementation(() => {})
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
     vi.spyOn(console, 'error').mockImplementation(() => {})
   })
 

@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createHash } from 'crypto'
+import { logError } from '@/lib/log'
 
 export const dynamic = 'force-dynamic'
 
 const PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID || '364836344657445'
+const SOURCE = 'api/meta-capi'
 
 function sha256(value: string) {
   return createHash('sha256').update(value).digest('hex')
@@ -77,13 +79,13 @@ export async function POST(req: NextRequest) {
 
     if (!res.ok) {
       const detail = await res.text()
-      console.error('Meta CAPI error:', detail)
+      logError(SOURCE, 'graph api failed', new Error(`status=${res.status} body=${detail}`))
       return NextResponse.json({ error: 'CAPI falhou' }, { status: 502 })
     }
 
     return NextResponse.json({ success: true }, { status: 200 })
   } catch (err) {
-    console.error('Route error:', err)
+    logError(SOURCE, 'route exception', err)
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
   }
 }
