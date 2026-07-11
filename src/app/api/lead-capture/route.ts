@@ -55,7 +55,6 @@ export async function POST(req: NextRequest) {
       whatsapp,
       email,
       property_id: propertyId,
-      property_name: propertyName,
       origem: 'Site',
       estagio_funil: 'primeiro_contato',
       source: 'book_download',
@@ -63,8 +62,11 @@ export async function POST(req: NextRequest) {
       proximo_followup: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
     }
 
+    // property_name entra em `extras` — se a coluna não existir no schema, o fallback
+    // insert-sem-extras ainda captura o lead (mesmo padrão defensivo do /api/leads).
     const growthFields = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'gclid', 'fbclid'] as const
     const extras: Record<string, unknown> = {}
+    if (propertyName) extras.property_name = propertyName
     for (const field of growthFields) {
       if (typeof body[field] === 'string' && body[field]) extras[field] = body[field]
     }

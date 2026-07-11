@@ -1,9 +1,9 @@
 import OpenAI from 'openai'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 
 // Lazy initialization - evita erro de build quando env vars nao estao presentes
 let _openai: OpenAI | null = null
-let _supabase: ReturnType<typeof createClient> | null = null
+let _supabase: SupabaseClient<any, any, any> | null = null
 
 function getOpenAI(): OpenAI {
   if (!_openai) {
@@ -15,7 +15,7 @@ function getOpenAI(): OpenAI {
   return _openai
 }
 
-function getSupabase(): ReturnType<typeof createClient> {
+function getSupabase(): SupabaseClient<any, any, any> {
   if (!_supabase) {
     _supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,

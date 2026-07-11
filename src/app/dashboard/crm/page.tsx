@@ -13,7 +13,7 @@ const fmt = (n: number) => 'R$\u00a0' + Math.round(n).toLocaleString('pt-BR')
 type Lead = {
   id: string; nome?: string; whatsapp: string; estagio_funil: string
   lead_score?: number; requer_atencao?: boolean; origem?: string
-  orcamento_max?: number; perfil?: string; email?: string
+  orcamento_max?: number | null; perfil?: string; email?: string | null
   temperatura?: number; anotacoes?: string | null; created_at?: string
   empreendimentos?: { nome?: string; cidade?: string } | null
   property_name?: string | null; visitas?: number; downloads?: number

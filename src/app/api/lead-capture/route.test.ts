@@ -144,6 +144,31 @@ describe('POST /api/lead-capture', () => {
     expect(mock.insertRows[1]).not.toHaveProperty('utm_source')
   })
 
+  it('cai no fallback base-sem-extras quando coluna property_name falta (mesmo padrão do /api/leads)', async () => {
+    const mock = makeSupabase({
+      insert: {
+        data: null,
+        error: { code: 'PGRST204', message: 'column "property_name" does not exist' },
+      },
+      insertRetry: { data: { id: 'lead-3' }, error: null },
+    })
+    supabaseHolder.current = mock
+
+    const { status, json } = await callPost({
+      nome: 'Ana',
+      whatsapp: '48991642332',
+      property_id: 'prop-1',
+      property_name: 'Empreendimento X',
+    })
+
+    expect(status).toBe(201)
+    expect(json.id).toBe('lead-3')
+    expect(mock.insertRows).toHaveLength(2)
+    expect(mock.insertRows[0]).toMatchObject({ property_id: 'prop-1', property_name: 'Empreendimento X' })
+    expect(mock.insertRows[1]).toMatchObject({ property_id: 'prop-1' })
+    expect(mock.insertRows[1]).not.toHaveProperty('property_name')
+  })
+
   it('retorna 500 quando o Supabase erra sem ser missing-column', async () => {
     const mock = makeSupabase({
       insert: { data: null, error: { code: 'XYZ', message: 'connection refused' } },

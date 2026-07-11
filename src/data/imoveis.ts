@@ -1,4 +1,21 @@
-export const imoveis = [
+export type Imovel = {
+  id: string
+  nome: string
+  slug: string
+  construtora_slug: string
+  construtora: string
+  bairro: string
+  cidade: string
+  uf: string
+  status: string
+  exibir_preco: boolean
+  preco: number | null
+  frase: string
+  img: string
+  ativo: boolean
+}
+
+export const imoveis: Imovel[] = [
 { id: '1', nome: 'Monte Leone Residencial', slug: 'monte-leone-centro-criciuma-sc', construtora_slug: 'fontana', construtora: 'Construtora Fontana', bairro: 'Centro', cidade: 'Criciúma', uf: 'SC', status: 'na planta', exibir_preco: false, preco: null, frase: 'Viver no centro com a sofisticação que você merece.', img: 'https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/monte-leone-centro-criciuma-sc.jpg', ativo: true },
 { id: '2', nome: 'Lavis Residencial', slug: 'lavis-residencial-centro-criciuma-sc', construtora_slug: 'fontana', construtora: 'Construtora Fontana', bairro: 'Centro', cidade: 'Criciúma', uf: 'SC', status: 'em obras', exibir_preco: false, preco: null, frase: 'Sofisticação em movimento — Centro de Criciúma.', img: 'https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/lavis-residencial-centro-criciuma-sc.jpg', ativo: true },
 { id: '3', nome: 'Águas de Marano Residencial', slug: 'aguas-de-marano-frente-mar-balneario-picarras-sc', construtora_slug: 'fontana', construtora: 'Construtora Fontana', bairro: 'Frente Mar', cidade: 'Balneário Piçarras', uf: 'SC', status: 'em obras', exibir_preco: false, preco: null, frase: 'Frente mar — mergulhe em cada detalhe.', img: 'https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/aguas-de-marano-frente-mar-balneario-picarras-sc.jpg', ativo: true },

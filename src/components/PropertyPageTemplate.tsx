@@ -15,6 +15,7 @@ const t = {
 }
 
 export type PropertyData = {
+  id?: string | null
   nome: string
   slug: string
   construtora_slug: string
@@ -41,8 +42,8 @@ export type PropertyData = {
   previsao_entrega?: string
   status?: string
   mapa_embed?: string
-  book_pdf_url?: string
-  schema?: unknown
+  book_pdf_url?: string | null
+  schema?: object | null
 }
 
 function ytId(url?: string) {
@@ -89,7 +90,7 @@ export default function PropertyPageTemplate({ data, relacionados }: { data: Pro
           {local && <p style={{ fontFamily: t.serif, fontStyle: 'italic', fontSize: 'clamp(16px,2vw,24px)', color: t.onDark, marginTop: 16 }}>{local}</p>}
           <a href={wppNome} target="_blank" rel="noopener" style={{ display: 'inline-block', marginTop: 28, padding: '14px 34px', background: acento, color: t.dark, fontFamily: t.body, fontSize: 13, letterSpacing: '0.16em', textTransform: 'uppercase', textDecoration: 'none' }}>Falar no WhatsApp</a>
           <div style={{ marginTop: 12 }}>
-            <LeadCaptureModal propertyId={data.id} propertyName={data.nome} />
+            <LeadCaptureModal propertyId={data.id ?? ''} propertyName={data.nome} bookPdfUrl={data.book_pdf_url ?? null} />
           </div>
         </div>
       </section>

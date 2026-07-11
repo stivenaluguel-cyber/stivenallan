@@ -13,7 +13,7 @@ import { PropertyCardImage } from '@/components/PropertyCardImage';
 import { LeadCaptureModal } from '@/components/LeadCaptureModal';
 import FormContato from './FormContato';
 import Image from 'next/image';
-import PropertyPageTemplate from '@/components/PropertyPageTemplate';
+import PropertyPageTemplate, { type PropertyData } from '@/components/PropertyPageTemplate';
 export const dynamic = 'force-dynamic';
 
 const SITE_URL = 'https://stivenallan.com.br';
@@ -121,7 +121,7 @@ export default async function EmpreendimentoPage({ params }: PageProps) {
         .eq('construtora_slug', construtora)
         .maybeSingle();
       if (dbProp && dbProp.oculto !== true && dbProp.ativo !== false) {
-        return <PropertyPageTemplate data={dbProp as any} relacionados={[]} />;
+        return <PropertyPageTemplate data={dbProp as unknown as PropertyData} relacionados={false} />;
       }
     } catch {
       // tabela/coluna ausente ou erro de conexão: cai no notFound abaixo
