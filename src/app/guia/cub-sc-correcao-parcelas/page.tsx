@@ -7,6 +7,9 @@ const CANONICAL = `${SITE_URL}/guia/${SLUG}`
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20quero%20entender%20como%20o%20CUB%2FSC%20afeta%20minhas%20parcelas.'
 
 const CUB_JUNHO_2026 = 3096.25
+const CUB_VALOR = 3121.62
+const CUB_MES = 'julho de 2026'
+const CUB_VARIACAO = '+0,82%'
 
 export const metadata: Metadata = {
   title: 'CUB/SC e Correção de Parcelas no Financiamento Direto: Guia Completo',
@@ -96,6 +99,8 @@ export default function GuiaCubScPage() {
 
       {/* CONTEÚDO */}
       <article style={{ maxWidth: 800, margin: '0 auto', padding: 'clamp(48px,8vh,96px) clamp(18px,5vw,64px)' }}>
+
+      <p style={{ background: '#FFF4CC', border: '1px solid #E0C04C', borderRadius: 2, padding: '16px 20px', margin: '0 0 32px', fontSize: 15, lineHeight: 1.6, color: '#333', fontWeight: 600 }}>{`CUB/SC residencial em ${CUB_MES}: R$ ${CUB_VALOR.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}/m² (variação mensal de ${CUB_VARIACAO}). Fonte: Sinduscon/SC. Valor de referência — consulte sempre o índice do mês vigente.`}</p>
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>O que é o CUB/SC?</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
