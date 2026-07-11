@@ -18,6 +18,10 @@ const CIDADES: Record<string, { nome: string; uf: string; descricao: string }> =
   'laguna-sc': { nome: 'Laguna', uf: 'SC', descricao: 'Empreendimentos à beira-mar em Laguna/SC.' },
   'rincao': { nome: 'Rincão', uf: 'SC', descricao: 'Empreendimentos em Rincão/SC.' },
   'rincao-sc': { nome: 'Rincão', uf: 'SC', descricao: 'Empreendimentos em Rincão/SC.' },
+  'balneario-rincao': { nome: 'Balneário Rincão', uf: 'SC', descricao: 'Empreendimentos frente mar em Balneário Rincão/SC, o litoral mais exclusivo do sul catarinense.' },
+  'balneario-rincao-sc': { nome: 'Balneário Rincão', uf: 'SC', descricao: 'Empreendimentos frente mar em Balneário Rincão/SC, o litoral mais exclusivo do sul catarinense.' },
+  'sideropolis': { nome: 'Siderópolis', uf: 'SC', descricao: 'Empreendimentos e lançamentos em Siderópolis/SC.' },
+  'sideropolis-sc': { nome: 'Siderópolis', uf: 'SC', descricao: 'Empreendimentos e lançamentos em Siderópolis/SC.' },
   'cocal-do-sul': { nome: 'Cocal do Sul', uf: 'SC', descricao: 'Empreendimentos em Cocal do Sul/SC.' },
   'cocal-do-sul-sc': { nome: 'Cocal do Sul', uf: 'SC', descricao: 'Empreendimentos em Cocal do Sul/SC.' },
   'sombrio': { nome: 'Sombrio', uf: 'SC', descricao: 'Lançamentos imobiliários em Sombrio/SC.' },
@@ -39,6 +43,25 @@ const SLUGS_POR_CIDADE: Record<string, string[]> = {
   'balneario-picarras': [
     'aguas-de-marano-frente-mar-balneario-picarras-sc',
   ],
+  'icara': [
+    'castellano-centro-icara-sc',
+    'pianezze-centro-icara-sc',
+    'piazza-castello-centro-icara-sc',
+  ],
+  'balneario-rincao': [
+    'mar-di-arienzo-centro-balneario-rincao-sc',
+    'mar-di-atrani-centro-balneario-rincao-sc',
+    'mar-positano-centro-balneario-rincao-sc',
+    'villammare-residencial-balneario-rincao-sc',
+  ],
+  'laguna': [
+    'mar-di-licata-mar-grosso-laguna-sc',
+    'mar-di-nizza-mar-grosso-laguna-sc',
+  ],
+  'sideropolis': [
+    'avezzano-centro-sideropolis-sc',
+    'rocca-pietore-centro-sideropolis-sc',
+  ],
 }
 
 // Dormitórios não existem em @/data/imoveis (dado de planta, não de status/preço).
@@ -47,6 +70,17 @@ const DORMS_POR_SLUG: Record<string, string> = {
   'lavis-residencial-centro-criciuma-sc': '2 e 3 dorms',
   'pineto-centro-criciuma-sc': '2 dorms · 1 suíte',
   'aguas-de-marano-frente-mar-balneario-picarras-sc': '3 e 4 dorms · 3 suítes',
+  'castellano-centro-icara-sc': '3 dorms',
+  'pianezze-centro-icara-sc': '2 e 3 dorms · 1 suíte',
+  'piazza-castello-centro-icara-sc': '3 dorms · 3 suítes',
+  'mar-di-arienzo-centro-balneario-rincao-sc': '3 dorms · 1 suíte',
+  'mar-di-atrani-centro-balneario-rincao-sc': '3 dorms · 1 suíte',
+  'mar-positano-centro-balneario-rincao-sc': '3 dorms · 1 suíte',
+  'villammare-residencial-balneario-rincao-sc': '4 dorms · 2 suítes + 2 demi suítes',
+  'mar-di-licata-mar-grosso-laguna-sc': '3 dorms · 1 suíte',
+  'mar-di-nizza-mar-grosso-laguna-sc': '2 e 3 dorms · 1 suíte',
+  'avezzano-centro-sideropolis-sc': '3 dorms · 3 suítes',
+  'rocca-pietore-centro-sideropolis-sc': '2 ou 3 dorms · 1 suíte',
 }
 
 function statusParaFase(status: string): string {
