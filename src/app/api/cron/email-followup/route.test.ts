@@ -9,12 +9,13 @@ vi.mock('@supabase/supabase-js', () => ({
   createClient: () => supabaseHolder.current,
 }))
 
-import { GET, _buildUnsubscribeUrl, _montarHtml } from './route'
+import { GET } from './route'
+import { buildUnsubscribeUrl, montarHtml } from '@/lib/cron/email-followup-helpers'
 import { verifyUnsubscribeToken } from '@/lib/leads/unsubscribe-token'
 
 // ---- Unit tests dos helpers puros ----
 
-describe('_buildUnsubscribeUrl', () => {
+describe('buildUnsubscribeUrl', () => {
   beforeEach(() => {
     process.env.UNSUBSCRIBE_SECRET = 'test-secret-cron'
   })
@@ -23,21 +24,21 @@ describe('_buildUnsubscribeUrl', () => {
   })
 
   it('constrói URL com SITE_URL + query lead_id + token válido (round-trip com verify)', () => {
-    const url = _buildUnsubscribeUrl('lead-1')
+    const url = buildUnsubscribeUrl('lead-1')
     expect(url).toContain('/api/unsubscribe?lead_id=lead-1&token=')
     const token = new URL(url).searchParams.get('token')
     expect(verifyUnsubscribeToken('lead-1', token)).toBe(true)
   })
 
   it('URL-encoda o lead_id (defesa em profundidade)', () => {
-    const url = _buildUnsubscribeUrl('lead com espaço')
+    const url = buildUnsubscribeUrl('lead com espaço')
     expect(url).toContain('lead%20com%20espa%C3%A7o')
   })
 })
 
-describe('_montarHtml', () => {
+describe('montarHtml', () => {
   it('inclui o corpo passado + link de descadastro na URL fornecida', () => {
-    const html = _montarHtml('<p>corpo teste</p>', 'https://example.com/api/unsubscribe?x=1')
+    const html = montarHtml('<p>corpo teste</p>', 'https://example.com/api/unsubscribe?x=1')
     expect(html).toContain('<p>corpo teste</p>')
     expect(html).toContain('href="https://example.com/api/unsubscribe?x=1"')
     expect(html).toContain('Descadastrar')
@@ -58,11 +59,14 @@ type MockConfig = {
     status: string
   }>
   selectError?: { code?: string; message?: string } | null
+  cronRunsMissing?: boolean // simula tabela cron_runs ausente (migration 0006 pendente)
 }
 
 function makeSupabase(cfg: MockConfig = {}) {
   const filters: Array<{ op: string; args: unknown[] }> = []
   const updates: Record<string, unknown>[] = []
+  const cronRunInserts: Record<string, unknown>[] = []
+  const cronRunUpdates: Record<string, unknown>[] = []
   const selectData = cfg.leads ?? []
 
   const selectChain = () => {
@@ -91,6 +95,8 @@ function makeSupabase(cfg: MockConfig = {}) {
   return {
     filters,
     updates,
+    cronRunInserts,
+    cronRunUpdates,
     from(table: string) {
       if (table === 'leads') {
         return {
@@ -108,6 +114,35 @@ function makeSupabase(cfg: MockConfig = {}) {
               maybeSingle: async () => ({ data: null, error: null }),
             }),
           }),
+        }
+      }
+      if (table === 'cron_runs') {
+        return {
+          insert: (row: Record<string, unknown>) => {
+            cronRunInserts.push(row)
+            return {
+              select: () => ({
+                single: async () => {
+                  if (cfg.cronRunsMissing) {
+                    return {
+                      data: null,
+                      error: { code: '42P01', message: 'relation "cron_runs" does not exist' },
+                    }
+                  }
+                  return { data: { id: 'run-mock' }, error: null }
+                },
+              }),
+            }
+          },
+          update: (row: Record<string, unknown>) => {
+            cronRunUpdates.push(row)
+            return {
+              eq: async (field: string, val: unknown) => {
+                cronRunUpdates.push({ __eq: [field, val] })
+                return { error: null }
+              },
+            }
+          },
         }
       }
       throw new Error(`Unexpected table: ${table}`)
@@ -253,5 +288,73 @@ describe('GET /api/cron/email-followup', () => {
     expect(json.enviados).toBe(0)
     expect(json.pulados).toBe(1)
     expect(fetchSpy).not.toHaveBeenCalled()
+  })
+
+  // ---- Pilha D: persistência em cron_runs ----
+
+  it('persiste run OK: insert running + update ok com contadores', async () => {
+    const mock = makeSupabase({ leads: [] })
+    supabaseHolder.current = mock
+
+    await GET(makeReq({ authorization: 'Bearer cron-secret' }))
+
+    // 1 insert (start) + 1 update payload + 1 update .eq
+    expect(mock.cronRunInserts).toHaveLength(1)
+    expect(mock.cronRunInserts[0]).toMatchObject({
+      cron_name: 'email-followup',
+      status: 'running',
+    })
+    expect(mock.cronRunUpdates).toHaveLength(2) // update() + .eq()
+    expect(mock.cronRunUpdates[0]).toMatchObject({
+      status: 'ok',
+      processados: 0,
+      enviados: 0,
+      pulados: 0,
+      erros_envio: 0,
+    })
+    expect(mock.cronRunUpdates[1]).toEqual({ __eq: ['id', 'run-mock'] })
+  })
+
+  it('persiste run skipped quando UNSUBSCRIBE_SECRET ausente', async () => {
+    delete process.env.UNSUBSCRIBE_SECRET
+    const mock = makeSupabase()
+    supabaseHolder.current = mock
+
+    await GET(makeReq({ authorization: 'Bearer cron-secret' }))
+
+    expect(mock.cronRunInserts[0]).toMatchObject({ status: 'running' })
+    expect(mock.cronRunUpdates[0]).toMatchObject({
+      status: 'skipped',
+      motivo: expect.stringMatching(/UNSUBSCRIBE_SECRET/),
+    })
+  })
+
+  it('persiste run skipped quando migration 0005 pendente', async () => {
+    const mock = makeSupabase({
+      selectError: { code: 'PGRST204', message: 'column "unsubscribed_at" does not exist' },
+    })
+    supabaseHolder.current = mock
+
+    await GET(makeReq({ authorization: 'Bearer cron-secret' }))
+
+    expect(mock.cronRunInserts[0]).toMatchObject({ status: 'running' })
+    expect(mock.cronRunUpdates[0]).toMatchObject({
+      status: 'skipped',
+      motivo: expect.stringMatching(/migração 0004 ou 0005/),
+    })
+  })
+
+  it('cron_runs ausente (0006 pendente) — cron continua funcionando (fail-open)', async () => {
+    const mock = makeSupabase({ leads: [], cronRunsMissing: true })
+    supabaseHolder.current = mock
+
+    const res = await GET(makeReq({ authorization: 'Bearer cron-secret' }))
+    const json = (await res.json()) as { processados: number }
+
+    expect(res.status).toBe(200)
+    expect(json.processados).toBe(0)
+    // Insert foi tentado mas errou; finishCronRun early-return (runId=null)
+    expect(mock.cronRunInserts).toHaveLength(1)
+    expect(mock.cronRunUpdates).toHaveLength(0)
   })
 })

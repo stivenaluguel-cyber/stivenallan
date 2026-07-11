@@ -1,27 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { generateUnsubscribeToken } from '@/lib/leads/unsubscribe-token'
 import { logError, logInfo, logWarn } from '@/lib/log'
-import { SITE_URL } from '@/lib/site'
+import { finishCronRun, startCronRun, type CronRunFinal } from '@/lib/cron/tracker'
+import { buildUnsubscribeUrl, montarHtml } from '@/lib/cron/email-followup-helpers'
 
 export const dynamic = 'force-dynamic'
 
 // Régua de e-mail D+2 e D+7 para leads com e-mail cadastrado.
-// TRAVAS DE SEGURANÇA (fail-open com skipped=true, nunca dispara sem estar tudo pronto):
+// TRAVAS DE SEGURANÇA (skipped=true, nunca dispara sem estar tudo pronto):
 //   - RESEND_FROM: remetente de domínio verificado no Resend
-//     (o onboarding@resend.dev só entrega para o dono da conta)
-//   - UNSUBSCRIBE_SECRET: sem ele não conseguimos gerar link de opt-out — LGPD
-//     obriga o mecanismo, então não enviamos e-mail que ficaria não-compliance.
+//   - UNSUBSCRIBE_SECRET: sem ele não conseguimos gerar link de opt-out (LGPD)
+//
+// Histórico de execuções persistido em cron_runs (Pilha D). Guards de envs
+// operacionais (RESEND/UNSUBSCRIBE_SECRET) ficam DENTRO do try pra que dias
+// pulados por env ausente também apareçam no histórico como status='skipped'.
 
 const SOURCE = 'email-followup'
+const CRON_NAME = 'email-followup'
 const WPP_LINK = 'https://wa.me/5548991642332'
-
-function getSupabase() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  )
-}
 
 type EtapaEmail = {
   diasMinimos: number
@@ -53,31 +49,6 @@ const ETAPAS: EtapaEmail[] = [
   },
 ]
 
-// Exportado para permitir teste unitário isolado do URL do opt-out
-export function _buildUnsubscribeUrl(leadId: string): string {
-  const token = generateUnsubscribeToken(leadId)
-  return `${SITE_URL}/api/unsubscribe?lead_id=${encodeURIComponent(leadId)}&token=${token}`
-}
-
-export function _montarHtml(corpo: string, unsubUrl: string): string {
-  return `
-  <div style="background:#F3F2EE;padding:32px 16px;font-family:system-ui,-apple-system,sans-serif">
-    <div style="max-width:520px;margin:0 auto;background:#ffffff;border-radius:16px;overflow:hidden">
-      <div style="background:#1A1A1A;padding:20px 24px;text-align:center">
-        <p style="color:#F5F2ED;font-size:13px;letter-spacing:0.22em;text-transform:uppercase;margin:0">Stiven Allan</p>
-      </div>
-      <div style="padding:28px 24px;color:#333;font-size:15px;line-height:1.7">
-        ${corpo}
-        <p style="margin-top:24px">Um abraço,<br/><strong>Stiven Allan</strong> — CRECI 60.275<br/>
-        <a href="https://stivenallan.com.br" style="color:#1A5C3A">stivenallan.com.br</a></p>
-      </div>
-      <div style="padding:14px 24px;background:#FAFAF8;border-top:1px solid #eee">
-        <p style="color:#999;font-size:12px;margin:0">Você recebeu este e-mail porque se cadastrou em stivenallan.com.br. <a href="${unsubUrl}" style="color:#999;text-decoration:underline">Descadastrar</a>.</p>
-      </div>
-    </div>
-  </div>`
-}
-
 async function enviarEmail(para: string, assunto: string, html: string, unsubUrl: string): Promise<boolean> {
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -90,7 +61,6 @@ async function enviarEmail(para: string, assunto: string, html: string, unsubUrl
       to: [para],
       subject: assunto,
       html,
-      // RFC 8058: Gmail/Outlook expõem botão "Cancelar inscrição" nativo quando esses headers estão presentes.
       headers: {
         'List-Unsubscribe': `<${unsubUrl}>`,
         'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
@@ -105,32 +75,44 @@ async function enviarEmail(para: string, assunto: string, html: string, unsubUrl
 }
 
 export async function GET(req: NextRequest) {
+  // 1) Auth — sem persist (supabase pode nem estar disponível)
   const authHeader = req.headers.get('authorization')
   if (authHeader !== 'Bearer ' + process.env.CRON_SECRET) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  if (!process.env.RESEND_API_KEY || !process.env.RESEND_FROM) {
-    return NextResponse.json({
-      skipped: true,
-      motivo: 'RESEND_FROM não configurado (domínio verificado no Resend)',
-    })
+  // 2) Envs Supabase — sem persist (obviamente)
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!supabaseUrl || !serviceRoleKey) {
+    return NextResponse.json({ error: 'Configuracao incompleta' }, { status: 503 })
   }
 
-  if (!process.env.UNSUBSCRIBE_SECRET) {
-    // Sem link de opt-out não enviamos: e-mail sem unsubscribe fere LGPD.
-    logWarn(SOURCE, 'skipped: UNSUBSCRIBE_SECRET ausente')
-    return NextResponse.json({ skipped: true, motivo: 'UNSUBSCRIBE_SECRET ausente' })
-  }
+  // 3) Client + start do rastreio
+  const supabase = createClient(supabaseUrl, serviceRoleKey)
+  const { runId, startedAt } = await startCronRun(supabase, CRON_NAME)
+
+  // 4) Result acumulado — sempre setado em cada return path, finally usa
+  let result: CronRunFinal | undefined
 
   try {
-    const supabase = getSupabase()
+    // Guards operacionais dentro do try: dias pulados por env ausente aparecem no histórico
+    if (!process.env.RESEND_API_KEY || !process.env.RESEND_FROM) {
+      result = { status: 'skipped', motivo: 'RESEND_FROM não configurado (domínio verificado no Resend)' }
+      return NextResponse.json({ skipped: true, motivo: result.motivo })
+    }
+
+    if (!process.env.UNSUBSCRIBE_SECRET) {
+      logWarn(SOURCE, 'skipped: UNSUBSCRIBE_SECRET ausente')
+      result = { status: 'skipped', motivo: 'UNSUBSCRIBE_SECRET ausente' }
+      return NextResponse.json({ skipped: true, motivo: result.motivo })
+    }
 
     const { data: leads, error } = await supabase
       .from('leads')
       .select('id, nome, email, created_at, email_followup_etapa, property_id, property_name, status')
       .not('email', 'is', null)
-      .is('unsubscribed_at', null) // Pula quem já fez opt-out
+      .is('unsubscribed_at', null)
       .lt('email_followup_etapa', ETAPAS.length)
       .in('status', ['novo', 'ativo'])
       .limit(30)
@@ -138,9 +120,11 @@ export async function GET(req: NextRequest) {
     if (error) {
       if (error.code === 'PGRST204' || /column/i.test(error.message ?? '')) {
         logWarn(SOURCE, 'migration pendente (0004 ou 0005)', { db_message: error.message ?? '' })
-        return NextResponse.json({ skipped: true, motivo: 'migração 0004 ou 0005 pendente' })
+        result = { status: 'skipped', motivo: 'migração 0004 ou 0005 pendente' }
+        return NextResponse.json({ skipped: true, motivo: result.motivo })
       }
       logError(SOURCE, 'db select failed', error)
+      result = { status: 'error', motivo: error.message ?? 'DB error' }
       return NextResponse.json({ error: 'DB error', details: error.message }, { status: 500 })
     }
 
@@ -169,11 +153,11 @@ export async function GET(req: NextRequest) {
       }
 
       const primeiroNome = (lead.nome ?? '').split(' ')[0] || 'tudo bem'
-      const unsubUrl = _buildUnsubscribeUrl(lead.id)
+      const unsubUrl = buildUnsubscribeUrl(lead.id)
       const ok = await enviarEmail(
         lead.email,
         etapa.assunto(nomeEmp),
-        _montarHtml(etapa.corpo(primeiroNome, nomeEmp), unsubUrl),
+        montarHtml(etapa.corpo(primeiroNome, nomeEmp), unsubUrl),
         unsubUrl,
       )
 
@@ -198,9 +182,15 @@ export async function GET(req: NextRequest) {
     const erros_envio = resultados.filter((r) => r.acao === 'erro_envio').length
     const summary = { processados: resultados.length, enviados, pulados, erros_envio }
     logInfo(SOURCE, 'run summary', summary)
+    result = { status: 'ok', ...summary }
     return NextResponse.json(summary)
   } catch (err: unknown) {
     logError(SOURCE, 'run failed', err)
+    result = { status: 'error', motivo: err instanceof Error ? err.message : String(err) }
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
+  } finally {
+    if (result) {
+      await finishCronRun(supabase, runId, startedAt, result)
+    }
   }
 }
