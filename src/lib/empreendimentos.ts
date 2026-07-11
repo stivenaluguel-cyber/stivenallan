@@ -1,5 +1,8 @@
-// Fonte única de dados dos empreendimentos — todos os 29 ativos.
-// Usada pela home, /empreendimentos, /empreendimento/[construtora]/[slug] e sitemap.
+// Fonte única de dados dos empreendimentos — todos os 27 ativos.
+// Usada por /empreendimentos e /empreendimento/[construtora]/[slug].
+// Dados (nome/status/preço/etc.) vêm de @/data/imoveis; home e sitemap leem
+// @/data/imoveis diretamente via getVitrineImoveis.
+import { imoveis } from '@/data/imoveis';
 
 export type StatusObra = 'na planta' | 'em obras' | 'pronto' | 'entregue';
 
@@ -28,35 +31,44 @@ export interface Empreendimento {
   construtoraNome?: string;
 }
 
-export const EMPREENDIMENTOS: Empreendimento[] = [
-  { slug: 'aguas-de-marano-frente-mar-balneario-picarras-sc', nome: 'Águas de Marano', construtoraSlug: 'fontana', cidade: 'Balneário Piçarras', bairro: 'Frente Mar', uf: 'SC', imagem: 'https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/aguas-de-marano-frente-mar-balneario-picarras-sc.jpg' },
-  { slug: 'avezzano-centro-sideropolis-sc', nome: 'Avezzano Residencial', construtoraSlug: 'fontana', cidade: 'Siderópolis', bairro: 'Centro', uf: 'SC', imagem: 'https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/avezzano-centro-sideropolis-sc.jpg' },
-  { slug: 'bellante-comerciario-criciuma-sc', nome: 'Bellante Residencial', construtoraSlug: 'fontana', cidade: 'Criciúma', bairro: 'Comerciário', uf: 'SC', imagem: 'https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/bellante-comerciario-criciuma-sc.jpg' },
-  { slug: 'bosco-del-montello-centro-criciuma-sc', nome: 'Bosco Del Montello Residencial', construtoraSlug: 'fontana', cidade: 'Criciúma', bairro: 'Centro', uf: 'SC', imagem: 'https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/bosco-del-montello-centro-criciuma-sc.jpg' },
-  { slug: 'calalzo-di-cadore-michel-criciuma-sc', nome: 'Calalzo Di Cadore Residencial', construtoraSlug: 'fontana', cidade: 'Criciúma', bairro: 'Michel', uf: 'SC', imagem: 'https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/calalzo-di-cadore-michel-criciuma-sc.jpg' },
-  { slug: 'calliano-centro-criciuma-sc', nome: 'Calliano Residencial', construtoraSlug: 'fontana', cidade: 'Criciúma', bairro: 'Centro', uf: 'SC', imagem: 'https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/calliano-centro-criciuma-sc.jpg' },
-  { slug: 'campos-da-montanha-bom-jardim-da-serra-sc', nome: 'Campos da Montanha Residencial', construtoraSlug: 'fontana', cidade: 'Bom Jardim da Serra', bairro: '', uf: 'SC', imagem: 'https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/campos-da-montanha-bom-jardim-da-serra-sc.jpg' },
-  { slug: 'castellano-centro-icara-sc', nome: 'Castellano Residencial', construtoraSlug: 'fontana', cidade: 'Içara', bairro: 'Centro', uf: 'SC', imagem: 'https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/castellano-centro-icara-sc.jpg' },
-  { slug: 'due-fratelli-centro-criciuma-sc', nome: 'Due Fratelli Residencial', construtoraSlug: 'fontana', cidade: 'Criciúma', bairro: 'Centro', uf: 'SC', imagem: 'https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/due-fratelli-centro-criciuma-sc.jpg' },
-  { slug: 'fidenza-residencial-cruzeiro-do-sul-criciuma-sc', nome: 'Fidenza Residencial', construtoraSlug: 'fontana', cidade: 'Criciúma', bairro: 'Cruzeiro do Sul', uf: 'SC', imagem: 'https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/fidenza-residencial-cruzeiro-do-sul-criciuma-sc.jpg' },
-  { slug: 'lavis-residencial-centro-criciuma-sc', nome: 'Lavis Residencial', construtoraSlug: 'fontana', cidade: 'Criciúma', bairro: 'Centro', uf: 'SC', imagem: 'https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/lavis-residencial-centro-criciuma-sc.jpg' },
-  { slug: 'mar-di-arienzo-centro-balneario-rincao-sc', nome: 'Mar di Arienzo Residencial', construtoraSlug: 'fontana', cidade: 'Balneário Rincão', bairro: 'Centro', uf: 'SC', imagem: 'https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/mar-di-arienzo-centro-balneario-rincao-sc.jpg' },
-  { slug: 'mar-di-atrani-centro-balneario-rincao-sc', nome: 'Mar di Atrani Residencial', construtoraSlug: 'fontana', cidade: 'Balneário Rincão', bairro: 'Centro', uf: 'SC', imagem: 'https://estilofontana.com.br/images/empreendimento/slideshows/mar-di-atrani-residencial-675c232fef052.jpg?fm=webp' },
-  { slug: 'mar-di-licata-mar-grosso-laguna-sc', nome: 'Mar di Licata Residencial', construtoraSlug: 'fontana', cidade: 'Laguna', bairro: 'Mar Grosso', uf: 'SC', imagem: 'https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/mar-di-licata-mar-grosso-laguna-sc.jpg' },
-  { slug: 'mar-di-nizza-mar-grosso-laguna-sc', nome: 'Mar di Nizza Residencial', construtoraSlug: 'fontana', cidade: 'Laguna', bairro: 'Mar Grosso', uf: 'SC', imagem: 'https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/mar-di-nizza-mar-grosso-laguna-sc.jpg' },
-  { slug: 'mar-positano-centro-balneario-rincao-sc', nome: 'Mar Positano Residencial', construtoraSlug: 'fontana', cidade: 'Balneário Rincão', bairro: 'Centro', uf: 'SC', imagem: 'https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/mar-positano-centro-balneario-rincao-sc.jpg' },
-  { slug: 'monte-leone-centro-criciuma-sc', nome: 'Monte Leone Residencial', construtoraSlug: 'fontana', cidade: 'Criciúma', bairro: 'Centro', uf: 'SC', imagem: 'https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/monte-leone-centro-criciuma-sc.jpg' },
-  { slug: 'parco-savello-santa-barbara-criciuma-sc', nome: 'Parco Savello Residencial', construtoraSlug: 'fontana', cidade: 'Criciúma', bairro: 'Santa Bárbara', uf: 'SC', imagem: 'https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/parco-savello-santa-barbara-criciuma-sc.jpg' },
-  { slug: 'pavia-rio-maina-criciuma-sc', nome: 'Pavia Residencial', construtoraSlug: 'fontana', cidade: 'Criciúma', bairro: 'Rio Maina', uf: 'SC', imagem: 'https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/pavia-rio-maina-criciuma-sc.jpg' },
-  { slug: 'pianezze-centro-icara-sc', nome: 'Pianezze Residencial', construtoraSlug: 'fontana', cidade: 'Içara', bairro: 'Centro', uf: 'SC', imagem: 'https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/pianezze-centro-icara-sc.jpg' },
-  { slug: 'piazza-castello-centro-icara-sc', nome: 'Piazza Castello Residencial', construtoraSlug: 'fontana', cidade: 'Içara', bairro: 'Centro', uf: 'SC', imagem: 'https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/piazza-castello-centro-icara-sc.jpg' },
-  { slug: 'pineto-centro-criciuma-sc', nome: 'Pineto Residencial', construtoraSlug: 'fontana', cidade: 'Criciúma', bairro: 'Centro', uf: 'SC', imagem: 'https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/pineto-centro-criciuma-sc.jpg' },
-  { slug: 'rocca-pietore-centro-sideropolis-sc', nome: 'Rocca Pietore Residencial', construtoraSlug: 'fontana', cidade: 'Siderópolis', bairro: 'Centro', uf: 'SC', imagem: 'https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/rocca-pietore-centro-sideropolis-sc.jpg' },
-  { slug: 'thiene-centro-criciuma-sc', nome: 'Thiene Residencial', construtoraSlug: 'fontana', cidade: 'Criciúma', bairro: 'Centro', uf: 'SC', imagem: 'https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/thiene-centro-criciuma-sc.jpg' },
-  { slug: 'tremezzo-residencial-centro-criciuma-sc', nome: 'Tremezzo Residencial', construtoraSlug: 'fontana', cidade: 'Criciúma', bairro: 'Centro', uf: 'SC', imagem: 'https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/tremezzo-residencial-centro-criciuma-sc.jpg' },
-  { slug: 'villaggio-verde-residenziale-grande-prospera-criciuma-sc', nome: 'Villaggio Verde Residenziale', construtoraSlug: 'fontana', cidade: 'Criciúma', bairro: 'Grande Próspera', uf: 'SC', imagem: 'https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/villaggio-verde-residenziale-grande-prospera-criciuma-sc.jpg' },
-  { slug: 'villammare-residencial-balneario-rincao-sc', nome: 'Villammare Residencial', construtoraSlug: 'fontana', cidade: 'Balneário Rincão', bairro: 'Centro', uf: 'SC', imagem: 'https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/villammare-residencial-balneario-rincao-sc.jpg' },
-];
+// Imagem do Mar di Atrani em /empreendimentos usa uma URL diferente da capa no
+// Supabase (que já aparece na home) — preservada intencionalmente nesta unificação
+// de fontes para não alterar o visual já publicado. Ver decisão registrada em
+// sessão de refatoração (2026-07-11).
+const IMAGEM_OVERRIDE: Record<string, string> = {
+  'mar-di-atrani-centro-balneario-rincao-sc':
+    'https://estilofontana.com.br/images/empreendimento/slideshows/mar-di-atrani-residencial-675c232fef052.jpg?fm=webp',
+};
+
+// @/data/imoveis tem 2 bairros incorretos (confirmado contra o PropertySchema das
+// páginas estáticas reais, fonte de maior confiança): Águas de Marano é "Frente Mar"
+// (imoveis.ts diz "Centro") e Villammare é "Centro" (imoveis.ts duplica a cidade,
+// "Balneário Rincão"). Override preserva o valor correto até o bug ser corrigido na
+// fonte. Ver decisão registrada em sessão de refatoração (2026-07-11).
+const BAIRRO_OVERRIDE: Record<string, string> = {
+  'aguas-de-marano-frente-mar-balneario-picarras-sc': 'Frente Mar',
+  'villammare-residencial-balneario-rincao-sc': 'Centro',
+};
+
+// Derivado de @/data/imoveis (fonte canônica) — ordenado alfabeticamente por nome
+// para preservar a ordem de exibição já publicada em /empreendimentos.
+export const EMPREENDIMENTOS: Empreendimento[] = [...imoveis]
+  .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'))
+  .map((i) => ({
+    slug: i.slug,
+    nome: i.nome,
+    construtoraSlug: i.construtora_slug,
+    cidade: i.cidade,
+    bairro: BAIRRO_OVERRIDE[i.slug] ?? i.bairro,
+    uf: i.uf,
+    imagem: IMAGEM_OVERRIDE[i.slug] ?? i.img,
+    oculto: !i.ativo,
+    statusObra: i.status as StatusObra,
+    exibirPreco: i.exibir_preco,
+    precoAPartirDe: i.preco ?? undefined,
+    frase: i.frase,
+    construtoraNome: i.construtora,
+  }));
 
 export function getEmpreendimentosVisiveis(): Empreendimento[] {
   return EMPREENDIMENTOS.filter((e) => !e.oculto);
@@ -84,5 +96,6 @@ export function statusLabel(s?: StatusObra): string {
   if (s === 'na planta') return 'Na planta';
   if (s === 'em obras') return 'Em obras';
   if (s === 'pronto') return 'Pronto para morar';
+  if (s === 'entregue') return 'Entregue';
   return 'Sob consulta';
 }
