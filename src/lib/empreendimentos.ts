@@ -40,16 +40,6 @@ const IMAGEM_OVERRIDE: Record<string, string> = {
     'https://estilofontana.com.br/images/empreendimento/slideshows/mar-di-atrani-residencial-675c232fef052.jpg?fm=webp',
 };
 
-// @/data/imoveis tem 2 bairros incorretos (confirmado contra o PropertySchema das
-// páginas estáticas reais, fonte de maior confiança): Águas de Marano é "Frente Mar"
-// (imoveis.ts diz "Centro") e Villammare é "Centro" (imoveis.ts duplica a cidade,
-// "Balneário Rincão"). Override preserva o valor correto até o bug ser corrigido na
-// fonte. Ver decisão registrada em sessão de refatoração (2026-07-11).
-const BAIRRO_OVERRIDE: Record<string, string> = {
-  'aguas-de-marano-frente-mar-balneario-picarras-sc': 'Frente Mar',
-  'villammare-residencial-balneario-rincao-sc': 'Centro',
-};
-
 // Derivado de @/data/imoveis (fonte canônica) — ordenado alfabeticamente por nome
 // para preservar a ordem de exibição já publicada em /empreendimentos.
 export const EMPREENDIMENTOS: Empreendimento[] = [...imoveis]
@@ -59,7 +49,7 @@ export const EMPREENDIMENTOS: Empreendimento[] = [...imoveis]
     nome: i.nome,
     construtoraSlug: i.construtora_slug,
     cidade: i.cidade,
-    bairro: BAIRRO_OVERRIDE[i.slug] ?? i.bairro,
+    bairro: i.bairro,
     uf: i.uf,
     imagem: IMAGEM_OVERRIDE[i.slug] ?? i.img,
     oculto: !i.ativo,
