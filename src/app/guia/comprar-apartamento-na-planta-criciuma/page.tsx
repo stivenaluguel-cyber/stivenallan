@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   alternates: { canonical: CANONICAL },
   openGraph: {
     title: 'Comprar Apartamento na Planta em Criciúma | Stiven Allan',
-    description: 'Tudo o que você precisa saber antes de comprar um apartamento na planta em Criciuma.',
+    description: 'Tudo o que você precisa saber antes de comprar um apartamento na planta em Criciúma.',
     url: CANONICAL,
     type: 'article',
   },
@@ -22,8 +22,8 @@ export const metadata: Metadata = {
 const SCHEMA = {
   '@context': 'https://schema.org',
   '@type': 'Article',
-  headline: 'Como Comprar Apartamento na Planta em Criciuma/SC',
-  description: 'Guia completo para comprar apartamento na planta em Criciuma/SC com financiamento direto Fontana.',
+  headline: 'Como Comprar Apartamento na Planta em Criciúma/SC',
+  description: 'Guia completo para comprar apartamento na planta em Criciúma/SC com financiamento direto Fontana.',
   url: CANONICAL,
   author: { '@type': 'Person', name: 'Stiven Allan', url: SITE_URL },
   publisher: { '@type': 'Organization', name: 'Stiven Allan Imoveis', url: SITE_URL },
