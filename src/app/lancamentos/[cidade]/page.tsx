@@ -29,7 +29,7 @@ const CIDADES: Record<string, { nome: string; uf: string; descricao: string }> =
 }
 
 // Seleção editorial de quais empreendimentos aparecem como card em cada cidade.
-// // Os DADOS de cada um (nome, status/fase, preço) vêm de @/data/imoveis — nada hardcoded aqui.
+// Os DADOS de cada um (nome, status/fase, preço) vêm de @/data/imoveis — nada hardcoded aqui.
 const SLUGS_POR_CIDADE: Record<string, string[]> = {
   'criciuma': [
     'monte-leone-centro-criciuma-sc',
