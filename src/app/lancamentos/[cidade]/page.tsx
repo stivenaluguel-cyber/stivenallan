@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { imoveis } from '@/data/imoveis'
 
 // Cidades suportadas
 const CIDADES: Record<string, { nome: string; uf: string; descricao: string }> = {
@@ -27,21 +28,50 @@ const CIDADES: Record<string, { nome: string; uf: string; descricao: string }> =
   'balneario-picarras-sc': { nome: 'Balneário Piçarras', uf: 'SC', descricao: 'Empreendimentos frente mar em Balneário Piçarras/SC.' },
 }
 
-// Portfólio hardcoded com preço híbrido (exibir_preco + preco_a_partir_de)
-// REGRA: se exibir_preco=false, mostrar "Sob consulta" em TODOS os lugares
-// Este objeto é o fallback — o ideal é vir do Supabase via exibir_preco
-const EMPREENDIMENTOS_POR_CIDADE: Record<string, {
-  nome: string; fase?: string; slug: string; construtora: string; dorms: string;
-  exibir_preco: boolean; preco_a_partir_de: number | null;
-}[]> = {
+// Seleção editorial de quais empreendimentos aparecem como card em cada cidade.
+// // Os DADOS de cada um (nome, status/fase, preço) vêm de @/data/imoveis — nada hardcoded aqui.
+const SLUGS_POR_CIDADE: Record<string, string[]> = {
   'criciuma': [
-    { nome: 'Monte Leone', fase: 'Na planta', slug: '/empreendimento/fontana/monte-leone-centro-criciuma-sc', construtora: 'Fontana', dorms: '2 e 3 dorms', exibir_preco: false, preco_a_partir_de: null },
-    { nome: 'Lavis Residencial', fase: 'Em obras', slug: '/empreendimento/fontana/lavis-residencial-centro-criciuma-sc', construtora: 'Fontana', dorms: '2 e 3 dorms', exibir_preco: true, preco_a_partir_de: 320000 },
-    { nome: 'Pineto Residencial', fase: 'Na planta', slug: '/empreendimento/fontana/pineto-centro-criciuma-sc', construtora: 'Fontana', dorms: '2 dorms · 1 suíte', exibir_preco: true, preco_a_partir_de: 619250 },
+    'monte-leone-centro-criciuma-sc',
+    'lavis-residencial-centro-criciuma-sc',
+    'pineto-centro-criciuma-sc',
   ],
   'balneario-picarras': [
-    { nome: 'Águas de Marano Residencial', fase: 'Em obras', slug: '/empreendimento/fontana/aguas-de-marano-frente-mar-balneario-picarras-sc', construtora: 'Fontana', dorms: '3 e 4 dorms · 3 suítes', exibir_preco: false, preco_a_partir_de: null },
+    'aguas-de-marano-frente-mar-balneario-picarras-sc',
   ],
+}
+
+// Dormitórios não existem em @/data/imoveis (dado de planta, não de status/preço).
+const DORMS_POR_SLUG: Record<string, string> = {
+  'monte-leone-centro-criciuma-sc': '2 e 3 dorms',
+  'lavis-residencial-centro-criciuma-sc': '2 e 3 dorms',
+  'pineto-centro-criciuma-sc': '2 dorms · 1 suíte',
+  'aguas-de-marano-frente-mar-balneario-picarras-sc': '3 e 4 dorms · 3 suítes',
+}
+
+function statusParaFase(status: string): string {
+  if (status === 'na planta') return 'Na planta'
+  if (status === 'em obras') return 'Em obras'
+  if (status === 'entregue') return 'Entregue'
+  if (status === 'pronto') return 'Pronto para morar'
+  return status
+}
+
+function getEmpreendimentosDaCidade(cityKey: string) {
+  const slugs = SLUGS_POR_CIDADE[cityKey]
+  if (!slugs) return []
+  return slugs
+    .map((slug) => imoveis.find((im) => im.slug === slug && im.ativo))
+    .filter((im): im is NonNullable<typeof im> => Boolean(im))
+    .map((im) => ({
+      nome: im.nome,
+      fase: statusParaFase(im.status),
+      slug: '/empreendimento/' + im.construtora_slug + '/' + im.slug,
+      construtora: im.construtora.replace(/^Construtora\s+/, ''),
+      dorms: DORMS_POR_SLUG[im.slug] || '',
+      exibir_preco: im.exibir_preco,
+      preco_a_partir_de: im.preco,
+    }))
 }
 
 function formatPreco(exibir_preco: boolean, preco_a_partir_de: number | null): string {
@@ -49,6 +79,7 @@ function formatPreco(exibir_preco: boolean, preco_a_partir_de: number | null): s
   const mil = preco_a_partir_de / 1000
   return `A partir de R$ ${mil % 1 === 0 ? mil.toFixed(0) : mil.toFixed(0)} mil`
 }
+
 
 type Props = { params: Promise<{ cidade: string }> }
 
@@ -87,7 +118,7 @@ export default async function LancamentosCidadePage({ params }: Props) {
   }
 
   const cityKey = cidade.replace('-sc', '')
-  const empreendimentos = EMPREENDIMENTOS_POR_CIDADE[cityKey] || []
+  const empreendimentos = getEmpreendimentosDaCidade(cityKey)
   const breadcrumbSchema = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
