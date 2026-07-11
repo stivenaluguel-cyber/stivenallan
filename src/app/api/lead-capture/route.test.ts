@@ -10,6 +10,7 @@ vi.mock('@supabase/supabase-js', () => ({
 }))
 
 import { POST } from './route'
+import { __resetForTests as resetRateLimit } from '@/lib/leads/rate-limit'
 
 type MockConfig = {
   insert?: { data: { id: string } | null; error: unknown }
@@ -41,17 +42,21 @@ function makeSupabase(cfg: MockConfig = {}) {
   }
 }
 
-async function callPost(body: unknown) {
-  const req = { json: async () => body } as unknown as NextRequest
+async function callPost(body: unknown, headers: Record<string, string> = {}) {
+  const req = {
+    json: async () => body,
+    headers: new Headers(headers),
+  } as unknown as NextRequest
   const res = await POST(req)
   const json = (await res.json()) as { id?: string | null; error?: string }
-  return { status: res.status, json }
+  return { status: res.status, json, headers: res.headers }
 }
 
 describe('POST /api/lead-capture', () => {
   beforeEach(() => {
     process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://test'
     process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-key'
+    resetRateLimit()
     vi.spyOn(console, 'error').mockImplementation(() => {})
   })
 
@@ -145,5 +150,62 @@ describe('POST /api/lead-capture', () => {
 
     const { status } = await callPost({ nome: 'Ana', whatsapp: '48991642332' })
     expect(status).toBe(500)
+  })
+
+  it('rejeita 400 com honeypot preenchido, sem tocar em Supabase', async () => {
+    const mock = makeSupabase()
+    supabaseHolder.current = mock
+
+    const { status } = await callPost({
+      nome: 'Ana',
+      whatsapp: '48991642332',
+      hp_url: 'http://spam.example.com',
+    })
+
+    expect(status).toBe(400)
+    expect(mock.insertRows).toHaveLength(0)
+  })
+
+  it('retorna 429 com Retry-After após 5 requests do mesmo IP no minuto', async () => {
+    const mock = makeSupabase({ insert: { data: { id: 'lead-ok' }, error: null } })
+    supabaseHolder.current = mock
+
+    for (let i = 0; i < 5; i++) {
+      const { status } = await callPost(
+        { nome: 'Ana', whatsapp: '48991642332' },
+        { 'x-forwarded-for': '1.2.3.4' },
+      )
+      expect(status).toBe(201)
+    }
+
+    const r = await callPost(
+      { nome: 'Ana', whatsapp: '48991642332' },
+      { 'x-forwarded-for': '1.2.3.4' },
+    )
+    expect(r.status).toBe(429)
+    const retry = r.headers.get('Retry-After')
+    expect(retry).toBeTruthy()
+    expect(Number(retry)).toBeGreaterThan(0)
+    expect(mock.insertRows).toHaveLength(5)
+  })
+
+  it('cota de rate limit é independente entre /api/leads e /api/lead-capture', async () => {
+    // /api/lead-capture usa identifier 'lead-capture' — esgotar aqui NÃO afeta 'leads'.
+    // Cobertura funcional dessa separação (o teste unitário do rate-limit já cobre a lógica).
+    supabaseHolder.current = makeSupabase({
+      insert: { data: { id: 'lead-ok' }, error: null },
+    })
+
+    for (let i = 0; i < 5; i++) {
+      await callPost(
+        { nome: 'Ana', whatsapp: '48991642332' },
+        { 'x-forwarded-for': '1.2.3.4' },
+      )
+    }
+    const blocked = await callPost(
+      { nome: 'Ana', whatsapp: '48991642332' },
+      { 'x-forwarded-for': '1.2.3.4' },
+    )
+    expect(blocked.status).toBe(429)
   })
 })

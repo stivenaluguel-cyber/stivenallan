@@ -31,6 +31,7 @@ export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
   const [email, setEmail] = useState('')
+  const [hp, setHp] = useState('') // honeypot: usuário real nunca vê, bot preenche → server responde 400
   const [status, setStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
   const backdropRef = useRef<HTMLDivElement>(null)
 
@@ -50,6 +51,7 @@ export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName
           email: email || null,
           property_id: propertyId,
           property_name: propertyName,
+          hp_url: hp,
           ...getAttribution(),
         }),
       })
@@ -166,6 +168,21 @@ export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px', textAlign: 'left' }}>
+
+                  {/* Honeypot invisível: bots preenchem, humanos não veem. */}
+                  <div
+                    aria-hidden="true"
+                    style={{ position: 'absolute', left: '-9999px', top: 'auto', width: 1, height: 1, overflow: 'hidden', opacity: 0, pointerEvents: 'none' }}
+                  >
+                    <input
+                      type="text"
+                      name="hp_url"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      value={hp}
+                      onChange={(e) => setHp(e.target.value)}
+                    />
+                  </div>
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                     <label htmlFor="lcm-nome" style={{ display: 'block', textAlign: 'left', fontSize: '11px', fontWeight: '700', color: '#52525b', textTransform: 'uppercase', letterSpacing: '0.07em', fontFamily: 'inherit' }}>

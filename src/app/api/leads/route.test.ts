@@ -12,6 +12,7 @@ vi.mock('@supabase/supabase-js', () => ({
 
 // Import DEPOIS do vi.mock (o mock é hoistado para cima do bloco de imports).
 import { POST } from './route'
+import { __resetForTests as resetRateLimit } from '@/lib/leads/rate-limit'
 
 type MockConfig = {
   property?: { id: string; nome: string | null } | null
@@ -57,17 +58,21 @@ function makeSupabase(cfg: MockConfig = {}) {
   }
 }
 
-async function callPost(body: unknown) {
-  const req = { json: async () => body } as unknown as NextRequest
+async function callPost(body: unknown, headers: Record<string, string> = {}) {
+  const req = {
+    json: async () => body,
+    headers: new Headers(headers),
+  } as unknown as NextRequest
   const res = await POST(req)
   const json = (await res.json()) as { success?: boolean; id?: string | null; error?: string }
-  return { status: res.status, json }
+  return { status: res.status, json, headers: res.headers }
 }
 
 describe('POST /api/leads', () => {
   beforeEach(() => {
     process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://test'
     process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-key'
+    resetRateLimit()
     // Silencia console.error nos paths de erro esperados
     vi.spyOn(console, 'error').mockImplementation(() => {})
   })
@@ -204,5 +209,101 @@ describe('POST /api/leads', () => {
 
     expect(mock.insertRows[0]).toMatchObject({ property_id: 'given-uuid' })
     expect(mock.insertRows[0]).not.toHaveProperty('property_name')
+  })
+
+  it('rejeita 400 com honeypot preenchido, sem tocar em Supabase', async () => {
+    const mock = makeSupabase()
+    supabaseHolder.current = mock
+
+    const { status } = await callPost({
+      nome: 'Ana',
+      telefone: '48991642332',
+      hp_url: 'http://spam.example.com',
+    })
+
+    expect(status).toBe(400)
+    expect(mock.insertRows).toHaveLength(0)
+  })
+
+  it('honeypot é checado antes do rate limit (bot não consome cota)', async () => {
+    const mock = makeSupabase({ insert: { data: { id: 'lead-hp' }, error: null } })
+    supabaseHolder.current = mock
+
+    // 3 tentativas de bot do mesmo IP — todas 400, não devem afetar o rate limit
+    for (let i = 0; i < 3; i++) {
+      const { status } = await callPost(
+        { nome: 'Ana', telefone: '48991642332', hp_url: 'x' },
+        { 'x-forwarded-for': '9.9.9.9' },
+      )
+      expect(status).toBe(400)
+    }
+
+    // Mesmo IP ainda tem os 5 tickets disponíveis
+    for (let i = 0; i < 5; i++) {
+      const { status } = await callPost(
+        { nome: 'Ana', telefone: '48991642332' },
+        { 'x-forwarded-for': '9.9.9.9' },
+      )
+      expect(status).toBe(201)
+    }
+  })
+
+  it('retorna 429 com Retry-After após 5 requests do mesmo IP no minuto', async () => {
+    const mock = makeSupabase({ insert: { data: { id: 'lead-ok' }, error: null } })
+    supabaseHolder.current = mock
+
+    for (let i = 0; i < 5; i++) {
+      const { status } = await callPost(
+        { nome: 'Ana', telefone: '48991642332' },
+        { 'x-forwarded-for': '1.2.3.4' },
+      )
+      expect(status).toBe(201)
+    }
+
+    const r = await callPost(
+      { nome: 'Ana', telefone: '48991642332' },
+      { 'x-forwarded-for': '1.2.3.4' },
+    )
+    expect(r.status).toBe(429)
+    const retry = r.headers.get('Retry-After')
+    expect(retry).toBeTruthy()
+    expect(Number(retry)).toBeGreaterThan(0)
+    // A 6ª request não gravou
+    expect(mock.insertRows).toHaveLength(5)
+  })
+
+  it('IPs diferentes têm cotas de rate limit independentes', async () => {
+    supabaseHolder.current = makeSupabase({
+      insert: { data: { id: 'lead-any' }, error: null },
+    })
+
+    for (let i = 0; i < 5; i++) {
+      await callPost(
+        { nome: 'Ana', telefone: '48991642332' },
+        { 'x-forwarded-for': '1.2.3.4' },
+      )
+    }
+    const blocked = await callPost(
+      { nome: 'Ana', telefone: '48991642332' },
+      { 'x-forwarded-for': '1.2.3.4' },
+    )
+    expect(blocked.status).toBe(429)
+
+    const other = await callPost(
+      { nome: 'Ana', telefone: '48991642332' },
+      { 'x-forwarded-for': '5.6.7.8' },
+    )
+    expect(other.status).toBe(201)
+  })
+
+  it('sem header de IP (unknown) o rate limit passa sempre — honeypot cobre', async () => {
+    supabaseHolder.current = makeSupabase({
+      insert: { data: { id: 'lead-noip' }, error: null },
+    })
+
+    for (let i = 0; i < 8; i++) {
+      const { status } = await callPost({ nome: 'Ana', telefone: '48991642332' })
+      expect(status).toBe(201)
+    }
   })
 })

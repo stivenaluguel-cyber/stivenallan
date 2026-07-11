@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { normalizeEmail, normalizePhone, normalizeString } from '@/lib/leads/normalize'
+import { extractIp, isBotSubmission } from '@/lib/leads/anti-spam'
+import { checkRateLimit } from '@/lib/leads/rate-limit'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,8 +15,27 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Configuracao incompleta' }, { status: 503 })
     }
 
-    const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey)
     const body = await req.json()
+
+    // Honeypot antes de qualquer trabalho — bot barato eliminado sem tocar em rate-limit/Supabase
+    if (isBotSubmission(body)) {
+      return NextResponse.json({ error: 'Payload invalido' }, { status: 400 })
+    }
+
+    // Rate limit por IP: 5 requests/min/IP no download do book
+    const rl = checkRateLimit(extractIp(req), {
+      identifier: 'lead-capture',
+      limit: 5,
+      windowSeconds: 60,
+    })
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: 'Muitas tentativas, tente novamente em instantes' },
+        { status: 429, headers: { 'Retry-After': String(rl.retryAfter ?? 60) } },
+      )
+    }
+
+    const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey)
 
     const nome = normalizeString(body.nome)
     const whatsapp = normalizePhone(body.whatsapp)

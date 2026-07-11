@@ -18,6 +18,7 @@ export default function FormContato({ empreendimento, propertyId, propertySlug }
   const [faixaInvestimento, setFaixaInvestimento] = useState('');
   const [prazoCompra, setPrazoCompra] = useState('');
   const [entradaDisponivel, setEntradaDisponivel] = useState('');
+  const [hp, setHp] = useState(''); // honeypot: usuário real nunca vê, bot preenche → server responde 400
   const [status, setStatus] = useState<'idle' | 'enviando' | 'ok' | 'erro'>('idle');
 
   const waLink = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(
@@ -46,6 +47,7 @@ export default function FormContato({ empreendimento, propertyId, propertySlug }
           faixa_investimento: faixaInvestimento,
           prazo_compra: prazoCompra,
           entrada_disponivel: entradaDisponivel,
+          hp_url: hp,
           ...getAttribution(),
         }),
       });
@@ -115,6 +117,29 @@ export default function FormContato({ empreendimento, propertyId, propertySlug }
 
   return (
     <form onSubmit={handleSubmit}>
+      {/* Honeypot invisível: bots preenchem, humanos não veem. */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          left: '-9999px',
+          top: 'auto',
+          width: 1,
+          height: 1,
+          overflow: 'hidden',
+          opacity: 0,
+          pointerEvents: 'none',
+        }}
+      >
+        <input
+          type="text"
+          name="hp_url"
+          tabIndex={-1}
+          autoComplete="off"
+          value={hp}
+          onChange={(e) => setHp(e.target.value)}
+        />
+      </div>
       <input
         type="text"
         placeholder="Seu nome"
