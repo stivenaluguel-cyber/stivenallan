@@ -64,7 +64,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: `Lançamentos em ${info.nome}/${info.uf} | Stiven Allan`,
       description: info.descricao,
     },
-        twitter: { card: 'summary_large_image', title: `Lançamentos em ${info.nome}/${info.uf} | Stiven Allan`, description: info.descricao },
+    twitter: { card: 'summary_large_image', title: `Lançamentos em ${info.nome}/${info.uf} | Stiven Allan`, description: info.descricao },
   }
 }
 
@@ -88,9 +88,30 @@ export default async function LancamentosCidadePage({ params }: Props) {
 
   const cityKey = cidade.replace('-sc', '')
   const empreendimentos = EMPREENDIMENTOS_POR_CIDADE[cityKey] || []
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+  { '@type': 'ListItem', position: 1, name: 'Início', item: 'https://stivenallan.com.br' },
+  { '@type': 'ListItem', position: 2, name: 'Lançamentos', item: 'https://stivenallan.com.br/lancamentos' },
+  { '@type': 'ListItem', position: 3, name: info.nome + '/' + info.uf, item: 'https://stivenallan.com.br/lancamentos/' + cidade },
+  ],
+  }
+  const itemListSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  itemListElement: empreendimentos.map((emp, i) => ({
+  '@type': 'ListItem',
+  position: i + 1,
+  name: emp.nome,
+  url: 'https://stivenallan.com.br' + emp.slug,
+  })),
+  }
 
   return (
     <main style={{ background: '#121315', minHeight: '100vh', color: '#fff', fontFamily: 'Inter, sans-serif' }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }} />
       <section style={{ padding: '80px 24px 60px', maxWidth: 1100, margin: '0 auto' }}>
         <nav style={{ marginBottom: 40 }}>
           <ol style={{ display: 'flex', gap: 8, listStyle: 'none', padding: 0, margin: 0, fontSize: 14, color: '#a7adb4' }}>
