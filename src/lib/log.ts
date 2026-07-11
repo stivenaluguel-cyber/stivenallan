@@ -1,6 +1,11 @@
+import * as Sentry from '@sentry/nextjs'
+
 // Log estruturado: emite uma linha JSON por evento.
 // Consumível por Vercel Log Viewer, Log Drain (Datadog/Logtail/Axiom) e grep local.
 // Convenção: nunca inclua PII (email/telefone/nome) — só ids opacos + status/counts.
+//
+// Erros também são enviados pro Sentry via logError (Pilha E4). Sem SENTRY_DSN
+// configurada, a captura vira no-op silencioso (design da SDK).
 
 type Level = 'info' | 'warn' | 'error'
 type Ctx = Record<string, unknown>
@@ -47,4 +52,21 @@ export function logWarn(source: string, message: string, ctx?: Ctx): void {
 
 export function logError(source: string, message: string, err?: unknown, ctx?: Ctx): void {
   emit('error', source, message, ctx, err)
+  // Sentry: canal adicional pra erros. Structured JSON log continua sendo verdade primária.
+  try {
+    if (err !== undefined && err !== null) {
+      Sentry.captureException(err, {
+        tags: { source },
+        extra: { message, ...(ctx ?? {}) },
+      })
+    } else {
+      Sentry.captureMessage(message, {
+        level: 'error',
+        tags: { source },
+        extra: ctx ?? {},
+      })
+    }
+  } catch {
+    // Sentry SDK falhou (bug interno, sem transporte): structured log já foi.
+  }
 }

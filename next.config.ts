@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next'
+import { withSentryConfig } from '@sentry/nextjs'
 
 const nextConfig: NextConfig = {
   typescript: {
@@ -61,4 +62,16 @@ const nextConfig: NextConfig = {
   ],
 }
 
-export default nextConfig
+// Sentry wrap — source map uploads são no-op sem SENTRY_AUTH_TOKEN,
+// stack traces em prod ficam bundled até você adicionar essa env (opcional).
+export default withSentryConfig(nextConfig, {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  silent: !process.env.CI,
+  widenClientFileUpload: true,
+  // Deixamos as source maps expostas apenas quando o auth token existir —
+  // sem ele, tentar upload retorna warning que polui o build log.
+  sourcemaps: {
+    disable: !process.env.SENTRY_AUTH_TOKEN,
+  },
+})

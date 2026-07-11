@@ -1,4 +1,19 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
+const { sentrySpies } = vi.hoisted(() => ({
+  sentrySpies: {
+    captureException: vi.fn(),
+    captureMessage: vi.fn(),
+  },
+}))
+
+vi.mock('@sentry/nextjs', () => ({
+  captureException: (...args: unknown[]) =>
+    (sentrySpies.captureException as unknown as (...a: unknown[]) => unknown)(...args),
+  captureMessage: (...args: unknown[]) =>
+    (sentrySpies.captureMessage as unknown as (...a: unknown[]) => unknown)(...args),
+}))
+
 import { logError, logInfo, logWarn } from './log'
 
 type Parsed = {
@@ -122,5 +137,70 @@ describe('logError', () => {
     logError('src', 'msg', { code: 'PGRST204', message: 'column x missing' })
     const parsed = parseLastCall(errSpy)
     expect(parsed.error).toEqual({ code: 'PGRST204', message: 'column x missing' })
+  })
+})
+
+describe('Sentry integration (E4)', () => {
+  beforeEach(() => {
+    vi.spyOn(console, 'log').mockImplementation(() => {})
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    sentrySpies.captureException.mockClear()
+    sentrySpies.captureMessage.mockClear()
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  it('logError com Error → captureException com tags{source} + extra{message, ...ctx}', () => {
+    const boom = new Error('boom')
+    logError('cron/tracker', 'startCronRun failed', boom, { cron: 'followup' })
+
+    expect(sentrySpies.captureException).toHaveBeenCalledTimes(1)
+    const [errArg, options] = sentrySpies.captureException.mock.calls[0]
+    expect(errArg).toBe(boom)
+    expect(options).toEqual({
+      tags: { source: 'cron/tracker' },
+      extra: { message: 'startCronRun failed', cron: 'followup' },
+    })
+    expect(sentrySpies.captureMessage).not.toHaveBeenCalled()
+  })
+
+  it('logError sem err → captureMessage com level error + tags/extra', () => {
+    logError('followup', 'evolution send failed', null, { leadId: 'lead-1' })
+
+    expect(sentrySpies.captureMessage).toHaveBeenCalledTimes(1)
+    const [msg, options] = sentrySpies.captureMessage.mock.calls[0]
+    expect(msg).toBe('evolution send failed')
+    expect(options).toEqual({
+      level: 'error',
+      tags: { source: 'followup' },
+      extra: { leadId: 'lead-1' },
+    })
+    expect(sentrySpies.captureException).not.toHaveBeenCalled()
+  })
+
+  it('logInfo NUNCA chama captureException nem captureMessage', () => {
+    logInfo('email-followup', 'run summary', { processados: 5 })
+    expect(sentrySpies.captureException).not.toHaveBeenCalled()
+    expect(sentrySpies.captureMessage).not.toHaveBeenCalled()
+  })
+
+  it('logWarn NUNCA chama captureException nem captureMessage', () => {
+    logWarn('api/leads', 'columns pending', { db_message: 'x' })
+    expect(sentrySpies.captureException).not.toHaveBeenCalled()
+    expect(sentrySpies.captureMessage).not.toHaveBeenCalled()
+  })
+
+  it('se captureException lançar, structured log ainda sai (não relança)', () => {
+    sentrySpies.captureException.mockImplementationOnce(() => {
+      throw new Error('sentry down')
+    })
+    const errSpy = vi.spyOn(console, 'error')
+
+    expect(() => logError('src', 'msg', new Error('boom'))).not.toThrow()
+    // O JSON log foi emitido antes da falha do Sentry
+    expect(errSpy).toHaveBeenCalled()
   })
 })
