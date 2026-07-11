@@ -58,7 +58,7 @@ export default function FormContato({ empreendimento, propertyId, propertySlug }
         body: JSON.stringify({ nome, whatsapp: telefone.replace(/\D/g, ''), property_name: empreendimento, email: email || null }),
       }).catch(() => {});
       const eventId = crypto.randomUUID();
-      trackLeadEvent(empreendimento, eventId);
+      trackLeadEvent(empreendimento, eventId, { email: email || null, telefone, nome });
       sendLeadToCapi({ event_id: eventId, nome, telefone, email: email || null, content_name: empreendimento });
       setStatus('ok');
       if (waTab) waTab.location.href = waLink;

@@ -10,7 +10,11 @@ const ATTRIB_PARAMS = [
   'fbclid',
 ] as const
 
-export type Attribution = Partial<Record<(typeof ATTRIB_PARAMS)[number], string>>
+export type Attribution = Partial<Record<(typeof ATTRIB_PARAMS)[number], string>> & {
+  // Timestamp (millis stringificados) do momento em que o `fbclid` entrou na sessão.
+  // Usado pra sintetizar `_fbc` no server com timestamp do CLICK, não do submit.
+  fbclid_ts?: string
+}
 
 // Captura UTMs/click-ids da URL de entrada e persiste na sessão (first-touch da sessão)
 export function captureAttribution() {
@@ -24,8 +28,15 @@ export function captureAttribution() {
     }
     if (Object.keys(found).length === 0) return
     const existing = getAttribution()
-    // First-touch: chaves já gravadas vencem — `existing` vem por último no spread para sobrescrever `found`.
-    sessionStorage.setItem(KEY_ATTRIB, JSON.stringify({ ...found, ...existing }))
+    // fbclid_ts é gravado APENAS quando o fbclid é novo na sessão — assim o
+    // first-touch preserva o momento real do click original (não sobrescreve
+    // com Date.now() de uma nova landing na mesma sessão).
+    const foundWithTs: Attribution = { ...found }
+    if (found.fbclid && !existing.fbclid) {
+      foundWithTs.fbclid_ts = String(Date.now())
+    }
+    // First-touch: chaves já gravadas vencem — `existing` vem por último no spread para sobrescrever `foundWithTs`.
+    sessionStorage.setItem(KEY_ATTRIB, JSON.stringify({ ...foundWithTs, ...existing }))
   } catch {}
 }
 
@@ -53,12 +64,91 @@ function gtag(): GtagFn | null {
   return typeof fn === 'function' ? fn : null
 }
 
-// Dispara Lead no Pixel (com eventID p/ deduplicar com a CAPI) + GA4 + conversão Google Ads
-export function trackLeadEvent(contentName: string, eventId: string) {
+// --- Enhanced Conversions (Google Ads) ---
+// Hashes SHA-256 client-side seguindo as normas de normalização do Google Ads.
+// Passar hashes junto do conversion event sobe match rate ~30% em campanhas.
+
+export type EnhancedUserData = {
+  email?: string | null
+  telefone?: string | null
+  nome?: string | null
+}
+
+export async function sha256Hex(input: string): Promise<string> {
+  const encoded = new TextEncoder().encode(input)
+  const digest = await crypto.subtle.digest('SHA-256', encoded)
+  return Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
+}
+
+export function normalizeEmailForHash(email: string): string {
+  return email.trim().toLowerCase()
+}
+
+// Normaliza pra E.164 com "+" — obrigatório: sem o "+", o hash não bate com o
+// que o Google normaliza no lado deles e o Enhanced Conversions match cai a 0%.
+// Regra: strip não-dígitos → prefix 55 se faltar country code → prefixa "+".
+export function normalizePhoneForHash(phone: string): string {
+  const digits = phone.replace(/\D/g, '')
+  if (!digits) return ''
+  if (digits.length >= 12) return '+' + digits
+  if (digits.length === 10 || digits.length === 11) return '+55' + digits
+  return '+' + digits
+}
+
+// Só primeiro nome, sem acentos, lowercase, trim.
+export function normalizeFirstNameForHash(nome: string): string {
+  return nome
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .split(/\s+/)[0]
+}
+
+export async function buildEnhancedUserData(data: EnhancedUserData): Promise<Record<string, unknown>> {
+  const out: Record<string, unknown> = {}
+  try {
+    if (data.email) {
+      const normalized = normalizeEmailForHash(data.email)
+      if (normalized) out.sha256_email_address = await sha256Hex(normalized)
+    }
+    if (data.telefone) {
+      const normalized = normalizePhoneForHash(data.telefone)
+      if (normalized) out.sha256_phone_number = await sha256Hex(normalized)
+    }
+    if (data.nome) {
+      const firstName = normalizeFirstNameForHash(data.nome)
+      // gtag Enhanced Conversions espera `address` como objeto (não array).
+      // Formato array é da Google Ads REST API — aqui viraria noop silencioso.
+      if (firstName) out.address = { sha256_first_name: await sha256Hex(firstName) }
+    }
+  } catch {
+    // crypto.subtle indisponível → devolve o que conseguiu construir
+  }
+  return out
+}
+
+// Dispara Lead no Pixel (com eventID p/ deduplicar com a CAPI) + GA4 + conversão Google Ads.
+// Se `userData` vier, sobe Enhanced Conversions no evento de conversão do Ads.
+export async function trackLeadEvent(
+  contentName: string,
+  eventId: string,
+  userData?: EnhancedUserData,
+) {
   fbq()?.('track', 'Lead', { content_name: contentName }, { eventID: eventId })
   gtag()?.('event', 'generate_lead', { method: 'form', content: contentName })
+
   const gadsConversion = process.env.NEXT_PUBLIC_GADS_CONVERSION
-  if (gadsConversion) gtag()?.('event', 'conversion', { send_to: gadsConversion })
+  if (!gadsConversion) return
+
+  const params: Record<string, unknown> = { send_to: gadsConversion }
+  if (userData) {
+    const enhanced = await buildEnhancedUserData(userData)
+    if (Object.keys(enhanced).length > 0) params.user_data = enhanced
+  }
+  gtag()?.('event', 'conversion', params)
 }
 
 export function trackViewContent(slug: string) {
@@ -87,6 +177,7 @@ export function sendLeadToCapi(payload: {
     body: JSON.stringify({
       ...payload,
       fbclid: attrib.fbclid || null,
+      fbclid_ts: attrib.fbclid_ts ?? null,
       url: window.location.href,
     }),
     keepalive: true,

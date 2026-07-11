@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json()
-    const { event_id, nome, telefone, email, content_name, fbclid, url } = body
+    const { event_id, nome, telefone, email, content_name, fbclid, fbclid_ts, url } = body
     if (!event_id || !nome || !telefone) {
       return NextResponse.json({ error: 'Campos obrigatorios ausentes' }, { status: 400 })
     }
@@ -41,7 +41,11 @@ export async function POST(req: NextRequest) {
     const cookies = req.cookies
     const fbp = cookies.get('_fbp')?.value || null
     const fbcCookie = cookies.get('_fbc')?.value || null
-    const fbc = fbcCookie || (fbclid ? `fb.1.${Date.now()}.${fbclid}` : null)
+    // fbclid_ts vem do sessionStorage do client (momento do click original).
+    // Fallback Date.now() se ausente ou inválido — retro-compat + defesa.
+    const clickTs = typeof fbclid_ts === 'string' ? parseInt(fbclid_ts, 10) : null
+    const clickTsSafe = clickTs !== null && !Number.isNaN(clickTs) ? clickTs : Date.now()
+    const fbc = fbcCookie || (fbclid ? `fb.1.${clickTsSafe}.${fbclid}` : null)
 
     const userData: Record<string, unknown> = {
       ph: [hashPhone(telefone)],

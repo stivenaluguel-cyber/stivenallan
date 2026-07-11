@@ -59,7 +59,7 @@ export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName
       const json = await res.json()
       leadId = json?.id ?? null
       const eventId = crypto.randomUUID()
-      trackLeadEvent(`Catálogo ${propertyName}`, eventId)
+      trackLeadEvent(`Catálogo ${propertyName}`, eventId, { email: email || null, telefone: phone, nome: name })
       sendLeadToCapi({ event_id: eventId, nome: name, telefone: phone.replace(/\D/g, ''), email: email || null, content_name: `Catálogo ${propertyName}` })
     } catch {
       pdfTab?.close()
