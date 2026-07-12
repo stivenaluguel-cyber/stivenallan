@@ -2,6 +2,7 @@
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
+import { NotificationBell } from '@/lib/dashboard/notification-bell';
 
 const D = {
   sidebar: '#131211', bronze: '#D24E22',
@@ -70,11 +71,14 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
   const SidebarContent = (
     <>
-      <button onClick={() => handleNav('/dashboard')}
-        style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, padding: '4px 6px', marginBottom: 22 }}>
-        <span style={{ width: 34, height: 34, borderRadius: 9, background: D.bronze, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 15, fontWeight: 800, flexShrink: 0 }}>SA</span>
-        <span style={{ fontSize: 15, color: D.onDark, fontWeight: 700, whiteSpace: 'nowrap' }}>SA Imóveis</span>
-      </button>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 22 }}>
+        <button onClick={() => handleNav('/dashboard')}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, padding: '4px 6px' }}>
+          <span style={{ width: 34, height: 34, borderRadius: 9, background: D.bronze, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 15, fontWeight: 800, flexShrink: 0 }}>SA</span>
+          <span style={{ fontSize: 15, color: D.onDark, fontWeight: 700, whiteSpace: 'nowrap' }}>SA Imóveis</span>
+        </button>
+        <NotificationBell variant="dark" />
+      </div>
 
       <nav style={{ display: 'flex', flexDirection: 'column', gap: 18, flex: 1 }}>
         {GRUPOS.map(grupo => (
@@ -123,13 +127,16 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           <span style={{ width: 28, height: 28, borderRadius: 8, background: D.bronze, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 13, fontWeight: 800 }}>SA</span>
           <span style={{ fontSize: 14, fontWeight: 700, color: D.onDark }}>{pageLabel}</span>
         </div>
-        <button onClick={() => setMenuOpen(v => !v)} aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
-          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6, color: D.onDark }}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            {menuOpen ? <><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></>
-              : <><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></>}
-          </svg>
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <NotificationBell variant="dark" />
+          <button onClick={() => setMenuOpen(v => !v)} aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6, color: D.onDark }}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              {menuOpen ? <><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></>
+                : <><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></>}
+            </svg>
+          </button>
+        </div>
       </header>
 
       {menuOpen && (
