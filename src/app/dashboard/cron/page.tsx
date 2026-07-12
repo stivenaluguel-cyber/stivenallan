@@ -1,13 +1,19 @@
 import { createClient } from '@supabase/supabase-js'
 import {
   aggregate,
+  aggregateByDay,
   filterLast7Days,
   formatDuration,
   type CronRunRow,
   type CronRunStatus,
 } from '@/lib/dashboard/cron-stats'
 import { RelativeTime } from '@/lib/dashboard/relative-time'
+import { CronTimelineChart } from '@/lib/dashboard/cron-chart'
+import { CronFilter } from '@/lib/dashboard/cron-filter'
+import { CronRowButton } from '@/lib/dashboard/cron-details-modal'
 
+// searchParams marca a página como dynamic per-request → sempre dados frescos.
+// Sem revalidate (dashboard admin, F5 é o "auto-refresh").
 export const dynamic = 'force-dynamic'
 
 // Paleta consistente com o resto do dashboard (dashboard/layout.tsx)
@@ -64,7 +70,13 @@ async function fetchCronRuns(): Promise<
   return { kind: 'ok', rows: (data ?? []) as CronRunRow[] }
 }
 
-export default async function CronDashboardPage() {
+export default async function CronDashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ cron?: string }>
+}) {
+  const params = await searchParams
+  const currentFilter = params.cron ?? null
   const result = await fetchCronRuns()
 
   return (
@@ -80,14 +92,22 @@ export default async function CronDashboardPage() {
         {result.kind === 'missing_table' && <MissingMigration />}
         {result.kind === 'error' && <ErrorState message={result.message} />}
         {result.kind === 'ok' && result.rows.length === 0 && <EmptyState />}
-        {result.kind === 'ok' && result.rows.length > 0 && <Populated rows={result.rows} />}
+        {result.kind === 'ok' && result.rows.length > 0 && (
+          <Populated rows={result.rows} currentFilter={currentFilter} />
+        )}
       </main>
     </div>
   )
 }
 
-function Populated({ rows }: { rows: CronRunRow[] }) {
-  const stats = aggregate(filterLast7Days(rows))
+function Populated({ rows, currentFilter }: { rows: CronRunRow[]; currentFilter: string | null }) {
+  // Nomes únicos de cron pra dropdown (sempre extraídos de TODOS os rows, não da view filtrada)
+  const cronNames = Array.from(new Set(rows.map((r) => r.cron_name))).sort()
+  const filtered = currentFilter ? rows.filter((r) => r.cron_name === currentFilter) : rows
+  const last7d = filterLast7Days(filtered)
+  const stats = aggregate(last7d)
+  const chartData = aggregateByDay(last7d, 7)
+
   return (
     <>
       <section
@@ -95,7 +115,7 @@ function Populated({ rows }: { rows: CronRunRow[] }) {
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
           gap: 16,
-          marginBottom: 32,
+          marginBottom: 24,
         }}
       >
         <Metric label="Runs (7d)" value={String(stats.total)} />
@@ -106,6 +126,24 @@ function Populated({ rows }: { rows: CronRunRow[] }) {
         />
         <Metric label="E-mails enviados (7d)" value={String(stats.totalEnviados)} accent />
         <Metric label="Erros de envio (7d)" value={String(stats.totalErrosEnvio)} />
+      </section>
+
+      <section
+        style={{
+          background: '#fff',
+          border: `1px solid ${T.border}`,
+          borderRadius: 12,
+          padding: '20px 22px',
+          marginBottom: 24,
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, flexWrap: 'wrap', gap: 12 }}>
+          <div style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: T.mutedInk, fontWeight: 600 }}>
+            Últimos 7 dias por status
+          </div>
+          <CronFilter crons={cronNames} current={currentFilter} />
+        </div>
+        <CronTimelineChart data={chartData} />
       </section>
 
       <section style={{ background: '#fff', border: `1px solid ${T.border}`, borderRadius: 12, overflow: 'hidden' }}>
@@ -122,25 +160,35 @@ function Populated({ rows }: { rows: CronRunRow[] }) {
             </tr>
           </thead>
           <tbody>
-            {rows.map((r, i) => (
+            {filtered.map((r, i) => (
               <tr key={r.id} style={{ background: i % 2 === 0 ? '#fff' : T.bronzeSoft }}>
-                <Td mono>{r.cron_name}</Td>
-                <Td>
-                  <RelativeTime iso={r.started_at} />
-                </Td>
-                <Td mono>{formatDuration(r.duration_ms)}</Td>
-                <Td>
-                  <StatusBadge status={r.status} />
-                </Td>
-                <Td align="right" mono>
-                  {r.enviados ?? '—'}
-                </Td>
-                <Td align="right" mono>
-                  {r.erros_envio ?? '—'}
-                </Td>
-                <Td muted title={r.motivo ?? undefined}>
-                  {truncate(r.motivo, 60) ?? '—'}
-                </Td>
+                <td colSpan={7} style={{ padding: 0, borderTop: `1px solid ${T.border}` }}>
+                  <CronRowButton row={r}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                      <tbody>
+                        <tr>
+                          <Td mono>{r.cron_name}</Td>
+                          <Td>
+                            <RelativeTime iso={r.started_at} />
+                          </Td>
+                          <Td mono>{formatDuration(r.duration_ms)}</Td>
+                          <Td>
+                            <StatusBadge status={r.status} />
+                          </Td>
+                          <Td align="right" mono>
+                            {r.enviados ?? '—'}
+                          </Td>
+                          <Td align="right" mono>
+                            {r.erros_envio ?? '—'}
+                          </Td>
+                          <Td muted title={r.motivo ?? undefined}>
+                            {truncate(r.motivo, 60) ?? '—'}
+                          </Td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </CronRowButton>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -230,7 +278,6 @@ function Td({
         textAlign: align,
         fontFamily: mono ? 'ui-monospace,SFMono-Regular,Menlo,monospace' : 'inherit',
         color: muted ? T.mutedInk : T.ink,
-        borderTop: `1px solid ${T.border}`,
       }}
     >
       {children}

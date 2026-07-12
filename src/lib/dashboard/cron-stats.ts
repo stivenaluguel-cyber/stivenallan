@@ -14,6 +14,7 @@ export type CronRunRow = {
   enviados: number | null
   pulados: number | null
   erros_envio: number | null
+  details: Record<string, unknown> | null
 }
 
 export type CronStats = {
@@ -61,4 +62,41 @@ export function formatDuration(ms: number | null): string {
   if (ms === null || ms === undefined) return '—'
   if (ms < 1000) return `${ms}ms`
   return `${(ms / 1000).toFixed(1)}s`
+}
+
+export type DayBucket = {
+  day: string // YYYY-MM-DD
+  ok: number
+  skipped: number
+  errors: number
+  running: number
+}
+
+// Agrupa runs por dia local (fuso do server). Retorna N dias (mais antigo → mais recente),
+// incluindo dias vazios pra que o chart não pule buracos temporais.
+export function aggregateByDay(rows: CronRunRow[], days: number = 7, now: Date = new Date()): DayBucket[] {
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const buckets: Record<string, DayBucket> = {}
+  const order: string[] = []
+
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date(today)
+    d.setDate(d.getDate() - i)
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+    buckets[key] = { day: key, ok: 0, skipped: 0, errors: 0, running: 0 }
+    order.push(key)
+  }
+
+  for (const r of rows) {
+    const d = new Date(r.started_at)
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+    const bucket = buckets[key]
+    if (!bucket) continue // fora da janela
+    if (r.status === 'ok') bucket.ok++
+    else if (r.status === 'skipped') bucket.skipped++
+    else if (r.status === 'error') bucket.errors++
+    else if (r.status === 'running') bucket.running++
+  }
+
+  return order.map((k) => buckets[k])
 }

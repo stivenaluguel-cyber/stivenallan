@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   aggregate,
+  aggregateByDay,
   filterLast7Days,
   formatDuration,
   type CronRunRow,
@@ -20,6 +21,7 @@ function row(status: CronRunStatus, extras: Partial<CronRunRow> = {}): CronRunRo
     enviados: null,
     pulados: null,
     erros_envio: null,
+    details: null,
     ...extras,
   }
 }
@@ -105,5 +107,50 @@ describe('formatDuration', () => {
     expect(formatDuration(1000)).toBe('1.0s')
     expect(formatDuration(3500)).toBe('3.5s')
     expect(formatDuration(12345)).toBe('12.3s')
+  })
+})
+
+describe('aggregateByDay', () => {
+  const now = new Date('2026-07-11T15:00:00Z')
+
+  it('array vazio → N dias de zeros', () => {
+    const result = aggregateByDay([], 7, now)
+    expect(result).toHaveLength(7)
+    for (const b of result) {
+      expect(b.ok).toBe(0)
+      expect(b.skipped).toBe(0)
+      expect(b.errors).toBe(0)
+      expect(b.running).toBe(0)
+    }
+  })
+
+  it('agrupa runs no mesmo dia por status', () => {
+    // Usar 12:00Z pra ficar longe da meia-noite local (evita bug de fuso na comparação)
+    const dayStart = new Date('2026-07-11T12:00:00Z').toISOString()
+    const rows = [
+      row('ok', { started_at: dayStart }),
+      row('ok', { started_at: dayStart }),
+      row('skipped', { started_at: dayStart }),
+      row('error', { started_at: dayStart }),
+    ]
+    const result = aggregateByDay(rows, 7, now)
+    const today = result[result.length - 1]
+    expect(today.ok).toBe(2)
+    expect(today.skipped).toBe(1)
+    expect(today.errors).toBe(1)
+    expect(today.running).toBe(0)
+  })
+
+  it('runs fora da janela são descartados', () => {
+    const veryOld = new Date('2020-01-01T12:00:00Z').toISOString()
+    const rows = [row('ok', { started_at: veryOld })]
+    const result = aggregateByDay(rows, 7, now)
+    expect(result).toHaveLength(7)
+    for (const b of result) expect(b.ok).toBe(0)
+  })
+
+  it('retorna dias em ordem cronológica (mais antigo → mais recente)', () => {
+    const result = aggregateByDay([], 3, now)
+    expect(result.map((b) => b.day)).toEqual(['2026-07-09', '2026-07-10', '2026-07-11'])
   })
 })
