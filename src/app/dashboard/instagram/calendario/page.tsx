@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { createClient } from '@supabase/supabase-js'
 import { InstagramCalendarBoard, type CalendarRow } from '@/lib/dashboard/instagram-calendar-board'
+import { IcsSubscribeBox } from '@/lib/dashboard/ics-subscribe-box'
 
 export const dynamic = 'force-dynamic'
 
@@ -57,6 +58,9 @@ export default async function InstagramCalendarioPage() {
   }
 
   const publicados = result.rows.filter((r) => r.status === 'publicado').length
+  const icsToken = process.env.ICS_FEED_TOKEN
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://stivenallan.com.br'
+  const icsUrl = icsToken ? `${siteUrl}/api/instagram/calendario.ics?token=${icsToken}` : null
 
   return (
     <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 18, maxWidth: 1100 }}>
@@ -71,6 +75,8 @@ export default async function InstagramCalendarioPage() {
           ← Voltar pra visão geral
         </Link>
       </div>
+
+      {icsUrl && <IcsSubscribeBox url={icsUrl} />}
 
       <InstagramCalendarBoard rows={result.rows} />
     </div>
