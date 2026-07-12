@@ -37,6 +37,16 @@ const STATUS_COLOR: Record<string, { color: string; bg: string }> = {
   publicado: { color: '#16a34a', bg: 'rgba(22,163,74,0.12)' },
 }
 
+const inputStyle: React.CSSProperties = {
+  padding: '7px 10px',
+  border: `1px solid ${T.border}`,
+  borderRadius: 7,
+  fontSize: 12.5,
+  fontFamily: 'inherit',
+  width: '100%',
+  boxSizing: 'border-box',
+}
+
 function formatarData(data: string | null): string {
   if (!data) return 'Sem data (reserva)'
   const [y, m, d] = data.split('-')
@@ -45,11 +55,154 @@ function formatarData(data: string | null): string {
   return `${diaSemana} ${d}/${m}/${y}`
 }
 
-function Row({ row, onChanged }: { row: CalendarRow; onChanged: () => void }) {
+type FormValues = {
+  data: string
+  tipo: string
+  linha: string
+  titulo: string
+  roteiro: string
+  observacoes: string
+}
+
+function rowToForm(row: CalendarRow): FormValues {
+  return {
+    data: row.data ?? '',
+    tipo: row.tipo,
+    linha: row.linha,
+    titulo: row.titulo,
+    roteiro: row.roteiro ?? '',
+    observacoes: row.observacoes ?? '',
+  }
+}
+
+function EntryFields({ values, onChange }: { values: FormValues; onChange: (v: FormValues) => void }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 10 }}>
+        <div>
+          <label style={{ fontSize: 11, fontWeight: 600, color: T.mutedInk }}>Data (vazio = reserva)</label>
+          <input
+            type="date"
+            value={values.data}
+            onChange={(e) => onChange({ ...values, data: e.target.value })}
+            style={{ ...inputStyle, marginTop: 4 }}
+          />
+        </div>
+        <div>
+          <label style={{ fontSize: 11, fontWeight: 600, color: T.mutedInk }}>Tipo</label>
+          <select value={values.tipo} onChange={(e) => onChange({ ...values, tipo: e.target.value })} style={{ ...inputStyle, marginTop: 4 }}>
+            {Object.entries(TIPO_LABEL).map(([k, label]) => (
+              <option key={k} value={k}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label style={{ fontSize: 11, fontWeight: 600, color: T.mutedInk }}>Linha</label>
+          <select value={values.linha} onChange={(e) => onChange({ ...values, linha: e.target.value })} style={{ ...inputStyle, marginTop: 4 }}>
+            {Object.entries(LINHA_LABEL).map(([k, label]) => (
+              <option key={k} value={k}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label style={{ fontSize: 11, fontWeight: 600, color: T.mutedInk }}>Título</label>
+        <input
+          type="text"
+          value={values.titulo}
+          onChange={(e) => onChange({ ...values, titulo: e.target.value })}
+          style={{ ...inputStyle, marginTop: 4 }}
+        />
+      </div>
+
+      <div>
+        <label style={{ fontSize: 11, fontWeight: 600, color: T.mutedInk }}>Roteiro</label>
+        <textarea
+          value={values.roteiro}
+          onChange={(e) => onChange({ ...values, roteiro: e.target.value })}
+          rows={6}
+          style={{ ...inputStyle, marginTop: 4, resize: 'vertical', fontFamily: 'inherit' }}
+        />
+      </div>
+
+      <div>
+        <label style={{ fontSize: 11, fontWeight: 600, color: T.mutedInk }}>Observações</label>
+        <textarea
+          value={values.observacoes}
+          onChange={(e) => onChange({ ...values, observacoes: e.target.value })}
+          rows={2}
+          style={{ ...inputStyle, marginTop: 4, resize: 'vertical', fontFamily: 'inherit' }}
+        />
+      </div>
+    </div>
+  )
+}
+
+function NewEntryForm({ onClose }: { onClose: () => void }) {
+  const router = useRouter()
+  const [values, setValues] = useState<FormValues>({ data: '', tipo: 'reel_educativo', linha: 'fontana', titulo: '', roteiro: '', observacoes: '' })
+  const [saving, setSaving] = useState(false)
+  const [erro, setErro] = useState<string | null>(null)
+
+  async function salvar() {
+    if (!values.titulo.trim()) {
+      setErro('Título é obrigatório.')
+      return
+    }
+    setSaving(true)
+    setErro(null)
+    const res = await fetch('/api/admin/instagram/calendario', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...values, data: values.data || null }),
+    })
+    setSaving(false)
+    if (res.ok) {
+      router.refresh()
+      onClose()
+    } else {
+      const err = await res.json().catch(() => ({}))
+      setErro(err.error ?? 'Falha ao salvar.')
+    }
+  }
+
+  return (
+    <div style={{ border: `1px solid ${T.bronze}`, borderRadius: 10, padding: 16, background: '#fff', display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ fontSize: 13, fontWeight: 700, color: T.ink }}>Novo conteúdo</div>
+      <EntryFields values={values} onChange={setValues} />
+      {erro && <div style={{ fontSize: 12, color: '#dc2626' }}>{erro}</div>}
+      <div style={{ display: 'flex', gap: 8 }}>
+        <button
+          onClick={salvar}
+          disabled={saving}
+          style={{ padding: '8px 16px', borderRadius: 8, border: 'none', background: T.bronze, color: '#fff', fontSize: 12.5, fontWeight: 700, cursor: saving ? 'default' : 'pointer', opacity: saving ? 0.7 : 1 }}
+        >
+          {saving ? 'Salvando…' : 'Criar'}
+        </button>
+        <button
+          onClick={onClose}
+          style={{ padding: '8px 16px', borderRadius: 8, border: `1px solid ${T.border}`, background: '#fff', color: T.mutedInk, fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}
+        >
+          Cancelar
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function Row({ row }: { row: CalendarRow }) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
+  const [editing, setEditing] = useState(false)
   const [status, setStatus] = useState(row.status)
+  const [values, setValues] = useState<FormValues>(() => rowToForm(row))
   const [saving, setSaving] = useState(false)
+  const [erro, setErro] = useState<string | null>(null)
 
   async function updateStatus(novoStatus: string) {
     setStatus(novoStatus)
@@ -61,7 +214,35 @@ function Row({ row, onChanged }: { row: CalendarRow; onChanged: () => void }) {
     })
     setSaving(false)
     router.refresh()
-    onChanged()
+  }
+
+  async function salvarEdicao() {
+    if (!values.titulo.trim()) {
+      setErro('Título é obrigatório.')
+      return
+    }
+    setSaving(true)
+    setErro(null)
+    const res = await fetch('/api/admin/instagram/calendario', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: row.id, ...values, data: values.data || null }),
+    })
+    setSaving(false)
+    if (res.ok) {
+      router.refresh()
+      setEditing(false)
+    } else {
+      const err = await res.json().catch(() => ({}))
+      setErro(err.error ?? 'Falha ao salvar.')
+    }
+  }
+
+  async function excluir() {
+    if (!confirm(`Excluir "${row.titulo}"? Essa ação não pode ser desfeita.`)) return
+    setSaving(true)
+    await fetch(`/api/admin/instagram/calendario?id=${row.id}`, { method: 'DELETE' })
+    router.refresh()
   }
 
   const sc = STATUS_COLOR[status] ?? STATUS_COLOR.planejado
@@ -111,7 +292,7 @@ function Row({ row, onChanged }: { row: CalendarRow; onChanged: () => void }) {
         </span>
       </button>
 
-      {open && (
+      {open && !editing && (
         <div style={{ padding: '14px 16px', borderTop: `1px solid ${T.border}`, background: '#fff', display: 'flex', flexDirection: 'column', gap: 12 }}>
           {row.roteiro && (
             <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', fontSize: 12.5, lineHeight: 1.6, color: '#3f3f46', margin: 0 }}>
@@ -141,6 +322,49 @@ function Row({ row, onChanged }: { row: CalendarRow; onChanged: () => void }) {
                 {row.watch_time_seg != null && `watch time ${row.watch_time_seg}s`}
               </span>
             )}
+            <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+              <button
+                onClick={() => {
+                  setValues(rowToForm(row))
+                  setEditing(true)
+                }}
+                style={{ fontSize: 11.5, fontWeight: 600, padding: '5px 10px', borderRadius: 6, border: `1px solid ${T.border}`, background: '#fff', color: T.ink, cursor: 'pointer' }}
+              >
+                Editar
+              </button>
+              <button
+                onClick={excluir}
+                disabled={saving}
+                style={{ fontSize: 11.5, fontWeight: 600, padding: '5px 10px', borderRadius: 6, border: '1px solid #fecaca', background: '#fff', color: '#dc2626', cursor: saving ? 'default' : 'pointer' }}
+              >
+                Excluir
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {open && editing && (
+        <div style={{ padding: '14px 16px', borderTop: `1px solid ${T.border}`, background: '#fff', display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <EntryFields values={values} onChange={setValues} />
+          {erro && <div style={{ fontSize: 12, color: '#dc2626' }}>{erro}</div>}
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button
+              onClick={salvarEdicao}
+              disabled={saving}
+              style={{ padding: '8px 16px', borderRadius: 8, border: 'none', background: T.bronze, color: '#fff', fontSize: 12.5, fontWeight: 700, cursor: saving ? 'default' : 'pointer', opacity: saving ? 0.7 : 1 }}
+            >
+              {saving ? 'Salvando…' : 'Salvar'}
+            </button>
+            <button
+              onClick={() => {
+                setEditing(false)
+                setErro(null)
+              }}
+              style={{ padding: '8px 16px', borderRadius: 8, border: `1px solid ${T.border}`, background: '#fff', color: T.mutedInk, fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}
+            >
+              Cancelar
+            </button>
           </div>
         </div>
       )}
@@ -151,7 +375,7 @@ function Row({ row, onChanged }: { row: CalendarRow; onChanged: () => void }) {
 export function InstagramCalendarBoard({ rows }: { rows: CalendarRow[] }) {
   const [filtroLinha, setFiltroLinha] = useState<string>('')
   const [filtroStatus, setFiltroStatus] = useState<string>('')
-  const [, forceTick] = useState(0)
+  const [criando, setCriando] = useState(false)
 
   const filtradas = useMemo(
     () =>
@@ -164,36 +388,48 @@ export function InstagramCalendarBoard({ rows }: { rows: CalendarRow[] }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-        <select
-          value={filtroLinha}
-          onChange={(e) => setFiltroLinha(e.target.value)}
-          style={{ padding: '7px 10px', border: `1px solid ${T.border}`, borderRadius: 8, fontSize: 12.5, fontFamily: 'inherit' }}
-        >
-          <option value="">Todas as linhas</option>
-          {Object.entries(LINHA_LABEL).map(([k, label]) => (
-            <option key={k} value={k}>
-              {label}
-            </option>
-          ))}
-        </select>
-        <select
-          value={filtroStatus}
-          onChange={(e) => setFiltroStatus(e.target.value)}
-          style={{ padding: '7px 10px', border: `1px solid ${T.border}`, borderRadius: 8, fontSize: 12.5, fontFamily: 'inherit' }}
-        >
-          <option value="">Todos os status</option>
-          {Object.entries(STATUS_LABEL).map(([k, label]) => (
-            <option key={k} value={k}>
-              {label}
-            </option>
-          ))}
-        </select>
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          <select
+            value={filtroLinha}
+            onChange={(e) => setFiltroLinha(e.target.value)}
+            style={{ padding: '7px 10px', border: `1px solid ${T.border}`, borderRadius: 8, fontSize: 12.5, fontFamily: 'inherit' }}
+          >
+            <option value="">Todas as linhas</option>
+            {Object.entries(LINHA_LABEL).map(([k, label]) => (
+              <option key={k} value={k}>
+                {label}
+              </option>
+            ))}
+          </select>
+          <select
+            value={filtroStatus}
+            onChange={(e) => setFiltroStatus(e.target.value)}
+            style={{ padding: '7px 10px', border: `1px solid ${T.border}`, borderRadius: 8, fontSize: 12.5, fontFamily: 'inherit' }}
+          >
+            <option value="">Todos os status</option>
+            {Object.entries(STATUS_LABEL).map(([k, label]) => (
+              <option key={k} value={k}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </div>
+        {!criando && (
+          <button
+            onClick={() => setCriando(true)}
+            style={{ padding: '8px 16px', borderRadius: 8, border: 'none', background: T.bronze, color: '#fff', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}
+          >
+            + Novo conteúdo
+          </button>
+        )}
       </div>
+
+      {criando && <NewEntryForm onClose={() => setCriando(false)} />}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {comData.map((r) => (
-          <Row key={r.id} row={r} onChanged={() => forceTick((t) => t + 1)} />
+          <Row key={r.id} row={r} />
         ))}
       </div>
 
@@ -204,7 +440,7 @@ export function InstagramCalendarBoard({ rows }: { rows: CalendarRow[] }) {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {reserva.map((r) => (
-              <Row key={r.id} row={r} onChanged={() => forceTick((t) => t + 1)} />
+              <Row key={r.id} row={r} />
             ))}
           </div>
         </div>
