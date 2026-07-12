@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createHash } from 'crypto'
-import { logError } from '@/lib/log'
+import { logError, logInfo } from '@/lib/log'
 
 export const dynamic = 'force-dynamic'
 
@@ -47,6 +47,18 @@ export async function POST(req: NextRequest) {
     const clickTsSafe = clickTs !== null && !Number.isNaN(clickTs) ? clickTs : Date.now()
     const fbc = fbcCookie || (fbclid ? `fb.1.${clickTsSafe}.${fbclid}` : null)
 
+    // F-Match-Verify: classifica origem do _fbc pra você agregar match quality no log.
+    //   cookie = Pixel plantou (melhor)
+    //   synthesized_click_ts = sintetizado com timestamp do click original (bom)
+    //   synthesized_now = sintetizado com timestamp do submit (aceitável — Meta docs
+    //                     dizem que baixa um pouco o match quality)
+    //   none = sem fbc (organic, sem ad Meta)
+    const fbc_source: 'cookie' | 'synthesized_click_ts' | 'synthesized_now' | 'none' =
+      fbcCookie ? 'cookie'
+      : !fbclid ? 'none'
+      : clickTs !== null && !Number.isNaN(clickTs) ? 'synthesized_click_ts'
+      : 'synthesized_now'
+
     const userData: Record<string, unknown> = {
       ph: [hashPhone(telefone)],
       fn: [hashName(nome)],
@@ -71,6 +83,16 @@ export async function POST(req: NextRequest) {
         },
       ],
     }
+
+    // F-Match-Verify: agregável no Vercel Log Viewer pra medir % de cada fbc_source.
+    // Só booleanos + enum — zero PII no log.
+    logInfo(SOURCE, 'capi payload built', {
+      fbc_source,
+      has_fbp: Boolean(fbp),
+      has_email: Boolean(email),
+      has_phone: Boolean(telefone),
+      has_ip: Boolean(ip),
+    })
 
     const res = await fetch(
       `https://graph.facebook.com/v21.0/${PIXEL_ID}/events?access_token=${encodeURIComponent(token)}`,

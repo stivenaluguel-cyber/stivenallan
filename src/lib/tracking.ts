@@ -132,6 +132,7 @@ export async function buildEnhancedUserData(data: EnhancedUserData): Promise<Rec
 
 // Dispara Lead no Pixel (com eventID p/ deduplicar com a CAPI) + GA4 + conversão Google Ads.
 // Se `userData` vier, sobe Enhanced Conversions no evento de conversão do Ads.
+// F-Match-Verify: emite sinal pro Sentry quando o Enhanced Conversions degrada.
 export async function trackLeadEvent(
   contentName: string,
   eventId: string,
@@ -146,7 +147,39 @@ export async function trackLeadEvent(
   const params: Record<string, unknown> = { send_to: gadsConversion }
   if (userData) {
     const enhanced = await buildEnhancedUserData(userData)
-    if (Object.keys(enhanced).length > 0) params.user_data = enhanced
+    const hashedFields = Object.keys(enhanced)
+    if (hashedFields.length > 0) {
+      params.user_data = enhanced
+      // Breadcrumb: aparece no Sentry se houver erro subsequente + no dashboard
+      // de performance como contexto do span da conversão.
+      try {
+        const Sentry = await import('@sentry/nextjs')
+        Sentry.addBreadcrumb({
+          category: 'gads',
+          message: 'enhanced conversion fired',
+          level: 'info',
+          data: { fields: hashedFields, content_name: contentName },
+        })
+      } catch {
+        // Sentry indisponível — silêncio, breadcrumb é nice-to-have.
+      }
+    } else {
+      // userData veio mas nada hasheou — form está mandando shape errado.
+      // Warning pro Sentry pra você ver quantos casos + quais inputs.
+      try {
+        const Sentry = await import('@sentry/nextjs')
+        Sentry.captureMessage('gads: userData provided but produced no hashes', {
+          level: 'warning',
+          tags: { source: 'tracking', check: 'match-verify' },
+          extra: {
+            content_name: contentName,
+            inputKeys: Object.keys(userData).filter((k) => Boolean((userData as Record<string, unknown>)[k])),
+          },
+        })
+      } catch {
+        // idem
+      }
+    }
   }
   gtag()?.('event', 'conversion', params)
 }

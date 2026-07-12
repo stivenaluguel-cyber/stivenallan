@@ -1,5 +1,21 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createHash } from 'node:crypto'
+
+// Mock hoisted do @sentry/nextjs pra observar breadcrumb + captureMessage
+const { sentrySpies } = vi.hoisted(() => ({
+  sentrySpies: {
+    addBreadcrumb: vi.fn(),
+    captureMessage: vi.fn(),
+    captureException: vi.fn(),
+  },
+}))
+
+vi.mock('@sentry/nextjs', () => ({
+  addBreadcrumb: (...a: unknown[]) => (sentrySpies.addBreadcrumb as unknown as (...x: unknown[]) => unknown)(...a),
+  captureMessage: (...a: unknown[]) => (sentrySpies.captureMessage as unknown as (...x: unknown[]) => unknown)(...a),
+  captureException: (...a: unknown[]) => (sentrySpies.captureException as unknown as (...x: unknown[]) => unknown)(...a),
+}))
+
 import {
   buildEnhancedUserData,
   captureAttribution,
@@ -277,5 +293,58 @@ describe('trackLeadEvent + Enhanced Conversions no gtag', () => {
     const [, , params] = conversionCall as [string, string, Record<string, unknown>]
     expect(params).toEqual({ send_to: 'AW-999' })
     expect(params.user_data).toBeUndefined()
+  })
+})
+
+describe('trackLeadEvent — sinal pro Sentry (F-Match-Verify)', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    delete process.env.NEXT_PUBLIC_GADS_CONVERSION
+    sentrySpies.addBreadcrumb.mockClear()
+    sentrySpies.captureMessage.mockClear()
+  })
+
+  it('adiciona breadcrumb Sentry quando enhanced conversion sobe com hashes válidos', async () => {
+    vi.stubGlobal('window', { fbq: undefined, gtag: vi.fn() })
+    process.env.NEXT_PUBLIC_GADS_CONVERSION = 'AW-123/abc'
+
+    await trackLeadEvent('Monte Leone', 'evt-1', {
+      email: 'a@b.com',
+      telefone: '(48) 9 9164-2332',
+      nome: 'Ana',
+    })
+
+    expect(sentrySpies.addBreadcrumb).toHaveBeenCalledTimes(1)
+    const [args] = sentrySpies.addBreadcrumb.mock.calls[0]
+    expect(args).toMatchObject({
+      category: 'gads',
+      message: 'enhanced conversion fired',
+      level: 'info',
+    })
+    // Não deve alarmar
+    expect(sentrySpies.captureMessage).not.toHaveBeenCalled()
+  })
+
+  it('captura warning Sentry quando userData veio mas nada hasheou (bug do form)', async () => {
+    vi.stubGlobal('window', { fbq: undefined, gtag: vi.fn() })
+    process.env.NEXT_PUBLIC_GADS_CONVERSION = 'AW-123/abc'
+
+    // Tudo empty/null — nada vai hashear
+    await trackLeadEvent('Book X', 'evt-3', {
+      email: null,
+      telefone: '',
+      nome: '   ',
+    })
+
+    expect(sentrySpies.captureMessage).toHaveBeenCalledTimes(1)
+    const [msg, options] = sentrySpies.captureMessage.mock.calls[0] as [
+      string,
+      Record<string, unknown>,
+    ]
+    expect(msg).toMatch(/produced no hashes/)
+    expect(options.level).toBe('warning')
+    expect((options.tags as Record<string, unknown>).check).toBe('match-verify')
+    // Breadcrumb não é adicionado nesse path
+    expect(sentrySpies.addBreadcrumb).not.toHaveBeenCalled()
   })
 })
