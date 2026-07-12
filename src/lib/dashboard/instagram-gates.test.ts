@@ -14,9 +14,52 @@ function week(overrides: Partial<WeeklyMetric> = {}): WeeklyMetric {
     visitas_perfil: 300,
     cliques_bio: 10,
     leads_qualificados: 4,
+    custo_por_visita: null,
+    tempo_resposta_medio_min: null,
     ...overrides,
   }
 }
+
+describe('computeWeeklyGates — G1 criativo', () => {
+  it('alerta quando custo por visita acima de R$0,30', () => {
+    const gates = computeWeeklyGates(week({ custo_por_visita: 0.45 }), [])
+    const g1 = gates.find((g) => g.codigo === 'G1')
+    expect(g1?.severidade).toBe('alerta')
+  })
+
+  it('info (campeão) quando custo por visita <= R$0,20', () => {
+    const gates = computeWeeklyGates(week({ custo_por_visita: 0.15 }), [])
+    const g1 = gates.find((g) => g.codigo === 'G1')
+    expect(g1?.severidade).toBe('info')
+  })
+
+  it('não dispara na faixa intermediária (0,20 - 0,30)', () => {
+    const gates = computeWeeklyGates(week({ custo_por_visita: 0.25 }), [])
+    expect(gates.some((g) => g.codigo === 'G1')).toBe(false)
+  })
+
+  it('ignora quando não informado', () => {
+    const gates = computeWeeklyGates(week({ custo_por_visita: null }), [])
+    expect(gates.some((g) => g.codigo === 'G1')).toBe(false)
+  })
+})
+
+describe('computeWeeklyGates — G8 velocidade de resposta', () => {
+  it('dispara quando 2 semanas seguidas acima de 30min', () => {
+    const gates = computeWeeklyGates(week({ tempo_resposta_medio_min: 45 }), [week({ tempo_resposta_medio_min: 40 })])
+    expect(gates.some((g) => g.codigo === 'G8')).toBe(true)
+  })
+
+  it('não dispara numa semana isolada acima de 30min', () => {
+    const gates = computeWeeklyGates(week({ tempo_resposta_medio_min: 45 }), [week({ tempo_resposta_medio_min: 10 })])
+    expect(gates.some((g) => g.codigo === 'G8')).toBe(false)
+  })
+
+  it('não dispara quando dentro da meta', () => {
+    const gates = computeWeeklyGates(week({ tempo_resposta_medio_min: 20 }), [week({ tempo_resposta_medio_min: 45 })])
+    expect(gates.some((g) => g.codigo === 'G8')).toBe(false)
+  })
+})
 
 describe('computeWeeklyGates — G2 geografia', () => {
   it('dispara quando % de novos seguidores locais < 50%', () => {

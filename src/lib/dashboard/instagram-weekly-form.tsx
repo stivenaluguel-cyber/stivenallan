@@ -17,6 +17,8 @@ const FIELDS: { key: keyof WeeklyMetric; label: string; step?: string }[] = [
   { key: 'visitas_perfil', label: 'Visitas ao perfil' },
   { key: 'cliques_bio', label: 'Cliques no link da bio' },
   { key: 'leads_qualificados', label: 'Leads qualificados' },
+  { key: 'custo_por_visita', label: 'Custo/visita do criativo ativo (R$)', step: '0.01' },
+  { key: 'tempo_resposta_medio_min', label: 'Tempo médio de resposta (min)', step: '0.1' },
 ]
 
 function segundaFeiraAtual(): string {

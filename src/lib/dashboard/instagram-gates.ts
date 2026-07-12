@@ -16,6 +16,8 @@ export type WeeklyMetric = {
   visitas_perfil: number | null
   cliques_bio: number | null
   leads_qualificados: number | null
+  custo_por_visita: number | null
+  tempo_resposta_medio_min: number | null
 }
 
 export type CalendarEntryForGates = {
@@ -38,6 +40,25 @@ const REEL_TIPOS = new Set(['reel_educativo', 'reel_imovel'])
 
 export function computeWeeklyGates(current: WeeklyMetric, history: WeeklyMetric[]): Gate[] {
   const gates: Gate[] = []
+
+  // G1 — Criativo (24h): custo por visita ao perfil do criativo ativo/campeão.
+  if (current.custo_por_visita != null) {
+    if (current.custo_por_visita > 0.3) {
+      gates.push({
+        codigo: 'G1',
+        nome: 'Criativo',
+        severidade: 'alerta',
+        mensagem: `Custo por visita em R$${current.custo_por_visita.toFixed(2)} (teto R$0,30). Desligar o criativo e testar um novo.`,
+      })
+    } else if (current.custo_por_visita <= 0.2) {
+      gates.push({
+        codigo: 'G1',
+        nome: 'Criativo',
+        severidade: 'info',
+        mensagem: `Custo por visita em R$${current.custo_por_visita.toFixed(2)} (piso campeão R$0,20). Manter e aplicar a regra CPC×100 pra escalar orçamento.`,
+      })
+    }
+  }
 
   // G2 — Geografia (30 dias): % de novos seguidores locais < 50%.
   if (current.novos_seguidores && current.novos_seguidores > 0 && current.novos_seguidores_locais != null) {
@@ -109,6 +130,19 @@ export function computeWeeklyGates(current: WeeklyMetric, history: WeeklyMetric[
         nome: 'Regressão de engajamento',
         severidade: 'alerta',
         mensagem: `Taxa de engajamento abaixo do baseline (${BASELINE_ENGAJAMENTO}%) por 2 semanas seguidas. Congelar aumento de cadência e voltar 100% ao formato campeão.`,
+      })
+    }
+  }
+
+  // G8 — Velocidade de resposta: > 30min de forma recorrente (2 semanas seguidas).
+  if (current.tempo_resposta_medio_min != null && current.tempo_resposta_medio_min > 30) {
+    const anterior = history[0]
+    if (anterior?.tempo_resposta_medio_min != null && anterior.tempo_resposta_medio_min > 30) {
+      gates.push({
+        codigo: 'G8',
+        nome: 'Velocidade de resposta',
+        severidade: 'alerta',
+        mensagem: `Tempo médio de primeira resposta em ${Math.round(current.tempo_resposta_medio_min)}min por 2 semanas seguidas (meta ≤30min). Ativar saudação automática com o form de 3 perguntas.`,
       })
     }
   }

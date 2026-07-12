@@ -155,7 +155,7 @@ export default async function InstagramOverviewPage() {
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5 }}>
               <thead>
                 <tr style={{ background: T.cream }}>
-                  {['Semana', 'Seguidores', 'Novos', '% locais', 'Alcance', 'Engaj.', 'Visitas perfil', 'Cliques bio', 'Leads'].map((h) => (
+                  {['Semana', 'Seguidores', 'Novos', '% locais', 'Alcance', 'Engaj.', 'Visitas perfil', 'Cliques bio', 'Leads', 'Custo/visita', 'Resp. média'].map((h) => (
                     <th key={h} style={{ textAlign: 'left', padding: '9px 12px', fontWeight: 700, color: T.mutedInk, whiteSpace: 'nowrap' }}>
                       {h}
                     </th>
@@ -179,6 +179,8 @@ export default async function InstagramOverviewPage() {
                       <td style={{ padding: '9px 12px' }}>{s.visitas_perfil ?? '—'}</td>
                       <td style={{ padding: '9px 12px' }}>{s.cliques_bio ?? '—'}</td>
                       <td style={{ padding: '9px 12px' }}>{s.leads_qualificados ?? '—'}</td>
+                      <td style={{ padding: '9px 12px' }}>{s.custo_por_visita != null ? `R$${s.custo_por_visita}` : '—'}</td>
+                      <td style={{ padding: '9px 12px' }}>{s.tempo_resposta_medio_min != null ? `${s.tempo_resposta_medio_min}min` : '—'}</td>
                     </tr>
                   )
                 })}
