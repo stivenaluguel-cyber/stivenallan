@@ -31,6 +31,12 @@ const GRUPOS: { titulo: string; itens: NavItem[] }[] = [
       { href: '/dashboard/cron', label: 'Cron', icon: '⏱️' },
     ],
   },
+  {
+    titulo: 'GROWTH',
+    itens: [
+      { href: '/dashboard/instagram', label: 'Instagram', icon: '📸' },
+    ],
+  },
 ];
 
 const PAGE_LABELS: Record<string, string> = {
@@ -38,7 +44,8 @@ const PAGE_LABELS: Record<string, string> = {
   '/dashboard/propostas': 'Propostas', '/dashboard/agenda': 'Agenda',
   '/dashboard/financeiro': 'Financeiro', '/dashboard/empreendimentos': 'Empreendimentos',
   '/dashboard/leads': 'Leads', '/dashboard/simulador': 'Simulador',
-  '/dashboard/cron': 'Cron',
+  '/dashboard/cron': 'Cron', '/dashboard/instagram': 'Instagram',
+  '/dashboard/instagram/calendario': 'Calendário Instagram',
 };
 
 function getLabel(pathname: string) {
