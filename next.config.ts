@@ -21,7 +21,11 @@ const nextConfig: NextConfig = {
     ],
     deviceSizes: [390, 768, 1024, 1280, 1536],
     imageSizes: [64, 128, 256, 384, 512],
-    minimumCacheTTL: 86400,
+    // 1 ano (era 86400 = 1 dia) — a cota de Image Optimization Transformations da Vercel
+    // (5.000/mês no Hobby) estourou (confirmado no painel de Usage: 5K/5K). Fotos de
+    // empreendimento são praticamente estáticas; cache longo faz o Vercel servir a
+    // variante já otimizada em vez de re-transformar, sem trocar qualidade/tamanho.
+    minimumCacheTTL: 31536000,
   },
   compress: true,
   poweredByHeader: false,
