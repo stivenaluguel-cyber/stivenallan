@@ -67,7 +67,7 @@ export default async function EmpreendimentosPage() {
               <Link key={emp.slug} href={href} style={{ textDecoration: 'none', display: 'block' }}>
                 <article style={{ background: '#202327', borderRadius: '12px', overflow: 'hidden', border: '1px solid rgba(201,162,75,0.1)' }}>
                   <div style={{ position: 'relative', aspectRatio: '16/9', overflow: 'hidden' }}>
-                    <Image src={emp.imagem} alt={'Fachada ' + emp.nome + ' — ' + emp.cidade + '/SC'} fill sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw" style={{ objectFit: 'cover' }} />
+                    <Image unoptimized src={emp.imagem} alt={'Fachada ' + emp.nome + ' — ' + emp.cidade + '/SC'} fill sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw" style={{ objectFit: 'cover' }} />
                     <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(18,19,21,0.6) 0%, transparent 50%)' }} />
                   </div>
                   <div style={{ padding: '1.25rem' }}>

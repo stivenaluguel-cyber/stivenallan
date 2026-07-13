@@ -180,7 +180,7 @@ export default function PiazzaCastelloPage() {
               { id:'1JnM304p4cRx4ltHHGoHcXr2Au4-1y0yp', label:'Brinquedoteca & Playground' },
             ].map(item => (
               <div key={item.id} className="pc-lazer-item">
-                <Image src={D(item.id)} alt={item.label} fill sizes="(max-width:768px) 50vw,25vw" style={{objectFit:'cover'}} />
+                <Image unoptimized src={D(item.id)} alt={item.label} fill sizes="(max-width:768px) 50vw,25vw" style={{objectFit:'cover'}} />
                 <div className="pc-lazer-label">{item.label}</div>
               </div>
             ))}
@@ -194,7 +194,7 @@ export default function PiazzaCastelloPage() {
           <h2 className="pc-section-title">No coração de Içara</h2>
           <div className="pc-loc-grid">
             <div className="pc-loc-img">
-              <Image src={D('1IjV56yK23LVqdCyXyu3VYdVnSebWobwN')} alt="Piazza Castello — Vista aérea" fill sizes="(max-width:768px) 100vw,50vw" style={{objectFit:'cover'}} />
+              <Image unoptimized src={D('1IjV56yK23LVqdCyXyu3VYdVnSebWobwN')} alt="Piazza Castello — Vista aérea" fill sizes="(max-width:768px) 100vw,50vw" style={{objectFit:'cover'}} />
             </div>
             <div>
               <p className="pc-loc-address">Praça Pres. João Goulart<br />frente à Praça Castelo Branco<br />Centro · Içara/SC</p>

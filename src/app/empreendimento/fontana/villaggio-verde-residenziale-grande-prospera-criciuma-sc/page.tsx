@@ -151,7 +151,7 @@ export default function Page() {
           </a>
         </div>
         <div style={{ position:'relative', aspectRatio:'3/4', borderRadius:2, overflow:'hidden' }}>
-          <Image src={IMG.hero2} alt="Vista aérea Villaggio Verde Criciúma" fill sizes="(max-width:768px) 100vw, 50vw" style={{ objectFit:'cover' }} />
+          <Image unoptimized src={IMG.hero2} alt="Vista aérea Villaggio Verde Criciúma" fill sizes="(max-width:768px) 100vw, 50vw" style={{ objectFit:'cover' }} />
         </div>
       </section>
 
@@ -187,7 +187,7 @@ export default function Page() {
               </a>
             </div>
             <div style={{ position:'relative', aspectRatio:'4/3', overflow:'hidden', borderRadius:2 }}>
-              <Image src={IMG.dsc} alt="área do Villaggio Verde Criciúma" fill sizes="(max-width:768px) 100vw, 50vw" style={{ objectFit:'cover' }} />
+              <Image unoptimized src={IMG.dsc} alt="área do Villaggio Verde Criciúma" fill sizes="(max-width:768px) 100vw, 50vw" style={{ objectFit:'cover' }} />
             </div>
           </div>
         </div>
@@ -221,16 +221,16 @@ export default function Page() {
             </div>
             <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
               <div style={{ position:'relative', aspectRatio:'1', overflow:'hidden', borderRadius:2 }}>
-                <Image src={D+'1qgCYyVJAt8xgVIwHolmchxxuOf-Z0HOW'} alt="Piscina Villaggio Verde" fill sizes="300px" style={{ objectFit:'cover' }} />
+                <Image unoptimized src={D+'1qgCYyVJAt8xgVIwHolmchxxuOf-Z0HOW'} alt="Piscina Villaggio Verde" fill sizes="300px" style={{ objectFit:'cover' }} />
               </div>
               <div style={{ position:'relative', aspectRatio:'1', overflow:'hidden', borderRadius:2 }}>
-                <Image src={D+'1S5u-pOdWNIBS6fYW4hsuax1Q5QoDagYp'} alt="Salão de festas Villaggio Verde" fill sizes="300px" style={{ objectFit:'cover' }} />
+                <Image unoptimized src={D+'1S5u-pOdWNIBS6fYW4hsuax1Q5QoDagYp'} alt="Salão de festas Villaggio Verde" fill sizes="300px" style={{ objectFit:'cover' }} />
               </div>
               <div style={{ position:'relative', aspectRatio:'1', overflow:'hidden', borderRadius:2 }}>
-                <Image src={D+'1Hs1b9dx7Z-hLuDMyHW6cj7-R9izbtJT6'} alt="Fachada Villaggio Verde" fill sizes="300px" style={{ objectFit:'cover' }} />
+                <Image unoptimized src={D+'1Hs1b9dx7Z-hLuDMyHW6cj7-R9izbtJT6'} alt="Fachada Villaggio Verde" fill sizes="300px" style={{ objectFit:'cover' }} />
               </div>
               <div style={{ position:'relative', aspectRatio:'1', overflow:'hidden', borderRadius:2 }}>
-                <Image src={D+'1jFLGK8EQ3dy4H4gQf3r-Dv85NTFX_Wok'} alt="Espaço de eventos Villaggio Verde" fill sizes="300px" style={{ objectFit:'cover' }} />
+                <Image unoptimized src={D+'1jFLGK8EQ3dy4H4gQf3r-Dv85NTFX_Wok'} alt="Espaço de eventos Villaggio Verde" fill sizes="300px" style={{ objectFit:'cover' }} />
               </div>
             </div>
           </div>
@@ -242,7 +242,7 @@ export default function Page() {
         <h2 className="vv-h2" style={{ color:t.ink, margin:'0 0 12px' }}>Grande Próspera · Criciúma</h2>
         <p style={{ color:t.muted, marginBottom:40 }}>Rodovia Leonardo Bialeck, 525 — Grande Próspera · Criciúma / SC</p>
         <div style={{ position:'relative', aspectRatio:'16/6', overflow:'hidden', borderRadius:2 }}>
-          <Image src={IMG.hero} alt="Localização Villaggio Verde Criciúma" fill sizes="(max-width:768px) 100vw, 1100px" style={{ objectFit:'cover', objectPosition:'center 30%' }} />
+          <Image unoptimized src={IMG.hero} alt="Localização Villaggio Verde Criciúma" fill sizes="(max-width:768px) 100vw, 1100px" style={{ objectFit:'cover', objectPosition:'center 30%' }} />
           <div style={{ position:'absolute', inset:0, background:'rgba(13,26,13,0.35)' }} />
           <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
             <p style={{ color:'#fff', fontSize:'clamp(14px,2vw,18px)', letterSpacing:'0.15em', textTransform:'uppercase', fontFamily:t.display, fontWeight:300 }}>Rodovia Leonardo Bialeck, 525 · Criciúma/SC</p>
@@ -264,7 +264,7 @@ export default function Page() {
       </section>
 
       <section style={{ position:'relative', minHeight:480, display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden' }}>
-        <Image src={IMG.hero2} alt="Villaggio Verde Residenziale Criciúma" fill sizes="100vw" style={{ objectFit:'cover', objectPosition:'center' }} />
+        <Image unoptimized src={IMG.hero2} alt="Villaggio Verde Residenziale Criciúma" fill sizes="100vw" style={{ objectFit:'cover', objectPosition:'center' }} />
         <div style={{ position:'absolute', inset:0, background:'rgba(13,26,13,0.72)' }} />
         <div style={{ position:'relative', textAlign:'center', padding:'0 32px' }}>
           <h2 className="vv-h2" style={{ color:'#fff', margin:'0 0 16px' }}>Villaggio Verde Residenziale</h2>

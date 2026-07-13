@@ -82,7 +82,7 @@ export default function PropertyPageTemplate({ data, relacionados }: { data: Pro
 
       {/* HERO */}
       <section style={{ position: 'relative', minHeight: '86svh', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', overflow: 'hidden', background: t.dark }}>
-        {hero && <Image src={hero} alt={data.nome} fill priority sizes="100vw" style={{ objectFit: 'cover' }} />}
+        {hero && <Image unoptimized src={hero} alt={data.nome} fill priority sizes="100vw" style={{ objectFit: 'cover' }} />}
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.30) 45%, rgba(0,0,0,0.15) 100%)' }} />
         <div style={{ position: 'relative', width: '100%', maxWidth: 1200, margin: '0 auto', padding: 'calc(68px + 6vh) clamp(20px,5vw,48px) clamp(48px,8vh,80px)' }}>
           {data.status && <p style={{ fontFamily: t.body, fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: acento, marginBottom: 16 }}>{data.status}</p>}
@@ -121,7 +121,7 @@ export default function PropertyPageTemplate({ data, relacionados }: { data: Pro
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: 'clamp(10px,1.5vw,18px)' }}>
               {data.galeria.map((src, i) => (
                 <div key={i} style={{ position: 'relative', aspectRatio: '4 / 3', overflow: 'hidden', background: '#EEE' }}>
-                  <Image src={src} alt={data.nome + ' — foto ' + (i + 1)} fill sizes="(max-width:768px)100vw,33vw" style={{ objectFit: 'cover' }} />
+                  <Image unoptimized src={src} alt={data.nome + ' — foto ' + (i + 1)} fill sizes="(max-width:768px)100vw,33vw" style={{ objectFit: 'cover' }} />
                 </div>
               ))}
             </div>

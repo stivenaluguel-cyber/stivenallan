@@ -302,7 +302,7 @@ No coração nobre de Criciúma, a poucos passos de comércio premium, gastronom
 <a href={WPP} target="_blank" rel="noopener noreferrer" className="ml-cta ml-cta-light" style={{ marginTop: 30 }}>Atendimento Exclusivo</a>
 </div>
 <div style={{ position: 'relative', aspectRatio: '4 / 3', overflow: 'hidden', borderRadius: 2 }}>
-<Image src={IMG.mapa} alt="Mapa da localização do Monte Leone Residencial no Centro de Criciúma/SC" fill loading="lazy" sizes="(max-width: 768px) 100vw, 50vw" style={{ objectFit: 'cover' }} />
+<Image unoptimized src={IMG.mapa} alt="Mapa da localização do Monte Leone Residencial no Centro de Criciúma/SC" fill loading="lazy" sizes="(max-width: 768px) 100vw, 50vw" style={{ objectFit: 'cover' }} />
 </div>
 </div>
 </section>
@@ -332,7 +332,7 @@ No coração nobre de Criciúma, a poucos passos de comércio premium, gastronom
 
 {/* 10 CTA FINAL */}
 <section style={{ position: 'relative', minHeight: '78vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
-<Image src={IMG.heroAerea} alt="Vista aérea do Monte Leone Residencial no Centro de Criciúma/SC" fill loading="lazy" sizes="100vw" style={{ objectFit: 'cover' }} />
+<Image unoptimized src={IMG.heroAerea} alt="Vista aérea do Monte Leone Residencial no Centro de Criciúma/SC" fill loading="lazy" sizes="100vw" style={{ objectFit: 'cover' }} />
 <div style={{ position: 'absolute', inset: 0, background: 'rgba(15,24,16,0.62)' }} />
 <div style={{ position: 'relative', zIndex: 2, padding: '0 clamp(18px,5vw,56px)', maxWidth: 880 }}>
 <p className="ml-eyebrow ml-onimg" style={{ color: '#fff', marginBottom: 22 }}>Atendimento Exclusivo</p>

@@ -159,7 +159,7 @@ export default function MarDiNizzaPage() {
               </ul>
             </div>
             <div className="mn-lazer-card">
-              <Image src={IMG.lazer} alt="Área de lazer — Mar di Nizza Residencial" fill sizes="(max-width: 768px) 100vw, 50vw" style={{ objectFit:'cover' }} />
+              <Image unoptimized src={IMG.lazer} alt="Área de lazer — Mar di Nizza Residencial" fill sizes="(max-width: 768px) 100vw, 50vw" style={{ objectFit:'cover' }} />
             </div>
           </div>
         </section>
@@ -205,7 +205,7 @@ export default function MarDiNizzaPage() {
               </a>
             </div>
             <div className="mn-mapa-img">
-              <Image src={IMG.mapa} alt="Localização Mar di Nizza — Mar Grosso, Laguna/SC" fill sizes="(max-width: 768px) 100vw, 50vw" style={{ objectFit:'cover' }} />
+              <Image unoptimized src={IMG.mapa} alt="Localização Mar di Nizza — Mar Grosso, Laguna/SC" fill sizes="(max-width: 768px) 100vw, 50vw" style={{ objectFit:'cover' }} />
             </div>
           </div>
         </section>

@@ -57,7 +57,7 @@ export default function GalleryWithLightbox({ galeria, prefix, gradient }: {
     <>
       {galeria.map((g, i) => (
         <figure key={i} className={`${prefix}-gcard`} style={{ margin: 0, aspectRatio: '4 / 3', position: 'relative', cursor: 'zoom-in' }} role="button" tabIndex={0} aria-label={`Ampliar: ${g.label}`} onClick={() => openLb(i)} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && openLb(i)}>
-          <Image src={g.src} alt={g.alt} fill loading="lazy" sizes="(max-width: 768px) 100vw, 33vw" style={{ objectFit: 'cover' }} />
+          <Image unoptimized src={g.src} alt={g.alt} fill loading="lazy" sizes="(max-width: 768px) 100vw, 33vw" style={{ objectFit: 'cover' }} />
           <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(to top, ${gradient}, rgba(0,0,0,0) 45%)` }} />
           <figcaption className={`${prefix}-onimg`} style={{ position: 'absolute', left: 18, bottom: 16, color: '#fff', fontSize: 12, letterSpacing: '0.24em', textTransform: 'uppercase' }}>{g.label}</figcaption>
         </figure>
@@ -74,7 +74,7 @@ export function LightboxPhoto({ src, alt, label, cardClass, imgSizes }: {
   return (
     <>
       <div className={cardClass} style={{ position: 'relative', aspectRatio: '4 / 3', overflow: 'hidden', cursor: 'zoom-in' }} role="button" tabIndex={0} aria-label={`Ampliar: ${label}`} onClick={() => setOpen(true)} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && setOpen(true)}>
-        <Image src={src} alt={alt} fill loading="lazy" sizes={imgSizes} style={{ objectFit: 'cover' }} />
+        <Image unoptimized src={src} alt={alt} fill loading="lazy" sizes={imgSizes} style={{ objectFit: 'cover' }} />
       </div>
       {open && <Lightbox images={[{ src, alt, label }]} startIndex={0} onClose={() => setOpen(false)} />}
     </>

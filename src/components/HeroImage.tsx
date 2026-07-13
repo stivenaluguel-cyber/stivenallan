@@ -29,5 +29,8 @@ export function HeroImage({ alt, style, ...props }: Props) {
     )
   }
 
-  return <Image alt={alt} style={style} onError={() => setFailed(true)} {...props} />
+  // Stopgap: cota de Image Optimization Transformations da Vercel (Hobby) no teto —
+  // serve o arquivo original direto do Supabase/Estilo Fontana, sem passar pelo
+  // otimizador. Reverter (remover `unoptimized`) se/quando o plano cobrir a demanda.
+  return <Image alt={alt} style={style} onError={() => setFailed(true)} unoptimized {...props} />
 }

@@ -235,7 +235,7 @@ export default function BoscoDelMontelloPage() {
             <a href={WPP} target="_blank" rel="noopener noreferrer" className="bm-cta bm-cta-light" style={{ marginTop: 30 }}>Atendimento Exclusivo</a>
           </div>
           <div style={{ position: 'relative', aspectRatio: '4 / 3', overflow: 'hidden', borderRadius: 2 }}>
-            <Image src={IMG.mapa} alt="Mapa da localização do Bosco Del Montello Residencial" fill loading="lazy" sizes="(max-width: 768px) 100vw, 50vw" style={{ objectFit: 'cover' }} />
+            <Image unoptimized src={IMG.mapa} alt="Mapa da localização do Bosco Del Montello Residencial" fill loading="lazy" sizes="(max-width: 768px) 100vw, 50vw" style={{ objectFit: 'cover' }} />
           </div>
         </div>
       </section>
@@ -263,7 +263,7 @@ export default function BoscoDelMontelloPage() {
 
       {/* CTA FINAL */}
       <section style={{ position: 'relative', minHeight: '78vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
-        <Image src={IMG.hero} alt="Bosco Del Montello Residencial — Fachada" fill loading="lazy" sizes="100vw" style={{ objectFit: 'cover' }} />
+        <Image unoptimized src={IMG.hero} alt="Bosco Del Montello Residencial — Fachada" fill loading="lazy" sizes="100vw" style={{ objectFit: 'cover' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(16,12,9,0.65)' }} />
         <div style={{ position: 'relative', zIndex: 2, padding: '0 clamp(18px,5vw,56px)', maxWidth: 880 }}>
           <p className="bm-eyebrow bm-onimg" style={{ color: '#fff', marginBottom: 22 }}>Atendimento Exclusivo</p>

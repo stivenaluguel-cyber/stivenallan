@@ -235,7 +235,7 @@ export default function CallianoPage() {
             <a href="https://www.google.com/maps/search/?api=1&query=Rua+S%C3%A3o+Jos%C3%A9%2C+Centro%2C+Crici%C3%BAma+SC" target="_blank" rel="noopener noreferrer" className="ca-cta-light">Ver no mapa</a>
           </div>
           <div style={{ position: 'relative', aspectRatio: '4 / 3', borderRadius: 2, overflow: 'hidden' }}>
-            <Image src={IMG.mapa} alt="Mapa localização Calliano Residencial" fill sizes="(max-width: 768px) 100vw, 50vw" style={{ objectFit: 'cover' }} />
+            <Image unoptimized src={IMG.mapa} alt="Mapa localização Calliano Residencial" fill sizes="(max-width: 768px) 100vw, 50vw" style={{ objectFit: 'cover' }} />
           </div>
         </div>
       </section>
@@ -270,7 +270,7 @@ export default function CallianoPage() {
 
       {/* CTA FINAL */}
       <section style={{ position: 'relative', minHeight: 480, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-        <Image src={IMG.hero} alt="Calliano Residencial — Criciúma" fill sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center' }} />
+        <Image unoptimized src={IMG.hero} alt="Calliano Residencial — Criciúma" fill sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(17,11,7,0.72)' }} />
         <div style={{ position: 'relative', zIndex: 1, textAlign: 'center', padding: '0 6vw' }}>
           <p className="ca-eyebrow" style={{ color: 'rgba(246,237,232,0.7)', marginBottom: 16 }}>Calliano Residencial</p>

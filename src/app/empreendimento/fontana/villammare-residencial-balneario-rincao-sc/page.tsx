@@ -157,7 +157,7 @@ export default function Page() {
           </a>
         </div>
         <div style={{ position:'relative', aspectRatio:'3/4', borderRadius:2, overflow:'hidden' }}>
-          <Image src={IMG.hero2} alt="Villammare Residencial fachada frontal" fill sizes="(max-width:768px) 100vw, 50vw" style={{ objectFit:'cover' }} />
+          <Image unoptimized src={IMG.hero2} alt="Villammare Residencial fachada frontal" fill sizes="(max-width:768px) 100vw, 50vw" style={{ objectFit:'cover' }} />
         </div>
       </section>
 
@@ -193,7 +193,7 @@ export default function Page() {
               </a>
             </div>
             <div style={{ position:'relative', aspectRatio:'4/3', overflow:'hidden', borderRadius:2 }}>
-              <Image src={D+'1fUHaA4u5lKVgpxEAJ_eQtBCUVDYkT_PU'} alt="Apartamento tipo Villammare" fill sizes="(max-width:768px) 100vw, 50vw" style={{ objectFit:'cover' }} />
+              <Image unoptimized src={D+'1fUHaA4u5lKVgpxEAJ_eQtBCUVDYkT_PU'} alt="Apartamento tipo Villammare" fill sizes="(max-width:768px) 100vw, 50vw" style={{ objectFit:'cover' }} />
             </div>
           </div>
         </div>
@@ -227,7 +227,7 @@ export default function Page() {
             <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
               {[D+'1BvuDuEqG85Hpx-7pPJAdmW0TrTon1MaL',D+'1n7iquXjXrDP9FK-6xqmdWRuqB--vpUsr',D+'1kTxiR4Zbz5ttX73gnNq31-eMjkQEztYW',D+'1AeibHujGTQS_kPO_orU3manrdh42qYzS'].map((src,i) => (
                 <div key={i} style={{ position:'relative', aspectRatio:'1', overflow:'hidden', borderRadius:2 }}>
-                  <Image src={src} alt={"Acabamento Villammare " + (i+1)} fill sizes="300px" style={{ objectFit:'cover' }} />
+                  <Image unoptimized src={src} alt={"Acabamento Villammare " + (i+1)} fill sizes="300px" style={{ objectFit:'cover' }} />
                 </div>
               ))}
             </div>
@@ -240,7 +240,7 @@ export default function Page() {
         <h2 className="vm-h2" style={{ color:t.ink, margin:'0 0 12px' }}>Balneário Rincão - SC</h2>
         <p style={{ color:t.muted, marginBottom:40 }}>Rua Manoel Jose Mage, No 15 - esquina com Av. Waldemar Carlos Petrini - Balneário Rincão/SC</p>
         <div style={{ position:'relative', aspectRatio:'16/7', overflow:'hidden', borderRadius:2 }}>
-          <Image src={IMG.fotomont} alt="Localizacao Villammare Balneário Rincão" fill sizes="(max-width:768px) 100vw, 1100px" style={{ objectFit:'cover' }} />
+          <Image unoptimized src={IMG.fotomont} alt="Localizacao Villammare Balneário Rincão" fill sizes="(max-width:768px) 100vw, 1100px" style={{ objectFit:'cover' }} />
         </div>
       </section>
 
@@ -258,7 +258,7 @@ export default function Page() {
       </section>
 
       <section style={{ position:'relative', minHeight:480, display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden' }}>
-        <Image src={IMG.hero} alt="Villammare Residencial Balneário Rincão" fill sizes="100vw" style={{ objectFit:'cover' }} />
+        <Image unoptimized src={IMG.hero} alt="Villammare Residencial Balneário Rincão" fill sizes="100vw" style={{ objectFit:'cover' }} />
         <div style={{ position:'absolute', inset:0, background:'rgba(9,24,40,0.72)' }} />
         <div style={{ position:'relative', textAlign:'center', padding:'0 32px' }}>
           <h2 className="vm-h2" style={{ color:'#fff', margin:'0 0 16px' }}>Villammare Residencial</h2>

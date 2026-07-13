@@ -307,7 +307,7 @@ Tendo o bem-estar e a natureza como seus melhores vizinhos. O Parque da Prefeitu
 
 {/* 9 CTA FINAL */}
 <section style={{ position: 'relative', minHeight: '78vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
-<Image src={IMG.aerea} alt="Vista aérea do Parco Savello Residencial em Santa Bárbara, Criciúma/SC" fill loading="lazy" sizes="100vw" style={{ objectFit: 'cover' }} />
+<Image unoptimized src={IMG.aerea} alt="Vista aérea do Parco Savello Residencial em Santa Bárbara, Criciúma/SC" fill loading="lazy" sizes="100vw" style={{ objectFit: 'cover' }} />
 <div style={{ position: 'absolute', inset: 0, background: 'rgba(14,26,15,0.62)' }} />
 <div style={{ position: 'relative', zIndex: 2, padding: '0 clamp(18px,5vw,56px)', maxWidth: 880 }}>
 <p className="ps-eyebrow ps-onimg" style={{ color: '#fff', marginBottom: 22 }}>Atendimento Exclusivo</p>

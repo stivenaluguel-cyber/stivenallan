@@ -40,7 +40,7 @@ export default function GalleryWithLightbox({ galeria, prefix, gradient }: Props
       <div className={`${prefix}-grid`}>
         {galeria.map((item, i) => (
           <div key={i} className={`${prefix}-thumb`} onClick={() => setLightbox(i)}>
-            <Image src={item.src} alt={item.alt} fill sizes="(max-width:640px) 50vw,33vw" style={{objectFit:'cover'}} />
+            <Image unoptimized src={item.src} alt={item.alt} fill sizes="(max-width:640px) 50vw,33vw" style={{objectFit:'cover'}} />
             <div style={{position:'absolute',inset:0,background:gradient,opacity:.2}} />
           </div>
         ))}
@@ -48,7 +48,7 @@ export default function GalleryWithLightbox({ galeria, prefix, gradient }: Props
       {lightbox !== null && (
         <div className={`${prefix}-lb`} onClick={fechar}>
           <div className={`${prefix}-lb-img`} onClick={e => e.stopPropagation()}>
-            <Image src={galeria[lightbox].src} alt={galeria[lightbox].alt} fill sizes="90vw" style={{objectFit:'contain'}} />
+            <Image unoptimized src={galeria[lightbox].src} alt={galeria[lightbox].alt} fill sizes="90vw" style={{objectFit:'contain'}} />
           </div>
           <button className={`${prefix}-lb-btn ${prefix}-lb-prev`} onClick={e=>{e.stopPropagation();anterior()}}>‹</button>
           <button className={`${prefix}-lb-btn ${prefix}-lb-next`} onClick={e=>{e.stopPropagation();proximo()}}>›</button>

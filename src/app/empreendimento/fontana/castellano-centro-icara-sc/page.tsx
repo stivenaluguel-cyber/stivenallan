@@ -215,7 +215,7 @@ export default function CastellanoPage() {
             <a href="https://www.google.com/maps/search/?api=1&query=Rua+Pio+XII+Içara+SC" target="_blank" rel="noopener noreferrer" className="cs-cta-light">Ver no mapa</a>
           </div>
           <div style={{ position: 'relative', aspectRatio: '4 / 3', borderRadius: 2, overflow: 'hidden' }}>
-            <Image src={IMG.mapa} alt="Mapa localização Castellano" fill sizes="(max-width: 768px) 100vw, 50vw" style={{ objectFit: 'cover' }} />
+            <Image unoptimized src={IMG.mapa} alt="Mapa localização Castellano" fill sizes="(max-width: 768px) 100vw, 50vw" style={{ objectFit: 'cover' }} />
           </div>
         </div>
       </section>
@@ -242,7 +242,7 @@ export default function CastellanoPage() {
       </section>
 
       <section style={{ position: 'relative', minHeight: 480, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-        <Image src={IMG.hero} alt="Castellano Residencial — Içara" fill sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center' }} />
+        <Image unoptimized src={IMG.hero} alt="Castellano Residencial — Içara" fill sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(15,11,20,0.75)' }} />
         <div style={{ position: 'relative', zIndex: 1, textAlign: 'center', padding: '0 6vw' }}>
           <p className="cs-eyebrow" style={{ color: 'rgba(239,233,246,0.7)', marginBottom: 16 }}>Castellano Residencial</p>

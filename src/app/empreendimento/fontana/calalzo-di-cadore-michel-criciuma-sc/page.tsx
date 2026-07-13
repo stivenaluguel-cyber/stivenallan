@@ -199,7 +199,7 @@ export default function CalalzoDiCadorePage() {
             <a href={WPP} target="_blank" rel="noopener noreferrer" className="cc-cta cc-cta-light" style={{ marginTop: 30 }}>Atendimento Exclusivo</a>
           </div>
           <div style={{ position: 'relative', aspectRatio: '4 / 3', overflow: 'hidden', borderRadius: 2 }}>
-            <Image src={IMG.mapa} alt="Mapa da localização do Calalzo Di Cadore Residencial" fill loading="lazy" sizes="(max-width: 768px) 100vw, 50vw" style={{ objectFit: 'cover' }} />
+            <Image unoptimized src={IMG.mapa} alt="Mapa da localização do Calalzo Di Cadore Residencial" fill loading="lazy" sizes="(max-width: 768px) 100vw, 50vw" style={{ objectFit: 'cover' }} />
           </div>
         </div>
       </section>
@@ -221,7 +221,7 @@ export default function CalalzoDiCadorePage() {
         </div>
       </section>
       <section style={{ position: 'relative', minHeight: '78vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
-        <Image src={IMG.hero} alt="Calalzo Di Cadore Residencial" fill loading="lazy" sizes="100vw" style={{ objectFit: 'cover' }} />
+        <Image unoptimized src={IMG.hero} alt="Calalzo Di Cadore Residencial" fill loading="lazy" sizes="100vw" style={{ objectFit: 'cover' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(15,23,16,0.65)' }} />
         <div style={{ position: 'relative', zIndex: 2, padding: '0 clamp(18px,5vw,56px)', maxWidth: 880 }}>
           <p className="cc-eyebrow cc-onimg" style={{ color: '#fff', marginBottom: 22 }}>Atendimento Exclusivo</p>

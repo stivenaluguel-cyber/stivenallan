@@ -171,7 +171,7 @@ export default function Page() {
           </a>
         </div>
         <div style={{ position:'relative', aspectRatio:'3/4', borderRadius:2, overflow:'hidden' }}>
-          <Image src={IMG.destaque} alt="Fachada Pavia Residencial" fill sizes="(max-width:768px) 100vw, 50vw" style={{ objectFit:'cover' }} />
+          <Image unoptimized src={IMG.destaque} alt="Fachada Pavia Residencial" fill sizes="(max-width:768px) 100vw, 50vw" style={{ objectFit:'cover' }} />
         </div>
       </section>
 
@@ -260,7 +260,7 @@ export default function Page() {
         <h2 className="pv-h2" style={{ color:t.ink, margin:'0 0 12px' }}>Rio Maina · Criciúma</h2>
         <p style={{ color:t.muted, marginBottom:40 }}>Avenida dos Imigrantes, esq. Rua João Colombo — Rio Maina · Criciúma / SC</p>
         <div style={{ position:'relative', aspectRatio:'16/7', overflow:'hidden', borderRadius:2 }}>
-          <Image src={IMG.mapa} alt="Mapa localização Pavia Residencial Criciúma" fill sizes="(max-width:768px) 100vw, 1100px" style={{ objectFit:'cover' }} />
+          <Image unoptimized src={IMG.mapa} alt="Mapa localização Pavia Residencial Criciúma" fill sizes="(max-width:768px) 100vw, 1100px" style={{ objectFit:'cover' }} />
         </div>
       </section>
 
@@ -278,7 +278,7 @@ export default function Page() {
       </section>
 
       <section style={{ position:'relative', minHeight:480, display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden' }}>
-        <Image src={IMG.hero} alt="Pavia Residencial Criciúma" fill sizes="100vw" style={{ objectFit:'cover', objectPosition:'center top' }} />
+        <Image unoptimized src={IMG.hero} alt="Pavia Residencial Criciúma" fill sizes="100vw" style={{ objectFit:'cover', objectPosition:'center top' }} />
         <div style={{ position:'absolute', inset:0, background:'rgba(13,27,42,0.70)' }} />
         <div style={{ position:'relative', textAlign:'center', padding:'0 32px' }}>
           <h2 className="pv-h2" style={{ color:'#fff', margin:'0 0 16px' }}>Pavia Residencial</h2>

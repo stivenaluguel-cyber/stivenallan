@@ -299,7 +299,7 @@ Com tudo a poucos passos, o Thiene coloca você no centro da vida urbana de Cric
 
 {/* 9 CTA FINAL */}
 <section style={{ position: 'relative', minHeight: '78vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
-<Image src={IMG.hero} alt="Thiene Residencial — Centro, Criciúma/SC" fill loading="lazy" sizes="100vw" style={{ objectFit: 'cover' }} />
+<Image unoptimized src={IMG.hero} alt="Thiene Residencial — Centro, Criciúma/SC" fill loading="lazy" sizes="100vw" style={{ objectFit: 'cover' }} />
 <div style={{ position: 'absolute', inset: 0, background: 'rgba(10,21,32,0.65)' }} />
 <div style={{ position: 'relative', zIndex: 2, padding: '0 clamp(18px,5vw,56px)', maxWidth: 880 }}>
 <p className="th-eyebrow th-onimg" style={{ color: '#fff', marginBottom: 22 }}>Atendimento Exclusivo</p>

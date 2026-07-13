@@ -204,7 +204,7 @@ html { scroll-behavior: smooth; }
 <hr className="cm-rule" style={{ marginBottom:16 }} />
 <p style={{ color:t.muted, fontSize:15, marginBottom:40, letterSpacing:'0.04em' }}>Rod. SC-390 — Bom Jardim da Serra / SC</p>
 <div style={{ position:'relative', width:'100%', aspectRatio:'16/7' }}>
-<Image src={IMG.mapa} alt="Mapa de localização – Campos da Montanha" fill sizes="(max-width:860px) 100vw, 1100px" style={{ objectFit:'cover', borderRadius:2 }} />
+<Image unoptimized src={IMG.mapa} alt="Mapa de localização – Campos da Montanha" fill sizes="(max-width:860px) 100vw, 1100px" style={{ objectFit:'cover', borderRadius:2 }} />
 </div>
 </div>
 </section>

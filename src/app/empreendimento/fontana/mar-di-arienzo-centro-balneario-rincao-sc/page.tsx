@@ -226,7 +226,7 @@ details.ma-menu > summary::-webkit-details-marker { display: none; }
 </div>
 </section>
 <section style={{ position: 'relative', minHeight: '78vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
-<Image src={IMG.hero} alt="Mar di Arienzo Residencial — Balneário Rincão/SC" fill loading="lazy" sizes="100vw" style={{ objectFit: 'cover' }} />
+<Image unoptimized src={IMG.hero} alt="Mar di Arienzo Residencial — Balneário Rincão/SC" fill loading="lazy" sizes="100vw" style={{ objectFit: 'cover' }} />
 <div style={{ position: 'absolute', inset: 0, background: 'rgba(8,15,16,0.62)' }} />
 <div style={{ position: 'relative', zIndex: 2, padding: '0 clamp(18px,5vw,56px)', maxWidth: 880 }}>
 <p className="ma-eyebrow ma-onimg" style={{ color: '#fff', marginBottom: 22 }}>Atendimento Exclusivo</p>

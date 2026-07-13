@@ -217,7 +217,7 @@ details.am-menu > summary::-webkit-details-marker { display: none; }
 <a href={WPP} target="_blank" rel="noopener noreferrer" className="am-cta am-cta-light" style={{ marginTop: 30 }}>Atendimento Exclusivo</a>
 </div>
 <div style={{ position: 'relative', aspectRatio: '4 / 3', overflow: 'hidden', borderRadius: 2 }}>
-<Image src={IMG.mapa} alt="Mapa da localizacao do Águas de Marano" fill loading="lazy" sizes="(max-width: 768px) 100vw, 50vw" style={{ objectFit: 'cover' }} />
+<Image unoptimized src={IMG.mapa} alt="Mapa da localizacao do Águas de Marano" fill loading="lazy" sizes="(max-width: 768px) 100vw, 50vw" style={{ objectFit: 'cover' }} />
 </div>
 </div>
 </section>
@@ -235,7 +235,7 @@ details.am-menu > summary::-webkit-details-marker { display: none; }
 </div>
 </section>
 <section style={{ position: 'relative', minHeight: '78vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
-<Image src={"https://estilofontana.com.br/images/2024/01/15/f-adm-spa-aquecido-ef-web-65a593695f5f0.jpg?fm=webp"} alt="Spa aquecido frente mar do Águas de Marano Residencial" fill loading="lazy" sizes="100vw" style={{ objectFit: 'cover' }} />
+<Image unoptimized src={"https://estilofontana.com.br/images/2024/01/15/f-adm-spa-aquecido-ef-web-65a593695f5f0.jpg?fm=webp"} alt="Spa aquecido frente mar do Águas de Marano Residencial" fill loading="lazy" sizes="100vw" style={{ objectFit: 'cover' }} />
 <div style={{ position: 'absolute', inset: 0, background: 'rgba(15,30,45,0.62)' }} />
 <div style={{ position: 'relative', zIndex: 2, padding: '0 clamp(18px,5vw,56px)', maxWidth: 880 }}>
 <p className="am-eyebrow am-onimg" style={{ color: '#fff', marginBottom: 22 }}>Atendimento Exclusivo</p>

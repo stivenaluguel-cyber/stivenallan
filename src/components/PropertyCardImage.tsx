@@ -37,6 +37,10 @@ export function PropertyCardImage({
         placeholder="blur"
         blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjYwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZTRlNGU3Ii8+PC9zdmc+"
         onError={() => setImgSrc(FALLBACK_SRC)}
+        // Stopgap: cota de Image Optimization Transformations da Vercel (Hobby) no teto —
+        // serve o arquivo original direto do Supabase/Estilo Fontana, sem passar pelo
+        // otimizador. Reverter (remover essa linha) se/quando o plano cobrir a demanda.
+        unoptimized
         {...props}
       />
     </div>

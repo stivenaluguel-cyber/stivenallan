@@ -171,7 +171,7 @@ export default function Page() {
           </a>
         </div>
         <div style={{ position:'relative', aspectRatio:'3/4', borderRadius:2, overflow:'hidden' }}>
-          <Image src={IMG.piscina} alt="Área de lazer Mar Positano" fill sizes="(max-width:768px) 100vw, 50vw" style={{ objectFit:'cover' }} />
+          <Image unoptimized src={IMG.piscina} alt="Área de lazer Mar Positano" fill sizes="(max-width:768px) 100vw, 50vw" style={{ objectFit:'cover' }} />
         </div>
       </section>
 
@@ -269,7 +269,7 @@ export default function Page() {
         <h2 className="mp-h2" style={{ color:t.ink, margin:'0 0 12px' }}>Centro de Balneário Rincão</h2>
         <p style={{ color:t.muted, marginBottom:40 }}>Rua Waldemar Carlos Petrini, esq. Rua Espírito Santo — Balneário Rincão / SC</p>
         <div style={{ position:'relative', aspectRatio:'16/7', overflow:'hidden', borderRadius:2 }}>
-          <Image src={IMG.mapa} alt="Mapa localização Mar Positano Balneário Rincão" fill sizes="(max-width:768px) 100vw, 1100px" style={{ objectFit:'cover' }} />
+          <Image unoptimized src={IMG.mapa} alt="Mapa localização Mar Positano Balneário Rincão" fill sizes="(max-width:768px) 100vw, 1100px" style={{ objectFit:'cover' }} />
         </div>
       </section>
 
@@ -289,7 +289,7 @@ export default function Page() {
 
       {/* CTA FINAL */}
       <section style={{ position:'relative', minHeight:480, display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden' }}>
-        <Image src={IMG.hero} alt="Mar Positano Residencial" fill sizes="100vw" style={{ objectFit:'cover', objectPosition:'center top' }} />
+        <Image unoptimized src={IMG.hero} alt="Mar Positano Residencial" fill sizes="100vw" style={{ objectFit:'cover', objectPosition:'center top' }} />
         <div style={{ position:'absolute', inset:0, background:'rgba(13,27,42,0.70)' }} />
         <div style={{ position:'relative', textAlign:'center', padding:'0 32px' }}>
           <h2 className="mp-h2" style={{ color:'#fff', margin:'0 0 16px' }}>Mar Positano Residencial</h2>

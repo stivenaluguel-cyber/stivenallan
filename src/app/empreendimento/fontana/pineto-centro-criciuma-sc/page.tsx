@@ -164,7 +164,7 @@ export default function Page() {
           </a>
         </div>
         <div style={{ position:'relative', aspectRatio:'3/4', borderRadius:2, overflow:'hidden' }}>
-          <Image src={IMG.hero2} alt="Pineto Residencial Criciúma" fill sizes="(max-width:768px) 100vw, 50vw" style={{ objectFit:'cover' }} />
+          <Image unoptimized src={IMG.hero2} alt="Pineto Residencial Criciúma" fill sizes="(max-width:768px) 100vw, 50vw" style={{ objectFit:'cover' }} />
         </div>
       </section>
 
@@ -229,7 +229,7 @@ export default function Page() {
               ))}
             </div>
             <div style={{ position:'relative', aspectRatio:'4/3', overflow:'hidden', borderRadius:2 }}>
-              <Image src={IMG.hero} alt="Pineto Residencial lazer" fill sizes="(max-width:768px) 100vw, 50vw" style={{ objectFit:'cover' }} />
+              <Image unoptimized src={IMG.hero} alt="Pineto Residencial lazer" fill sizes="(max-width:768px) 100vw, 50vw" style={{ objectFit:'cover' }} />
             </div>
           </div>
         </div>
@@ -240,7 +240,7 @@ export default function Page() {
         <h2 className="pn-h2" style={{ color:t.ink, margin:'0 0 12px' }}>Centro de Criciúma</h2>
         <p style={{ color:t.muted, marginBottom:40 }}>Rua Itajaí, 185 — Centro · Criciúma / SC</p>
         <div style={{ position:'relative', aspectRatio:'16/7', overflow:'hidden', borderRadius:2 }}>
-          <Image src={IMG.mapa} alt="Mapa localização Pineto Residencial Criciúma" fill sizes="(max-width:768px) 100vw, 1100px" style={{ objectFit:'cover' }} />
+          <Image unoptimized src={IMG.mapa} alt="Mapa localização Pineto Residencial Criciúma" fill sizes="(max-width:768px) 100vw, 1100px" style={{ objectFit:'cover' }} />
         </div>
       </section>
 
@@ -258,7 +258,7 @@ export default function Page() {
       </section>
 
       <section style={{ position:'relative', minHeight:480, display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden' }}>
-        <Image src={IMG.hero2} alt="Pineto Residencial Criciúma" fill sizes="100vw" style={{ objectFit:'cover', objectPosition:'center' }} />
+        <Image unoptimized src={IMG.hero2} alt="Pineto Residencial Criciúma" fill sizes="100vw" style={{ objectFit:'cover', objectPosition:'center' }} />
         <div style={{ position:'absolute', inset:0, background:'rgba(13,27,42,0.70)' }} />
         <div style={{ position:'relative', textAlign:'center', padding:'0 32px' }}>
           <h2 className="pn-h2" style={{ color:'#fff', margin:'0 0 16px' }}>Pineto Residencial</h2>
