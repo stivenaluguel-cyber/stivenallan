@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import { HeroImage } from '@/components/HeroImage'
 import GalleryWithLightbox, { LightboxPhoto } from './gallery-lightbox'
 import Link from 'next/link'
 import { LeadCaptureButton } from '@/components/LeadCaptureButton'
@@ -101,37 +102,6 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 }
 
-const SCHEMA = {
-  '@context': 'https://schema.org',
-  '@graph': [
-    {
-      '@type': 'RealEstateAgent',
-      name: 'Stiven Allan',
-      url: SITE_URL,
-      telephone: '+5548991642332',
-      areaServed: { '@type': 'City', name: 'Criciúma', containedInPlace: { '@type': 'State', name: 'Santa Catarina' } },
-    },
-    {
-      '@type': 'Apartment',
-      name: 'Fidenza Residencial',
-      description: 'Apartamentos de alto padrão no Cruzeiro do Sul, Criciúma/SC: 3 dormitórios (todos suítes), 149 a 161 m² privativos, 2 unidades por andar, com financiamento direto com a Construtora Fontana.',
-      image: IMG.heroFrontal,
-      numberOfRooms: 3,
-      numberOfBathroomsTotal: 3,
-      floorSize: { '@type': 'QuantitativeValue', minValue: 149, maxValue: 161, unitCode: 'MTK' },
-      address: { '@type': 'PostalAddress', streetAddress: 'Rua São José, 1000', addressLocality: 'Criciúma', addressRegion: 'SC', addressCountry: 'BR' },
-    },
-    {
-      '@type': 'BreadcrumbList',
-      itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Início', item: SITE_URL },
-        { '@type': 'ListItem', position: 2, name: 'Lançamentos Criciúma', item: `${SITE_URL}/lancamentos/criciuma-sc` },
-        { '@type': 'ListItem', position: 3, name: 'Fidenza Residencial', item: `${SITE_URL}/empreendimento/fontana/fidenza-residencial-cruzeiro-do-sul-criciuma-sc` },
-      ],
-    },
-  ],
-}
-
 export default function FidenzaPage() {
   return (
     <main lang="pt-BR" style={{ background: t.bg, color: t.ink, fontFamily: t.body, overflowX: 'hidden' }}>
@@ -208,7 +178,7 @@ export default function FidenzaPage() {
           <line x1="720" y1="0" x2="720" y2="900" />
           <line x1="1120" y1="0" x2="1120" y2="900" />
         </svg>
-        <Image src={IMG.heroFrontal} alt="Fachada frontal do Fidenza Residencial — Cruzeiro do Sul, Criciúma/SC, em frente ao Criciúma Clube" fill priority sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center top' }} />
+        <HeroImage src={IMG.heroFrontal} alt="Fachada frontal do Fidenza Residencial — Cruzeiro do Sul, Criciúma/SC, em frente ao Criciúma Clube" fill priority sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center top' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(20,19,15,0.42) 0%, rgba(20,19,15,0.12) 40%, rgba(20,19,15,0.82) 100%)' }} />
         <div className="fz-fade" style={{ position: 'relative', zIndex: 2, padding: '0 clamp(18px,5vw,56px) clamp(56px,9vh,110px)', maxWidth: 1100 }}>
           <p className="fz-eyebrow fz-onimg" style={{ color: '#fff', marginBottom: 18 }}>Construtora Fontana &mdash; Cruzeiro do Sul, Criciúma/SC</p>

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import { HeroImage } from '@/components/HeroImage'
 import GalleryWithLightbox, { LightboxPhoto } from './gallery-lightbox'
 import { LeadCaptureButton } from '@/components/LeadCaptureButton'
 import { PropertySchema } from '@/components/PropertySchema'
@@ -65,35 +66,6 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 }
 
-const SCHEMA = {
-  '@context': 'https://schema.org',
-  '@graph': [
-    {
-      '@type': 'Apartment',
-      name: 'Calliano Residencial',
-      description: 'Residencial com 2 ou 3 dormitórios e até 92 m² privativos no Centro de Criciúma/SC.',
-      numberOfRooms: 3,
-      floorSize: { '@type': 'QuantitativeValue', value: 92, unitCode: 'MTK' },
-      address: {
-        '@type': 'PostalAddress',
-        streetAddress: 'Rua São José',
-        addressLocality: 'Criciúma',
-        addressRegion: 'SC',
-        addressCountry: 'BR',
-        addressNeighborhood: 'Centro',
-      },
-      image: IMG.hero,
-      url: `${SITE_URL}/empreendimento/fontana/calliano-centro-criciuma-sc`,
-    },
-    {
-      '@type': 'RealEstateAgent',
-      name: 'Stiven Allan',
-      url: SITE_URL,
-      telephone: '+5548991642332',
-    },
-  ],
-}
-
 export default function CallianoPage() {
   return (
     <main style={{ background: t.bg, color: t.ink, fontFamily: t.body, overflowX: 'hidden' }}>
@@ -141,7 +113,7 @@ export default function CallianoPage() {
 
       {/* HERO */}
       <section id="top" style={{ position: 'relative', height: '100svh', minHeight: 560, overflow: 'hidden' }}>
-        <Image src={IMG.hero} alt="Calliano Residencial — Criciúma SC" fill priority sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center' }} />
+        <HeroImage src={IMG.hero} alt="Calliano Residencial — Criciúma SC" fill priority sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(17,11,7,0.72) 0%, rgba(17,11,7,0.18) 55%, transparent 100%)' }} />
         <div className="ca-fade" style={{ position: 'absolute', bottom: '10svh', left: '6vw', right: '6vw', maxWidth: 680 }}>
           <p className="ca-eyebrow" style={{ color: 'rgba(246,237,232,0.8)', marginBottom: 14 }}>Construtora Fontana · Centro · Criciúma/SC</p>

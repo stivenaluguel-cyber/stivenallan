@@ -16,34 +16,7 @@ export const metadata: Metadata = {
                                       twitter: { card: 'summary_large_image', title: 'Sobre Stiven Allan — Corretor CRECI/RS 60.275 | Stiven Allan' },
                                   }
 
-                                  const schema = {
-                                    '@context': 'https://schema.org',
-                                      '@type': 'RealEstateAgent',
-                                        name: 'Stiven Allan',
-                                          jobTitle: 'Corretor de Imóveis',
-                                            description: 'Especialista em lançamentos e empreendimentos imobiliários em Criciúma e região sul catarinense. CRECI/RS 60.275.',
-                                              url: 'https://stivenallan.com.br/sobre',
-                                                telephone: '+5548991642332',
-                                                  email: 'contato@stivenallan.com.br',
-                                                    address: {
-                                                        '@type': 'PostalAddress',
-                                                            addressLocality: 'Criciúma',
-                                                                addressRegion: 'SC',
-                                                                    addressCountry: 'BR',
-                                                                      },
-                                                                        areaServed: [
-                                                                            { '@type': 'City', name: 'Criciúma' },
-                                                                                { '@type': 'City', name: 'Içara' },
-                                                                                    { '@type': 'City', name: 'Araranguá' },
-                                                                                        { '@type': 'City', name: 'Tubarão' },
-                                                                                          ],
-                                                                                            knowsAbout: ['Lançamentos Imobiliários', 'Apartamentos', 'Empreendimentos', 'Financiamento Imobiliário', 'MCMV'],
-                                                                                              sameAs: [
-                                                                                                  'https://www.instagram.com/stivenallan.ofc',
-                                                                                                    ],
-                                                                                                    }
-                                                                                                    
-                                                                                                    const stats = [
+                                  const stats = [
                                                                                                       { value: '8+', label: 'Anos de experiência' },
                                                                                                         { value: '200+', label: 'Famílias atendidas' },
                                                                                                           { value: '4', label: 'Lançamentos ativos' },
@@ -89,11 +62,6 @@ export const metadata: Metadata = {
                                                                                                                                                                                               
                                                                                                                                                                                                 return (
                                                                                                                                                                                                     <>
-                                                                                                                                                                                                          <script
-                                                                                                                                                                                                                  type="application/ld+json"
-                                                                                                                                                                                                                          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-                                                                                                                                                                                                                                />
-                                                                                                                                                                                                                                
                                                                                                                                                                                                                                       <main style={{ background: '#121315', minHeight: '100vh', color: '#fff', fontFamily: 'Inter, sans-serif' }}>
                                                                                                                                                                                                                                       
                                                                                                                                                                                                                                               {/* Hero */}

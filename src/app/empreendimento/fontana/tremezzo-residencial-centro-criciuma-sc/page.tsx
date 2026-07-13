@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import { HeroImage } from '@/components/HeroImage'
 import Link from 'next/link'
 import GalleryWithLightbox from './gallery-lightbox'
 import { LeadCaptureButton } from '@/components/LeadCaptureButton'
@@ -141,7 +142,7 @@ const CSS = `
       </nav>
       {/* HERO */}
       <section style={{ position: 'relative', height: '100vh', minHeight: 600, overflow: 'hidden' }}>
-        <Image unoptimized src={RENDERS[0].src} alt="Tremezzo Residencial — fachada, Centro de Criciúma SC" fill priority style={{ objectFit: 'cover', objectPosition: 'center 40%' }} sizes="100vw" />
+        <HeroImage unoptimized src={RENDERS[0].src} alt="Tremezzo Residencial — fachada, Centro de Criciúma SC" fill priority style={{ objectFit: 'cover', objectPosition: 'center 40%' }} sizes="100vw" />
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.40) 55%, rgba(0,0,0,0.55) 100%)' }} />
         <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 clamp(24px,6vw,80px)', paddingTop: 68 }}>
           <p className="tz-fade" style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 10, letterSpacing: '0.45em', textTransform: 'uppercase', color: 'rgba(245,238,240,0.80)', marginBottom: 24, textShadow: '0 1px 6px rgba(0,0,0,0.4)' }}>

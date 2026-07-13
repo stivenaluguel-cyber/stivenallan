@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import { HeroImage } from '@/components/HeroImage'
 import GalleryWithLightbox, { LightboxPhoto } from './gallery-lightbox'
 import Link from 'next/link'
 import { LeadCaptureButton } from '@/components/LeadCaptureButton'
@@ -96,37 +97,6 @@ images: [IMG.aerea],
 robots: { index: true, follow: true },
 }
 
-const SCHEMA = {
-'@context': 'https://schema.org',
-'@graph': [
-{
-'@type': 'RealEstateAgent',
-name: 'Stiven Allan',
-url: SITE_URL,
-telephone: '+5548991642332',
-areaServed: { '@type': 'City', name: 'Criciúma', containedInPlace: { '@type': 'State', name: 'Santa Catarina' } },
-},
-{
-'@type': 'Apartment',
-name: 'Parco Savello Residencial',
-description: 'Apartamentos no bairro Santa Bárbara, Criciúma/SC: 3 dormitórios (2 suítes), 93 a 94 m² privativos, 2 vagas, com financiamento direto com a Construtora Fontana.',
-image: IMG.hero,
-numberOfRooms: 3,
-numberOfBathroomsTotal: 2,
-floorSize: { '@type': 'QuantitativeValue', minValue: 93, maxValue: 94, unitCode: 'MTK' },
-address: { '@type': 'PostalAddress', streetAddress: 'Rua Duarte da Costa, 875', addressLocality: 'Criciúma', addressRegion: 'SC', addressCountry: 'BR' },
-},
-{
-'@type': 'BreadcrumbList',
-itemListElement: [
-{ '@type': 'ListItem', position: 1, name: 'Início', item: SITE_URL },
-{ '@type': 'ListItem', position: 2, name: 'Lançamentos Criciúma', item: `${SITE_URL}/lancamentos/criciuma-sc` },
-{ '@type': 'ListItem', position: 3, name: 'Parco Savello Residencial', item: `${SITE_URL}/empreendimento/fontana/parco-savello-santa-barbara-criciuma-sc` },
-],
-},
-],
-}
-
 export default function ParcoSavelloPage() {
 return (
 <main style={{ background: t.bg, color: t.ink, fontFamily: t.body, overflowX: 'hidden' }}>
@@ -198,7 +168,7 @@ details.ps-menu > summary::-webkit-details-marker { display: none; }
 
 {/* 1 HERO */}
 <section id="top" style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'flex-end' }}>
-<Image src={IMG.hero} alt="Parco Savello Residencial — perspectiva do empreendimento no bairro Santa Bárbara, Criciúma/SC" fill priority sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center' }} />
+<HeroImage src={IMG.hero} alt="Parco Savello Residencial — perspectiva do empreendimento no bairro Santa Bárbara, Criciúma/SC" fill priority sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center' }} />
 <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(14,26,15,0.42) 0%, rgba(14,26,15,0.12) 40%, rgba(14,26,15,0.82) 100%)' }} />
 <div className="ps-fade" style={{ position: 'relative', zIndex: 2, padding: '0 clamp(18px,5vw,56px) clamp(56px,9vh,110px)', maxWidth: 1100 }}>
 <p className="ps-eyebrow ps-onimg" style={{ color: '#fff', marginBottom: 18 }}>Parco Savello Residencial &mdash; Santa Bárbara, Criciúma/SC</p>

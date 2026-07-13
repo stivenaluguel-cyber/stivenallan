@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import { HeroImage } from '@/components/HeroImage'
 import Link from 'next/link'
 import GalleryWithLightbox from './gallery-lightbox'
 import { LeadCaptureButton } from '@/components/LeadCaptureButton'
@@ -115,7 +116,7 @@ export default function Page() {
       </header>
 
       <section style={{ position:'relative', height:'100vh', minHeight:560, display:'flex', alignItems:'flex-end' }}>
-        <Image src={IMG.hero} alt="Villaggio Verde Residenziale — Grande Próspera, Criciúma SC" fill priority sizes="100vw" style={{ objectFit:'cover', objectPosition:'center' }} />
+        <HeroImage src={IMG.hero} alt="Villaggio Verde Residenziale — Grande Próspera, Criciúma SC" fill priority sizes="100vw" style={{ objectFit:'cover', objectPosition:'center' }} />
         <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top, rgba(13,26,13,0.75) 0%, rgba(13,26,13,0.18) 55%, transparent 100%)' }} />
         <div style={{ position:'relative', padding:'0 32px 64px', maxWidth:800 }}>
           <p className="vv-eyebrow" style={{ color:'rgba(255,255,255,0.7)', marginBottom:16 }}>Grande Próspera · Criciúma / SC</p>

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import { HeroImage } from '@/components/HeroImage'
 import Link from 'next/link'
 import GalleryWithLightbox, { LightboxPhoto } from './gallery-lightbox'
 import { LeadCaptureButton } from '@/components/LeadCaptureButton'
@@ -131,7 +132,7 @@ details.ml-menu > summary::-webkit-details-marker { display: none; }`}</style>
 </nav>
 </header>
 <section id="top" style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'flex-end' }}>
-<Image src={IMG.hero} alt="Fachada Mar di Licata Residencial — Mar Grosso, Laguna/SC" fill priority sizes="100vw" style={{ objectFit: 'cover' }} />
+<HeroImage src={IMG.hero} alt="Fachada Mar di Licata Residencial — Mar Grosso, Laguna/SC" fill priority sizes="100vw" style={{ objectFit: 'cover' }} />
 <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(7,13,18,0.42) 0%, rgba(7,13,18,0.12) 40%, rgba(7,13,18,0.78) 100%)' }} />
 <div className="ml-fade" style={{ position: 'relative', zIndex: 2, padding: '0 clamp(18px,5vw,56px) clamp(56px,9vh,110px)', maxWidth: 1100 }}>
 <p className="ml-eyebrow ml-onimg" style={{ color: '#fff', marginBottom: 18 }}>Mar di Licata Residencial &mdash; Mar Grosso, Laguna/SC</p>

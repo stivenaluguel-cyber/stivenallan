@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import { HeroImage } from '@/components/HeroImage'
 import GalleryWithLightbox, { LightboxPhoto } from './gallery-lightbox'
 import { LeadCaptureButton } from '@/components/LeadCaptureButton'
 import { PropertySchema } from '@/components/PropertySchema'
@@ -99,37 +100,6 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 }
 
-const SCHEMA = {
-  '@context': 'https://schema.org',
-  '@graph': [
-    {
-      '@type': 'RealEstateAgent',
-      name: 'Stiven Allan',
-      url: SITE_URL,
-      telephone: '+5548991642332',
-      areaServed: { '@type': 'City', name: 'Criciúma', containedInPlace: { '@type': 'State', name: 'Santa Catarina' } },
-    },
-    {
-      '@type': 'Apartment',
-      name: 'Lavis Residencial',
-      description: 'Apartamentos de alto padrão no Centro de Criciúma/SC: 3 dormitórios, todos suítes, 125 a 132 m² privativos, com financiamento direto com a Construtora Fontana.',
-      image: IMG.heroFrontal,
-      numberOfRooms: 3,
-      numberOfBathroomsTotal: 3,
-      floorSize: { '@type': 'QuantitativeValue', minValue: 125, maxValue: 132, unitCode: 'MTK' },
-      address: { '@type': 'PostalAddress', streetAddress: 'Rua Timóteo Batista, 53', addressLocality: 'Criciúma', addressRegion: 'SC', addressCountry: 'BR' },
-    },
-    {
-      '@type': 'BreadcrumbList',
-      itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Início', item: SITE_URL },
-        { '@type': 'ListItem', position: 2, name: 'Lançamentos Criciúma', item: `${SITE_URL}/lancamentos/criciuma-sc` },
-        { '@type': 'ListItem', position: 3, name: 'Lavis Residencial', item: `${SITE_URL}/empreendimento/fontana/lavis-residencial-centro-criciuma-sc` },
-      ],
-    },
-  ],
-}
-
 export default function LavisPage() {
   return (
     <main style={{ background: t.bg, color: t.ink, fontFamily: t.body, overflowX: 'hidden' }}>
@@ -195,7 +165,7 @@ export default function LavisPage() {
 
       {/* 1 HERO */}
       <section id="top" style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'flex-end' }}>
-        <Image src={IMG.heroFrontal} alt="Fachada frontal do Lavis Residencial, no Centro de Criciúma/SC" fill priority sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center' }} />
+        <HeroImage src={IMG.heroFrontal} alt="Fachada frontal do Lavis Residencial, no Centro de Criciúma/SC" fill priority sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(20,16,10,0.42) 0%, rgba(20,16,10,0.12) 40%, rgba(20,16,10,0.82) 100%)' }} />
         <div className="lv-fade" style={{ position: 'relative', zIndex: 2, padding: '0 clamp(18px,5vw,56px) clamp(56px,9vh,110px)', maxWidth: 1100 }}>
           <p className="lv-eyebrow lv-onimg" style={{ color: '#fff', marginBottom: 18 }}>Lavis Residencial &mdash; Centro, Criciúma/SC</p>

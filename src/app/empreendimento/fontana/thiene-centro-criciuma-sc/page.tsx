@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import { HeroImage } from '@/components/HeroImage'
 import GalleryWithLightbox from './gallery-lightbox'
 import Link from 'next/link'
 import { LeadCaptureButton } from '@/components/LeadCaptureButton'
@@ -91,37 +92,6 @@ images: [IMG.hero],
 robots: { index: true, follow: true },
 }
 
-const SCHEMA = {
-'@context': 'https://schema.org',
-'@graph': [
-{
-'@type': 'RealEstateAgent',
-name: 'Stiven Allan',
-url: SITE_URL,
-telephone: '+5548991642332',
-areaServed: { '@type': 'City', name: 'Criciúma', containedInPlace: { '@type': 'State', name: 'Santa Catarina' } },
-},
-{
-'@type': 'Apartment',
-name: 'Thiene Residencial',
-description: 'Apartamentos no Centro de Criciúma/SC: 3 dormitórios (1 suíte), 101 a 102 m² privativos, com financiamento direto com a Construtora Fontana.',
-image: IMG.hero,
-numberOfRooms: 3,
-numberOfBathroomsTotal: 1,
-floorSize: { '@type': 'QuantitativeValue', minValue: 101, maxValue: 102, unitCode: 'MTK' },
-address: { '@type': 'PostalAddress', streetAddress: 'Rua Monteiro Lobato, esq. Rua Santo Antônio', addressLocality: 'Criciúma', addressRegion: 'SC', addressCountry: 'BR' },
-},
-{
-'@type': 'BreadcrumbList',
-itemListElement: [
-{ '@type': 'ListItem', position: 1, name: 'Início', item: SITE_URL },
-{ '@type': 'ListItem', position: 2, name: 'Lançamentos Criciúma', item: `${SITE_URL}/lancamentos/criciuma-sc` },
-{ '@type': 'ListItem', position: 3, name: 'Thiene Residencial', item: `${SITE_URL}/empreendimento/fontana/thiene-centro-criciuma-sc` },
-],
-},
-],
-}
-
 export default function ThieneResidencialPage() {
 return (
 <main style={{ background: t.bg, color: t.ink, fontFamily: t.body, overflowX: 'hidden' }}>
@@ -189,7 +159,7 @@ details.th-menu > summary::-webkit-details-marker { display: none; }
 
 {/* 1 HERO */}
 <section id="top" style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'flex-end' }}>
-<Image src={IMG.hero} alt="Thiene Residencial — perspectiva do empreendimento no Centro, Criciúma/SC" fill priority sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center' }} />
+<HeroImage src={IMG.hero} alt="Thiene Residencial — perspectiva do empreendimento no Centro, Criciúma/SC" fill priority sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center' }} />
 <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(10,21,32,0.42) 0%, rgba(10,21,32,0.12) 40%, rgba(10,21,32,0.82) 100%)' }} />
 <div className="th-fade" style={{ position: 'relative', zIndex: 2, padding: '0 clamp(18px,5vw,56px) clamp(56px,9vh,110px)', maxWidth: 1100 }}>
 <p className="th-eyebrow th-onimg" style={{ color: '#fff', marginBottom: 18 }}>Thiene Residencial &mdash; Centro, Criciúma/SC</p>

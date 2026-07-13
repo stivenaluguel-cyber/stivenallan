@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import { HeroImage } from '@/components/HeroImage'
 import Link from 'next/link'
 import GalleryWithLightbox, { LightboxPhoto } from './gallery-lightbox'
 import { LeadCaptureButton } from '@/components/LeadCaptureButton'
@@ -131,7 +132,7 @@ html { scroll-behavior: smooth; }
 </nav>
 </header>
 <section style={{ position:'relative', height:'100vh', minHeight:560, display:'flex', alignItems:'flex-end', paddingBottom:80 }}>
-<Image src={IMG.hero} alt="Campos da Montanha Residencial – Vista aérea" fill sizes="100vw" style={{ objectFit:'cover', objectPosition:'center' }} priority />
+<HeroImage src={IMG.hero} alt="Campos da Montanha Residencial – Vista aérea" fill sizes="100vw" style={{ objectFit:'cover', objectPosition:'center' }} priority />
 <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top, rgba(8,15,9,0.72) 0%, rgba(8,15,9,0.18) 55%, transparent 100%)' }} />
 <div style={{ position:'relative', padding:'0 48px', maxWidth:840 }} className="cm-fade">
 <p className="cm-eyebrow cm-onimg" style={{ color:t.onDarkMuted, marginBottom:16 }}>Rod. SC-390 · Bom Jardim da Serra / SC</p>

@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import { HeroImage } from '@/components/HeroImage'
 import type { Metadata } from 'next'
 import GalleryWithLightbox from './gallery-lightbox'
 import { LeadCaptureButton } from '@/components/LeadCaptureButton'

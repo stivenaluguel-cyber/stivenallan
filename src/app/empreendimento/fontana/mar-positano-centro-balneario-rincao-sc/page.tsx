@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import { HeroImage } from '@/components/HeroImage'
 import Link from 'next/link'
 import GalleryWithLightbox, { LightboxPhoto } from './gallery-lightbox'
 import { LeadCaptureButton } from '@/components/LeadCaptureButton'
@@ -135,7 +136,7 @@ export default function Page() {
 
       {/* HERO */}
       <section style={{ position:'relative', height:'100vh', minHeight:560, display:'flex', alignItems:'flex-end' }}>
-        <Image src={IMG.hero} alt="Mar Positano Residencial — Balneário Rincão SC" fill priority sizes="100vw" style={{ objectFit:'cover', objectPosition:'center' }} />
+        <HeroImage src={IMG.hero} alt="Mar Positano Residencial — Balneário Rincão SC" fill priority sizes="100vw" style={{ objectFit:'cover', objectPosition:'center' }} />
         <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top, rgba(13,27,42,0.72) 0%, rgba(13,27,42,0.18) 55%, transparent 100%)' }} />
         <div style={{ position:'relative', padding:'0 32px 64px', maxWidth:760 }}>
           <p className="mp-eyebrow" style={{ color:'rgba(255,255,255,0.7)', marginBottom:16 }}>Centro · Balneário Rincão / SC</p>

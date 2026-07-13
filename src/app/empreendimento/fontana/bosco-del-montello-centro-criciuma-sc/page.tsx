@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import { HeroImage } from '@/components/HeroImage'
 import GalleryWithLightbox, { LightboxPhoto } from './gallery-lightbox'
 import { LeadCaptureButton } from '@/components/LeadCaptureButton'
 import { PropertySchema } from '@/components/PropertySchema'
@@ -143,7 +144,7 @@ export default function BoscoDelMontelloPage() {
 
       {/* HERO */}
       <section id="top" style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'flex-end' }}>
-        <Image src={IMG.hero} alt="Fachada do Bosco Del Montello Residencial — Centro, Criciúma/SC" fill priority sizes="100vw" style={{ objectFit: 'cover' }} />
+        <HeroImage src={IMG.hero} alt="Fachada do Bosco Del Montello Residencial — Centro, Criciúma/SC" fill priority sizes="100vw" style={{ objectFit: 'cover' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(16,12,9,0.42) 0%, rgba(16,12,9,0.12) 40%, rgba(16,12,9,0.78) 100%)' }} />
         <div className="bm-fade" style={{ position: 'relative', zIndex: 2, padding: '0 clamp(18px,5vw,56px) clamp(56px,9vh,110px)', maxWidth: 1100 }}>
           <p className="bm-eyebrow bm-onimg" style={{ color: '#fff', marginBottom: 18 }}>Bosco Del Montello Residencial &mdash; Centro, Criciúma/SC</p>

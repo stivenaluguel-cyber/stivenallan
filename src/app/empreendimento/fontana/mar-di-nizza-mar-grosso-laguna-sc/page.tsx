@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import { HeroImage } from '@/components/HeroImage'
 import GalleryWithLightbox from './gallery-lightbox'
 import { LeadCaptureButton } from '@/components/LeadCaptureButton'
 import { PropertySchema } from '@/components/PropertySchema'
@@ -112,7 +113,7 @@ export default function MarDiNizzaPage() {
         {/* HERO */}
         <section className="mn-hero">
           <div className="mn-hero-img">
-            <Image src={IMG.hero} alt="Mar di Nizza Residencial — fachada" fill priority sizes="100vw" style={{ objectFit:'cover', objectPosition:'center 30%' }} />
+            <HeroImage src={IMG.hero} alt="Mar di Nizza Residencial — fachada" fill priority sizes="100vw" style={{ objectFit:'cover', objectPosition:'center 30%' }} />
           </div>
           <div className="mn-hero-overlay" />
           <div className="mn-hero-content">

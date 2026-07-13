@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import { HeroImage } from '@/components/HeroImage'
 import GalleryWithLightbox, { LightboxPhoto } from './gallery-lightbox'
 import { LeadCaptureButton } from '@/components/LeadCaptureButton'
 import { PropertySchema } from '@/components/PropertySchema'
@@ -68,23 +69,6 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 }
 
-const SCHEMA = {
-  '@context': 'https://schema.org',
-  '@graph': [
-    {
-      '@type': 'Apartment',
-      name: 'Castellano Residencial',
-      description: 'Residencial com 3 dormitórios e 109 a 112 m² privativos no Centro de Içara/SC.',
-      numberOfRooms: 3,
-      floorSize: { '@type': 'QuantitativeValue', value: 112, unitCode: 'MTK' },
-      address: { '@type': 'PostalAddress', streetAddress: 'Rua Pio XII', addressLocality: 'Içara', addressRegion: 'SC', addressCountry: 'BR', addressNeighborhood: 'Centro' },
-      image: IMG.hero,
-      url: `${SITE_URL}/empreendimento/fontana/castellano-centro-icara-sc`,
-    },
-    { '@type': 'RealEstateAgent', name: 'Stiven Allan', url: SITE_URL, telephone: '+5548991642332' },
-  ],
-}
-
 export default function CastellanoPage() {
   return (
     <main style={{ background: t.bg, color: t.ink, fontFamily: t.body, overflowX: 'hidden' }}>
@@ -129,7 +113,7 @@ export default function CastellanoPage() {
       </header>
 
       <section id="top" style={{ position: 'relative', height: '100svh', minHeight: 560, overflow: 'hidden' }}>
-        <Image src={IMG.hero} alt="Castellano Residencial — Içara SC" fill priority sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center' }} />
+        <HeroImage src={IMG.hero} alt="Castellano Residencial — Içara SC" fill priority sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(15,11,20,0.78) 0%, rgba(15,11,20,0.2) 55%, transparent 100%)' }} />
         <div className="cs-fade" style={{ position: 'absolute', bottom: '10svh', left: '6vw', right: '6vw', maxWidth: 680 }}>
           <p className="cs-eyebrow" style={{ color: 'rgba(239,233,246,0.8)', marginBottom: 14 }}>Construtora Fontana · Centro · Içara/SC</p>

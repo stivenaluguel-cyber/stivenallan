@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import { HeroImage } from '@/components/HeroImage'
 import GalleryWithLightbox, { LightboxPhoto } from './gallery-lightbox'
 import Link from 'next/link'
 import { LeadCaptureButton } from '@/components/LeadCaptureButton'
@@ -104,37 +105,6 @@ images: [IMG.heroAerea],
 robots: { index: true, follow: true },
 }
 
-const SCHEMA = {
-'@context': 'https://schema.org',
-'@graph': [
-{
-'@type': 'RealEstateAgent',
-name: 'Stiven Allan',
-url: SITE_URL,
-telephone: '+5548991642332',
-areaServed: { '@type': 'City', name: 'Criciúma', containedInPlace: { '@type': 'State', name: 'Santa Catarina' } },
-},
-{
-'@type': 'Apartment',
-name: 'Monte Leone Residencial',
-description: 'Apartamentos de alto padrão no Centro de Criciúma/SC: 4 dormitórios (3 suítes), 230 a 253 m² privativos, 3 vagas, com financiamento direto com a Construtora Fontana.',
-image: IMG.heroFrontal,
-numberOfRooms: 4,
-numberOfBathroomsTotal: 5,
-floorSize: { '@type': 'QuantitativeValue', minValue: 230, maxValue: 253, unitCode: 'MTK' },
-address: { '@type': 'PostalAddress', streetAddress: 'Rua Hortêncio João da Silva, 98', addressLocality: 'Criciúma', addressRegion: 'SC', addressCountry: 'BR' },
-},
-{
-'@type': 'BreadcrumbList',
-itemListElement: [
-{ '@type': 'ListItem', position: 1, name: 'Início', item: SITE_URL },
-{ '@type': 'ListItem', position: 2, name: 'Lançamentos Criciúma', item: `${SITE_URL}/lancamentos/criciuma-sc` },
-{ '@type': 'ListItem', position: 3, name: 'Monte Leone Residencial', item: `${SITE_URL}/empreendimento/fontana/monte-leone-centro-criciuma-sc` },
-],
-},
-],
-}
-
 export default function MonteLeonePage() {
 return (
 <main style={{ background: t.bg, color: t.ink, fontFamily: t.body, overflowX: 'hidden' }}>
@@ -205,7 +175,7 @@ details.ml-menu > summary::-webkit-details-marker { display: none; }
 
 {/* 1 HERO */}
 <section id="top" style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'flex-end' }}>
-<Image src={IMG.heroFrontal} alt="Fachada frontal do Monte Leone Residencial, no Centro de Criciúma/SC" fill priority sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center' }} />
+<HeroImage src={IMG.heroFrontal} alt="Fachada frontal do Monte Leone Residencial, no Centro de Criciúma/SC" fill priority sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center' }} />
 <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(15,24,16,0.42) 0%, rgba(15,24,16,0.12) 40%, rgba(15,24,16,0.82) 100%)' }} />
 <div className="ml-fade" style={{ position: 'relative', zIndex: 2, padding: '0 clamp(18px,5vw,56px) clamp(56px,9vh,110px)', maxWidth: 1100 }}>
 <p className="ml-eyebrow ml-onimg" style={{ color: '#fff', marginBottom: 18 }}>Monte Leone Residencial &mdash; Centro, Criciúma/SC</p>
