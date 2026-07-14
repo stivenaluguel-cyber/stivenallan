@@ -27,21 +27,25 @@ serif: "\'Cormorant Garamond\', Georgia, serif",
 body: "\'Hanken Grotesk\', system-ui, sans-serif",
 }
 
+// Imagens hospedadas localmente (baixadas e comprimidas do Estilo Fontana em
+// 2026-07-14): o host de terceiro servia originais gigantes (até 3,2MB) e sem
+// garantia de disponibilidade, causando carregamento lento e falhas intermitentes.
+const IMG_BASE = '/images/empreendimentos/parco-savello-santa-barbara-criciuma-sc'
 const IMG = {
-hero: 'https://estilofontana.com.br/images/empreendimento/slideshows/parco-savello-residencial-6644aab323ce3.jpg?fm=webp',
-fachada: 'https://estilofontana.com.br/images/2024/05/20/f-ps-fotomontagem-ef-aprovada-664bad69c0a0e.jpg?fm=webp',
-aerea: 'https://estilofontana.com.br/images/2024/05/20/f-ps-voo-passaro-ef-op3-web-aprovada-664babbb72fb9.jpg?fm=webp',
+hero: `${IMG_BASE}/hero.jpg`,
+fachada: `${IMG_BASE}/fachada.jpg`,
+aerea: `${IMG_BASE}/vista-aerea.jpg`,
 }
 
 const GALERIA: { src: string; alt: string; label: string }[] = [
-{ src: 'https://estilofontana.com.br/images/empreendimento/slideshows/parco-savello-residencial-6644aab323ce3.jpg?fm=webp', alt: 'Parco Savello Residencial - perspectiva', label: 'O Residencial' },
-{ src: 'https://estilofontana.com.br/images/2024/05/20/f-ps-fotomontagem-ef-aprovada-664bad69c0a0e.jpg?fm=webp', alt: 'Parco Savello Residencial - fachada', label: 'Fachada' },
-{ src: 'https://estilofontana.com.br/images/2024/05/20/f-ps-voo-passaro-ef-op3-web-aprovada-664babbb72fb9.jpg?fm=webp', alt: 'Parco Savello Residencial - vista aérea', label: 'Vista Aérea' },
-{ src: 'https://blog.estilofontana.com.br/wp-content/uploads/2024/06/lan%C3%A7amento-em-crici%C3%BAma-parco-savello-1.jpg', alt: 'Parco Savello Residencial - acesso principal', label: 'Acesso Principal' },
-{ src: 'https://www.estilofontana.com.br/blog/wp-content/uploads/2024/06/lan%C3%A7amento-em-Crici%C3%BAma-parco-savello-4.jpg', alt: 'Parco Savello Residencial - torre', label: 'Torre' },
-{ src: 'https://www.estilofontana.com.br/blog/wp-content/uploads/2024/06/lan%C3%A7amento-em-Crici%C3%BAma-parco-savello-3.jpg', alt: 'Parco Savello Residencial - entorno', label: 'Entorno' },
-{ src: 'https://www.estilofontana.com.br/blog/wp-content/uploads/2024/06/lan%C3%A7amento-em-Crici%C3%BAma-parco-savello-6.jpg', alt: 'Parco Savello Residencial - lazer', label: 'Lazer' },
-{ src: 'https://www.estilofontana.com.br/blog/wp-content/uploads/2024/06/lan%C3%A7amento-em-Crici%C3%BAma-parco-savello-5-1.jpg', alt: 'Parco Savello Residencial - paisagismo', label: 'Paisagismo' },
+{ src: `${IMG_BASE}/hero.jpg`, alt: 'Parco Savello Residencial - perspectiva', label: 'O Residencial' },
+{ src: `${IMG_BASE}/fachada.jpg`, alt: 'Parco Savello Residencial - fachada', label: 'Fachada' },
+{ src: `${IMG_BASE}/vista-aerea.jpg`, alt: 'Parco Savello Residencial - vista aérea', label: 'Vista Aérea' },
+{ src: `${IMG_BASE}/acesso-principal.jpg`, alt: 'Parco Savello Residencial - acesso principal', label: 'Acesso Principal' },
+{ src: `${IMG_BASE}/torre.jpg`, alt: 'Parco Savello Residencial - torre', label: 'Torre' },
+{ src: `${IMG_BASE}/entorno.jpg`, alt: 'Parco Savello Residencial - entorno', label: 'Entorno' },
+{ src: `${IMG_BASE}/lazer.jpg`, alt: 'Parco Savello Residencial - lazer', label: 'Lazer' },
+{ src: `${IMG_BASE}/paisagismo.jpg`, alt: 'Parco Savello Residencial - paisagismo', label: 'Paisagismo' },
 ]
 
 const DIFERENCIAIS: string[] = [
