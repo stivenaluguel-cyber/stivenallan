@@ -22,8 +22,8 @@ body:"'Hanken Grotesk',system-ui,sans-serif",
 }
 
 const IMG = {
-hero: 'https://estilofontana.com.br/images/empreendimento/slideshows/campos-da-montanha-residencial-6297ada80ea83.jpg?fm=webp',
-mapa: 'https://estilofontana.com.br/images/2022/06/01/localizacao-5f96cd92c6aef-6297b2eeb9403.png?fm=webp',
+hero: '/images/empreendimentos/campos-da-montanha-bom-jardim-da-serra-sc/campos-da-montanha-residencial-6297ada80ea83.jpg',
+mapa: '/images/empreendimentos/campos-da-montanha-bom-jardim-da-serra-sc/localizacao-5f96cd92c6aef-6297b2eeb9403.jpg',
 }
 
 const GALERIA = [

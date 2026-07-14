@@ -19,11 +19,11 @@ display: "'Jost', system-ui, sans-serif", serif: "'Cormorant Garamond', Georgia,
 body: "'Hanken Grotesk', system-ui, sans-serif",
 }
 const IMG = {
-hero: 'https://estilofontana.com.br/images/empreendimento/slideshows/mar-di-arienzo-residencial-69d2e834c59ea.jpg?fm=webp',
+hero: '/images/empreendimentos/mar-di-arienzo-centro-balneario-rincao-sc/mar-di-arienzo-residencial-69d2e834c59ea.jpg',
 lazer: 'https://lh3.googleusercontent.com/d/1vNhfjwg8oG3EzCeXdRiK1uqfsBPSXaC6',
 }
 const GALERIA = [
-{ src: 'https://estilofontana.com.br/images/empreendimento/slideshows/mar-di-arienzo-residencial-69d2e834c59ea.jpg?fm=webp', alt: 'Mar di Arienzo Residencial — fachada frontal', label: 'Fachada Frontal' },
+{ src: '/images/empreendimentos/mar-di-arienzo-centro-balneario-rincao-sc/mar-di-arienzo-residencial-69d2e834c59ea.jpg', alt: 'Mar di Arienzo Residencial — fachada frontal', label: 'Fachada Frontal' },
 { src: 'https://lh3.googleusercontent.com/d/1Shs1tG3s1Zo9_kzboLZrA0ntvo9vw4CD', alt: 'Mar di Arienzo — fachada angular', label: 'Fachada Angular' },
 { src: 'https://lh3.googleusercontent.com/d/1d6GcKbUKqb94Vl1pGIwOntXb4-9SylaJ', alt: 'Terraço Mar di Arienzo Residencial', label: 'Terraço' },
 { src: 'https://lh3.googleusercontent.com/d/1vNhfjwg8oG3EzCeXdRiK1uqfsBPSXaC6', alt: 'Piscina adulto e infantil Mar di Arienzo', label: 'Piscina' },
@@ -58,20 +58,20 @@ title: 'Mar di Arienzo Residencial — Centro, Balneário Rincão/SC | Stiven Al
 description: 'Amplie seu horizonte. Apartamentos 3 dormitórios com suíte, 97 a 109 m² privativos no Centro de Balneário Rincão/SC. Atendimento exclusivo com Stiven Allan.',
 url: SITE_URL + '/empreendimento/fontana/mar-di-arienzo-centro-balneario-rincao-sc',
 type: 'website',
-images: [{ url: 'https://estilofontana.com.br/images/empreendimento/slideshows/mar-di-arienzo-residencial-69d2e834c59ea.jpg?fm=webp', width: 1200, height: 800, alt: 'Fachada Mar di Arienzo Residencial' }],
+images: [{ url: '/images/empreendimentos/mar-di-arienzo-centro-balneario-rincao-sc/mar-di-arienzo-residencial-69d2e834c59ea.jpg', width: 1200, height: 800, alt: 'Fachada Mar di Arienzo Residencial' }],
 },
 twitter: {
 card: 'summary_large_image',
 title: 'Mar di Arienzo Residencial — Centro, Balneário Rincão/SC | Stiven Allan',
 description: 'Amplie seu horizonte. Apartamentos 3 dormitórios com suíte, 97 a 109 m² privativos no Centro de Balneário Rincão/SC. Atendimento exclusivo com Stiven Allan.',
-images: ['https://estilofontana.com.br/images/empreendimento/slideshows/mar-di-arienzo-residencial-69d2e834c59ea.jpg?fm=webp'],
+images: ['/images/empreendimentos/mar-di-arienzo-centro-balneario-rincao-sc/mar-di-arienzo-residencial-69d2e834c59ea.jpg'],
 },
 robots: { index: true, follow: true },
 }
 const SCHEMA = {
 '@context': 'https://schema.org',
 '@graph': [
-{ '@type': 'Apartment', name: 'Mar di Arienzo Residencial', description: 'Apartamentos 3 dormitórios com suíte, 97 a 109 m² privativos no Centro de Balneário Rincão/SC.', image: 'https://estilofontana.com.br/images/empreendimento/slideshows/mar-di-arienzo-residencial-69d2e834c59ea.jpg?fm=webp', numberOfRooms: 3, numberOfBathroomsTotal: 1, floorSize: { '@type': 'QuantitativeValue', value: 109, unitCode: 'MTK' }, address: { '@type': 'PostalAddress', streetAddress: 'Rua Criciúma esq. Rua Araranguá', addressLocality: 'Balneário Rincão', addressRegion: 'SC', addressCountry: 'BR' } },
+{ '@type': 'Apartment', name: 'Mar di Arienzo Residencial', description: 'Apartamentos 3 dormitórios com suíte, 97 a 109 m² privativos no Centro de Balneário Rincão/SC.', image: '/images/empreendimentos/mar-di-arienzo-centro-balneario-rincao-sc/mar-di-arienzo-residencial-69d2e834c59ea.jpg', numberOfRooms: 3, numberOfBathroomsTotal: 1, floorSize: { '@type': 'QuantitativeValue', value: 109, unitCode: 'MTK' }, address: { '@type': 'PostalAddress', streetAddress: 'Rua Criciúma esq. Rua Araranguá', addressLocality: 'Balneário Rincão', addressRegion: 'SC', addressCountry: 'BR' } },
 ],
 }
 

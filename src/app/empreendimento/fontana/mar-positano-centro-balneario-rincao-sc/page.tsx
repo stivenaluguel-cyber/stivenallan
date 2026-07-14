@@ -22,8 +22,8 @@ const t = {
 }
 
 const IMG = {
-  hero: 'https://estilofontana.com.br/images/empreendimento/slideshows/mar-positano-residencial-676db4dfc93f5.jpg',
-  mapa: 'https://estilofontana.com.br/images/2025/01/08/mapa-mar-positano-677ea2e7cb00b.jpg',
+  hero: '/images/empreendimentos/mar-positano-centro-balneario-rincao-sc/mar-positano-residencial-676db4dfc93f5.jpg',
+  mapa: '/images/empreendimentos/mar-positano-centro-balneario-rincao-sc/mapa-mar-positano-677ea2e7cb00b.jpg',
   video: '',
   piscina: 'https://lh3.googleusercontent.com/d/1MLv9SV4J6njj6M68rllCnt3Zdl8yC67P',
 }
@@ -68,7 +68,7 @@ export const metadata: Metadata = {
     title: 'Mar Positano Residencial | Balneário Rincão SC | Stiven Allan',
     description: 'Apartamentos de 3 dormitórios com suíte, 107 a 126 m², no Centro de Balneário Rincão. Lazer completo e financiamento facilitado.',
     url: `${SITE_URL}/empreendimento/fontana/mar-positano-centro-balneario-rincao-sc`,
-    images: [{ url: 'https://estilofontana.com.br/images/empreendimento/slideshows/mar-positano-residencial-676db4dfc93f5.jpg', width: 1200, height: 630, alt: 'Mar Positano Residencial' }],
+    images: [{ url: '/images/empreendimentos/mar-positano-centro-balneario-rincao-sc/mar-positano-residencial-676db4dfc93f5.jpg', width: 1200, height: 630, alt: 'Mar Positano Residencial' }],
     type: 'website',
   },
   twitter: { card: 'summary_large_image', title: 'Mar Positano Residencial | Balneário Rincão SC | Stiven Allan', description: 'Apartamentos 3 dorms (1 suíte), 107–126 m². Centro de Balneário Rincão.' },
@@ -83,7 +83,7 @@ const SCHEMA = {
       name: 'Mar Positano Residencial',
       description: 'Apartamentos de 3 dormitórios (1 suíte), 107 a 126 m², no Centro de Balneário Rincão/SC. Sacada com churrasqueira, piscina e lazer completo.',
       url: `${SITE_URL}/empreendimento/fontana/mar-positano-centro-balneario-rincao-sc`,
-      image: 'https://estilofontana.com.br/images/empreendimento/slideshows/mar-positano-residencial-676db4dfc93f5.jpg',
+      image: '/images/empreendimentos/mar-positano-centro-balneario-rincao-sc/mar-positano-residencial-676db4dfc93f5.jpg',
       address: {
         '@type': 'PostalAddress',
         streetAddress: 'Rua Waldemar Carlos Petrini, esq. Rua Espírito Santo',

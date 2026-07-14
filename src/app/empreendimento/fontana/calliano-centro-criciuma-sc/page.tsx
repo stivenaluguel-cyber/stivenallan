@@ -21,9 +21,9 @@ const t = {
 }
 
 const IMG = {
-  hero: 'https://estilofontana.com.br/images/empreendimento/slideshows/calliano-residencial-5f903109ab6a9.jpg?fm=webp',
-  mapa: 'https://estilofontana.com.br/images/2020/10/21/localizacao-5f9032238d8ae.png?fm=webp',
-  lazer: 'https://estilofontana.com.br/images/empreendimento/slideshows/calliano-residencial-5f903109ab6a9.jpg?fm=webp',
+  hero: '/images/empreendimentos/calliano-centro-criciuma-sc/calliano-residencial-5f903109ab6a9.jpg',
+  mapa: '/images/empreendimentos/calliano-centro-criciuma-sc/localizacao-5f9032238d8ae.jpg',
+  lazer: '/images/empreendimentos/calliano-centro-criciuma-sc/calliano-residencial-5f903109ab6a9.jpg',
 }
 
 const GALERIA = [

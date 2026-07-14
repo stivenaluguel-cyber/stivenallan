@@ -29,23 +29,23 @@ const t = {
 }
 
 const IMG = {
-  heroFrontal: 'https://estilofontana.com.br/upload/2025/11/26/1-f-la-fachada-frontal-r03-web-6926d44adbc25.jpg',
-  fachadaAngular: 'https://estilofontana.com.br/upload/2025/11/26/2-f-la-fachada-angular-r03-web-6926d44aad3cb.jpg',
-  fotomontagem: 'https://estilofontana.com.br/images/2025/11/26/27-f-la-fotomontagem-op-02-ef-web-6926e7faba3f4.jpg?fm=webp',
-  mapa: 'https://estilofontana.com.br/images/2025/11/26/lavis-6926d96bce7ad.jpg?fm=webp',
-  piscina: 'https://estilofontana.com.br/images/2025/11/26/11-f-la-piscina-op-002-ef-web-6926d56317e9f.jpg?fm=webp',
+  heroFrontal: '/images/empreendimentos/lavis-residencial-centro-criciuma-sc/1-f-la-fachada-frontal-r03-web-6926d44adbc25.jpg',
+  fachadaAngular: '/images/empreendimentos/lavis-residencial-centro-criciuma-sc/2-f-la-fachada-angular-r03-web-6926d44aad3cb.jpg',
+  fotomontagem: '/images/empreendimentos/lavis-residencial-centro-criciuma-sc/27-f-la-fotomontagem-op-02-ef-web-6926e7faba3f4.jpg',
+  mapa: '/images/empreendimentos/lavis-residencial-centro-criciuma-sc/lavis-6926d96bce7ad.jpg',
+  piscina: '/images/empreendimentos/lavis-residencial-centro-criciuma-sc/11-f-la-piscina-op-002-ef-web-6926d56317e9f.jpg',
   video: 'https://www.youtube.com/embed/gLjgaXUa-A8',
 }
 
 const GALERIA: { src: string; alt: string; label: string }[] = [
-  { src: 'https://estilofontana.com.br/images/empreendimento/slideshows/lavis-residencial-6926d1adaa325.jpg?fm=webp', alt: 'Lavis Residencial — perspectiva do empreendimento no Centro de Criciúma/SC', label: 'O Residencial' },
-  { src: 'https://estilofontana.com.br/images/empreendimento/slideshows/lavis-residencial-6926d230f3b44.jpg?fm=webp', alt: 'Lavis Residencial — fachada e volumetria arquitetônica', label: 'Arquitetura' },
-  { src: 'https://estilofontana.com.br/images/empreendimento/slideshows/lavis-residencial-6926d29d5b1d9.jpg?fm=webp', alt: 'Lavis Residencial — perspectiva externa', label: 'Perspectiva' },
-  { src: 'https://estilofontana.com.br/images/2025/11/26/3-f-la-embasamento-r03-web-6926d4a93fe97.jpg?fm=webp', alt: 'Acesso principal do Lavis Residencial', label: 'Acesso principal' },
-  { src: 'https://estilofontana.com.br/images/2025/11/26/13-f-la-hall-de-entrada-ef-web-6926d4c2528ec.jpg?fm=webp', alt: 'Hall de entrada do Lavis Residencial', label: 'Hall de entrada' },
-  { src: 'https://estilofontana.com.br/images/2025/11/26/8-6926d4ea5db5d.jpg?fm=webp', alt: 'Espaço gourmet do Lavis Residencial', label: 'Espaço gourmet' },
-  { src: 'https://estilofontana.com.br/images/2025/11/26/11-f-la-piscina-op-002-ef-web-6926d56317e9f.jpg?fm=webp', alt: 'Piscina do Lavis Residencial', label: 'Piscina' },
-  { src: 'https://estilofontana.com.br/images/2025/11/26/7-f-la-fitness-r03-web-6926d5b639a52.jpg?fm=webp', alt: 'Academia do Lavis Residencial', label: 'Academia' },
+  { src: '/images/empreendimentos/lavis-residencial-centro-criciuma-sc/lavis-residencial-6926d1adaa325.jpg', alt: 'Lavis Residencial — perspectiva do empreendimento no Centro de Criciúma/SC', label: 'O Residencial' },
+  { src: '/images/empreendimentos/lavis-residencial-centro-criciuma-sc/lavis-residencial-6926d230f3b44.jpg', alt: 'Lavis Residencial — fachada e volumetria arquitetônica', label: 'Arquitetura' },
+  { src: '/images/empreendimentos/lavis-residencial-centro-criciuma-sc/lavis-residencial-6926d29d5b1d9.jpg', alt: 'Lavis Residencial — perspectiva externa', label: 'Perspectiva' },
+  { src: '/images/empreendimentos/lavis-residencial-centro-criciuma-sc/3-f-la-embasamento-r03-web-6926d4a93fe97.jpg', alt: 'Acesso principal do Lavis Residencial', label: 'Acesso principal' },
+  { src: '/images/empreendimentos/lavis-residencial-centro-criciuma-sc/13-f-la-hall-de-entrada-ef-web-6926d4c2528ec.jpg', alt: 'Hall de entrada do Lavis Residencial', label: 'Hall de entrada' },
+  { src: '/images/empreendimentos/lavis-residencial-centro-criciuma-sc/8-6926d4ea5db5d.jpg', alt: 'Espaço gourmet do Lavis Residencial', label: 'Espaço gourmet' },
+  { src: '/images/empreendimentos/lavis-residencial-centro-criciuma-sc/11-f-la-piscina-op-002-ef-web-6926d56317e9f.jpg', alt: 'Piscina do Lavis Residencial', label: 'Piscina' },
+  { src: '/images/empreendimentos/lavis-residencial-centro-criciuma-sc/7-f-la-fitness-r03-web-6926d5b639a52.jpg', alt: 'Academia do Lavis Residencial', label: 'Academia' },
 ]
 
 const DIFERENCIAIS: string[] = [

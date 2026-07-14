@@ -19,12 +19,12 @@ display: "'Jost', system-ui, sans-serif", serif: "'Cormorant Garamond', Georgia,
 body: "'Hanken Grotesk', system-ui, sans-serif",
 }
 const IMG = {
-hero: 'https://estilofontana.com.br/images/empreendimento/slideshows/mar-di-licata-residencial-655b9b64e5d33.jpg?fm=webp',
-mapa: 'https://estilofontana.com.br/images/2023/11/20/localizacao-655ba53d107c5.jpg?fm=webp',
+hero: '/images/empreendimentos/mar-di-licata-mar-grosso-laguna-sc/mar-di-licata-residencial-655b9b64e5d33.jpg',
+mapa: '/images/empreendimentos/mar-di-licata-mar-grosso-laguna-sc/localizacao-655ba53d107c5.jpg',
 lazer: 'https://lh3.googleusercontent.com/d/1g2LQH2bzGM8O928OzMoRhFwOYf762VoK',
 }
 const GALERIA = [
-{ src: 'https://estilofontana.com.br/images/empreendimento/slideshows/mar-di-licata-residencial-655b9b64e5d33.jpg?fm=webp', alt: 'Mar di Licata Residencial — fachada', label: 'Fachada' },
+{ src: '/images/empreendimentos/mar-di-licata-mar-grosso-laguna-sc/mar-di-licata-residencial-655b9b64e5d33.jpg', alt: 'Mar di Licata Residencial — fachada', label: 'Fachada' },
 { src: 'https://lh3.googleusercontent.com/d/1g2LQH2bzGM8O928OzMoRhFwOYf762VoK', alt: 'Rooftop Mar di Licata Residencial', label: 'Rooftop' },
 { src: 'https://lh3.googleusercontent.com/d/19TFjHvE6Hr4bs_11PVN1n29vRg3Ahhr_', alt: 'Piscina com deck Mar di Licata', label: 'Piscina com Deck' },
 { src: 'https://lh3.googleusercontent.com/d/16MY5rf7ZQx9HgditS310M3V7h5TUEgeO', alt: 'Salão de festas Mar di Licata', label: 'Salão de Festas' },
@@ -58,20 +58,20 @@ title: 'Mar di Licata Residencial — Mar Grosso, Laguna/SC | Stiven Allan',
 description: 'Bem-vindo ao seu novo horizonte particular. Rooftop com vista para o mar, 120 a 122 m² privativos em Laguna/SC. Atendimento exclusivo com Stiven Allan.',
 url: SITE_URL + '/empreendimento/fontana/mar-di-licata-mar-grosso-laguna-sc',
 type: 'website',
-images: [{ url: 'https://estilofontana.com.br/images/empreendimento/slideshows/mar-di-licata-residencial-655b9b64e5d33.jpg?fm=webp', width: 1200, height: 800, alt: 'Fachada Mar di Licata Residencial' }],
+images: [{ url: '/images/empreendimentos/mar-di-licata-mar-grosso-laguna-sc/mar-di-licata-residencial-655b9b64e5d33.jpg', width: 1200, height: 800, alt: 'Fachada Mar di Licata Residencial' }],
 },
 twitter: {
 card: 'summary_large_image',
 title: 'Mar di Licata Residencial — Mar Grosso, Laguna/SC | Stiven Allan',
 description: 'Bem-vindo ao seu novo horizonte particular. Rooftop com vista para o mar, 120 a 122 m² privativos em Laguna/SC.',
-images: ['https://estilofontana.com.br/images/empreendimento/slideshows/mar-di-licata-residencial-655b9b64e5d33.jpg?fm=webp'],
+images: ['/images/empreendimentos/mar-di-licata-mar-grosso-laguna-sc/mar-di-licata-residencial-655b9b64e5d33.jpg'],
 },
 robots: { index: true, follow: true },
 }
 const SCHEMA = {
 '@context': 'https://schema.org',
 '@graph': [
-{ '@type': 'Apartment', name: 'Mar di Licata Residencial', description: 'Apartamentos 3 dorm com suíte, 120 a 122 m² privativos, rooftop com vista para o mar no Mar Grosso em Laguna/SC.', image: 'https://estilofontana.com.br/images/empreendimento/slideshows/mar-di-licata-residencial-655b9b64e5d33.jpg?fm=webp', numberOfRooms: 3, numberOfBathroomsTotal: 1, floorSize: { '@type': 'QuantitativeValue', value: 122, unitCode: 'MTK' }, address: { '@type': 'PostalAddress', streetAddress: 'Rua Juiz Erwin Rubi Peressoni Teixeira, 627', addressLocality: 'Laguna', addressRegion: 'SC', addressCountry: 'BR' } },
+{ '@type': 'Apartment', name: 'Mar di Licata Residencial', description: 'Apartamentos 3 dorm com suíte, 120 a 122 m² privativos, rooftop com vista para o mar no Mar Grosso em Laguna/SC.', image: '/images/empreendimentos/mar-di-licata-mar-grosso-laguna-sc/mar-di-licata-residencial-655b9b64e5d33.jpg', numberOfRooms: 3, numberOfBathroomsTotal: 1, floorSize: { '@type': 'QuantitativeValue', value: 122, unitCode: 'MTK' }, address: { '@type': 'PostalAddress', streetAddress: 'Rua Juiz Erwin Rubi Peressoni Teixeira, 627', addressLocality: 'Laguna', addressRegion: 'SC', addressCountry: 'BR' } },
 ],
 }
 

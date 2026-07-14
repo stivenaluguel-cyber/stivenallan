@@ -18,20 +18,20 @@ display: "'Jost', system-ui, sans-serif", serif: "'Cormorant Garamond', Georgia,
 body: "'Hanken Grotesk', system-ui, sans-serif",
 }
 const IMG = {
-hero: "https://estilofontana.com.br/images/2024/01/15/f-adm-fachada-02-ef-web-65a588a03d4c8.jpg?fm=webp",
-mapa: "https://estilofontana.com.br/images/2024/01/19/89898-65aab89d1a2fb.png?fm=webp",
+hero: "/images/empreendimentos/aguas-de-marano-frente-mar-balneario-picarras-sc/f-adm-fachada-02-ef-web-65a588a03d4c8.jpg",
+mapa: "/images/empreendimentos/aguas-de-marano-frente-mar-balneario-picarras-sc/89898-65aab89d1a2fb.jpg",
 video: "https://www.youtube.com/embed/bdU-2kkXRZg",
-piscina: "https://estilofontana.com.br/images/2024/01/15/f-adm-piscina-completa-ef-web-65a59327c6b50.jpg?fm=webp",
+piscina: "/images/empreendimentos/aguas-de-marano-frente-mar-balneario-picarras-sc/f-adm-piscina-completa-ef-web-65a59327c6b50.jpg",
 }
 const GALERIA = [
-{ src: "https://estilofontana.com.br/images/empreendimento/slideshows/aguas-de-marano-residencial-65a583e5c68f2.jpg?fm=webp", alt: 'Águas de Marano — perspectiva frente mar', label: 'Frente mar' },
-{ src: "https://estilofontana.com.br/images/empreendimento/slideshows/aguas-de-marano-residencial-65a6bbf8a4550.jpg?fm=webp", alt: 'Águas de Marano — vista do empreendimento', label: 'O empreendimento' },
-{ src: "https://estilofontana.com.br/images/empreendimento/slideshows/aguas-de-marano-residencial-65a6bfc2517cc.jpg?fm=webp", alt: 'Águas de Marano — perspectiva externa', label: 'Arquitetura' },
-{ src: "https://estilofontana.com.br/images/2024/01/15/f-adm-piscina-completa-ef-web-65a59327c6b50.jpg?fm=webp", alt: 'Piscina adulto com wet bar', label: 'Piscina & wet bar' },
-{ src: "https://estilofontana.com.br/images/2024/01/15/f-adm-spa-aquecido-ef-web-65a593695f5f0.jpg?fm=webp", alt: 'Spa aquecido do Águas de Marano', label: 'Spa aquecido' },
-{ src: "https://estilofontana.com.br/images/2024/01/15/f-adm-terraco-espaco-fogo-ef-web-65a5938b45e1b.jpg?fm=webp", alt: 'Terraço com espaço fogo', label: 'Terraço & espaço fogo' },
-{ src: "https://estilofontana.com.br/images/2024/01/15/f-adm-salao-festas-01-ef-web-65a593fa7718c.jpg?fm=webp", alt: 'Salão de festas do Águas de Marano', label: 'Salão de festas' },
-{ src: "https://estilofontana.com.br/images/2024/01/15/f-adm-playground-ef-web-65a596dc5e2e7.jpg?fm=webp", alt: 'Playground do Águas de Marano', label: 'Playground' },
+{ src: "/images/empreendimentos/aguas-de-marano-frente-mar-balneario-picarras-sc/aguas-de-marano-residencial-65a583e5c68f2.jpg", alt: 'Águas de Marano — perspectiva frente mar', label: 'Frente mar' },
+{ src: "/images/empreendimentos/aguas-de-marano-frente-mar-balneario-picarras-sc/aguas-de-marano-residencial-65a6bbf8a4550.jpg", alt: 'Águas de Marano — vista do empreendimento', label: 'O empreendimento' },
+{ src: "/images/empreendimentos/aguas-de-marano-frente-mar-balneario-picarras-sc/aguas-de-marano-residencial-65a6bfc2517cc.jpg", alt: 'Águas de Marano — perspectiva externa', label: 'Arquitetura' },
+{ src: "/images/empreendimentos/aguas-de-marano-frente-mar-balneario-picarras-sc/f-adm-piscina-completa-ef-web-65a59327c6b50.jpg", alt: 'Piscina adulto com wet bar', label: 'Piscina & wet bar' },
+{ src: "/images/empreendimentos/aguas-de-marano-frente-mar-balneario-picarras-sc/f-adm-spa-aquecido-ef-web-65a593695f5f0.jpg", alt: 'Spa aquecido do Águas de Marano', label: 'Spa aquecido' },
+{ src: "/images/empreendimentos/aguas-de-marano-frente-mar-balneario-picarras-sc/f-adm-terraco-espaco-fogo-ef-web-65a5938b45e1b.jpg", alt: 'Terraço com espaço fogo', label: 'Terraço & espaço fogo' },
+{ src: "/images/empreendimentos/aguas-de-marano-frente-mar-balneario-picarras-sc/f-adm-salao-festas-01-ef-web-65a593fa7718c.jpg", alt: 'Salão de festas do Águas de Marano', label: 'Salão de festas' },
+{ src: "/images/empreendimentos/aguas-de-marano-frente-mar-balneario-picarras-sc/f-adm-playground-ef-web-65a596dc5e2e7.jpg", alt: 'Playground do Águas de Marano', label: 'Playground' },
 ]
 const DIFERENCIAIS = [
 'Sacada com churrasqueira e guarda-corpo de vidro','Persianas automatizadas nos dormitórios',
@@ -53,20 +53,20 @@ title: 'Águas de Marano Residencial — frente mar em Balneário Piçarras/SC |
 description: 'Tenha o mar como seu vizinho. Apartamentos frente mar de alto padrão no Centro de Balneário Piçarras/SC. Atendimento exclusivo com Stiven Allan.',
 url: SITE_URL + '/empreendimento/fontana/aguas-de-marano-frente-mar-balneario-picarras-sc',
 type: 'website',
-images: [{ url: "https://estilofontana.com.br/images/2024/01/15/f-adm-fachada-02-ef-web-65a588a03d4c8.jpg?fm=webp", width: 1200, height: 800, alt: 'Fachada do Águas de Marano Residencial' }],
+images: [{ url: "/images/empreendimentos/aguas-de-marano-frente-mar-balneario-picarras-sc/f-adm-fachada-02-ef-web-65a588a03d4c8.jpg", width: 1200, height: 800, alt: 'Fachada do Águas de Marano Residencial' }],
 },
 twitter: {
 card: 'summary_large_image',
 title: 'Águas de Marano Residencial — frente mar em Balneário Piçarras/SC | Stiven Allan',
 description: 'Tenha o mar como seu vizinho. Apartamentos frente mar de alto padrão no Centro de Balneário Piçarras/SC. Atendimento exclusivo com Stiven Allan.',
-images: ["https://estilofontana.com.br/images/2024/01/15/f-adm-fachada-02-ef-web-65a588a03d4c8.jpg?fm=webp"],
+images: ["/images/empreendimentos/aguas-de-marano-frente-mar-balneario-picarras-sc/f-adm-fachada-02-ef-web-65a588a03d4c8.jpg"],
 },
 robots: { index: true, follow: true },
 }
 const SCHEMA = {
 '@context': 'https://schema.org',
 '@graph': [
-{ '@type': 'Apartment', name: 'Águas de Marano Residencial', description: 'Apartamentos frente mar de alto padrão no Centro de Balneário Piçarras/SC.', image: "https://estilofontana.com.br/images/2024/01/15/f-adm-fachada-02-ef-web-65a588a03d4c8.jpg?fm=webp", numberOfRooms: 4, numberOfBathroomsTotal: 4, floorSize: { '@type': 'QuantitativeValue', value: 199, unitCode: 'MTK' }, address: { '@type': 'PostalAddress', streetAddress: 'Av. Nereu Ramos, esq. Rua Henrique Todeschini', addressLocality: 'Balneário Piçarras', addressRegion: 'SC', addressCountry: 'BR' } },
+{ '@type': 'Apartment', name: 'Águas de Marano Residencial', description: 'Apartamentos frente mar de alto padrão no Centro de Balneário Piçarras/SC.', image: "/images/empreendimentos/aguas-de-marano-frente-mar-balneario-picarras-sc/f-adm-fachada-02-ef-web-65a588a03d4c8.jpg", numberOfRooms: 4, numberOfBathroomsTotal: 4, floorSize: { '@type': 'QuantitativeValue', value: 199, unitCode: 'MTK' }, address: { '@type': 'PostalAddress', streetAddress: 'Av. Nereu Ramos, esq. Rua Henrique Todeschini', addressLocality: 'Balneário Piçarras', addressRegion: 'SC', addressCountry: 'BR' } },
 ],
 }
 
@@ -235,7 +235,7 @@ details.am-menu > summary::-webkit-details-marker { display: none; }
 </div>
 </section>
 <section style={{ position: 'relative', minHeight: '78vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
-<Image unoptimized src={"https://estilofontana.com.br/images/2024/01/15/f-adm-spa-aquecido-ef-web-65a593695f5f0.jpg?fm=webp"} alt="Spa aquecido frente mar do Águas de Marano Residencial" fill loading="lazy" sizes="100vw" style={{ objectFit: 'cover' }} />
+<Image unoptimized src={"/images/empreendimentos/aguas-de-marano-frente-mar-balneario-picarras-sc/f-adm-spa-aquecido-ef-web-65a593695f5f0.jpg"} alt="Spa aquecido frente mar do Águas de Marano Residencial" fill loading="lazy" sizes="100vw" style={{ objectFit: 'cover' }} />
 <div style={{ position: 'absolute', inset: 0, background: 'rgba(15,30,45,0.62)' }} />
 <div style={{ position: 'relative', zIndex: 2, padding: '0 clamp(18px,5vw,56px)', maxWidth: 880 }}>
 <p className="am-eyebrow am-onimg" style={{ color: '#fff', marginBottom: 22 }}>Atendimento Exclusivo</p>

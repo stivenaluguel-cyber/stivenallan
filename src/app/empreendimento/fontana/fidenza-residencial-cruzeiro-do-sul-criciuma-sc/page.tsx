@@ -31,15 +31,15 @@ const t = {
 }
 
 const IMG = {
-  heroFrontal: 'https://estilofontana.com.br/images/2024/09/02/f-f-fachada-frontal-r05-ef-web-66d61ccec113e.jpg?fm=webp',
-  fachadaAngular: 'https://estilofontana.com.br/images/2024/09/02/f-f-fachada-angular-r05-ef-web-66d61cd5390b1.jpg?fm=webp',
-  aerea: 'https://estilofontana.com.br/images/2025/03/25/f-f-voo-passaro-ef-67e2adc29eced.jpg?w=1120&h=645&fm=webp',
-  acessoPrincipal: 'https://estilofontana.com.br/images/2024/09/02/f-f-acesso-principal-r05-ef-web-66d61eada23cc.jpg?w=1120&h=645&fm=webp',
-  piscina: 'https://estilofontana.com.br/images/2024/09/12/f-f-piscina-com-prainha-ef-web-66e31ed990718.jpg?w=1120&h=645&fm=webp',
-  academia: 'https://estilofontana.com.br/images/2024/09/02/f-f-academia-com-varanda-ef-66d61eeab74cd.jpg?w=1120&h=645&fm=webp',
-  brinquedoteca: 'https://estilofontana.com.br/images/2024/09/02/f-f-brinquedoteca-ef-web-66d61eb2047ac.jpg?w=1120&h=645&fm=webp',
-  playground: 'https://estilofontana.com.br/images/2024/09/02/f-f-playground-ef-web-66d61ecc672f3.jpg?w=1120&h=645&fm=webp',
-  mapa: 'https://estilofontana.com.br/images/2024/07/15/mapa-fidenza-66952783e227e.jpg?fm=webp',
+  heroFrontal: '/images/empreendimentos/fidenza-residencial-cruzeiro-do-sul-criciuma-sc/f-f-fachada-frontal-r05-ef-web-66d61ccec113e.jpg',
+  fachadaAngular: '/images/empreendimentos/fidenza-residencial-cruzeiro-do-sul-criciuma-sc/f-f-fachada-angular-r05-ef-web-66d61cd5390b1.jpg',
+  aerea: '/images/empreendimentos/fidenza-residencial-cruzeiro-do-sul-criciuma-sc/f-f-voo-passaro-ef-67e2adc29eced.jpg',
+  acessoPrincipal: '/images/empreendimentos/fidenza-residencial-cruzeiro-do-sul-criciuma-sc/f-f-acesso-principal-r05-ef-web-66d61eada23cc.jpg',
+  piscina: '/images/empreendimentos/fidenza-residencial-cruzeiro-do-sul-criciuma-sc/f-f-piscina-com-prainha-ef-web-66e31ed990718.jpg',
+  academia: '/images/empreendimentos/fidenza-residencial-cruzeiro-do-sul-criciuma-sc/f-f-academia-com-varanda-ef-66d61eeab74cd.jpg',
+  brinquedoteca: '/images/empreendimentos/fidenza-residencial-cruzeiro-do-sul-criciuma-sc/f-f-brinquedoteca-ef-web-66d61eb2047ac.jpg',
+  playground: '/images/empreendimentos/fidenza-residencial-cruzeiro-do-sul-criciuma-sc/f-f-playground-ef-web-66d61ecc672f3.jpg',
+  mapa: '/images/empreendimentos/fidenza-residencial-cruzeiro-do-sul-criciuma-sc/mapa-fidenza-66952783e227e.jpg',
   video: 'https://www.youtube.com/embed/SNJ_EynBBOA',
 }
 

@@ -28,16 +28,16 @@ body: "\'Hanken Grotesk\', system-ui, sans-serif",
 }
 
 const IMG = {
-hero: 'https://estilofontana.com.br/images/empreendimento/slideshows/thiene-residencial-64be6b2174a61.jpg?fm=webp',
+hero: '/images/empreendimentos/thiene-centro-criciuma-sc/thiene-residencial-64be6b2174a61.jpg',
 }
 
 const GALERIA: { src: string; alt: string; label: string }[] = [
-{ src: 'https://estilofontana.com.br/images/empreendimento/slideshows/thiene-residencial-64be6b2174a61.jpg?fm=webp', alt: 'Thiene Residencial - fachada', label: 'Fachada' },
-{ src: 'https://blog.estilofontana.com.br/wp-content/uploads/FON_THI_ACESSO_EF_web.jpg', alt: 'Thiene Residencial - acesso principal', label: 'Acesso' },
-{ src: 'https://www.estilofontana.com.br/blog/wp-content/uploads/FON_THI_FOTOMONTAGEM_EF_web.jpg', alt: 'Thiene Residencial - fotomontagem', label: 'Perspectiva' },
-{ src: 'https://www.estilofontana.com.br/blog/wp-content/uploads/FON_THI_SUITE_FINAL_01_EF_web.jpg', alt: 'Thiene Residencial - suíte', label: 'Suíte' },
-{ src: 'https://www.estilofontana.com.br/blog/wp-content/uploads/FON_THI_PISCINA_EF_web.jpg', alt: 'Thiene Residencial - piscina', label: 'Piscina' },
-{ src: 'https://www.estilofontana.com.br/blog/wp-content/uploads/FON_THI_FACHADA_ANGULAR_EF_web.jpg', alt: 'Thiene Residencial - fachada angular', label: 'Vista Angular' },
+{ src: '/images/empreendimentos/thiene-centro-criciuma-sc/thiene-residencial-64be6b2174a61.jpg', alt: 'Thiene Residencial - fachada', label: 'Fachada' },
+{ src: '/images/empreendimentos/thiene-centro-criciuma-sc/fon-thi-acesso-ef-web.jpg', alt: 'Thiene Residencial - acesso principal', label: 'Acesso' },
+{ src: '/images/empreendimentos/thiene-centro-criciuma-sc/fon-thi-fotomontagem-ef-web.jpg', alt: 'Thiene Residencial - fotomontagem', label: 'Perspectiva' },
+{ src: '/images/empreendimentos/thiene-centro-criciuma-sc/fon-thi-suite-final-01-ef-web.jpg', alt: 'Thiene Residencial - suíte', label: 'Suíte' },
+{ src: '/images/empreendimentos/thiene-centro-criciuma-sc/fon-thi-piscina-ef-web.jpg', alt: 'Thiene Residencial - piscina', label: 'Piscina' },
+{ src: '/images/empreendimentos/thiene-centro-criciuma-sc/fon-thi-fachada-angular-ef-web.jpg', alt: 'Thiene Residencial - fachada angular', label: 'Vista Angular' },
 ]
 
 const DIFERENCIAIS: string[] = [

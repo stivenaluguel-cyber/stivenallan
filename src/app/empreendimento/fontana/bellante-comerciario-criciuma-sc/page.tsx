@@ -11,7 +11,7 @@ export const revalidate = 3600;
 const ACCENT = '#2C4A7C';
 const ACCENT_DARK = '#1a2d4d';
 const WA = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Bellante%20Residencial.';
-const HERO = 'https://estilofontana.com.br/images/empreendimento/slideshows/bellante-residencial-642b0899097e5.jpg?fm=webp';
+const HERO = '/images/empreendimentos/bellante-comerciario-criciuma-sc/bellante-residencial-642b0899097e5.jpg';
 
 const GALERIA = [
   { src: 'https://lh3.googleusercontent.com/d/12AAsmhPmf2OEAiJ92P1XFUTZMuXYgYjG', alt: 'Fachada' },
@@ -175,7 +175,7 @@ export default function BellantePage() {
             Rua Treze de Maio, 92 — Comerciário, Criciúma/SC
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '2.5rem' }}>
-            <img src="https://estilofontana.com.br/images/2023/04/06/localizacao-bellante-642edb705c4c6.jpg?fm=webp"
+            <img src="/images/empreendimentos/bellante-comerciario-criciuma-sc/localizacao-bellante-642edb705c4c6.jpg"
               alt="Localização Bellante Residencial — Comerciário Criciúma"
               style={{ width: '100%', height: '300px', objectFit: 'cover', borderRadius: '4px' }} />
             <div style={{ borderRadius: '4px', overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.1)' }}>

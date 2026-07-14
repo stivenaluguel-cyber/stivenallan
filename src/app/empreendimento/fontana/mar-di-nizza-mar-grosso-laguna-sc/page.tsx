@@ -14,13 +14,13 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Mar di Nizza Residencial | Mar Grosso Laguna SC | Stiven Allan',
     description: 'Sinta a leveza do litoral de Laguna no seu dia a dia. 2 e 3 dormitórios, 65 a 92 m² privativos.',
-    images: ['https://estilofontana.com.br/images/empreendimento/slideshows/mar-di-nizza-residencial-64e74bef1ceb6.jpg?fm=webp'],
+    images: ['/images/empreendimentos/mar-di-nizza-mar-grosso-laguna-sc/mar-di-nizza-residencial-64e74bef1ceb6.jpg'],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Mar di Nizza Residencial | Mar Grosso Laguna SC | Stiven Allan',
     description: 'Sinta a leveza do litoral de Laguna no seu dia a dia. 2 e 3 dormitórios, 65 a 92 m² privativos.',
-    images: ['https://estilofontana.com.br/images/empreendimento/slideshows/mar-di-nizza-residencial-64e74bef1ceb6.jpg?fm=webp'],
+    images: ['/images/empreendimentos/mar-di-nizza-mar-grosso-laguna-sc/mar-di-nizza-residencial-64e74bef1ceb6.jpg'],
   },
 }
 
@@ -34,9 +34,9 @@ const t = {
 }
 
 const IMG = {
-  hero: 'https://estilofontana.com.br/images/empreendimento/slideshows/mar-di-nizza-residencial-64e74bef1ceb6.jpg?fm=webp',
-  mapa: 'https://estilofontana.com.br/images/2023/08/24/localizacao-64e74f0416d2d.png?fm=webp',
-  lazer: 'https://estilofontana.com.br/images/empreendimento/slideshows/mar-di-nizza-residencial-64e74bef1ceb6.jpg?fm=webp',
+  hero: '/images/empreendimentos/mar-di-nizza-mar-grosso-laguna-sc/mar-di-nizza-residencial-64e74bef1ceb6.jpg',
+  mapa: '/images/empreendimentos/mar-di-nizza-mar-grosso-laguna-sc/localizacao-64e74f0416d2d.jpg',
+  lazer: '/images/empreendimentos/mar-di-nizza-mar-grosso-laguna-sc/mar-di-nizza-residencial-64e74bef1ceb6.jpg',
 }
 
 const GALERIA = [

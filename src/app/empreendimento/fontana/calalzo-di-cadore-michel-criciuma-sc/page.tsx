@@ -19,9 +19,9 @@ const t = {
 }
 
 const IMG = {
-  hero: 'https://estilofontana.com.br/images/empreendimento/slideshows/calalzo-di-cadore-residencial-64a2c669b3bc6.JPG?fm=webp',
-  mapa: 'https://estilofontana.com.br/images/2020/10/26/localizacao-5f96e4a316e04.png?fm=webp',
-  lazer: 'https://estilofontana.com.br/images/empreendimento/slideshows/calalzo-di-cadore-residencial-64a2c6698cf6f.JPG?fm=webp',
+  hero: '/images/empreendimentos/calalzo-di-cadore-michel-criciuma-sc/calalzo-di-cadore-residencial-64a2c669b3bc6.jpg',
+  mapa: '/images/empreendimentos/calalzo-di-cadore-michel-criciuma-sc/localizacao-5f96e4a316e04.jpg',
+  lazer: '/images/empreendimentos/calalzo-di-cadore-michel-criciuma-sc/calalzo-di-cadore-residencial-64a2c6698cf6f.jpg',
 }
 
 const GALERIA = [

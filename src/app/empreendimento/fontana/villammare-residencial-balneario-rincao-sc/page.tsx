@@ -20,7 +20,7 @@ const t = {
   body: "'Inter', system-ui, sans-serif"
 }
 
-const CDN = 'https://estilofontana.com.br/images/empreendimento/slideshows/'
+const CDN = '/images/empreendimentos/villammare-residencial-balneario-rincao-sc/'
 const D = 'https://lh3.googleusercontent.com/d/'
 
 const IMG = {

@@ -19,12 +19,12 @@ display: "'Jost', system-ui, sans-serif", serif: "'Cormorant Garamond', Georgia,
 body: "'Hanken Grotesk', system-ui, sans-serif",
 }
 const IMG = {
-hero: 'https://estilofontana.com.br/images/empreendimento/slideshows/mar-di-atrani-residencial-675c232fef052.jpg?fm=webp',
-mapa: 'https://estilofontana.com.br/images/2024/12/16/mapa-mardiatrani-67603ff05bdb5.jpg?fm=webp',
-lazer: 'https://estilofontana.com.br/images/empreendimento/slideshows/mar-di-atrani-residencial-675c232fef052.jpg?fm=webp',
+hero: '/images/empreendimentos/mar-di-atrani-centro-balneario-rincao-sc/mar-di-atrani-residencial-675c232fef052.jpg',
+mapa: '/images/empreendimentos/mar-di-atrani-centro-balneario-rincao-sc/mapa-mardiatrani-67603ff05bdb5.jpg',
+lazer: '/images/empreendimentos/mar-di-atrani-centro-balneario-rincao-sc/mar-di-atrani-residencial-675c232fef052.jpg',
 }
 const GALERIA = [
-{ src: 'https://estilofontana.com.br/images/empreendimento/slideshows/mar-di-atrani-residencial-675c232fef052.jpg?fm=webp', alt: 'Mar di Atrani Residencial — fachada frontal', label: 'Fachada Frontal' },
+{ src: '/images/empreendimentos/mar-di-atrani-centro-balneario-rincao-sc/mar-di-atrani-residencial-675c232fef052.jpg', alt: 'Mar di Atrani Residencial — fachada frontal', label: 'Fachada Frontal' },
 { src: 'https://lh3.googleusercontent.com/d/1PXeNqh6dhGqr5ZbJKqaqksqmhpA_vfK6', alt: 'Mar di Atrani — fachada angular', label: 'Fachada Angular' },
 { src: 'https://lh3.googleusercontent.com/d/1fe9t2T0geSe3EUTdZn8yUVKIxXk6bbKk', alt: 'Salão de festas com deck Mar di Atrani', label: 'Salão de Festas com Deck' },
 { src: 'https://lh3.googleusercontent.com/d/1lKvi0RUjyT24pU2-PRjzOimweaQBdB3E', alt: 'Living integrado Mar di Atrani Residencial', label: 'Living Integrado' },
@@ -56,13 +56,13 @@ title: 'Mar di Atrani Residencial — Centro, Balneário Rincão/SC | Stiven All
 description: 'A vida no agora. Apartamentos 3 dormitórios com suíte, 100 a 101 m² privativos, a 250 metros da beira-mar em Balneário Rincão/SC. Atendimento exclusivo com Stiven Allan.',
 url: SITE_URL + '/empreendimento/fontana/mar-di-atrani-centro-balneario-rincao-sc',
 type: 'website',
-images: [{ url: 'https://estilofontana.com.br/images/empreendimento/slideshows/mar-di-atrani-residencial-675c232fef052.jpg?fm=webp', width: 1200, height: 800, alt: 'Fachada Mar di Atrani Residencial' }],
+images: [{ url: '/images/empreendimentos/mar-di-atrani-centro-balneario-rincao-sc/mar-di-atrani-residencial-675c232fef052.jpg', width: 1200, height: 800, alt: 'Fachada Mar di Atrani Residencial' }],
 },
 twitter: {
 card: 'summary_large_image',
 title: 'Mar di Atrani Residencial — Centro, Balneário Rincão/SC | Stiven Allan',
 description: 'A vida no agora. Apartamentos 3 dormitórios com suíte, 100 a 101 m² privativos, a 250 metros da beira-mar em Balneário Rincão/SC. Atendimento exclusivo com Stiven Allan.',
-images: ['https://estilofontana.com.br/images/empreendimento/slideshows/mar-di-atrani-residencial-675c232fef052.jpg?fm=webp'],
+images: ['/images/empreendimentos/mar-di-atrani-centro-balneario-rincao-sc/mar-di-atrani-residencial-675c232fef052.jpg'],
 },
 robots: { index: true, follow: true },
 }
@@ -251,7 +251,7 @@ details.mt-menu > summary::-webkit-details-marker { display: none; }
       uf="SC"
       bairro="Centro"
       descricao="Apartamentos 3 dormitórios com suíte, 100 a 101 m2 privativos, a 250 metros da beira-mar no Centro de Balneário Rincão/SC."
-      imagem="https://estilofontana.com.br/images/empreendimento/slideshows/mar-di-atrani-residencial-675c232fef052.jpg?fm=webp"
+      imagem="/images/empreendimentos/mar-di-atrani-centro-balneario-rincao-sc/mar-di-atrani-residencial-675c232fef052.jpg"
       faq={[
         {pergunta:"Como funciona o financiamento direto do Mar di Atrani?",resposta:"Entrada de 20%, saldo em até 72 parcelas mensais e 6 reforos anuais (cada reforo = 5 mensais), correcao pelo CUB/SC durante a obra. Sem banco."},
         {pergunta:"Qual a previsao de entrega do Mar di Atrani Residencial?",resposta:"Consulte a previsao de entrega atual com Stiven pelo WhatsApp (48) 99164-2332."},

@@ -30,23 +30,23 @@ body: "\'Hanken Grotesk\', system-ui, sans-serif",
 }
 
 const IMG = {
-heroFrontal: 'https://estilofontana.com.br/upload/2025/08/29/f-ml-fachada-frontal-ef-web-68b18b16935ef.jpg',
-heroAerea: 'https://estilofontana.com.br/images/2025/08/28/f-ml-voo-passaro-ef-web-68b0986133a09.jpg?fm=webp',
-fachadaAngular: 'https://estilofontana.com.br/upload/2025/08/29/f-ml-fachada-angular-ef-web-68b18b1717c8b.jpg',
-mapa: 'https://estilofontana.com.br/images/2025/08/27/monte-leone-68af608281484.png?fm=webp',
-piscina: 'https://estilofontana.com.br/images/2025/08/11/f-ml-piscina-ang-02-ef-web-689a457c22a22.jpg',
+heroFrontal: '/images/empreendimentos/monte-leone-centro-criciuma-sc/f-ml-fachada-frontal-ef-web-68b18b16935ef.jpg',
+heroAerea: '/images/empreendimentos/monte-leone-centro-criciuma-sc/f-ml-voo-passaro-ef-web-68b0986133a09.jpg',
+fachadaAngular: '/images/empreendimentos/monte-leone-centro-criciuma-sc/f-ml-fachada-angular-ef-web-68b18b1717c8b.jpg',
+mapa: '/images/empreendimentos/monte-leone-centro-criciuma-sc/monte-leone-68af608281484.jpg',
+piscina: '/images/empreendimentos/monte-leone-centro-criciuma-sc/f-ml-piscina-ang-02-ef-web-689a457c22a22.jpg',
 video: 'https://www.youtube.com/embed/7CIZGHxnTXE',
 }
 
 const GALERIA: { src: string; alt: string; label: string }[] = [
-{ src: 'https://estilofontana.com.br/images/empreendimento/slideshows/monte-leone-residencial-68b0b93ab1366.jpg?fm=webp', alt: 'Monte Leone Residencial — perspectiva do empreendimento no Centro de Criciúma/SC', label: 'O Residencial' },
-{ src: 'https://estilofontana.com.br/images/empreendimento/slideshows/monte-leone-residencial-68b0b93dc2c1e.jpg?fm=webp', alt: 'Monte Leone Residencial — conjunto arquitetônico', label: 'Arquitetura' },
-{ src: 'https://estilofontana.com.br/images/empreendimento/slideshows/monte-leone-residencial-68b0b946d1e4d.jpg?fm=webp', alt: 'Monte Leone Residencial — detalhe da fachada', label: 'Fachada' },
-{ src: 'https://estilofontana.com.br/images/2025/08/11/f-ml-embasamento-ef-web-689a44e070a08.jpg', alt: 'Monte Leone — acesso principal e embasamento', label: 'Acesso Principal' },
-{ src: 'https://estilofontana.com.br/images/2025/08/11/f-ml-hall-ef-web-689a44f77e59d.jpg', alt: 'Monte Leone — hall com pé-direito duplo', label: 'Hall de Entrada' },
-{ src: 'https://estilofontana.com.br/images/2025/08/11/f-ml-lounge-ang-01-ef-web-689a455866961.jpg', alt: 'Monte Leone — lounge e passarela', label: 'Lounge' },
-{ src: 'https://estilofontana.com.br/images/2025/08/11/f-ml-piscina-ang-02-ef-web-689a457c22a22.jpg', alt: 'Monte Leone — piscina climatizada adulto e infantil', label: 'Piscina' },
-{ src: 'https://estilofontana.com.br/images/2025/08/11/f-ml-deck-ang-02-ef-web-689a45c5b88a0.jpg', alt: 'Monte Leone — deck da piscina', label: 'Deck' },
+{ src: '/images/empreendimentos/monte-leone-centro-criciuma-sc/monte-leone-residencial-68b0b93ab1366.jpg', alt: 'Monte Leone Residencial — perspectiva do empreendimento no Centro de Criciúma/SC', label: 'O Residencial' },
+{ src: '/images/empreendimentos/monte-leone-centro-criciuma-sc/monte-leone-residencial-68b0b93dc2c1e.jpg', alt: 'Monte Leone Residencial — conjunto arquitetônico', label: 'Arquitetura' },
+{ src: '/images/empreendimentos/monte-leone-centro-criciuma-sc/monte-leone-residencial-68b0b946d1e4d.jpg', alt: 'Monte Leone Residencial — detalhe da fachada', label: 'Fachada' },
+{ src: '/images/empreendimentos/monte-leone-centro-criciuma-sc/f-ml-embasamento-ef-web-689a44e070a08.jpg', alt: 'Monte Leone — acesso principal e embasamento', label: 'Acesso Principal' },
+{ src: '/images/empreendimentos/monte-leone-centro-criciuma-sc/f-ml-hall-ef-web-689a44f77e59d.jpg', alt: 'Monte Leone — hall com pé-direito duplo', label: 'Hall de Entrada' },
+{ src: '/images/empreendimentos/monte-leone-centro-criciuma-sc/f-ml-lounge-ang-01-ef-web-689a455866961.jpg', alt: 'Monte Leone — lounge e passarela', label: 'Lounge' },
+{ src: '/images/empreendimentos/monte-leone-centro-criciuma-sc/f-ml-piscina-ang-02-ef-web-689a457c22a22.jpg', alt: 'Monte Leone — piscina climatizada adulto e infantil', label: 'Piscina' },
+{ src: '/images/empreendimentos/monte-leone-centro-criciuma-sc/f-ml-deck-ang-02-ef-web-689a45c5b88a0.jpg', alt: 'Monte Leone — deck da piscina', label: 'Deck' },
 ]
 
 

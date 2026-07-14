@@ -21,9 +21,9 @@ const t = {
 }
 
 const IMG = {
-  hero: 'https://estilofontana.com.br/images/empreendimento/slideshows/castellano-residencial-600076ae1e9e9.jpg?fm=webp',
-  mapa: 'https://estilofontana.com.br/images/2020/10/27/localizacao-5f984a88a761c.png?fm=webp',
-  lazer: 'https://estilofontana.com.br/images/empreendimento/slideshows/castellano-residencial-600076ae1e9e9.jpg?fm=webp',
+  hero: '/images/empreendimentos/castellano-centro-icara-sc/castellano-residencial-600076ae1e9e9.jpg',
+  mapa: '/images/empreendimentos/castellano-centro-icara-sc/localizacao-5f984a88a761c.jpg',
+  lazer: '/images/empreendimentos/castellano-centro-icara-sc/castellano-residencial-600076ae1e9e9.jpg',
 }
 
 const GALERIA = [

@@ -11,7 +11,7 @@ export const revalidate = 3600;
 const ACCENT = '#5B3427';
 const ACCENT_DARK = '#3d2219';
 const WA = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Avezzano%20Residencial.';
-const HERO = 'https://estilofontana.com.br/images/empreendimento/slideshows/avezzano-residencial-61a626507d294.jpg?fm=webp';
+const HERO = '/images/empreendimentos/avezzano-centro-sideropolis-sc/avezzano-residencial-61a626507d294.jpg';
 
 const GALERIA = [
   { src: 'https://lh3.googleusercontent.com/d/1teagfJJc-4pfX8o6uiFdTR-kwTnYhB23', alt: 'Fachada' },

@@ -20,13 +20,13 @@ const t = {
   body: "'Inter', system-ui, sans-serif"
 }
 
-const CDN = 'https://estilofontana.com.br/images/empreendimento/slideshows/'
+const CDN = '/images/empreendimentos/villaggio-verde-residenziale-grande-prospera-criciuma-sc/'
 const D = 'https://lh3.googleusercontent.com/d/'
 
 const IMG = {
-  hero:  CDN + 'villaggio-verde-residenziale-646388473855e.JPG',
-  hero2: CDN + 'villaggio-verde-residenziale-646388324deac.JPG',
-  dsc:   'https://estilofontana.com.br/images/2020/10/22/dsc-5478-5f91b72cb327a.jpg',
+  hero:  CDN + 'villaggio-verde-residenziale-646388473855e.jpg',
+  hero2: CDN + 'villaggio-verde-residenziale-646388324deac.jpg',
+  dsc:   '/images/empreendimentos/villaggio-verde-residenziale-grande-prospera-criciuma-sc/dsc-5478-5f91b72cb327a.jpg',
 }
 
 const GALERIA = [
@@ -67,7 +67,7 @@ export const metadata: Metadata = {
     title: 'Villaggio Verde Residenziale | Condomínio em Criciúma SC | Stiven Allan',
     description: 'Terrenos de 794—1.038 m² em condomínio fechado. 12.000 m² de lazer exclusivo. Grande Próspera · Criciúma.',
     url: `${SITE_URL}/empreendimento/fontana/villaggio-verde-residenziale-grande-prospera-criciuma-sc`,
-    images: [{ url: CDN+'villaggio-verde-residenziale-646388473855e.JPG', width: 1200, height: 630, alt: 'Villaggio Verde Residenziale' }],
+    images: [{ url: CDN+'villaggio-verde-residenziale-646388473855e.jpg', width: 1200, height: 630, alt: 'Villaggio Verde Residenziale' }],
     type: 'website',
   },
   twitter: { card: 'summary_large_image', title: 'Villaggio Verde Residenziale | Criciúma SC | Stiven Allan', description: 'Terrenos 794—1.038 m² · Condomínio fechado · Grande Próspera · Criciúma' },
@@ -85,7 +85,7 @@ export default function Page() {
         uf="SC"
         bairro="Grande Prospera"
         descricao="Condominio fechado de terrenos de 794 a 1.038 m2 na Grande Prospera, Criciúma/SC."
-        imagem={CDN+'villaggio-verde-residenziale-646388473855e.JPG'}
+        imagem={CDN+'villaggio-verde-residenziale-646388473855e.jpg'}
         faq={[
           {pergunta:"Como funciona o financiamento do Villaggio Verde?",resposta:"Entrada de 25,3%, saldo em até 72 parcelas mensais e 6 reforos anuais, correcao pelo IPCA. Sem banco."},
           {pergunta:"Quais os tamanhos de terreno no Villaggio Verde?",resposta:"Terrenos de 794 a 1.038 m2 em condominio fechado na Grande Prospera, Criciúma/SC."},

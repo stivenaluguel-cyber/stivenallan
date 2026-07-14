@@ -28,7 +28,7 @@ const D = 'https://lh3.googleusercontent.com/d/'
 const IMG = {
   hero:  D + '1KSAQZxT2-vTIMRXxOUtUmUqtfLECIZuq',
   hero2: D + '1W-Xo_llBhK6P6bMl4xNBAp7fKbhRzGCM',
-  mapa:  'https://estilofontana.com.br/images/2020/10/20/localizacao-5f8f1080066a5.png',
+  mapa:  '/images/empreendimentos/rocca-pietore-centro-sideropolis-sc/localizacao-5f8f1080066a5.jpg',
 }
 
 const GALERIA = [

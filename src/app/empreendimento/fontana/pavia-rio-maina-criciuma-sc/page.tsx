@@ -22,8 +22,8 @@ const t = {
 }
 
 const IMG = {
-  hero: 'https://estilofontana.com.br/images/empreendimento/slideshows/pavia-residencial-636b9e731f40c.jpg',
-  mapa: 'https://estilofontana.com.br/images/2020/10/28/localizacao-5f9980ebd7dbf.png',
+  hero: '/images/empreendimentos/pavia-rio-maina-criciuma-sc/pavia-residencial-636b9e731f40c.jpg',
+  mapa: '/images/empreendimentos/pavia-rio-maina-criciuma-sc/localizacao-5f9980ebd7dbf.jpg',
   video: '',
   destaque: 'https://lh3.googleusercontent.com/d/1klibODLwrlq4qIWMsB7HxgDMW1n5ZFTb',
 }
@@ -70,7 +70,7 @@ export const metadata: Metadata = {
     title: 'Pavia Residencial | Rio Maina · Criciúma SC | Stiven Allan',
     description: 'Apartamentos de 1, 2 ou 3 dorms, 52–79 m², no Rio Maina em Criciúma. 4 torres, lazer completo e financiamento direto com a construtora.',
     url: `${SITE_URL}/empreendimento/fontana/pavia-rio-maina-criciuma-sc`,
-    images: [{ url: 'https://estilofontana.com.br/images/empreendimento/slideshows/pavia-residencial-636b9e731f40c.jpg', width: 1200, height: 630, alt: 'Pavia Residencial' }],
+    images: [{ url: '/images/empreendimentos/pavia-rio-maina-criciuma-sc/pavia-residencial-636b9e731f40c.jpg', width: 1200, height: 630, alt: 'Pavia Residencial' }],
     type: 'website',
   },
   twitter: { card: 'summary_large_image', title: 'Pavia Residencial | Criciúma SC | Stiven Allan', description: 'Aptos 1, 2 ou 3 dorms · 52–79 m² · Rio Maina · Criciúma' },
@@ -85,7 +85,7 @@ const SCHEMA = {
       name: 'Pavia Residencial',
       description: 'Apartamentos de 1, 2 ou 3 dormitórios, 52 a 79 m², no Rio Maina em Criciúma/SC. 4 torres com lazer completo.',
       url: `${SITE_URL}/empreendimento/fontana/pavia-rio-maina-criciuma-sc`,
-      image: 'https://estilofontana.com.br/images/empreendimento/slideshows/pavia-residencial-636b9e731f40c.jpg',
+      image: '/images/empreendimentos/pavia-rio-maina-criciuma-sc/pavia-residencial-636b9e731f40c.jpg',
       address: {
         '@type': 'PostalAddress',
         streetAddress: 'Avenida dos Imigrantes, esq. Rua João Colombo',

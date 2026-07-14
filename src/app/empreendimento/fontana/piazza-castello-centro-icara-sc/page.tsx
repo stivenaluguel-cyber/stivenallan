@@ -8,7 +8,7 @@ import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 
 const COR = '#5B2333'
-const CDN = 'https://estilofontana.com.br/images/empreendimento/slideshows/'
+const CDN = '/images/empreendimentos/piazza-castello-centro-icara-sc/'
 const D = (id: string) => `https://lh3.googleusercontent.com/d/${id}`
 const WA = 'https://wa.me/5548991642332?text=Ol%C3%A1!%20Tenho%20interesse%20no%20Piazza%20Castello%20Residencial.'
 const CATALOGO = 'https://drive.google.com/file/d/1q_66Ex_z0HJLQG_hvC0bau8sqILvvcsc/view'

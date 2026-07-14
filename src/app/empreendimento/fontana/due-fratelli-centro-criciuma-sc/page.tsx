@@ -18,9 +18,9 @@ display: "'Jost', system-ui, sans-serif", serif: "'Cormorant Garamond', Georgia,
 body: "'Hanken Grotesk', system-ui, sans-serif",
 }
 const IMG = {
-hero: 'https://estilofontana.com.br/images/empreendimento/slideshows/due-fratelli-residencial-5f889c789761e.jpg?fm=webp',
-mapa: 'https://estilofontana.com.br/images/2020/10/27/localizacao-5f985c6f66773.png?fm=webp',
-lazer: 'https://estilofontana.com.br/images/empreendimento/slideshows/due-fratelli-residencial-5f88a49aa91f3.jpg?fm=webp',
+hero: '/images/empreendimentos/due-fratelli-centro-criciuma-sc/due-fratelli-residencial-5f889c789761e.jpg',
+mapa: '/images/empreendimentos/due-fratelli-centro-criciuma-sc/localizacao-5f985c6f66773.jpg',
+lazer: '/images/empreendimentos/due-fratelli-centro-criciuma-sc/due-fratelli-residencial-5f88a49aa91f3.jpg',
 }
 const GALERIA = [
 { src: IMG.hero, alt: 'Fachada Due Fratelli Residencial', label: 'Fachada' },
@@ -73,20 +73,20 @@ title: 'Due Fratelli Residencial — Centro Criciúma/SC | Stiven Allan',
 description: 'Qualidade de vida e praticidade no Centro de Criciúma. 2 e 3 dormítórios, até 92 m² privativos, sacada com churrasqueira.',
 url: SITE_URL + '/empreendimento/fontana/due-fratelli-centro-criciuma-sc',
 type: 'website',
-images: [{ url: 'https://estilofontana.com.br/images/empreendimento/slideshows/due-fratelli-residencial-5f889c789761e.jpg?fm=webp', width: 1200, height: 800, alt: 'Fachada Due Fratelli Residencial' }],
+images: [{ url: '/images/empreendimentos/due-fratelli-centro-criciuma-sc/due-fratelli-residencial-5f889c789761e.jpg', width: 1200, height: 800, alt: 'Fachada Due Fratelli Residencial' }],
 },
 twitter: {
 card: 'summary_large_image',
 title: 'Due Fratelli Residencial — Centro Criciúma/SC | Stiven Allan',
 description: 'Qualidade de vida e praticidade no Centro de Criciúma. 2 e 3 dormítórios, até 92 m² privativos.',
-images: ['https://estilofontana.com.br/images/empreendimento/slideshows/due-fratelli-residencial-5f889c789761e.jpg?fm=webp'],
+images: ['/images/empreendimentos/due-fratelli-centro-criciuma-sc/due-fratelli-residencial-5f889c789761e.jpg'],
 },
 robots: { index: true, follow: true },
 }
 const SCHEMA = {
 '@context': 'https://schema.org',
 '@graph': [
-{ '@type': 'Apartment', name: 'Due Fratelli Residencial', description: 'Residencial com 2 e 3 dormítórios de até 92 m² privativos no Centro de Criciúma/SC.', image: 'https://estilofontana.com.br/images/empreendimento/slideshows/due-fratelli-residencial-5f889c789761e.jpg?fm=webp', numberOfRooms: 3, floorSize: { '@type': 'QuantitativeValue', value: 92, unitCode: 'MTK' }, address: { '@type': 'PostalAddress', streetAddress: 'Rua Princesa Isabel', addressLocality: 'Criciúma', addressRegion: 'SC', addressCountry: 'BR' } },
+{ '@type': 'Apartment', name: 'Due Fratelli Residencial', description: 'Residencial com 2 e 3 dormítórios de até 92 m² privativos no Centro de Criciúma/SC.', image: '/images/empreendimentos/due-fratelli-centro-criciuma-sc/due-fratelli-residencial-5f889c789761e.jpg', numberOfRooms: 3, floorSize: { '@type': 'QuantitativeValue', value: 92, unitCode: 'MTK' }, address: { '@type': 'PostalAddress', streetAddress: 'Rua Princesa Isabel', addressLocality: 'Criciúma', addressRegion: 'SC', addressCountry: 'BR' } },
 ],
 }
 

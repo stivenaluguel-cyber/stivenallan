@@ -22,9 +22,9 @@ const t = {
 }
 
 const IMG = {
-  hero: 'https://estilofontana.com.br/images/empreendimento/slideshows/pianezze-residencial-69b2b42d573df.JPG',
-  hero2: 'https://estilofontana.com.br/images/empreendimento/slideshows/pianezze-residencial-69b2b44053955.JPG',
-  mapa: 'https://estilofontana.com.br/images/2021/11/08/localizacao-6189565b5e614.jpg',
+  hero: '/images/empreendimentos/pianezze-centro-icara-sc/pianezze-residencial-69b2b42d573df.jpg',
+  hero2: '/images/empreendimentos/pianezze-centro-icara-sc/pianezze-residencial-69b2b44053955.jpg',
+  mapa: '/images/empreendimentos/pianezze-centro-icara-sc/localizacao-6189565b5e614.jpg',
   destaque: 'https://lh3.googleusercontent.com/d/1MrTzWvolu9TsNVkVNCag0A_a-ifGV54V',
 }
 
@@ -72,7 +72,7 @@ export const metadata: Metadata = {
     title: 'Pianezze Residencial | Centro de Içara SC | Stiven Allan',
     description: 'Apartamentos 2 e 3 dorms (1 suíte), 66–86 m², no Centro de Içara. Lazer completo e financiamento direto com a Construtora Fontana.',
     url: `${SITE_URL}/empreendimento/fontana/pianezze-centro-icara-sc`,
-    images: [{ url: 'https://estilofontana.com.br/images/empreendimento/slideshows/pianezze-residencial-69b2b42d573df.JPG', width: 1200, height: 630, alt: 'Pianezze Residencial' }],
+    images: [{ url: '/images/empreendimentos/pianezze-centro-icara-sc/pianezze-residencial-69b2b42d573df.jpg', width: 1200, height: 630, alt: 'Pianezze Residencial' }],
     type: 'website',
   },
   twitter: { card: 'summary_large_image', title: 'Pianezze Residencial | Içara SC | Stiven Allan', description: 'Aptos 2 e 3 dorms · 66–86 m² · Centro de Içara' },
@@ -87,7 +87,7 @@ const SCHEMA = {
       name: 'Pianezze Residencial',
       description: 'Apartamentos de 2 e 3 dormitórios (1 suíte), 66 a 86 m², no Centro de Içara/SC. Lazer completo com piscina, academia e playground.',
       url: `${SITE_URL}/empreendimento/fontana/pianezze-centro-icara-sc`,
-      image: 'https://estilofontana.com.br/images/empreendimento/slideshows/pianezze-residencial-69b2b42d573df.JPG',
+      image: '/images/empreendimentos/pianezze-centro-icara-sc/pianezze-residencial-69b2b42d573df.jpg',
       address: {
         '@type': 'PostalAddress',
         streetAddress: 'Av. Dilcio Esmael da Silva, esq. R. João Bonomo',

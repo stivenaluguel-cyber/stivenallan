@@ -22,14 +22,14 @@ const t = {
 }
 
 const IMG = {
-  hero: 'https://estilofontana.com.br/images/empreendimento/slideshows/pineto-residencial-68249cd5dfc70.jpg',
-  hero2: 'https://estilofontana.com.br/images/empreendimento/slideshows/pineto-residencial-68249cdb816aa.jpg',
-  mapa: 'https://estilofontana.com.br/images/2025/05/19/mapa-pineto-682b2075b57bb.jpg',
+  hero: '/images/empreendimentos/pineto-centro-criciuma-sc/pineto-residencial-68249cd5dfc70.jpg',
+  hero2: '/images/empreendimentos/pineto-centro-criciuma-sc/pineto-residencial-68249cdb816aa.jpg',
+  mapa: '/images/empreendimentos/pineto-centro-criciuma-sc/mapa-pineto-682b2075b57bb.jpg',
 }
 
 const GALERIA = [
-  { src: 'https://estilofontana.com.br/images/empreendimento/slideshows/pineto-residencial-68249cd5dfc70.jpg', alt: 'Fachada Pineto Residencial Criciúma', label: 'Fachada' },
-  { src: 'https://estilofontana.com.br/images/empreendimento/slideshows/pineto-residencial-68249cdb816aa.jpg', alt: 'Pineto Residencial Centro Criciúma', label: 'Vista Geral' },
+  { src: '/images/empreendimentos/pineto-centro-criciuma-sc/pineto-residencial-68249cd5dfc70.jpg', alt: 'Fachada Pineto Residencial Criciúma', label: 'Fachada' },
+  { src: '/images/empreendimentos/pineto-centro-criciuma-sc/pineto-residencial-68249cdb816aa.jpg', alt: 'Pineto Residencial Centro Criciúma', label: 'Vista Geral' },
 ]
 
 const DIFERENCIAIS = [
@@ -63,7 +63,7 @@ export const metadata: Metadata = {
     title: 'Pineto Residencial | Centro de Criciúma SC | Stiven Allan',
     description: 'Apartamentos 2 dorms (1 suíte), 75–76 m², no Centro de Criciúma. Academia, coworking, espaço ioga e financiamento direto com a Construtora Fontana.',
     url: `${SITE_URL}/empreendimento/fontana/pineto-centro-criciuma-sc`,
-    images: [{ url: 'https://estilofontana.com.br/images/empreendimento/slideshows/pineto-residencial-68249cd5dfc70.jpg', width: 1200, height: 630, alt: 'Pineto Residencial' }],
+    images: [{ url: '/images/empreendimentos/pineto-centro-criciuma-sc/pineto-residencial-68249cd5dfc70.jpg', width: 1200, height: 630, alt: 'Pineto Residencial' }],
     type: 'website',
   },
   twitter: { card: 'summary_large_image', title: 'Pineto Residencial | Criciúma SC | Stiven Allan', description: 'Aptos 2 dorms (1 suíte) · 75–76 m² · Centro de Criciúma' },
@@ -78,7 +78,7 @@ const SCHEMA = {
       name: 'Pineto Residencial',
       description: 'Apartamentos de 2 dormitórios (1 suíte), 75 a 76 m², no Centro de Criciúma/SC. Academia, coworking, espaço ioga e acabamento premium.',
       url: `${SITE_URL}/empreendimento/fontana/pineto-centro-criciuma-sc`,
-      image: 'https://estilofontana.com.br/images/empreendimento/slideshows/pineto-residencial-68249cd5dfc70.jpg',
+      image: '/images/empreendimentos/pineto-centro-criciuma-sc/pineto-residencial-68249cd5dfc70.jpg',
       address: {
         '@type': 'PostalAddress',
         streetAddress: 'Rua Itajaí, 185',

@@ -19,9 +19,9 @@ const t = {
 }
 
 const IMG = {
-  hero: 'https://estilofontana.com.br/images/empreendimento/slideshows/bosco-del-montello-residencial-613a4794e8ddd.jpg?fm=webp',
-  mapa: 'https://estilofontana.com.br/images/2020/10/26/localizacao-5f96e20b6e722.png?fm=webp',
-  lazer: 'https://estilofontana.com.br/images/2020/10/02/f-bdm-suite-ef-web-5f77596286190.jpg?fm=webp',
+  hero: '/images/empreendimentos/bosco-del-montello-centro-criciuma-sc/bosco-del-montello-residencial-613a4794e8ddd.jpg',
+  mapa: '/images/empreendimentos/bosco-del-montello-centro-criciuma-sc/localizacao-5f96e20b6e722.jpg',
+  lazer: '/images/empreendimentos/bosco-del-montello-centro-criciuma-sc/f-bdm-suite-ef-web-5f77596286190.jpg',
 }
 
 const GALERIA = [
