@@ -62,7 +62,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
             siteName: 'Stiven Allan',
             locale: 'pt_BR',
             type: 'website',
-            images: dbProp.cover_image_url ? [{ url: dbProp.cover_image_url }] : undefined,
+            // images omitido de propósito: Next.js resolve automaticamente via
+            // opengraph-image.tsx (next/og) desta rota, que já usa cover_image_url.
           },
           twitter: { card: 'summary_large_image', title: dTitleBrand, description: dDesc },
         };
@@ -90,7 +91,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       siteName: 'Stiven Allan',
       locale: 'pt_BR',
       type: 'website',
-      images: emp.imagem ? [{ url: emp.imagem }] : undefined,
+      // images omitido de propósito: Next.js resolve automaticamente via
+      // opengraph-image.tsx (next/og) desta rota, que já usa emp.imagem.
     },
             twitter: { card: 'summary_large_image', title: titleBrand, description },
   };

@@ -1,4 +1,5 @@
 import { SITE_URL } from '@/lib/site'
+import type { ApartmentComplex, BreadcrumbList, FAQPage, WithContext } from 'schema-dts'
 
 type FaqItem = { pergunta: string; resposta: string }
 
@@ -33,35 +34,37 @@ export function PropertySchema({ schema, nome, slug, construtora_slug, cidade, u
 
   // Modo props: gera schema ApartmentComplex + Breadcrumb + FAQPage
   const url = `${SITE_URL}/empreendimento/${construtora_slug}/${slug}`
-  const schemas: object[] = [
-    {
-      '@context': 'https://schema.org',
-      '@type': 'ApartmentComplex',
-      name: nome,
-      url,
-      description: descricao,
-      ...(imagem ? { image: imagem } : {}),
-      address: {
-        '@type': 'PostalAddress',
-        addressLocality: cidade,
-        addressRegion: uf,
-        ...(bairro ? { streetAddress: bairro } : {}),
-        addressCountry: 'BR',
-      },
+
+  const apartmentComplex: WithContext<ApartmentComplex> = {
+    '@context': 'https://schema.org',
+    '@type': 'ApartmentComplex',
+    name: nome,
+    url,
+    description: descricao,
+    ...(imagem ? { image: imagem } : {}),
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: cidade,
+      addressRegion: uf,
+      ...(bairro ? { streetAddress: bairro } : {}),
+      addressCountry: 'BR',
     },
-    {
-      '@context': 'https://schema.org',
-      '@type': 'BreadcrumbList',
-      itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Início', item: SITE_URL },
-        { '@type': 'ListItem', position: 2, name: 'Empreendimentos', item: `${SITE_URL}/empreendimentos` },
-        { '@type': 'ListItem', position: 3, name: nome, item: url },
-      ],
-    },
-  ]
+  }
+
+  const breadcrumb: WithContext<BreadcrumbList> = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Início', item: SITE_URL },
+      { '@type': 'ListItem', position: 2, name: 'Empreendimentos', item: `${SITE_URL}/empreendimentos` },
+      { '@type': 'ListItem', position: 3, name: nome, item: url },
+    ],
+  }
+
+  const schemas: WithContext<ApartmentComplex | BreadcrumbList | FAQPage>[] = [apartmentComplex, breadcrumb]
 
   if (faq && faq.length) {
-    schemas.push({
+    const faqPage: WithContext<FAQPage> = {
       '@context': 'https://schema.org',
       '@type': 'FAQPage',
       mainEntity: faq.map((f) => ({
@@ -69,7 +72,8 @@ export function PropertySchema({ schema, nome, slug, construtora_slug, cidade, u
         name: f.pergunta,
         acceptedAnswer: { '@type': 'Answer', text: f.resposta },
       })),
-    })
+    }
+    schemas.push(faqPage)
   }
 
   return (
