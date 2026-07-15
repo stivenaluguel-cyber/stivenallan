@@ -59,7 +59,6 @@ REGRAS CRITICAS
 - Nunca mencione outros corretores ou imobiliarias.
 - Foco 100% em lancamentos de construtoras (nao imoveis de terceiros).
 - Ao qualificar lead, sempre registrar no CRM via atualizar_lead().
-- Empreendimentos disponiveis: Monte Leone, Lavis, Pineto, Hub Smart Home (todos Fontana em Criciuma).
 `
 
 // ============================================
@@ -131,20 +130,25 @@ async function executarTool(nome: string, args: Record<string, unknown>, whatsap
   const supabase = getSupabase()
 
   if (nome === 'buscar_empreendimentos') {
+    // properties é a tabela unificada em uso hoje (27 empreendimentos ativos);
+    // a antiga 'empreendimentos' é legado com ~5 linhas congeladas — nunca mais
+    // atualizada desde a migração 0001_properties_unified.sql.
     let query = supabase
-      .from('empreendimentos')
-      .select('nome, slug, cidade, bairro, preco_a_partir_de, preco_ate, area_privativa_min, area_privativa_max, status_venda, descricao_curta')
-      .eq('status_venda', 'ativo')
+      .from('properties')
+      .select('nome, slug, cidade, bairro, preco, exibir_preco, dormitorios, suites, metragem, status, descricao_curta')
+      .eq('ativo', true)
+      .eq('oculto', false)
 
     if (args.cidade) query = query.ilike('cidade', `%${args.cidade}%`)
-    if (args.preco_max) query = query.lte('preco_a_partir_de', args.preco_max)
+    if (args.preco_max) query = query.lte('preco', args.preco_max)
 
     const { data } = await query.limit(5)
     if (!data || data.length === 0) return 'Nenhum empreendimento encontrado com esses filtros.'
 
-    return data.map(e =>
-      `${e.nome} | ${e.cidade}/${e.bairro} | R$ ${e.preco_a_partir_de?.toLocaleString('pt-BR')} a R$ ${e.preco_ate?.toLocaleString('pt-BR')} | ${e.area_privativa_min}-${e.area_privativa_max}m2 | Status: ${e.status_venda}`
-    ).join('\n')
+    return data.map(e => {
+      const precoTxt = e.exibir_preco && e.preco ? `R$ ${Number(e.preco).toLocaleString('pt-BR')}` : 'Sob consulta'
+      return `${e.nome} | ${e.cidade}/${e.bairro} | ${precoTxt} | ${e.dormitorios ?? '?'} dorm, ${e.suites ?? '?'} suites, ${e.metragem ?? '?'}m2 | Status: ${e.status ?? 'disponivel'}`
+    }).join('\n')
   }
 
   if (nome === 'atualizar_lead') {

@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { getAttribution, trackLeadEvent, sendLeadToCapi } from '@/lib/tracking';
+import { createClient } from '@/lib/supabase/client';
+import { getAnonId, getVisitas } from '@/components/VisitTracker';
 
 interface Props {
   empreendimento: string;
@@ -10,6 +12,7 @@ interface Props {
 }
 
 const WHATSAPP = '5548991642332';
+const KEY_LEAD = 'sa_lead';
 
 export default function FormContato({ empreendimento, propertyId, propertySlug }: Props) {
   const [nome, setNome] = useState('');
@@ -29,6 +32,7 @@ export default function FormContato({ empreendimento, propertyId, propertySlug }
     e.preventDefault();
     if (!nome || !telefone || !faixaInvestimento || !prazoCompra || !entradaDisponivel) return;
     setStatus('enviando');
+    let leadId: string | null = null;
     // Aba aberta ainda dentro do gesto de clique — Safari bloqueia window.open() chamado após um await
     const waTab = window.open('', '_blank');
     try {
@@ -52,6 +56,8 @@ export default function FormContato({ empreendimento, propertyId, propertySlug }
         }),
       });
       if (!res.ok) { waTab?.close(); throw new Error('falha'); }
+      const json = await res.json();
+      leadId = json?.id ?? null;
       fetch('/api/notify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -60,13 +66,27 @@ export default function FormContato({ empreendimento, propertyId, propertySlug }
       const eventId = crypto.randomUUID();
       trackLeadEvent(empreendimento, eventId, { email: email || null, telefone, nome });
       sendLeadToCapi({ event_id: eventId, nome, telefone, email: email || null, content_name: empreendimento });
-      setStatus('ok');
-      if (waTab) waTab.location.href = waLink;
-      else window.open(waLink, '_blank', 'noopener,noreferrer');
     } catch {
       waTab?.close();
       setStatus('erro');
+      return;
     }
+    try {
+      if (leadId) {
+        localStorage.setItem(KEY_LEAD, JSON.stringify({ id: leadId, nome }));
+        const supabase = createClient();
+        const visitas = getVisitas();
+        if (visitas.length) {
+          await supabase.from('lead_eventos').insert(
+            visitas.map((v) => ({ lead_id: leadId, anon_id: getAnonId(), tipo: 'visita', slug: v.slug, created_at: v.ts }))
+          );
+        }
+        await supabase.from('lead_eventos').insert({ lead_id: leadId, anon_id: getAnonId(), tipo: 'interesse', slug: propertySlug || empreendimento });
+      }
+    } catch {}
+    setStatus('ok');
+    if (waTab) waTab.location.href = waLink;
+    else window.open(waLink, '_blank', 'noopener,noreferrer');
   }
 
   const inputStyle: React.CSSProperties = {
