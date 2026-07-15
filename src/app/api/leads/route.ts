@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Rate limit por IP: 5 requests/min/IP na captura do formulário
-    const rl = checkRateLimit(extractIp(req), {
+    const rl = await checkRateLimit(extractIp(req), {
       identifier: 'leads',
       limit: 5,
       windowSeconds: 60,

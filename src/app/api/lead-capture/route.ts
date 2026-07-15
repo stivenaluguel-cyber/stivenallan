@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Rate limit por IP: 5 requests/min/IP no download do book
-    const rl = checkRateLimit(extractIp(req), {
+    const rl = await checkRateLimit(extractIp(req), {
       identifier: 'lead-capture',
       limit: 5,
       windowSeconds: 60,
