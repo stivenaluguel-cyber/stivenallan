@@ -28,9 +28,18 @@ export default function FormContato({ empreendimento, propertyId, propertySlug, 
   const [hp, setHp] = useState(''); // honeypot: usuário real nunca vê, bot preenche → server responde 400
   const [status, setStatus] = useState<'idle' | 'enviando' | 'ok' | 'erro'>('idle');
 
-  const waLink = `https://wa.me/${whatsapp || WHATSAPP}?text=${encodeURIComponent(
-    waMessage || `Olá Stiven! Me cadastrei sobre o ${empreendimento}. Pode me enviar as condições?`
-  )}`;
+  function buildWaLink() {
+    const saudacao = waMessage || `Olá Stiven! Me cadastrei sobre o ${empreendimento}. Pode me enviar as condições?`;
+    const detalhes = [
+      nome && `Nome: ${nome}`,
+      telefone && `Telefone: ${telefone}`,
+      faixaInvestimento && `Faixa de investimento: ${faixaInvestimento}`,
+      prazoCompra && `Quando pretende comprar: ${prazoCompra}`,
+      entradaDisponivel && `Entrada disponível: ${entradaDisponivel}`,
+    ].filter(Boolean);
+    const texto = detalhes.length ? `${saudacao}\n\n${detalhes.join('\n')}` : saudacao;
+    return `https://wa.me/${whatsapp || WHATSAPP}?text=${encodeURIComponent(texto)}`;
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -89,8 +98,9 @@ export default function FormContato({ empreendimento, propertyId, propertySlug, 
       }
     } catch {}
     setStatus('ok');
-    if (waTab) waTab.location.href = waLink;
-    else window.open(waLink, '_blank', 'noopener,noreferrer');
+    const link = buildWaLink();
+    if (waTab) waTab.location.href = link;
+    else window.open(link, '_blank', 'noopener,noreferrer');
   }
 
   const inputStyle: React.CSSProperties = {
@@ -117,7 +127,7 @@ export default function FormContato({ empreendimento, propertyId, propertySlug, 
           Recebido! Continue no WhatsApp para receber as condições.
         </p>
         <a
-          href={waLink}
+          href={buildWaLink()}
           target="_blank"
           rel="noopener noreferrer"
           style={{
