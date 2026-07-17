@@ -221,7 +221,18 @@ export default function CasaGuaibaParkPage() {
             waMessage="Olá! Me cadastrei sobre a Casa Guaíba Park. Pode me enviar as condições?"
           />
         </div>
-        <p style={{ fontSize: 12, color: '#a1a1aa', textAlign: 'center', marginTop: 24 }}>
+        <p style={{ fontSize: 13, color: t.muted, textAlign: 'center', marginTop: 24 }}>
+          Maiores informações:{' '}
+          <a
+            href="https://wa.me/5551980537255?text=Ol%C3%A1!%20Tenho%20interesse%20na%20Casa%20Gua%C3%ADba%20Park.%20Pode%20me%20enviar%20mais%20informa%C3%A7%C3%B5es%3F"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: t.goldDark, fontWeight: 600, textDecoration: 'none' }}
+          >
+            (51) 98053-7255
+          </a>
+        </p>
+        <p style={{ fontSize: 12, color: '#a1a1aa', textAlign: 'center', marginTop: 10 }}>
           Stiven Allan · Corretor CRECI 60.275 · Atendimento exclusivo
         </p>
       </section>
