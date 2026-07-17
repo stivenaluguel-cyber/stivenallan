@@ -32,8 +32,14 @@ const t = {
 
 const IMG_BASE = '/images/casa-guaiba-park'
 
-const GALERIA = [
-  { src: `${IMG_BASE}/hero-render.jpg`, alt: 'Visualização ilustrativa da casa no Guaíba Park', label: 'Projeto (ilustrativo)' },
+const PROJETO = [
+  { src: `${IMG_BASE}/projeto-noite.jpg`, alt: 'Projeto da casa no Guaíba Park — fachada iluminada ao entardecer, com piscina', label: 'Fachada ao Entardecer' },
+  { src: `${IMG_BASE}/projeto-fachada.jpg`, alt: 'Projeto da casa no Guaíba Park — fachada frontal', label: 'Fachada Frontal' },
+  { src: `${IMG_BASE}/projeto-lateral.jpg`, alt: 'Projeto da casa no Guaíba Park — vista da rua', label: 'Vista da Rua' },
+  { src: `${IMG_BASE}/projeto-aereo.jpg`, alt: 'Projeto da casa no Guaíba Park — vista aérea com piscina e jardim', label: 'Vista Aérea' },
+]
+
+const OBRA = [
   { src: `${IMG_BASE}/obra-atual.jpg`, alt: 'Obra da casa no Guaíba Park, vista aérea', label: 'Obra · Vista Aérea' },
   { src: `${IMG_BASE}/obra-04.jpg`, alt: 'Obra da casa no Guaíba Park, estrutura do telhado', label: 'Obra · Estrutura' },
   { src: `${IMG_BASE}/obra-05.jpg`, alt: 'Obra da casa no Guaíba Park, andamento', label: 'Obra · Andamento' },
@@ -81,6 +87,8 @@ export default function CasaGuaibaParkPage() {
         .cg-gcard:hover img { transform: scale(1.06); }
         .cg-gcard:focus { outline: 2px solid ${t.gold}; outline-offset: 2px; }
         .cg-stat { text-align: center; }
+        .cg-projeto figure:first-child { grid-column: 1 / -1; aspect-ratio: 16 / 9 !important; }
+        @media (max-width: 640px) { .cg-projeto figure:first-child { aspect-ratio: 4 / 3 !important; } }
         .cg-badge { display: inline-block; background: rgba(138,109,59,0.14); color: ${t.goldDark}; font-family: ${t.body}; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; padding: 8px 18px; border-radius: 999px; border: 1px solid rgba(138,109,59,0.3); }
       `}</style>
 
@@ -131,17 +139,36 @@ export default function CasaGuaibaParkPage() {
         </div>
       </section>
 
-      {/* GALERIA */}
+      {/* O PROJETO — renders em destaque */}
+      <section style={{ background: t.dark, color: t.onDark, marginTop: 'clamp(56px,8vw,96px)' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', padding: 'clamp(56px,8vw,96px) 20px' }}>
+          <div style={{ textAlign: 'center', marginBottom: 40 }}>
+            <p className="cg-eyebrow">O Projeto</p>
+            <h2 className="cg-h2" style={{ marginTop: 8, color: '#fff' }}>Veja como vai ficar</h2>
+            <p className="cg-serif" style={{ fontSize: 'clamp(18px,2.4vw,24px)', color: t.onDarkMuted, marginTop: 16, maxWidth: 560, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.5 }}>
+              Piscina, jardim, iluminação e acabamento — o projeto completo da casa que está nascendo.
+            </p>
+            <p style={{ fontSize: 12, color: t.onDarkMuted, marginTop: 12 }}>
+              Imagens ilustrativas do projeto — não representam o acabamento final.
+            </p>
+          </div>
+          <div className="cg-projeto" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 10 }}>
+            <GalleryWithLightbox galeria={PROJETO} prefix="cg" gradient="rgba(18,20,15,0.75)" />
+          </div>
+        </div>
+      </section>
+
+      {/* ACOMPANHE A OBRA */}
       <section style={{ maxWidth: 1200, margin: '0 auto', padding: 'clamp(56px,8vw,96px) 20px 0' }}>
         <div style={{ textAlign: 'center', marginBottom: 36 }}>
-          <p className="cg-eyebrow">Galeria</p>
-          <h2 className="cg-h2" style={{ marginTop: 8 }}>Projeto & Obra</h2>
+          <p className="cg-eyebrow">Transparência</p>
+          <h2 className="cg-h2" style={{ marginTop: 8 }}>Acompanhe a obra</h2>
           <p style={{ fontSize: 13, color: t.muted, marginTop: 14, maxWidth: 480, marginLeft: 'auto', marginRight: 'auto' }}>
-            A primeira imagem é uma visualização ilustrativa gerada a partir da obra real — as demais são fotos atuais, sem edição.
+            Fotos reais e atuais do andamento — sem edição.
           </p>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 4 }}>
-          <GalleryWithLightbox galeria={GALERIA} prefix="cg" gradient="rgba(18,20,15,0.75)" />
+          <GalleryWithLightbox galeria={OBRA} prefix="cg" gradient="rgba(18,20,15,0.75)" />
         </div>
       </section>
 
