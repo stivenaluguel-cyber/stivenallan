@@ -101,8 +101,12 @@ export default function CasaGuaibaParkPage() {
           <p className="cg-serif cg-onimg" style={{ color: t.onDark, fontSize: 'clamp(19px,2.6vw,28px)', marginTop: 18, marginBottom: 28 }}>
             Elegância, funcionalidade e qualidade de vida em cada detalhe.
           </p>
-          <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap', marginBottom: 20 }}>
             <span className="cg-badge" style={{ background: 'rgba(243,239,230,0.14)', color: '#fff', borderColor: 'rgba(243,239,230,0.4)' }}>R$ 990.000,00</span>
+            <span className="cg-badge" style={{ background: 'rgba(243,239,230,0.14)', color: '#fff', borderColor: 'rgba(243,239,230,0.4)' }}>Financiável pela Caixa</span>
+            <span className="cg-badge" style={{ background: 'rgba(243,239,230,0.14)', color: '#fff', borderColor: 'rgba(243,239,230,0.4)' }}>Entrega set/2026</span>
+          </div>
+          <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
             <a href="#contato" className="cg-cta">Quero receber as condições</a>
           </div>
         </div>
@@ -166,7 +170,7 @@ export default function CasaGuaibaParkPage() {
             Em frente a uma praça com opções de lazer, quadra esportiva e academia ao ar livre.
           </p>
           <p style={{ textAlign: 'center', color: t.onDarkMuted, fontSize: 15, marginTop: 20, lineHeight: 1.6 }}>
-            Próxima ao Stock Center, Havan e McDonald&apos;s, com fácil acesso à BR e ao centro da cidade — em Guaíba/RS.
+            A poucos minutos da Havan (3 min), McDonald&apos;s (2 min) e Stock Center (5 min), com fácil acesso à BR e ao centro da cidade — e vista para o Rio Guaíba.
           </p>
         </div>
       </section>
@@ -176,7 +180,7 @@ export default function CasaGuaibaParkPage() {
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
           <p className="cg-eyebrow">Valor</p>
           <div className="cg-serif" style={{ fontSize: 'clamp(40px,7vw,64px)', color: t.ink, marginTop: 10 }}>R$ 990.000,00</div>
-          <p style={{ fontSize: 13, color: t.muted, marginTop: 6 }}>Condições e forma de pagamento a combinar direto com o corretor.</p>
+          <p style={{ fontSize: 13, color: t.muted, marginTop: 6 }}>Financiável pela Caixa · Entrega prevista 01/09/2026 · Condições a combinar direto com o corretor.</p>
         </div>
         <div style={{ background: '#ffffff', border: `1px solid ${t.line}`, borderRadius: 14, padding: '26px 20px' }}>
           <h2 style={{ fontSize: 19, fontWeight: 700, margin: '0 0 6px', textAlign: 'center', fontFamily: t.display }}>Receba as condições no WhatsApp</h2>
