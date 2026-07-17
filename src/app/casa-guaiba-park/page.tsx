@@ -3,16 +3,33 @@ import Image from 'next/image'
 import { HeroImage } from '@/components/HeroImage'
 import GalleryWithLightbox from './gallery-lightbox'
 import FormContato from '@/app/empreendimento/[construtora]/[slug]/FormContato'
+import { SITE_URL } from '@/lib/site'
 
 // LP avulsa de um imóvel de terceiro (administração), fora do portfólio Fontana.
 // Só existe pra tráfego direto/anúncio — sem link em nenhum menu ou listagem, noindex.
 // Padrão visual "hotsite premium" (mesmo sistema do Parco Savello): Bricolage Grotesque
 // (display), Cormorant Garamond itálico (destaques), Hanken Grotesk (corpo).
 
+const OG_IMAGE = '/images/casa-guaiba-park/projeto-noite.jpg'
+
 export const metadata: Metadata = {
   title: 'Casa no Guaíba Park — R$ 990.000',
   description: 'Casa de alto padrão em construção no Guaíba Park, Guaíba/RS. 312m² de terreno, 124,80m² privativos, 3 dormitórios (1 suíte), piscina, espaço gourmet. R$ 990.000.',
   robots: { index: false, follow: false },
+  openGraph: {
+    title: 'Casa no Guaíba Park — R$ 990.000',
+    description: 'Casa de alto padrão em construção no Guaíba Park, Guaíba/RS. Financiável pela Caixa, entrega prevista set/2026. 312m² de terreno, 3 dormitórios, piscina.',
+    url: `${SITE_URL}/casa-guaiba-park`,
+    images: [{ url: OG_IMAGE, width: 1280, height: 768, alt: 'Casa Guaíba Park — visualização ilustrativa do projeto' }],
+    type: 'website',
+    locale: 'pt_BR',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Casa no Guaíba Park — R$ 990.000',
+    description: 'Casa de alto padrão em construção no Guaíba Park, Guaíba/RS. Financiável pela Caixa, entrega prevista set/2026.',
+    images: [OG_IMAGE],
+  },
 }
 
 const t = {
