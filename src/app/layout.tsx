@@ -3,7 +3,7 @@ import { SITE_URL } from '@/lib/site'
 import Script from 'next/script'
 import { VisitTracker } from '@/components/VisitTracker'
 import { TrackingProvider } from '@/components/TrackingProvider'
-import { Bricolage_Grotesque, Hanken_Grotesk } from 'next/font/google'
+import { Bricolage_Grotesque, Hanken_Grotesk, Cormorant_Garamond } from 'next/font/google'
 import './globals.css'
 
 const bricolage = Bricolage_Grotesque({
@@ -18,6 +18,17 @@ const hanken = Hanken_Grotesk({
   display: 'swap',
   variable: '--font-hanken',
   weight: ['400', '500', '600', '700'],
+})
+
+// Usado nos hotsites premium (ex. Parco Savello, Casa Guaíba Park) para os
+// destaques em itálico serifado — antes só existia como string CSS sem
+// nenhum @font-face carregado, então caía silenciosamente pro Georgia.
+const cormorant = Cormorant_Garamond({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-cormorant',
+  weight: ['400', '500', '600'],
+  style: ['normal', 'italic'],
 })
 
 export const metadata: Metadata = {
@@ -75,7 +86,7 @@ const schemaAgent = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className={`${bricolage.variable} ${hanken.variable}`}>
+    <html lang="pt-BR" className={`${bricolage.variable} ${hanken.variable} ${cormorant.variable}`}>
       <head>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaAgent) }} />
         <link rel="dns-prefetch" href="https://images.unsplash.com" />
