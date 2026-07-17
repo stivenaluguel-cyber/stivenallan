@@ -233,7 +233,7 @@ export default function CasaGuaibaParkPage() {
           </a>
         </p>
         <p style={{ fontSize: 12, color: '#a1a1aa', textAlign: 'center', marginTop: 10 }}>
-          Stiven Allan · Corretor CRECI 60.275 · Atendimento exclusivo
+          Atendimento exclusivo
         </p>
       </section>
     </main>
