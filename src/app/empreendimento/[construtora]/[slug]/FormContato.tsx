@@ -9,12 +9,16 @@ interface Props {
   empreendimento: string;
   propertyId?: string | null;
   propertySlug?: string | null;
+  // Redireciona o WhatsApp pra outro número (ex.: imóvel de terceiro sob
+  // administração) — o lead continua indo pro dashboard normalmente.
+  whatsapp?: string;
+  waMessage?: string;
 }
 
 const WHATSAPP = '5548991642332';
 const KEY_LEAD = 'sa_lead';
 
-export default function FormContato({ empreendimento, propertyId, propertySlug }: Props) {
+export default function FormContato({ empreendimento, propertyId, propertySlug, whatsapp, waMessage }: Props) {
   const [nome, setNome] = useState('');
   const [telefone, setTelefone] = useState('');
   const [email, setEmail] = useState('');
@@ -24,8 +28,8 @@ export default function FormContato({ empreendimento, propertyId, propertySlug }
   const [hp, setHp] = useState(''); // honeypot: usuário real nunca vê, bot preenche → server responde 400
   const [status, setStatus] = useState<'idle' | 'enviando' | 'ok' | 'erro'>('idle');
 
-  const waLink = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(
-    `Olá Stiven! Me cadastrei sobre o ${empreendimento}. Pode me enviar as condições?`
+  const waLink = `https://wa.me/${whatsapp || WHATSAPP}?text=${encodeURIComponent(
+    waMessage || `Olá Stiven! Me cadastrei sobre o ${empreendimento}. Pode me enviar as condições?`
   )}`;
 
   async function handleSubmit(e: React.FormEvent) {

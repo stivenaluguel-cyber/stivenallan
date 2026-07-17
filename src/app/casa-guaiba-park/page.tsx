@@ -214,7 +214,12 @@ export default function CasaGuaibaParkPage() {
           <p style={{ fontSize: 13, color: t.muted, textAlign: 'center', margin: '0 0 18px' }}>
             Fotos atualizadas da obra, vídeo e condições da casa no Guaíba Park — resposta rápida, sem compromisso.
           </p>
-          <FormContato empreendimento="Casa Guaíba Park (Guaíba/RS) — R$ 990.000" propertySlug="casa-guaiba-park" />
+          <FormContato
+            empreendimento="Casa Guaíba Park (Guaíba/RS) — R$ 990.000"
+            propertySlug="casa-guaiba-park"
+            whatsapp="5551980537255"
+            waMessage="Olá! Me cadastrei sobre a Casa Guaíba Park. Pode me enviar as condições?"
+          />
         </div>
         <p style={{ fontSize: 12, color: '#a1a1aa', textAlign: 'center', marginTop: 24 }}>
           Stiven Allan · Corretor CRECI 60.275 · Atendimento exclusivo
