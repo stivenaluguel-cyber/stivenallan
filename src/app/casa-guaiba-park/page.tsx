@@ -38,7 +38,7 @@ const GALERIA = [
   { src: `${IMG_BASE}/obra-04.jpg`, alt: 'Obra da casa no Guaíba Park, estrutura do telhado', label: 'Obra · Estrutura' },
   { src: `${IMG_BASE}/obra-05.jpg`, alt: 'Obra da casa no Guaíba Park, andamento', label: 'Obra · Andamento' },
   { src: `${IMG_BASE}/obra-02.jpg`, alt: 'Obra da casa no Guaíba Park, terreno de esquina', label: 'Terreno de Esquina' },
-  { src: `${IMG_BASE}/obra-03-entorno.jpg`, alt: 'Entorno do Guaíba Park', label: 'Entorno do Condomínio' },
+  { src: `${IMG_BASE}/obra-03-entorno.jpg`, alt: 'Entorno do lote no Guaíba Park', label: 'Entorno do Lote' },
   { src: `${IMG_BASE}/obra-aerea.jpg`, alt: 'Fase inicial da obra no Guaíba Park', label: 'Início da Obra' },
 ]
 
