@@ -3,7 +3,6 @@ import { imoveis } from '@/data/imoveis'
 import { getVitrineImoveis } from '@/lib/vitrine'
 import Image from 'next/image'
 import { SITE_URL } from '@/lib/site'
-import RegionFilter from '@/components/RegionFilter'
 import { HeroImage } from '@/components/HeroImage'
 
 const WPP = 'https://wa.me/5548991642332'
@@ -45,10 +44,18 @@ const DEPOIMENTOS = [
 ]
 
 const COMO_FUNCIONA = [
-  { n: '01', titulo: 'Escolha o imóvel', desc: 'Navegue pelo portfólio e escolha o empreendimento ideal para o seu estilo de vida e objetivos.' },
+  { n: '01', titulo: 'Escolha o imóvel', desc: 'Comece pelos destaques ou navegue pelo portfólio completo e escolha o empreendimento ideal para o seu momento.' },
   { n: '02', titulo: 'Simulação personalizada', desc: 'Stiven estrutura um plano de pagamento sob medida, sem intermediação bancária.' },
-  { n: '03', titulo: 'Contrato direto', desc: 'Documentação simplificada, sem intermediários.' },
-  { n: '04', titulo: 'Chaves na mão', desc: 'Acompanhamento completo até a entrega. Seu imóvel, do jeito que você imaginou.' },
+  { n: '03', titulo: 'Contrato direto e chaves na mão', desc: 'Documentação simplificada, sem intermediários, com acompanhamento completo até a entrega.' },
+]
+
+// Curadoria da home: 3 pontos de partida em vez do catálogo completo,
+// que continua acessível em /empreendimentos. Slugs de src/data/imoveis.ts;
+// se um destaque sair da vitrine (ativo: false), ele simplesmente não renderiza.
+const DESTAQUES_HOME = [
+  { slug: 'piazza-castello-centro-icara-sc', motivo: 'Pronto para morar' },
+  { slug: 'mar-positano-centro-balneario-rincao-sc', motivo: 'Para viver o mar' },
+  { slug: 'monte-leone-centro-criciuma-sc', motivo: 'Para viver o centro' },
 ]
 
 function StatusBadge({ status }: { status: string }) {
@@ -102,15 +109,12 @@ function EmpCard({ emp }: { emp: typeof imoveis[0] }) {
 export default async function HomePage() {
   const imoveisVitrine = await getVitrineImoveis();
   const ativos = imoveisVitrine.filter(e => e.ativo)
-  const cidadesAtivas = [...new Set(ativos.map(e => e.cidade))].sort()
   const totalEmpreendimentos = ativos.length
-  const totalCidades = cidadesAtivas.length
-  const metricas = [
-    { valor: `${totalEmpreendimentos}`, label: 'Empreendimentos ativos' },
-    { valor: '100%', label: 'Financiamento direto' },
-    { valor: '+', label: 'Construtoras parceiras' },
-    { valor: 'SC', label: 'Sul de Santa Catarina' },
-  ]
+  const totalCidades = new Set(ativos.map(e => e.cidade)).size
+  const destaques = DESTAQUES_HOME.flatMap(d => {
+    const emp = ativos.find(e => e.slug === d.slug)
+    return emp ? [{ motivo: d.motivo, emp }] : []
+  })
   return (
     <>
       <style>{`
@@ -141,17 +145,14 @@ export default async function HomePage() {
         .home-btn--cham:hover { background: #B89B5E; color: #FAFAF8; }
         .home-step-n { font-family: var(--font-bricolage), system-ui, sans-serif; font-weight: 300; font-size: clamp(40px,6vw,64px); color: rgba(184,155,94,0.62); letter-spacing: 0.04em; line-height: 1; }
         .home-dep-card { background: #fff; padding: 36px 32px; border-top: 2px solid #B89B5E; }
-        .home-region-select { font-family: var(--font-hanken), system-ui, sans-serif; font-size: 11px; letter-spacing: 0.20em; text-transform: uppercase; color: #6B655B; border: 1px solid rgba(26,24,20,0.15); padding: 12px 40px 12px 20px; background: transparent; width: 100%; cursor: pointer; appearance: none; -webkit-appearance: none; -moz-appearance: none; transition: border-color .25s, color .25s; }
-        .home-region-select:hover, .home-region-select:focus { border-color: #B89B5E; color: #B89B5E; outline: none; }
-        .home-region-select option { color: #1A1814; background: #FAFAF8; }
         .home-wa-float { position: fixed; right: 22px; bottom: 22px; z-index: 60; width: 54px; height: 54px; border-radius: 50%; background: #25D366; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(37,211,102,0.35); transition: transform .2s ease; }
         .home-wa-float:hover { transform: scale(1.08); }
         @keyframes fadein { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:none; } }
         .fade-in { animation: fadein .7s ease both; }
         .fade-in-1 { animation-delay: .10s; } .fade-in-2 { animation-delay: .22s; } .fade-in-3 { animation-delay: .34s; } .fade-in-4 { animation-delay: .46s; }
         @media (max-width: 1200px) { section { padding-left: clamp(16px,4vw,32px) !important; padding-right: clamp(16px,4vw,32px) !important; } }
-        @media (max-width: 900px) { .home-how-grid, .home-metrics-grid { grid-template-columns: 1fr 1fr !important; } }
-        @media (max-width: 768px) { .home-cards-grid { grid-template-columns: 1fr !important; } .home-how-grid { grid-template-columns: 1fr 1fr !important; } .home-metrics-grid { grid-template-columns: 1fr 1fr !important; } .home-footer-grid { grid-template-columns: 1fr !important; gap: 40px !important; } .home-dep-grid { grid-template-columns: 1fr !important; } }
+        @media (max-width: 900px) { .home-how-grid { grid-template-columns: 1fr 1fr !important; } }
+        @media (max-width: 768px) { .home-cards-grid { grid-template-columns: 1fr !important; } .home-how-grid { grid-template-columns: 1fr 1fr !important; } .home-footer-grid { grid-template-columns: 1fr !important; gap: 40px !important; } .home-dep-grid { grid-template-columns: 1fr !important; } }
         @media (max-width: 480px) { .home-how-grid { grid-template-columns: 1fr !important; } }
       `}</style>
 
@@ -162,7 +163,7 @@ export default async function HomePage() {
             Stiven Allan
           </Link>
           <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
-            <Link href="/#empreendimentos" style={{ fontFamily: t.body, fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#FFFFFF', textDecoration: 'none', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }} className="home-nav-link">Empreendimentos</Link>
+            <Link href="/empreendimentos" style={{ fontFamily: t.body, fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#FFFFFF', textDecoration: 'none', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }} className="home-nav-link">Empreendimentos</Link>
             <a href={WPP_MSG} data-wpp="1" target="_blank" rel="noopener noreferrer" style={{ fontFamily: t.body, fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: t.champagne, textDecoration: 'none', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }} className="home-nav-wpp">WhatsApp</a>
           </div>
         </div>
@@ -209,57 +210,27 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* EMPREENDIMENTOS */}
+      {/* DESTAQUES */}
       <section id="empreendimentos" style={{ padding: 'clamp(72px,12vh,120px) clamp(18px,4vw,40px)' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 'clamp(48px,8vh,72px)' }}>
-            <p className="home-eyebrow" style={{ marginBottom: 16, color: '#6B5A3A' }}>Portfólio</p>
-            <h2 className="home-h2">Empreendimentos</h2>
+            <p className="home-eyebrow" style={{ marginBottom: 16, color: '#6B5A3A' }}>Curadoria</p>
+            <h2 className="home-h2">Por onde começar</h2>
+            <p className="home-serif" style={{ fontSize: 'clamp(15px,1.8vw,19px)', color: t.muted, marginTop: 20, maxWidth: 540, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.65 }}>
+              Três caminhos diferentes para o seu próximo endereço — e o portfólio completo a um clique.
+            </p>
             <hr className="home-rule" style={{ margin: '20px auto 0' }} />
           </div>
-          <RegionFilter cidades={cidadesAtivas} />
           <div className="home-cards-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(300px,1fr))', gap: 'clamp(16px,2.5vw,28px)' }}>
-            {ativos.map((emp, i) => (
-              <div key={emp.id} data-cidade={emp.cidade} className={'fade-in fade-in-' + ((i % 4) + 1)}>
-                <EmpCard emp={emp} />
+            {destaques.map((d, i) => (
+              <div key={d.emp.id} className={'fade-in fade-in-' + (i + 1)}>
+                <p style={{ margin: '0 0 14px', fontFamily: t.body, fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: '#8A7240', fontWeight: 600, textAlign: 'center' }}>{d.motivo}</p>
+                <EmpCard emp={d.emp} />
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* COMO FUNCIONA */}
-      <section id="como-funciona" style={{ background: t.dark, color: t.onDark, padding: 'clamp(72px,12vh,120px) clamp(18px,4vw,40px)' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 'clamp(48px,8vh,72px)' }}>
-            <p className="home-eyebrow" style={{ color: t.champagne, marginBottom: 16 }}>Como funciona</p>
-            <h2 className="home-h2" style={{ color: t.onDark }}>Financiamento direto</h2>
-            <p className="home-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(15px,1.8vw,19px)', marginTop: 20, maxWidth: 520, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.65 }}>
-              Financiamento negociado diretamente com a construtora, sem intermediação bancária.
-            </p>
-          </div>
-          <div className="home-how-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 'clamp(24px,3vw,40px)' }}>
-            {COMO_FUNCIONA.map((step, i) => (
-              <div key={step.n} className={'fade-in fade-in-' + (i + 1)} style={{ borderTop: '1px solid rgba(245,241,234,0.12)', paddingTop: 28 }}>
-                <div className="home-step-n" aria-hidden="true">{step.n}</div>
-                <h3 style={{ fontFamily: t.display, fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.12em', fontSize: 14, color: t.onDark, margin: '16px 0 10px' }}>{step.titulo}</h3>
-                <p style={{ fontFamily: t.body, fontSize: 14, color: t.onDarkMuted, lineHeight: 1.65, margin: 0 }}>{step.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* MÉTRICAS */}
-      <section style={{ padding: 'clamp(56px,10vh,96px) clamp(18px,4vw,40px)', borderBottom: `1px solid ${t.line}` }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-          <div className="home-metrics-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 'clamp(24px,3vw,40px)', textAlign: 'center' }}>
-            {metricas.map((m, i) => (
-              <div key={m.label} className={'fade-in fade-in-' + (i + 1)} style={{ borderTop: `2px solid ${t.champagne}`, paddingTop: 24 }}>
-                <div style={{ fontFamily: t.display, fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: 'clamp(36px,5vw,56px)', color: t.ink, lineHeight: 1 }}>{m.valor}</div>
-                <p style={{ fontFamily: t.body, fontSize: 12, letterSpacing: '0.20em', textTransform: 'uppercase', color: t.muted, margin: '10px 0 0', fontWeight: 500 }}>{m.label}</p>
-              </div>
-            ))}
+          <div style={{ textAlign: 'center', marginTop: 'clamp(40px,6vh,56px)' }}>
+            <Link href="/empreendimentos" className="home-btn">Ver todos os {totalEmpreendimentos} empreendimentos</Link>
           </div>
         </div>
       </section>
@@ -290,6 +261,28 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* COMO FUNCIONA */}
+      <section id="como-funciona" style={{ background: t.dark, color: t.onDark, padding: 'clamp(72px,12vh,120px) clamp(18px,4vw,40px)' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 'clamp(48px,8vh,72px)' }}>
+            <p className="home-eyebrow" style={{ color: t.champagne, marginBottom: 16 }}>Como funciona</p>
+            <h2 className="home-h2" style={{ color: t.onDark }}>Financiamento direto</h2>
+            <p className="home-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(15px,1.8vw,19px)', marginTop: 20, maxWidth: 520, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.65 }}>
+              Financiamento negociado diretamente com a construtora, sem intermediação bancária.
+            </p>
+          </div>
+          <div className="home-how-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 'clamp(24px,3vw,40px)' }}>
+            {COMO_FUNCIONA.map((step, i) => (
+              <div key={step.n} className={'fade-in fade-in-' + (i + 1)} style={{ borderTop: '1px solid rgba(245,241,234,0.12)', paddingTop: 28 }}>
+                <div className="home-step-n" aria-hidden="true">{step.n}</div>
+                <h3 style={{ fontFamily: t.display, fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.12em', fontSize: 14, color: t.onDark, margin: '16px 0 10px' }}>{step.titulo}</h3>
+                <p style={{ fontFamily: t.body, fontSize: 14, color: t.onDarkMuted, lineHeight: 1.65, margin: 0 }}>{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA FINAL */}
       <section style={{ background: t.dark, color: t.onDark, padding: 'clamp(80px,14vh,140px) clamp(18px,4vw,40px)', textAlign: 'center' }}>
         <div style={{ maxWidth: 680, margin: '0 auto' }}>
@@ -300,7 +293,7 @@ export default async function HomePage() {
           </p>
           <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
             <a href={WPP_MSG} data-wpp="1" target="_blank" rel="noopener noreferrer" className="home-btn" style={{ background: t.champagne, borderColor: t.champagne, color: t.ink }}>Falar com Stiven</a>
-            <Link href="/#empreendimentos" className="home-btn home-btn--cham">Ver empreendimentos</Link>
+            <Link href="/empreendimentos" className="home-btn home-btn--cham">Ver todos os empreendimentos</Link>
           </div>
         </div>
       </section>
@@ -316,7 +309,7 @@ export default async function HomePage() {
             </div>
             <div>
               <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.25em', textTransform: 'uppercase', color: t.champagne, marginBottom: 20 }}>Menu</div>
-              {[['/', 'Início'], ['/#empreendimentos', 'Empreendimentos'], ['/#como-funciona', 'Financiamento direto'], ['/guia', 'Guias']].map(([href, label]) => (
+              {[['/', 'Início'], ['/empreendimentos', 'Empreendimentos'], ['/#como-funciona', 'Financiamento direto'], ['/guia', 'Guias']].map(([href, label]) => (
                 <div key={href} style={{ marginBottom: 10 }}>
                   <Link href={href} style={{ fontSize: 13, color: 'rgba(245,241,234,0.55)', textDecoration: 'none', letterSpacing: '0.04em' }}>{label}</Link>
                 </div>
