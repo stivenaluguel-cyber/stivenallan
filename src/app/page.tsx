@@ -23,13 +23,19 @@ export const metadata = {
   robots: { index: true, follow: true },
 }
 
+// Fontes: usa as variáveis já carregadas via next/font no layout raiz
+// (Bricolage Grotesque / Cormorant Garamond / Hanken Grotesk) — a home antes
+// carregava Jost + Cormorant + Hanken de novo via @import (bloqueia
+// renderização, +1 round-trip até o CSS do Google Fonts, fontes duplicadas).
+// Isso media ~2.1s de First Contentful Paint; a troca elimina esse gargalo
+// e unifica a tipografia com o resto do site (Parco Savello, Casa Guaíba Park).
 const t = {
   bg: '#FAFAF8', ink: '#1A1814', champagne: '#B89B5E', chamDark: '#8A7240',
   muted: '#6B655B', line: 'rgba(26,24,20,0.10)', dark: '#141210',
   onDark: '#F5F1EA', onDarkMuted: 'rgba(245,241,234,0.60)',
-  display: "'Jost', system-ui, sans-serif",
-  serif: "'Cormorant Garamond', Georgia, serif",
-  body: "'Hanken Grotesk', system-ui, sans-serif",
+  display: "var(--font-bricolage), system-ui, sans-serif",
+  serif: "var(--font-cormorant), Georgia, serif",
+  body: "var(--font-hanken), system-ui, sans-serif",
 }
 
 const DEPOIMENTOS = [
@@ -43,13 +49,6 @@ const COMO_FUNCIONA = [
   { n: '02', titulo: 'Simulação personalizada', desc: 'Stiven estrutura um plano de pagamento sob medida, sem intermediação bancária.' },
   { n: '03', titulo: 'Contrato direto', desc: 'Documentação simplificada, sem intermediários.' },
   { n: '04', titulo: 'Chaves na mão', desc: 'Acompanhamento completo até a entrega. Seu imóvel, do jeito que você imaginou.' },
-]
-
-const METRICAS = [
-  { valor: '4+', label: 'Empreendimentos ativos' },
-  { valor: '100%', label: 'Financiamento direto' },
-  { valor: '+', label: 'Construtoras parceiras' },
-  { valor: 'SC', label: 'Sul de Santa Catarina' },
 ]
 
 function StatusBadge({ status }: { status: string }) {
@@ -102,13 +101,22 @@ function EmpCard({ emp }: { emp: typeof imoveis[0] }) {
 
 export default async function HomePage() {
   const imoveisVitrine = await getVitrineImoveis();
+  const ativos = imoveisVitrine.filter(e => e.ativo)
+  const cidadesAtivas = [...new Set(ativos.map(e => e.cidade))].sort()
+  const totalEmpreendimentos = ativos.length
+  const totalCidades = cidadesAtivas.length
+  const metricas = [
+    { valor: `${totalEmpreendimentos}`, label: 'Empreendimentos ativos' },
+    { valor: '100%', label: 'Financiamento direto' },
+    { valor: '+', label: 'Construtoras parceiras' },
+    { valor: 'SC', label: 'Sul de Santa Catarina' },
+  ]
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,400;1,300;1,400&family=Hanken+Grotesk:wght@300;400;500&display=swap');
         html { scroll-behavior: smooth; }
         *, *::before, *::after { box-sizing: border-box; }
-        body { margin: 0; background: #FAFAF8; color: #1A1814; font-family: 'Hanken Grotesk', system-ui, sans-serif; }
+        body { margin: 0; background: #FAFAF8; color: #1A1814; font-family: var(--font-hanken), system-ui, sans-serif; }
         .home-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; transition: background .35s ease, box-shadow .35s ease; background: transparent; }
         .home-nav--solid { background: rgba(250,250,248,0.97) !important; backdrop-filter: blur(20px); box-shadow: 0 1px 0 rgba(26,24,20,0.08); }
         .home-nav--solid .home-nav-link { color: #1A1814 !important; text-shadow: none !important; }
@@ -118,23 +126,24 @@ export default async function HomePage() {
           .home-nav { animation: nav-fill linear both; animation-timeline: scroll(); animation-range: 0px 80px; }
           @keyframes nav-fill { to { background: rgba(250,250,248,0.96); backdrop-filter: blur(20px); box-shadow: 0 1px 0 rgba(26,24,20,0.08); } }
         }
-        .home-eyebrow { font-size: 11px; letter-spacing: 0.42em; text-transform: uppercase; color: #B89B5E; font-family: 'Hanken Grotesk', system-ui, sans-serif; font-weight: 500; }
-        .home-h1 { font-family: 'Jost', system-ui, sans-serif; font-weight: 300; text-transform: uppercase; letter-spacing: 0.12em; line-height: 1.06; margin: 0; }
-        .home-h2 { font-family: 'Jost', system-ui, sans-serif; font-weight: 300; text-transform: uppercase; letter-spacing: 0.14em; line-height: 1.1; margin: 0; font-size: clamp(26px,4vw,44px); }
-        .home-serif { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-weight: 300; }
+        .home-eyebrow { font-size: 11px; letter-spacing: 0.42em; text-transform: uppercase; color: #B89B5E; font-family: var(--font-hanken), system-ui, sans-serif; font-weight: 500; }
+        .home-h1 { font-family: var(--font-bricolage), system-ui, sans-serif; font-weight: 300; text-transform: uppercase; letter-spacing: 0.12em; line-height: 1.06; margin: 0; }
+        .home-h2 { font-family: var(--font-bricolage), system-ui, sans-serif; font-weight: 300; text-transform: uppercase; letter-spacing: 0.14em; line-height: 1.1; margin: 0; font-size: clamp(26px,4vw,44px); }
+        .home-serif { font-family: var(--font-cormorant), Georgia, serif; font-style: italic; font-weight: 300; }
         .home-rule { width: 48px; height: 1px; background: #B89B5E; border: 0; margin: 0; }
         .home-card { background: #FAFAF8; overflow: hidden; transition: transform .35s ease, box-shadow .35s ease; }
         .home-card:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(26,24,20,0.12); }
         .home-cta-primary { transition: border-color .25s ease, color .25s ease; cursor: pointer; }
         .home-cta-primary:hover { color: #B89B5E; }
-        .home-btn { display: inline-block; font-family: 'Hanken Grotesk', system-ui, sans-serif; font-size: 11px; letter-spacing: 0.32em; text-transform: uppercase; color: #1A1814; border: 1px solid #1A1814; padding: 15px 36px; text-decoration: none; transition: background .3s ease, color .3s ease; }
+        .home-btn { display: inline-block; font-family: var(--font-hanken), system-ui, sans-serif; font-size: 11px; letter-spacing: 0.32em; text-transform: uppercase; color: #1A1814; border: 1px solid #1A1814; padding: 15px 36px; text-decoration: none; transition: background .3s ease, color .3s ease; }
         .home-btn:hover { background: #1A1814; color: #FAFAF8; }
         .home-btn--cham { border-color: #B89B5E; color: #B89B5E; }
         .home-btn--cham:hover { background: #B89B5E; color: #FAFAF8; }
-        .home-step-n { font-family: 'Jost', system-ui, sans-serif; font-weight: 300; font-size: clamp(40px,6vw,64px); color: rgba(184,155,94,0.62); letter-spacing: 0.04em; line-height: 1; }
+        .home-step-n { font-family: var(--font-bricolage), system-ui, sans-serif; font-weight: 300; font-size: clamp(40px,6vw,64px); color: rgba(184,155,94,0.62); letter-spacing: 0.04em; line-height: 1; }
         .home-dep-card { background: #fff; padding: 36px 32px; border-top: 2px solid #B89B5E; }
-        .home-region-btn { font-family: 'Hanken Grotesk', system-ui, sans-serif; font-size: 10px; letter-spacing: 0.30em; text-transform: uppercase; color: #6B655B; border: 1px solid rgba(26,24,20,0.15); padding: 10px 22px; background: transparent; text-decoration: none; display: inline-block; cursor: pointer; transition: border-color .25s, color .25s; }
-        .home-region-btn:hover { border-color: #B89B5E; color: #B89B5E; }
+        .home-region-select { font-family: var(--font-hanken), system-ui, sans-serif; font-size: 11px; letter-spacing: 0.20em; text-transform: uppercase; color: #6B655B; border: 1px solid rgba(26,24,20,0.15); padding: 12px 40px 12px 20px; background: transparent; width: 100%; cursor: pointer; appearance: none; -webkit-appearance: none; -moz-appearance: none; transition: border-color .25s, color .25s; }
+        .home-region-select:hover, .home-region-select:focus { border-color: #B89B5E; color: #B89B5E; outline: none; }
+        .home-region-select option { color: #1A1814; background: #FAFAF8; }
         .home-wa-float { position: fixed; right: 22px; bottom: 22px; z-index: 60; width: 54px; height: 54px; border-radius: 50%; background: #25D366; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(37,211,102,0.35); transition: transform .2s ease; }
         .home-wa-float:hover { transform: scale(1.08); }
         @keyframes fadein { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:none; } }
@@ -169,11 +178,11 @@ export default async function HomePage() {
           <h1 className="home-h1 fade-in fade-in-1" style={{ fontSize: 'clamp(30px,3.6vw,52px)', lineHeight: 1.08, color: '#FFFFFF', textShadow: '0 2px 8px rgba(0,0,0,0.5), 0 2px 32px rgba(0,0,0,0.60)', maxWidth: '28ch' }}>
             Apartamentos na planta com financiamento direto — sem banco, sem burocracia
           </h1>
-          <hr className="home-rule fade-in fade-in-2" style={{ margin: '28px auto' }} />
+          <hr className="home-rule fade-in fade-in-2" style={{ margin: '20px auto' }} />
           <p className="home-serif fade-in fade-in-2" style={{ fontSize: 'clamp(16px,2.2vw,22px)', color: '#FFFFFF', maxWidth: 560, margin: '0 0 20px', lineHeight: 1.6, textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
             Morar bem não deveria depender de um banco.
           </p>
-          <p className="fade-in fade-in-2" style={{ fontFamily: t.body, fontSize: 'clamp(13px,1.6vw,16px)', color: 'rgba(245,241,234,0.82)', maxWidth: 620, margin: '0 0 40px', lineHeight: 1.7, textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
+          <p className="fade-in fade-in-2" style={{ fontFamily: t.body, fontSize: 'clamp(13px,1.6vw,16px)', color: 'rgba(245,241,234,0.82)', maxWidth: 620, margin: '0 0 28px', lineHeight: 1.7, textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
             Empreendimentos de alto padrão com financiamento direto da construtora em Criciúma, Balneário Rincão, Laguna e todo o Sul de Santa Catarina. Sem banco, sem burocracia.
           </p>
           <div className="fade-in fade-in-3" style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
@@ -183,8 +192,18 @@ export default async function HomePage() {
               Falar com Stiven
             </a>
           </div>
+          <div className="fade-in fade-in-4" style={{ display: 'flex', gap: 'clamp(28px,6vw,64px)', justifyContent: 'center', marginTop: 20, paddingTop: 16, borderTop: '1px solid rgba(245,241,234,0.18)' }}>
+            <div>
+              <div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 'clamp(22px,3vw,30px)', color: t.champagne, textShadow: '0 2px 8px rgba(0,0,0,0.4)' }}>{totalEmpreendimentos}</div>
+              <p style={{ margin: '4px 0 0', fontFamily: t.body, fontSize: 10, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(245,241,234,0.60)' }}>Empreendimentos ativos</p>
+            </div>
+            <div>
+              <div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 'clamp(22px,3vw,30px)', color: t.champagne, textShadow: '0 2px 8px rgba(0,0,0,0.4)' }}>{totalCidades}</div>
+              <p style={{ margin: '4px 0 0', fontFamily: t.body, fontSize: 10, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(245,241,234,0.60)' }}>Cidades atendidas</p>
+            </div>
+          </div>
         </div>
-        <div style={{ position: 'absolute', bottom: 32, left: '50%', transform: 'translateX(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', alignSelf: 'center', gap: 8, marginTop: 32, paddingBottom: 12 }}>
           <span style={{ fontFamily: t.body, fontSize: 9, letterSpacing: '0.30em', textTransform: 'uppercase', color: 'rgba(245,241,234,0.40)' }}>rolar</span>
           <div style={{ width: 1, height: 40, background: 'rgba(245,241,234,0.25)' }} />
         </div>
@@ -198,9 +217,9 @@ export default async function HomePage() {
             <h2 className="home-h2">Empreendimentos</h2>
             <hr className="home-rule" style={{ margin: '20px auto 0' }} />
           </div>
-          <RegionFilter cidades={[...new Set(imoveisVitrine.filter(e => e.ativo).map(e => e.cidade))].sort()} />
+          <RegionFilter cidades={cidadesAtivas} />
           <div className="home-cards-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(300px,1fr))', gap: 'clamp(16px,2.5vw,28px)' }}>
-            {imoveisVitrine.filter(e => e.ativo).map((emp, i) => (
+            {ativos.map((emp, i) => (
               <div key={emp.id} data-cidade={emp.cidade} className={'fade-in fade-in-' + ((i % 4) + 1)}>
                 <EmpCard emp={emp} />
               </div>
@@ -235,7 +254,7 @@ export default async function HomePage() {
       <section style={{ padding: 'clamp(56px,10vh,96px) clamp(18px,4vw,40px)', borderBottom: `1px solid ${t.line}` }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div className="home-metrics-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 'clamp(24px,3vw,40px)', textAlign: 'center' }}>
-            {METRICAS.map((m, i) => (
+            {metricas.map((m, i) => (
               <div key={m.label} className={'fade-in fade-in-' + (i + 1)} style={{ borderTop: `2px solid ${t.champagne}`, paddingTop: 24 }}>
                 <div style={{ fontFamily: t.display, fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: 'clamp(36px,5vw,56px)', color: t.ink, lineHeight: 1 }}>{m.valor}</div>
                 <p style={{ fontFamily: t.body, fontSize: 12, letterSpacing: '0.20em', textTransform: 'uppercase', color: t.muted, margin: '10px 0 0', fontWeight: 500 }}>{m.label}</p>
@@ -305,7 +324,7 @@ export default async function HomePage() {
             </div>
             <div>
               <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.25em', textTransform: 'uppercase', color: t.champagne, marginBottom: 20 }}>Empreendimentos</div>
-              {imoveisVitrine.filter(e => e.ativo).map(emp => (
+              {ativos.map(emp => (
                 <div key={emp.id} style={{ marginBottom: 10 }}>
                   <Link href={'/empreendimento/' + emp.construtora_slug + '/' + emp.slug} style={{ fontSize: 13, color: 'rgba(245,241,234,0.55)', textDecoration: 'none' }}>{emp.nome}</Link>
                 </div>
