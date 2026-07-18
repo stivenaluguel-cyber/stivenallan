@@ -301,7 +301,7 @@ export default async function HomePage() {
       {/* FOOTER */}
       <footer style={{ background: '#0E0C0A', color: t.onDark, padding: 'clamp(56px,10vh,96px) clamp(18px,4vw,40px) clamp(32px,6vh,56px)' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-          <div className="home-footer-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: 'clamp(32px,4vw,64px)', marginBottom: 56, paddingBottom: 40, borderBottom: '1px solid rgba(245,241,234,0.10)' }}>
+          <div className="home-footer-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 'clamp(32px,4vw,64px)', marginBottom: 40, paddingBottom: 40, borderBottom: '1px solid rgba(245,241,234,0.10)' }}>
             <div>
               <p style={{ fontFamily: t.display, fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.22em', fontSize: 16, color: t.onDark, margin: '0 0 16px' }}>Stiven Allan</p>
               <p style={{ fontFamily: t.body, fontSize: 13, color: t.onDarkMuted, lineHeight: 1.7, margin: '0 0 12px', maxWidth: 280 }}>Corretor de imóveis especializado em empreendimentos Fontana com financiamento direto.</p>
@@ -316,17 +316,17 @@ export default async function HomePage() {
               ))}
             </div>
             <div>
-              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.25em', textTransform: 'uppercase', color: t.champagne, marginBottom: 20 }}>Empreendimentos</div>
-              {ativos.map(emp => (
-                <div key={emp.id} style={{ marginBottom: 10 }}>
-                  <Link href={'/empreendimento/' + emp.construtora_slug + '/' + emp.slug} style={{ fontSize: 13, color: 'rgba(245,241,234,0.55)', textDecoration: 'none' }}>{emp.nome}</Link>
-                </div>
-              ))}
-            </div>
-            <div>
               <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.25em', textTransform: 'uppercase', color: t.champagne, marginBottom: 20 }}>Contato</div>
               <a href={WPP} data-wpp="1" target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: 'rgba(245,241,234,0.55)', textDecoration: 'none', display: 'block', marginBottom: 10 }}>WhatsApp</a>
               <p style={{ fontSize: 13, color: 'rgba(245,241,234,0.5)', margin: '16px 0 0', lineHeight: 1.6 }}>Sul de Santa Catarina</p>
+            </div>
+          </div>
+          <div style={{ marginBottom: 40, paddingBottom: 40, borderBottom: '1px solid rgba(245,241,234,0.10)' }}>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.25em', textTransform: 'uppercase', color: t.champagne, marginBottom: 20 }}>Todos os empreendimentos</div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(160px,1fr))', columnGap: 20, rowGap: 10 }}>
+              {ativos.map(emp => (
+                <Link key={emp.id} href={'/empreendimento/' + emp.construtora_slug + '/' + emp.slug} style={{ fontSize: 13, color: 'rgba(245,241,234,0.55)', textDecoration: 'none' }}>{emp.nome}</Link>
+              ))}
             </div>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
