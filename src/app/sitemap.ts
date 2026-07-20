@@ -26,6 +26,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: SITE_URL + '/empreendimentos', lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: SITE_URL + '/sobre', lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
     { url: SITE_URL + '/contato', lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
+    { url: SITE_URL + '/politica-de-privacidade', lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
   ]
 
   // Páginas de cidade (/lancamentos/[cidade]) — cidades com empreendimentos ativos
@@ -85,5 +86,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }))
 
-  return [...staticPages, ...guiaIndexPage, ...cidadePages, ...bairroPages, ...guiaPages, ...empPages]
+  // Lançamentos Eraldo com página bespoke própria (mesmo padrão do Aura Residence)
+  // que ainda não têm registro em `properties` — entrada estática evita depender
+  // do cadastro no banco só para aparecer no sitemap.
+  const eraldoSlugs = ['arbor-centro-criciuma-sc']
+  const eraldoPages: MetadataRoute.Sitemap = eraldoSlugs.map((slug) => ({
+    url: SITE_URL + '/empreendimento/eraldo/' + slug,
+    lastModified: now,
+    changeFrequency: 'weekly' as const,
+    priority: 0.8,
+  }))
+
+  return [...staticPages, ...guiaIndexPage, ...cidadePages, ...bairroPages, ...guiaPages, ...empPages, ...eraldoPages]
 }
