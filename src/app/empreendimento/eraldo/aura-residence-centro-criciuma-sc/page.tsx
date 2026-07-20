@@ -363,7 +363,7 @@ export default function AuraResidencePage() {
             />
           </div>
           <div style={{ marginTop: 24, display: 'flex', justifyContent: 'center', gap: 48, flexWrap: 'wrap' }}>
-            {[{ label: 'Endereço', val: 'Av. Getúlio Vargas, Centro' }, { label: 'Bairro', val: 'Centro, Criciúma/SC' }, { label: 'Status', val: 'Lançamento · Entrega 04/2029' }].map(({ label, val }) => (
+            {[{ label: 'Endereço', val: 'Av. Getúlio Vargas, Centro' }, { label: 'Bairro', val: 'Centro, Criciúma/SC' }, { label: 'Status', val: 'Lançamento · Entrega 04/2029' }, { label: 'Registro de incorporação', val: 'R.5/166.021 · 1º Ofício de Imóveis de Criciúma' }].map(({ label, val }) => (
               <div key={label} style={{ textAlign: 'center' }}>
                 <p style={{ fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 10, letterSpacing: '0.3em', textTransform: 'uppercase', color: '#9C5F2E', marginBottom: 4 }}>{label}</p>
                 <p style={{ fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 15, color: '#1A1814' }}>{val}</p>
@@ -434,7 +434,7 @@ export default function AuraResidencePage() {
         </div>
         <div style={{ maxWidth: 1200, margin: '16px auto 0', paddingTop: 16, borderTop: '1px solid rgba(245,238,230,0.05)' }}>
           <p style={{ fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 11, color: 'rgba(245,238,230,0.30)', letterSpacing: '0.08em' }}>
-            {new Date().getFullYear()} Stiven Allan · Aura Residence é um empreendimento da Eraldo Construções. Imagens e plantas meramente ilustrativas.
+            {new Date().getFullYear()} Stiven Allan · Aura Residence é um empreendimento da Eraldo Construções. Incorporação imobiliária R.5/166.021, 1º Ofício de Registro de Imóveis de Criciúma/SC. Imagens e plantas meramente ilustrativas.
           </p>
         </div>
       </footer>
