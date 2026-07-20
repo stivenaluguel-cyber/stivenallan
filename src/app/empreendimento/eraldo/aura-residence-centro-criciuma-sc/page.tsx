@@ -11,12 +11,13 @@ import { SITE_URL } from '@/lib/site'
 
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Aura%20Residence%20em%20Crici%C3%BAma.%20Pode%20me%20passar%20mais%20informa%C3%A7%C3%B5es%3F'
 
-// Renders oficiais da Eraldo Construções (pasta compartilhada "AURA RESIDENCE"),
-// servidos via lh3.googleusercontent.com/d/<id> — confirmado publicamente
-// acessível (200, sem sessão) antes de usar aqui.
+// Renders oficiais da Eraldo Construções — pasta compartilhada "AURA RESIDENCE"
+// (Drive) para fachadas, e o próprio site oficial (wp-content/uploads) para os
+// interiores e plantas humanizadas. Todas as URLs confirmadas publicamente
+// acessíveis (200, sem sessão) antes de usar aqui.
 const HERO_IMG = 'https://lh3.googleusercontent.com/d/1L2HRoIQKbtlcNudne3TfP-eML4gDrRgB'
 const BLUEHOUR_IMG = 'https://lh3.googleusercontent.com/d/1vsT7hcot_oAbg4FpTEAnbexORMrj-1-E'
-const PISCINA_IMG = 'https://lh3.googleusercontent.com/d/1eB_eUtdolTBaBp0n2zn1-p8lDTMteWLl'
+const ERALDO_SITE = 'https://www.eraldoconstrucoes.com.br/wp-content/uploads'
 
 export const metadata: Metadata = {
   title: 'Aura Residence | Centro Criciúma',
@@ -41,30 +42,74 @@ export const metadata: Metadata = {
 }
 
 const DIFERENCIAIS = [
-  { ico: '🚗', title: 'Garage hall', desc: 'Recepção coberta para embarque e desembarque com conforto.' },
-  { ico: '🔐', title: 'Acesso facial e QR Code', desc: 'Reconhecimento facial e QR Code no hall de entrada.' },
-  { ico: '🔌', title: 'Carregamento elétrico', desc: 'Tomadas individuais para automóveis elétricos na garagem.' },
-  { ico: '🚙', title: 'Acesso por placa na garagem', desc: 'Leitura automática de placas no acesso veicular.' },
-  { ico: '🏛', title: 'Fachada 100% pastilhada', desc: 'Acabamento nobre e durável em toda a fachada.' },
-  { ico: '🏺', title: 'Porcelanato 90×90', desc: 'Áreas internas revestidas em grandes formatos.' },
-  { ico: '🚿', title: 'Nicho para ducha higiênica', desc: 'Espera já preparada nos banheiros.' },
-  { ico: '🛗', title: '2 elevadores', desc: 'Circulação ágil, mesmo nos horários de pico.' },
+  { ico: '🔐', title: 'Fechadura digital com biometria', desc: 'Segurança e praticidade na porta do apartamento.' },
+  { ico: '🪪', title: 'Acesso facial e QR Code', desc: 'Reconhecimento facial e QR Code no hall de entrada.' },
+  { ico: '🪟', title: 'Persianas automatizadas', desc: 'Controle de luz e privacidade com um toque, direto na esquadria.' },
+  { ico: '🚪', title: 'Porta pivotante', desc: 'Entrada do apartamento com acabamento diferenciado.' },
+  { ico: '🍖', title: 'Churrasqueira a carvão com exaustor', desc: 'Sabor de verdade, sem fumaça dentro de casa.' },
+  { ico: '🧱', title: 'Forro de gesso com bordas negativas', desc: 'Detalhe de acabamento premium no teto.' },
+  { ico: '🧱', title: 'Paredes mais espessas entre apartamentos', desc: 'Mais privacidade acústica entre unidades vizinhas.' },
+  { ico: '🔇', title: 'Contrapiso com atenuante de ruído', desc: 'Conforto sonoro no impacto entre andares.' },
   { ico: '☀️', title: 'Energia fotovoltaica', desc: 'Geração própria de energia solar nas áreas comuns.' },
+  { ico: '🛗', title: '3 elevadores', desc: 'Circulação ágil, mesmo nos horários de pico.' },
+  { ico: '🏛', title: 'Fachada 100% pastilhada', desc: 'Acabamento nobre e durável em toda a fachada.' },
+  { ico: '🏺', title: 'Porcelanato 80×80 nas áreas comuns', desc: 'Acabamento em grandes formatos.' },
+  { ico: '🚗', title: 'Garage hall', desc: 'Recepção coberta para embarque e desembarque com conforto.' },
+  { ico: '🌂', title: 'Deck coberto', desc: 'Área externa protegida em qualquer estação do ano.' },
   { ico: '💧', title: 'Reúso de água da chuva', desc: 'Aproveitamento na limpeza das áreas comuns.' },
-  { ico: '🛋', title: 'Lazer mobiliado e climatizado', desc: 'Áreas comuns decoradas e prontas para uso.' },
   { ico: '📹', title: 'Monitoramento eletrônico', desc: 'Áreas comuns com vigilância contínua.' },
-  { ico: '📦', title: 'Espaço Delivery', desc: 'Recebimento seguro de encomendas.' },
   { ico: '🗄', title: 'Depósito individual', desc: 'Espaço extra de armazenamento por apartamento.' },
-  { ico: '🧊', title: 'Máquina de gelo', desc: 'Disponível nas áreas de lazer.' },
   { ico: '🏊', title: 'Piscina com trocador de calor', desc: 'Pré-instalação pronta para climatização futura.' },
 ]
 
-const LAZER = ['Piscina', 'Salão de festas', 'Espaço gourmet', 'Academia', 'Beauty Space', 'Brinquedoteca', 'Coworking', 'Pet Place', 'Playground']
+const FICHA_TECNICA = [
+  'Espaço Delivery',
+  'Carregamento para carros elétricos',
+  'Acesso à garagem por reconhecimento de placa',
+  'Máquina de gelo nas áreas de lazer',
+  'Nicho e espera para ducha higiênica',
+  'Pré-instalação para automação residencial',
+  'Ar-condicionado com tubulação de cobre',
+  'Pré-instalação de água e gás',
+  'Cabeamento de internet em todos os quartos e living',
+  'Tomadas com USB-C',
+  '16 apartamentos com 3 vagas de garagem',
+]
+
+const LAZER = ['Piscina com prainha e deck', 'Salão de festas', '2 espaços gourmet', 'Wellness Center', 'Espaço Mulher', 'Brinquedoteca', 'Coworking', 'Pet Place', 'Playground']
 
 const GALERIA = [
-  { src: HERO_IMG, alt: 'Aura Residence — fachada diurna, Centro de Criciúma SC', label: 'Fachada' },
-  { src: BLUEHOUR_IMG, alt: 'Aura Residence — fachada ao entardecer', label: 'Entardecer' },
-  { src: PISCINA_IMG, alt: 'Aura Residence — terraço com piscina', label: 'Terraço piscina' },
+  { src: `${ERALDO_SITE}/2025/09/07_EXT03_TERRACO-PISCINA_HR-scaled.jpg`, alt: 'Aura Residence — terraço com piscina', label: 'Terraço piscina' },
+  { src: `${ERALDO_SITE}/2025/10/07_EXT04_TERRACO-PET-PLACE_HR-2-scaled.jpg`, alt: 'Aura Residence — terraço pet place', label: 'Terraço pet place' },
+  { src: `${ERALDO_SITE}/2025/10/07_INT01_HALL_HR-1-1536x864.jpg`, alt: 'Aura Residence — hall de entrada', label: 'Hall de entrada' },
+  { src: `${ERALDO_SITE}/2025/09/07_INT02_SALAO-DE-FESTAS_HR-scaled.jpg`, alt: 'Aura Residence — salão de festas', label: 'Salão de festas' },
+  { src: `${ERALDO_SITE}/2025/10/07_INT03_ESPACO-GOURMET_HR-2-scaled.jpg`, alt: 'Aura Residence — espaço gourmet', label: 'Espaço gourmet' },
+  { src: `${ERALDO_SITE}/2025/10/07_INT04_ACADEMIA_HR-2-scaled.jpg`, alt: 'Aura Residence — wellness center', label: 'Wellness Center' },
+  { src: `${ERALDO_SITE}/2025/10/07_INT05_COWORKING_HR-1-scaled.jpg`, alt: 'Aura Residence — coworking', label: 'Coworking' },
+  { src: `${ERALDO_SITE}/2025/10/07_INT06_ESPACO-BELEZA_HR-2-scaled.jpg`, alt: 'Aura Residence — espaço mulher', label: 'Espaço Mulher' },
+  { src: `${ERALDO_SITE}/2025/10/07_INT07_BRINQUEDOTECA_HR-2-scaled.jpg`, alt: 'Aura Residence — brinquedoteca', label: 'Brinquedoteca' },
+  { src: `${ERALDO_SITE}/2025/10/07_INT08_LIVING-TIPO_HR-1-1536x864.jpg`, alt: 'Aura Residence — living do apartamento tipo', label: 'Living · Apto tipo' },
+  { src: `${ERALDO_SITE}/2025/10/07_INT09_LIVING-COBERTURA_HR-2-scaled.jpg`, alt: 'Aura Residence — living da cobertura duplex', label: 'Living · Cobertura' },
+]
+
+const PLANTAS = [
+  { src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Tipo-Final-01-V01-scaled-e1764188009811.png`, alt: 'Aura Residence — planta apartamento tipo final 01', label: 'Tipo final 01' },
+  { src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Tipo-Final-02-V01-2-scaled-e1764188411574.png`, alt: 'Aura Residence — planta apartamento tipo final 02', label: 'Tipo final 02' },
+  { src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Tipo-Final-03-V01-3-scaled-e1764188707216.png`, alt: 'Aura Residence — planta apartamento tipo final 03', label: 'Tipo final 03' },
+  { src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Tipo-Final-04-V01-1-scaled-e1764188763360.png`, alt: 'Aura Residence — planta apartamento tipo final 04', label: 'Tipo final 04' },
+  { src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Duplex-Inf.-Final-01-V01-scaled-e1764188853963.png`, alt: 'Aura Residence — planta duplex inferior 01', label: 'Duplex inferior 01' },
+  { src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Duplex-Sup.-Final-01-V01-scaled-e1764189176390.png`, alt: 'Aura Residence — planta duplex superior 01', label: 'Duplex superior 01' },
+  { src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Duplex-Inf.-Final-02-V01-scaled-e1764189253552.png`, alt: 'Aura Residence — planta duplex inferior 02', label: 'Duplex inferior 02' },
+  { src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Duplex-Sup.-Final-02-V01-scaled-e1764189320833.png`, alt: 'Aura Residence — planta duplex superior 02', label: 'Duplex superior 02' },
+  { src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Duplex-Inf.-Final-03-V01-scaled-e1764189379115.png`, alt: 'Aura Residence — planta duplex inferior 03', label: 'Duplex inferior 03' },
+  { src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Duplex-Sup.-Final-03-V01-scaled-e1764189420419.png`, alt: 'Aura Residence — planta duplex superior 03', label: 'Duplex superior 03' },
+  { src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Duplex-Inf.-Final-04-V01-scaled-e1764189501135.png`, alt: 'Aura Residence — planta duplex inferior 04', label: 'Duplex inferior 04' },
+  { src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Duplex-Sup.-Final-04-V01-2-scaled-e1764189733890.png`, alt: 'Aura Residence — planta duplex superior 04', label: 'Duplex superior 04' },
+  { src: `${ERALDO_SITE}/2025/11/Aura-Planta-Humanizada_Area-de-Lazer-Alt.-Academia-scaled.png`, alt: 'Aura Residence — planta do pavimento de lazer', label: 'Área de lazer' },
+  { src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Terreo-V02.png`, alt: 'Aura Residence — planta do térreo', label: 'Térreo' },
+  { src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Subsolo-01-V01.png`, alt: 'Aura Residence — planta do subsolo 1', label: 'Subsolo 1' },
+  { src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Subsolo-02-V02.png`, alt: 'Aura Residence — planta do subsolo 2', label: 'Subsolo 2' },
+  { src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Subsolo-03-V01.png`, alt: 'Aura Residence — planta do subsolo 3', label: 'Subsolo 3' },
 ]
 
 const FAQ = [
@@ -88,8 +133,8 @@ export default function AuraResidencePage() {
     .ar-fade { opacity: 0; transform: translateY(24px); animation: arfade .9s ease forwards; }
     .ar-fade-1 { animation-delay: .1s; } .ar-fade-2 { animation-delay: .25s; } .ar-fade-3 { animation-delay: .4s; }
     @keyframes arfade { to { opacity: 1; transform: none; } }
-    .ar-gcard img { transition: transform .8s ease; }
-    .ar-gcard:hover img { transform: scale(1.06); }
+    .ar-gcard img, .arp-gcard img { transition: transform .8s ease; }
+    .ar-gcard:hover img, .arp-gcard:hover img { transform: scale(1.06); }
     .ar-btn { display: inline-flex; align-items: center; gap: 8px; padding: 14px 32px; font-family: var(--font-bricolage), system-ui, sans-serif; font-size: 11px; font-weight: 400; letter-spacing: 0.3em; text-transform: uppercase; text-decoration: none; border: 1px solid #9C5F2E; color: #9C5F2E; background: transparent; cursor: pointer; transition: all .25s ease; border-radius: 2px; }
     .ar-btn:hover { background: #9C5F2E; color: #fff; }
     .ar-btn--solid { background: #9C5F2E; color: #fff; }
@@ -226,7 +271,7 @@ export default function AuraResidencePage() {
             <p style={{ fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 10, letterSpacing: '0.45em', textTransform: 'uppercase', color: '#9C5F2E', display: 'block', marginBottom: 16 }}>Diferenciais</p>
             <h2 className="ar-h2" style={{ fontSize: 'clamp(24px,3.5vw,42px)', color: '#1A1814' }}>O padrão que transforma</h2>
           </div>
-          <div className="ar-diff-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '0 48px', maxWidth: 900, margin: '0 auto' }}>
+          <div className="ar-diff-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '0 48px', maxWidth: 900, margin: '0 auto 48px' }}>
             {DIFERENCIAIS.map(({ ico, title, desc }) => (
               <div key={title} className="ar-diff-item">
                 <div className="ar-diff-icon">{ico}</div>
@@ -236,6 +281,14 @@ export default function AuraResidencePage() {
                 </div>
               </div>
             ))}
+          </div>
+          <div style={{ maxWidth: 900, margin: '0 auto', paddingTop: 32, borderTop: '1px solid rgba(26,24,20,0.10)' }}>
+            <p style={{ fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 10, letterSpacing: '0.3em', textTransform: 'uppercase', color: '#9C5F2E', marginBottom: 16, textAlign: 'center' }}>Também incluso</p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, justifyContent: 'center' }}>
+              {FICHA_TECNICA.map(item => (
+                <span key={item} style={{ padding: '7px 14px', background: 'rgba(156,95,46,0.07)', borderRadius: 2, fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 12, letterSpacing: '0.06em', color: '#6B655B' }}>{item}</span>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -254,11 +307,25 @@ export default function AuraResidencePage() {
         </div>
       </section>
 
+      {/* PLANTAS */}
+      <section id="plantas" style={{ background: '#F5EEE6', padding: 'clamp(64px,8vw,120px) clamp(24px,6vw,80px)' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 56 }}>
+            <p style={{ fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 10, letterSpacing: '0.45em', textTransform: 'uppercase', color: '#9C5F2E', display: 'block', marginBottom: 16 }}>Plantas</p>
+            <h2 className="ar-h2" style={{ fontSize: 'clamp(24px,3.5vw,42px)', color: '#1A1814', marginBottom: 16 }}>Escolha o seu layout</h2>
+            <p className="ar-serif" style={{ fontSize: 'clamp(15px,1.8vw,19px)', color: '#6B655B', maxWidth: 560, margin: '0 auto' }}>
+              4 apartamentos tipo, 4 coberturas duplex, área de lazer, térreo e 3 subsolos de garagem.
+            </p>
+          </div>
+          <GalleryWithLightbox galeria={PLANTAS} prefix="arp" gradient="linear-gradient(to top, rgba(26,20,16,0.45), transparent 55%)" badge="Planta humanizada" />
+        </div>
+      </section>
+
       {/* LAZER */}
       <section id="lazer" style={{ background: '#1A1410', padding: 'clamp(64px,8vw,120px) clamp(24px,6vw,80px)' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'clamp(48px,6vw,96px)', alignItems: 'center' }}>
           <div style={{ position: 'relative', aspectRatio: '4/3', borderRadius: 4, overflow: 'hidden', order: 2 }}>
-            <Image unoptimized src={PISCINA_IMG} alt="Aura Residence — terraço com piscina" fill style={{ objectFit: 'cover' }} sizes="(min-width:768px) 50vw,100vw" />
+            <Image unoptimized src={`${ERALDO_SITE}/2025/10/07_EXT05_TERRACO-PLAY-GROUND_HR-2-scaled.jpg`} alt="Aura Residence — terraço playground" fill style={{ objectFit: 'cover' }} sizes="(min-width:768px) 50vw,100vw" />
           </div>
           <div>
             <p style={{ fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 10, letterSpacing: '0.45em', textTransform: 'uppercase', color: 'rgba(217,160,102,0.80)', display: 'block', marginBottom: 16 }}>Lazer</p>
@@ -367,7 +434,7 @@ export default function AuraResidencePage() {
         </div>
         <div style={{ maxWidth: 1200, margin: '16px auto 0', paddingTop: 16, borderTop: '1px solid rgba(245,238,230,0.05)' }}>
           <p style={{ fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 11, color: 'rgba(245,238,230,0.30)', letterSpacing: '0.08em' }}>
-            {new Date().getFullYear()} Stiven Allan · Aura Residence é um empreendimento da Eraldo Construções. Imagens meramente ilustrativas.
+            {new Date().getFullYear()} Stiven Allan · Aura Residence é um empreendimento da Eraldo Construções. Imagens e plantas meramente ilustrativas.
           </p>
         </div>
       </footer>
