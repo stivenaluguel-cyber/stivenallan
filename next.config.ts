@@ -63,6 +63,75 @@ const nextConfig: NextConfig = {
       destination: '/empreendimentos',
       permanent: true,
     },
+    // Site antigo (www.stivenallan.com.br) — checklist SEO 2026-07-20: essas URLs
+    // ainda recebem impressão/clique real no Search Console mas hoje batem 404
+    // (o redirect de www só trocava o domínio, mantendo o path morto). Mapeamento
+    // 1:1 pros empreendimentos que continuam no portfólio atual; o resto (unidades
+    // descontinuadas — Sordello, Volpago, Gabiano, Belfiore, Hexa Prime, Longarone,
+    // terrenos/casas avulsas — e as buscas antigas /imoveis/?...) cai no catálogo.
+    {
+      source: '/home',
+      destination: '/',
+      permanent: true,
+    },
+    {
+      source: '/imovel/residencial-bosco-del-montello-pronto-para-morar-no-centro-de-criciuma-178/AP0097',
+      destination: '/empreendimento/fontana/bosco-del-montello-centro-criciuma-sc',
+      permanent: true,
+    },
+    {
+      source: '/imovel/residencial-calalzo-di-cadore-modernidade-e-conforto-no-bairro-michel-criciuma-179/AP0098-179',
+      destination: '/empreendimento/fontana/calalzo-di-cadore-michel-criciuma-sc',
+      permanent: true,
+    },
+    {
+      source: '/imovel/residencial-fidenza-grande-lancamento-no-centro-de-criciuma-182/AP0101-182',
+      destination: '/empreendimento/fontana/fidenza-residencial-cruzeiro-do-sul-criciuma-sc',
+      permanent: true,
+    },
+    {
+      source: '/imovel/residencial-parco-savello-alto-padrao-no-bairro-santa-barbara-criciuma-sc-192/AP0108',
+      destination: '/empreendimento/fontana/parco-savello-santa-barbara-criciuma-sc',
+      permanent: true,
+    },
+    {
+      source: '/imovel/residencial-parco-savello-alto-padrao-no-bairro-santa-barbara-criciuma-sc-192/AP0108-192',
+      destination: '/empreendimento/fontana/parco-savello-santa-barbara-criciuma-sc',
+      permanent: true,
+    },
+    {
+      source: '/imovel/thiene-residencial-sofisticacao-e-conforto-no-centro-de-criciuma-195/AP0111-195',
+      destination: '/empreendimento/fontana/thiene-centro-criciuma-sc',
+      permanent: true,
+    },
+    {
+      source: '/agendar-visita/thiene-residencial-sofisticacao-e-conforto-no-centro-de-criciuma-195',
+      destination: '/empreendimento/fontana/thiene-centro-criciuma-sc',
+      permanent: true,
+    },
+    // Fallback: qualquer outra URL do site antigo (unidade descontinuada ou busca
+    // antiga) cai no catálogo em vez de 404 — precisa vir depois dos matches
+    // específicos acima, senão o wildcard captura primeiro.
+    {
+      source: '/imovel/:path*',
+      destination: '/empreendimentos',
+      permanent: true,
+    },
+    {
+      source: '/agendar-visita/:path*',
+      destination: '/empreendimentos',
+      permanent: true,
+    },
+    {
+      source: '/imoveis',
+      destination: '/empreendimentos',
+      permanent: true,
+    },
+    {
+      source: '/imoveis/:path*',
+      destination: '/empreendimentos',
+      permanent: true,
+    },
   ],
 }
 

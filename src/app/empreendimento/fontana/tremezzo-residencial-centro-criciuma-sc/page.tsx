@@ -12,7 +12,7 @@ const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20int
 
 export const metadata: Metadata = {
   title: 'Tremezzo Residencial | Centro Criciúma',
-  description: 'Tremezzo Residencial — 3 dormitórios, 125 m², decorado disponível para visitação. 18 andares no Centro de Criciúma. Financiamento direto Fontana, sem banco.',
+  description: 'Tremezzo Residencial, o apartamento no Centro de Criciúma/SC — 3 dormitórios, 125 m², decorado disponível para visita hoje. Financiamento direto com a construtora, sem banco. Fale com Stiven Allan.',
   alternates: { canonical: SITE_URL + '/empreendimento/fontana/tremezzo-residencial-centro-criciuma-sc' },
   openGraph: {
     title: 'Tremezzo Residencial | Criciúma | Stiven Allan',

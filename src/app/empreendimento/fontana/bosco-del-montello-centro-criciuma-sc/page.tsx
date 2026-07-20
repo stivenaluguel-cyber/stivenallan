@@ -56,7 +56,7 @@ const AMENIDADES = [
 
 export const metadata: Metadata = {
   title: 'Bosco Del Montello Residencial | Centro Criciúma SC',
-  description: 'Bosco Del Montello Residencial — 2 dormitórios (1 suíte), até 66 m², Centro de Criciúma/SC. Financiamento direto Fontana. Conheça com Stiven Allan CRECI 60.275.',
+  description: 'Veja fotos e plantas do Bosco Del Montello Residencial, no Centro de Criciúma/SC — 2 dormitórios (1 suíte), até 66 m². Financiamento direto com a construtora, sem banco. Fale com Stiven Allan, CRECI 60.275.',
   alternates: { canonical: SITE_URL + '/empreendimento/fontana/bosco-del-montello-centro-criciuma-sc' },
   openGraph: {
     title: 'Bosco Del Montello Residencial | Centro Criciúma SC | Stiven Allan',
