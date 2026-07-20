@@ -1,8 +1,28 @@
 'use client'
 import Image from 'next/image'
 import { useState, useEffect, useCallback } from 'react'
+import { trackPlantaOpen } from '@/lib/tracking'
 
-type GalItem = { src: string; alt: string; label: string }
+type GalItem = {
+  src: string
+  alt: string
+  label: string
+  categoria?: string
+  // Ficha técnica — opcional: só exibimos o chip quando o dado real chegar.
+  area?: number
+  quartos?: number
+  suites?: number
+  vagas?: number
+}
+
+function fichaTecnica(item: GalItem): string | null {
+  const partes: string[] = []
+  if (item.area) partes.push(`${item.area} m²`)
+  if (item.quartos) partes.push(`${item.quartos} dorm.`)
+  if (item.suites) partes.push(`${item.suites} suíte${item.suites > 1 ? 's' : ''}`)
+  if (item.vagas) partes.push(`${item.vagas} vaga${item.vagas > 1 ? 's' : ''}`)
+  return partes.length ? partes.join(' · ') : null
+}
 
 function Lightbox({ images, startIndex, onClose }: { images: GalItem[]; startIndex: number; onClose: () => void }) {
   const [idx, setIdx] = useState(startIndex)
@@ -45,19 +65,28 @@ function Lightbox({ images, startIndex, onClose }: { images: GalItem[]; startInd
         />
       </div>
       <button onClick={next} aria-label="Próximo" style={{ position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.18)', borderRadius: 4, color: '#fff', fontSize: 22, cursor: 'pointer', padding: '10px 16px', zIndex: 2 }}>&#8250;</button>
-      <p style={{ marginTop: 16, color: 'rgba(255,255,255,0.65)', fontSize: 13, letterSpacing: '0.06em', textTransform: 'uppercase' }}>{images[idx].label}</p>
+      <p style={{ marginTop: 16, color: 'rgba(255,255,255,0.65)', fontSize: 13, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+        {images[idx].label}
+        {fichaTecnica(images[idx]) && <span style={{ opacity: 0.7 }}> · {fichaTecnica(images[idx])}</span>}
+      </p>
     </div>
   )
 }
 
-export default function GalleryWithLightbox({ galeria, prefix, gradient, badge }: {
+export default function GalleryWithLightbox({ galeria, prefix, gradient, badge, trackPlantas }: {
   galeria: GalItem[]
   prefix: string
   gradient: string
   badge?: string
+  // Objeto serializável (strings) em vez de callback — a página é Server Component
+  // e não pode passar função como prop pra este client component.
+  trackPlantas?: { empreendimento: string; content_name: string }
 }) {
   const [lb, setLb] = useState({ open: false, index: 0 })
-  const open = (i: number) => setLb({ open: true, index: i })
+  const open = (i: number) => {
+    setLb({ open: true, index: i })
+    if (trackPlantas) trackPlantaOpen(galeria[i].label, trackPlantas)
+  }
   const close = () => setLb({ open: false, index: 0 })
   return (
     <>
@@ -74,7 +103,14 @@ export default function GalleryWithLightbox({ galeria, prefix, gradient, badge }
           >
             <Image unoptimized src={item.src} alt={item.alt} fill style={{ objectFit: 'cover' }} sizes="(min-width:1024px) 33vw,50vw" />
             <div style={{ position: 'absolute', inset: 0, background: gradient }} />
-            <figcaption style={{ position: 'absolute', bottom: 12, left: 14, right: 14, color: '#fff', fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: 'var(--font-hanken), system-ui, sans-serif' }}>{item.label}</figcaption>
+            <figcaption style={{ position: 'absolute', bottom: 12, left: 14, right: 14, color: '#fff', fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: 'var(--font-hanken), system-ui, sans-serif' }}>
+              {item.label}
+              {fichaTecnica(item) && (
+                <span style={{ display: 'block', fontSize: 10, letterSpacing: '0.08em', opacity: 0.75, marginTop: 3, textTransform: 'none' }}>
+                  {fichaTecnica(item)}
+                </span>
+              )}
+            </figcaption>
             {badge && (
               <div style={{ position: 'absolute', top: 10, right: 10, background: 'rgba(156,95,46,0.88)', borderRadius: 2, padding: '4px 10px', fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#fff' }}>{badge}</div>
             )}

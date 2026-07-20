@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { LeadCaptureModal } from '@/components/LeadCaptureModal'
 import { createBrowserClient } from '@supabase/ssr'
+import { trackCatalogClick } from '@/lib/tracking'
 
 type Props = {
   slug: string
@@ -23,6 +24,7 @@ export function LeadCaptureButton({
 
   async function fetchAndOpen() {
     if (data) return
+    trackCatalogClick({ empreendimento: slug, content_name: propertyDisplayName || slug, form_type: 'catalog_modal' })
     setLoading(true)
     const supabase = createBrowserClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,

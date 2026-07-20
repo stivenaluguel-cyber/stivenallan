@@ -194,6 +194,37 @@ export function trackSpaPageView(path: string) {
   gtag()?.('event', 'page_view', { page_path: path })
 }
 
+// --- Micro-conversões da jornada (funil pré-lead) ---
+// GA4 apenas: o pipeline de conversão real (Lead + CAPI + Enhanced Conversions)
+// já vive isolado em trackLeadEvent/sendLeadToCapi acima — não duplicar aqui.
+// O clique em links de WhatsApp usa outro mecanismo (data-wpp, delegado em
+// layout.tsx) porque já existe um evento Contact/contact_whatsapp sitewide.
+
+type FunilParams = { empreendimento: string; content_name: string }
+// form_type distingue, no GA4, qual formulário gerou o evento — nunca incluir
+// nome/telefone/e-mail ou qualquer dado pessoal nestes params.
+type FormParams = FunilParams & { form_type: 'catalog_modal' | 'contact_form' }
+
+export function trackCatalogClick(params: FormParams) {
+  gtag()?.('event', 'catalog_click', params)
+}
+
+export function trackPlantaOpen(label: string, params: FunilParams) {
+  gtag()?.('event', 'planta_open', { label, ...params })
+}
+
+export function trackFormOpen(params: FormParams) {
+  gtag()?.('event', 'form_open', params)
+}
+
+export function trackFormStart(params: FormParams) {
+  gtag()?.('event', 'form_start', params)
+}
+
+export function trackFormSubmit(params: FormParams) {
+  gtag()?.('event', 'form_submit', params)
+}
+
 // Reenvio server-side (Meta CAPI) — fire-and-forget, noop se env não configurada no servidor
 export function sendLeadToCapi(payload: {
   event_id: string

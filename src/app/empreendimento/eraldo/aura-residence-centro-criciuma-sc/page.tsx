@@ -10,6 +10,8 @@ import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
 
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Aura%20Residence%20em%20Crici%C3%BAma.%20Pode%20me%20passar%20mais%20informa%C3%A7%C3%B5es%3F'
+const SLUG = 'aura-residence-centro-criciuma-sc'
+const NOME = 'Aura Residence'
 
 // Renders oficiais da Eraldo Construções — pasta compartilhada "AURA RESIDENCE"
 // (Drive) para fachadas, e o próprio site oficial (wp-content/uploads) para os
@@ -41,25 +43,45 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 }
 
-const DIFERENCIAIS = [
-  { ico: '🔐', title: 'Fechadura digital com biometria', desc: 'Segurança e praticidade na porta do apartamento.' },
-  { ico: '🪪', title: 'Acesso facial e QR Code', desc: 'Reconhecimento facial e QR Code no hall de entrada.' },
-  { ico: '🪟', title: 'Persianas automatizadas', desc: 'Controle de luz e privacidade com um toque, direto na esquadria.' },
-  { ico: '🚪', title: 'Porta pivotante', desc: 'Entrada do apartamento com acabamento diferenciado.' },
-  { ico: '🍖', title: 'Churrasqueira a carvão com exaustor', desc: 'Sabor de verdade, sem fumaça dentro de casa.' },
-  { ico: '🧱', title: 'Forro de gesso com bordas negativas', desc: 'Detalhe de acabamento premium no teto.' },
-  { ico: '🧱', title: 'Paredes mais espessas entre apartamentos', desc: 'Mais privacidade acústica entre unidades vizinhas.' },
-  { ico: '🔇', title: 'Contrapiso com atenuante de ruído', desc: 'Conforto sonoro no impacto entre andares.' },
-  { ico: '☀️', title: 'Energia fotovoltaica', desc: 'Geração própria de energia solar nas áreas comuns.' },
-  { ico: '🛗', title: '3 elevadores', desc: 'Circulação ágil, mesmo nos horários de pico.' },
-  { ico: '🏛', title: 'Fachada 100% pastilhada', desc: 'Acabamento nobre e durável em toda a fachada.' },
-  { ico: '🏺', title: 'Porcelanato 80×80 nas áreas comuns', desc: 'Acabamento em grandes formatos.' },
-  { ico: '🚗', title: 'Garage hall', desc: 'Recepção coberta para embarque e desembarque com conforto.' },
-  { ico: '🌂', title: 'Deck coberto', desc: 'Área externa protegida em qualquer estação do ano.' },
-  { ico: '💧', title: 'Reúso de água da chuva', desc: 'Aproveitamento na limpeza das áreas comuns.' },
-  { ico: '📹', title: 'Monitoramento eletrônico', desc: 'Áreas comuns com vigilância contínua.' },
-  { ico: '🗄', title: 'Depósito individual', desc: 'Espaço extra de armazenamento por apartamento.' },
-  { ico: '🏊', title: 'Piscina com trocador de calor', desc: 'Pré-instalação pronta para climatização futura.' },
+const DIFERENCIAIS_GRUPOS = [
+  {
+    titulo: 'Segurança & Acesso',
+    itens: [
+      { ico: '🔐', title: 'Fechadura digital com biometria', desc: 'Segurança e praticidade na porta do apartamento.' },
+      { ico: '🪪', title: 'Acesso facial e QR Code', desc: 'Reconhecimento facial e QR Code no hall de entrada.' },
+      { ico: '🛗', title: '3 elevadores', desc: 'Circulação ágil, mesmo nos horários de pico.' },
+      { ico: '🚗', title: 'Garage hall', desc: 'Recepção coberta para embarque e desembarque com conforto.' },
+      { ico: '📹', title: 'Monitoramento eletrônico', desc: 'Áreas comuns com vigilância contínua.' },
+    ],
+  },
+  {
+    titulo: 'Conforto acústico & Tecnologia',
+    itens: [
+      { ico: '🪟', title: 'Persianas automatizadas', desc: 'Controle de luz e privacidade com um toque, direto na esquadria.' },
+      { ico: '🧱', title: 'Paredes mais espessas entre apartamentos', desc: 'Mais privacidade acústica entre unidades vizinhas.' },
+      { ico: '🔇', title: 'Contrapiso com atenuante de ruído', desc: 'Conforto sonoro no impacto entre andares.' },
+      { ico: '🏊', title: 'Piscina com trocador de calor', desc: 'Pré-instalação pronta para climatização futura.' },
+      { ico: '🍖', title: 'Churrasqueira a carvão com exaustor', desc: 'Sabor de verdade, sem fumaça dentro de casa.' },
+    ],
+  },
+  {
+    titulo: 'Sustentabilidade',
+    itens: [
+      { ico: '☀️', title: 'Energia fotovoltaica', desc: 'Geração própria de energia solar nas áreas comuns.' },
+      { ico: '💧', title: 'Reúso de água da chuva', desc: 'Aproveitamento na limpeza das áreas comuns.' },
+    ],
+  },
+  {
+    titulo: 'Design & Acabamento',
+    itens: [
+      { ico: '🚪', title: 'Porta pivotante', desc: 'Entrada do apartamento com acabamento diferenciado.' },
+      { ico: '🧱', title: 'Forro de gesso com bordas negativas', desc: 'Detalhe de acabamento premium no teto.' },
+      { ico: '🏛', title: 'Fachada 100% pastilhada', desc: 'Acabamento nobre e durável em toda a fachada.' },
+      { ico: '🏺', title: 'Porcelanato 80×80 nas áreas comuns', desc: 'Acabamento em grandes formatos.' },
+      { ico: '🌂', title: 'Deck coberto', desc: 'Área externa protegida em qualquer estação do ano.' },
+      { ico: '🗄', title: 'Depósito individual', desc: 'Espaço extra de armazenamento por apartamento.' },
+    ],
+  },
 ]
 
 const FICHA_TECNICA = [
@@ -92,24 +114,34 @@ const GALERIA = [
   { src: `${ERALDO_SITE}/2025/10/07_INT09_LIVING-COBERTURA_HR-2-scaled.jpg`, alt: 'Aura Residence — living da cobertura duplex', label: 'Living · Cobertura' },
 ]
 
+// categoria: usada só pra agrupar a exibição (Apartamentos tipo / Coberturas duplex /
+// Áreas comuns e garagens). Ficha técnica (m², dormitórios, suítes, vagas) ainda não
+// chegou por unidade — os campos existem no tipo GalItem mas ficam de fora aqui até
+// termos o dado real; o card só mostra o chip quando algum vier preenchido.
 const PLANTAS = [
-  { src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Tipo-Final-01-V01-scaled-e1764188009811.png`, alt: 'Aura Residence — planta apartamento tipo final 01', label: 'Tipo final 01' },
-  { src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Tipo-Final-02-V01-2-scaled-e1764188411574.png`, alt: 'Aura Residence — planta apartamento tipo final 02', label: 'Tipo final 02' },
-  { src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Tipo-Final-03-V01-3-scaled-e1764188707216.png`, alt: 'Aura Residence — planta apartamento tipo final 03', label: 'Tipo final 03' },
-  { src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Tipo-Final-04-V01-1-scaled-e1764188763360.png`, alt: 'Aura Residence — planta apartamento tipo final 04', label: 'Tipo final 04' },
-  { src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Duplex-Inf.-Final-01-V01-scaled-e1764188853963.png`, alt: 'Aura Residence — planta duplex inferior 01', label: 'Duplex inferior 01' },
-  { src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Duplex-Sup.-Final-01-V01-scaled-e1764189176390.png`, alt: 'Aura Residence — planta duplex superior 01', label: 'Duplex superior 01' },
-  { src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Duplex-Inf.-Final-02-V01-scaled-e1764189253552.png`, alt: 'Aura Residence — planta duplex inferior 02', label: 'Duplex inferior 02' },
-  { src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Duplex-Sup.-Final-02-V01-scaled-e1764189320833.png`, alt: 'Aura Residence — planta duplex superior 02', label: 'Duplex superior 02' },
-  { src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Duplex-Inf.-Final-03-V01-scaled-e1764189379115.png`, alt: 'Aura Residence — planta duplex inferior 03', label: 'Duplex inferior 03' },
-  { src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Duplex-Sup.-Final-03-V01-scaled-e1764189420419.png`, alt: 'Aura Residence — planta duplex superior 03', label: 'Duplex superior 03' },
-  { src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Duplex-Inf.-Final-04-V01-scaled-e1764189501135.png`, alt: 'Aura Residence — planta duplex inferior 04', label: 'Duplex inferior 04' },
-  { src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Duplex-Sup.-Final-04-V01-2-scaled-e1764189733890.png`, alt: 'Aura Residence — planta duplex superior 04', label: 'Duplex superior 04' },
-  { src: `${ERALDO_SITE}/2025/11/Aura-Planta-Humanizada_Area-de-Lazer-Alt.-Academia-scaled.png`, alt: 'Aura Residence — planta do pavimento de lazer', label: 'Área de lazer' },
-  { src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Terreo-V02.png`, alt: 'Aura Residence — planta do térreo', label: 'Térreo' },
-  { src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Subsolo-01-V01.png`, alt: 'Aura Residence — planta do subsolo 1', label: 'Subsolo 1' },
-  { src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Subsolo-02-V02.png`, alt: 'Aura Residence — planta do subsolo 2', label: 'Subsolo 2' },
-  { src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Subsolo-03-V01.png`, alt: 'Aura Residence — planta do subsolo 3', label: 'Subsolo 3' },
+  { categoria: 'tipo', src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Tipo-Final-01-V01-scaled-e1764188009811.png`, alt: 'Aura Residence — planta apartamento tipo final 01', label: 'Tipo final 01' },
+  { categoria: 'tipo', src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Tipo-Final-02-V01-2-scaled-e1764188411574.png`, alt: 'Aura Residence — planta apartamento tipo final 02', label: 'Tipo final 02' },
+  { categoria: 'tipo', src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Tipo-Final-03-V01-3-scaled-e1764188707216.png`, alt: 'Aura Residence — planta apartamento tipo final 03', label: 'Tipo final 03' },
+  { categoria: 'tipo', src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Tipo-Final-04-V01-1-scaled-e1764188763360.png`, alt: 'Aura Residence — planta apartamento tipo final 04', label: 'Tipo final 04' },
+  { categoria: 'duplex', src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Duplex-Inf.-Final-01-V01-scaled-e1764188853963.png`, alt: 'Aura Residence — planta duplex inferior 01', label: 'Duplex inferior 01' },
+  { categoria: 'duplex', src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Duplex-Sup.-Final-01-V01-scaled-e1764189176390.png`, alt: 'Aura Residence — planta duplex superior 01', label: 'Duplex superior 01' },
+  { categoria: 'duplex', src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Duplex-Inf.-Final-02-V01-scaled-e1764189253552.png`, alt: 'Aura Residence — planta duplex inferior 02', label: 'Duplex inferior 02' },
+  { categoria: 'duplex', src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Duplex-Sup.-Final-02-V01-scaled-e1764189320833.png`, alt: 'Aura Residence — planta duplex superior 02', label: 'Duplex superior 02' },
+  { categoria: 'duplex', src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Duplex-Inf.-Final-03-V01-scaled-e1764189379115.png`, alt: 'Aura Residence — planta duplex inferior 03', label: 'Duplex inferior 03' },
+  { categoria: 'duplex', src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Duplex-Sup.-Final-03-V01-scaled-e1764189420419.png`, alt: 'Aura Residence — planta duplex superior 03', label: 'Duplex superior 03' },
+  { categoria: 'duplex', src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Duplex-Inf.-Final-04-V01-scaled-e1764189501135.png`, alt: 'Aura Residence — planta duplex inferior 04', label: 'Duplex inferior 04' },
+  { categoria: 'duplex', src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Duplex-Sup.-Final-04-V01-2-scaled-e1764189733890.png`, alt: 'Aura Residence — planta duplex superior 04', label: 'Duplex superior 04' },
+  { categoria: 'comum', src: `${ERALDO_SITE}/2025/11/Aura-Planta-Humanizada_Area-de-Lazer-Alt.-Academia-scaled.png`, alt: 'Aura Residence — planta do pavimento de lazer', label: 'Área de lazer' },
+  { categoria: 'comum', src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Terreo-V02.png`, alt: 'Aura Residence — planta do térreo', label: 'Térreo' },
+  { categoria: 'comum', src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Subsolo-01-V01.png`, alt: 'Aura Residence — planta do subsolo 1', label: 'Subsolo 1' },
+  { categoria: 'comum', src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Subsolo-02-V02.png`, alt: 'Aura Residence — planta do subsolo 2', label: 'Subsolo 2' },
+  { categoria: 'comum', src: `${ERALDO_SITE}/2025/10/Aura-Planta-Humanizada_Subsolo-03-V01.png`, alt: 'Aura Residence — planta do subsolo 3', label: 'Subsolo 3' },
+]
+
+const PLANTAS_GRUPOS = [
+  { titulo: 'Apartamentos tipo', categoria: 'tipo' },
+  { titulo: 'Coberturas duplex', categoria: 'duplex' },
+  { titulo: 'Áreas comuns e garagens', categoria: 'comum' },
 ]
 
 const FAQ = [
@@ -175,7 +207,7 @@ export default function AuraResidencePage() {
           </Link>
           <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
             <Link href="/empreendimentos" style={{ fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.85)', textDecoration: 'none', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>Empreendimentos</Link>
-            <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#D9A066', textDecoration: 'none', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>WhatsApp</a>
+            <a href={WPP} target="_blank" rel="noopener noreferrer" data-wpp="nav" data-wpp-emp={SLUG} data-wpp-nome={NOME} style={{ fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#D9A066', textDecoration: 'none', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>WhatsApp</a>
           </div>
         </div>
       </nav>
@@ -196,9 +228,8 @@ export default function AuraResidencePage() {
             Aura Residence — lançamento no Centro de Criciúma, onde cada pôr do sol vira uma pintura na sua janela.
           </p>
           <div className="ar-fade ar-fade-3" style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
-            <a href={WPP} target="_blank" rel="noopener noreferrer" className="ar-btn ar-btn--solid">Falar com Stiven</a>
-            <LeadCaptureButton slug="aura-residence-centro-criciuma-sc" construtora_slug="eraldo" propertyDisplayName="Aura Residence" className="ar-btn" label="Baixar catálogo & plantas" />
-            <a href="#diferenciais" className="ar-btn" style={{ borderColor: 'rgba(255,255,255,0.55)', color: '#fff', backdropFilter: 'blur(8px)' }}>Ver diferenciais</a>
+            <a href={WPP} target="_blank" rel="noopener noreferrer" className="ar-btn ar-btn--solid" data-wpp="hero" data-wpp-emp={SLUG} data-wpp-nome={NOME}>Falar com Stiven</a>
+            <LeadCaptureButton slug={SLUG} construtora_slug="eraldo" propertyDisplayName={NOME} className="ar-btn" label="Baixar catálogo & plantas" />
           </div>
           <p className="ar-fade ar-fade-3" style={{ marginTop: 20, fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 12, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.55)', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>
             Lançamento · Condições especiais de pré-lançamento
@@ -271,13 +302,20 @@ export default function AuraResidencePage() {
             <p style={{ fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 10, letterSpacing: '0.45em', textTransform: 'uppercase', color: '#9C5F2E', display: 'block', marginBottom: 16 }}>Diferenciais</p>
             <h2 className="ar-h2" style={{ fontSize: 'clamp(24px,3.5vw,42px)', color: '#1A1814' }}>O padrão que transforma</h2>
           </div>
-          <div className="ar-diff-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '0 48px', maxWidth: 900, margin: '0 auto 48px' }}>
-            {DIFERENCIAIS.map(({ ico, title, desc }) => (
-              <div key={title} className="ar-diff-item">
-                <div className="ar-diff-icon">{ico}</div>
-                <div>
-                  <p style={{ fontFamily: 'var(--font-bricolage), system-ui, sans-serif', fontWeight: 400, fontSize: 14, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#1A1814', marginBottom: 4 }}>{title}</p>
-                  <p style={{ fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 14, color: '#6B655B', lineHeight: 1.6 }}>{desc}</p>
+          <div style={{ maxWidth: 900, margin: '0 auto 48px', display: 'flex', flexDirection: 'column', gap: 40 }}>
+            {DIFERENCIAIS_GRUPOS.map(({ titulo, itens }) => (
+              <div key={titulo}>
+                <p style={{ fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#9C5F2E', marginBottom: 8 }}>{titulo}</p>
+                <div className="ar-diff-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '0 48px' }}>
+                  {itens.map(({ ico, title, desc }) => (
+                    <div key={title} className="ar-diff-item">
+                      <div className="ar-diff-icon">{ico}</div>
+                      <div>
+                        <p style={{ fontFamily: 'var(--font-bricolage), system-ui, sans-serif', fontWeight: 400, fontSize: 14, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#1A1814', marginBottom: 4 }}>{title}</p>
+                        <p style={{ fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 14, color: '#6B655B', lineHeight: 1.6 }}>{desc}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             ))}
@@ -317,7 +355,24 @@ export default function AuraResidencePage() {
               4 apartamentos tipo, 4 coberturas duplex, área de lazer, térreo e 3 subsolos de garagem.
             </p>
           </div>
-          <GalleryWithLightbox galeria={PLANTAS} prefix="arp" gradient="linear-gradient(to top, rgba(26,20,16,0.45), transparent 55%)" badge="Planta humanizada" />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 48 }}>
+            {PLANTAS_GRUPOS.map(({ titulo, categoria }) => {
+              const itens = PLANTAS.filter(p => p.categoria === categoria)
+              if (!itens.length) return null
+              return (
+                <div key={categoria}>
+                  <p style={{ fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#9C5F2E', marginBottom: 16 }}>{titulo}</p>
+                  <GalleryWithLightbox
+                    galeria={itens}
+                    prefix="arp"
+                    gradient="linear-gradient(to top, rgba(26,20,16,0.45), transparent 55%)"
+                    badge="Planta humanizada"
+                    trackPlantas={{ empreendimento: SLUG, content_name: NOME }}
+                  />
+                </div>
+              )
+            })}
+          </div>
         </div>
       </section>
 
@@ -380,14 +435,14 @@ export default function AuraResidencePage() {
             <p style={{ fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 10, letterSpacing: '0.45em', textTransform: 'uppercase', color: '#9C5F2E', display: 'block', marginBottom: 16 }}>Como funciona</p>
             <h2 className="ar-h2" style={{ fontSize: 'clamp(24px,3.5vw,42px)', color: '#1A1814', marginBottom: 16 }}>Financiamento direto</h2>
             <p className="ar-serif" style={{ fontSize: 'clamp(15px,1.8vw,19px)', color: '#6B655B', maxWidth: 480, margin: '0 auto', lineHeight: 1.7 }}>
-              Negociado diretamente com a Eraldo Construções, sem intermediação bancária.
+              Negociado diretamente com a Eraldo Construções, sem intermediação bancária. Condições sob consulta — fale com Stiven para a tabela de pagamento atualizada.
             </p>
           </div>
           <div className="ar-step-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 'clamp(32px,4vw,56px)' }}>
             {[
               { n: '01', titulo: 'Escolha a sua unidade', desc: 'Conheça as plantas disponíveis e reserve a unidade ideal para o seu momento.' },
               { n: '02', titulo: 'Simulação personalizada', desc: 'Stiven estrutura as condições de pagamento com a construtora, de acordo com o seu perfil.' },
-              { n: '03', titulo: 'Contrato direto', desc: 'Documentação simplificada, sem intermediários, corrigida pelo CUB/SC.' },
+              { n: '03', titulo: 'Contrato direto', desc: 'Documentação simplificada, sem intermediários.' },
             ].map(({ n, titulo, desc }) => (
               <div key={n} style={{ display: 'flex', gap: 24, alignItems: 'flex-start' }}>
                 <span style={{ fontFamily: 'var(--font-bricolage), system-ui, sans-serif', fontSize: 36, fontWeight: 300, color: 'rgba(156,95,46,0.25)', lineHeight: 1, flexShrink: 0, width: 48 }}>{n}</span>
@@ -413,8 +468,8 @@ export default function AuraResidencePage() {
             O Aura Residence está em fase de lançamento — as melhores condições costumam valer só nesta etapa. Fale com Stiven para conhecer plantas, valores e condições de pagamento direto com a Eraldo Construções.
           </p>
           <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href={WPP} target="_blank" rel="noopener noreferrer" className="ar-btn ar-btn--solid">Falar com Stiven</a>
-            <a href={WPP} target="_blank" rel="noopener noreferrer" className="ar-btn" style={{ borderColor: 'rgba(245,238,230,0.30)', color: '#F5EEE6' }}>Sob consulta · Financiamento direto</a>
+            <a href={WPP} target="_blank" rel="noopener noreferrer" className="ar-btn ar-btn--solid" data-wpp="cta_final" data-wpp-emp={SLUG} data-wpp-nome={NOME}>Falar com Stiven</a>
+            <a href={WPP} target="_blank" rel="noopener noreferrer" className="ar-btn" style={{ borderColor: 'rgba(245,238,230,0.30)', color: '#F5EEE6' }} data-wpp="cta_final" data-wpp-emp={SLUG} data-wpp-nome={NOME}>Sob consulta · Financiamento direto</a>
           </div>
         </div>
       </section>
@@ -429,6 +484,7 @@ export default function AuraResidencePage() {
           <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
             <Link href="/" style={{ fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 12, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(245,238,230,0.65)', textDecoration: 'none' }}>Início</Link>
             <Link href="/empreendimentos" style={{ fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 12, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(245,238,230,0.65)', textDecoration: 'none' }}>Empreendimentos</Link>
+            <Link href="/politica-de-privacidade" style={{ fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 12, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(245,238,230,0.65)', textDecoration: 'none' }}>Privacidade</Link>
             <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 12, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#D9A066', textDecoration: 'none' }}>WhatsApp</a>
           </div>
         </div>
@@ -440,7 +496,7 @@ export default function AuraResidencePage() {
       </footer>
 
       {/* WA FLOAT */}
-      <a href={WPP} target="_blank" rel="noopener noreferrer" className="ar-wa-float" aria-label="Falar com Stiven pelo WhatsApp">
+      <a href={WPP} target="_blank" rel="noopener noreferrer" className="ar-wa-float" aria-label="Falar com Stiven pelo WhatsApp" data-wpp="float" data-wpp-emp={SLUG} data-wpp-nome={NOME}>
         <svg width="26" height="26" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
       </a>
 

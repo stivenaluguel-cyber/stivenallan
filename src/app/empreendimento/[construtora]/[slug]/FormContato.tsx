@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { getAttribution, trackLeadEvent, sendLeadToCapi } from '@/lib/tracking';
+import { useState, useRef } from 'react';
+import Link from 'next/link';
+import { getAttribution, trackLeadEvent, sendLeadToCapi, trackFormStart, trackFormSubmit } from '@/lib/tracking';
 import { createClient } from '@/lib/supabase/client';
 import { getAnonId, getVisitas } from '@/components/VisitTracker';
 
@@ -27,6 +28,14 @@ export default function FormContato({ empreendimento, propertyId, propertySlug, 
   const [entradaDisponivel, setEntradaDisponivel] = useState('');
   const [hp, setHp] = useState(''); // honeypot: usuário real nunca vê, bot preenche → server responde 400
   const [status, setStatus] = useState<'idle' | 'enviando' | 'ok' | 'erro'>('idle');
+  const startedRef = useRef(false);
+  const funilParams = { empreendimento: propertySlug || empreendimento, content_name: empreendimento, form_type: 'contact_form' as const };
+
+  function markStarted() {
+    if (startedRef.current) return;
+    startedRef.current = true;
+    trackFormStart(funilParams);
+  }
 
   function buildWaLink() {
     const saudacao = waMessage || `Olá Stiven! Me cadastrei sobre o ${empreendimento}. Pode me enviar as condições?`;
@@ -79,6 +88,7 @@ export default function FormContato({ empreendimento, propertyId, propertySlug, 
       const eventId = crypto.randomUUID();
       trackLeadEvent(empreendimento, eventId, { email: email || null, telefone, nome });
       sendLeadToCapi({ event_id: eventId, nome, telefone, email: email || null, content_name: empreendimento });
+      trackFormSubmit(funilParams);
     } catch {
       waTab?.close();
       setStatus('erro');
@@ -179,6 +189,7 @@ export default function FormContato({ empreendimento, propertyId, propertySlug, 
         placeholder="Seu nome"
         value={nome}
         onChange={(e) => setNome(e.target.value)}
+        onFocus={markStarted}
         required
         style={inputStyle}
         aria-label="Seu nome"
@@ -188,6 +199,7 @@ export default function FormContato({ empreendimento, propertyId, propertySlug, 
         placeholder="Telefone / WhatsApp"
         value={telefone}
         onChange={(e) => setTelefone(e.target.value)}
+        onFocus={markStarted}
         required
         style={inputStyle}
         aria-label="Telefone ou WhatsApp"
@@ -197,12 +209,14 @@ export default function FormContato({ empreendimento, propertyId, propertySlug, 
         placeholder="E-mail (opcional)"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
+        onFocus={markStarted}
         style={inputStyle}
         aria-label="E-mail"
       />
       <select
         value={faixaInvestimento}
         onChange={(e) => setFaixaInvestimento(e.target.value)}
+        onFocus={markStarted}
         required
         style={selectStyle}
         aria-label="Faixa de investimento"
@@ -218,6 +232,7 @@ export default function FormContato({ empreendimento, propertyId, propertySlug, 
       <select
         value={prazoCompra}
         onChange={(e) => setPrazoCompra(e.target.value)}
+        onFocus={markStarted}
         required
         style={selectStyle}
         aria-label="Quando pretende comprar"
@@ -233,6 +248,7 @@ export default function FormContato({ empreendimento, propertyId, propertySlug, 
       <select
         value={entradaDisponivel}
         onChange={(e) => setEntradaDisponivel(e.target.value)}
+        onFocus={markStarted}
         required
         style={selectStyle}
         aria-label="Entrada disponível"
@@ -268,6 +284,13 @@ export default function FormContato({ empreendimento, propertyId, propertySlug, 
           Não foi possível enviar. Tente pelo WhatsApp.
         </p>
       )}
+      <p style={{ fontSize: 11, color: '#a1a1aa', marginTop: 10, textAlign: 'center', lineHeight: 1.5 }}>
+        Usamos seus dados só para retornar seu contato sobre {empreendimento} pelo WhatsApp ou e-mail.{' '}
+        <Link href="/politica-de-privacidade" style={{ color: '#71717a', textDecoration: 'underline' }}>
+          Política de Privacidade
+        </Link>
+        .
+      </p>
     </form>
   );
 }

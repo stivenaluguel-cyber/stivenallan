@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { getAnonId, getVisitas } from '@/components/VisitTracker'
-import { getAttribution, trackLeadEvent, sendLeadToCapi } from '@/lib/tracking'
+import { getAttribution, trackLeadEvent, sendLeadToCapi, trackFormOpen, trackFormStart, trackFormSubmit } from '@/lib/tracking'
 
 type Props = {
   propertyId: string
@@ -11,7 +12,6 @@ type Props = {
   propertyDisplayName?: string
   bookPdfUrl: string | null
   autoOpen?: boolean
-  buttonClassName?: string
 }
 
 const KEY_LEAD = 'sa_lead'
@@ -24,7 +24,7 @@ function maskPhone(value: string) {
     .replace(/(\d{5})(\d{1,4})$/, '$1-$2')
 }
 
-export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName, bookPdfUrl, autoOpen = false, buttonClassName = '' }: Props) {
+export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName, bookPdfUrl, autoOpen = false }: Props) {
   const [open, setOpen] = useState(autoOpen)
   const storedLead = typeof window !== 'undefined' ? localStorage.getItem(KEY_LEAD) : null
   const returningLead: { id: string; nome: string } | null = storedLead ? JSON.parse(storedLead) : null
@@ -34,6 +34,24 @@ export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName
   const [hp, setHp] = useState('') // honeypot: usuário real nunca vê, bot preenche → server responde 400
   const [status, setStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
   const backdropRef = useRef<HTMLDivElement>(null)
+  const startedRef = useRef(false)
+  const funilParams = { empreendimento: propertyName, content_name: propertyDisplayName || propertyName, form_type: 'catalog_modal' as const }
+
+  // Cada abertura do modal (inclui autoOpen no mount e reaberturas depois de fechar)
+  // dispara form_open uma vez e reabre a janela do form_start — sem isso, fechar e
+  // reabrir o mesmo modal nunca mais contaria um novo "início de preenchimento".
+  useEffect(() => {
+    if (!open) return
+    trackFormOpen(funilParams)
+    startedRef.current = false
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open])
+
+  function markStarted() {
+    if (startedRef.current) return
+    startedRef.current = true
+    trackFormStart(funilParams)
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -61,6 +79,7 @@ export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName
       const eventId = crypto.randomUUID()
       trackLeadEvent(`Catálogo ${propertyName}`, eventId, { email: email || null, telefone: phone, nome: name })
       sendLeadToCapi({ event_id: eventId, nome: name, telefone: phone.replace(/\D/g, ''), email: email || null, content_name: `Catálogo ${propertyName}` })
+      trackFormSubmit(funilParams)
     } catch {
       pdfTab?.close()
       setStatus('error')
@@ -193,7 +212,7 @@ export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName
                       value={name} onChange={(e) => setName(e.target.value)}
                       placeholder="Seu nome completo"
                       style={{ display: 'block', width: '100%', border: '1.5px solid #e4e4e7', borderRadius: '10px', padding: '12px 14px', fontSize: '15px', color: '#18181b', backgroundColor: '#fff', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', WebkitAppearance: 'none' }}
-                      onFocus={e => (e.currentTarget.style.borderColor = '#18181b')}
+                      onFocus={e => { e.currentTarget.style.borderColor = '#18181b'; markStarted() }}
                       onBlur={e => (e.currentTarget.style.borderColor = '#e4e4e7')}
                     />
                   </div>
@@ -207,7 +226,7 @@ export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName
                       value={phone} onChange={(e) => setPhone(maskPhone(e.target.value))}
                       placeholder="(48) 99999-9999" inputMode="numeric"
                       style={{ display: 'block', width: '100%', border: '1.5px solid #e4e4e7', borderRadius: '10px', padding: '12px 14px', fontSize: '15px', color: '#18181b', backgroundColor: '#fff', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', WebkitAppearance: 'none' }}
-                      onFocus={e => (e.currentTarget.style.borderColor = '#18181b')}
+                      onFocus={e => { e.currentTarget.style.borderColor = '#18181b'; markStarted() }}
                       onBlur={e => (e.currentTarget.style.borderColor = '#e4e4e7')}
                     />
                   </div>
@@ -221,7 +240,7 @@ export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName
                       value={email} onChange={(e) => setEmail(e.target.value)}
                       placeholder="seu@email.com"
                       style={{ display: 'block', width: '100%', border: '1.5px solid #e4e4e7', borderRadius: '10px', padding: '12px 14px', fontSize: '15px', color: '#18181b', backgroundColor: '#fff', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', WebkitAppearance: 'none' }}
-                      onFocus={e => (e.currentTarget.style.borderColor = '#18181b')}
+                      onFocus={e => { e.currentTarget.style.borderColor = '#18181b'; markStarted() }}
                       onBlur={e => (e.currentTarget.style.borderColor = '#e4e4e7')}
                     />
                   </div>
@@ -240,8 +259,12 @@ export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName
                     {status === 'loading' ? 'Aguarde...' : 'Receber material gratuitamente'}
                   </button>
 
-                  <p style={{ textAlign: 'center', fontSize: '11px', color: '#a1a1aa', margin: 0, fontFamily: 'inherit' }}>
-                    Seus dados são protegidos. Sem spam.
+                  <p style={{ textAlign: 'center', fontSize: '11px', color: '#a1a1aa', margin: 0, fontFamily: 'inherit', lineHeight: 1.5 }}>
+                    Usamos seus dados só para retornar seu contato sobre {propertyDisplayName || propertyName} pelo WhatsApp ou e-mail.{' '}
+                    <Link href="/politica-de-privacidade" style={{ color: '#71717a', textDecoration: 'underline' }}>
+                      Política de Privacidade
+                    </Link>
+                    .
                   </p>
                 </form>
               )}
