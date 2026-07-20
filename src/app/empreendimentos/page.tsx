@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getVitrineEmpreendimentos } from '@/lib/vitrine'
 import { HeroImage } from '@/components/HeroImage'
+import RegionFilter from '@/components/RegionFilter'
 import { statusLabel, precoLabel, type Empreendimento, type StatusObra } from '@/lib/empreendimentos'
 
 export const revalidate = 3600
@@ -89,7 +90,8 @@ function CatalogCard({ emp }: { emp: Empreendimento }) {
 export default async function EmpreendimentosPage() {
   const listaEmp = await getVitrineEmpreendimentos()
   const lista = listaEmp.filter((e) => !e.oculto && e.construtoraSlug && e.slug && e.imagem)
-  const totalCidades = new Set(lista.map((e) => e.cidade)).size
+  const cidades = [...new Set(lista.map((e) => e.cidade))].sort()
+  const totalCidades = cidades.length
   const breadcrumbSchema = { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [ { '@type': 'ListItem', position: 1, name: 'Início', item: 'https://stivenallan.com.br' }, { '@type': 'ListItem', position: 2, name: 'Empreendimentos', item: 'https://stivenallan.com.br/empreendimentos' } ] }
   const itemListSchema = { '@context': 'https://schema.org', '@type': 'ItemList', itemListElement: lista.map((emp, i) => ({ '@type': 'ListItem', position: i + 1, name: emp.nome, url: 'https://stivenallan.com.br/empreendimento/' + emp.construtoraSlug + '/' + emp.slug })) }
 
@@ -116,6 +118,9 @@ export default async function EmpreendimentosPage() {
         .cat-btn--cham:hover { background: #B89B5E; color: #FAFAF8; }
         .cat-wa-float { position: fixed; right: 22px; bottom: 22px; z-index: 60; width: 54px; height: 54px; border-radius: 50%; background: #25D366; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(37,211,102,0.35); transition: transform .2s ease; }
         .cat-wa-float:hover { transform: scale(1.08); }
+        .cat-region-select { font-family: var(--font-hanken), system-ui, sans-serif; font-size: 11px; letter-spacing: 0.20em; text-transform: uppercase; color: #6B655B; border: 1px solid rgba(26,24,20,0.15); padding: 12px 40px 12px 20px; background: transparent; width: 100%; cursor: pointer; appearance: none; -webkit-appearance: none; -moz-appearance: none; transition: border-color .25s, color .25s; }
+        .cat-region-select:hover, .cat-region-select:focus { border-color: #B89B5E; color: #B89B5E; outline: none; }
+        .cat-region-select option { color: #1A1814; background: #FAFAF8; }
         @keyframes fadein { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:none; } }
         .fade-in { animation: fadein .7s ease both; }
         .fade-in-1 { animation-delay: .10s; } .fade-in-2 { animation-delay: .22s; } .fade-in-3 { animation-delay: .34s; } .fade-in-4 { animation-delay: .46s; }
@@ -163,9 +168,10 @@ export default async function EmpreendimentosPage() {
             <h2 className="cat-h2">Todos os empreendimentos</h2>
             <hr className="cat-rule" style={{ margin: '20px auto 0' }} />
           </div>
+          <RegionFilter cidades={cidades} />
           <div className="cat-cards-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(300px,1fr))', gap: 'clamp(16px,2.5vw,28px)' }}>
             {lista.map((emp, i) => (
-              <div key={emp.slug} className={'fade-in fade-in-' + ((i % 4) + 1)}>
+              <div key={emp.slug} data-cidade={emp.cidade} className={'fade-in fade-in-' + ((i % 4) + 1)}>
                 <CatalogCard emp={emp} />
               </div>
             ))}
