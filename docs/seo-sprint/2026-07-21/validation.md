@@ -26,6 +26,63 @@ Uma revisão somente-leitura pós-commit inicial encontrou 2 achados novos, não
 | `src/middleware.test.ts` | As 9 URLs confirmadas como descontinuadas retornam 410; uma URL válida e a home não retornam 410 |
 | `tests/next-config-redirects.test.ts` | Os 7 redirects legados 1:1 continuam com `permanent: true` e destino correto; o wildcard `/imovel/:path*`/`/agendar-visita/:path*` não existe mais (trava a regressão); `/imoveis` → `/empreendimentos` continua de pé |
 
+## Atualização — rodada 3: lógica pura do sitemap + fixture combinada + cidadePages unificado
+
+### O que mudou
+
+`src/app/sitemap.ts` foi refatorado: a lógica de montagem do sitemap saiu do `default export` (que faz I/O — chama `getVitrineImoveis()`, que por sua vez toca Supabase) e virou uma função pura exportada, `buildSitemap(ativos: ImovelVitrine[]): MetadataRoute.Sitemap`. O `sitemap()` default agora é só:
+
+```ts
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const imoveisVitrine = await getVitrineImoveis()
+  const ativos = imoveisVitrine.filter((i) => i.ativo === true)
+  return buildSitemap(ativos)
+}
+```
+
+Isso permite testar a lógica de montagem/dedupe/união de cidades com fixtures determinísticas, sem precisar mockar Supabase/`next/headers`.
+
+**`cidadePages` agora deriva da união de 3 fontes**, não só de `ativos`:
+1. Fontana estático (`@/data/imoveis`, dentro de `ativos`)
+2. Supabase (`properties`, também dentro de `ativos` — `getVitrineImoveis` já mescla os dois)
+3. **Eraldo estático** (`ERALDO_COM_DADOS_PROPRIOS` — os 8 arquivos `src/data/eraldo/*.ts`) — **nova**
+
+Antes, só as fontes 1+2 alimentavam `cidadePages`; qualquer cidade que só existisse via Eraldo estático (como Tubarão, antes da migração desses dados pro Supabase) nunca aparecia no sitemap local, mesmo a página já tendo conteúdo real.
+
+### Fixture combinada (prova pedida no item 1)
+
+`ATIVOS_COM_ERALDO_DUPLICADO_DO_SUPABASE` em `src/app/sitemap.test.ts` simula exatamente o cenário de produção encontrado na auditoria: os 8 Eraldo que já têm arquivo estático **e** os mesmos 8 registros aparecendo em `ativos` (como se já tivessem sido cadastrados no Supabase, incluindo Aura Residence — que não tem arquivo estático, só a entrada de fallback `auraPages`).
+
+**Contagem esperada com essa fixture**: `buildSitemap(ATIVOS_COM_ERALDO_DUPLICADO_DO_SUPABASE)` — 5 estáticas + 1 índice de guia + cidades (união: Criciúma, Tubarão, Balneário Rincão, Laguna — 4, já que a fixture não inclui nenhum Fontana) + 5 bairros + 7 guias + 9 `empPages` (os 9 itens da fixture, incluindo Aura) + 8 `eraldoPages` (estático) + 1 `auraPages` = 40 páginas **antes do dedupe**, **31 únicas depois** (9 URLs de empreendimento duplicadas: as 8 Eraldo + Aura, cada uma aparecendo 1x em `empPages` e 1x em `eraldoPages`/`auraPages`).
+
+**URLs deduplicadas nessa fixture** (cada uma verificada por teste — `ocorrencias === 1`):
+- `.../empreendimento/eraldo/arbor-centro-criciuma-sc`
+- `.../empreendimento/eraldo/gran-michel-criciuma-sc`
+- `.../empreendimento/eraldo/gran-palazzo-vila-moema-tubarao-sc`
+- `.../empreendimento/eraldo/harmony-residence-centro-balneario-rincao-sc`
+- `.../empreendimento/eraldo/horizon-centro-balneario-rincao-sc`
+- `.../empreendimento/eraldo/lessence-home-club-cruzeiro-do-sul-criciuma-sc`
+- `.../empreendimento/eraldo/play-residence-vila-moema-tubarao-sc`
+- `.../empreendimento/eraldo/symphony-mar-grosso-laguna-sc`
+- `.../empreendimento/eraldo/aura-residence-centro-criciuma-sc`
+
+Teste também confirma `buildSitemap([])` (Supabase e Fontana totalmente ausentes): Tubarão e os 2 empreendimentos reais da cidade continuam no sitemap, vindos só da fonte estática Eraldo.
+
+### Justificativa de cada URL de cidade no sitemap (união das 3 fontes)
+
+| Cidade (slug) | Fonte | Por que aparece |
+|---|---|---|
+| `criciuma-sc` | Fontana estático | Vários empreendimentos ativos em `@/data/imoveis` |
+| `icara-sc` | Fontana estático | Castellano, Pianezze, Piazza Castello |
+| `balneario-rincao-sc` | Fontana estático **+** Eraldo estático | Fontana: Mar di Arienzo etc. Eraldo: Harmony, Horizon (mesma cidade, união não gera duplicata porque `cidadeSlug` produz o mesmo slug pras duas fontes) |
+| `laguna-sc` | Fontana estático **+** Eraldo estático | Fontana: Mar di Licata, Mar di Nizza. Eraldo: Symphony |
+| `sideropolis-sc` | Fontana estático | Avezzano, Rocca Pietore |
+| `bom-jardim-da-serra-sc` | Fontana estático | Campos da Montanha |
+| `balneario-picarras-sc` | Fontana estático | Águas de Marano |
+| `tubarao-sc` | **Eraldo estático (novo)** | Gran Palazzo e Play Residence — únicos empreendimentos na cidade, sem nenhum registro em `@/data/imoveis`; antes desta correção só aparecia via Supabase (`ativos`), agora aparece sempre, mesmo localmente sem Supabase |
+
+Nenhuma cidade aparece "sem motivo" — todas têm pelo menos 1 empreendimento real (Fontana ou Eraldo) por trás do slug.
+
 ## Verificado localmente
 
 | Comando | Resultado |
