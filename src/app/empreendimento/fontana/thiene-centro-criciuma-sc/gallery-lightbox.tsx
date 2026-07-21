@@ -1,8 +1,28 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
+import { trackPlantaOpen } from '@/lib/tracking'
 
-type GalItem = { src: string; alt: string; label: string }
+type GalItem = {
+  src: string
+  alt: string
+  label: string
+  categoria?: string
+  // Ficha técnica — opcional: só exibimos o chip quando o dado real chegar.
+  area?: number
+  quartos?: number
+  suites?: number
+  vagas?: number
+}
+
+function fichaTecnica(item: GalItem): string | null {
+  const partes: string[] = []
+  if (item.area) partes.push(`${item.area} m²`)
+  if (item.quartos) partes.push(`${item.quartos} dorm.`)
+  if (item.suites) partes.push(`${item.suites} suíte${item.suites > 1 ? 's' : ''}`)
+  if (item.vagas) partes.push(`${item.vagas} vaga${item.vagas > 1 ? 's' : ''}`)
+  return partes.length ? partes.join(' · ') : null
+}
 
 function Lightbox({ images, startIndex, onClose }: { images: GalItem[]; startIndex: number; onClose: () => void }) {
 const [idx, setIdx] = useState(startIndex)
@@ -20,6 +40,7 @@ window.addEventListener('keydown', k)
 return () => { window.removeEventListener('keydown', k); document.body.style.overflow = '' }
 }, [onClose, prev, next])
 const img = images[idx]
+const ficha = fichaTecnica(img)
 return (
 <div role="dialog" aria-modal="true" aria-label={"Lightbox — " + img.label} style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(0,0,0,0.92)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
 <div onClick={onClose} style={{ position: 'absolute', inset: 0, zIndex: 0 }} aria-hidden="true" />
@@ -40,28 +61,45 @@ style={{ position: 'relative', zIndex: 2, maxWidth: '90vw', maxHeight: '80vh', c
 </div>
 <div style={{ position: 'absolute', bottom: 18, left: 0, right: 0, textAlign: 'center', zIndex: 3, color: 'rgba(255,255,255,0.85)', fontSize: 12, letterSpacing: '0.26em', textTransform: 'uppercase' }}>
 {img.label}{images.length > 1 && <span style={{ marginLeft: 14, opacity: 0.55 }}>{idx + 1} / {images.length}</span>}
+{ficha && <div style={{ marginTop: 6, fontSize: 11, letterSpacing: '0.08em', textTransform: 'none', opacity: 0.75 }}>{ficha}</div>}
 </div>
 </div>
 )
 }
 
-export default function GalleryWithLightbox({ galeria, prefix, gradient }: {
+export default function GalleryWithLightbox({ galeria, prefix, gradient, badge, trackPlantas }: {
 galeria: GalItem[]
 prefix: string
 gradient: string
+badge?: string
+// Objeto serializável (strings) em vez de callback — a página é Server Component
+// e não pode passar função como prop pra este client component.
+trackPlantas?: { empreendimento: string; content_name: string }
 }) {
 const [lb, setLb] = useState({ open: false, index: 0 })
-const openLb = useCallback((i: number) => setLb({ open: true, index: i }), [])
+const openLb = useCallback((i: number) => {
+  setLb({ open: true, index: i })
+  if (trackPlantas) trackPlantaOpen(galeria[i].label, trackPlantas)
+}, [trackPlantas, galeria])
 const closeLb = useCallback(() => setLb(s => ({ ...s, open: false })), [])
 return (
 <>
-{galeria.map((g, i) => (
-<figure key={i} className={`${prefix}-gcard`} style={{ margin: 0, aspectRatio: '4 / 3', position: 'relative', overflow: 'hidden', cursor: 'zoom-in' }} role="button" tabIndex={0} aria-label={`Ampliar: ${g.label}`} onClick={() => openLb(i)} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && openLb(i)}>
-<img src={g.src} alt={g.alt} loading="lazy" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transition: 'transform .8s ease' }} />
-<div style={{ position: 'absolute', inset: 0, background: `linear-gradient(to top, ${gradient}, rgba(0,0,0,0) 45%)` }} />
-<figcaption className={`${prefix}-onimg`} style={{ position: 'absolute', left: 18, bottom: 16, color: '#fff', fontSize: 12, letterSpacing: '0.24em', textTransform: 'uppercase' }}>{g.label}</figcaption>
-</figure>
-))}
+{galeria.map((g, i) => {
+  const ficha = fichaTecnica(g)
+  return (
+    <figure key={i} className={`${prefix}-gcard`} style={{ margin: 0, aspectRatio: '4 / 3', position: 'relative', cursor: 'zoom-in' }} role="button" tabIndex={0} aria-label={`Ampliar: ${g.label}`} onClick={() => openLb(i)} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && openLb(i)}>
+      <Image unoptimized src={g.src} alt={g.alt} fill loading="lazy" sizes="(max-width: 768px) 100vw, 33vw" style={{ objectFit: 'cover' }} />
+      <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(to top, ${gradient}, rgba(0,0,0,0) 45%)` }} />
+      <figcaption className={`${prefix}-onimg`} style={{ position: 'absolute', left: 18, bottom: 16, right: 18, color: '#fff', fontSize: 12, letterSpacing: '0.24em', textTransform: 'uppercase' }}>
+        {g.label}
+        {ficha && <span style={{ display: 'block', fontSize: 10, letterSpacing: '0.08em', opacity: 0.75, marginTop: 3, textTransform: 'none' }}>{ficha}</span>}
+      </figcaption>
+      {badge && (
+        <div style={{ position: 'absolute', top: 10, right: 10, background: 'rgba(0,0,0,0.55)', borderRadius: 2, padding: '4px 10px', fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#fff' }}>{badge}</div>
+      )}
+    </figure>
+  )
+})}
 {lb.open && <Lightbox images={galeria} startIndex={lb.index} onClose={closeLb} />}
 </>
 )
@@ -74,7 +112,7 @@ const [open, setOpen] = useState(false)
 return (
 <>
 <div className={cardClass} style={{ position: 'relative', aspectRatio: '4 / 3', overflow: 'hidden', cursor: 'zoom-in' }} role="button" tabIndex={0} aria-label={`Ampliar: ${label}`} onClick={() => setOpen(true)} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && setOpen(true)}>
-<Image src={src} alt={alt} fill loading="lazy" sizes={imgSizes} style={{ objectFit: 'cover' }} unoptimized />
+<Image unoptimized src={src} alt={alt} fill loading="lazy" sizes={imgSizes} style={{ objectFit: 'cover' }} />
 </div>
 {open && <Lightbox images={[{ src, alt, label }]} startIndex={0} onClose={() => setOpen(false)} />}
 </>
