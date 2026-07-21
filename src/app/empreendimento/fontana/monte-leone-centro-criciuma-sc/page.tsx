@@ -12,7 +12,6 @@ import { SITE_URL } from '@/lib/site'
 // Hotsite premium Monte Leone Residencial (Fontana, Centro Criciúma/SC). Padrão EPIC — benchmark Aguas de Marano.
 // WhatsApp do corretor Stiven (NAO usar numeros internos da Fontana).
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Monte%20Leone%20Residencial.'
-const CATALOGO_PDF = 'https://estilofontana.com.br/upload/empreendimento/catalogo/monte-leone-residencial-1756387346.pdf'
 
 const t = {
 bg: '#FAFAF8',
@@ -81,16 +80,46 @@ const AMENIDADES: string[] = [
 'Espaço delivery',
 ]
 
+// Plantas oficiais — site estilofontana.com.br (aba "Plantas" do Monte Leone).
+// Finais 01/02 = 3 suítes; final 03 = 4 suítes (nota de rodapé da tabela vigente) — não generalizar.
+const PLANTAS = [
+{ categoria: 'tipo', src: 'https://estilofontana.com.br/images/empreendimento_planta/apartamento-tipo-final-01-1756401745.jpg', alt: 'Monte Leone Residencial — planta apartamento tipo final 01', label: 'Apartamento Tipo — Final 01', area: 253.80, quartos: 4, suites: 3 },
+{ categoria: 'tipo', src: 'https://estilofontana.com.br/images/empreendimento_planta/apartamento-tipo-final-02-1756402030.jpg', alt: 'Monte Leone Residencial — planta apartamento tipo final 02', label: 'Apartamento Tipo — Final 02', area: 240.30, quartos: 4, suites: 3 },
+{ categoria: 'tipo', src: 'https://estilofontana.com.br/images/empreendimento_planta/apartamento-tipo-final-03-1756402389.jpg', alt: 'Monte Leone Residencial — planta apartamento tipo final 03', label: 'Apartamento Tipo — Final 03', area: 232.70, quartos: 4, suites: 4 },
+{ categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/pavimento-lazer-1756402502.jpg', alt: 'Monte Leone Residencial — pavimento de lazer', label: 'Pavimento Lazer' },
+{ categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/terreo-1756402608.jpg', alt: 'Monte Leone Residencial — planta do térreo', label: 'Térreo' },
+{ categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/1o-pavimento-garagem-1756402679.jpg', alt: 'Monte Leone Residencial — 1º pavimento de garagem', label: '1º Pavimento · Garagem' },
+{ categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/subsolo-1-garagem-1756402770.jpg', alt: 'Monte Leone Residencial — subsolo 1, garagem', label: 'Subsolo 1 · Garagem' },
+{ categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/subsolo-2-garagem-1756402807.jpg', alt: 'Monte Leone Residencial — subsolo 2, garagem', label: 'Subsolo 2 · Garagem' },
+]
+const PLANTAS_GRUPOS = [
+{ titulo: 'Apartamentos tipo', categoria: 'tipo' },
+{ titulo: 'Lazer, térreo e garagem', categoria: 'comum' },
+]
+
+// Condições comerciais — fonte única (tabela vigente Julho/2026). Alimenta a seção visível, o FAQ e o schema.
+const COMERCIAL = {
+texto: 'Entrada de 20% do valor do imóvel, paga em parcela única no ato. Saldo dividido em 6 reforços anuais (cada um equivalente a 5x o valor da parcela mensal) e 72 parcelas mensais, direto com a construtora — sem necessidade de banco.',
+correcao: 'Durante a obra, os valores são corrigidos pelo CUB/Sinduscon-SC. Após a conclusão do empreendimento, o comprador escolhe entre correção pelo IGPM + 0,75% ao mês ou pelo CUB/Sinduscon-SC.',
+vigencia: 'Condições conforme a tabela vigente (Julho/2026), sujeitas à atualização. Consulte a tabela vigente para valores e disponibilidade por unidade.',
+}
+const FAQ_ITEMS = [
+{ pergunta: 'Como funciona o financiamento direto do Monte Leone Residencial?', resposta: `${COMERCIAL.texto} ${COMERCIAL.correcao} ${COMERCIAL.vigencia}` },
+{ pergunta: 'Qual a previsão de entrega do Monte Leone Residencial?', resposta: 'A previsão de entrega é agosto de 2030, em Centro, Criciúma/SC.' },
+{ pergunta: 'Todas as unidades têm 3 suítes?', resposta: 'Não. Conforme a tabela vigente, as unidades finais 01 e 02 têm 4 dormitórios (3 suítes), enquanto as unidades final 03 têm 4 dormitórios (4 suítes). A metragem também varia por final — consulte o corretor para confirmar a planta e a suíte da unidade de seu interesse.' },
+{ pergunta: 'Onde fica o Monte Leone Residencial?', resposta: 'O Monte Leone Residencial está localizado no Centro, Criciúma/SC.' },
+]
+
 export const revalidate = 3600
 
 export const metadata: Metadata = {
 title: 'Monte Leone Residencial — Alto Padrão Criciúma/SC',
-description: 'Monte Leone Residencial (Construtora Fontana): 4 dormitórios (3 suítes), 230 a 253 m², no Centro de Criciúma/SC. Vista para a Serra, financiamento direto com a construtora. Atendimento exclusivo com Stiven Allan.',
+description: 'Monte Leone Residencial (Construtora Fontana): 4 dormitórios (3 ou 4 suítes, conforme o final), 232 a 253 m², no Centro de Criciúma/SC. Vista para a Serra, financiamento direto com a construtora. Atendimento exclusivo com Stiven Allan.',
 keywords: ['Monte Leone Residencial', 'apartamento alto padrão Criciúma', 'lançamento Fontana', 'Centro Criciúma', 'Stiven Allan corretor SC'],
 alternates: { canonical: `${SITE_URL}/empreendimento/fontana/monte-leone-centro-criciuma-sc` },
 openGraph: {
 title: 'Monte Leone Residencial — Magnífico por essência | Stiven Allan',
-description: 'Monte Leone Residencial (Construtora Fontana): 4 dormitórios (3 suítes), 230 a 253 m², no Centro de Criciúma/SC. Vista para a Serra. Atendimento exclusivo com Stiven Allan.',
+description: 'Monte Leone Residencial (Construtora Fontana): 4 dormitórios (3 ou 4 suítes, conforme o final), 232 a 253 m², no Centro de Criciúma/SC. Vista para a Serra. Atendimento exclusivo com Stiven Allan.',
 url: `${SITE_URL}/empreendimento/fontana/monte-leone-centro-criciuma-sc`,
 images: [{ url: IMG.heroAerea, width: 1200, height: 630, alt: 'Monte Leone Residencial — fachada' }],
 type: 'website',
@@ -99,7 +128,7 @@ locale: 'pt_BR',
 twitter: {
 card: 'summary_large_image',
 title: 'Monte Leone Residencial — Magnífico por essência | Stiven Allan',
-description: 'Monte Leone Residencial (Construtora Fontana): 4 dormitórios (3 suítes), 230 a 253 m², no Centro de Criciúma/SC. Vista para a Serra. Atendimento exclusivo com Stiven Allan.',
+description: 'Monte Leone Residencial (Construtora Fontana): 4 dormitórios (3 ou 4 suítes, conforme o final), 232 a 253 m², no Centro de Criciúma/SC. Vista para a Serra. Atendimento exclusivo com Stiven Allan.',
 images: [IMG.heroAerea],
 },
 robots: { index: true, follow: true },
@@ -108,7 +137,7 @@ robots: { index: true, follow: true },
 export default function MonteLeonePage() {
 return (
 <main style={{ background: t.bg, color: t.ink, fontFamily: t.body, overflowX: 'hidden' }}>
-      <PropertySchema nome="Monte Leone Residencial" slug="monte-leone-centro-criciuma-sc" construtora_slug="fontana" cidade="Criciúma" uf="SC" bairro="Centro" descricao="Monte Leone Residencial (Construtora Fontana): 4 dormitórios (3 suítes), 230 a 253 m², no Centro de Criciúma/SC. Vista para a Serra. Atendimento exclusivo com Stiven Allan." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/monte-leone-centro-criciuma-sc.jpg" faq={[{"pergunta":"Como funciona o financiamento direto do Monte Leone Residencial?","resposta":"Entrada de 20%, saldo em até 72 parcelas mensais e 6 reforços anuais (cada reforço equivale a 5 parcelas mensais), com correção pelo CUB/SC durante a obra. Sem análise de banco."},{"pergunta":"Qual a previsão de entrega do Monte Leone Residencial?","resposta":"A previsão de entrega é agosto de 2030, em Centro, Criciúma/SC."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Sim. Além do financiamento direto com a construtora, é possível optar por financiamento bancário. Fale com o Stiven pelo WhatsApp para simular as duas opções."},{"pergunta":"Onde fica o Monte Leone Residencial?","resposta":"O Monte Leone Residencial está localizado no Centro, Criciúma/SC."}]} />
+      <PropertySchema nome="Monte Leone Residencial" slug="monte-leone-centro-criciuma-sc" construtora_slug="fontana" cidade="Criciúma" uf="SC" bairro="Centro" descricao="Monte Leone Residencial (Construtora Fontana): 4 dormitórios (3 ou 4 suítes, conforme o final), 232 a 253 m², no Centro de Criciúma/SC. Vista para a Serra. Atendimento exclusivo com Stiven Allan." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/monte-leone-centro-criciuma-sc.jpg" faq={FAQ_ITEMS} />
 
 
 <style>{`
@@ -233,11 +262,11 @@ style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 
 <p className="ml-eyebrow" style={{ color: t.onDark, marginBottom: 18 }}>As Residências</p>
 <h2 className="ml-h2" style={{ color: t.onDark }}>Espaço para contemplação</h2>
 <p className="ml-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 56 }}>Plantas amplas, vista para a Serra.</p>
-<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 'clamp(28px,5vw,64px)', marginBottom: 56 }}>
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 'clamp(28px,5vw,64px)', marginBottom: 32 }}>
 {[
-{ n: '4', l: 'Dormitórios (3 suítes)' },
-{ n: '3', l: 'Suítes' },
-{ n: '230 a 253', l: 'm² privativos' },
+{ n: '4', l: 'Dormitórios' },
+{ n: '3 ou 4', l: 'Suítes (conforme o final)' },
+{ n: '232,70 a 253,80', l: 'm² privativos' },
 { n: '3', l: 'Vagas de garagem' },
 ].map((it, i) => (
 <div key={i}>
@@ -246,7 +275,22 @@ style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 
 </div>
 ))}
 </div>
+<p style={{ color: t.onDarkMuted, fontSize: 13, lineHeight: 1.6, maxWidth: 620, margin: '0 auto 56px' }}>Finais 01 e 02: 4 dormitórios (3 suítes), 253,80 m² e 240,30 m² privativos. Final 03: 4 dormitórios (4 suítes), 232,70 m² privativos.</p>
 <LeadCaptureButton slug="monte-leone-centro-criciuma-sc" construtora_slug="fontana" className="ml-cta ml-cta-light"  propertyDisplayName="Monte Leone Residencial" />
+</div>
+<div style={{ maxWidth: 1160, margin: 'clamp(64px,10vh,96px) auto 0', textAlign: 'left' }}>
+{PLANTAS_GRUPOS.map(({ titulo, categoria }) => {
+const itens = PLANTAS.filter(p => p.categoria === categoria)
+if (!itens.length) return null
+return (
+<div key={categoria} style={{ marginBottom: 40 }}>
+<p className="ml-eyebrow" style={{ color: t.onDarkMuted, marginBottom: 16, textAlign: 'center' }}>{titulo}</p>
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+<GalleryWithLightbox galeria={itens} prefix="ml" gradient="rgba(15,24,16,0.6)" badge="Planta oficial" trackPlantas={{ empreendimento: 'monte-leone-centro-criciuma-sc', content_name: 'Monte Leone Residencial' }} />
+</div>
+</div>
+)
+})}
 </div>
 </section>
 
@@ -312,7 +356,9 @@ No coração nobre de Criciúma, a poucos passos de comércio premium, gastronom
 <div style={{ maxWidth: 1080, margin: '0 auto', textAlign: 'center' }}>
 <p className="ml-eyebrow" style={{ color: t.onDark, marginBottom: 18 }}>Financiamento Direto</p>
 <h2 className="ml-h2" style={{ color: t.onDark }}>A liberdade de comprar sem banco</h2>
-<p className="ml-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 60 }}>Sem burocracia, sem intermediários. Direto com a construtora.</p>
+<p className="ml-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 40 }}>Sem burocracia, sem intermediários. Direto com a construtora.</p>
+<p style={{ color: t.onDarkMuted, fontSize: 17, lineHeight: 1.7, maxWidth: 720, margin: '0 auto 20px' }}>{COMERCIAL.texto}</p>
+<p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.7, maxWidth: 720, margin: '0 auto 40px' }}>{COMERCIAL.correcao}</p>
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px,1fr))', gap: 'clamp(28px,4vw,52px)' }}>
 {[
 { n: '01', ti: 'Converse com o corretor', d: 'Atendimento exclusivo e reservado com Stiven Allan para entender o seu momento e as melhores condições.' },
@@ -326,7 +372,7 @@ No coração nobre de Criciúma, a poucos passos de comércio premium, gastronom
 </div>
 ))}
 </div>
-<p style={{ marginTop: 56, fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: t.onDark }}>Alto padrão exclusivo &middot; Sob consulta</p>
+<p style={{ marginTop: 56, fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: t.onDark }}>{COMERCIAL.vigencia}</p>
 </div>
 </section>
 
@@ -345,7 +391,7 @@ No coração nobre de Criciúma, a poucos passos de comércio premium, gastronom
 
 {/* FOOTER */}
       {/* SEO FAQ */}
-      <PropertyFAQ items={[{"pergunta":"Como funciona o financiamento direto do Monte Leone Residencial?","resposta":"Entrada de 20%, saldo em até 72 parcelas mensais e 6 reforços anuais (cada reforço equivale a 5 parcelas mensais), com correção pelo CUB/SC durante a obra. Sem análise de banco."},{"pergunta":"Qual a previsão de entrega do Monte Leone Residencial?","resposta":"A previsão de entrega é agosto de 2030, em Centro, Criciúma/SC."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Sim. Além do financiamento direto com a construtora, é possível optar por financiamento bancário. Fale com o Stiven pelo WhatsApp para simular as duas opções."},{"pergunta":"Onde fica o Monte Leone Residencial?","resposta":"O Monte Leone Residencial está localizado no Centro, Criciúma/SC."}]} accent="#33503F" />
+      <PropertyFAQ items={FAQ_ITEMS} accent="#33503F" />
       <RelatedProperties atualSlug="monte-leone-centro-criciuma-sc" cidade="Criciúma" />
 
 <footer style={{ background: t.greenDark, color: t.onDarkMuted, padding: 'clamp(56px,9vh,96px) clamp(18px,5vw,56px)' }}>
