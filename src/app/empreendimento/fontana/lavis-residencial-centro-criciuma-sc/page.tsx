@@ -11,7 +11,6 @@ import { SITE_URL } from '@/lib/site'
 // Hotsite premium Lavis Residencial (Fontana, Centro de Criciúma/SC). Padrão EPIC — benchmark Aguas de Marano.
 // WhatsApp do corretor Stiven (NAO usar numeros internos da Fontana).
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Lavis%20Residencial.'
-const CATALOGO_PDF = 'https://estilofontana.com.br/upload/empreendimento/catalogo/lavis-residencial-1764352426.pdf'
 
 const t = {
   bg: '#FAFAF8',
@@ -76,6 +75,38 @@ const AMENIDADES: string[] = [
   'Espera para carregador de carro elétrico',
 ]
 
+// Plantas oficiais — site estilofontana.com.br (aba "Plantas" do Lavis). Tipologia única e confirmada: 3 dormitórios (3 suítes) em todas as 55 unidades da tabela.
+const PLANTAS = [
+  { categoria: 'tipo', src: 'https://estilofontana.com.br/images/empreendimento_planta/planta-tipo-final-01-1764154579.jpg', alt: 'Lavis Residencial — planta tipo final 01', label: 'Planta Tipo — Final 01', quartos: 3, suites: 3 },
+  { categoria: 'tipo', src: 'https://estilofontana.com.br/images/empreendimento_planta/planta-tipo-final-02-1764154728.jpg', alt: 'Lavis Residencial — planta tipo final 02', label: 'Planta Tipo — Final 02', quartos: 3, suites: 3 },
+  { categoria: 'tipo', src: 'https://estilofontana.com.br/images/empreendimento_planta/planta-tipo-final-03-1764154900.jpg', alt: 'Lavis Residencial — planta tipo final 03', label: 'Planta Tipo — Final 03', quartos: 3, suites: 3 },
+  { categoria: 'tipo', src: 'https://estilofontana.com.br/images/empreendimento_planta/planta-tipo-final-04-1764155044.jpg', alt: 'Lavis Residencial — planta tipo final 04', label: 'Planta Tipo — Final 04', quartos: 3, suites: 3 },
+  { categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/pavimento-lazer-1764154171.jpg', alt: 'Lavis Residencial — pavimento de lazer', label: 'Pavimento Lazer' },
+  { categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/terreo-1764156714.jpg', alt: 'Lavis Residencial — planta do térreo', label: 'Térreo' },
+  { categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/1o-pavimento-1770817680.jpg', alt: 'Lavis Residencial — 1º pavimento', label: '1º Pavimento' },
+  { categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/2o-pavimento-1764156667.jpg', alt: 'Lavis Residencial — 2º pavimento', label: '2º Pavimento' },
+  { categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/subsolo-1-1764156762.jpg', alt: 'Lavis Residencial — subsolo 1', label: 'Subsolo 1 · Garagem' },
+  { categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/subsolo-2-1764156803.jpg', alt: 'Lavis Residencial — subsolo 2', label: 'Subsolo 2 · Garagem' },
+]
+const PLANTAS_GRUPOS = [
+  { titulo: 'Planta tipo (3 dormitórios, 3 suítes)', categoria: 'tipo' },
+  { titulo: 'Lazer, pavimentos e garagem', categoria: 'comum' },
+]
+
+// Condições comerciais — fonte única (tabela vigente Julho/2026). Duas modalidades distintas — não fundir.
+const COMERCIAL = {
+  principal: 'Modalidade principal (parcelamento direto com a construtora): entrada de 20% do valor da unidade (parcela única, no ato), mais reforços anuais em 6 parcelas, mais parcelas mensais em 72 vezes — juntas, essas três parcelas somam 100% do valor da unidade, sem necessidade de banco.',
+  correcaoPrincipal: 'Nesta modalidade, os valores são corrigidos monetariamente a partir da data do contrato, à escolha do comprador: IGPM + juros de 0,75% ao mês, ou exclusivamente pelo CUB/SC.',
+  alternativa: 'Modalidade alternativa (Opção Comercial 1): pagamento de 40% do valor total até a entrega das chaves (ato mínimo de 10%); o saldo remanescente (60%) pode ser quitado via financiamento bancário ou diretamente com a construtora, em até 240 meses após a conclusão da obra, corrigido pelo IGPM + juros de 0,75% ao mês (nesta opção não é aceita permuta).',
+  vigencia: 'Condições conforme a tabela vigente (Julho/2026), sujeitas à atualização. Consulte a tabela vigente para valores e disponibilidade por unidade.',
+}
+const FAQ_ITEMS = [
+  { pergunta: 'Como funciona o financiamento direto do Lavis Residencial?', resposta: `${COMERCIAL.principal} ${COMERCIAL.correcaoPrincipal} ${COMERCIAL.vigencia}` },
+  { pergunta: 'Existe outra forma de pagamento além da modalidade principal?', resposta: `Sim. ${COMERCIAL.alternativa} ${COMERCIAL.vigencia}` },
+  { pergunta: 'Qual a previsão de entrega do Lavis Residencial?', resposta: 'A previsão de entrega é dezembro de 2030, em Centro, Criciúma/SC.' },
+  { pergunta: 'Onde fica o Lavis Residencial?', resposta: 'O Lavis Residencial está localizado no Centro, Criciúma/SC.' },
+]
+
 export const revalidate = 3600
 
 export const metadata: Metadata = {
@@ -103,7 +134,7 @@ export const metadata: Metadata = {
 export default function LavisPage() {
   return (
     <main style={{ background: t.bg, color: t.ink, fontFamily: t.body, overflowX: 'hidden' }}>
-      <PropertySchema nome="Lavis Residencial" slug="lavis-residencial-centro-criciuma-sc" construtora_slug="fontana" cidade="Criciúma" uf="SC" bairro="Centro" descricao="Lavis Residencial (Construtora Fontana): apartamentos de alto padrão no Centro de Criciúma/SC. 3 suítes, 125 a 132 m², financiamento direto com a construtora. Atendimento exclusivo com Stiven Allan." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/lavis-residencial-centro-criciuma-sc.jpg" faq={[{"pergunta":"Como funciona o financiamento direto do Lavis Residencial?","resposta":"Entrada de 20%, saldo em até 72 parcelas mensais e 6 reforços anuais (cada reforço equivale a 5 parcelas mensais), com correção pelo CUB/SC durante a obra. Sem análise de banco."},{"pergunta":"Qual a previsão de entrega do Lavis Residencial?","resposta":"A previsão de entrega é dezembro de 2030, em Centro, Criciúma/SC."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Sim. Além do financiamento direto com a construtora, é possível optar por financiamento bancário. Fale com o Stiven pelo WhatsApp para simular as duas opções."},{"pergunta":"Onde fica o Lavis Residencial?","resposta":"O Lavis Residencial está localizado no Centro, Criciúma/SC."}]} />
+      <PropertySchema nome="Lavis Residencial" slug="lavis-residencial-centro-criciuma-sc" construtora_slug="fontana" cidade="Criciúma" uf="SC" bairro="Centro" descricao="Lavis Residencial (Construtora Fontana): apartamentos de alto padrão no Centro de Criciúma/SC. 3 suítes, 125 a 132 m², financiamento direto com a construtora. Atendimento exclusivo com Stiven Allan." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/lavis-residencial-centro-criciuma-sc.jpg" faq={FAQ_ITEMS} />
       
 
       <style>{`
@@ -237,6 +268,20 @@ export default function LavisPage() {
           </div>
           <LeadCaptureButton slug="lavis-residencial-centro-criciuma-sc" construtora_slug="fontana" className="lv-cta lv-cta-light"  propertyDisplayName="Lavis Residencial" />
         </div>
+        <div style={{ maxWidth: 1160, margin: 'clamp(64px,10vh,96px) auto 0', textAlign: 'left' }}>
+          {PLANTAS_GRUPOS.map(({ titulo, categoria }) => {
+            const itens = PLANTAS.filter(p => p.categoria === categoria)
+            if (!itens.length) return null
+            return (
+              <div key={categoria} style={{ marginBottom: 40 }}>
+                <p className="lv-eyebrow" style={{ color: t.onDarkMuted, marginBottom: 16, textAlign: 'center' }}>{titulo}</p>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+                  <GalleryWithLightbox galeria={itens} prefix="lv" gradient="rgba(20,16,10,0.6)" badge="Planta oficial" trackPlantas={{ empreendimento: 'lavis-residencial-centro-criciuma-sc', content_name: 'Lavis Residencial' }} />
+                </div>
+              </div>
+            )
+          })}
+        </div>
       </section>
 
       {/* 6 DIFERENCIAIS */}
@@ -298,7 +343,10 @@ export default function LavisPage() {
         <div style={{ maxWidth: 1080, margin: '0 auto', textAlign: 'center' }}>
           <p className="lv-eyebrow" style={{ color: t.onDark, marginBottom: 18 }}>Financiamento Direto</p>
           <h2 className="lv-h2" style={{ color: t.onDark }}>A liberdade de comprar sem banco</h2>
-          <p className="lv-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 60 }}>Sem burocracia, sem intermediários. Direto com a construtora.</p>
+          <p className="lv-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 40 }}>Sem burocracia, sem intermediários. Direto com a construtora.</p>
+          <p style={{ color: t.onDarkMuted, fontSize: 17, lineHeight: 1.7, maxWidth: 720, margin: '0 auto 16px' }}>{COMERCIAL.principal}</p>
+          <p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.7, maxWidth: 720, margin: '0 auto 20px' }}>{COMERCIAL.correcaoPrincipal}</p>
+          <p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.7, maxWidth: 720, margin: '0 auto 40px' }}>{COMERCIAL.alternativa}</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px,1fr))', gap: 'clamp(28px,4vw,52px)' }}>
             {[
               { n: '01', ti: 'Converse com o corretor', d: 'Atendimento exclusivo e personalizado para entender o seu momento e as melhores condições.' },
@@ -312,9 +360,12 @@ export default function LavisPage() {
               </div>
             ))}
           </div>
-          <p style={{ marginTop: 56, fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: t.onDark }}>Alto padrão exclusivo &middot; Sob consulta</p>
+          <p style={{ marginTop: 56, fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: t.onDark }}>{COMERCIAL.vigencia}</p>
         </div>
       </section>
+
+      {/* SEO FAQ */}
+      <PropertyFAQ items={FAQ_ITEMS} accent={t.terra} />
 
       <RelatedProperties atualSlug="lavis-residencial-centro-criciuma-sc" cidade="Criciúma" />
 
