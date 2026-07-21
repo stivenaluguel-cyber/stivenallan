@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import GalleryWithLightbox from './gallery-lightbox';
+import PlantasLightbox from './plantas-lightbox';
 import { LeadCaptureButton } from '@/components/LeadCaptureButton'
 import { PropertySchema } from '@/components/PropertySchema'
 import { PropertyFAQ } from '@/components/PropertyFAQ'
@@ -26,6 +27,31 @@ const GALERIA = [
   { src: 'https://lh3.googleusercontent.com/d/1Rmvc_bwvgr4LJISFgN4ObYzZ67b8R-pv', alt: 'Academia' },
 ];
 
+// Plantas oficiais — site estilofontana.com.br (aba "Plantas" do Bellante).
+const PLANTAS = [
+  { src: 'https://estilofontana.com.br/images/empreendimento_planta/undefined-1680632224.jpg', alt: 'Bellante Residencial — planta apartamento tipo final 01', label: 'Apartamento Tipo — Final 01', quartos: 2, suites: 1 },
+  { src: 'https://estilofontana.com.br/images/empreendimento_planta/undefined-1680632230.jpg', alt: 'Bellante Residencial — planta apartamento tipo final 02', label: 'Apartamento Tipo — Final 02', quartos: 2, suites: 1 },
+  { src: 'https://estilofontana.com.br/images/empreendimento_planta/undefined-1680632237.jpg', alt: 'Bellante Residencial — planta apartamento tipo final 03', label: 'Apartamento Tipo — Final 03', quartos: 2, suites: 1 },
+  { src: 'https://estilofontana.com.br/images/empreendimento_planta/undefined-1680632245.jpg', alt: 'Bellante Residencial — planta apartamento tipo final 04', label: 'Apartamento Tipo — Final 04', quartos: 2, suites: 1 },
+  { src: 'https://estilofontana.com.br/images/empreendimento_planta/undefined-1680632716.jpg', alt: 'Bellante Residencial — planta apartamento tipo final 05', label: 'Apartamento Tipo — Final 05', quartos: 2, suites: 1 },
+  { src: 'https://estilofontana.com.br/images/empreendimento_planta/undefined-1680632724.jpg', alt: 'Bellante Residencial — planta apartamento tipo final 06', label: 'Apartamento Tipo — Final 06', quartos: 2, suites: 1 },
+  { src: 'https://estilofontana.com.br/images/empreendimento_planta/undefined-1680632860.jpg', alt: 'Bellante Residencial — planta do térreo', label: 'Térreo' },
+  { src: 'https://estilofontana.com.br/images/empreendimento_planta/undefined-1680632870.jpg', alt: 'Bellante Residencial — garagem', label: 'Garagem' },
+  { src: 'https://estilofontana.com.br/images/empreendimento_planta/undefined-1680632880.jpg', alt: 'Bellante Residencial — subsolo', label: 'Subsolo' },
+];
+
+// Condições comerciais — fonte única (tabela vigente Julho/2026). Estrutura própria: entrada + parcelas até a entrega (30%) + saldo via 2 opções.
+const COMERCIAL = {
+  texto: 'Entrada de 8% (pagamento único), mais parcelas ao longo da obra, até totalizar 30% do valor na data da entrega (prevista para novembro de 2026).',
+  saldo: 'O saldo remanescente (70%) é liquidado, à escolha do comprador, via financiamento bancário ou em até 240 meses diretamente com a construtora. Desconto de 5% para pagamento à vista.',
+  vigencia: 'Condições conforme a tabela vigente (Julho/2026), sujeitas à atualização. Consulte a tabela vigente para valores e disponibilidade por unidade.',
+};
+const FAQ_ITEMS = [
+  { pergunta: 'Como funciona o financiamento direto do Bellante?', resposta: `${COMERCIAL.texto} ${COMERCIAL.saldo} ${COMERCIAL.vigencia}` },
+  { pergunta: 'Qual a previsão de entrega do Bellante?', resposta: 'A previsão de entrega é novembro de 2026, em Comerciário, Criciúma/SC.' },
+  { pergunta: 'Onde fica o Bellante?', resposta: 'O Bellante está localizado no Comerciário, Criciúma/SC.' },
+];
+
 export const metadata: Metadata = {
   title: 'Bellante Residencial | Comerciário Criciúma SC',
   description: 'Bellante Residencial — 2 dormitórios (1 suíte), 62–66 m², Comerciário em Criciúma/SC. Em obras. Financiamento direto Fontana. Conheça com Stiven Allan.',
@@ -45,7 +71,7 @@ export const metadata: Metadata = {
 export default function BellantePage() {
   return (
     <main style={{ fontFamily: "'Inter', sans-serif", color: '#1a1a1a', overflowX: 'hidden' }}>
-      <PropertySchema nome="Bellante" slug="bellante-comerciario-criciuma-sc" construtora_slug="fontana" cidade="Criciúma" uf="SC" bairro="Comerciário" descricao="Bellante Residencial — 2 dormitórios (1 suíte), 62–66 m², Comerciário em Criciúma/SC. Em obras. Financiamento direto Fontana. Conheça com Stiven Allan." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/bellante-comerciario-criciuma-sc.jpg" faq={[{"pergunta":"Como funciona o financiamento direto do Bellante?","resposta":"Entrada de 20%, saldo em até 60 parcelas mensais e 2 reforços anuais (cada reforço equivale a 5 parcelas mensais), com correção pelo CUB/SC durante a obra. Sem análise de banco."},{"pergunta":"Qual a previsão de entrega do Bellante?","resposta":"A previsão de entrega é novembro de 2026, em Comerciário, Criciúma/SC."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Sim. Além do financiamento direto com a construtora, é possível optar por financiamento bancário. Fale com o Stiven pelo WhatsApp para simular as duas opções."},{"pergunta":"Onde fica o Bellante?","resposta":"O Bellante está localizado no Comerciário, Criciúma/SC."}]} />
+      <PropertySchema nome="Bellante" slug="bellante-comerciario-criciuma-sc" construtora_slug="fontana" cidade="Criciúma" uf="SC" bairro="Comerciário" descricao="Bellante Residencial — 2 dormitórios (1 suíte), 62–66 m², Comerciário em Criciúma/SC. Em obras. Financiamento direto Fontana. Conheça com Stiven Allan." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/bellante-comerciario-criciuma-sc.jpg" faq={FAQ_ITEMS} />
 
       {/* NAV */}
       <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 2rem', height: '64px' }}>
@@ -131,9 +157,13 @@ export default function BellantePage() {
               </div>
             ))}
           </div>
-          <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '1rem', lineHeight: 1.8, maxWidth: '650px', margin: '0 auto' }}>
+          <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '1rem', lineHeight: 1.8, maxWidth: '650px', margin: '0 auto 4rem' }}>
             Residências pensadas para quem exige o melhor. Ambientes integrados, acabamentos nobres e espaços que celebram cada momento da sua história.
           </p>
+          <div style={{ textAlign: 'left' }}>
+            <p style={{ color: ACCENT, fontSize: '0.7rem', letterSpacing: '0.3em', textTransform: 'uppercase', textAlign: 'center', marginBottom: '2rem' }}>Plantas Oficiais</p>
+            <PlantasLightbox plantas={PLANTAS} accent={ACCENT} trackPlantas={{ empreendimento: 'bellante-comerciario-criciuma-sc', content_name: 'Bellante Residencial' }} />
+          </div>
         </div>
       </section>
 
@@ -216,7 +246,9 @@ export default function BellantePage() {
           <h2 style={{ fontSize: 'clamp(1.8rem,3vw,2.5rem)', fontWeight: 300, marginBottom: '1rem' }}>
             Financiamento <strong style={{ fontWeight: 700 }}>Direto Fontana</strong>
           </h2>
-          <p style={{ color: 'rgba(255,255,255,0.7)', marginBottom: '3rem', fontSize: '1rem' }}>Sem banco. Sem burocracia. Condições sob medida para você.</p>
+          <p style={{ color: 'rgba(255,255,255,0.7)', marginBottom: '2rem', fontSize: '1rem' }}>Condições sob medida para você.</p>
+          <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: '1rem', lineHeight: 1.8, maxWidth: '640px', margin: '0 auto 1rem' }}>{COMERCIAL.texto}</p>
+          <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', lineHeight: 1.8, maxWidth: '640px', margin: '0 auto 3rem' }}>{COMERCIAL.saldo}</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem', marginBottom: '3rem' }}>
             {[
               { n: '01', t: 'Converse com Stiven', d: 'Entenda as condições e tire todas as suas dúvidas.' },
@@ -230,13 +262,16 @@ export default function BellantePage() {
               </div>
             ))}
           </div>
-          <p style={{ fontSize: '1.5rem', color: '#fff', marginBottom: '0.5rem', fontWeight: 300 }}>Preço: <strong style={{ fontWeight: 700 }}>Sob consulta</strong></p>
+          <p style={{ fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)', marginBottom: '0.5rem' }}>{COMERCIAL.vigencia}</p>
           <a href={WA} target="_blank" rel="noopener"
             style={{ display: 'inline-block', marginTop: '1.5rem', background: '#fff', color: ACCENT_DARK, padding: '1rem 2.5rem', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', borderRadius: '2px' }}>
             CONSULTAR CONDIÇÕES
           </a>
         </div>
       </section>
+
+      {/* SEO FAQ */}
+      <PropertyFAQ items={FAQ_ITEMS} accent={ACCENT} />
 
       <RelatedProperties atualSlug="bellante-comerciario-criciuma-sc" cidade="Criciúma" />
 
