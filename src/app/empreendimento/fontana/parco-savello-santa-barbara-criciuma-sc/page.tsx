@@ -77,6 +77,36 @@ const AMENIDADES: string[] = [
 'Sistema de câmeras 24h',
 ]
 
+// Plantas oficiais — site estilofontana.com.br (aba "Plantas" do Parco Savello).
+const PLANTAS = [
+{ categoria: 'tipo', src: 'https://estilofontana.com.br/images/empreendimento_planta/apartamento-tipo-final-01-1716385603.jpg', alt: 'Parco Savello Residencial — planta apartamento tipo final 01', label: 'Apartamento Tipo — Final 01', area: 93.31, quartos: 3, suites: 2 },
+{ categoria: 'tipo', src: 'https://estilofontana.com.br/images/empreendimento_planta/apartamento-tipo-final-02-1716385722.jpg', alt: 'Parco Savello Residencial — planta apartamento tipo final 02', label: 'Apartamento Tipo — Final 02', area: 94.07, quartos: 3, suites: 2 },
+{ categoria: 'tipo', src: 'https://estilofontana.com.br/images/empreendimento_planta/apartamento-tipo-final-03-1716385822.jpg', alt: 'Parco Savello Residencial — planta apartamento tipo final 03', label: 'Apartamento Tipo — Final 03', area: 93.31, quartos: 3, suites: 2 },
+{ categoria: 'tipo', src: 'https://estilofontana.com.br/images/empreendimento_planta/apartamento-tipo-final-04-1716385893.jpg', alt: 'Parco Savello Residencial — planta apartamento tipo final 04', label: 'Apartamento Tipo — Final 04', area: 94.07, quartos: 3, suites: 2 },
+{ categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/Area-de-lazer-1716386105.jpg', alt: 'Parco Savello Residencial — área de lazer', label: 'Área de Lazer' },
+{ categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/terreo-1716386225.jpg', alt: 'Parco Savello Residencial — planta do térreo', label: 'Térreo' },
+{ categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/subsolo-1716386276.jpg', alt: 'Parco Savello Residencial — subsolo', label: 'Subsolo · Garagem' },
+]
+const PLANTAS_GRUPOS = [
+{ titulo: 'Apartamentos tipo', categoria: 'tipo' },
+{ titulo: 'Lazer, térreo e garagem', categoria: 'comum' },
+]
+
+// Condições comerciais — fonte única (tabela vigente Julho/2026). Plano padrão + Política Comercial (2 modalidades alternativas, distintas).
+const COMERCIAL = {
+padrao: 'Plano padrão de pagamento: entrada de 20% do valor da unidade (à vista, em parcela única), mais 6 reforços anuais, mais até 72 parcelas mensais — juntas, essas três parcelas somam 100% do valor da unidade, direto com a construtora.',
+correcaoPadrao: 'Durante a obra, os valores são corrigidos mensalmente pelo CUB/Sinduscon-SC; após a conclusão, o comprador escolhe entre correção pelo IGPM + 0,75% ao mês ou apenas pelo CUB/Sinduscon-SC.',
+alternativas: 'Modalidades alternativas (Política Comercial): 15% de desconto para pagamento à vista (sem permuta); ou 10% de desconto pagando 40% do valor até a entrega das chaves (ato mínimo de 10%), com o saldo remanescente quitável via financiamento bancário ou diretamente com a construtora, em até 180 meses após a conclusão, corrigido pelo IGPM + 0,75% ao mês (sem permuta nesta opção).',
+vigencia: 'Condições conforme a tabela vigente (Julho/2026), sujeitas à atualização. Consulte a tabela vigente para valores e disponibilidade por unidade.',
+}
+const FAQ_ITEMS = [
+{ pergunta: 'Como funciona o financiamento direto do Parco Savello Residencial?', resposta: `${COMERCIAL.padrao} ${COMERCIAL.correcaoPadrao} ${COMERCIAL.vigencia}` },
+{ pergunta: 'Existe outra forma de pagamento além do plano padrão?', resposta: `Sim. ${COMERCIAL.alternativas} ${COMERCIAL.vigencia}` },
+{ pergunta: 'Qual a previsão de entrega do Parco Savello Residencial?', resposta: 'A previsão de entrega é maio de 2028, em Santa Bárbara, Criciúma/SC.' },
+{ pergunta: 'Quantas vagas de garagem tem cada unidade?', resposta: 'O número de vagas varia por unidade (simples, estendida ou dupla, conforme a tabela vigente). Consulte o corretor para confirmar a vaga da unidade de seu interesse.' },
+{ pergunta: 'Onde fica o Parco Savello Residencial?', resposta: 'O Parco Savello Residencial está localizado na Rua Duarte da Costa, 875, no bairro Santa Bárbara, Criciúma/SC.' },
+]
+
 export const revalidate = 3600
 
 export const metadata: Metadata = {
@@ -104,7 +134,7 @@ robots: { index: true, follow: true },
 export default function ParcoSavelloPage() {
 return (
 <main style={{ background: t.bg, color: t.ink, fontFamily: t.body, overflowX: 'hidden' }}>
-<PropertySchema nome="Parco Savello Residencial" slug="parco-savello-santa-barbara-criciuma-sc" construtora_slug="fontana" cidade="Criciúma" uf="SC" bairro="Santa Bárbara" descricao="Parco Savello Residencial — 3 dormitórios (2 suítes), 93 a 94 m² privativos no Santa Bárbara, Criciúma/SC. Financiamento direto Fontana." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/parco-savello-santa-barbara-criciuma-sc.jpg" faq={[{"pergunta":"Como funciona o financiamento direto do Parco Savello Residencial?","resposta":"Entrada de 20%, saldo em até 72 parcelas mensais e 6 reforços anuais (cada reforço equivale a 5 parcelas mensais), com correção pelo CUB/SC durante a obra. Sem análise de banco."},{"pergunta":"Qual a previsão de entrega do Parco Savello Residencial?","resposta":"A previsão de entrega é maio de 2028, em Santa Bárbara, Criciúma/SC."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Sim. Além do financiamento direto com a construtora, é possível optar por financiamento bancário. Fale com o Stiven pelo WhatsApp para simular as duas opções."},{"pergunta":"Onde fica o Parco Savello Residencial?","resposta":"O Parco Savello Residencial está localizado na Rua Duarte da Costa, 875, no bairro Santa Bárbara, Criciúma/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"O empreendimento oferece apartamentos com 3 dormitórios (2 suítes), de 93 a 94 m² privativos."}]} />
+<PropertySchema nome="Parco Savello Residencial" slug="parco-savello-santa-barbara-criciuma-sc" construtora_slug="fontana" cidade="Criciúma" uf="SC" bairro="Santa Bárbara" descricao="Parco Savello Residencial — 3 dormitórios (2 suítes), 93 a 94 m² privativos no Santa Bárbara, Criciúma/SC. Financiamento direto Fontana." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/parco-savello-santa-barbara-criciuma-sc.jpg" faq={FAQ_ITEMS} />
 
 
 
@@ -214,12 +244,12 @@ No coração do bairro Santa Bárbara, com o Parque da Prefeitura como extensão
 <div style={{ maxWidth: 1080, margin: '0 auto', textAlign: 'center' }}>
 <p className="ps-eyebrow" style={{ color: t.onDark, marginBottom: 18 }}>As Residências</p>
 <h2 className="ps-h2" style={{ color: t.onDark }}>Espaço para viver com inteireza</h2>
-<p className="ps-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 56 }}>3 dormitórios, 2 suítes, 2 vagas.</p>
+<p className="ps-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 56 }}>3 dormitórios, 2 suítes.</p>
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 'clamp(28px,5vw,64px)', marginBottom: 56 }}>
 {[
 { n: '3', l: 'Dormitórios (2 suítes)' },
 { n: '93–94', l: 'm² privativos' },
-{ n: '2', l: 'Vagas de garagem' },
+{ n: 'Simples, Est. ou Dupla', l: 'Vaga de garagem' },
 ].map((it, i) => (
 <div key={i}>
 <div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 'clamp(34px,5vw,58px)', letterSpacing: '0.04em', lineHeight: 1 }}>{it.n}</div>
@@ -229,6 +259,20 @@ No coração do bairro Santa Bárbara, com o Parque da Prefeitura como extensão
 </div>
 <a href={WPP} target="_blank" rel="noopener noreferrer" className="ps-cta ps-cta-light" data-wpp="1">Solicitar Catálogo</a>
 <LeadCaptureButton slug="parco-savello-santa-barbara-criciuma-sc" construtora_slug="fontana"  propertyDisplayName="Parco Savello Residencial" />
+</div>
+<div style={{ maxWidth: 1160, margin: 'clamp(64px,10vh,96px) auto 0', textAlign: 'left' }}>
+{PLANTAS_GRUPOS.map(({ titulo, categoria }) => {
+const itens = PLANTAS.filter(p => p.categoria === categoria)
+if (!itens.length) return null
+return (
+<div key={categoria} style={{ marginBottom: 40 }}>
+<p className="ps-eyebrow" style={{ color: t.onDarkMuted, marginBottom: 16, textAlign: 'center' }}>{titulo}</p>
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+<GalleryWithLightbox galeria={itens} prefix="ps" gradient="rgba(14,26,15,0.6)" badge="Planta oficial" trackPlantas={{ empreendimento: 'parco-savello-santa-barbara-criciuma-sc', content_name: 'Parco Savello Residencial' }} />
+</div>
+</div>
+)
+})}
 </div>
 </section>
 
@@ -291,7 +335,10 @@ Tendo o bem-estar e a natureza como seus melhores vizinhos. O Parque da Prefeitu
 <div style={{ maxWidth: 1080, margin: '0 auto', textAlign: 'center' }}>
 <p className="ps-eyebrow" style={{ color: t.onDark, marginBottom: 18 }}>Financiamento Direto</p>
 <h2 className="ps-h2" style={{ color: t.onDark }}>A liberdade de comprar sem banco</h2>
-<p className="ps-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 60 }}>Sem burocracia, sem intermediários. Direto com a construtora.</p>
+<p className="ps-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 40 }}>Sem burocracia, sem intermediários. Direto com a construtora.</p>
+<p style={{ color: t.onDarkMuted, fontSize: 17, lineHeight: 1.7, maxWidth: 720, margin: '0 auto 16px' }}>{COMERCIAL.padrao}</p>
+<p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.7, maxWidth: 720, margin: '0 auto 20px' }}>{COMERCIAL.correcaoPadrao}</p>
+<p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.7, maxWidth: 720, margin: '0 auto 40px' }}>{COMERCIAL.alternativas}</p>
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px,1fr))', gap: 'clamp(28px,4vw,52px)' }}>
 {[
 { n: '01', ti: 'Converse com o Corretor', d: 'Atendimento exclusivo e reservado com Stiven Allan para entender o seu momento e as melhores condições.' },
@@ -305,9 +352,12 @@ Tendo o bem-estar e a natureza como seus melhores vizinhos. O Parque da Prefeitu
 </div>
 ))}
 </div>
-<p style={{ marginTop: 56, fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: t.onDark }}>Na planta &middot; Sob consulta</p>
+<p style={{ marginTop: 56, fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: t.onDark }}>{COMERCIAL.vigencia}</p>
 </div>
 </section>
+
+{/* SEO FAQ */}
+<PropertyFAQ items={FAQ_ITEMS} accent="#3D5A3E" />
 
 {/* 9 CTA FINAL */}
 <section style={{ position: 'relative', minHeight: '78vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
@@ -349,8 +399,6 @@ Tendo o bem-estar e a natureza como seus melhores vizinhos. O Parque da Prefeitu
 </a>
 
 
-{/* SEO FAQ */}
-<PropertyFAQ items={[{"pergunta":"Como funciona o financiamento direto do Parco Savello Residencial?","resposta":"Entrada de 20%, saldo em até 72 parcelas mensais e 6 reforços anuais (cada reforço equivale a 5 parcelas mensais), com correção pelo CUB/SC durante a obra. Sem análise de banco."},{"pergunta":"Qual a previsão de entrega do Parco Savello Residencial?","resposta":"A previsão de entrega é maio de 2028, em Santa Bárbara, Criciúma/SC."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Sim. Além do financiamento direto com a construtora, é possível optar por financiamento bancário. Fale com o Stiven pelo WhatsApp para simular as duas opções."},{"pergunta":"Onde fica o Parco Savello Residencial?","resposta":"O Parco Savello Residencial está localizado na Rua Duarte da Costa, 875, no bairro Santa Bárbara, Criciúma/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"O empreendimento oferece apartamentos com 3 dormitórios (2 suítes), de 93 a 94 m² privativos."}]} accent="#3D5A3E" />
 <RelatedProperties atualSlug="parco-savello-santa-barbara-criciuma-sc" cidade="Criciúma" />
 
 
