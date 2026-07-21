@@ -13,27 +13,29 @@ function cidadeSlug(cidade: string): string {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const now = new Date()
   // Mesma fonte da vitrine da home: estáticos + properties do banco (ativos/não-ocultos)
   // que ainda não têm página em @/data/imoveis — sem isso, empreendimentos cadastrados
   // só pelo dashboard ficam visíveis no site mas invisíveis para o Google.
   const imoveisVitrine = await getVitrineImoveis()
   const ativos = imoveisVitrine.filter((i) => i.ativo === true)
 
+  // Sem lastModified: nenhuma fonte de dado (imoveis.ts, properties no Supabase)
+  // expõe uma data real de última alteração por página. Declarar lastmod com a
+  // data do build passaria um sinal falso ao Google — melhor omitir o campo.
+
   // Rotas estáticas
   const staticPages: MetadataRoute.Sitemap = [
-    { url: SITE_URL, lastModified: now, changeFrequency: 'weekly', priority: 1 },
-    { url: SITE_URL + '/empreendimentos', lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
-    { url: SITE_URL + '/sobre', lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
-    { url: SITE_URL + '/contato', lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
-    { url: SITE_URL + '/politica-de-privacidade', lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
+    { url: SITE_URL, changeFrequency: 'weekly', priority: 1 },
+    { url: SITE_URL + '/empreendimentos', changeFrequency: 'weekly', priority: 0.9 },
+    { url: SITE_URL + '/sobre', changeFrequency: 'monthly', priority: 0.5 },
+    { url: SITE_URL + '/contato', changeFrequency: 'monthly', priority: 0.5 },
+    { url: SITE_URL + '/politica-de-privacidade', changeFrequency: 'yearly', priority: 0.3 },
   ]
 
   // Páginas de cidade (/lancamentos/[cidade]) — cidades com empreendimentos ativos
   const cidades = Array.from(new Set(ativos.map((i) => cidadeSlug(i.cidade))))
   const cidadePages: MetadataRoute.Sitemap = cidades.map((slug) => ({
     url: SITE_URL + '/lancamentos/' + slug,
-    lastModified: now,
     changeFrequency: 'weekly' as const,
     priority: 0.7,
   }))
@@ -51,15 +53,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ]
   const bairroPages: MetadataRoute.Sitemap = bairroCombos.map(({ cidade, bairro }) => ({
     url: SITE_URL + '/lancamentos/' + cidade + '/' + bairro,
-    lastModified: now,
     changeFrequency: 'weekly' as const,
     priority: 0.65,
   }))
 
-    // Indice de guias
-      const guiaIndexPage: MetadataRoute.Sitemap = [
-          { url: SITE_URL + '/guia', lastModified: now, changeFrequency: 'monthly' as const, priority: 0.6 },
-            ]
+  // Indice de guias
+  const guiaIndexPage: MetadataRoute.Sitemap = [
+    { url: SITE_URL + '/guia', changeFrequency: 'monthly' as const, priority: 0.6 },
+  ]
 
   // Guias SEO
   const guias = [
@@ -73,29 +74,37 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ]
   const guiaPages: MetadataRoute.Sitemap = guias.map((slug) => ({
     url: SITE_URL + '/guia/' + slug,
-    lastModified: now,
     changeFrequency: 'monthly' as const,
     priority: 0.7,
   }))
 
-  // Páginas de empreendimento — todos os imóveis ativos
+  // Páginas de empreendimento — todos os imóveis ativos (estáticos + properties do
+  // banco, incluindo Eraldo caso já tenha migrado pra lá — ver eraldoPages abaixo).
   const empPages: MetadataRoute.Sitemap = ativos.map((i) => ({
     url: SITE_URL + '/empreendimento/' + i.construtora_slug + '/' + i.slug,
-    lastModified: now,
     changeFrequency: 'weekly' as const,
     priority: 0.8,
   }))
 
-  // Lançamentos Eraldo com página bespoke própria (mesmo padrão do Aura Residence)
-  // que ainda não têm registro em `properties` — entrada estática evita depender
-  // do cadastro no banco só para aparecer no sitemap.
+  // Lançamentos Eraldo com página bespoke própria (mesmo padrão do Aura Residence).
+  // Mantido como fallback estático para o caso de algum desses slugs ainda não
+  // existir em `properties` — o dedupe abaixo evita URL duplicada quando já existir.
   const eraldoSlugs = ['arbor-centro-criciuma-sc', 'gran-michel-criciuma-sc', 'harmony-residence-centro-balneario-rincao-sc', 'gran-palazzo-vila-moema-tubarao-sc', 'horizon-centro-balneario-rincao-sc', 'lessence-home-club-cruzeiro-do-sul-criciuma-sc', 'play-residence-vila-moema-tubarao-sc', 'symphony-mar-grosso-laguna-sc']
   const eraldoPages: MetadataRoute.Sitemap = eraldoSlugs.map((slug) => ({
     url: SITE_URL + '/empreendimento/eraldo/' + slug,
-    lastModified: now,
     changeFrequency: 'weekly' as const,
     priority: 0.8,
   }))
 
-  return [...staticPages, ...guiaIndexPage, ...cidadePages, ...bairroPages, ...guiaPages, ...empPages, ...eraldoPages]
+  const todasPaginas = [...staticPages, ...guiaIndexPage, ...cidadePages, ...bairroPages, ...guiaPages, ...empPages, ...eraldoPages]
+
+  // Dedupe por URL: `ativos` (Supabase properties) e `eraldoSlugs` (fallback
+  // hardcoded) podem gerar a mesma URL quando um empreendimento Eraldo já foi
+  // cadastrado no banco — sem isso, o sitemap publica <loc> repetido.
+  const vistos = new Set<string>()
+  return todasPaginas.filter((pagina) => {
+    if (vistos.has(pagina.url)) return false
+    vistos.add(pagina.url)
+    return true
+  })
 }

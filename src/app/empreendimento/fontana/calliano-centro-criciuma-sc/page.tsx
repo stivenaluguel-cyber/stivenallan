@@ -52,17 +52,17 @@ const AMENIDADES = [
 ]
 
 export const metadata: Metadata = {
-  title: 'Calliano Residencial | Centro Criciúma SC',
-  description: 'Calliano Residencial, no Centro de Criciúma/SC — 2 ou 3 dormitórios, até 92 m² privativos, acabamento refinado e design italiano. Financiamento direto com a construtora, sem banco. Fale com Stiven Allan.',
+  title: 'Calliano Residencial — Pronto para Morar, Centro Criciúma/SC',
+  description: 'Calliano Residencial, pronto para morar no Centro de Criciúma/SC — 2 ou 3 dormitórios, até 92 m² privativos. Financiamento direto com a construtora, sem banco.',
   alternates: { canonical: `${SITE_URL}/empreendimento/fontana/calliano-centro-criciuma-sc` },
   openGraph: {
-    title: 'Calliano Residencial | Centro Criciúma SC | Stiven Allan',
-    description: 'Idealizado para oferecer o melhor — 2 ou 3 dorms · até 92 m² · Centro de Criciúma/SC.',
+    title: 'Calliano Residencial — Pronto para Morar, Centro Criciúma/SC | Stiven Allan',
+    description: 'Pronto para morar — 2 ou 3 dorms · até 92 m² · Centro de Criciúma/SC. Financiamento direto, sem banco.',
     url: `${SITE_URL}/empreendimento/fontana/calliano-centro-criciuma-sc`,
     images: [{ url: IMG.hero, width: 1200, height: 630, alt: 'Calliano Residencial — Criciúma SC' }],
     type: 'website',
   },
-  twitter: { card: 'summary_large_image', title: 'Calliano Residencial | Centro Criciúma SC | Stiven Allan', description: 'Até 92 m² privativos no Centro de Criciúma. Sob consulta.', images: [IMG.hero] },
+  twitter: { card: 'summary_large_image', title: 'Calliano Residencial — Pronto para Morar, Centro Criciúma/SC | Stiven Allan', description: 'Pronto para morar — até 92 m² privativos no Centro de Criciúma.', images: [IMG.hero] },
   robots: { index: true, follow: true },
 }
 
