@@ -5,14 +5,34 @@ import { createClient } from "@/lib/supabase/server";
 // Item da vitrine da Home, no mesmo formato do array estatico @/data/imoveis.
 export type ImovelVitrine = (typeof imoveis)[number];
 
+// Busca o nome de exibicao de cada construtora cadastrada (tabela `construtoras`),
+// indexado por slug. Isolado em try/catch proprio: se a consulta falhar, retorna um
+// mapa vazio e cada chamador cai no fallback seguro (construtora_slug cru).
+async function getConstrutorasPorSlug(
+  supabase: Awaited<ReturnType<typeof createClient>>
+): Promise<Map<string, string>> {
+  try {
+    const { data } = await supabase.from("construtoras").select("slug, nome");
+    const mapa = new Map<string, string>();
+    if (Array.isArray(data)) {
+      for (const c of data) {
+        if (c?.slug && c?.nome) mapa.set(c.slug, c.nome);
+      }
+    }
+    return mapa;
+  } catch {
+    return new Map();
+  }
+}
+
 // Mapeia uma linha de properties (snake_case, superset) para o formato ImovelVitrine.
-function mapDbToImovel(p: any): ImovelVitrine {
+function mapDbToImovel(p: any, construtorasPorSlug: Map<string, string>): ImovelVitrine {
   return {
     id: p.id ?? p.slug,
     nome: p.nome ?? "",
     slug: p.slug,
     construtora_slug: p.construtora_slug ?? "",
-    construtora: p.construtora ?? p.construtora_slug ?? "",
+    construtora: construtorasPorSlug.get(p.construtora_slug) ?? p.construtora_slug ?? "",
     bairro: p.bairro ?? "",
     cidade: p.cidade ?? "",
     uf: p.uf ?? "",
@@ -35,11 +55,12 @@ export async function getVitrineImoveis(): Promise<ImovelVitrine[]> {
       .from("properties")
       .select("*");
     if (!Array.isArray(data)) return estaticos;
+    const construtorasPorSlug = await getConstrutorasPorSlug(supabase);
     const slugsEstaticos = new Set(estaticos.map((e) => e.slug));
     const extras = data
       .filter((p) => p && p.slug && !slugsEstaticos.has(p.slug))
       .filter((p) => p.oculto !== true && p.ativo !== false)
-      .map(mapDbToImovel);
+      .map((p) => mapDbToImovel(p, construtorasPorSlug));
     return [...estaticos, ...extras];
   } catch {
     return estaticos;
@@ -55,6 +76,7 @@ export async function getVitrineEmpreendimentos(): Promise<Empreendimento[]> {
       .from("properties")
       .select("*");
     if (!Array.isArray(data)) return estaticos;
+    const construtorasPorSlug = await getConstrutorasPorSlug(supabase);
     const slugsEstaticos = new Set(estaticos.map((e) => e.slug));
     const extras: Empreendimento[] = data
       .filter((p) => p && p.slug && !slugsEstaticos.has(p.slug))
@@ -80,7 +102,7 @@ export async function getVitrineEmpreendimentos(): Promise<Empreendimento[]> {
         diferenciais: Array.isArray(p.diferenciais) ? p.diferenciais : [],
         videoUrl: p.video_url ?? null,
         catalogoUrl: p.book_pdf_url ?? null,
-        construtoraNome: p.construtora ?? p.construtora_slug ?? "",
+        construtoraNome: construtorasPorSlug.get(p.construtora_slug) ?? p.construtora_slug ?? "",
       }) as Empreendimento);
     return [...estaticos, ...extras];
   } catch {
