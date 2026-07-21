@@ -78,6 +78,33 @@ const AMENIDADES: string[] = [
   'Espera para carregador de carro elétrico',
 ]
 
+// Plantas oficiais — site estilofontana.com.br (aba "Plantas" do Fidenza).
+const PLANTAS = [
+  { categoria: 'tipo', src: 'https://estilofontana.com.br/images/empreendimento_planta/planta-tipo-final-01-1725382472.jpg', alt: 'Fidenza Residencial — planta apartamento tipo final 01', label: 'Apartamento Tipo — Final 01', area: 149.52, quartos: 3, suites: 3 },
+  { categoria: 'tipo', src: 'https://estilofontana.com.br/images/empreendimento_planta/planta-tipo-final-02-1725382919.jpg', alt: 'Fidenza Residencial — planta apartamento tipo final 02', label: 'Apartamento Tipo — Final 02', area: 161.45, quartos: 3, suites: 3 },
+  { categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/pavimento-lazer-1725382287.jpg', alt: 'Fidenza Residencial — pavimento de lazer', label: 'Pavimento Lazer' },
+  { categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/terreo-1725383082.jpg', alt: 'Fidenza Residencial — planta do térreo', label: 'Térreo' },
+  { categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/2o-pavimento-1725383130.jpg', alt: 'Fidenza Residencial — 2º pavimento', label: '2º Pavimento' },
+  { categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/subsolo-1725383192.jpg', alt: 'Fidenza Residencial — subsolo', label: 'Subsolo · Garagem' },
+]
+const PLANTAS_GRUPOS = [
+  { titulo: 'Apartamentos tipo', categoria: 'tipo' },
+  { titulo: 'Lazer, térreo e garagem', categoria: 'comum' },
+]
+
+// Condições comerciais — fonte única (tabela vigente Julho/2026).
+const COMERCIAL = {
+  texto: 'Entrada de 20% do valor da unidade, paga em parcela única no ato. Saldo dividido em 6 reforços anuais (juntos, 23,53% do valor) e 72 parcelas mensais (56,47% do valor), direto com a construtora.',
+  correcao: 'Durante a obra, os valores são corrigidos pelo CUB/Sinduscon-SC. Após a conclusão do empreendimento, o comprador escolhe entre correção pelo IGPM + 0,75% ao mês ou pelo CUB/Sinduscon-SC.',
+  vigencia: 'Condições conforme a tabela vigente (Julho/2026), sujeitas à atualização. Consulte a tabela vigente para valores e disponibilidade por unidade.',
+}
+const FAQ_ITEMS = [
+  { pergunta: 'Como funciona o financiamento direto do Fidenza Residencial?', resposta: `${COMERCIAL.texto} ${COMERCIAL.correcao} ${COMERCIAL.vigencia}` },
+  { pergunta: 'Qual a previsão de entrega do Fidenza Residencial?', resposta: 'A previsão de entrega é dezembro de 2027, no Cruzeiro do Sul, Criciúma/SC.' },
+  { pergunta: 'Quantas vagas de garagem tem cada unidade?', resposta: 'Todas as unidades têm 2 vagas de garagem, conforme a tabela vigente (a configuração física do box varia por unidade).' },
+  { pergunta: 'Onde fica o Fidenza Residencial?', resposta: 'O Fidenza Residencial está localizado na Rua São José, 1000, esquina com a Rua Monteiro Lobato, no Cruzeiro do Sul, Criciúma/SC.' },
+]
+
 export const revalidate = 3600
 
 export const metadata: Metadata = {
@@ -105,7 +132,7 @@ export const metadata: Metadata = {
 export default function FidenzaPage() {
   return (
     <main lang="pt-BR" style={{ background: t.bg, color: t.ink, fontFamily: t.body, overflowX: 'hidden' }}>
-      
+      <PropertySchema nome="Fidenza Residencial" slug="fidenza-residencial-cruzeiro-do-sul-criciuma-sc" construtora_slug="fontana" cidade="Criciúma" uf="SC" bairro="Cruzeiro do Sul" descricao="Fidenza Residencial (Construtora Fontana): apartamentos de alto padrão no Cruzeiro do Sul, Criciúma/SC. 3 suítes, 149 a 161 m², financiamento direto com a construtora. Atendimento exclusivo com Stiven Allan." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/fidenza-residencial-cruzeiro-do-sul-criciuma-sc.jpg" faq={FAQ_ITEMS} />
 
       <style>{`
         html { scroll-behavior: smooth; }
@@ -255,6 +282,7 @@ export default function FidenzaPage() {
             {[
               { n: '3', l: 'Dormitórios (3 suítes)' },
               { n: '149–161', l: 'm² privativos' },
+              { n: '2', l: 'Vagas de garagem' },
               { n: '2', l: 'Apartamentos por andar' },
               { n: '2', l: 'Elevadores' },
               { n: '11', l: 'Pavimentos' },
@@ -272,6 +300,20 @@ export default function FidenzaPage() {
             <span style={{ fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: t.onDarkMuted }}>Entrega prevista</span>
           </div>
           <LeadCaptureButton slug="fidenza-residencial-cruzeiro-do-sul-criciuma-sc" construtora_slug="fontana" className="fz-cta fz-cta-light"  propertyDisplayName="Fidenza Residencial" />
+        </div>
+        <div style={{ maxWidth: 1160, margin: 'clamp(64px,10vh,96px) auto 0', textAlign: 'left' }}>
+          {PLANTAS_GRUPOS.map(({ titulo, categoria }) => {
+            const itens = PLANTAS.filter(p => p.categoria === categoria)
+            if (!itens.length) return null
+            return (
+              <div key={categoria} style={{ marginBottom: 40 }}>
+                <p className="fz-eyebrow" style={{ color: t.onDarkMuted, marginBottom: 16, textAlign: 'center' }}>{titulo}</p>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+                  <GalleryWithLightbox galeria={itens} prefix="fz" gradient="rgba(20,19,15,0.6)" badge="Planta oficial" trackPlantas={{ empreendimento: 'fidenza-residencial-cruzeiro-do-sul-criciuma-sc', content_name: 'Fidenza Residencial' }} />
+                </div>
+              </div>
+            )
+          })}
         </div>
       </section>
 
@@ -340,7 +382,9 @@ export default function FidenzaPage() {
         <div style={{ maxWidth: 1080, margin: '0 auto', textAlign: 'center' }}>
           <p className="fz-eyebrow" style={{ color: t.onDark, marginBottom: 18 }}>Financiamento Direto</p>
           <h2 className="fz-h2" style={{ color: t.onDark }}>O privilégio de comprar sem banco</h2>
-          <p className="fz-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 60 }}>Sem burocracia, sem intermediários. Liberdade total, direto com a construtora.</p>
+          <p className="fz-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 40 }}>Sem burocracia, sem intermediários. Liberdade total, direto com a construtora.</p>
+          <p style={{ color: t.onDarkMuted, fontSize: 17, lineHeight: 1.7, maxWidth: 720, margin: '0 auto 20px' }}>{COMERCIAL.texto}</p>
+          <p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.7, maxWidth: 720, margin: '0 auto 40px' }}>{COMERCIAL.correcao}</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px,1fr))', gap: 'clamp(28px,4vw,52px)' }}>
             {[
               { n: '01', ti: 'Converse com o corretor', d: 'Atendimento exclusivo e personalizado com Stiven Allan para entender o seu momento e as melhores condições.' },
@@ -354,9 +398,12 @@ export default function FidenzaPage() {
               </div>
             ))}
           </div>
-          <p style={{ marginTop: 56, fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: t.onDark }}>Premium exclusivo &middot; Sob consulta</p>
+          <p style={{ marginTop: 56, fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: t.onDark }}>{COMERCIAL.vigencia}</p>
         </div>
       </section>
+
+      {/* SEO FAQ */}
+      <PropertyFAQ items={FAQ_ITEMS} accent={t.graphite} />
 
       <RelatedProperties atualSlug="fidenza-residencial-cruzeiro-do-sul-criciuma-sc" cidade="Criciúma" />
 
