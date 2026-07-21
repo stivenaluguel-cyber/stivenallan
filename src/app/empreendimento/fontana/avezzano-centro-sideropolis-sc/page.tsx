@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import GalleryWithLightbox from './gallery-lightbox';
+import PlantasLightbox from './plantas-lightbox';
 import { LeadCaptureButton } from '@/components/LeadCaptureButton'
 import { PropertySchema } from '@/components/PropertySchema'
 import { PropertyFAQ } from '@/components/PropertyFAQ'
@@ -27,18 +28,38 @@ const GALERIA = [
   { src: 'https://lh3.googleusercontent.com/d/1CYgrjHd-CNBWhWVij-AYjnYoq2rQu0Kl', alt: 'PlayGround' },
 ];
 
+// Plantas oficiais — site estilofontana.com.br (aba "Plantas" do Avezzano).
+// Confirmado na tabela vigente: 03 Dormitórios (01 Suíte e 02 Demi-Suítes) — não "3 suítes".
+const PLANTAS = [
+  { src: 'https://estilofontana.com.br/images/empreendimento_planta/apartamento-tipo-1601648098.jpg', alt: 'Avezzano Residencial — planta apartamento tipo (finais 2, 3 e 4, rebatida)', label: 'Apartamento Tipo — Final 01 (finais 2, 3 e 4, rebatida)', quartos: 3, suites: 1, area: 127.22 },
+  { src: 'https://estilofontana.com.br/images/empreendimento_planta/terreo-1602250225.jpg', alt: 'Avezzano Residencial — planta do térreo', label: 'Térreo' },
+  { src: 'https://estilofontana.com.br/images/empreendimento_planta/subsolo-1607952178.jpg', alt: 'Avezzano Residencial — subsolo', label: 'Subsolo · Garagem' },
+];
+
+// Condições comerciais — fonte única (tabela vigente Julho/2026). Estrutura própria: entrada única + saldo via 2 opções.
+const COMERCIAL = {
+  texto: 'Entrada de 15% do valor total, em parcela única.',
+  saldo: 'O saldo devedor (85%) pode ser quitado, à escolha do comprador, por duas opções: financiamento bancário, ou parcelamento direto com a construtora em até 240 meses, corrigido pelo IGPM e acrescido de juros de 0,75% ao mês.',
+  vigencia: 'Condições conforme a tabela vigente (Julho/2026), sujeitas à atualização. Consulte a tabela vigente para valores e disponibilidade por unidade.',
+};
+const FAQ_ITEMS = [
+  { pergunta: 'Como funciona o pagamento do Avezzano?', resposta: `${COMERCIAL.texto} ${COMERCIAL.saldo} ${COMERCIAL.vigencia}` },
+  { pergunta: 'O Avezzano tem 3 suítes?', resposta: 'Não. Conforme a tabela vigente, as unidades têm 3 dormitórios, sendo 1 suíte completa e 2 demi-suítes (banheiro compartilhado/reduzido). Consulte o corretor para mais detalhes sobre a planta.' },
+  { pergunta: 'Onde fica o Avezzano?', resposta: 'O Avezzano está localizado no Centro, Siderópolis/SC.' },
+];
+
 export const metadata: Metadata = {
   title: 'Avezzano Residencial | Centro Siderópolis SC',
-  description: 'Avezzano Residencial — 3 dormitórios (3 suítes), até 127 m², Centro de Siderópolis/SC. Financiamento direto Fontana, sem bancos. Conheça com Stiven Allan.',
+  description: 'Avezzano Residencial — 3 dormitórios (1 suíte e 2 demi-suítes), 127 m², Centro de Siderópolis/SC. Financiamento direto Fontana. Conheça com Stiven Allan.',
   openGraph: {
     title: 'Avezzano Residencial | Centro Siderópolis SC | Stiven Allan',
-    description: 'Permita-se viver no melhor. Apartamentos com 3 suítes até 127 m² no coração de Siderópolis.',
+    description: 'Permita-se viver no melhor. Apartamentos de 127 m² no coração de Siderópolis.',
     images: [{ url: HERO }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Avezzano Residencial | Centro Siderópolis SC | Stiven Allan',
-    description: 'Permita-se viver no melhor. Apartamentos com 3 suítes até 127 m² no coração de Siderópolis.',
+    description: 'Permita-se viver no melhor. Apartamentos de 127 m² no coração de Siderópolis.',
     images: [HERO],
   },
 };
@@ -46,7 +67,7 @@ export const metadata: Metadata = {
 export default function AvezzanoPage() {
   return (
     <main style={{ fontFamily: "'Inter', sans-serif", color: '#1a1a1a', overflowX: 'hidden' }}>
-      <PropertySchema nome="Avezzano" slug="avezzano-centro-sideropolis-sc" construtora_slug="fontana" cidade="Siderópolis" uf="SC" bairro="Centro" descricao="Avezzano Residencial — 3 dormitórios (3 suítes), até 127 m², Centro de Siderópolis/SC. Financiamento direto Fontana, sem bancos. Conheça com Stiven Allan." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/avezzano-centro-sideropolis-sc.jpg" faq={[{"pergunta":"Como funciona o pagamento do Avezzano?","resposta":"Entrada e saldo por financiamento bancário ou parcelado direto com a construtora em até 240 meses, com correção IGPM + 0,75% a.m."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Sim. Além do financiamento direto com a construtora, é possível optar por financiamento bancário. Fale com o Stiven pelo WhatsApp para simular as duas opções."},{"pergunta":"Onde fica o Avezzano?","resposta":"O Avezzano está localizado no Centro, Siderópolis/SC."}]} />
+      <PropertySchema nome="Avezzano" slug="avezzano-centro-sideropolis-sc" construtora_slug="fontana" cidade="Siderópolis" uf="SC" bairro="Centro" descricao="Avezzano Residencial — 3 dormitórios (1 suíte e 2 demi-suítes), 127 m², Centro de Siderópolis/SC. Financiamento direto Fontana. Conheça com Stiven Allan." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/avezzano-centro-sideropolis-sc.jpg" faq={FAQ_ITEMS} />
 
       {/* NAV */}
       <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 2rem', height: '64px' }}>
@@ -100,7 +121,7 @@ export default function AvezzanoPage() {
             "Permita-se viver no melhor."
           </blockquote>
           <p style={{ fontSize: '1rem', lineHeight: 1.9, color: '#555' }}>
-            3 dormitórios com 3 suítes, apartamentos de até 127 m² privativos no coração de Siderópolis/SC. Uma construção que honra cada detalhe com acabamentos nobres e espaços que respiram elegância.
+            3 dormitórios (1 suíte e 2 demi-suítes), apartamentos de 127 m² privativos no coração de Siderópolis/SC. Uma construção que honra cada detalhe com acabamentos nobres e espaços que respiram elegância.
           </p>
         </div>
       </section>
@@ -122,7 +143,7 @@ export default function AvezzanoPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem', marginBottom: '3rem' }}>
             {[
               { n: '3', l: 'dormitórios' },
-              { n: '3', l: 'suítes' },
+              { n: '1+2', l: 'suíte + demi-suítes' },
               { n: '127', l: 'm² privativos' },
               { n: '2', l: 'elevadores' },
             ].map(({ n, l }) => (
@@ -132,9 +153,13 @@ export default function AvezzanoPage() {
               </div>
             ))}
           </div>
-          <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '1rem', lineHeight: 1.8, maxWidth: '650px', margin: '0 auto' }}>
+          <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '1rem', lineHeight: 1.8, maxWidth: '650px', margin: '0 auto 4rem' }}>
             Residências pensadas para quem exige o melhor. Ambientes integrados, acabamentos nobres e espaços que celebram cada momento da sua história.
           </p>
+          <div style={{ textAlign: 'left' }}>
+            <p style={{ color: ACCENT, fontSize: '0.7rem', letterSpacing: '0.3em', textTransform: 'uppercase', textAlign: 'center', marginBottom: '2rem' }}>Plantas Oficiais</p>
+            <PlantasLightbox plantas={PLANTAS} accent={ACCENT} trackPlantas={{ empreendimento: 'avezzano-centro-sideropolis-sc', content_name: 'Avezzano Residencial' }} />
+          </div>
         </div>
       </section>
 
@@ -144,7 +169,7 @@ export default function AvezzanoPage() {
           <p style={{ color: ACCENT, fontSize: '0.7rem', letterSpacing: '0.3em', textTransform: 'uppercase', textAlign: 'center', marginBottom: '0.75rem' }}>Diferenciais das Unidades</p>
           <div style={{ width: '40px', height: '2px', background: ACCENT, margin: '0 auto 3rem' }} />
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.5rem' }}>
-            {['3 suítes','Living amplo','Lavabo','Home office','Fechadura digital','2 elevadores','Churrasqueira'].map((item, i) => (
+            {['1 suíte + 2 demi-suítes','Living amplo','Lavabo','Home office','Fechadura digital','2 elevadores','Churrasqueira'].map((item, i) => (
               <div key={item} style={{ background: '#fff', padding: '1.75rem 2rem', borderTop: `3px solid ${ACCENT}`, boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
                 <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '2rem', color: ACCENT, fontWeight: 300, display: 'block', marginBottom: '0.5rem' }}>{String(i + 1).padStart(2, '0')}</span>
                 <p style={{ fontWeight: 600, fontSize: '0.95rem', color: '#1a1a1a', margin: 0 }}>{item}</p>
@@ -212,7 +237,9 @@ export default function AvezzanoPage() {
           <h2 style={{ fontSize: 'clamp(1.8rem,3vw,2.5rem)', fontWeight: 300, marginBottom: '1rem' }}>
             Financiamento <strong style={{ fontWeight: 700 }}>Direto Fontana</strong>
           </h2>
-          <p style={{ color: 'rgba(255,255,255,0.7)', marginBottom: '3rem', fontSize: '1rem' }}>Sem banco. Sem burocracia. Condições sob medida para você.</p>
+          <p style={{ color: 'rgba(255,255,255,0.7)', marginBottom: '2rem', fontSize: '1rem' }}>Sem burocracia. Condições sob medida para você.</p>
+          <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: '1rem', lineHeight: 1.8, maxWidth: '640px', margin: '0 auto 1rem' }}>{COMERCIAL.texto}</p>
+          <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', lineHeight: 1.8, maxWidth: '640px', margin: '0 auto 3rem' }}>{COMERCIAL.saldo}</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem', marginBottom: '3rem' }}>
             {[
               { n: '01', t: 'Converse com Stiven', d: 'Entenda as condições e tire todas as suas dúvidas.' },
@@ -226,13 +253,16 @@ export default function AvezzanoPage() {
               </div>
             ))}
           </div>
-          <p style={{ fontSize: '1.5rem', color: '#fff', marginBottom: '0.5rem', fontWeight: 300 }}>Preço: <strong style={{ fontWeight: 700 }}>Sob consulta</strong></p>
+          <p style={{ fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)', marginBottom: '0.5rem' }}>{COMERCIAL.vigencia}</p>
           <a href={WA} target="_blank" rel="noopener"
             style={{ display: 'inline-block', marginTop: '1.5rem', background: '#fff', color: ACCENT_DARK, padding: '1rem 2.5rem', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', borderRadius: '2px' }}>
             CONSULTAR CONDIÇÕES
           </a>
         </div>
       </section>
+
+      {/* SEO FAQ */}
+      <PropertyFAQ items={FAQ_ITEMS} accent={ACCENT} />
 
       <RelatedProperties atualSlug="avezzano-centro-sideropolis-sc" cidade="Siderópolis" />
 
