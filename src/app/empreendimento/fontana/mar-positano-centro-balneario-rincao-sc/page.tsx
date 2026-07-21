@@ -44,11 +44,12 @@ const DIFERENCIAIS = [
   'Apartamentos de 107 a 126 m² com planta inteligente',
   'Sacada com churrasqueira em todos os apartamentos',
   'Suíte master com closet',
-  'Cozinha integrada ao living para amplidam',
-  'Acabamentos de alto padrão selecionados',
+  'Cozinha integrada ao living, ampliando a sensação de espaço',
+  'Câmeras de segurança 24h',
+  'Garagem com pintura epóxi',
+  'Persianas automatizadas',
+  'Fechadura digital',
   'Localização privilegiada no Centro de Balneário Rincão',
-  'Construtora Fontana — tradição e qualidade comprovadas',
-  'Financiamento direto com a Construtora Fontana',
 ]
 
 const AMENIDADES = [
@@ -59,6 +60,30 @@ const AMENIDADES = [
   'Playground',
   'Espaço fitness',
 ]
+
+// Plantas oficiais — site estilofontana.com.br (aba "Plantas" do Mar Positano).
+// Metragens/dormitórios/suítes por tipo confirmados na própria imagem da planta oficial.
+const PLANTAS = [
+  { categoria: 'tipo', src: 'https://estilofontana.com.br/images/empreendimento_planta/apartamento-tipo-401-1736354292.jpg', alt: 'Mar Positano Residencial — planta tipo 401', label: 'Tipo 401', area: 121.06, quartos: 3, suites: 1 },
+  { categoria: 'tipo', src: 'https://estilofontana.com.br/images/empreendimento_planta/apartamento-tipo-501-1736354769.jpg', alt: 'Mar Positano Residencial — planta tipo 501', label: 'Tipo 501', area: 126, quartos: 3, suites: 1 },
+  { categoria: 'tipo', src: 'https://estilofontana.com.br/images/empreendimento_planta/apartamento-tipo-303-1736354845.jpg', alt: 'Mar Positano Residencial — planta tipo 303', label: 'Tipo 303', area: 110.39, quartos: 3, suites: 1 },
+  { categoria: 'tipo', src: 'https://estilofontana.com.br/images/empreendimento_planta/apartamento-tipo-403-1736355034.jpg', alt: 'Mar Positano Residencial — planta tipo 403', label: 'Tipo 403', area: 107.38, quartos: 3, suites: 1 },
+  { categoria: 'tipo', src: 'https://estilofontana.com.br/images/empreendimento_planta/apartamento-tipo-503-1736355070.jpg', alt: 'Mar Positano Residencial — planta tipo 503', label: 'Tipo 503', area: 107.89, quartos: 3, suites: 1 },
+  { categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/terreo-1736355100.jpg', alt: 'Mar Positano Residencial — planta do térreo', label: 'Térreo' },
+  { categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/1o-pavimento-1736355165.jpg', alt: 'Mar Positano Residencial — 1º pavimento, área de lazer', label: '1º Pavimento · Lazer' },
+  { categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/subsolo-1736355210.jpg', alt: 'Mar Positano Residencial — subsolo, garagem', label: 'Subsolo · Garagem' },
+]
+
+const PLANTAS_GRUPOS = [
+  { titulo: 'Apartamentos tipo', categoria: 'tipo' },
+  { titulo: 'Térreo, lazer e garagem', categoria: 'comum' },
+]
+
+const CONDICOES = {
+  texto: 'Entrada de 20% do valor do imóvel, paga em parcela única, mais 6 reforços anuais (cada um equivalente a 5x o valor da parcela mensal), e o saldo dividido em 72 parcelas mensais. Durante a obra, os valores são corrigidos mensalmente pelo CUB/SC.',
+  posEntrega: 'Após a entrega, o saldo remanescente é corrigido, à escolha do comprador, pelo IGPM acrescido de juros compensatórios de 0,75% ao mês, ou apenas pelo CUB/SC.',
+  vigencia: 'Condições conforme tabela de julho/2026, sujeitas à atualização.',
+}
 
 export const metadata: Metadata = {
   title: 'Mar Positano Residencial | Apartamentos em Balneário Rincão SC | Fontana',
@@ -106,14 +131,14 @@ const SCHEMA = {
 export default function Page() {
   return (
     <main style={{ fontFamily: t.body, background: t.bg, color: t.ink, overflowX: 'hidden' }}>
-<PropertySchema nome="Mar Positano Residencial" slug="mar-positano-centro-balneario-rincao-sc" construtora_slug="fontana" cidade="Balneário Rincão" uf="SC" bairro="Centro" descricao="Mar Positano Residencial — apartamentos 3 dormitórios com suíte, 107 a 126 m² privativos no Centro de Balneário Rincão/SC. Financiamento direto Fontana." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/mar-positano-centro-balneario-rincao-sc.jpg" faq={[{"pergunta":"Como funciona o financiamento direto do Mar Positano Residencial?","resposta":"Entrada de 20%, saldo em até 72 parcelas mensais e 6 reforços anuais (cada reforço equivale a 5 parcelas mensais), com correção pelo CUB/SC durante a obra. Sem análise de banco."},{"pergunta":"Qual a previsão de entrega do Mar Positano Residencial?","resposta":"A previsão de entrega é agosto de 2029, em Centro, Balneário Rincão/SC."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Sim. Além do financiamento direto com a construtora, é possível optar por financiamento bancário. Fale com o Stiven pelo WhatsApp para simular as duas opções."},{"pergunta":"Onde fica o Mar Positano Residencial?","resposta":"O Mar Positano Residencial está localizado na Rua Waldemar Carlos Petrini, esq. Rua Espírito Santo, no Centro de Balneário Rincão/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"O empreendimento oferece apartamentos com 3 dormitórios (1 suíte), de 107 a 126 m² privativos, com sacada."}]} />
+<PropertySchema nome="Mar Positano Residencial" slug="mar-positano-centro-balneario-rincao-sc" construtora_slug="fontana" cidade="Balneário Rincão" uf="SC" bairro="Centro" descricao="Mar Positano Residencial — apartamentos 3 dormitórios com suíte, 107 a 126 m² privativos no Centro de Balneário Rincão/SC. Financiamento direto Fontana." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/mar-positano-centro-balneario-rincao-sc.jpg" faq={[{"pergunta":"Como funciona o financiamento direto do Mar Positano Residencial?","resposta":"Entrada de 20% (parcela única), 6 reforços anuais (cada um equivalente a 5x o valor da parcela mensal) e saldo em 72 parcelas mensais, corrigidas pelo CUB/SC durante a obra. Condições conforme tabela de julho/2026, sujeitas à atualização — fale com Stiven para simular sua unidade."},{"pergunta":"Qual a previsão de entrega do Mar Positano Residencial?","resposta":"A previsão de entrega é agosto de 2029, em Centro, Balneário Rincão/SC."},{"pergunta":"Como é a correção monetária após a entrega das chaves?","resposta":"O saldo remanescente é corrigido mensalmente, à escolha do comprador, por uma de duas opções: IGPM acrescido de juros compensatórios de 0,75% ao mês, ou apenas pelo CUB/SC."},{"pergunta":"Onde fica o Mar Positano Residencial?","resposta":"O Mar Positano Residencial está localizado na Rua Waldemar Carlos Petrini, esq. Rua Espírito Santo, no Centro de Balneário Rincão/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"Apartamentos de 3 dormitórios (1 suíte), de 107,38 a 126 m² privativos, em 5 tipos de planta — confira as plantas oficiais na página."}]} />
 
       <style>{`
         html { scroll-behavior: smooth; }
         .mp-eyebrow { font-size:11px; letter-spacing:0.42em; text-transform:uppercase; }
         .mp-h1 { font-family:${t.display}; font-weight:300; text-transform:uppercase; letter-spacing:0.14em; }
         .mp-h2 { font-family:${t.display}; font-weight:300; text-transform:uppercase; font-size:clamp(26px,4vw,46px); }
-        .mp-cta { display:inline-block; letter-spacing:0.3em; border:1px solid; padding:16px 34px; text-decoration:none; }
+        .mp-cta { display:inline-block; letter-spacing:0.3em; border:1px solid; padding:16px 34px; text-decoration:none; color:#fff; border-color:rgba(255,255,255,0.6); background:none; cursor:pointer; font-family:inherit; font-size:11px; text-transform:uppercase; }
         .mp-gcard { position:relative; overflow:hidden; }
         .mp-amen { display:flex; align-items:center; gap:12px; padding:14px 0; border-bottom:1px solid rgba(0,0,0,0.08); }
         .mp-amen::before { content:''; width:6px; height:6px; background:${t.navy}; border-radius:50%; flex-shrink:0; }
@@ -121,6 +146,15 @@ export default function Page() {
         .mp-wa { position:fixed; right:20px; bottom:20px; width:56px; height:56px; border-radius:50%; background:#25D366; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 16px rgba(0,0,0,0.25); z-index:200; }
         details.mp-menu > summary { list-style:none; }
         details.mp-menu > summary::-webkit-details-marker { display:none; }
+        @media (max-width: 768px) {
+          .mp-grid-2 { grid-template-columns: 1fr !important; }
+          .mp-grid-3 { grid-template-columns: repeat(2,1fr) !important; }
+          .mp-grid-4 { grid-template-columns: repeat(2,1fr) !important; }
+        }
+        @media (max-width: 480px) {
+          .mp-grid-3 { grid-template-columns: 1fr !important; }
+          .mp-grid-4 { grid-template-columns: 1fr !important; }
+        }
       `}</style>
 
       {/* HEADER */}
@@ -144,14 +178,17 @@ export default function Page() {
           <p style={{ color:'rgba(255,255,255,0.8)', fontSize:'clamp(15px,2vw,18px)', fontFamily:t.serif, fontStyle:'italic', marginBottom:36 }}>
             Um verdadeiro mergulho em sensações únicas.
           </p>
-          <a href={WPP} target="_blank" rel="noopener noreferrer" className="mp-cta" style={{ color:'#fff', borderColor:'rgba(255,255,255,0.6)', fontSize:11, letterSpacing:'0.3em', textTransform:'uppercase' }}>
-            Quero Saber Mais
-          </a>
+          <div style={{ display:'flex', gap:16, flexWrap:'wrap' }}>
+            <a href={WPP} target="_blank" rel="noopener noreferrer" className="mp-cta" style={{ color:'#fff', borderColor:'rgba(255,255,255,0.6)', fontSize:11, letterSpacing:'0.3em', textTransform:'uppercase' }}>
+              Quero Saber Mais
+            </a>
+            <LeadCaptureButton slug="mar-positano-centro-balneario-rincao-sc" construtora_slug="fontana" propertyDisplayName="Mar Positano Residencial" className="mp-cta" label="Baixar Catálogo & Plantas" />
+          </div>
         </div>
       </section>
 
       {/* RESIDENCIAL */}
-      <section style={{ padding:'96px 32px', maxWidth:1100, margin:'0 auto', display:'grid', gridTemplateColumns:'1fr 1fr', gap:64, alignItems:'center' }}>
+      <section className="mp-grid-2" style={{ padding:'96px 32px', maxWidth:1100, margin:'0 auto', display:'grid', gridTemplateColumns:'1fr 1fr', gap:64, alignItems:'center' }}>
         <div>
           <p className="mp-eyebrow" style={{ color:t.navy, marginBottom:20 }}>O Empreendimento</p>
           <h2 className="mp-h2" style={{ color:t.ink, margin:'0 0 28px' }}>As Residências</h2>
@@ -159,7 +196,7 @@ export default function Page() {
             O Mar Positano entrega apartamentos de <strong>3 dormitórios</strong> com 1 suíte, em plantas de <strong>107 a 126 m²</strong>, no coração do Centro de Balneário Rincão. Cada unidade conta com sacada com churrasqueira, cozinha integrada ao living e acabamentos criteriosamente selecionados.
           </p>
           <ul style={{ listStyle:'none', padding:0, margin:'0 0 36px', display:'flex', flexDirection:'column', gap:10 }}>
-            {['3 dormitórios · 1 suíte master com closet','107 a 126 m² de área privativa','Sacada com churrasqueira','Cozinha integrada ao living','2 vagas de garagem','Área de serviço completa'].map((f,i) => (
+            {['3 dormitórios · 1 suíte master com closet','107 a 126 m² de área privativa','Sacada com churrasqueira','Cozinha integrada ao living','Área de serviço completa'].map((f,i) => (
               <li key={i} style={{ display:'flex', alignItems:'center', gap:10, fontSize:14, color:t.ink }}>
                 <span style={{ width:6, height:6, borderRadius:'50%', background:t.navy, flexShrink:0, display:'inline-block' }} />
                 {f}
@@ -180,7 +217,7 @@ export default function Page() {
         <div style={{ maxWidth:1100, margin:'0 auto' }}>
           <p className="mp-eyebrow" style={{ color:t.navy, marginBottom:20 }}>Galeria</p>
           <h2 className="mp-h2" style={{ color:t.ink, margin:'0 0 48px' }}>Perspectivas</h2>
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:16 }}>
+          <div className="mp-grid-3" style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:16 }}>
             <GalleryWithLightbox galeria={GALERIA} prefix="mp" gradient="rgba(13,27,42,0.55)" />
           </div>
         </div>
@@ -191,7 +228,7 @@ export default function Page() {
         <div style={{ maxWidth:1100, margin:'0 auto' }}>
           <p className="mp-eyebrow" style={{ color:t.onDarkMuted, marginBottom:20 }}>Plantas</p>
           <h2 className="mp-h2" style={{ color:t.onDark, margin:'0 0 16px' }}>Pavimentos & Tipologias</h2>
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:48, marginBottom:48 }}>
+          <div className="mp-grid-2" style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:48, marginBottom:48 }}>
             <div>
               <p style={{ color:t.onDarkMuted, lineHeight:1.8, marginBottom:32 }}>
                 Dois tipos de apartamento — <strong style={{ color:t.onDark }}>107 m²</strong> e <strong style={{ color:t.onDark }}>126 m²</strong> — com layouts que integram ambientes e maximizam a luminosidade natural.
@@ -209,19 +246,19 @@ export default function Page() {
               <LeadCaptureButton slug="mar-positano-centro-balneario-rincao-sc" construtora_slug="fontana" className="mp-cta"  propertyDisplayName="Mar Positano Residencial" />
             </div>
           </div>
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:16 }}>
-            {[
-              { src:'https://lh3.googleusercontent.com/d/1vtqxF5YhLrMBkG9zpRaZ41mDLPJ0j_FF', alt:'Planta subsolo Mar Positano', label:'Subsolo' },
-              { src:'https://lh3.googleusercontent.com/d/1tYeh2YknKyqA7wWL6aPWNrU02ruNCCwv', alt:'Planta térreo Mar Positano', label:'Térreo' },
-              { src:'https://lh3.googleusercontent.com/d/1NFfweqWv-w4oK6O7WDZcSqf13Ii03eYJ', alt:'Planta 1º pavimento Mar Positano', label:'1º Pavimento' },
-              { src:'https://lh3.googleusercontent.com/d/1pOqr8BjjOfY-bp5WA0OjZDNju3KMNZc-', alt:'Planta tipo 303 Mar Positano', label:'Tipo 303' },
-              { src:'https://lh3.googleusercontent.com/d/1gIU5_dqL4ntat5HuQJ0UV_BEUKD4riNx', alt:'Planta tipo 401 Mar Positano', label:'Tipo 401' },
-              { src:'https://lh3.googleusercontent.com/d/1hD8CHaNoV4cBx62vh5ePssVCueaSPTxl', alt:'Planta tipo 403 Mar Positano', label:'Tipo 403' },
-              { src:'https://lh3.googleusercontent.com/d/19V31YHxwjUTaWJj-GHhJAW65dvbHWZmG', alt:'Planta tipo 501 Mar Positano', label:'Tipo 501' },
-              { src:'https://lh3.googleusercontent.com/d/1s8g-ZVWgjn6s6HyvhR-NjWu3aGlG4u2m', alt:'Planta tipo 503 Mar Positano', label:'Tipo 503' },
-            ].map((p) => (
-              <LightboxPhoto key={p.label} src={p.src} alt={p.alt} label={p.label} cardClass="mp-lazer-card" imgSizes="(max-width:768px) 50vw, 25vw" />
-            ))}
+          <div style={{ display:'flex', flexDirection:'column', gap:40 }}>
+            {PLANTAS_GRUPOS.map(({ titulo, categoria }) => {
+              const itens = PLANTAS.filter(p => p.categoria === categoria)
+              if (!itens.length) return null
+              return (
+                <div key={categoria}>
+                  <p style={{ fontSize:11, letterSpacing:'0.24em', textTransform:'uppercase', color:t.onDarkMuted, marginBottom:16 }}>{titulo}</p>
+                  <div className="mp-grid-4" style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:16 }}>
+                    <GalleryWithLightbox galeria={itens} prefix="mpp" gradient="rgba(13,27,42,0.6)" badge="Planta oficial" trackPlantas={{ empreendimento: 'mar-positano-centro-balneario-rincao-sc', content_name: 'Mar Positano Residencial' }} />
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </div>
       </section>
@@ -230,7 +267,7 @@ export default function Page() {
       <section style={{ padding:'96px 32px', maxWidth:1100, margin:'0 auto' }}>
         <p className="mp-eyebrow" style={{ color:t.navy, marginBottom:20 }}>Por que escolher</p>
         <h2 className="mp-h2" style={{ color:t.ink, margin:'0 0 56px' }}>Diferenciais</h2>
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:'28px 64px' }}>
+        <div className="mp-grid-2" style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:'28px 64px' }}>
           {DIFERENCIAIS.map((d, i) => (
             <div key={i} style={{ display:'flex', gap:24, alignItems:'flex-start' }}>
               <span style={{ fontFamily:t.display, fontSize:32, fontWeight:300, color:t.navy, lineHeight:1, flexShrink:0 }}>{String(i+1).padStart(2,'0')}</span>
@@ -245,7 +282,7 @@ export default function Page() {
         <div style={{ maxWidth:1100, margin:'0 auto' }}>
           <p className="mp-eyebrow" style={{ color:t.navy, marginBottom:20 }}>Área de Lazer</p>
           <h2 className="mp-h2" style={{ color:t.ink, margin:'0 0 48px' }}>Infraestrutura Completa</h2>
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:48, alignItems:'start' }}>
+          <div className="mp-grid-2" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:48, alignItems:'start' }}>
             <div>
               {AMENIDADES.map((a,i) => (
                 <div key={i} className="mp-amen">
@@ -253,7 +290,7 @@ export default function Page() {
                 </div>
               ))}
             </div>
-            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+            <div className="mp-grid-2" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
               <LightboxPhoto src="https://lh3.googleusercontent.com/d/1MLv9SV4J6njj6M68rllCnt3Zdl8yC67P" alt="Piscina Mar Positano" label="Piscina" cardClass="mp-lazer-card" imgSizes="(max-width:768px) 50vw, 25vw" />
               <LightboxPhoto src="https://lh3.googleusercontent.com/d/1O3EqgdcFgvEEZ2PObrGVQDo5AVwR93V6" alt="Quiosque Mar Positano" label="Quiosque" cardClass="mp-lazer-card" imgSizes="(max-width:768px) 50vw, 25vw" />
               <LightboxPhoto src="https://lh3.googleusercontent.com/d/1RNQUwH-xTbtkNeyIUKCqoNaB51tZ8e-6" alt="Salão de festas Mar Positano" label="Salão de Festas" cardClass="mp-lazer-card" imgSizes="(max-width:768px) 50vw, 25vw" />
@@ -277,10 +314,14 @@ export default function Page() {
       <section style={{ background:t.dark, padding:'96px 32px' }}>
         <div style={{ maxWidth:900, margin:'0 auto', textAlign:'center' }}>
           <p className="mp-eyebrow" style={{ color:t.onDarkMuted, marginBottom:20 }}>Financiamento</p>
-          <h2 className="mp-h2" style={{ color:t.onDark, margin:'0 0 24px' }}>Financiamento Direto com a Fontana</h2>
-          <p style={{ color:t.onDarkMuted, fontSize:16, lineHeight:1.8, marginBottom:48, maxWidth:640, margin:'0 auto 48px' }}>
-            A Construtora Fontana oferece financiamento direto, sem burocracia de banco. Parcelas que cabem no seu bolso, atendimento personalizado e condições especiais para quem compra na planta.
+          <h2 className="mp-h2" style={{ color:t.onDark, margin:'0 0 24px' }}>Condições de pagamento</h2>
+          <p style={{ color:t.onDarkMuted, fontSize:16, lineHeight:1.8, marginBottom:24, maxWidth:640, margin:'0 auto 24px' }}>
+            {CONDICOES.texto}
           </p>
+          <p style={{ color:t.onDarkMuted, fontSize:14, lineHeight:1.8, marginBottom:32, maxWidth:640, margin:'0 auto 32px' }}>
+            {CONDICOES.posEntrega}
+          </p>
+          <p style={{ color:'rgba(245,242,237,0.45)', fontSize:12, letterSpacing:'0.04em', marginBottom:40 }}>{CONDICOES.vigencia}</p>
           <a href={WPP} target="_blank" rel="noopener noreferrer" className="mp-cta" style={{ color:t.onDark, borderColor:'rgba(245,242,237,0.4)', fontSize:11, textTransform:'uppercase' }}>
             Consultar Condições
           </a>
@@ -305,6 +346,7 @@ export default function Page() {
         <p style={{ color:t.onDarkMuted, fontSize:12, letterSpacing:'0.2em', textTransform:'uppercase', margin:'0 0 8px' }}>Stiven Allan</p>
         <p style={{ color:t.onDarkMuted, fontSize:11, margin:'0 0 4px' }}>CRECI 60.275</p>
         <p style={{ color:t.onDarkMuted, fontSize:11, margin:0 }}>Balneário Rincão · SC</p>
+        <p style={{ color:t.onDarkMuted, fontSize:11, margin:'16px auto 0', maxWidth:560, opacity:.75 }}>Mar Positano Residencial é um empreendimento da Construtora Fontana, incorporado por BEZ &amp; BEZ Construções e Incorporações Ltda. Incorporação imobiliária averbada na Matrícula R-3-53.002, Cartório de Registro de Imóveis da Comarca de Içara/SC.</p>
         <div style={{ marginTop:24 }}>
           <Link href="/" style={{ color:t.onDarkMuted, fontSize:11, letterSpacing:'0.2em', textTransform:'uppercase', textDecoration:'none' }}>← Todos os Empreendimentos</Link>
         </div>
@@ -319,7 +361,7 @@ export default function Page() {
       </a>
 
 {/* SEO FAQ */}
-<PropertyFAQ items={[{"pergunta":"Como funciona o financiamento direto do Mar Positano Residencial?","resposta":"Entrada de 20%, saldo em até 72 parcelas mensais e 6 reforços anuais (cada reforço equivale a 5 parcelas mensais), com correção pelo CUB/SC durante a obra. Sem análise de banco."},{"pergunta":"Qual a previsão de entrega do Mar Positano Residencial?","resposta":"A previsão de entrega é agosto de 2029, em Centro, Balneário Rincão/SC."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Sim. Além do financiamento direto com a construtora, é possível optar por financiamento bancário. Fale com o Stiven pelo WhatsApp para simular as duas opções."},{"pergunta":"Onde fica o Mar Positano Residencial?","resposta":"O Mar Positano Residencial está localizado na Rua Waldemar Carlos Petrini, esq. Rua Espírito Santo, no Centro de Balneário Rincão/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"O empreendimento oferece apartamentos com 3 dormitórios (1 suíte), de 107 a 126 m² privativos, com sacada."}]} accent="#1B3A5B" />
+<PropertyFAQ items={[{"pergunta":"Como funciona o financiamento direto do Mar Positano Residencial?","resposta":"Entrada de 20% (parcela única), 6 reforços anuais (cada um equivalente a 5x o valor da parcela mensal) e saldo em 72 parcelas mensais, corrigidas pelo CUB/SC durante a obra. Condições conforme tabela de julho/2026, sujeitas à atualização — fale com Stiven para simular sua unidade."},{"pergunta":"Qual a previsão de entrega do Mar Positano Residencial?","resposta":"A previsão de entrega é agosto de 2029, em Centro, Balneário Rincão/SC."},{"pergunta":"Como é a correção monetária após a entrega das chaves?","resposta":"O saldo remanescente é corrigido mensalmente, à escolha do comprador, por uma de duas opções: IGPM acrescido de juros compensatórios de 0,75% ao mês, ou apenas pelo CUB/SC."},{"pergunta":"Onde fica o Mar Positano Residencial?","resposta":"O Mar Positano Residencial está localizado na Rua Waldemar Carlos Petrini, esq. Rua Espírito Santo, no Centro de Balneário Rincão/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"Apartamentos de 3 dormitórios (1 suíte), de 107,38 a 126 m² privativos, em 5 tipos de planta — confira as plantas oficiais na página."}]} accent="#1B3A5B" />
 <RelatedProperties atualSlug="mar-positano-centro-balneario-rincao-sc" cidade="Balneário Rincão" />
 
 
