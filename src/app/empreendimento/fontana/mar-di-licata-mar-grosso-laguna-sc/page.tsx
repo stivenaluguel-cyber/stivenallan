@@ -41,6 +41,9 @@ const DIFERENCIAIS = [
 'Manta acústica entre pavimentos',
 'Hall de Entrada com pé-direito duplo e Porte-Cochère',
 'Possibilidade de personalização de planta',
+'Rebaixo em gesso e espera para ar-condicionado split',
+'Espera para coifa na cozinha e tubulação para água quente',
+'Lavabo e churrasqueira a carvão na sacada',
 ]
 const AMENIDADES = [
 'Rooftop','Piscina com Deck Molhado','Terraço',
@@ -48,6 +51,26 @@ const AMENIDADES = [
 'Hall com pé-direito duplo','Porte-Cochère',
 'Câmeras 24h','2 Elevadores','Acesso para Banhistas',
 ]
+
+// Plantas oficiais — site estilofontana.com.br (aba "Plantas" do Mar di Licata).
+const PLANTAS = [
+{ categoria: 'tipo', src: 'https://estilofontana.com.br/images/empreendimento_planta/planta-tipo-final-01-1700662003.jpg', alt: 'Mar di Licata Residencial — planta tipo final 01', label: 'Apartamento Tipo — Final 01', area: 120.43, quartos: 3, suites: 1 },
+{ categoria: 'tipo', src: 'https://estilofontana.com.br/images/empreendimento_planta/planta-tipo-final-02-1700856849.jpg', alt: 'Mar di Licata Residencial — planta tipo final 02', label: 'Apartamento Tipo — Final 02', area: 122.15, quartos: 3, suites: 1 },
+{ categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/Area-de-lazer-completa-no-rooftop-1700859539.jpg', alt: 'Mar di Licata Residencial — área de lazer no rooftop', label: 'Rooftop · Área de Lazer' },
+{ categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/terreo-1700859613.jpg', alt: 'Mar di Licata Residencial — planta do térreo', label: 'Térreo' },
+{ categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/subsolo-1700859644.jpg', alt: 'Mar di Licata Residencial — planta do subsolo', label: 'Subsolo · Garagem' },
+{ categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/garagem-pavimento-1-1700859726.jpg', alt: 'Mar di Licata Residencial — 1º pavimento de garagem', label: '1º Pavimento · Garagem' },
+{ categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/garagem-pavimento-2-1700859773.jpg', alt: 'Mar di Licata Residencial — 2º pavimento de garagem', label: '2º Pavimento · Garagem' },
+]
+const PLANTAS_GRUPOS = [
+{ titulo: 'Apartamentos tipo', categoria: 'tipo' },
+{ titulo: 'Rooftop, térreo e garagem', categoria: 'comum' },
+]
+const CONDICOES = {
+texto: 'Entrada de 20% do valor do imóvel, paga em parcela única, mais 6 reforços anuais, e o saldo dividido em 72 parcelas mensais. Durante a obra, os valores são corrigidos mensalmente pelo CUB/Sinduscon-SC.',
+desconto: 'Para pagamento à vista, desconto de 15% sobre o valor total.',
+vigencia: 'Condições conforme tabela de julho/2026, sujeitas à atualização.',
+}
 
 export const metadata: Metadata = {
 title: 'Mar di Licata Residencial | Mar Grosso Laguna SC',
@@ -68,16 +91,18 @@ images: ['/images/empreendimentos/mar-di-licata-mar-grosso-laguna-sc/mar-di-lica
 },
 robots: { index: true, follow: true },
 }
-const SCHEMA = {
-'@context': 'https://schema.org',
-'@graph': [
-{ '@type': 'Apartment', name: 'Mar di Licata Residencial', description: 'Apartamentos 3 dorm com suíte, 120 a 122 m² privativos, rooftop com vista para o mar no Mar Grosso em Laguna/SC.', image: '/images/empreendimentos/mar-di-licata-mar-grosso-laguna-sc/mar-di-licata-residencial-655b9b64e5d33.jpg', numberOfRooms: 3, numberOfBathroomsTotal: 1, floorSize: { '@type': 'QuantitativeValue', value: 122, unitCode: 'MTK' }, address: { '@type': 'PostalAddress', streetAddress: 'Rua Juiz Erwin Rubi Peressoni Teixeira, 627', addressLocality: 'Laguna', addressRegion: 'SC', addressCountry: 'BR' } },
-],
-}
+const FAQ_ITEMS = [
+{ pergunta: 'Como funciona o financiamento direto do Mar di Licata Residencial?', resposta: 'Entrada de 20% (parcela única), 6 reforços anuais e saldo em 72 parcelas mensais, corrigidas pelo CUB/Sinduscon-SC durante a obra. Para pagamento à vista, desconto de 15%. Condições conforme tabela de julho/2026, sujeitas à atualização — fale com Stiven para simular sua unidade.' },
+{ pergunta: 'Qual a previsão de entrega do Mar di Licata Residencial?', resposta: 'A previsão de entrega é outubro de 2027, em Mar Grosso, Laguna/SC.' },
+{ pergunta: 'Como é a correção monetária após a entrega das chaves?', resposta: 'O saldo remanescente é corrigido mensalmente, à escolha do comprador, por uma de duas opções: IGPM acrescido de juros compensatórios de 0,75% ao mês, ou apenas pelo CUB/Sinduscon-SC.' },
+{ pergunta: 'Onde fica o Mar di Licata Residencial?', resposta: 'O Mar di Licata Residencial está localizado na Rua Juiz Erwin Rubi Peressoni Teixeira, 627, no Mar Grosso, Laguna/SC.' },
+{ pergunta: 'Quais as plantas e metragens disponíveis?', resposta: 'Apartamentos de 3 dormitórios (1 suíte), de 120,43 a 122,15 m² privativos, com rooftop exclusivo — confira as plantas oficiais na página.' },
+]
 
 export default function MarDiLicataPage() {
 return (
 <main style={{ background: t.bg, color: t.ink, fontFamily: t.body, overflowX: 'hidden' }}>
+<PropertySchema nome="Mar di Licata Residencial" slug="mar-di-licata-mar-grosso-laguna-sc" construtora_slug="fontana" cidade="Laguna" uf="SC" bairro="Mar Grosso" descricao="Mar di Licata Residencial — apartamentos 3 dormitórios com suíte, 120 a 122 m² privativos, rooftop com vista para o mar no Mar Grosso, Laguna/SC. Financiamento direto Fontana." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/mar-di-licata-mar-grosso-laguna-sc.jpg" faq={FAQ_ITEMS} />
 
 <style>{`html { scroll-behavior: smooth; }
 .ml-eyebrow { font-size: 11px; letter-spacing: 0.42em; text-transform: uppercase; color: ${t.ocean}; font-family: ${t.body}; font-weight: 500; }
@@ -163,11 +188,25 @@ details.ml-menu > summary::-webkit-details-marker { display: none; }`}</style>
 <h2 className="ml-h2" style={{ color: t.onDark }}>Espaço para viver com grandiosidade</h2>
 <p className="ml-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 56 }}>Rooftop exclusivo, no Mar Grosso de Laguna.</p>
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 'clamp(28px,5vw,64px)', marginBottom: 56 }}>
-{[{n:'3',l:'Dormêtórios'},{n:'1',l:'Suíte'},{n:'120 a 122',l:'m² privativos'},{n:'Rooftop',l:'exclusivo'}].map((it,i)=>(
+{[{n:'3',l:'Dormitórios'},{n:'1',l:'Suíte'},{n:'120 a 122',l:'m² privativos'},{n:'Rooftop',l:'exclusivo'}].map((it,i)=>(
 <div key={i}><div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 'clamp(34px,5vw,58px)', letterSpacing: '0.04em', lineHeight: 1 }}>{it.n}</div><div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDarkMuted, marginTop: 12 }}>{it.l}</div></div>
 ))}
 </div>
 <LeadCaptureButton slug="mar-di-licata-mar-grosso-laguna-sc" construtora_slug="fontana" className="ml-cta ml-cta-light"  propertyDisplayName="Mar di Licata Residencial" />
+</div>
+<div style={{ maxWidth: 1160, margin: 'clamp(64px,10vh,96px) auto 0', textAlign: 'left' }}>
+{PLANTAS_GRUPOS.map(({ titulo, categoria }) => {
+const itens = PLANTAS.filter(p => p.categoria === categoria)
+if (!itens.length) return null
+return (
+<div key={categoria} style={{ marginBottom: 40 }}>
+<p className="ml-eyebrow" style={{ color: t.onDarkMuted, marginBottom: 16, textAlign: 'center' }}>{titulo}</p>
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+<GalleryWithLightbox galeria={itens} prefix="ml" gradient="rgba(7,13,18,0.6)" badge="Planta oficial" trackPlantas={{ empreendimento: 'mar-di-licata-mar-grosso-laguna-sc', content_name: 'Mar di Licata Residencial' }} />
+</div>
+</div>
+)
+})}
 </div>
 </section>
 <section id="diferenciais" style={{ padding: 'clamp(80px,14vh,160px) clamp(18px,5vw,56px)' }}>
@@ -219,14 +258,16 @@ details.ml-menu > summary::-webkit-details-marker { display: none; }`}</style>
 <section style={{ background: t.ocean, color: t.onDark, padding: 'clamp(80px,14vh,160px) clamp(18px,5vw,56px)' }}>
 <div style={{ maxWidth: 1080, margin: '0 auto', textAlign: 'center' }}>
 <p className="ml-eyebrow" style={{ color: t.onDark, marginBottom: 18 }}>Financiamento Direto</p>
-<h2 className="ml-h2" style={{ color: t.onDark }}>A liberdade de comprar sem banco</h2>
-<p className="ml-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 60 }}>Sem burocracia, sem intermediários. Direto com a construtora.</p>
+<h2 className="ml-h2" style={{ color: t.onDark }}>Condições de pagamento</h2>
+<p className="ml-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 40 }}>Sem burocracia, sem intermediários. Direto com a Construtora Fontana.</p>
+<p style={{ color: t.onDarkMuted, fontSize: 17, lineHeight: 1.7, maxWidth: 720, margin: '0 auto 20px' }}>{CONDICOES.texto}</p>
+<p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.7, maxWidth: 720, margin: '0 auto 40px' }}>{CONDICOES.desconto}</p>
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px,1fr))', gap: 'clamp(28px,4vw,52px)' }}>
 {[{n:'01',t:'Converse com o corretor',d:'Atendimento exclusivo e personalizado para entender o seu momento e as melhores condições.'},{n:'02',t:'Escolha a sua planta',d:'Selecione a unidade ideal e defina uma proposta sob medida, sem amarras bancárias.'},{n:'03',t:'Negocie direto',d:'Condições flexíveis diretamente com a Construtora Fontana, com a liberdade que você merece.'}].map((s,i)=>(
 <div key={i} style={{ textAlign: 'left' }}><div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 40, opacity: 0.55, marginBottom: 14 }}>{s.n}</div><h3 style={{ fontFamily: t.display, fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: 17, margin: '0 0 12px' }}>{s.t}</h3><p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.6, margin: 0 }}>{s.d}</p></div>
 ))}
 </div>
-<p style={{ marginTop: 56, fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: t.onDark }}>Mar Grosso &middot; Laguna/SC &middot; Sob consulta</p>
+<p style={{ marginTop: 56, fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: t.onDark }}>{CONDICOES.vigencia}</p>
 </div>
 </section>
 <section style={{ position: 'relative', minHeight: '78vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
@@ -244,14 +285,17 @@ details.ml-menu > summary::-webkit-details-marker { display: none; }`}</style>
 <div><div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDark, marginBottom: 14 }}>Contato</div><a href={WPP} target="_blank" rel="noopener noreferrer" style={{ color: t.onDarkMuted, textDecoration: 'none', fontSize: 14 }}>WhatsApp &middot; (48) 99164-2332</a></div>
 <div><div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDark, marginBottom: 14 }}>Empreendimento</div><p style={{ fontSize: 14, lineHeight: 1.6, margin: 0 }}>Mar di Licata Residencial<br />Construtora Fontana<br />Mar Grosso, Laguna/SC</p></div>
 </div>
-<div style={{ maxWidth: 1180, margin: '40px auto 0', paddingTop: 24, borderTop: '1px solid rgba(226,238,246,0.12)', fontSize: 12 }}>&copy; {new Date().getFullYear()} Stiven Allan. Imagens meramente ilustrativas. Sob consulta.</div>
+<div style={{ maxWidth: 1180, margin: '40px auto 0', paddingTop: 24, borderTop: '1px solid rgba(226,238,246,0.12)', fontSize: 12 }}>
+<p style={{ margin: '0 0 8px', opacity: .8 }}>Mar di Licata Residencial é um empreendimento da Construtora Fontana, incorporado por Domus Aurea Incorporações Ltda. Incorporação imobiliária averbada na Matrícula R-6/42.905, Ofício de Registro de Imóveis da Comarca de Laguna/SC.</p>
+<p style={{ margin: 0 }}>&copy; {new Date().getFullYear()} Stiven Allan. Imagens meramente ilustrativas. Sob consulta.</p>
+</div>
 </footer>
 <a href={WPP} target="_blank" rel="noopener noreferrer" className="ml-wa" aria-label="Falar no WhatsApp com Stiven Allan">
 <svg width="30" height="30" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.515 5.26l-.999 3.648 3.973-1.042zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
 </a>
 
 {/* SEO FAQ */}
-<PropertyFAQ items={[{"pergunta":"Como funciona o financiamento direto do Mar di Licata Residencial?","resposta":"Entrada de 20%, saldo em até 72 parcelas mensais e 6 reforços anuais (cada reforço equivale a 5 parcelas mensais), com correção pelo CUB/SC durante a obra. Sem análise de banco."},{"pergunta":"Qual a previsão de entrega do Mar di Licata Residencial?","resposta":"A previsão de entrega é outubro de 2027, em Mar Grosso, Laguna/SC."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Sim. Além do financiamento direto com a construtora, é possível optar por financiamento bancário. Fale com o Stiven pelo WhatsApp para simular as duas opções."},{"pergunta":"Onde fica o Mar di Licata Residencial?","resposta":"O Mar di Licata Residencial está localizado na Rua Juiz Erwin Rubi Peressoni Teixeira, 627, no Mar Grosso, Laguna/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"O empreendimento oferece apartamentos com rooftop e 120 a 122 m² privativos, com vista para o mar."}]} accent="#1A4E72" />
+<PropertyFAQ items={FAQ_ITEMS} accent="#1A4E72" />
 <RelatedProperties atualSlug="mar-di-licata-mar-grosso-laguna-sc" cidade="Laguna" />
 
 
