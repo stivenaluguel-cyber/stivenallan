@@ -70,6 +70,35 @@ const GALERIA = [
 
 const LAZER_IMGS = RENDERS.slice(6)
 
+// Plantas oficiais — site estilofontana.com.br (aba "Plantas" do Tremezzo). Tipologia única: 3 dormitórios, 1 suíte.
+const PLANTAS = [
+  { categoria: 'tipo', src: 'https://estilofontana.com.br/images/empreendimento_planta/apartamento-tipo-final-01-finais-02-03-e-04-possuem-a-mesma-planta-apenas-rebatida-com-uma-diferenca-de-0-16m-a-mais-1674473702.jpg', alt: 'Tremezzo Residencial — planta apartamento tipo final 01 (finais 02, 03 e 04 com a mesma planta, rebatida)', label: 'Apartamento Tipo — Final 01 (finais 02, 03 e 04, rebatida)', quartos: 3, suites: 1 },
+  { categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/pavimento-lazer-1678470337.jpg', alt: 'Tremezzo Residencial — pavimento de lazer', label: 'Pavimento Lazer' },
+  { categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/terreo-1678470954.jpg', alt: 'Tremezzo Residencial — planta do térreo', label: 'Térreo' },
+  { categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/pavimento-garagem-1678470977.jpg', alt: 'Tremezzo Residencial — pavimento de garagem', label: 'Pavimento Garagem' },
+  { categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/subsolo-01-1678470845.jpg', alt: 'Tremezzo Residencial — subsolo 1', label: 'Subsolo 1 · Garagem' },
+  { categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/subsolo-02-1678470896.jpg', alt: 'Tremezzo Residencial — subsolo 2', label: 'Subsolo 2 · Garagem' },
+]
+const PLANTAS_GRUPOS = [
+  { titulo: 'Planta tipo (3 dormitórios, 1 suíte)', categoria: 'tipo' },
+  { titulo: 'Lazer, térreo e garagem', categoria: 'comum' },
+]
+
+// Condições comerciais — fonte única (tabela vigente Julho/2026). Plano padrão + Política Comercial (2 modalidades alternativas, distintas).
+const COMERCIAL = {
+  padrao: 'Plano padrão de pagamento: entrada de 20% do valor da unidade (à vista, em parcela única), mais 6 reforços anuais, mais 72 parcelas mensais — juntas, essas três parcelas somam 100% do valor da unidade, direto com a construtora.',
+  correcaoPadrao: 'Durante a obra, os valores são corrigidos mensalmente pelo CUB/Sinduscon-SC; após a conclusão, o comprador escolhe entre correção pelo IGPM + 0,75% ao mês ou apenas pelo CUB/Sinduscon-SC.',
+  alternativas: 'Modalidades alternativas (Política Comercial): 15% de desconto para pagamento à vista (sem permuta); ou 10% de desconto pagando 40% do valor até a entrega das chaves (ato mínimo de 10%), com o saldo remanescente quitável via financiamento bancário ou diretamente com a construtora, em até 180 meses após a conclusão, corrigido pelo IGPM + 0,75% ao mês (sem permuta nesta opção).',
+  vigencia: 'Condições conforme a tabela vigente (Julho/2026), sujeitas à atualização. Consulte a tabela vigente para valores e disponibilidade por unidade.',
+}
+const FAQ_ITEMS = [
+  { pergunta: 'Como funciona o financiamento direto do Tremezzo Residencial?', resposta: `${COMERCIAL.padrao} ${COMERCIAL.correcaoPadrao} ${COMERCIAL.vigencia}` },
+  { pergunta: 'Existe outra forma de pagamento além do plano padrão?', resposta: `Sim. ${COMERCIAL.alternativas} ${COMERCIAL.vigencia}` },
+  { pergunta: 'Qual a previsão de entrega do Tremezzo Residencial?', resposta: 'Previsão de entrega março de 2027, no Centro de Criciúma/SC.' },
+  { pergunta: 'O Tremezzo tem apartamento decorado para visitar?', resposta: 'Sim. O apartamento decorado está disponível para visitação. Agende com Stiven pelo WhatsApp (48) 99164-2332.' },
+  { pergunta: 'Quantos andares e qual a metragem do Tremezzo?', resposta: '18 andares, apartamentos de 3 dormitórios (1 suíte) com 125 m² privativos, no Centro de Criciúma/SC.' },
+]
+
 export default function TremezzoPage() {
 const CSS = `
   @import url('https://fonts.googleapis.com/css2?family=Jost:wght@200;300;400&family=Cormorant+Garamond:ital,wght@0,300;1,300;1,400&family=Hanken+Grotesk:wght@300;400;500&display=swap');
@@ -116,15 +145,9 @@ const CSS = `
       cidade="Criciúma"
       uf="SC"
       bairro="Centro"
-      descricao="Apartamentos 3 dormitórios, 125 m2, 18 andares no Centro de Criciúma/SC. Decorado disponivel. Financiamento direto Fontana."
+      descricao="Apartamentos 3 dormitórios (1 suíte), 125 m², 18 andares no Centro de Criciúma/SC. Decorado disponível. Financiamento direto Fontana."
       imagem="https://lh3.googleusercontent.com/d/1zwMSHa-Ja6MGdlC2lq9fxQU7plgxHBLo"
-      faq={[
-        {pergunta:"Como funciona o financiamento direto do Tremezzo Residencial?",resposta:"Entrada de 20%, saldo em até 72 parcelas mensais e 6 reforos anuais (cada reforo = 5 mensais), correcao pelo CUB/SC durante a obra. Entrega prevista marco 2027. Sem banco."},
-        {pergunta:"Qual a previsao de entrega do Tremezzo Residencial?",resposta:"Previsao de entrega marco de 2027, no Centro de Criciúma/SC."},
-        {pergunta:"O Tremezzo tem apartamento decorado para visitar?",resposta:"Sim. O apartamento decorado esta disponivel para visitacao. Agende com Stiven pelo WhatsApp (48) 99164-2332."},
-        {pergunta:"Quantos andares e qual a metragem do Tremezzo?",resposta:"18 andares, apartamentos de 3 dormitórios com 125 m2 privativos, no Centro de Criciúma/SC."},
-        {pergunta:"Posso usar FGTS ou financiamento bancario no Tremezzo?",resposta:"Sim. Alem do financiamento direto Fontana, e possivel financiamento bancario ou FGTS. Consulte Stiven pelo WhatsApp."},
-      ]}
+      faq={FAQ_ITEMS}
     />
       <style>{`${CSS}`}</style>
 
@@ -181,7 +204,7 @@ const CSS = `
               Com 3 dormitórios (1 suíte master), 125 m² privativos e 200 m² de área total, cada unidade foi concebida para oferecer privacidade, conforto e funcionalidade. São apenas 4 apartamentos por andar.
             </p>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-              {[{ ico: '🏗', label: 'Em obras · 03/2027' }, { ico: '📐', label: '125 m² privativos' }, { ico: '🏢', label: '18 andares' }, { ico: '🚗', label: '2 vagas' }].map(({ ico, label }) => (
+              {[{ ico: '🏗', label: 'Em obras · 03/2027' }, { ico: '📐', label: '125 m² privativos' }, { ico: '🏢', label: '18 andares' }].map(({ ico, label }) => (
                 <span key={label} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(107,45,62,0.07)', color: '#6B2D3E', borderRadius: 2, padding: '7px 14px', fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 12, letterSpacing: '0.1em' }}>{ico} {label}</span>
               ))}
             </div>
@@ -240,12 +263,26 @@ const CSS = `
             ))}
           </div>
           <div style={{ marginTop: 64, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px,1fr))', gap: 24, borderTop: '1px solid rgba(245,238,240,0.10)', paddingTop: 48 }}>
-            {[{ n: '3', label: 'Dormitórios (1 suíte)' }, { n: '200', label: 'm² área total' }, { n: '4', label: 'Aptos por andar' }, { n: '2', label: 'Elevadores' }, { n: '2', label: 'Vagas' }, { n: '~72', label: 'Unidades' }].map(({ n, label }) => (
+            {[{ n: '3', label: 'Dormitórios (1 suíte)' }, { n: '200', label: 'm² área total' }, { n: '4', label: 'Aptos por andar' }, { n: '2', label: 'Elevadores' }, { n: '14', label: 'Unidades' }].map(({ n, label }) => (
               <div key={label} style={{ textAlign: 'center', padding: '24px 16px' }}>
                 <p style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 200, fontSize: 'clamp(28px,4vw,48px)', color: '#D4869A', letterSpacing: '0.04em', lineHeight: 1 }}>{n}</p>
                 <p style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 12, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(245,238,240,0.65)', marginTop: 8 }}>{label}</p>
               </div>
             ))}
+          </div>
+          <div style={{ marginTop: 64, borderTop: '1px solid rgba(245,238,240,0.10)', paddingTop: 48 }}>
+            {PLANTAS_GRUPOS.map(({ titulo, categoria }) => {
+              const itens = PLANTAS.filter(p => p.categoria === categoria)
+              if (!itens.length) return null
+              return (
+                <div key={categoria} style={{ marginBottom: 40 }}>
+                  <p style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 10, letterSpacing: '0.3em', textTransform: 'uppercase', color: 'rgba(107,45,62,0.80)', textAlign: 'center', marginBottom: 16 }}>{titulo}</p>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+                    <GalleryWithLightbox galeria={itens} prefix="tz" gradient="linear-gradient(to top, rgba(26,12,16,0.6), transparent 50%)" badge="Planta oficial" trackPlantas={{ empreendimento: 'tremezzo-residencial-centro-criciuma-sc', content_name: 'Tremezzo Residencial' }} />
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </div>
       </section>
@@ -265,7 +302,7 @@ const CSS = `
               { ico: '🔇', title: 'Manta acústica', desc: 'Conforto sonoro para o seu descanso.' },
               { ico: '🧺', title: 'Lavanderia independente', desc: 'Com acesso externo — praticidade no dia a dia.' },
               { ico: '🍖', title: 'Sacada gourmet + churrasqueira', desc: 'Integrada ao living, com churrasqueira a carvão.' },
-              { ico: '🅿', title: '2 vagas de garagem', desc: 'Espaço garantido para toda a família.' },
+              { ico: '🔌', title: 'Espera para carregador elétrico', desc: 'Disponível na garagem, pronto para o seu veículo elétrico.' },
             ].map(({ ico, title, desc }) => (
               <div key={title} className="tz-diff-item">
                 <div className="tz-diff-icon">{ico}</div>
@@ -336,8 +373,13 @@ const CSS = `
             <p style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 10, letterSpacing: '0.45em', textTransform: 'uppercase', color: '#6B2D3E', display: 'block', marginBottom: 16 }}>Como funciona</p>
             <h2 className="tz-h2" style={{ fontSize: 'clamp(24px,3.5vw,42px)', color: '#1A1814', marginBottom: 16 }}>Financiamento direto</h2>
             <p className="tz-serif" style={{ fontSize: 'clamp(15px,1.8vw,19px)', color: '#6B655B', maxWidth: 480, margin: '0 auto', lineHeight: 1.7 }}>
-              Negociado diretamente com a Construtora Fontana, sem intermediação bancária.
+              Negociado diretamente com a Construtora Fontana.
             </p>
+          </div>
+          <div style={{ maxWidth: 720, margin: '0 auto clamp(40px,6vw,64px)' }}>
+            <p style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 15, lineHeight: 1.8, color: '#6B655B', marginBottom: 16 }}>{COMERCIAL.padrao}</p>
+            <p style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 14, lineHeight: 1.8, color: '#8A8177', marginBottom: 16 }}>{COMERCIAL.correcaoPadrao}</p>
+            <p style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 14, lineHeight: 1.8, color: '#8A8177' }}>{COMERCIAL.alternativas}</p>
           </div>
           <div className="tz-step-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 'clamp(32px,4vw,56px)' }}>
             {[
@@ -354,6 +396,7 @@ const CSS = `
               </div>
             ))}
           </div>
+          <p style={{ marginTop: 48, fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 11, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#8A8177', textAlign: 'center' }}>{COMERCIAL.vigencia}</p>
         </div>
       </section>
 
@@ -370,7 +413,7 @@ const CSS = `
           </p>
           <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
             <a href={WPP} target="_blank" rel="noopener noreferrer" className="tz-btn tz-btn--solid">Falar com Stiven</a>
-            <a href={WPP} target="_blank" rel="noopener noreferrer" className="tz-btn" style={{ borderColor: 'rgba(245,238,240,0.30)', color: '#F5EEF0' }}>Sob consulta · Financiamento direto</a>
+            <a href={WPP} target="_blank" rel="noopener noreferrer" className="tz-btn" style={{ borderColor: 'rgba(245,238,240,0.30)', color: '#F5EEF0' }}>Financiamento direto com a construtora</a>
           </div>
         </div>
       </section>
@@ -400,13 +443,7 @@ const CSS = `
         <svg width="26" height="26" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
       </a>
 
-      <PropertyFAQ items={[
-        {pergunta:"Como funciona o financiamento direto do Tremezzo Residencial?",resposta:"Entrada de 20%, saldo em até 72 parcelas mensais e 6 reforços anuais (cada reforço = 5 mensais), correção pelo CUB/SC durante a obra. Entrega prevista março 2027. Sem banco."},
-        {pergunta:"Qual a previsão de entrega do Tremezzo Residencial?",resposta:"Previsão de entrega março de 2027, no Centro de Criciúma/SC."},
-        {pergunta:"O Tremezzo tem apartamento decorado para visitar?",resposta:"Sim. O apartamento decorado está disponível para visitação. Agende com Stiven pelo WhatsApp (48) 99164-2332."},
-        {pergunta:"Quantos andares e qual a metragem do Tremezzo?",resposta:"18 andares, apartamentos de 3 dormitórios com 125 m² privativos, no Centro de Criciúma/SC."},
-        {pergunta:"Posso usar FGTS ou financiamento bancário no Tremezzo?",resposta:"Sim. Além do financiamento direto Fontana, é possível financiamento bancário ou FGTS. Consulte Stiven pelo WhatsApp."},
-      ]} accent="#7A3B2E" />
+      <PropertyFAQ items={FAQ_ITEMS} accent="#6B2D3E" />
 
       <RelatedProperties atualSlug="tremezzo-residencial-centro-criciuma-sc" cidade="Criciúma" />
     </>
