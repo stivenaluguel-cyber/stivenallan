@@ -74,17 +74,38 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 }
 
-const SCHEMA = {
-  '@context': 'https://schema.org',
-  '@graph': [
-    { '@type': 'Apartment', name: 'Bosco Del Montello Residencial', description: 'Apartamentos de 2 dormitórios (1 suíte) com até 66 m² privativos no Centro de Criciúma/SC.', image: IMG.hero, numberOfRooms: 2, numberOfBathroomsTotal: 2, floorSize: { '@type': 'QuantitativeValue', value: 66, unitCode: 'MTK' }, address: { '@type': 'PostalAddress', streetAddress: 'Rua Urussanga', addressLocality: 'Criciúma', addressRegion: 'SC', addressCountry: 'BR' } },
-  ],
+// Plantas oficiais — site estilofontana.com.br (aba "Plantas" do Bosco Del Montello). Empreendimento com 2 torres.
+const PLANTAS = [
+  { categoria: 'tipo', src: 'https://estilofontana.com.br/images/empreendimento_planta/apto-tipo-final-1-torre-1-e-2-planta-rebatida-torre-1-final-4-5-e-8-torre-2-final-3-4-e-6-1609333936.jpg', alt: 'Bosco Del Montello Residencial — planta apartamento tipo final 1 (torres 1 e 2)', label: 'Apartamento Tipo — Final 1 (torres 1 e 2, rebatida)', quartos: 2, suites: 1 },
+  { categoria: 'tipo', src: 'https://estilofontana.com.br/images/empreendimento_planta/torre-1-final-2-torre-1-finais-3-6-e-7-e-torre-2-finais-2-e-5-tem-a-mesma-rebatida-1602251016.jpg', alt: 'Bosco Del Montello Residencial — planta apartamento tipo final 2 (torre 1)', label: 'Apartamento Tipo — Final 2 (torre 1, rebatida)', quartos: 2, suites: 1 },
+  { categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/terreo-1-1602251184.jpg', alt: 'Bosco Del Montello Residencial — térreo, torre 1', label: 'Térreo — Torre 1' },
+  { categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/terreo-2-1602251202.jpg', alt: 'Bosco Del Montello Residencial — térreo, torre 2', label: 'Térreo — Torre 2' },
+  { categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/subsolo-1-torre-1-1602251231.jpg', alt: 'Bosco Del Montello Residencial — subsolo 1, torre 1', label: 'Subsolo 1 — Torre 1' },
+  { categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/subsolo-2-torre-1-1602251246.jpg', alt: 'Bosco Del Montello Residencial — subsolo 2, torre 1', label: 'Subsolo 2 — Torre 1' },
+  { categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/subsolo-1-torre-2-1602251259.jpg', alt: 'Bosco Del Montello Residencial — subsolo 1, torre 2', label: 'Subsolo 1 — Torre 2' },
+  { categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/subsolo-2-torre-2-1602252030.jpg', alt: 'Bosco Del Montello Residencial — subsolo 2, torre 2', label: 'Subsolo 2 — Torre 2' },
+]
+const PLANTAS_GRUPOS = [
+  { titulo: 'Apartamentos tipo', categoria: 'tipo' },
+  { titulo: 'Térreo e garagem (torres 1 e 2)', categoria: 'comum' },
+]
+
+// Condições comerciais — fonte única (tabela vigente Julho/2026). Estrutura própria: entrada única + saldo via 2 opções (não segue o padrão de reforços anuais de outros empreendimentos maiores).
+const COMERCIAL = {
+  texto: 'Entrada de 15% do valor do imóvel, paga à vista (parcela única).',
+  saldo: 'O saldo remanescente (85%) pode ser quitado, à escolha do comprador, via financiamento bancário ou parcelado diretamente com a construtora em até 180 meses, corrigido pelo IGPM + juros de 0,75% ao mês.',
+  vigencia: 'Condições conforme a tabela vigente (Julho/2026), sujeitas à atualização. Consulte a tabela vigente para valores e disponibilidade por unidade.',
 }
+const FAQ_ITEMS = [
+  { pergunta: 'Como funciona o pagamento do Bosco Del Montello?', resposta: `${COMERCIAL.texto} ${COMERCIAL.saldo} ${COMERCIAL.vigencia}` },
+  { pergunta: 'Onde fica o Bosco Del Montello Residencial?', resposta: 'O Bosco Del Montello Residencial está localizado na Rua Urussanga, Centro, Criciúma/SC.' },
+]
 
 export default function BoscoDelMontelloPage() {
   return (
     <main style={{ background: t.bg, color: t.ink, fontFamily: t.body, overflowX: 'hidden' }}>
-      
+      <PropertySchema nome="Bosco Del Montello Residencial" slug="bosco-del-montello-centro-criciuma-sc" construtora_slug="fontana" cidade="Criciúma" uf="SC" bairro="Centro" descricao="Bosco Del Montello Residencial — 2 dormitórios (1 suíte), até 66 m² privativos no Centro de Criciúma/SC. Fale com Stiven Allan." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/bosco-del-montello-centro-criciuma-sc.jpg" faq={FAQ_ITEMS} />
+
       <style>{`
         html { scroll-behavior: smooth; }
         .bm-eyebrow { font-size: 11px; letter-spacing: 0.42em; text-transform: uppercase; color: ${t.brown}; font-family: ${t.body}; font-weight: 500; }
@@ -187,6 +208,20 @@ export default function BoscoDelMontelloPage() {
           </div>
           <LeadCaptureButton slug="bosco-del-montello-centro-criciuma-sc" construtora_slug="fontana" className="bm-cta bm-cta-light"  propertyDisplayName="Bosco del Montello Residencial" />
         </div>
+        <div style={{ maxWidth: 1160, margin: 'clamp(64px,10vh,96px) auto 0', textAlign: 'left' }}>
+          {PLANTAS_GRUPOS.map(({ titulo, categoria }) => {
+            const itens = PLANTAS.filter(p => p.categoria === categoria)
+            if (!itens.length) return null
+            return (
+              <div key={categoria} style={{ marginBottom: 40 }}>
+                <p className="bm-eyebrow" style={{ color: t.onDarkMuted, marginBottom: 16, textAlign: 'center' }}>{titulo}</p>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+                  <GalleryWithLightbox galeria={itens} prefix="bm" gradient="rgba(16,12,9,0.6)" badge="Planta oficial" trackPlantas={{ empreendimento: 'bosco-del-montello-centro-criciuma-sc', content_name: 'Bosco Del Montello Residencial' }} />
+                </div>
+              </div>
+            )
+          })}
+        </div>
       </section>
 
       {/* DIFERENCIAIS */}
@@ -245,7 +280,9 @@ export default function BoscoDelMontelloPage() {
         <div style={{ maxWidth: 1080, margin: '0 auto', textAlign: 'center' }}>
           <p className="bm-eyebrow" style={{ color: t.onDark, marginBottom: 18 }}>Financiamento Direto</p>
           <h2 className="bm-h2" style={{ color: t.onDark }}>A liberdade de comprar sem banco</h2>
-          <p className="bm-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 60 }}>Sem burocracia, sem intermediários. Direto com a construtora.</p>
+          <p className="bm-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 40 }}>Sem burocracia, sem intermediários. Direto com a construtora.</p>
+          <p style={{ color: t.onDarkMuted, fontSize: 17, lineHeight: 1.7, maxWidth: 720, margin: '0 auto 16px' }}>{COMERCIAL.texto}</p>
+          <p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.7, maxWidth: 720, margin: '0 auto 40px' }}>{COMERCIAL.saldo}</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px,1fr))', gap: 'clamp(28px,4vw,52px)' }}>
             {[{n:'01',t:'Converse com o corretor',d:'Atendimento exclusivo e personalizado para entender o seu momento e as melhores condições.'},{n:'02',t:'Escolha a sua unidade',d:'Selecione o apartamento ideal e defina uma proposta sob medida, sem amarras bancárias.'},{n:'03',t:'Negocie direto',d:'Condições flexíveis diretamente com a Construtora Fontana, com a liberdade que você merece.'}].map((s,i)=>(
               <div key={i} style={{ textAlign: 'left' }}><div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 40, opacity: 0.55, marginBottom: 14 }}>{s.n}</div><h3 style={{ fontFamily: t.display, fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: 17, margin: '0 0 12px', color: t.onDark }}>{s.t}</h3><p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.6, margin: 0 }}>{s.d}</p></div>
@@ -255,9 +292,12 @@ export default function BoscoDelMontelloPage() {
             <a href={CATALOGO_PDF} target="_blank" rel="noopener noreferrer" className="bm-cta bm-cta-light">Baixar Catálogo</a>
             <a href={WPP} target="_blank" rel="noopener noreferrer" className="bm-cta bm-cta-light">Atendimento Exclusivo</a>
           </div>
-          <p style={{ marginTop: 40, fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: t.onDark }}>Centro, Criciúma/SC &middot; Sob consulta</p>
+          <p style={{ marginTop: 40, fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: t.onDark }}>{COMERCIAL.vigencia}</p>
         </div>
       </section>
+
+      {/* SEO FAQ */}
+      <PropertyFAQ items={FAQ_ITEMS} accent={t.brown} />
 
       <RelatedProperties atualSlug="bosco-del-montello-centro-criciuma-sc" cidade="Criciúma" />
 
