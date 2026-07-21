@@ -10,7 +10,6 @@ import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
 
 const WPP = "https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20%C3%81guas%20de%20Marano%20Residencial."
-const CATALOGO_PDF = "https://estilofontana.com.br/upload/empreendimento/catalogo/Aguas-de-marano-residencial-1707323527.pdf"
 const t = {
 bg: '#FAFAF8', ink: '#16202B', navy: '#1B3A5B', navyDark: '#13293F', muted: '#5E6973',
 line: 'rgba(22,32,43,0.12)', dark: '#0F1E2D', onDark: '#EAF1F6', onDarkMuted: 'rgba(234,241,246,0.66)',
@@ -63,17 +62,36 @@ images: ["/images/empreendimentos/aguas-de-marano-frente-mar-balneario-picarras-
 },
 robots: { index: true, follow: true },
 }
-const SCHEMA = {
-'@context': 'https://schema.org',
-'@graph': [
-{ '@type': 'Apartment', name: 'Águas de Marano Residencial', description: 'Apartamentos frente mar de alto padrão no Centro de Balneário Piçarras/SC.', image: "/images/empreendimentos/aguas-de-marano-frente-mar-balneario-picarras-sc/f-adm-fachada-02-ef-web-65a588a03d4c8.jpg", numberOfRooms: 4, numberOfBathroomsTotal: 4, floorSize: { '@type': 'QuantitativeValue', value: 199, unitCode: 'MTK' }, address: { '@type': 'PostalAddress', streetAddress: 'Av. Nereu Ramos, esq. Rua Henrique Todeschini', addressLocality: 'Balneário Piçarras', addressRegion: 'SC', addressCountry: 'BR' } },
-],
-}
+
+// Plantas oficiais — site estilofontana.com.br (aba "Plantas" do Águas de Marano).
+// Sem tabela de preços localizada para este empreendimento — ficha técnica por final não confirmada além do que o site institucional já publica.
+const PLANTAS = [
+{ categoria: 'tipo', src: 'https://estilofontana.com.br/images/empreendimento_planta/apartamento-tipo-final-01-1706276501.jpg', alt: 'Águas de Marano Residencial — planta apartamento tipo final 01', label: 'Apartamento Tipo — Final 01' },
+{ categoria: 'tipo', src: 'https://estilofontana.com.br/images/empreendimento_planta/apartamento-tipo-final-02-1706276532.jpg', alt: 'Águas de Marano Residencial — planta apartamento tipo final 02', label: 'Apartamento Tipo — Final 02' },
+{ categoria: 'tipo', src: 'https://estilofontana.com.br/images/empreendimento_planta/apartamento-tipo-final-03-1706276589.jpg', alt: 'Águas de Marano Residencial — planta apartamento tipo final 03', label: 'Apartamento Tipo — Final 03' },
+{ categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/Area-de-lazer-completa-1706277240.jpg', alt: 'Águas de Marano Residencial — área de lazer completa', label: 'Área de Lazer Completa' },
+{ categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/terreo-1706277800.jpg', alt: 'Águas de Marano Residencial — planta do térreo', label: 'Térreo' },
+{ categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/garagem-pavimento-1-1706277877.jpg', alt: 'Águas de Marano Residencial — garagem pavimento 1', label: 'Garagem · Pavimento 1' },
+{ categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/garagem-pavimento-2-1706277990.jpg', alt: 'Águas de Marano Residencial — garagem pavimento 2', label: 'Garagem · Pavimento 2' },
+{ categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/garagem-subsolo-1706278080.jpg', alt: 'Águas de Marano Residencial — garagem subsolo', label: 'Garagem · Subsolo' },
+]
+const PLANTAS_GRUPOS = [
+{ titulo: 'Apartamentos tipo', categoria: 'tipo' },
+{ titulo: 'Lazer, térreo e garagem', categoria: 'comum' },
+]
+
+// Sem tabela de preços vigente localizada para este empreendimento — condições comerciais ficam pendentes.
+// Não publicar entrada, parcelas, reforços, financiamento ou desconto sem uma tabela real para confirmar.
+const FAQ_ITEMS = [
+{ pergunta: 'Quais são as condições de pagamento do Águas de Marano?', resposta: 'As condições comerciais deste empreendimento estão em atualização. Fale com o corretor Stiven Allan pelo WhatsApp para receber a tabela vigente e simular as condições disponíveis para a sua unidade.' },
+{ pergunta: 'Qual a previsão de entrega do Águas de Marano?', resposta: 'A previsão de entrega é julho de 2028, em Frente Mar, Balneário Piçarras/SC.' },
+{ pergunta: 'Onde fica o Águas de Marano?', resposta: 'O Águas de Marano está localizado no Frente Mar, Balneário Piçarras/SC.' },
+]
 
 export default function AguasDeMaranoPage() {
 return (
 <main style={{ background: t.bg, color: t.ink, fontFamily: t.body, overflowX: 'hidden' }}>
-      <PropertySchema nome="Águas de Marano" slug="aguas-de-marano-frente-mar-balneario-picarras-sc" construtora_slug="fontana" cidade="Balneário Piçarras" uf="SC" bairro="Frente Mar" descricao="Tenha o mar como seu vizinho. Apartamentos frente mar de alto padrão no Centro de Balneário Piçarras/SC. Atendimento exclusivo com Stiven Allan." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/aguas-de-marano-frente-mar-balneario-picarras-sc.jpg" faq={[{"pergunta":"Como funciona o financiamento direto do Águas de Marano?","resposta":"Entrada de 20%, saldo em até 72 parcelas mensais e 6 reforços anuais (cada reforço equivale a 5 parcelas mensais), com correção pelo CUB/SC durante a obra. Sem análise de banco."},{"pergunta":"Qual a previsão de entrega do Águas de Marano?","resposta":"A previsão de entrega é julho de 2028, em Frente Mar, Balneário Piçarras/SC."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Sim. Além do financiamento direto com a construtora, é possível optar por financiamento bancário. Fale com o Stiven pelo WhatsApp para simular as duas opções."},{"pergunta":"Onde fica o Águas de Marano?","resposta":"O Águas de Marano está localizado no Frente Mar, Balneário Piçarras/SC."}]} />
+      <PropertySchema nome="Águas de Marano" slug="aguas-de-marano-frente-mar-balneario-picarras-sc" construtora_slug="fontana" cidade="Balneário Piçarras" uf="SC" bairro="Frente Mar" descricao="Tenha o mar como seu vizinho. Apartamentos frente mar de alto padrão no Centro de Balneário Piçarras/SC. Atendimento exclusivo com Stiven Allan." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/aguas-de-marano-frente-mar-balneario-picarras-sc.jpg" faq={FAQ_ITEMS} />
 
 <style>{`
 html { scroll-behavior: smooth; }
@@ -175,6 +193,20 @@ details.am-menu > summary::-webkit-details-marker { display: none; }
 </div>
 <LeadCaptureButton slug="aguas-de-marano-frente-mar-balneario-picarras-sc" construtora_slug="fontana" className="am-cta am-cta-light"  propertyDisplayName="Águas de Marano Residencial" />
 </div>
+<div style={{ maxWidth: 1160, margin: 'clamp(64px,10vh,96px) auto 0', textAlign: 'left' }}>
+{PLANTAS_GRUPOS.map(({ titulo, categoria }) => {
+const itens = PLANTAS.filter(p => p.categoria === categoria)
+if (!itens.length) return null
+return (
+<div key={categoria} style={{ marginBottom: 40 }}>
+<p className="am-eyebrow" style={{ color: t.onDarkMuted, marginBottom: 16, textAlign: 'center' }}>{titulo}</p>
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+<GalleryWithLightbox galeria={itens} prefix="am" gradient="rgba(15,30,45,0.6)" badge="Planta oficial" trackPlantas={{ empreendimento: 'aguas-de-marano-frente-mar-balneario-picarras-sc', content_name: 'Águas de Marano Residencial' }} />
+</div>
+</div>
+)
+})}
+</div>
 </section>
 <section id="diferenciais" style={{ padding: 'clamp(80px,14vh,160px) clamp(18px,5vw,56px)' }}>
 <div style={{ maxWidth: 1120, margin: '0 auto' }}>
@@ -223,15 +255,16 @@ details.am-menu > summary::-webkit-details-marker { display: none; }
 </section>
 <section style={{ background: t.navy, color: t.onDark, padding: 'clamp(80px,14vh,160px) clamp(18px,5vw,56px)' }}>
 <div style={{ maxWidth: 1080, margin: '0 auto', textAlign: 'center' }}>
-<p className="am-eyebrow" style={{ color: t.onDark, marginBottom: 18 }}>Financiamento Direto</p>
-<h2 className="am-h2" style={{ color: t.onDark }}>A liberdade de comprar sem banco</h2>
-<p className="am-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 60 }}>Sem burocracia, sem intermediários. Direto com a construtora.</p>
+<p className="am-eyebrow" style={{ color: t.onDark, marginBottom: 18 }}>Condições de Pagamento</p>
+<h2 className="am-h2" style={{ color: t.onDark }}>Fale com o corretor</h2>
+<p className="am-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 40 }}>Sem burocracia, sem intermediários. Direto com a construtora.</p>
+<p style={{ color: t.onDarkMuted, fontSize: 17, lineHeight: 1.7, maxWidth: 640, margin: '0 auto 40px' }}>As condições comerciais deste empreendimento estão em atualização. Fale com o Stiven Allan pelo WhatsApp para receber a tabela vigente e simular as condições disponíveis para a sua unidade.</p>
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px,1fr))', gap: 'clamp(28px,4vw,52px)' }}>
-{[{n:'01',t:'Converse com o corretor',d:'Atendimento exclusivo e personalizado para entender o seu momento e as melhores condições.'},{n:'02',t:'Escolha a sua planta',d:'Selecione a unidade frente mar ideal e defina uma proposta sob medida, sem amarras bancárias.'},{n:'03',t:'Negocie direto',d:'Condições flexíveis diretamente com a Construtora Fontana, com a liberdade que você merece.'}].map((s,i)=>(
+{[{n:'01',t:'Converse com o corretor',d:'Atendimento exclusivo e personalizado para entender o seu momento.'},{n:'02',t:'Receba a tabela vigente',d:'Stiven Allan envia as condições atualizadas e a disponibilidade por unidade.'},{n:'03',t:'Simule a sua unidade',d:'Condições apresentadas diretamente pela Construtora Fontana, sem intermediários.'}].map((s,i)=>(
 <div key={i} style={{ textAlign: 'left' }}><div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 40, opacity: 0.55, marginBottom: 14 }}>{s.n}</div><h3 style={{ fontFamily: t.display, fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: 17, margin: '0 0 12px' }}>{s.t}</h3><p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.6, margin: 0 }}>{s.d}</p></div>
 ))}
 </div>
-<p style={{ marginTop: 56, fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: t.onDark }}>Frente mar exclusivo &middot; Sob consulta</p>
+<p style={{ marginTop: 56, fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: t.onDark }}>Consulte a tabela vigente para valores e disponibilidade por unidade.</p>
 </div>
 </section>
 <section style={{ position: 'relative', minHeight: '78vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
@@ -244,7 +277,7 @@ details.am-menu > summary::-webkit-details-marker { display: none; }
 </div>
 </section>
       {/* SEO FAQ */}
-      <PropertyFAQ items={[{"pergunta":"Como funciona o financiamento direto do Águas de Marano?","resposta":"Entrada de 20%, saldo em até 72 parcelas mensais e 6 reforços anuais (cada reforço equivale a 5 parcelas mensais), com correção pelo CUB/SC durante a obra. Sem análise de banco."},{"pergunta":"Qual a previsão de entrega do Águas de Marano?","resposta":"A previsão de entrega é julho de 2028, em Frente Mar, Balneário Piçarras/SC."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Sim. Além do financiamento direto com a construtora, é possível optar por financiamento bancário. Fale com o Stiven pelo WhatsApp para simular as duas opções."},{"pergunta":"Onde fica o Águas de Marano?","resposta":"O Águas de Marano está localizado no Frente Mar, Balneário Piçarras/SC."}]} accent="#18181b" />
+      <PropertyFAQ items={FAQ_ITEMS} accent={t.navy} />
       <RelatedProperties atualSlug="aguas-de-marano-frente-mar-balneario-picarras-sc" cidade="Balneário Piçarras" />
 
 <footer style={{ background: t.navyDark, color: t.onDarkMuted, padding: 'clamp(56px,9vh,96px) clamp(18px,5vw,56px)' }}>
