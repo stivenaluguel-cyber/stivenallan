@@ -69,7 +69,7 @@ const PLANTAS_GRUPOS = [
 const CONDICOES = {
 texto: 'Entrada de 20% do valor do imóvel, paga em parcela única, mais 6 reforços anuais, e o saldo dividido em 72 parcelas mensais. Durante a obra, os valores são corrigidos mensalmente pelo CUB/Sinduscon-SC.',
 desconto: 'Para pagamento à vista, desconto de 15% sobre o valor total.',
-vigencia: 'Condições conforme tabela de julho/2026, sujeitas à atualização.',
+vigencia: 'Condições conforme tabela de julho/2026, sujeitas à atualização. Consulte a tabela vigente para valores e disponibilidade por unidade.',
 }
 
 export const metadata: Metadata = {
@@ -92,7 +92,7 @@ images: ['/images/empreendimentos/mar-di-licata-mar-grosso-laguna-sc/mar-di-lica
 robots: { index: true, follow: true },
 }
 const FAQ_ITEMS = [
-{ pergunta: 'Como funciona o financiamento direto do Mar di Licata Residencial?', resposta: 'Entrada de 20% (parcela única), 6 reforços anuais e saldo em 72 parcelas mensais, corrigidas pelo CUB/Sinduscon-SC durante a obra. Para pagamento à vista, desconto de 15%. Condições conforme tabela de julho/2026, sujeitas à atualização — fale com Stiven para simular sua unidade.' },
+{ pergunta: 'Como funciona o financiamento direto do Mar di Licata Residencial?', resposta: 'Entrada de 20% (parcela única), 6 reforços anuais e saldo em 72 parcelas mensais, corrigidas pelo CUB/Sinduscon-SC durante a obra. Para pagamento à vista, desconto de 15%. Condições conforme tabela de julho/2026, sujeitas à atualização — fale com Stiven para simular sua unidade. Consulte a tabela vigente para valores e disponibilidade por unidade.' },
 { pergunta: 'Qual a previsão de entrega do Mar di Licata Residencial?', resposta: 'A previsão de entrega é outubro de 2027, em Mar Grosso, Laguna/SC.' },
 { pergunta: 'Como é a correção monetária após a entrega das chaves?', resposta: 'O saldo remanescente é corrigido mensalmente, à escolha do comprador, por uma de duas opções: IGPM acrescido de juros compensatórios de 0,75% ao mês, ou apenas pelo CUB/Sinduscon-SC.' },
 { pergunta: 'Onde fica o Mar di Licata Residencial?', resposta: 'O Mar di Licata Residencial está localizado na Rua Juiz Erwin Rubi Peressoni Teixeira, 627, no Mar Grosso, Laguna/SC.' },

@@ -69,8 +69,8 @@ const PLANTAS_GRUPOS = [
 ]
 const CONDICOES = {
 texto: 'Entrada de 20% do valor do imóvel, paga em parcela única, mais 6 reforços anuais (cada um equivalente a 5x o valor da parcela mensal), e o saldo dividido em até 72 parcelas mensais. Durante a obra, os valores são corrigidos mensalmente pelo CUB/Sinduscon-SC.',
-desconto: 'Desconto de 15% para pagamento à vista, sem permuta. Também há uma opção com 5% de desconto pagando 40% até a entrega das chaves (ato mínimo de 10%), com o saldo financiado — bancário ou direto com a construtora — em até 180 meses.',
-vigencia: 'Condições conforme tabela de julho/2026, sujeitas à atualização.',
+desconto: 'Desconto de 15% para pagamento à vista, sem permuta. Também há uma Opção 2: 5% de desconto pagando 40% até a entrega das chaves (ato mínimo de 10%, sem permuta nesta opção), com o saldo (60%) financiado — bancário ou direto com a construtora — em até 180 meses, corrigido pelo IGPM acrescido de juros compensatórios de 0,75% a.m.',
+vigencia: 'Condições conforme tabela de julho/2026, sujeitas à atualização. Consulte a tabela vigente para valores e disponibilidade por unidade.',
 }
 
 export const metadata: Metadata = {
@@ -93,9 +93,9 @@ images: ['/images/empreendimentos/mar-di-arienzo-centro-balneario-rincao-sc/mar-
 robots: { index: true, follow: true },
 }
 const FAQ_ITEMS = [
-{ pergunta: 'Como funciona o financiamento direto do Mar di Arienzo Residencial?', resposta: 'Entrada de 20% (parcela única), 6 reforços anuais (cada um equivalente a 5x o valor da parcela mensal) e saldo em até 72 parcelas mensais, corrigidas pelo CUB/Sinduscon-SC durante a obra. Desconto de 15% para pagamento à vista. Condições conforme tabela de julho/2026, sujeitas à atualização — fale com Stiven para simular sua unidade.' },
+{ pergunta: 'Como funciona o financiamento direto do Mar di Arienzo Residencial?', resposta: 'Entrada de 20% (parcela única), 6 reforços anuais (cada um equivalente a 5x o valor da parcela mensal) e saldo em até 72 parcelas mensais, corrigidas pelo CUB/Sinduscon-SC durante a obra. Desconto de 15% para pagamento à vista, sem permuta — ou, na Opção 2, 5% de desconto pagando 40% até a entrega das chaves (sem permuta), com o saldo financiado em até 180 meses. Condições conforme tabela de julho/2026, sujeitas à atualização — fale com Stiven para simular sua unidade. Consulte a tabela vigente para valores e disponibilidade por unidade.' },
 { pergunta: 'Qual a previsão de entrega do Mar di Arienzo Residencial?', resposta: 'A previsão de entrega é agosto de 2030, em Centro, Balneário Rincão/SC.' },
-{ pergunta: 'Como é a correção monetária após a entrega das chaves?', resposta: 'O saldo remanescente é corrigido mensalmente, à escolha do comprador, por uma de duas opções: IGPM acrescido de juros compensatórios de 0,75% ao mês, ou apenas pelo CUB/Sinduscon-SC.' },
+{ pergunta: 'Como é a correção monetária após a entrega das chaves?', resposta: 'No plano padrão (entrada + reforços + parcelas), o saldo remanescente é corrigido mensalmente, à escolha do comprador, por uma de duas opções: IGPM acrescido de juros compensatórios de 0,75% ao mês, ou apenas pelo CUB/Sinduscon-SC. Já na Opção 2 (saldo de 60% financiado após pagar 40% até as chaves), a correção é fixa em IGPM + 0,75% a.m., sem alternativa de CUB para essa modalidade.' },
 { pergunta: 'Onde fica o Mar di Arienzo Residencial?', resposta: 'O Mar di Arienzo Residencial está localizado na Rua Criciúma esq. Rua Araranguá, no Centro de Balneário Rincão/SC.' },
 { pergunta: 'Quais as plantas e metragens disponíveis?', resposta: 'Apartamentos de 3 dormitórios (1 suíte), de 97,07 a 109,70 m² privativos, em 4 tipos de planta — confira as plantas oficiais na página.' },
 ]
