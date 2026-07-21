@@ -53,9 +53,37 @@ const DIFERENCIAIS = [
   'Espaço Fitness com Terraço',
   'Churrasqueira com sistema de exaustão e dumper',
   'Hall de Entrada com pé-direito duplo',
-  'Persianas nos dormitórios e rebaixo em gesso',
+  'Persianas nos dormitórios',
+  'Rebaixo em gesso',
+  'Tubulação de água quente',
+  'Espera para ar-condicionado split',
   'Possibilidade de personalização de planta',
 ]
+
+// Plantas oficiais — site estilofontana.com.br (aba "Plantas" do Mar di Nizza).
+// Metragens/dormitórios/suítes por final confirmados na própria imagem da planta oficial.
+const PLANTAS = [
+  { categoria: 'tipo', src: 'https://estilofontana.com.br/images/empreendimento_planta/planta-tipo-final-01-1692882173.jpg', alt: 'Mar di Nizza Residencial — planta tipo final 01', label: 'Planta tipo — Final 01', area: 92.09, quartos: 3, suites: 1 },
+  { categoria: 'tipo', src: 'https://estilofontana.com.br/images/empreendimento_planta/planta-tipo-final-02-1692882306.jpg', alt: 'Mar di Nizza Residencial — planta tipo final 02', label: 'Planta tipo — Final 02', area: 87.98, quartos: 3, suites: 1 },
+  { categoria: 'tipo', src: 'https://estilofontana.com.br/images/empreendimento_planta/planta-tipo-final-03-1692882472.jpg', alt: 'Mar di Nizza Residencial — planta tipo final 03', label: 'Planta tipo — Final 03', area: 65.89, quartos: 2, suites: 1 },
+  { categoria: 'tipo', src: 'https://estilofontana.com.br/images/empreendimento_planta/planta-tipo-final-04-1692882534.jpg', alt: 'Mar di Nizza Residencial — planta tipo final 04', label: 'Planta tipo — Final 04', area: 87.84, quartos: 3, suites: 1 },
+  { categoria: 'tipo', src: 'https://estilofontana.com.br/images/empreendimento_planta/planta-tipo-final-05-1692882594.jpg', alt: 'Mar di Nizza Residencial — planta tipo final 05', label: 'Planta tipo — Final 05', area: 90.78, quartos: 3, suites: 1 },
+  { categoria: 'tipo', src: 'https://estilofontana.com.br/images/empreendimento_planta/planta-tipo-final-06-1692882646.jpg', alt: 'Mar di Nizza Residencial — planta tipo final 06', label: 'Planta tipo — Final 06', area: 66.51, quartos: 2, suites: 1 },
+  { categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/terreo-1692883746.jpg', alt: 'Mar di Nizza Residencial — planta do térreo', label: 'Térreo' },
+  { categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/1o-pavimento-1692883770.jpg', alt: 'Mar di Nizza Residencial — 1º pavimento de garagem', label: '1º Pavimento · Garagem' },
+  { categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/2o-pavimento-1692883787.jpg', alt: 'Mar di Nizza Residencial — 2º pavimento de garagem', label: '2º Pavimento · Garagem' },
+]
+
+const PLANTAS_GRUPOS = [
+  { titulo: 'Apartamentos tipo', categoria: 'tipo' },
+  { titulo: 'Térreo e garagem', categoria: 'comum' },
+]
+
+const CONDICOES = {
+  texto: 'Entrada de 20% do valor do imóvel, paga em parcela única, mais 6 reforços anuais (cada um equivalente a 5x o valor da parcela mensal), e o saldo dividido em até 72 parcelas mensais. Durante a obra, os valores são corrigidos mensalmente pelo CUB/Sinduscon-SC.',
+  desconto: 'Para pagamento à vista, desconto de 15% sobre o valor total (sem permuta).',
+  vigencia: 'Condições conforme tabela de julho/2026, sujeitas à atualização.',
+}
 
 const AMENIDADES = [
   'Salão de Festas com Deck Externo','Espaço Fitness com Terraço',
@@ -91,7 +119,7 @@ const jsonLd = {
   url: 'https://stivenallan.com.br/empreendimento/fontana/mar-di-nizza-mar-grosso-laguna-sc',
 }
 
-const CSS = `.mn-hero{position:relative;width:100%;height:100vh;min-height:520px;display:flex;align-items:flex-end}.mn-hero-img{position:absolute;inset:0;z-index:0}.mn-hero-overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(to top,rgba(7,13,12,0.72) 0%,rgba(7,13,12,0.18) 60%,rgba(7,13,12,0.04) 100%)}.mn-hero-content{position:relative;z-index:2;width:100%;max-width:900px;margin:0 auto;padding:0 24px 72px}.mn-tagline{font-size:clamp(2rem,5vw,3.4rem);font-weight:300;color:#E2F4F2;line-height:1.18;letter-spacing:-.01em;margin:0 0 20px}.mn-hero-cta{display:inline-flex;align-items:center;gap:10px;background:#1B7A72;color:#fff;text-decoration:none;padding:14px 28px;font-size:.85rem;letter-spacing:.14em;text-transform:uppercase;font-weight:500;border-radius:2px;transition:background .2s}.mn-hero-cta:hover{background:#104E48}.mn-section{padding:80px 24px;max-width:1160px;margin:0 auto}.mn-section-sm{padding:48px 24px;max-width:1160px;margin:0 auto}.mn-label{font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;font-weight:600;margin:0 0 16px;opacity:.55}.mn-h2{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:300;letter-spacing:-.02em;margin:0 0 24px;line-height:1.2}.mn-copy{font-size:1.05rem;line-height:1.75;max-width:680px;opacity:.82}.mn-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:2px;background:rgba(15,28,34,0.08);margin-top:56px}.mn-stat{background:#F8FAFA;padding:28px 20px;text-align:center}.mn-stat-n{font-size:clamp(1.6rem,3.5vw,2.2rem);font-weight:300;color:#1B7A72;letter-spacing:-.02em;display:block;margin-bottom:4px}.mn-stat-l{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;opacity:.55}.mn-divider{width:100%;height:1px;background:rgba(15,28,34,0.12);margin:0}.mn-two-col{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}@media(max-width:768px){.mn-two-col{grid-template-columns:1fr;gap:40px}}.mn-diff-list{list-style:none;padding:0;margin:0;display:grid;gap:16px}.mn-diff-item{display:flex;gap:16px;align-items:flex-start}.mn-diff-num{font-size:.72rem;letter-spacing:.16em;color:#1B7A72;font-weight:600;padding-top:2px;min-width:28px}.mn-diff-text{font-size:.97rem;line-height:1.5;opacity:.82}.mn-lazer-card{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:2px}.mn-gal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}@media(max-width:640px){.mn-gal-grid{grid-template-columns:1fr}}.mn-gcard{border-radius:0}.mn-onimg{font-family:'Hanken Grotesk',system-ui,sans-serif}.mn-amenidades{display:flex;flex-wrap:wrap;gap:10px}.mn-chip{display:inline-flex;align-items:center;padding:8px 16px;border:1px solid rgba(15,28,34,0.16);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;border-radius:2px;opacity:.8}.mn-mapa-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}@media(max-width:768px){.mn-mapa-grid{grid-template-columns:1fr;gap:40px}}.mn-mapa-img{position:relative;width:100%;aspect-ratio:4/3;overflow:hidden;border-radius:2px}.mn-cta-band{background:#104E48;color:#E2F4F2;padding:72px 24px;text-align:center}.mn-cta-band-h{font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:300;margin:0 0 12px;letter-spacing:-.01em}.mn-cta-band-sub{opacity:.66;margin:0 0 36px;font-size:1rem}.mn-cta-btn{display:inline-flex;align-items:center;gap:10px;background:#1B7A72;color:#fff;text-decoration:none;padding:16px 32px;font-size:.85rem;letter-spacing:.14em;text-transform:uppercase;font-weight:500;border-radius:2px;transition:background .2s}.mn-cta-btn:hover{background:#104E48}.mn-fab{position:fixed;bottom:28px;right:28px;z-index:999;display:flex;align-items:center;gap:10px;background:#1B7A72;color:#fff;text-decoration:none;padding:14px 22px;border-radius:100px;font-size:.82rem;font-weight:600;letter-spacing:.06em;box-shadow:0 4px 24px rgba(27,122,114,.38);transition:background .2s}.mn-fab:hover{background:#104E48}.mn-footer{background:#070D0C;color:rgba(226,244,242,0.66);padding:32px 24px;text-align:center;font-size:.82rem}`
+const CSS = `.mn-hero{position:relative;width:100%;height:100vh;min-height:520px;display:flex;align-items:flex-end}.mn-hero-img{position:absolute;inset:0;z-index:0}.mn-hero-overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(to top,rgba(7,13,12,0.72) 0%,rgba(7,13,12,0.18) 60%,rgba(7,13,12,0.04) 100%)}.mn-hero-content{position:relative;z-index:2;width:100%;max-width:900px;margin:0 auto;padding:0 24px 72px}.mn-tagline{font-size:clamp(2rem,5vw,3.4rem);font-weight:300;color:#E2F4F2;line-height:1.18;letter-spacing:-.01em;margin:0 0 20px}.mn-hero-cta{display:inline-flex;align-items:center;gap:10px;background:#1B7A72;color:#fff;text-decoration:none;padding:14px 28px;font-size:.85rem;letter-spacing:.14em;text-transform:uppercase;font-weight:500;border-radius:2px;transition:background .2s;border:none;cursor:pointer;font-family:'Jost',system-ui,sans-serif}.mn-hero-cta:hover{background:#104E48}.mn-section{padding:80px 24px;max-width:1160px;margin:0 auto}.mn-section-sm{padding:48px 24px;max-width:1160px;margin:0 auto}.mn-label{font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;font-weight:600;margin:0 0 16px;opacity:.55}.mn-h2{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:300;letter-spacing:-.02em;margin:0 0 24px;line-height:1.2}.mn-copy{font-size:1.05rem;line-height:1.75;max-width:680px;opacity:.82}.mn-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:2px;background:rgba(15,28,34,0.08);margin-top:56px}.mn-stat{background:#F8FAFA;padding:28px 20px;text-align:center}.mn-stat-n{font-size:clamp(1.6rem,3.5vw,2.2rem);font-weight:300;color:#1B7A72;letter-spacing:-.02em;display:block;margin-bottom:4px}.mn-stat-l{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;opacity:.55}.mn-divider{width:100%;height:1px;background:rgba(15,28,34,0.12);margin:0}.mn-two-col{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}@media(max-width:768px){.mn-two-col{grid-template-columns:1fr;gap:40px}}.mn-diff-list{list-style:none;padding:0;margin:0;display:grid;gap:16px}.mn-diff-item{display:flex;gap:16px;align-items:flex-start}.mn-diff-num{font-size:.72rem;letter-spacing:.16em;color:#1B7A72;font-weight:600;padding-top:2px;min-width:28px}.mn-diff-text{font-size:.97rem;line-height:1.5;opacity:.82}.mn-lazer-card{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:2px}.mn-gal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}@media(max-width:640px){.mn-gal-grid{grid-template-columns:1fr}}.mn-gcard{border-radius:0}.mn-onimg{font-family:'Hanken Grotesk',system-ui,sans-serif}.mn-amenidades{display:flex;flex-wrap:wrap;gap:10px}.mn-chip{display:inline-flex;align-items:center;padding:8px 16px;border:1px solid rgba(15,28,34,0.16);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;border-radius:2px;opacity:.8}.mn-mapa-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}@media(max-width:768px){.mn-mapa-grid{grid-template-columns:1fr;gap:40px}}.mn-mapa-img{position:relative;width:100%;aspect-ratio:4/3;overflow:hidden;border-radius:2px}.mn-cta-band{background:#104E48;color:#E2F4F2;padding:72px 24px;text-align:center}.mn-cta-band-h{font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:300;margin:0 0 12px;letter-spacing:-.01em}.mn-cta-band-sub{opacity:.66;margin:0 0 36px;font-size:1rem}.mn-cta-btn{display:inline-flex;align-items:center;gap:10px;background:#1B7A72;color:#fff;text-decoration:none;padding:16px 32px;font-size:.85rem;letter-spacing:.14em;text-transform:uppercase;font-weight:500;border-radius:2px;transition:background .2s}.mn-cta-btn:hover{background:#104E48}.mn-fab{position:fixed;bottom:28px;right:28px;z-index:999;display:flex;align-items:center;gap:10px;background:#1B7A72;color:#fff;text-decoration:none;padding:14px 22px;border-radius:100px;font-size:.82rem;font-weight:600;letter-spacing:.06em;box-shadow:0 4px 24px rgba(27,122,114,.38);transition:background .2s}.mn-fab:hover{background:#104E48}.mn-footer{background:#070D0C;color:rgba(226,244,242,0.66);padding:32px 24px;text-align:center;font-size:.82rem}`
 
 export default function MarDiNizzaPage() {
   return (
@@ -99,7 +127,7 @@ export default function MarDiNizzaPage() {
       
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
       <div style={{ fontFamily: t.body, background: t.bg, color: t.ink }}>
-<PropertySchema nome="Mar di Nizza Residencial" slug="mar-di-nizza-mar-grosso-laguna-sc" construtora_slug="fontana" cidade="Laguna" uf="SC" bairro="Mar Grosso" descricao="Mar di Nizza Residencial — 2 e 3 dormitórios, 65 a 92 m² privativos no Mar Grosso, Laguna/SC. Financiamento direto Fontana." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/mar-di-nizza-mar-grosso-laguna-sc.jpg" faq={[{"pergunta":"Como funciona o financiamento direto do Mar di Nizza Residencial?","resposta":"Entrada de 20%, saldo em até 72 parcelas mensais e 6 reforços anuais (cada reforço equivale a 5 parcelas mensais), com correção pelo CUB/SC durante a obra. Sem análise de banco."},{"pergunta":"Qual a previsão de entrega do Mar di Nizza Residencial?","resposta":"A previsão de entrega é dezembro de 2026, em Mar Grosso, Laguna/SC."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Sim. Além do financiamento direto com a construtora, é possível optar por financiamento bancário. Fale com o Stiven pelo WhatsApp para simular as duas opções."},{"pergunta":"Onde fica o Mar di Nizza Residencial?","resposta":"O Mar di Nizza Residencial está localizado na Rua Joana Mussi, esq. Rua Moreira Gomes, no Mar Grosso, Laguna/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"O empreendimento oferece apartamentos com 2 e 3 dormitórios, de 65 a 92 m² privativos."}]} />
+<PropertySchema nome="Mar di Nizza Residencial" slug="mar-di-nizza-mar-grosso-laguna-sc" construtora_slug="fontana" cidade="Laguna" uf="SC" bairro="Mar Grosso" descricao="Mar di Nizza Residencial — 2 e 3 dormitórios, 65 a 92 m² privativos no Mar Grosso, Laguna/SC. Financiamento direto Fontana." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/mar-di-nizza-mar-grosso-laguna-sc.jpg" faq={[{"pergunta":"Como funciona o financiamento direto do Mar di Nizza Residencial?","resposta":"Entrada de 20% (parcela única), 6 reforços anuais (cada um equivalente a 5x o valor da parcela mensal) e saldo em até 72 parcelas mensais, corrigidas pelo CUB/Sinduscon-SC durante a obra. Para pagamento à vista, desconto de 15% sobre o valor total. Condições conforme tabela de julho/2026, sujeitas à atualização — fale com Stiven para simular sua unidade."},{"pergunta":"Qual a previsão de entrega do Mar di Nizza Residencial?","resposta":"A previsão de entrega é dezembro de 2026, em Mar Grosso, Laguna/SC."},{"pergunta":"Como é a correção monetária após a entrega das chaves?","resposta":"O saldo remanescente é corrigido mensalmente, à escolha do comprador, por uma de duas opções: IGPM acrescido de juros compensatórios de 0,75% ao mês, ou apenas pelo CUB/Sinduscon-SC."},{"pergunta":"Onde fica o Mar di Nizza Residencial?","resposta":"O Mar di Nizza Residencial está localizado na Rua Joana Mussi, esq. Rua Moreira Gomes, no Mar Grosso, Laguna/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"2 dormitórios (1 suíte) de 65,89 a 66,51 m² privativos, ou 3 dormitórios (1 suíte) de 87,84 a 92,09 m² privativos, conforme o final do apartamento — confira as plantas oficiais na página."}]} />
 
         {/* NAV */}
         <header style={{ position:'absolute', top:0, left:0, right:0, zIndex:10, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'20px 32px' }}>
@@ -119,10 +147,13 @@ export default function MarDiNizzaPage() {
           <div className="mn-hero-content">
             <p className="mn-label" style={{ color:'rgba(226,244,242,0.66)' }}>Mar Grosso — Laguna/SC</p>
             <h1 className="mn-tagline" style={{ fontFamily:t.serif }}>Sinta a leveza do litoral de Laguna no seu dia a dia.</h1>
-            <a href={WA} target="_blank" rel="noopener noreferrer" className="mn-hero-cta" style={{ fontFamily:t.display }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-              Tenho interesse
-            </a>
+            <div style={{ display:'flex', gap:16, flexWrap:'wrap' }}>
+              <a href={WA} target="_blank" rel="noopener noreferrer" className="mn-hero-cta" style={{ fontFamily:t.display }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                Tenho interesse
+              </a>
+              <LeadCaptureButton slug="mar-di-nizza-mar-grosso-laguna-sc" construtora_slug="fontana" propertyDisplayName="Mar di Nizza Residencial" className="mn-hero-cta" label="Baixar catálogo & plantas" />
+            </div>
           </div>
         </section>
 
@@ -161,6 +192,29 @@ export default function MarDiNizzaPage() {
             <div className="mn-lazer-card">
               <Image unoptimized src={IMG.lazer} alt="Área de lazer — Mar di Nizza Residencial" fill sizes="(max-width: 768px) 100vw, 50vw" style={{ objectFit:'cover' }} />
             </div>
+          </div>
+        </section>
+
+        <hr className="mn-divider" />
+
+        {/* PLANTAS */}
+        <section className="mn-section">
+          <p className="mn-label" style={{ color:t.teal }}>Plantas</p>
+          <h2 className="mn-h2" style={{ fontFamily:t.serif }}>Escolha o seu layout</h2>
+          <p className="mn-copy" style={{ marginBottom: 40 }}>Plantas oficiais da Construtora Fontana — 2 e 3 dormitórios (1 suíte), de 65,89 a 92,09 m² privativos, conforme o final do apartamento.</p>
+          <div style={{ display:'flex', flexDirection:'column', gap:48 }}>
+            {PLANTAS_GRUPOS.map(({ titulo, categoria }) => {
+              const itens = PLANTAS.filter(p => p.categoria === categoria)
+              if (!itens.length) return null
+              return (
+                <div key={categoria}>
+                  <p className="mn-label" style={{ color:t.teal, marginBottom:16 }}>{titulo}</p>
+                  <div className="mn-gal-grid" style={{ borderRadius: 2, overflow:'hidden' }}>
+                    <GalleryWithLightbox galeria={itens} prefix="mnp" gradient="rgba(7,13,12,0.55)" badge="Planta oficial" trackPlantas={{ empreendimento: 'mar-di-nizza-mar-grosso-laguna-sc', content_name: 'Mar di Nizza Residencial' }} />
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </section>
 
@@ -210,6 +264,21 @@ export default function MarDiNizzaPage() {
           </div>
         </section>
 
+        <hr className="mn-divider" />
+
+        {/* CONDIÇÕES DE PAGAMENTO */}
+        <section className="mn-section">
+          <p className="mn-label" style={{ color:t.teal }}>Investimento</p>
+          <h2 className="mn-h2" style={{ fontFamily:t.serif }}>Condições de pagamento</h2>
+          <p className="mn-copy">{CONDICOES.texto}</p>
+          <p className="mn-copy" style={{ marginTop: 16 }}>{CONDICOES.desconto}</p>
+          <p style={{ marginTop: 24, fontSize: '.78rem', letterSpacing: '.04em', opacity: .55 }}>{CONDICOES.vigencia}</p>
+          <a href={WA} target="_blank" rel="noopener noreferrer" className="mn-hero-cta" style={{ fontFamily:t.display, marginTop: 32 }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Simular condições
+          </a>
+        </section>
+
         {/* CTA BAND */}
         <section className="mn-cta-band">
           <p className="mn-cta-band-h" style={{ fontFamily:t.serif }}>Pronto para morar no litoral?</p>
@@ -223,6 +292,7 @@ export default function MarDiNizzaPage() {
         {/* FOOTER */}
         <footer className="mn-footer" style={{ fontFamily:t.body }}>
           <p style={{ margin:0 }}>&copy; {new Date().getFullYear()} Stiven Allan — Corretor de Imóveis</p>
+          <p style={{ margin:'6px 0 0', opacity:.7 }}>Mar di Nizza Residencial é um empreendimento da Construtora Fontana, incorporado por OBF Construções Ltda. Incorporação imobiliária averbada na Matrícula R-1/45.501, Ofício de Registro de Imóveis da Comarca de Laguna/SC.</p>
         </footer>
 
         {/* FAB WhatsApp */}
@@ -232,7 +302,7 @@ export default function MarDiNizzaPage() {
         </a>
       
 {/* SEO FAQ */}
-<PropertyFAQ items={[{"pergunta":"Como funciona o financiamento direto do Mar di Nizza Residencial?","resposta":"Entrada de 20%, saldo em até 72 parcelas mensais e 6 reforços anuais (cada reforço equivale a 5 parcelas mensais), com correção pelo CUB/SC durante a obra. Sem análise de banco."},{"pergunta":"Qual a previsão de entrega do Mar di Nizza Residencial?","resposta":"A previsão de entrega é dezembro de 2026, em Mar Grosso, Laguna/SC."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Sim. Além do financiamento direto com a construtora, é possível optar por financiamento bancário. Fale com o Stiven pelo WhatsApp para simular as duas opções."},{"pergunta":"Onde fica o Mar di Nizza Residencial?","resposta":"O Mar di Nizza Residencial está localizado na Rua Joana Mussi, esq. Rua Moreira Gomes, no Mar Grosso, Laguna/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"O empreendimento oferece apartamentos com 2 e 3 dormitórios, de 65 a 92 m² privativos."}]} accent="#1B7A72" />
+<PropertyFAQ items={[{"pergunta":"Como funciona o financiamento direto do Mar di Nizza Residencial?","resposta":"Entrada de 20% (parcela única), 6 reforços anuais (cada um equivalente a 5x o valor da parcela mensal) e saldo em até 72 parcelas mensais, corrigidas pelo CUB/Sinduscon-SC durante a obra. Para pagamento à vista, desconto de 15% sobre o valor total. Condições conforme tabela de julho/2026, sujeitas à atualização — fale com Stiven para simular sua unidade."},{"pergunta":"Qual a previsão de entrega do Mar di Nizza Residencial?","resposta":"A previsão de entrega é dezembro de 2026, em Mar Grosso, Laguna/SC."},{"pergunta":"Como é a correção monetária após a entrega das chaves?","resposta":"O saldo remanescente é corrigido mensalmente, à escolha do comprador, por uma de duas opções: IGPM acrescido de juros compensatórios de 0,75% ao mês, ou apenas pelo CUB/Sinduscon-SC."},{"pergunta":"Onde fica o Mar di Nizza Residencial?","resposta":"O Mar di Nizza Residencial está localizado na Rua Joana Mussi, esq. Rua Moreira Gomes, no Mar Grosso, Laguna/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"2 dormitórios (1 suíte) de 65,89 a 66,51 m² privativos, ou 3 dormitórios (1 suíte) de 87,84 a 92,09 m² privativos, conforme o final do apartamento — confira as plantas oficiais na página."}]} accent="#1B7A72" />
 <RelatedProperties atualSlug="mar-di-nizza-mar-grosso-laguna-sc" cidade="Laguna" />
 
 </div>
