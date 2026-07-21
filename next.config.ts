@@ -132,6 +132,11 @@ const nextConfig: NextConfig = {
   ],
 }
 
+// Export nomeado só pra teste (tests/next-config-redirects.test.ts) — inspecionar
+// nextConfig.redirects() diretamente, sem depender de como withSentryConfig repassa
+// (ou não) essa propriedade no objeto default exportado.
+export { nextConfig }
+
 // Sentry wrap — source map uploads são no-op sem SENTRY_AUTH_TOKEN,
 // stack traces em prod ficam bundled até você adicionar essa env (opcional).
 export default withSentryConfig(nextConfig, {

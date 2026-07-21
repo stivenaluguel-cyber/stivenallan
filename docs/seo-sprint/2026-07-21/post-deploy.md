@@ -18,6 +18,16 @@ curl -s -o /dev/null -w "%{http_code} %{redirect_url}\n" https://stivenallan.com
 
 # Calliano com title/description novos
 curl -s https://stivenallan.com.br/empreendimento/fontana/calliano-centro-criciuma-sc | grep -o '<title>[^<]*</title>'
+
+# Tubarão (achado novo desta rodada): deve virar 200 com conteúdo real, nunca mais
+# 200 com "Cidade não encontrada"
+curl -s -o /dev/null -w "%{http_code}\n" https://stivenallan.com.br/lancamentos/tubarao-sc   # esperado: 200
+curl -s https://stivenallan.com.br/lancamentos/tubarao-sc | grep -o '<title>[^<]*</title>\|<link rel="canonical"[^>]*>\|Gran Palazzo\|Play Residence\|Cidade não encontrada'
+# esperado: título "Lançamentos Imobiliários em Tubarão/SC | Stiven Allan", canonical
+# self, "Gran Palazzo" e "Play Residence" presentes, "Cidade não encontrada" ausente
+
+# Sitemap: Aura Residence deve aparecer mesmo antes de qualquer alteração no Supabase
+curl -s https://stivenallan.com.br/sitemap.xml | grep -c aura-residence-centro-criciuma-sc   # esperado: 1
 ```
 
 ## 2. Reindexação manual (Google Search Console — URL Inspection)
@@ -26,7 +36,8 @@ Só faz sentido pedir reindexação de URLs **canônicas e valiosas** — não p
 
 Solicitar "Testar URL publicada" + "Solicitar indexação" para:
 1. `https://stivenallan.com.br/empreendimento/fontana/calliano-centro-criciuma-sc` (title/description mudaram)
-2. `https://stivenallan.com.br/sitemap.xml` (reenviar no Search Console após confirmar 0 duplicatas)
+2. `https://stivenallan.com.br/lancamentos/tubarao-sc` (antes retornava "Cidade não encontrada" com 200; agora tem conteúdo, title e canonical reais — vale pedir reindexação pra substituir o snapshot antigo que o Google possa ter guardado)
+3. `https://stivenallan.com.br/sitemap.xml` (reenviar no Search Console após confirmar 0 duplicatas e a presença do Aura Residence)
 
 ## 3. Checar relatório Page Indexing (2–3 dias após deploy, depois de novo em ~14 dias)
 
@@ -38,6 +49,11 @@ Solicitar "Testar URL publicada" + "Solicitar indexação" para:
 
 - Extrair novamente `query`/`page`/`clicks`/`impressions`/`ctr`/`position` para `calliano-centro-criciuma-sc` e comparar com o baseline desta sessão (57 impr, posição 7.77, CTR 1.75%) — só então afirmar se houve melhora real de CTR.
 - Repetir a checagem de duplicidade do sitemap contra o número de URLs realmente enviadas no GSC.
+- Verificar se `/lancamentos/tubarao-sc` começa a acumular impressões próprias (hoje não há dado de query/página específico pra essa URL no Search Analytics, já que ela nunca teve conteúdo real antes deste patch).
+
+## 5. Watch estrutural: novas cidades vindas do Supabase antes de entrarem em `CIDADES`
+
+O fallback que causava "Cidade não encontrada" com 200 foi trocado por `notFound()` real em `src/app/lancamentos/[cidade]/page.tsx` — isso vale pra **qualquer** cidade nova que apareça em `properties` no Supabase antes de alguém adicionar a entrada correspondente em `CIDADES`. Comportamento agora é seguro (404 real, nunca mais um 200 fake), mas ainda gera um buraco temporário no funil (sitemap referencia a URL, a página 404 até a entrada ser adicionada). Se o Page Indexing mostrar uma nova cidade em "Não encontrada (404)", é sinal pra adicionar a cidade em `CIDADES` com dados reais, não pra ignorar.
 
 ## PROMPT PRONTO PARA A EXTENSÃO DO CHROME (usar só depois do deploy)
 
@@ -52,6 +68,11 @@ Abra o Google Search Console para a propriedade sc-domain:stivenallan.com.br.
 
 2. Para a URL https://stivenallan.com.br/empreendimento/fontana/calliano-centro-criciuma-sc,
    se o status permitir, clique em "Solicitar indexação" e confirme a URL exata antes de enviar.
+
+3a. Verifique https://stivenallan.com.br/lancamentos/tubarao-sc especificamente: confirme
+   que o Google já enxerga o novo title ("Lançamentos Imobiliários em Tubarão/SC") e
+   canonical (a própria URL, não mais a home) — relate exatamente o que a Inspeção de
+   URL mostrar, incluindo se ainda há uma versão em cache com o conteúdo antigo.
 
 3. Vá em Indexação > Páginas (relatório Page Indexing) e verifique se estas 9 URLs aparecem
    como "Não encontrada (404)" ou "Removida (410)" — relate o status exato de cada uma, não

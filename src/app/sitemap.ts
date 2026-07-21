@@ -1,6 +1,14 @@
 import { MetadataRoute } from 'next'
 import { getVitrineImoveis } from '@/lib/vitrine'
 import { SITE_URL } from '@/lib/site'
+import { arbor } from '@/data/eraldo/arbor'
+import { granMichel } from '@/data/eraldo/gran-michel'
+import { granPalazzo } from '@/data/eraldo/gran-palazzo'
+import { harmony } from '@/data/eraldo/harmony'
+import { horizon } from '@/data/eraldo/horizon'
+import { lessence } from '@/data/eraldo/lessence'
+import { play } from '@/data/eraldo/play'
+import { symphony } from '@/data/eraldo/symphony'
 
 function cidadeSlug(cidade: string): string {
   return (
@@ -86,17 +94,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }))
 
-  // Lançamentos Eraldo com página bespoke própria (mesmo padrão do Aura Residence).
-  // Mantido como fallback estático para o caso de algum desses slugs ainda não
-  // existir em `properties` — o dedupe abaixo evita URL duplicada quando já existir.
-  const eraldoSlugs = ['arbor-centro-criciuma-sc', 'gran-michel-criciuma-sc', 'harmony-residence-centro-balneario-rincao-sc', 'gran-palazzo-vila-moema-tubarao-sc', 'horizon-centro-balneario-rincao-sc', 'lessence-home-club-cruzeiro-do-sul-criciuma-sc', 'play-residence-vila-moema-tubarao-sc', 'symphony-mar-grosso-laguna-sc']
-  const eraldoPages: MetadataRoute.Sitemap = eraldoSlugs.map((slug) => ({
-    url: SITE_URL + '/empreendimento/eraldo/' + slug,
+  // Lançamentos Eraldo com página bespoke própria e arquivo de dados real em
+  // src/data/eraldo/*.ts (não vêm de `properties`/`imoveis.ts`). Slugs derivados
+  // diretamente desses arquivos — não hardcoded como string solta — pra não
+  // depender do Supabase pra aparecer no sitemap, e pra um 9º empreendimento novo
+  // em src/data/eraldo/ entrar automaticamente sem precisar editar este arquivo.
+  // O dedupe abaixo cobre o caso de algum desses slugs também existir em `properties`.
+  const eraldoComDadosProprios = [arbor, granMichel, granPalazzo, harmony, horizon, lessence, play, symphony]
+  const eraldoPages: MetadataRoute.Sitemap = eraldoComDadosProprios.map((emp) => ({
+    url: SITE_URL + '/empreendimento/' + emp.construtoraSlug + '/' + emp.slug,
     changeFrequency: 'weekly' as const,
     priority: 0.8,
   }))
 
-  const todasPaginas = [...staticPages, ...guiaIndexPage, ...cidadePages, ...bairroPages, ...guiaPages, ...empPages, ...eraldoPages]
+  // Aura Residence: página bespoke Eraldo mais antiga, anterior ao padrão
+  // src/data/eraldo/*.ts (não tem arquivo de dados próprio — conteúdo fica direto
+  // no page.tsx, como as páginas estáticas Fontana). Por isso não entra na lista
+  // acima; precisa da própria entrada estática pra não depender do Supabase pra
+  // aparecer no sitemap — achado da auditoria SEO 2026-07-21 (antes ficava de fora
+  // do sitemap local e só aparecia via `ativos`/Supabase em produção).
+  const auraPages: MetadataRoute.Sitemap = [
+    { url: SITE_URL + '/empreendimento/eraldo/aura-residence-centro-criciuma-sc', changeFrequency: 'weekly' as const, priority: 0.8 },
+  ]
+
+  const todasPaginas = [...staticPages, ...guiaIndexPage, ...cidadePages, ...bairroPages, ...guiaPages, ...empPages, ...eraldoPages, ...auraPages]
 
   // Dedupe por URL: `ativos` (Supabase properties) e `eraldoSlugs` (fallback
   // hardcoded) podem gerar a mesma URL quando um empreendimento Eraldo já foi
