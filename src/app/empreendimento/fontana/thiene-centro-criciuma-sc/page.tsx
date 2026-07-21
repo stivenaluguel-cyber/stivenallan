@@ -68,6 +68,34 @@ const AMENIDADES: string[] = [
 'Aproveitamento de águas pluviais',
 ]
 
+// Plantas oficiais — site estilofontana.com.br (aba "Plantas" do Thiene).
+const PLANTAS = [
+{ categoria: 'tipo', src: 'https://estilofontana.com.br/images/empreendimento_planta/planta-tipo-final-01-1690288709.jpg', alt: 'Thiene Residencial — planta apartamento tipo final 01', label: 'Apartamento Tipo — Final 01', quartos: 3, suites: 1 },
+{ categoria: 'tipo', src: 'https://estilofontana.com.br/images/empreendimento_planta/sugestao-de-alteracao-de-planta-planta-tipo-final-01-1690288813.jpg', alt: 'Thiene Residencial — sugestão de alteração de planta, final 01', label: 'Sugestão de Alteração — Final 01', quartos: 3, suites: 1 },
+{ categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/lazer-1690289360.jpg', alt: 'Thiene Residencial — pavimento de lazer', label: 'Lazer' },
+{ categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/terreo-1690289241.jpg', alt: 'Thiene Residencial — planta do térreo', label: 'Térreo' },
+{ categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/garagem-1690289397.jpg', alt: 'Thiene Residencial — garagem', label: 'Garagem' },
+{ categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/subsolo-1690289447.jpg', alt: 'Thiene Residencial — subsolo', label: 'Subsolo · Garagem' },
+]
+const PLANTAS_GRUPOS = [
+{ titulo: 'Apartamento tipo', categoria: 'tipo' },
+{ titulo: 'Lazer, térreo e garagem', categoria: 'comum' },
+]
+
+// Condições comerciais — fonte única (tabela vigente Julho/2026). Plano padrão + Política Comercial (2 modalidades alternativas, distintas).
+const COMERCIAL = {
+padrao: 'Plano padrão de pagamento: entrada de 20% do valor da unidade (à vista, em parcela única), mais 6 reforços intercalados, mais 72 parcelas mensais — juntas, essas três parcelas somam 100% do valor da unidade, direto com a construtora.',
+correcaoPadrao: 'Durante a obra, os valores são corrigidos mensalmente pelo CUB/Sinduscon-SC; após a conclusão, o comprador escolhe entre correção pelo IGPM + 0,75% ao mês ou apenas pelo CUB/Sinduscon-SC.',
+alternativas: 'Modalidades alternativas (Política Comercial): 15% de desconto para pagamento à vista; ou 10% de desconto pagando 40% do valor até a entrega das chaves (ato mínimo de 10%), com o saldo remanescente quitável via financiamento bancário ou diretamente com a construtora, em até 180 meses após a conclusão, corrigido pelo IGPM + 0,75% ao mês (sem permuta nesta opção).',
+vigencia: 'Condições conforme a tabela vigente (Julho/2026), sujeitas à atualização. Consulte a tabela vigente para valores e disponibilidade por unidade.',
+}
+const FAQ_ITEMS = [
+{ pergunta: 'Como funciona o pagamento do Thiene Residencial?', resposta: `${COMERCIAL.padrao} ${COMERCIAL.correcaoPadrao} ${COMERCIAL.vigencia}` },
+{ pergunta: 'Existe outra forma de pagamento além do plano padrão?', resposta: `Sim. ${COMERCIAL.alternativas} ${COMERCIAL.vigencia}` },
+{ pergunta: 'Qual a previsão de entrega do Thiene Residencial?', resposta: 'A previsão de entrega é setembro de 2026, em Centro, Criciúma/SC.' },
+{ pergunta: 'Onde fica o Thiene Residencial?', resposta: 'O Thiene Residencial está localizado na Rua Monteiro Lobato, 105, esq. Rua Santo Antônio, no Centro de Criciúma/SC.' },
+]
+
 export const revalidate = 3600
 
 export const metadata: Metadata = {
@@ -95,7 +123,7 @@ robots: { index: true, follow: true },
 export default function ThieneResidencialPage() {
 return (
 <main style={{ background: t.bg, color: t.ink, fontFamily: t.body, overflowX: 'hidden' }}>
-<PropertySchema nome="Thiene Residencial" slug="thiene-centro-criciuma-sc" construtora_slug="fontana" cidade="Criciúma" uf="SC" bairro="Centro" descricao="Thiene Residencial — 3 dormitórios (1 suíte), 101 a 102 m² privativos no Centro de Criciúma/SC. Financiamento direto Fontana." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/thiene-centro-criciuma-sc.jpg" faq={[{"pergunta":"Como funciona o pagamento do Thiene Residencial?","resposta":"Entrada de 10%, saldo parcelado diretamente com a construtora em até 180 meses, com correção IGPM + 0,75% a.m."},{"pergunta":"Qual a previsão de entrega do Thiene Residencial?","resposta":"A previsão de entrega é setembro de 2026, em Centro, Criciúma/SC."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Sim. Além do financiamento direto com a construtora, é possível optar por financiamento bancário. Fale com o Stiven pelo WhatsApp para simular as duas opções."},{"pergunta":"Onde fica o Thiene Residencial?","resposta":"O Thiene Residencial está localizado na Rua Monteiro Lobato, esq. Rua Santo Antônio, no Centro de Criciúma/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"O empreendimento oferece apartamentos com 3 dormitórios (1 suíte), de 101 a 102 m² privativos."}]} />
+<PropertySchema nome="Thiene Residencial" slug="thiene-centro-criciuma-sc" construtora_slug="fontana" cidade="Criciúma" uf="SC" bairro="Centro" descricao="Thiene Residencial — 3 dormitórios (1 suíte), 101 a 102 m² privativos no Centro de Criciúma/SC. Financiamento direto Fontana." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/thiene-centro-criciuma-sc.jpg" faq={FAQ_ITEMS} />
 
 
 
@@ -218,6 +246,20 @@ No Centro da cidade, com tudo a poucos passos, o Thiene entrega espaço, sofisti
 <a href={WPP} target="_blank" rel="noopener noreferrer" className="th-cta th-cta-light" data-wpp="1">Solicitar Catálogo</a>
 <LeadCaptureButton slug="thiene-centro-criciuma-sc" construtora_slug="fontana"  propertyDisplayName="Thiene Residencial" />
 </div>
+<div style={{ maxWidth: 1160, margin: 'clamp(64px,10vh,96px) auto 0', textAlign: 'left' }}>
+{PLANTAS_GRUPOS.map(({ titulo, categoria }) => {
+const itens = PLANTAS.filter(p => p.categoria === categoria)
+if (!itens.length) return null
+return (
+<div key={categoria} style={{ marginBottom: 40 }}>
+<p className="th-eyebrow" style={{ color: t.onDarkMuted, marginBottom: 16, textAlign: 'center' }}>{titulo}</p>
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+<GalleryWithLightbox galeria={itens} prefix="th" gradient="rgba(10,21,32,0.6)" badge="Planta oficial" trackPlantas={{ empreendimento: 'thiene-centro-criciuma-sc', content_name: 'Thiene Residencial' }} />
+</div>
+</div>
+)
+})}
+</div>
 </section>
 
 {/* 5 DIFERENCIAIS DAS UNIDADES */}
@@ -279,7 +321,10 @@ Com tudo a poucos passos, o Thiene coloca você no centro da vida urbana de Cric
 <div style={{ maxWidth: 1080, margin: '0 auto', textAlign: 'center' }}>
 <p className="th-eyebrow" style={{ color: t.onDark, marginBottom: 18 }}>Financiamento Direto</p>
 <h2 className="th-h2" style={{ color: t.onDark }}>A liberdade de comprar sem banco</h2>
-<p className="th-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 60 }}>Sem burocracia, sem intermediários. Direto com a construtora.</p>
+<p className="th-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 40 }}>Sem burocracia, sem intermediários. Direto com a construtora.</p>
+<p style={{ color: t.onDarkMuted, fontSize: 17, lineHeight: 1.7, maxWidth: 720, margin: '0 auto 16px' }}>{COMERCIAL.padrao}</p>
+<p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.7, maxWidth: 720, margin: '0 auto 20px' }}>{COMERCIAL.correcaoPadrao}</p>
+<p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.7, maxWidth: 720, margin: '0 auto 40px' }}>{COMERCIAL.alternativas}</p>
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px,1fr))', gap: 'clamp(28px,4vw,52px)' }}>
 {[
 { n: '01', ti: 'Converse com o Corretor', d: 'Atendimento exclusivo e reservado com Stiven Allan para entender o seu momento e as melhores condições.' },
@@ -293,7 +338,7 @@ Com tudo a poucos passos, o Thiene coloca você no centro da vida urbana de Cric
 </div>
 ))}
 </div>
-<p style={{ marginTop: 56, fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: t.onDark }}>Na planta &middot; Sob consulta</p>
+<p style={{ marginTop: 56, fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: t.onDark }}>{COMERCIAL.vigencia}</p>
 </div>
 </section>
 
@@ -338,7 +383,7 @@ Com tudo a poucos passos, o Thiene coloca você no centro da vida urbana de Cric
 
 
 {/* SEO FAQ */}
-<PropertyFAQ items={[{"pergunta":"Como funciona o pagamento do Thiene Residencial?","resposta":"Entrada de 10%, saldo parcelado diretamente com a construtora em até 180 meses, com correção IGPM + 0,75% a.m."},{"pergunta":"Qual a previsão de entrega do Thiene Residencial?","resposta":"A previsão de entrega é setembro de 2026, em Centro, Criciúma/SC."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Sim. Além do financiamento direto com a construtora, é possível optar por financiamento bancário. Fale com o Stiven pelo WhatsApp para simular as duas opções."},{"pergunta":"Onde fica o Thiene Residencial?","resposta":"O Thiene Residencial está localizado na Rua Monteiro Lobato, esq. Rua Santo Antônio, no Centro de Criciúma/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"O empreendimento oferece apartamentos com 3 dormitórios (1 suíte), de 101 a 102 m² privativos."}]} accent="#1C3144" />
+<PropertyFAQ items={FAQ_ITEMS} accent="#1C3144" />
 <RelatedProperties atualSlug="thiene-centro-criciuma-sc" cidade="Criciúma" />
 
 
