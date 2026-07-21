@@ -51,9 +51,32 @@ const AMENIDADES = [
   'Playground','Campo de Futebol','Churrasqueira','Elevador',
 ]
 
+// Plantas oficiais — site estilofontana.com.br (aba "Plantas" do Calliano).
+// Confirmado na tabela vigente: finais 1, 2, 4 e 5 = 3 dormitórios (1 suíte); finais 3 e 6 = 2 dormitórios (1 suíte).
+const PLANTAS = [
+  { categoria: 'tipo', src: 'https://estilofontana.com.br/images/empreendimento_planta/final-2-final-1-4-e-5-possuem-a-mesma-rebatida-1603284878.jpg', alt: 'Calliano Residencial — planta apartamento tipo final 2 (finais 1, 4 e 5 possuem a mesma planta, rebatida)', label: 'Apartamento Tipo — Final 2 (finais 1, 4 e 5, rebatida)', quartos: 3, suites: 1 },
+  { categoria: 'tipo', src: 'https://estilofontana.com.br/images/empreendimento_planta/final-3-final-6-possui-a-mesma-rebatida-1603284927.jpg', alt: 'Calliano Residencial — planta apartamento tipo final 3 (final 6 possui a mesma planta, rebatida)', label: 'Apartamento Tipo — Final 3 (final 6, rebatida)', quartos: 2, suites: 1 },
+  { categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/cobertura-inferior-1603285073.jpg', alt: 'Calliano Residencial — cobertura inferior, final 2 (final 1 rebatida)', label: 'Cobertura Inferior — Final 2 (final 1, rebatida)' },
+  { categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/cobertura-superior-1603285002.jpg', alt: 'Calliano Residencial — cobertura superior, final 2 (final 1 rebatida)', label: 'Cobertura Superior — Final 2 (final 1, rebatida)' },
+  { categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/terreo-1603285142.jpg', alt: 'Calliano Residencial — planta do térreo', label: 'Térreo' },
+  { categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/garagem-1603285213.jpg', alt: 'Calliano Residencial — garagem, 1º pavimento', label: 'Garagem — 1º Pavimento' },
+  { categoria: 'comum', src: 'https://estilofontana.com.br/images/empreendimento_planta/subsolo-1603285203.jpg', alt: 'Calliano Residencial — subsolo', label: 'Subsolo' },
+]
+const PLANTAS_GRUPOS = [
+  { titulo: 'Apartamentos tipo', categoria: 'tipo' },
+  { titulo: 'Coberturas, térreo e garagem', categoria: 'comum' },
+]
+
+// Tabela vigente traz apenas 1 unidade-exemplo (305) — não uma tabela completa. Veredito: texto seguro genérico.
+const FAQ_ITEMS = [
+  { pergunta: 'Quais são as condições de pagamento do Calliano Residencial?', resposta: 'Condições variam conforme unidade e modalidade. Consulte a tabela vigente para valores e disponibilidade. Condições conforme a tabela vigente, sujeitas à atualização. Consulte a tabela vigente para valores e disponibilidade por unidade.' },
+  { pergunta: 'Todas as unidades têm a mesma metragem e o mesmo número de dormitórios?', resposta: 'Não. Os finais 1, 2, 4 e 5 têm 3 dormitórios (1 suíte); os finais 3 e 6 têm 2 dormitórios (1 suíte). Consulte o corretor para confirmar a planta e a metragem exata da unidade de seu interesse.' },
+  { pergunta: 'Onde fica o Calliano Residencial?', resposta: 'O Calliano Residencial está localizado na Rua São José, Centro, Criciúma/SC.' },
+]
+
 export const metadata: Metadata = {
   title: 'Calliano Residencial | Centro Criciúma SC',
-  description: 'Calliano Residencial, no Centro de Criciúma/SC — 2 ou 3 dormitórios, até 92 m² privativos, acabamento refinado e design italiano. Financiamento direto com a construtora, sem banco. Fale com Stiven Allan.',
+  description: 'Calliano Residencial, no Centro de Criciúma/SC — 2 ou 3 dormitórios (1 suíte), até 92 m² privativos, acabamento refinado e design italiano. Condições conforme a tabela vigente. Fale com Stiven Allan.',
   alternates: { canonical: `${SITE_URL}/empreendimento/fontana/calliano-centro-criciuma-sc` },
   openGraph: {
     title: 'Calliano Residencial | Centro Criciúma SC | Stiven Allan',
@@ -69,7 +92,8 @@ export const metadata: Metadata = {
 export default function CallianoPage() {
   return (
     <main style={{ background: t.bg, color: t.ink, fontFamily: t.body, overflowX: 'hidden' }}>
-      
+      <PropertySchema nome="Calliano Residencial" slug="calliano-centro-criciuma-sc" construtora_slug="fontana" cidade="Criciúma" uf="SC" bairro="Centro" descricao="Calliano Residencial, no Centro de Criciúma/SC — 2 ou 3 dormitórios (1 suíte), até 92 m² privativos, acabamento refinado e design italiano. Fale com Stiven Allan." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/calliano-centro-criciuma-sc.jpg" faq={FAQ_ITEMS} />
+
       <style>{`
         html { scroll-behavior: smooth; }
         .ca-eyebrow { font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: ${t.terra}; font-family: ${t.display}; }
@@ -181,6 +205,20 @@ export default function CallianoPage() {
             </div>
           </div>
         </div>
+        <div style={{ maxWidth: 1100, margin: 'clamp(64px,10vh,96px) auto 0', textAlign: 'left' }}>
+          {PLANTAS_GRUPOS.map(({ titulo, categoria }) => {
+            const itens = PLANTAS.filter(p => p.categoria === categoria)
+            if (!itens.length) return null
+            return (
+              <div key={categoria} style={{ marginBottom: 40 }}>
+                <p className="ca-eyebrow" style={{ color: t.onDarkMuted, marginBottom: 16, textAlign: 'center' }}>{titulo}</p>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+                  <GalleryWithLightbox galeria={itens} prefix="ca" gradient="rgba(17,11,7,0.6)" badge="Planta oficial" trackPlantas={{ empreendimento: 'calliano-centro-criciuma-sc', content_name: 'Calliano Residencial' }} />
+                </div>
+              </div>
+            )
+          })}
+        </div>
       </section>
 
       {/* DIFERENCIAIS */}
@@ -245,7 +283,8 @@ export default function CallianoPage() {
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <p className="ca-eyebrow" style={{ color: 'rgba(246,237,232,0.7)' }}>Como adquirir</p>
           <div className="ca-rule" style={{ background: 'rgba(246,237,232,0.5)' }} />
-          <h2 className="ca-h2" style={{ fontSize: 'clamp(24px,3.5vw,44px)', color: t.onDark, margin: '0 0 48px' }}>Financiamento<br />Direto com a Construtora</h2>
+          <h2 className="ca-h2" style={{ fontSize: 'clamp(24px,3.5vw,44px)', color: t.onDark, margin: '0 0 24px' }}>Financiamento<br />Direto com a Construtora</h2>
+          <p style={{ fontSize: 15, lineHeight: 1.8, color: t.onDarkMuted, maxWidth: 640, margin: '0 0 40px' }}>Condições variam conforme unidade e modalidade. Consulte a tabela vigente para valores e disponibilidade.</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 32, marginBottom: 48 }}>
             {[
               ['01','Escolha seu imóvel','Selecione a planta ideal para você e sua família.'],
@@ -263,8 +302,12 @@ export default function CallianoPage() {
             <a href={CATALOGO_PDF} target="_blank" rel="noopener noreferrer" className="ca-cta-light">Baixar catálogo</a>
             <a href={WPP} target="_blank" rel="noopener noreferrer" className="ca-cta-light">Falar com Stiven</a>
           </div>
+          <p style={{ marginTop: 40, fontSize: 11, letterSpacing: '.2em', textTransform: 'uppercase', color: 'rgba(246,237,232,0.7)' }}>Condições conforme a tabela vigente, sujeitas à atualização. Consulte a tabela vigente para valores e disponibilidade por unidade.</p>
         </div>
       </section>
+
+      {/* SEO FAQ */}
+      <PropertyFAQ items={FAQ_ITEMS} accent={t.terra} />
 
       <RelatedProperties atualSlug="calliano-centro-criciuma-sc" cidade="Criciúma" />
 
