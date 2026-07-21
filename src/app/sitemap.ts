@@ -89,7 +89,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Lançamentos Eraldo com página bespoke própria (mesmo padrão do Aura Residence)
   // que ainda não têm registro em `properties` — entrada estática evita depender
   // do cadastro no banco só para aparecer no sitemap.
-  const eraldoSlugs = ['arbor-centro-criciuma-sc', 'gran-michel-criciuma-sc']
+  const eraldoSlugs = ['arbor-centro-criciuma-sc', 'gran-michel-criciuma-sc', 'harmony-residence-centro-balneario-rincao-sc']
   const eraldoPages: MetadataRoute.Sitemap = eraldoSlugs.map((slug) => ({
     url: SITE_URL + '/empreendimento/eraldo/' + slug,
     lastModified: now,
