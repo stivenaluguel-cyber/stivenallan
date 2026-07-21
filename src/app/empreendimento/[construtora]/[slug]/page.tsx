@@ -14,9 +14,9 @@ import { LeadCaptureModal } from '@/components/LeadCaptureModal';
 import FormContato from './FormContato';
 import Image from 'next/image';
 import PropertyPageTemplate, { type PropertyData } from '@/components/PropertyPageTemplate';
+import { SITE_URL } from '@/lib/site';
 export const dynamic = 'force-dynamic';
 
-const SITE_URL = 'https://stivenallan.com.br';
 const WHATSAPP = '5548991642332';
 
 export const revalidate = 3600;

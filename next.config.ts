@@ -66,9 +66,11 @@ const nextConfig: NextConfig = {
     // Site antigo (www.stivenallan.com.br) — checklist SEO 2026-07-20: essas URLs
     // ainda recebem impressão/clique real no Search Console mas hoje batem 404
     // (o redirect de www só trocava o domínio, mantendo o path morto). Mapeamento
-    // 1:1 pros empreendimentos que continuam no portfólio atual; o resto (unidades
-    // descontinuadas — Sordello, Volpago, Gabiano, Belfiore, Hexa Prime, Longarone,
-    // terrenos/casas avulsas — e as buscas antigas /imoveis/?...) cai no catálogo.
+    // 1:1 pros empreendimentos que continuam no portfólio atual. Unidades
+    // confirmadas como descontinuadas (Sordello, Volpago, Belfiore, Hexa Prime,
+    // Longarone, terrenos/casas avulsas) NÃO entram aqui — não têm equivalente
+    // real, então viram 410 em src/middleware.ts em vez de redirect pro catálogo
+    // (auditoria SEO 2026-07-21, docs/seo-sprint/2026-07-21/redirects.csv).
     {
       source: '/home',
       destination: '/',
@@ -109,19 +111,14 @@ const nextConfig: NextConfig = {
       destination: '/empreendimento/fontana/thiene-centro-criciuma-sc',
       permanent: true,
     },
-    // Fallback: qualquer outra URL do site antigo (unidade descontinuada ou busca
-    // antiga) cai no catálogo em vez de 404 — precisa vir depois dos matches
-    // específicos acima, senão o wildcard captura primeiro.
-    {
-      source: '/imovel/:path*',
-      destination: '/empreendimentos',
-      permanent: true,
-    },
-    {
-      source: '/agendar-visita/:path*',
-      destination: '/empreendimentos',
-      permanent: true,
-    },
+    // Removido o fallback wildcard `/imovel/:path*` e `/agendar-visita/:path*` →
+    // /empreendimentos que existia aqui: redirecionava em massa qualquer URL não
+    // mapeada (inclusive as 9 unidades confirmadas como descontinuadas) para o
+    // catálogo, sem equivalente real — auditoria SEO 2026-07-21 (ver
+    // docs/seo-sprint/2026-07-21/baseline.md, achado B1-4). As descontinuadas
+    // confirmadas agora respondem 410 (src/middleware.ts); qualquer outra URL
+    // antiga não mapeada aqui e não listada como descontinuada cai em 404 padrão
+    // — mais correto do que fingir um redirect sem destino real comprovado.
     {
       source: '/imoveis',
       destination: '/empreendimentos',
@@ -134,6 +131,11 @@ const nextConfig: NextConfig = {
     },
   ],
 }
+
+// Export nomeado só pra teste (tests/next-config-redirects.test.ts) — inspecionar
+// nextConfig.redirects() diretamente, sem depender de como withSentryConfig repassa
+// (ou não) essa propriedade no objeto default exportado.
+export { nextConfig }
 
 // Sentry wrap — source map uploads são no-op sem SENTRY_AUTH_TOKEN,
 // stack traces em prod ficam bundled até você adicionar essa env (opcional).

@@ -1,6 +1,10 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { notFound } from 'next/navigation'
 import { imoveis } from '@/data/imoveis'
+import { granPalazzo } from '@/data/eraldo/gran-palazzo'
+import { play } from '@/data/eraldo/play'
+import type { Empreendimento as EmpreendimentoEraldo } from '@/data/eraldo/types'
 
 // Cidades suportadas
 const CIDADES: Record<string, { nome: string; uf: string; descricao: string }> = {
@@ -30,6 +34,13 @@ const CIDADES: Record<string, { nome: string; uf: string; descricao: string }> =
   'bom-jardim-da-serra-sc': { nome: 'Bom Jardim da Serra', uf: 'SC', descricao: 'Empreendimentos na Serra Catarinense.' },
   'balneario-picarras': { nome: 'Balneário Piçarras', uf: 'SC', descricao: 'Empreendimentos frente mar em Balneário Piçarras/SC.' },
   'balneario-picarras-sc': { nome: 'Balneário Piçarras', uf: 'SC', descricao: 'Empreendimentos frente mar em Balneário Piçarras/SC.' },
+  // Tubarão só tem empreendimentos da Eraldo Construções (não da Fontana) — dados
+  // reais em src/data/eraldo/gran-palazzo.ts e src/data/eraldo/play.ts, ambos na
+  // Vila Moema. Antes desta correção, "tubarao"/"tubarao-sc" não existia aqui, e a
+  // página caía no branch `!info` (200 com "Cidade não encontrada") mesmo aparecendo
+  // no sitemap — achado da auditoria SEO 2026-07-21.
+  'tubarao': { nome: 'Tubarão', uf: 'SC', descricao: 'Empreendimentos da Eraldo Construções na Vila Moema, Tubarão/SC.' },
+  'tubarao-sc': { nome: 'Tubarão', uf: 'SC', descricao: 'Empreendimentos da Eraldo Construções na Vila Moema, Tubarão/SC.' },
 }
 
 // Seleção editorial de quais empreendimentos aparecem como card em cada cidade.
@@ -192,21 +203,51 @@ function statusParaFase(status: string): string {
   return status
 }
 
+// Empreendimentos da Eraldo Construções por cidade — mesma ideia editorial de
+// SLUGS_POR_CIDADE, mas para empreendimentos que vivem em src/data/eraldo (não em
+// @/data/imoveis, que é só Fontana). Hoje só Tubarão depende exclusivamente desta
+// lista; cidades com empreendimentos Fontana continuam usando SLUGS_POR_CIDADE.
+const ERALDO_POR_CIDADE: Record<string, EmpreendimentoEraldo[]> = {
+  tubarao: [granPalazzo, play],
+}
+
+function statusEraldoParaFase(status: EmpreendimentoEraldo['status']): string {
+  if (status === 'lancamento') return 'Na planta'
+  if (status === 'em_construcao') return 'Em obras'
+  if (status === 'entregue') return 'Entregue'
+  return status
+}
+
 function getEmpreendimentosDaCidade(cityKey: string) {
   const slugs = SLUGS_POR_CIDADE[cityKey]
-  if (!slugs) return []
-  return slugs
-    .map((slug) => imoveis.find((im) => im.slug === slug && im.ativo))
-    .filter((im): im is NonNullable<typeof im> => Boolean(im))
-    .map((im) => ({
-      nome: im.nome,
-      fase: statusParaFase(im.status),
-      slug: '/empreendimento/' + im.construtora_slug + '/' + im.slug,
-      construtora: im.construtora.replace(/^Construtora\s+/, ''),
-      dorms: DORMS_POR_SLUG[im.slug] || '',
-      exibir_preco: im.exibir_preco,
-      preco_a_partir_de: im.preco,
-    }))
+  const fontana = !slugs
+    ? []
+    : slugs
+        .map((slug) => imoveis.find((im) => im.slug === slug && im.ativo))
+        .filter((im): im is NonNullable<typeof im> => Boolean(im))
+        .map((im) => ({
+          nome: im.nome,
+          fase: statusParaFase(im.status),
+          slug: '/empreendimento/' + im.construtora_slug + '/' + im.slug,
+          construtora: im.construtora.replace(/^Construtora\s+/, ''),
+          dorms: DORMS_POR_SLUG[im.slug] || '',
+          exibir_preco: im.exibir_preco,
+          preco_a_partir_de: im.preco,
+        }))
+
+  const eraldo = (ERALDO_POR_CIDADE[cityKey] || []).map((emp) => ({
+    nome: emp.nome,
+    fase: statusEraldoParaFase(emp.status),
+    slug: '/empreendimento/' + emp.construtoraSlug + '/' + emp.slug,
+    construtora: 'Eraldo Construções',
+    // Sem campo de dormitórios único em src/data/eraldo (fica em tipologias[],
+    // por planta) — omitido aqui em vez de inventar um resumo.
+    dorms: '',
+    exibir_preco: false,
+    preco_a_partir_de: null as number | null,
+  }))
+
+  return [...fontana, ...eraldo]
 }
 
 function formatPreco(exibir_preco: boolean, preco_a_partir_de: number | null): string {
@@ -243,13 +284,14 @@ export default async function LancamentosCidadePage({ params }: Props) {
   const info = CIDADES[cidade]
   const wppUrl = 'https://wa.me/5548991642332?text=Ol%C3%A1+Stiven!+Vi+o+site+e+quero+saber+dos+lan%C3%A7amentos.'
 
+  // Sem entrada em CIDADES = sem dados reais o suficiente pra montar uma página —
+  // 404 de verdade em vez do 200 com "Cidade não encontrada" que existia aqui antes
+  // (achado da auditoria SEO 2026-07-21: /lancamentos/tubarao-sc aparecia no sitemap
+  // com esse fallback, retornando 200 com conteúdo de erro). Qualquer cidade nova que
+  // apareça via Supabase antes de ganhar uma entrada em CIDADES cai aqui — 404 real,
+  // nunca mais um soft-404 disfarçado de 200.
   if (!info) {
-    return (
-      <main style={{ background: '#121315', minHeight: '100vh', color: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontFamily: 'Inter, sans-serif', gap: 20 }}>
-        <h1 style={{ fontSize: '2rem', fontWeight: 800 }}>Cidade não encontrada</h1>
-        <Link href="/" style={{ color: '#c9a24b', textDecoration: 'none', fontSize: 16 }}>Voltar ao início</Link>
-      </main>
-    )
+    notFound()
   }
 
   const cityKey = cidade.replace('-sc', '')
