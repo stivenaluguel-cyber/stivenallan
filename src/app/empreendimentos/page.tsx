@@ -89,8 +89,11 @@ function CatalogCard({ emp }: { emp: Empreendimento }) {
 
 export default async function EmpreendimentosPage() {
   const listaEmp = await getVitrineEmpreendimentos()
-  const lista = listaEmp.filter((e) => !e.oculto && e.construtoraSlug && e.slug && e.imagem)
+  const lista = listaEmp
+    .filter((e) => !e.oculto && e.construtoraSlug && e.slug && e.imagem)
+    .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' }))
   const cidades = [...new Set(lista.map((e) => e.cidade))].sort()
+  const construtoras = [...new Set(lista.map((e) => e.construtoraNome || 'Construtora Fontana'))].sort()
   const totalCidades = cidades.length
   const breadcrumbSchema = { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [ { '@type': 'ListItem', position: 1, name: 'Início', item: 'https://stivenallan.com.br' }, { '@type': 'ListItem', position: 2, name: 'Empreendimentos', item: 'https://stivenallan.com.br/empreendimentos' } ] }
   const itemListSchema = { '@context': 'https://schema.org', '@type': 'ItemList', itemListElement: lista.map((emp, i) => ({ '@type': 'ListItem', position: i + 1, name: emp.nome, url: 'https://stivenallan.com.br/empreendimento/' + emp.construtoraSlug + '/' + emp.slug })) }
@@ -168,14 +171,25 @@ export default async function EmpreendimentosPage() {
             <h2 className="cat-h2">Todos os empreendimentos</h2>
             <hr className="cat-rule" style={{ margin: '20px auto 0' }} />
           </div>
-          <RegionFilter cidades={cidades} />
+          <RegionFilter cidades={cidades} construtoras={construtoras} />
           <div className="cat-cards-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(300px,1fr))', gap: 'clamp(16px,2.5vw,28px)' }}>
             {lista.map((emp, i) => (
-              <div key={emp.slug} data-cidade={emp.cidade} className={'fade-in fade-in-' + ((i % 4) + 1)}>
+              <div
+                key={emp.slug}
+                data-cidade={emp.cidade}
+                data-construtora={emp.construtoraNome || 'Construtora Fontana'}
+                className={'fade-in fade-in-' + ((i % 4) + 1)}
+              >
                 <CatalogCard emp={emp} />
               </div>
             ))}
           </div>
+          <p
+            data-empty-state
+            style={{ display: 'none', textAlign: 'center', fontFamily: t.body, fontSize: 14, color: t.muted, padding: '48px 0 0' }}
+          >
+            Nenhum empreendimento encontrado para essa combinação de filtros.
+          </p>
         </div>
       </section>
 
