@@ -54,6 +54,13 @@ const AMENIDADES = [
   'Salão de Festas','Hall de Entrada','Playground','Churrasqueira','2 Elevadores',
 ]
 
+const FAQ_ITEMS = [
+  { pergunta: 'Como funciona o pagamento do Castellano Residencial?', resposta: 'O pagamento pode ser via financiamento bancário ou parcelamento direto com a Construtora Fontana em até 180 meses, corrigido pelo IGPM + 0,75% ao mês. Condições variam conforme unidade e modalidade — consulte a tabela vigente para valores e disponibilidade, sujeita à atualização. Fale com o Stiven pelo WhatsApp para simular as opções.' },
+  { pergunta: 'Posso usar financiamento bancário ou FGTS?', resposta: 'Sim, o financiamento bancário é uma das opções de pagamento disponíveis para o Castellano Residencial. Fale com o Stiven pelo WhatsApp para simular.' },
+  { pergunta: 'Onde fica o Castellano Residencial?', resposta: 'O Castellano Residencial está localizado na Rua Pio XII esquina com Rua Duque de Caxias, Centro, Içara/SC.' },
+  { pergunta: 'Quais as plantas e metragens disponíveis?', resposta: 'O Castellano oferece apartamentos de 3 dormitórios, sendo 1 suíte, com 109 a 112 m² privativos e 2 sacadas.' },
+]
+
 export const metadata: Metadata = {
   title: 'Castellano Residencial | Centro Içara SC',
   description: 'Castellano Residencial — 3 dormitórios com 109 a 112 m² privativos no Centro de Içara/SC. Inspirado em um castelo italiano. Sob consulta.',
@@ -72,7 +79,8 @@ export const metadata: Metadata = {
 export default function CastellanoPage() {
   return (
     <main style={{ background: t.bg, color: t.ink, fontFamily: t.body, overflowX: 'hidden' }}>
-      
+      <PropertySchema nome="Castellano Residencial" slug="castellano-centro-icara-sc" construtora_slug="fontana" cidade="Içara" uf="SC" bairro="Centro" descricao="Castellano Residencial — 3 dormitórios com 109 a 112 m² privativos no Centro de Içara/SC. Inspirado em um castelo italiano." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/castellano-centro-icara-sc.jpg" faq={FAQ_ITEMS} />
+
       <style>{`
         html { scroll-behavior: smooth; }
         .cs-eyebrow { font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: ${t.purple}; font-family: ${t.display}; }
@@ -250,6 +258,9 @@ export default function CastellanoPage() {
           <a href={WPP} target="_blank" rel="noopener noreferrer" className="cs-cta-light">Quero saber mais</a>
         </div>
       </section>
+
+      {/* SEO FAQ */}
+      <PropertyFAQ items={FAQ_ITEMS} accent={t.purple} />
 
       <RelatedProperties atualSlug="castellano-centro-icara-sc" cidade="Içara" />
 

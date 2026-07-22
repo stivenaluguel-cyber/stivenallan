@@ -47,13 +47,21 @@ const AMENIDADES = [
 'Acesso Principal',
 ]
 
+const FAQ_ITEMS = [
+{ pergunta: 'Como funciona o financiamento direto do Mar di Atrani Residencial?', resposta: 'O plano padrão é entrada em parcela única + 72 parcelas mensais + 6 reforços anuais, negociado diretamente com a Construtora Fontana, sem análise de banco. Também há modalidades alternativas: 15% de desconto para pagamento à vista, ou 10% de desconto + 40% até as chaves + saldo em até 180 meses. Condições variam conforme unidade e modalidade — consulte a tabela vigente para valores e disponibilidade, sujeita à atualização. Fale com o Stiven pelo WhatsApp para simular a melhor opção para você.' },
+{ pergunta: 'Qual a previsão de entrega do Mar di Atrani Residencial?', resposta: 'A previsão de entrega é outubro de 2028, em Centro, Balneário Rincão/SC.' },
+{ pergunta: 'Posso usar financiamento bancário ou FGTS?', resposta: 'Fale com o Stiven pelo WhatsApp para simular as opções de pagamento e verificar a disponibilidade de financiamento bancário para esta unidade.' },
+{ pergunta: 'Onde fica o Mar di Atrani Residencial?', resposta: 'O Mar di Atrani Residencial está localizado na Rua Rio de Janeiro, 230, esq. Rua Urussanga, no Centro de Balneário Rincão/SC.' },
+{ pergunta: 'Quais as plantas e metragens disponíveis?', resposta: 'O empreendimento oferece apartamentos com 3 dormitórios (1 suíte), de 100 a 102 m² privativos, a 250 metros da beira-mar.' },
+]
+
 export const metadata: Metadata = {
 title: 'Mar di Atrani Residencial | Balneário Rincão SC',
-description: 'Mar di Atrani Residencial (Construtora Fontana): apartamentos 3 dormitórios com suíte, 100 a 101 m² privativos, a 250 metros da beira-mar no Centro de Balneário Rincão/SC. Atendimento exclusivo com Stiven Allan.',
+description: 'Mar di Atrani Residencial (Construtora Fontana): apartamentos 3 dormitórios com suíte, 100 a 102 m² privativos, a 250 metros da beira-mar no Centro de Balneário Rincão/SC. Atendimento exclusivo com Stiven Allan.',
 alternates: { canonical: SITE_URL + '/empreendimento/fontana/mar-di-atrani-centro-balneario-rincao-sc' },
 openGraph: {
 title: 'Mar di Atrani Residencial — Centro, Balneário Rincão/SC | Stiven Allan',
-description: 'A vida no agora. Apartamentos 3 dormitórios com suíte, 100 a 101 m² privativos, a 250 metros da beira-mar em Balneário Rincão/SC. Atendimento exclusivo com Stiven Allan.',
+description: 'A vida no agora. Apartamentos 3 dormitórios com suíte, 100 a 102 m² privativos, a 250 metros da beira-mar em Balneário Rincão/SC. Atendimento exclusivo com Stiven Allan.',
 url: SITE_URL + '/empreendimento/fontana/mar-di-atrani-centro-balneario-rincao-sc',
 type: 'website',
 images: [{ url: '/images/empreendimentos/mar-di-atrani-centro-balneario-rincao-sc/mar-di-atrani-residencial-675c232fef052.jpg', width: 1200, height: 800, alt: 'Fachada Mar di Atrani Residencial' }],
@@ -61,7 +69,7 @@ images: [{ url: '/images/empreendimentos/mar-di-atrani-centro-balneario-rincao-s
 twitter: {
 card: 'summary_large_image',
 title: 'Mar di Atrani Residencial — Centro, Balneário Rincão/SC | Stiven Allan',
-description: 'A vida no agora. Apartamentos 3 dormitórios com suíte, 100 a 101 m² privativos, a 250 metros da beira-mar em Balneário Rincão/SC. Atendimento exclusivo com Stiven Allan.',
+description: 'A vida no agora. Apartamentos 3 dormitórios com suíte, 100 a 102 m² privativos, a 250 metros da beira-mar em Balneário Rincão/SC. Atendimento exclusivo com Stiven Allan.',
 images: ['/images/empreendimentos/mar-di-atrani-centro-balneario-rincao-sc/mar-di-atrani-residencial-675c232fef052.jpg'],
 },
 robots: { index: true, follow: true },
@@ -156,7 +164,7 @@ details.mt-menu > summary::-webkit-details-marker { display: none; }
 <h2 className="mt-h2" style={{ color: t.onDark }}>Espaço para viver com liberdade</h2>
 <p className="mt-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 56 }}>250 metros da beira-mar, no centro de tudo.</p>
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 'clamp(28px,5vw,64px)', marginBottom: 56 }}>
-{[{n:'3',l:'Dormitórios'},{n:'1',l:'Suíte'},{n:'100 a 101',l:'m² privativos'},{n:'250m',l:'da beira-mar'}].map((it,i)=>(
+{[{n:'3',l:'Dormitórios'},{n:'1',l:'Suíte'},{n:'100 a 102',l:'m² privativos'},{n:'250m',l:'da beira-mar'}].map((it,i)=>(
 <div key={i}><div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 'clamp(34px,5vw,58px)', letterSpacing: '0.04em', lineHeight: 1 }}>{it.n}</div><div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDarkMuted, marginTop: 12 }}>{it.l}</div></div>
 ))}
 </div>
@@ -250,17 +258,12 @@ details.mt-menu > summary::-webkit-details-marker { display: none; }
       cidade="Balneário Rincão"
       uf="SC"
       bairro="Centro"
-      descricao="Apartamentos 3 dormitórios com suíte, 100 a 101 m2 privativos, a 250 metros da beira-mar no Centro de Balneário Rincão/SC."
+      descricao="Apartamentos 3 dormitórios com suíte, 100 a 102 m² privativos, a 250 metros da beira-mar no Centro de Balneário Rincão/SC."
       imagem="/images/empreendimentos/mar-di-atrani-centro-balneario-rincao-sc/mar-di-atrani-residencial-675c232fef052.jpg"
-      faq={[
-        {pergunta:"Como funciona o financiamento direto do Mar di Atrani?",resposta:"Entrada de 20%, saldo em até 72 parcelas mensais e 6 reforos anuais (cada reforo = 5 mensais), correcao pelo CUB/SC durante a obra. Sem banco."},
-        {pergunta:"Qual a previsao de entrega do Mar di Atrani Residencial?",resposta:"Consulte a previsao de entrega atual com Stiven pelo WhatsApp (48) 99164-2332."},
-        {pergunta:"Quais sao as plantas do Mar di Atrani Residencial?",resposta:"3 dormitórios (1 suíte), 100 a 101 m2 privativos, a 250 metros da beira-mar em Balneário Rincão/SC."},
-        {pergunta:"O Mar di Atrani fica perto da praia de Balneário Rincão?",resposta:"Sim. O Mar di Atrani fica a apenas 250 metros da beira-mar no Centro de Balneário Rincão/SC."},
-        {pergunta:"Posso usar FGTS ou financiamento bancario no Mar di Atrani?",resposta:"Sim. Alem do financiamento direto Fontana, e possivel financiamento bancario ou FGTS. Consulte Stiven."},
-      ]}
-    />{/* SEO FAQ */}
-<PropertyFAQ items={[{"pergunta":"Como funciona o financiamento direto do Mar di Atrani Residencial?","resposta":"Entrada de 20%, saldo em até 72 parcelas mensais e 6 reforços anuais (cada reforço equivale a 5 parcelas mensais), com correção pelo CUB/SC durante a obra. Sem análise de banco."},{"pergunta":"Qual a previsão de entrega do Mar di Atrani Residencial?","resposta":"A previsão de entrega é outubro de 2028, em Centro, Balneário Rincão/SC."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Sim. Além do financiamento direto com a construtora, é possível optar por financiamento bancário. Fale com o Stiven pelo WhatsApp para simular as duas opções."},{"pergunta":"Onde fica o Mar di Atrani Residencial?","resposta":"O Mar di Atrani Residencial está localizado na Rua Rio de Janeiro, 230, esq. Rua Urussanga, no Centro de Balneário Rincão/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"O empreendimento oferece apartamentos com 3 dormitórios (1 suíte), de 100 a 101 m² privativos, a 250 metros da beira-mar."}]} accent="#1B5E8B" />
+      faq={FAQ_ITEMS}
+    />
+{/* SEO FAQ */}
+<PropertyFAQ items={FAQ_ITEMS} accent="#1B5E8B" />
 <RelatedProperties atualSlug="mar-di-atrani-centro-balneario-rincao-sc" cidade="Balneário Rincão" />
 
 

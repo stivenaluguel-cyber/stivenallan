@@ -45,7 +45,7 @@ const GALERIA = [
 ]
 
 const DIFERENCIAIS = [
-'Lotes de 850 a 1.369 m² em condomínio fechado',
+'Lotes de 800 a 1.823 m² em condomínio fechado',
 'Infraestrutura completa: água, luz, drenagem e ruas pavimentadas',
 'Espaço para pouso de helicóptero',
 'Fazendinha e pomar nativos integrados ao verde',
@@ -62,7 +62,7 @@ const SCHEMA = {
 '@context': 'https://schema.org',
 '@type': 'LandLot',
 name: 'Campos da Montanha Residencial',
-description: 'Terreno em condomínio fechado na Serra Catarinense. Lotes de 850 a 1.369 m² em Bom Jardim da Serra/SC.',
+description: 'Terreno em condomínio fechado na Serra Catarinense. Lotes de 800 a 1.823 m² em Bom Jardim da Serra/SC.',
 url: `${SITE_URL}/empreendimento/fontana/campos-da-montanha-bom-jardim-da-serra-sc`,
 address: {
 '@type': 'PostalAddress',
@@ -71,21 +71,21 @@ addressLocality: 'Bom Jardim da Serra',
 addressRegion: 'SC',
 addressCountry: 'BR',
 },
-floorSize: { '@type': 'QuantitativeValue', minValue: 850, maxValue: 1369, unitCode: 'MTK' },
+floorSize: { '@type': 'QuantitativeValue', minValue: 800, maxValue: 1823, unitCode: 'MTK' },
 }
 
 export const metadata: Metadata = {
 title: 'Campos da Montanha Residencial | Bom Jardim da Serra SC',
-description: 'Terreno em condomínio na Serra Catarinense. Lotes de 850 a 1.369 m² com infraestrutura completa em Bom Jardim da Serra/SC.',
+description: 'Terreno em condomínio na Serra Catarinense. Lotes de 800 a 1.823 m² com infraestrutura completa em Bom Jardim da Serra/SC.',
 openGraph: {
 title: 'Campos da Montanha Residencial | Bom Jardim da Serra SC | Stiven Allan',
-description: 'Terreno em condomínio na Serra Catarinense. Lotes de 850 a 1.369 m².',
+description: 'Terreno em condomínio na Serra Catarinense. Lotes de 800 a 1.823 m².',
 images: [{ url: IMG.hero }],
 },
 twitter: {
 card: 'summary_large_image',
 title: 'Campos da Montanha Residencial | Bom Jardim da Serra SC | Stiven Allan',
-description: 'Terreno em condomínio na Serra Catarinense. Lotes de 850 a 1.369 m².',
+description: 'Terreno em condomínio na Serra Catarinense. Lotes de 800 a 1.823 m².',
 images: [IMG.hero],
 },
 }
@@ -93,6 +93,7 @@ images: [IMG.hero],
 export default function CamposDaMontanhaPage() {
 return (
 <main style={{ background: t.bg, color: t.ink, fontFamily: t.body, overflowX: 'hidden' }}>
+<PropertySchema schema={SCHEMA} />
 
 <style>{`
 html { scroll-behavior: smooth; }
@@ -151,7 +152,7 @@ html { scroll-behavior: smooth; }
 <p className="cm-eyebrow" style={{ color:t.onDarkMuted, marginBottom:12 }}>Os Lotes</p>
 <hr className="cm-rule" style={{ background:t.onDark, marginBottom:40 }} />
 <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))', gap:2 }}>
-{([{n:'850 a 1.369',l:'m² por lote'},{n:'100%',l:'Infraestrutura'},{n:'1.000+',l:'metros de altitude'},{n:'Serra',l:'Catarinense'}] as {n:string,l:string}[]).map((s,i) => (
+{([{n:'800 a 1.823',l:'m² por lote'},{n:'100%',l:'Infraestrutura'},{n:'1.000+',l:'metros de altitude'},{n:'Serra',l:'Catarinense'}] as {n:string,l:string}[]).map((s,i) => (
 <div key={i} style={{ background:'rgba(232,242,232,0.04)', padding:'40px 32px', borderLeft:'1px solid rgba(232,242,232,0.08)' }}>
 <p style={{ fontFamily:t.display, fontSize:'clamp(28px,4vw,52px)', fontWeight:300, color:t.onDark, margin:'0 0 6px', letterSpacing:'0.04em' }}>{s.n}</p>
 <p style={{ fontFamily:t.body, fontSize:12, letterSpacing:'0.3em', textTransform:'uppercase', color:t.onDarkMuted, margin:0 }}>{s.l}</p>
@@ -225,7 +226,7 @@ html { scroll-behavior: smooth; }
 </a>
 
 {/* SEO FAQ */}
-<PropertyFAQ items={[{"pergunta":"Como funciona o pagamento do Campos da Montanha Residencial?","resposta":"Entrada de 20%, saldo em até 60 parcelas mensais e 5 reforços anuais (cada reforço equivale a 5 parcelas mensais), negociado diretamente com a Construtora Fontana. Sem análise de banco."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Sim. Além do financiamento direto com a construtora, é possível optar por financiamento bancário. Fale com o Stiven pelo WhatsApp para simular as duas opções."},{"pergunta":"Onde fica o Campos da Montanha Residencial?","resposta":"O Campos da Montanha Residencial está localizado na Rod. SC-390, em Bom Jardim da Serra/SC."},{"pergunta":"Quais as metragens de lote disponíveis?","resposta":"O condomínio oferece lotes de 850 a 1.369 m² com infraestrutura completa: água, luz, drenagem e ruas pavimentadas."}]} accent="#2D4A2F" />
+<PropertyFAQ items={[{"pergunta":"Como funciona o pagamento do Campos da Montanha Residencial?","resposta":"Condições variam conforme o lote e a modalidade de pagamento, negociadas diretamente com a Construtora Fontana. Consulte a tabela vigente para valores e disponibilidade — condições sujeitas à atualização. Fale com o Stiven pelo WhatsApp para simular a proposta ideal para você."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Sim. Além do financiamento direto com a construtora, é possível optar por financiamento bancário. Fale com o Stiven pelo WhatsApp para simular as duas opções."},{"pergunta":"Onde fica o Campos da Montanha Residencial?","resposta":"O Campos da Montanha Residencial está localizado na Rod. SC-390, em Bom Jardim da Serra/SC."},{"pergunta":"Quais as metragens de lote disponíveis?","resposta":"O condomínio Campos da Montanha possui 130 lotes, com área privativa de 800 até 1.823 m², com infraestrutura completa: água, luz, drenagem e ruas pavimentadas."}]} accent="#2D4A2F" />
 <RelatedProperties atualSlug="campos-da-montanha-bom-jardim-da-serra-sc" cidade="Bom Jardim da Serra" />
 
 
