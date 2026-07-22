@@ -25,7 +25,12 @@ import {
   normalizePhoneForHash,
   sha256Hex,
   trackLeadEvent,
+  trackSpaPageView,
+  trackViewContent,
+  trackWhatsappClick,
+  trackWhatsappLinkFallback,
 } from './tracking'
+import { CONSENT_STORAGE_KEY, CONSENT_VERSION } from './consent'
 
 // Referência independente para comparar com o helper (Web Crypto no runtime vs Node crypto no teste)
 function sha256HexRef(input: string): string {
@@ -34,10 +39,43 @@ function sha256HexRef(input: string): string {
 
 const KEY = 'sa_attrib'
 
-// Stub mínimo de window + sessionStorage para rodar em ambiente node (sem jsdom).
-function mountBrowser({ search, session = {} }: { search: string; session?: Record<string, string> }) {
+function consentJson(categories: { analytics: boolean; marketing: boolean }): string {
+  return JSON.stringify({ version: CONSENT_VERSION, updatedAt: '2026-01-01T00:00:00.000Z', categories })
+}
+
+const FULL_CONSENT = consentJson({ analytics: true, marketing: true })
+
+// Stub mínimo de window + storages para rodar em ambiente node (sem jsdom).
+// `consent` default liga tudo — os testes de gate passam o cenário negado.
+function mountBrowser({
+  search,
+  session = {},
+  consent = FULL_CONSENT,
+  fbq,
+  gtag,
+}: {
+  search: string
+  session?: Record<string, string>
+  consent?: string | null
+  fbq?: ReturnType<typeof vi.fn>
+  gtag?: ReturnType<typeof vi.fn>
+}) {
   const store: Record<string, string> = { ...session }
-  vi.stubGlobal('window', { location: { search } })
+  const local: Record<string, string> = {}
+  if (consent) local[CONSENT_STORAGE_KEY] = consent
+  const localStorage = {
+    getItem: (k: string) => (k in local ? local[k] : null),
+    setItem: (k: string, v: string) => {
+      local[k] = v
+    },
+  }
+  vi.stubGlobal('window', {
+    location: { search, href: `https://stivenallan.com.br/x${search}`, hostname: 'stivenallan.com.br' },
+    localStorage,
+    fbq,
+    gtag,
+  })
+  vi.stubGlobal('document', { title: 'Página Teste', cookie: '' })
   vi.stubGlobal('sessionStorage', {
     getItem: (k: string) => (k in store ? store[k] : null),
     setItem: (k: string, v: string) => {
@@ -244,7 +282,7 @@ describe('trackLeadEvent + Enhanced Conversions no gtag', () => {
 
   it('não chama conversion event quando NEXT_PUBLIC_GADS_CONVERSION ausente', async () => {
     const gtagSpy = vi.fn()
-    vi.stubGlobal('window', { fbq: undefined, gtag: gtagSpy })
+    mountBrowser({ search: '', gtag: gtagSpy })
     delete process.env.NEXT_PUBLIC_GADS_CONVERSION
 
     await trackLeadEvent('Monte Leone', 'evt-1', { email: 'a@b.com' })
@@ -258,7 +296,7 @@ describe('trackLeadEvent + Enhanced Conversions no gtag', () => {
 
   it('injeta user_data hasheado no conversion event quando userData é passado', async () => {
     const gtagSpy = vi.fn()
-    vi.stubGlobal('window', { fbq: undefined, gtag: gtagSpy })
+    mountBrowser({ search: '', gtag: gtagSpy })
     process.env.NEXT_PUBLIC_GADS_CONVERSION = 'AW-123/abc'
 
     await trackLeadEvent('Monte Leone', 'evt-1', {
@@ -281,7 +319,7 @@ describe('trackLeadEvent + Enhanced Conversions no gtag', () => {
 
   it('dispara conversion sem user_data quando userData não é passado (retro-compat)', async () => {
     const gtagSpy = vi.fn()
-    vi.stubGlobal('window', { fbq: undefined, gtag: gtagSpy })
+    mountBrowser({ search: '', gtag: gtagSpy })
     process.env.NEXT_PUBLIC_GADS_CONVERSION = 'AW-999'
 
     await trackLeadEvent('Book Empreendimento', 'evt-2')
@@ -294,6 +332,221 @@ describe('trackLeadEvent + Enhanced Conversions no gtag', () => {
     expect(params).toEqual({ send_to: 'AW-999' })
     expect(params.user_data).toBeUndefined()
   })
+
+  it('propaga empreendimento/position padronizados pro Pixel e pro GA4', async () => {
+    const gtagSpy = vi.fn()
+    const fbqSpy = vi.fn()
+    mountBrowser({ search: '', gtag: gtagSpy, fbq: fbqSpy })
+
+    await trackLeadEvent('Monte Leone', 'evt-ctx', undefined, {
+      empreendimento: 'monte-leone-centro-criciuma-sc',
+      position: 'contact_form',
+    })
+
+    const expected = {
+      content_name: 'Monte Leone',
+      method: 'form',
+      empreendimento: 'monte-leone-centro-criciuma-sc',
+      position: 'contact_form',
+    }
+    expect(fbqSpy).toHaveBeenCalledWith('track', 'Lead', expected, { eventID: 'evt-ctx' })
+    expect(gtagSpy).toHaveBeenCalledWith('event', 'generate_lead', expected)
+  })
+})
+
+describe('gates de consentimento (LGPD)', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    delete process.env.NEXT_PUBLIC_GADS_CONVERSION
+  })
+
+  it('sem consentimento salvo: nenhum evento sai (Pixel, GA4 e Ads bloqueados)', async () => {
+    const gtagSpy = vi.fn()
+    const fbqSpy = vi.fn()
+    mountBrowser({ search: '', consent: null, gtag: gtagSpy, fbq: fbqSpy })
+    process.env.NEXT_PUBLIC_GADS_CONVERSION = 'AW-123/abc'
+
+    await trackLeadEvent('Monte Leone', 'evt-1', { email: 'a@b.com' })
+    trackWhatsappClick({ content_name: 'WhatsApp' })
+    trackViewContent('monte-leone-centro-criciuma-sc')
+    trackSpaPageView('/empreendimentos')
+
+    expect(fbqSpy).not.toHaveBeenCalled()
+    expect(gtagSpy).not.toHaveBeenCalled()
+  })
+
+  it('só analytics: GA4 recebe, Pixel e conversão Ads não', async () => {
+    const gtagSpy = vi.fn()
+    const fbqSpy = vi.fn()
+    mountBrowser({
+      search: '',
+      consent: consentJson({ analytics: true, marketing: false }),
+      gtag: gtagSpy,
+      fbq: fbqSpy,
+    })
+    process.env.NEXT_PUBLIC_GADS_CONVERSION = 'AW-123/abc'
+
+    await trackLeadEvent('Monte Leone', 'evt-1')
+
+    expect(fbqSpy).not.toHaveBeenCalled()
+    expect(gtagSpy).toHaveBeenCalledWith('event', 'generate_lead', expect.objectContaining({ content_name: 'Monte Leone' }))
+    const conversionCall = gtagSpy.mock.calls.find((c) => c[0] === 'event' && c[1] === 'conversion')
+    expect(conversionCall).toBeUndefined()
+  })
+
+  it('só marketing: Pixel e conversão Ads recebem, GA4 não', async () => {
+    const gtagSpy = vi.fn()
+    const fbqSpy = vi.fn()
+    mountBrowser({
+      search: '',
+      consent: consentJson({ analytics: false, marketing: true }),
+      gtag: gtagSpy,
+      fbq: fbqSpy,
+    })
+    process.env.NEXT_PUBLIC_GADS_CONVERSION = 'AW-123/abc'
+
+    await trackLeadEvent('Monte Leone', 'evt-1')
+
+    expect(fbqSpy).toHaveBeenCalledWith(
+      'track',
+      'Lead',
+      expect.objectContaining({ content_name: 'Monte Leone' }),
+      { eventID: 'evt-1' },
+    )
+    const generateLead = gtagSpy.mock.calls.find((c) => c[0] === 'event' && c[1] === 'generate_lead')
+    expect(generateLead).toBeUndefined()
+    const conversionCall = gtagSpy.mock.calls.find((c) => c[0] === 'event' && c[1] === 'conversion')
+    expect(conversionCall).toBeDefined()
+  })
+
+  it('consentimento de versão antiga é tratado como não decidido (bloqueia tudo)', () => {
+    const gtagSpy = vi.fn()
+    const fbqSpy = vi.fn()
+    mountBrowser({
+      search: '',
+      consent: JSON.stringify({ version: 0, updatedAt: 'x', categories: { analytics: true, marketing: true } }),
+      gtag: gtagSpy,
+      fbq: fbqSpy,
+    })
+    trackSpaPageView('/x')
+    trackWhatsappClick({ content_name: 'WhatsApp' })
+    expect(gtagSpy).not.toHaveBeenCalled()
+    expect(fbqSpy).not.toHaveBeenCalled()
+  })
+})
+
+describe('trackViewContent — enriquecimento pelo catálogo', () => {
+  afterEach(() => vi.unstubAllGlobals())
+
+  it('slug do catálogo → item completo (nome, construtora, cidade, status), SEM preço', () => {
+    const gtagSpy = vi.fn()
+    const fbqSpy = vi.fn()
+    mountBrowser({ search: '', gtag: gtagSpy, fbq: fbqSpy })
+
+    const sent = trackViewContent('monte-leone-centro-criciuma-sc')
+
+    expect(sent).toEqual({ meta: true, ga4: true })
+    expect(fbqSpy).toHaveBeenCalledWith('track', 'ViewContent', expect.objectContaining({
+      content_ids: ['monte-leone-centro-criciuma-sc'],
+      content_name: 'Monte Leone Residencial',
+      content_type: 'product',
+      content_category: 'Criciúma',
+      construtora: 'Construtora Fontana',
+    }))
+    const [, , ga4Params] = gtagSpy.mock.calls.find((c) => c[1] === 'view_item') as [string, string, Record<string, unknown>]
+    const item = (ga4Params.items as Record<string, unknown>[])[0]
+    expect(item).toMatchObject({
+      item_id: 'monte-leone-centro-criciuma-sc',
+      item_name: 'Monte Leone Residencial',
+      item_brand: 'Construtora Fontana',
+      item_category: 'Criciúma',
+    })
+    // Preço "sob consulta" nunca vira value/currency
+    expect(ga4Params.value).toBeUndefined()
+    expect(ga4Params.currency).toBeUndefined()
+  })
+
+  it('slug fora do catálogo → fallback slug-only', () => {
+    const fbqSpy = vi.fn()
+    mountBrowser({ search: '', fbq: fbqSpy, gtag: vi.fn() })
+    trackViewContent('slug-so-do-banco-xyz')
+    expect(fbqSpy).toHaveBeenCalledWith('track', 'ViewContent', expect.objectContaining({
+      content_ids: ['slug-so-do-banco-xyz'],
+      content_name: 'slug-so-do-banco-xyz',
+    }))
+  })
+
+  it('canais seletivos: dispara só o canal pedido e reporta o que saiu', () => {
+    const gtagSpy = vi.fn()
+    const fbqSpy = vi.fn()
+    mountBrowser({ search: '', gtag: gtagSpy, fbq: fbqSpy })
+
+    const sent = trackViewContent('monte-leone-centro-criciuma-sc', { meta: false, ga4: true })
+
+    expect(sent).toEqual({ meta: false, ga4: true })
+    expect(fbqSpy).not.toHaveBeenCalled()
+    expect(gtagSpy).toHaveBeenCalled()
+  })
+
+  it('reporta canal como não-enviado quando o script ainda não carregou (fbq ausente)', () => {
+    const gtagSpy = vi.fn()
+    mountBrowser({ search: '', gtag: gtagSpy, fbq: undefined })
+    const sent = trackViewContent('monte-leone-centro-criciuma-sc')
+    expect(sent).toEqual({ meta: false, ga4: true })
+  })
+})
+
+describe('trackSpaPageView / trackWhatsappClick — parâmetros', () => {
+  afterEach(() => vi.unstubAllGlobals())
+
+  it('page_view manda page_path + page_location + page_title', () => {
+    const gtagSpy = vi.fn()
+    mountBrowser({ search: '?utm_source=x', gtag: gtagSpy })
+    trackSpaPageView('/empreendimentos')
+    expect(gtagSpy).toHaveBeenCalledWith('event', 'page_view', {
+      page_path: '/empreendimentos',
+      page_location: 'https://stivenallan.com.br/x?utm_source=x',
+      page_title: 'Página Teste',
+    })
+  })
+
+  it('contact_whatsapp usa os mesmos nomes de parâmetro do Lead', () => {
+    const gtagSpy = vi.fn()
+    const fbqSpy = vi.fn()
+    mountBrowser({ search: '', gtag: gtagSpy, fbq: fbqSpy })
+    trackWhatsappClick({ content_name: 'Monte Leone', empreendimento: 'monte-leone-centro-criciuma-sc', position: 'hero' })
+    const expected = {
+      content_name: 'Monte Leone',
+      method: 'whatsapp',
+      empreendimento: 'monte-leone-centro-criciuma-sc',
+      position: 'hero',
+    }
+    expect(fbqSpy).toHaveBeenCalledWith('track', 'Contact', expected)
+    expect(gtagSpy).toHaveBeenCalledWith('event', 'contact_whatsapp', expected)
+  })
+
+  it('fallback de link wa.me sem data-wpp: deriva slug do path e nome do catálogo', () => {
+    const fbqSpy = vi.fn()
+    mountBrowser({ search: '', fbq: fbqSpy, gtag: vi.fn() })
+    trackWhatsappLinkFallback('/empreendimento/fontana/monte-leone-centro-criciuma-sc')
+    expect(fbqSpy).toHaveBeenCalledWith('track', 'Contact', {
+      content_name: 'Monte Leone Residencial',
+      method: 'whatsapp',
+      empreendimento: 'monte-leone-centro-criciuma-sc',
+      position: 'link_whatsapp',
+    })
+  })
+
+  it('fallback fora de página de empreendimento: content_name genérico, sem slug', () => {
+    const fbqSpy = vi.fn()
+    mountBrowser({ search: '', fbq: fbqSpy, gtag: vi.fn() })
+    trackWhatsappLinkFallback('/')
+    expect(fbqSpy).toHaveBeenCalledWith('track', 'Contact', {
+      content_name: 'WhatsApp',
+      method: 'whatsapp',
+      position: 'link_whatsapp',
+    })
+  })
 })
 
 describe('trackLeadEvent — sinal pro Sentry (F-Match-Verify)', () => {
@@ -305,7 +558,7 @@ describe('trackLeadEvent — sinal pro Sentry (F-Match-Verify)', () => {
   })
 
   it('adiciona breadcrumb Sentry quando enhanced conversion sobe com hashes válidos', async () => {
-    vi.stubGlobal('window', { fbq: undefined, gtag: vi.fn() })
+    mountBrowser({ search: '', gtag: vi.fn() })
     process.env.NEXT_PUBLIC_GADS_CONVERSION = 'AW-123/abc'
 
     await trackLeadEvent('Monte Leone', 'evt-1', {
@@ -326,7 +579,7 @@ describe('trackLeadEvent — sinal pro Sentry (F-Match-Verify)', () => {
   })
 
   it('captura warning Sentry quando userData veio mas nada hasheou (bug do form)', async () => {
-    vi.stubGlobal('window', { fbq: undefined, gtag: vi.fn() })
+    mountBrowser({ search: '', gtag: vi.fn() })
     process.env.NEXT_PUBLIC_GADS_CONVERSION = 'AW-123/abc'
 
     // Tudo empty/null — nada vai hashear

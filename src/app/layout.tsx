@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
 import { SITE_URL } from '@/lib/site'
-import Script from 'next/script'
 import { VisitTracker } from '@/components/VisitTracker'
 import { TrackingProvider } from '@/components/TrackingProvider'
+import { AnalyticsScripts } from '@/components/AnalyticsScripts'
+import { CookieConsent } from '@/components/CookieConsent'
 import { Bricolage_Grotesque, Hanken_Grotesk, Cormorant_Garamond } from 'next/font/google'
 import './globals.css'
 
@@ -88,6 +89,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="pt-BR" className={`${bricolage.variable} ${hanken.variable} ${cormorant.variable}`}>
       <head>
+        {/* Google Consent Mode v2 — default DENY antes de qualquer gtag.js (LGPD).
+            Restaura sincronicamente a escolha salva (mesma chave/versão de
+            src/lib/consent.ts) pra visitantes que já decidiram. Os scripts de
+            GA4/Pixel só carregam após o aceite (AnalyticsScripts). */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}window.gtag=window.gtag||gtag;
+gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied',wait_for_update:500});
+try{var sc=JSON.parse(localStorage.getItem('sa_consent'));if(sc&&sc.version===1&&sc.categories){var cc=sc.categories;gtag('consent','update',{analytics_storage:cc.analytics?'granted':'denied',ad_storage:cc.marketing?'granted':'denied',ad_user_data:cc.marketing?'granted':'denied',ad_personalization:cc.marketing?'granted':'denied'});}}catch(e){}`,
+          }}
+        />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaAgent) }} />
         <link rel="dns-prefetch" href="https://images.unsplash.com" />
         <link rel="dns-prefetch" href="https://xpkznaqgctfkoonqpcye.supabase.co" />
@@ -95,14 +107,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="icon" href="/favicon.ico" sizes="any" />
       </head>
       <body><VisitTracker /><TrackingProvider />{children}
-<Script src="https://www.googletagmanager.com/gtag/js?id=G-5TWF0JTG8H" strategy="afterInteractive"/>
-<Script id="ga4" strategy="afterInteractive">{`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-5TWF0JTG8H');`}</Script>
-<Script id="meta-pixel" strategy="afterInteractive">{`!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','364836344657445');fbq('track','PageView');`}</Script>
-{/* Contact/contact_whatsapp em qualquer link com data-wpp. data-wpp-emp/data-wpp-nome (opcionais) enriquecem com empreendimento/content_name sem mudar o evento pras páginas que só usam data-wpp="1". */}
-<Script id="wpp-track" strategy="afterInteractive">{`document.addEventListener('click',function(e){var a=e.target.closest('[data-wpp]');if(!a)return;var p={content_name:a.getAttribute('data-wpp-nome')||'WhatsApp',method:'whatsapp'};var pos=a.getAttribute('data-wpp');if(pos)p.position=pos;var emp=a.getAttribute('data-wpp-emp');if(emp)p.empreendimento=emp;if(typeof fbq!=='undefined')fbq('track','Contact',p);if(typeof gtag!=='undefined')gtag('event','contact_whatsapp',p);});`}</Script>
-{process.env.NEXT_PUBLIC_GADS_ID && (
-  <Script id="gads" strategy="afterInteractive">{`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('config','${process.env.NEXT_PUBLIC_GADS_ID}');`}</Script>
-)}
+{/* GA4/Meta/Google Ads carregam SÓ após consentimento (LGPD) — ver AnalyticsScripts.
+    O clique em [data-wpp] (Contact/contact_whatsapp) é delegado no TrackingProvider. */}
+<AnalyticsScripts />
+<CookieConsent />
 </body>
     </html>
   )
