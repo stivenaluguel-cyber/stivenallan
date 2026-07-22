@@ -21,8 +21,24 @@ function hashPhone(phone: string) {
   return sha256(digits)
 }
 
-function hashName(nome: string) {
+function hashFirstName(nome: string) {
   return sha256(nome.trim().toLowerCase().split(/\s+/)[0])
+}
+
+// Sobrenome (última palavra) quando o nome tem 2+ palavras — sobe o match
+// quality sem nenhum dado extra do visitante. Sempre hasheado, nunca bruto.
+function hashLastName(nome: string): string | null {
+  const parts = nome.trim().toLowerCase().split(/\s+/)
+  if (parts.length < 2) return null
+  return sha256(parts[parts.length - 1])
+}
+
+// Defesa contra payload malformado/abusivo: só strings, com teto de tamanho.
+function asString(value: unknown, max: number): string | null {
+  if (typeof value !== 'string') return null
+  const trimmed = value.trim()
+  if (!trimmed) return null
+  return trimmed.slice(0, max)
 }
 
 export async function POST(req: NextRequest) {
@@ -33,7 +49,14 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json()
-    const { event_id, nome, telefone, email, content_name, fbclid, fbclid_ts, url } = body
+    const event_id = asString(body.event_id, 64)
+    const nome = asString(body.nome, 200)
+    const telefone = asString(body.telefone, 40)
+    const email = asString(body.email, 254)
+    const content_name = asString(body.content_name, 200)
+    const fbclid = asString(body.fbclid, 500)
+    const fbclid_ts = asString(body.fbclid_ts, 20)
+    const url = asString(body.url, 1000)
     if (!event_id || !nome || !telefone) {
       return NextResponse.json({ error: 'Campos obrigatorios ausentes' }, { status: 400 })
     }
@@ -61,15 +84,21 @@ export async function POST(req: NextRequest) {
 
     const userData: Record<string, unknown> = {
       ph: [hashPhone(telefone)],
-      fn: [hashName(nome)],
+      fn: [hashFirstName(nome)],
       client_user_agent: req.headers.get('user-agent') || undefined,
     }
+    const ln = hashLastName(nome)
+    if (ln) userData.ln = [ln]
     if (email) userData.em = [hashEmail(email)]
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
     if (ip) userData.client_ip_address = ip
     if (fbp) userData.fbp = fbp
     if (fbc) userData.fbc = fbc
 
+    // META_TEST_EVENT_CODE (env server, opcional): roteia os eventos pra aba
+    // "Testar eventos" do Gerenciador de Eventos SEM poluir os dados reais.
+    // Usar só durante validação; remover a env depois.
+    const testEventCode = process.env.META_TEST_EVENT_CODE
     const payload = {
       data: [
         {
@@ -82,6 +111,7 @@ export async function POST(req: NextRequest) {
           custom_data: content_name ? { content_name } : undefined,
         },
       ],
+      ...(testEventCode ? { test_event_code: testEventCode } : {}),
     }
 
     // F-Match-Verify: agregável no Vercel Log Viewer pra medir % de cada fbc_source.

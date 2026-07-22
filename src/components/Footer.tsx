@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { CookiePreferencesLink } from '@/components/CookiePreferencesLink'
 
 const C = {
   bg: '#0d0e10',
@@ -124,8 +125,12 @@ export default function Footer() {
           <p style={{ color: C.muted, fontSize: '12px' }}>
             © {new Date().getFullYear()} Stiven Allan. CRECI 60.275. Todos os direitos reservados.
           </p>
-          <p style={{ color: C.muted, fontSize: '12px' }}>
-            Criciúma, Santa Catarina
+          <p style={{ color: C.muted, fontSize: '12px', display: 'flex', flexWrap: 'wrap', gap: '14px', alignItems: 'center' }}>
+            <Link href="/politica-de-privacidade" style={{ color: C.muted, textDecoration: 'underline' }}>
+              Política de Privacidade
+            </Link>
+            <CookiePreferencesLink style={{ color: C.muted, fontSize: '12px' }} />
+            <span>Criciúma, Santa Catarina</span>
           </p>
         </div>
       </div>

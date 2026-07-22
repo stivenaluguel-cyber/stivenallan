@@ -1,3 +1,6 @@
+import { hasAnalyticsConsent, hasMarketingConsent } from './consent'
+import { imoveis } from '@/data/imoveis'
+
 const KEY_ATTRIB = 'sa_attrib'
 
 const ATTRIB_PARAMS = [
@@ -16,7 +19,17 @@ export type Attribution = Partial<Record<(typeof ATTRIB_PARAMS)[number], string>
   fbclid_ts?: string
 }
 
-// Captura UTMs/click-ids da URL de entrada e persiste na sessão (first-touch da sessão)
+// Log de desenvolvimento: cada evento disparado (ou bloqueado por consentimento)
+// aparece no console SÓ em `next dev` — o branch é eliminado no build de produção.
+function devLog(...args: unknown[]) {
+  if (process.env.NODE_ENV === 'development') {
+    console.debug('[tracking]', ...args)
+  }
+}
+
+// Captura UTMs/click-ids da URL de entrada e persiste na sessão (first-touch da sessão).
+// Armazenamento first-party pra fins de atendimento/CRM — só é COMPARTILHADO com
+// plataformas de anúncio (CAPI) mediante consentimento de marketing.
 export function captureAttribution() {
   if (typeof window === 'undefined') return
   try {
@@ -52,14 +65,29 @@ export function getAttribution(): Attribution {
 type FbqFn = (...args: unknown[]) => void
 type GtagFn = (...args: unknown[]) => void
 
+// Meta Pixel: exige consentimento de MARKETING além do script carregado.
 function fbq(): FbqFn | null {
   if (typeof window === 'undefined') return null
+  if (!hasMarketingConsent()) return null
   const fn = (window as unknown as { fbq?: FbqFn }).fbq
   return typeof fn === 'function' ? fn : null
 }
 
-function gtag(): GtagFn | null {
+// GA4: exige consentimento de ANALYTICS. O stub global de gtag existe sempre
+// (script inline do layout, que também seta o Consent Mode default deny) —
+// eventos entram na dataLayer e só são processados se/quando o gtag.js
+// carregar, o que também é condicionado ao consentimento (AnalyticsScripts).
+function gtagAnalytics(): GtagFn | null {
   if (typeof window === 'undefined') return null
+  if (!hasAnalyticsConsent()) return null
+  const fn = (window as unknown as { gtag?: GtagFn }).gtag
+  return typeof fn === 'function' ? fn : null
+}
+
+// Google Ads (conversões): categoria MARKETING.
+function gtagAds(): GtagFn | null {
+  if (typeof window === 'undefined') return null
+  if (!hasMarketingConsent()) return null
   const fn = (window as unknown as { gtag?: GtagFn }).gtag
   return typeof fn === 'function' ? fn : null
 }
@@ -130,19 +158,42 @@ export async function buildEnhancedUserData(data: EnhancedUserData): Promise<Rec
   return out
 }
 
+// Contexto padronizado dos eventos de conversão — permite comparar WhatsApp
+// (Contact/contact_whatsapp) e formulário (Lead/generate_lead) por
+// empreendimento (slug), posição do CTA e campanha, com os MESMOS nomes de
+// parâmetro nas duas plataformas. Nunca incluir dados pessoais aqui.
+export type LeadEventContext = {
+  // Slug do empreendimento (ex.: monte-leone-centro-criciuma-sc)
+  empreendimento?: string | null
+  // Posição/origem do CTA (ex.: contact_form, catalog_modal, hero, float, footer)
+  position?: string | null
+}
+
 // Dispara Lead no Pixel (com eventID p/ deduplicar com a CAPI) + GA4 + conversão Google Ads.
+// CHAMAR SOMENTE APÓS SUCESSO REAL DA API (res.ok) — nunca no submit otimista.
 // Se `userData` vier, sobe Enhanced Conversions no evento de conversão do Ads.
 // F-Match-Verify: emite sinal pro Sentry quando o Enhanced Conversions degrada.
 export async function trackLeadEvent(
   contentName: string,
   eventId: string,
   userData?: EnhancedUserData,
+  context?: LeadEventContext,
 ) {
-  fbq()?.('track', 'Lead', { content_name: contentName }, { eventID: eventId })
-  gtag()?.('event', 'generate_lead', { method: 'form', content: contentName })
+  const shared: Record<string, unknown> = { content_name: contentName, method: 'form' }
+  if (context?.empreendimento) shared.empreendimento = context.empreendimento
+  if (context?.position) shared.position = context.position
 
+  fbq()?.('track', 'Lead', shared, { eventID: eventId })
+  gtagAnalytics()?.('event', 'generate_lead', shared)
+  devLog('Lead/generate_lead', { eventId, ...shared })
+
+  // Lido no momento da chamada (não const de módulo): o Next inline-a
+  // process.env.NEXT_PUBLIC_* no build do client de qualquer forma, e os testes
+  // manipulam a env em runtime.
   const gadsConversion = process.env.NEXT_PUBLIC_GADS_CONVERSION
   if (!gadsConversion) return
+  const ads = gtagAds()
+  if (!ads) return
 
   const params: Record<string, unknown> = { send_to: gadsConversion }
   if (userData) {
@@ -181,24 +232,134 @@ export async function trackLeadEvent(
       }
     }
   }
-  gtag()?.('event', 'conversion', params)
+  ads('event', 'conversion', params)
 }
 
-export function trackViewContent(slug: string) {
-  fbq()?.('track', 'ViewContent', { content_name: slug, content_type: 'product' })
-  gtag()?.('event', 'view_item', { items: [{ item_id: slug }] })
+// Clique em CTA de WhatsApp (delegado via [data-wpp] no TrackingProvider).
+// Mesmos nomes de parâmetro do Lead — comparável por empreendimento/posição.
+export function trackWhatsappClick(params: {
+  content_name: string
+  empreendimento?: string | null
+  position?: string | null
+}) {
+  const shared: Record<string, unknown> = { content_name: params.content_name, method: 'whatsapp' }
+  if (params.empreendimento) shared.empreendimento = params.empreendimento
+  if (params.position) shared.position = params.position
+  fbq()?.('track', 'Contact', shared)
+  gtagAnalytics()?.('event', 'contact_whatsapp', shared)
+  devLog('Contact/contact_whatsapp', shared)
 }
 
+// Fallback pra links wa.me SEM [data-wpp] (várias páginas de empreendimento não
+// anotam os CTAs): deriva o empreendimento do pathname e o nome do catálogo.
+// position 'link_whatsapp' distingue esses cliques dos CTAs anotados.
+export function trackWhatsappLinkFallback(path: string) {
+  const m = path.match(/^\/empreendimento\/[^/]+\/([^/]+)/)
+  const slug = m?.[1] ?? null
+  const info = slug ? lookupItem(slug) : null
+  trackWhatsappClick({
+    content_name: info?.item_name ?? 'WhatsApp',
+    empreendimento: slug,
+    position: 'link_whatsapp',
+  })
+}
+
+// Catálogo estático → enriquece view_item/ViewContent sem custo de rede.
+// Páginas só-do-banco (rota dinâmica sem pasta literal) caem no fallback slug-only.
+type ItemInfo = {
+  item_id: string
+  item_name?: string
+  construtora?: string
+  cidade?: string
+  bairro?: string
+  status?: string
+}
+
+// Preço NUNCA é enviado: estratégia do site é "sob consulta" (exibir_preco=false
+// em todo o catálogo) — valor não confiável não entra em value/currency.
+function lookupItem(slug: string): ItemInfo {
+  const found = imoveis.find((i) => i.slug === slug)
+  if (!found) return { item_id: slug }
+  return {
+    item_id: slug,
+    item_name: found.nome,
+    construtora: found.construtora,
+    cidade: found.cidade,
+    bairro: found.bairro || undefined,
+    status: found.status,
+  }
+}
+
+export type ViewContentChannels = { meta: boolean; ga4: boolean }
+
+// Abertura de página de empreendimento. `channels` permite ao TrackingProvider
+// disparar por canal (ex.: consentimento concedido depois do load) sem duplicar
+// no canal que já recebeu. Retorna o que foi de fato despachado.
+export function trackViewContent(
+  slug: string,
+  channels: ViewContentChannels = { meta: true, ga4: true },
+): ViewContentChannels {
+  const info = lookupItem(slug)
+  const sent: ViewContentChannels = { meta: false, ga4: false }
+
+  if (channels.meta) {
+    const f = fbq()
+    if (f) {
+      f('track', 'ViewContent', {
+        content_ids: [info.item_id],
+        content_name: info.item_name ?? info.item_id,
+        content_type: 'product',
+        content_category: info.cidade,
+        empreendimento: info.item_id,
+        construtora: info.construtora,
+        status: info.status,
+      })
+      sent.meta = true
+    }
+  }
+  if (channels.ga4) {
+    const g = gtagAnalytics()
+    if (g) {
+      g('event', 'view_item', {
+        items: [
+          {
+            item_id: info.item_id,
+            item_name: info.item_name,
+            item_brand: info.construtora,
+            item_category: info.cidade,
+            item_category2: info.bairro,
+            item_category3: info.status,
+          },
+        ],
+      })
+      sent.ga4 = true
+    }
+  }
+  devLog('ViewContent/view_item', slug, sent)
+  return sent
+}
+
+// page_view manual de navegação SPA (App Router). O page_view INICIAL vem da
+// config do gtag.js / PageView do Pixel quando os scripts montam — aqui só as
+// navegações client-side seguintes (TrackingProvider pula o primeiro render).
+// IMPORTANTE: manter "Alterações de página por histórico do navegador" DESLIGADO
+// no Enhanced Measurement do GA4, senão cada navegação conta duas vezes
+// (ver docs/growth/tracking.md).
 export function trackSpaPageView(path: string) {
   fbq()?.('track', 'PageView')
-  gtag()?.('event', 'page_view', { page_path: path })
+  gtagAnalytics()?.('event', 'page_view', {
+    page_path: path,
+    page_location: typeof window !== 'undefined' ? window.location.href : path,
+    page_title: typeof document !== 'undefined' ? document.title : undefined,
+  })
+  devLog('page_view', path)
 }
 
 // --- Micro-conversões da jornada (funil pré-lead) ---
 // GA4 apenas: o pipeline de conversão real (Lead + CAPI + Enhanced Conversions)
 // já vive isolado em trackLeadEvent/sendLeadToCapi acima — não duplicar aqui.
-// O clique em links de WhatsApp usa outro mecanismo (data-wpp, delegado em
-// layout.tsx) porque já existe um evento Contact/contact_whatsapp sitewide.
+// O clique em links de WhatsApp usa outro mecanismo (data-wpp, delegado no
+// TrackingProvider) porque já existe um evento Contact/contact_whatsapp sitewide.
 
 type FunilParams = { empreendimento: string; content_name: string }
 // form_type distingue, no GA4, qual formulário gerou o evento — nunca incluir
@@ -206,26 +367,28 @@ type FunilParams = { empreendimento: string; content_name: string }
 type FormParams = FunilParams & { form_type: 'catalog_modal' | 'contact_form' }
 
 export function trackCatalogClick(params: FormParams) {
-  gtag()?.('event', 'catalog_click', params)
+  gtagAnalytics()?.('event', 'catalog_click', params)
 }
 
 export function trackPlantaOpen(label: string, params: FunilParams) {
-  gtag()?.('event', 'planta_open', { label, ...params })
+  gtagAnalytics()?.('event', 'planta_open', { label, ...params })
 }
 
 export function trackFormOpen(params: FormParams) {
-  gtag()?.('event', 'form_open', params)
+  gtagAnalytics()?.('event', 'form_open', params)
 }
 
 export function trackFormStart(params: FormParams) {
-  gtag()?.('event', 'form_start', params)
+  gtagAnalytics()?.('event', 'form_start', params)
 }
 
 export function trackFormSubmit(params: FormParams) {
-  gtag()?.('event', 'form_submit', params)
+  gtagAnalytics()?.('event', 'form_submit', params)
 }
 
-// Reenvio server-side (Meta CAPI) — fire-and-forget, noop se env não configurada no servidor
+// Reenvio server-side (Meta CAPI) — fire-and-forget, noop se env não configurada
+// no servidor. Gated por consentimento de MARKETING: sem aceite, nem fbclid nem
+// dados de contato (mesmo que depois hasheados) saem do browser rumo à Meta.
 export function sendLeadToCapi(payload: {
   event_id: string
   nome: string
@@ -234,6 +397,10 @@ export function sendLeadToCapi(payload: {
   content_name: string
 }) {
   if (typeof window === 'undefined') return
+  if (!hasMarketingConsent()) {
+    devLog('CAPI bloqueada: sem consentimento de marketing')
+    return
+  }
   const attrib = getAttribution()
   fetch('/api/meta-capi', {
     method: 'POST',

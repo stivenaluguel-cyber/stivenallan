@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { SITE_URL } from '@/lib/site'
+import { CookiePreferencesLink } from '@/components/CookiePreferencesLink'
 
 // Minuta preparada por IA a partir do que o código realmente faz (Meta Pixel/CAPI,
 // Google Ads Enhanced Conversions, Supabase, UTMs/gclid/fbclid de sessão). NÃO é
@@ -153,10 +154,24 @@ export default function PoliticaDePrivacidadePage() {
 
         <Secao id="cookies" titulo="6. Cookies e atribuição de campanhas">
           <p>
-            Quando você chega ao site a partir de um anúncio, guardamos temporariamente (na sessão do seu
-            navegador) os parâmetros de origem da campanha — como <code>utm_source</code>, <code>gclid</code>
-            {' '}ou <code>fbclid</code> — para associar um eventual contato seu à campanha correspondente. Esses
-            dados não identificam você sozinhos e são descartados ao final da sessão de navegação.
+            Cookies de medição (Google Analytics) e de marketing (Meta e Google Ads) <strong>só são ativados
+            depois do seu aceite</strong> no aviso de cookies, por categoria. Você pode aceitar tudo, rejeitar
+            os não essenciais ou escolher categoria a categoria — e mudar de ideia quando quiser:
+          </p>
+          <p>
+            <CookiePreferencesLink style={{ color: C.accent, fontSize: 'inherit' }} />
+          </p>
+          <p>
+            Ao revogar uma categoria, os cookies correspondentes (<code>_ga</code>, <code>_fbp</code> etc.) são
+            expirados e as plataformas param de receber eventos deste navegador.
+          </p>
+          <p>
+            Independentemente de cookies, quando você chega ao site a partir de um anúncio guardamos
+            temporariamente (na sessão do seu navegador) os parâmetros de origem da campanha — como{' '}
+            <code>utm_source</code>, <code>gclid</code> ou <code>fbclid</code> — para associar um eventual
+            contato seu à campanha correspondente. Esses dados não identificam você sozinhos, são descartados
+            ao final da sessão de navegação e só são compartilhados com plataformas de anúncio mediante o seu
+            consentimento de marketing.
           </p>
         </Secao>
 
