@@ -15,16 +15,16 @@ const CATALOGO = 'https://drive.google.com/file/d/1q_66Ex_z0HJLQG_hvC0bau8sqILvv
 
 export const metadata: Metadata = {
   title: 'Piazza Castello Residencial — Centro · Içara/SC | Construtora Fontana',
-  description: '3 dormítórios (3 suítes), até 172 m², apenas 2 apartamentos por andar. Centro de Içara/SC. Financiamento direto com a Construtora Fontana.',
+  description: 'Piazza Castello Residencial: apartamentos com 3 dormitórios (3 suítes) e até 172 m² privativos, no Centro de Içara/SC. Localização central, lazer completo e financiamento direto com a Construtora Fontana.',
   openGraph: {
     title: 'Piazza Castello Residencial — Centro · Içara/SC | Stiven Allan',
-    description: 'Exclusividade no coração de Içara: apenas 2 apartamentos por andar, 3 suítes, até 172 m².',
+    description: 'Apartamentos de 3 suítes e até 172 m² no coração de Içara/SC. Localização central e lazer completo.',
     images: [`${CDN}piazza-castello-residencial-5f8dcbdd18ee4.jpg`],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Piazza Castello Residencial — Centro · Içara/SC | Stiven Allan',
-    description: 'Exclusividade no coração de Içara: apenas 2 apartamentos por andar, 3 suítes, até 172 m².',
+    description: 'Apartamentos de 3 suítes e até 172 m² no coração de Içara/SC. Localização central e lazer completo.',
     images: [`${CDN}piazza-castello-residencial-5f8dcbdd18ee4.jpg`],
   },
 }
@@ -46,7 +46,7 @@ export default function PiazzaCastelloPage() {
     '@context': 'https://schema.org',
     '@type': 'RealEstateListing',
     name: 'Piazza Castello Residencial',
-    description: '3 dormítórios (3 suítes), até 172 m², apenas 2 apartamentos por andar, no Centro de Içara/SC.',
+    description: '3 dormítórios (3 suítes), até 172 m², no Centro de Içara/SC.',
     address: {
       '@type': 'PostalAddress',
       streetAddress: 'Praça Presidente João Goulart',
@@ -104,7 +104,7 @@ export default function PiazzaCastelloPage() {
       `}</style>
 
       
-<PropertySchema nome="Piazza Castello Residencial" slug="piazza-castello-centro-icara-sc" construtora_slug="fontana" cidade="Içara" uf="SC" bairro="Centro" descricao="Piazza Castello Residencial — 3 dormitórios (3 suítes), até 172 m² privativos, apenas 2 unidades por andar, no Centro de Içara/SC." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/piazza-castello-centro-icara-sc.jpg" faq={[{"pergunta":"Como funciona o pagamento do Piazza Castello Residencial?","resposta":"Condições de pagamento sob consulta. Fale com um corretor para receber a composição comercial e a disponibilidade atualizadas."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Fale com um corretor para confirmar as modalidades de pagamento disponíveis, incluindo financiamento bancário e FGTS."},{"pergunta":"Onde fica o Piazza Castello Residencial?","resposta":"O Piazza Castello Residencial está localizado na Praça Presidente João Goulart, frente à Praça Castelo Branco, no Centro de Içara/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"O empreendimento oferece apartamentos exclusivos com 3 dormitórios (3 suítes) e até 172 m² privativos, com apenas 2 unidades por andar."}]} />
+<PropertySchema nome="Piazza Castello Residencial" slug="piazza-castello-centro-icara-sc" construtora_slug="fontana" cidade="Içara" uf="SC" bairro="Centro" descricao="Piazza Castello Residencial — 3 dormitórios (3 suítes), até 172 m² privativos, no Centro de Içara/SC." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/piazza-castello-centro-icara-sc.jpg" faq={[{"pergunta":"Como funciona o pagamento do Piazza Castello Residencial?","resposta":"Condições de pagamento sob consulta. Fale com um corretor para receber a composição comercial e a disponibilidade atualizadas."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Fale com um corretor para confirmar as modalidades de pagamento disponíveis, incluindo financiamento bancário e FGTS."},{"pergunta":"Onde fica o Piazza Castello Residencial?","resposta":"O Piazza Castello Residencial está localizado na Praça Presidente João Goulart, frente à Praça Castelo Branco, no Centro de Içara/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"O empreendimento oferece apartamentos com 3 dormitórios (3 suítes) e até 172 m² privativos."}]} />
 <header style={{position:'absolute',top:0,left:0,right:0,zIndex:10,padding:'1.5rem'}}>
         <a href="/" style={{color:'#fff',fontSize:'1rem',fontWeight:700,textDecoration:'none',letterSpacing:'.04em'}}>
           Stiven Allan
@@ -123,9 +123,9 @@ export default function PiazzaCastelloPage() {
         <div className="pc-hero-overlay" />
         <div className="pc-hero-content">
           <div className="pc-container">
-            <span className="pc-badge">Pronto para morar · Centro · Içara/SC</span>
+            <span className="pc-badge">Centro · Içara/SC</span>
             <h1 className="pc-hero-title">Piazza Castello<br />Residencial</h1>
-            <p className="pc-hero-sub">Apenas 2 apartamentos por andar — exclusividade no coração de Içara.</p>
+            <p className="pc-hero-sub">3 suítes e acabamento premium no coração de Içara.</p>
             <a href={WA} target="_blank" rel="noopener noreferrer" className="pc-hero-btn">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.116.551 4.103 1.515 5.83L.057 23.536a.5.5 0 0 0 .612.612l5.701-1.458A11.94 11.94 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.797 9.797 0 0 1-5.003-1.37l-.358-.213-3.724.952.969-3.735-.234-.373A9.799 9.799 0 0 1 2.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg>
               Falar pelo WhatsApp
@@ -137,8 +137,8 @@ export default function PiazzaCastelloPage() {
       <div className="pc-specs">
         <div className="pc-spec"><div className="pc-spec-val">3</div><div className="pc-spec-lbl">Dormítórios (3 suítes)</div></div>
         <div className="pc-spec"><div className="pc-spec-val">172 m²</div><div className="pc-spec-lbl">Área privativa</div></div>
-        <div className="pc-spec"><div className="pc-spec-val">2</div><div className="pc-spec-lbl">Aptos por andar</div></div>
-        <div className="pc-spec"><div className="pc-spec-val">Pronto</div><div className="pc-spec-lbl">Para morar</div></div>
+        <div className="pc-spec"><div className="pc-spec-val">2</div><div className="pc-spec-lbl">Elevadores</div></div>
+        <div className="pc-spec"><div className="pc-spec-val">Centro</div><div className="pc-spec-lbl">Içara/SC</div></div>
       </div>
 
       <section className="pc-section" style={{background:'#f8f8f8',paddingTop:'3rem',paddingBottom:'3rem'}}>
@@ -152,11 +152,11 @@ export default function PiazzaCastelloPage() {
       <section className="pc-section">
         <div className="pc-container">
           <p className="pc-section-tag">O Empreendimento</p>
-          <h2 className="pc-section-title">Sofisticação e exclusividade<br />no centro de Içara</h2>
-          <p className="pc-section-text">O Piazza Castello foi concebido para quem valoriza privacidade e requinte. Com apenas 2 apartamentos por andar, cada unidade ocupa um espaço privilegiado — silêncio, privacidade e a sensação de uma residência particular em pleno coração de Içara.</p>
-          <p className="pc-section-text">Os apartamentos de até 172 m² contam com 3 suítes, sacada gourmet e hall de entrada com pé direito duplo. Um projeto que une grandiosidade à intimidade.</p>
+          <h2 className="pc-section-title">Sofisticação<br />no centro de Içara</h2>
+          <p className="pc-section-text">O Piazza Castello está localizado no coração de Içara, em frente à Praça Castelo Branco — fácil acesso a comércio, serviços e toda a infraestrutura da cidade.</p>
+          <p className="pc-section-text">Os apartamentos de até 172 m² contam com 3 suítes, sacada gourmet e hall de entrada com pé direito duplo.</p>
           <div className="pc-features">
-            {['3 suítes','Sacada Gourmet','Hall com pé direito duplo','2 Elevadores','2 aptos por andar','Piscina','Salão de Festas','Academia','Brinquedoteca','Playground'].map(f => (
+            {['3 suítes','Sacada Gourmet','Hall com pé direito duplo','2 Elevadores','Piscina','Salão de Festas','Academia','Brinquedoteca','Playground'].map(f => (
               <div key={f} className="pc-feature"><span className="pc-feature-dot" />{f}</div>
             ))}
           </div>
@@ -236,7 +236,7 @@ export default function PiazzaCastelloPage() {
         <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.116.551 4.103 1.515 5.83L.057 23.536a.5.5 0 0 0 .612.612l5.701-1.458A11.94 11.94 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.797 9.797 0 0 1-5.003-1.37l-.358-.213-3.724.952.969-3.735-.234-.373A9.799 9.799 0 0 1 2.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg>
       </a>
       {/* SEO FAQ */}
-      <PropertyFAQ items={[{"pergunta":"Como funciona o pagamento do Piazza Castello Residencial?","resposta":"Condições de pagamento sob consulta. Fale com um corretor para receber a composição comercial e a disponibilidade atualizadas."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Fale com um corretor para confirmar as modalidades de pagamento disponíveis, incluindo financiamento bancário e FGTS."},{"pergunta":"Onde fica o Piazza Castello Residencial?","resposta":"O Piazza Castello Residencial está localizado na Praça Presidente João Goulart, frente à Praça Castelo Branco, no Centro de Içara/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"O empreendimento oferece apartamentos exclusivos com 3 dormitórios (3 suítes) e até 172 m² privativos, com apenas 2 unidades por andar."}]} accent="#3D5C38" />
+      <PropertyFAQ items={[{"pergunta":"Como funciona o pagamento do Piazza Castello Residencial?","resposta":"Condições de pagamento sob consulta. Fale com um corretor para receber a composição comercial e a disponibilidade atualizadas."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Fale com um corretor para confirmar as modalidades de pagamento disponíveis, incluindo financiamento bancário e FGTS."},{"pergunta":"Onde fica o Piazza Castello Residencial?","resposta":"O Piazza Castello Residencial está localizado na Praça Presidente João Goulart, frente à Praça Castelo Branco, no Centro de Içara/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"O empreendimento oferece apartamentos com 3 dormitórios (3 suítes) e até 172 m² privativos."}]} accent="#3D5C38" />
       <RelatedProperties atualSlug="piazza-castello-centro-icara-sc" cidade="Içara" />
     </>
   )
