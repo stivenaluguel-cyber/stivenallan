@@ -76,11 +76,11 @@ const FAQ_ITEMS = [
 
 export const metadata: Metadata = {
   title: 'Calliano Residencial — Pronto para Morar, Centro Criciúma/SC',
-  description: 'Calliano Residencial, pronto para morar no Centro de Criciúma/SC — 2 ou 3 dormitórios, até 92 m² privativos. Financiamento direto com a construtora, sem banco.',
+  description: 'Calliano Residencial, pronto para morar no Centro de Criciúma/SC — 2 ou 3 dormitórios e até 92 m² privativos. Consulte as condições de pagamento e a disponibilidade atualizadas.',
   alternates: { canonical: `${SITE_URL}/empreendimento/fontana/calliano-centro-criciuma-sc` },
   openGraph: {
     title: 'Calliano Residencial — Pronto para Morar, Centro Criciúma/SC | Stiven Allan',
-    description: 'Pronto para morar — 2 ou 3 dorms · até 92 m² · Centro de Criciúma/SC. Financiamento direto, sem banco.',
+    description: 'Pronto para morar — 2 ou 3 dorms · até 92 m² · Centro de Criciúma/SC. Consulte as condições de pagamento atualizadas.',
     url: `${SITE_URL}/empreendimento/fontana/calliano-centro-criciuma-sc`,
     images: [{ url: IMG.hero, width: 1200, height: 630, alt: 'Calliano Residencial — Criciúma SC' }],
     type: 'website',
