@@ -55,7 +55,7 @@ const GALERIA = [
 { src: 'https://lh3.googleusercontent.com/d/1IatMUMVqUqr5ofMavFYJhRJjQ-QNV6A8', alt: 'Banheiro Due Fratelli', label: 'Banheiro' },
 ]
 const DIFERENCIAIS = [
-'2 e 3 dormítórios com até 92 m² privativos',
+'2 e 3 dormítórios de 91 a 256 m² privativos',
 '1 suíte com acabamento refinado',
 'Sacada privativa com churrasqueira',
 '2 elevadores no edifício',
@@ -66,11 +66,11 @@ const AMENIDADES = [
 
 export const metadata: Metadata = {
 title: 'Due Fratelli Residencial — Centro Criciúma/SC',
-description: 'Due Fratelli Residencial (Construtora Fontana): 2 e 3 dormítórios com até 92 m² privativos no Centro de Criciúma/SC. Sacada com churrasqueira, 2 elevadores. Atendimento exclusivo com Stiven Allan.',
+description: 'Due Fratelli Residencial (parceria Bez & Bez / rede Estilo Fontana): 2 e 3 dormítórios de 91 a 256 m² privativos no Centro de Criciúma/SC. Sacada com churrasqueira, 2 elevadores. Atendimento exclusivo com Stiven Allan.',
 alternates: { canonical: SITE_URL + '/empreendimento/fontana/due-fratelli-centro-criciuma-sc' },
 openGraph: {
 title: 'Due Fratelli Residencial — Centro Criciúma/SC | Stiven Allan',
-description: 'Qualidade de vida e praticidade no Centro de Criciúma. 2 e 3 dormítórios, até 92 m² privativos, sacada com churrasqueira.',
+description: 'Qualidade de vida e praticidade no Centro de Criciúma. 2 e 3 dormítórios, 91 a 256 m² privativos, sacada com churrasqueira.',
 url: SITE_URL + '/empreendimento/fontana/due-fratelli-centro-criciuma-sc',
 type: 'website',
 images: [{ url: '/images/empreendimentos/due-fratelli-centro-criciuma-sc/due-fratelli-residencial-5f889c789761e.jpg', width: 1200, height: 800, alt: 'Fachada Due Fratelli Residencial' }],
@@ -78,21 +78,21 @@ images: [{ url: '/images/empreendimentos/due-fratelli-centro-criciuma-sc/due-fra
 twitter: {
 card: 'summary_large_image',
 title: 'Due Fratelli Residencial — Centro Criciúma/SC | Stiven Allan',
-description: 'Qualidade de vida e praticidade no Centro de Criciúma. 2 e 3 dormítórios, até 92 m² privativos.',
+description: 'Qualidade de vida e praticidade no Centro de Criciúma. 2 e 3 dormítórios, 91 a 256 m² privativos.',
 images: ['/images/empreendimentos/due-fratelli-centro-criciuma-sc/due-fratelli-residencial-5f889c789761e.jpg'],
 },
 robots: { index: true, follow: true },
 }
-const SCHEMA = {
-'@context': 'https://schema.org',
-'@graph': [
-{ '@type': 'Apartment', name: 'Due Fratelli Residencial', description: 'Residencial com 2 e 3 dormítórios de até 92 m² privativos no Centro de Criciúma/SC.', image: '/images/empreendimentos/due-fratelli-centro-criciuma-sc/due-fratelli-residencial-5f889c789761e.jpg', numberOfRooms: 3, floorSize: { '@type': 'QuantitativeValue', value: 92, unitCode: 'MTK' }, address: { '@type': 'PostalAddress', streetAddress: 'Rua Princesa Isabel', addressLocality: 'Criciúma', addressRegion: 'SC', addressCountry: 'BR' } },
-],
-}
-
+const FAQ_ITEMS = [
+{ pergunta: 'Como funciona o pagamento do Due Fratelli Residencial?', resposta: 'O pagamento pode ser via financiamento bancário ou parcelamento direto em até 180 meses, corrigido pelo IGPM + 0,75% ao mês. Condições variam conforme unidade e modalidade — consulte a tabela vigente para valores e disponibilidade, sujeita à atualização. Fale com o Stiven pelo WhatsApp para simular as opções.' },
+{ pergunta: 'Posso usar financiamento bancário ou FGTS?', resposta: 'Sim. O financiamento bancário é uma das opções de pagamento disponíveis. Fale com o Stiven pelo WhatsApp para simular.' },
+{ pergunta: 'Onde fica o Due Fratelli Residencial?', resposta: 'O Due Fratelli Residencial está localizado na Rua Princesa Isabel, no Centro de Criciúma/SC.' },
+{ pergunta: 'Quais as plantas e metragens disponíveis?', resposta: 'O empreendimento oferece apartamentos com 2 dormitórios (1 suíte, de 91 a 160 m² privativos) ou 3 dormitórios (1 suíte, de 91 a 256 m² privativos), com sacada e churrasqueira.' },
+]
 export default function DueFratelliPage() {
 return (
 <main style={{ background: t.bg, color: t.ink, fontFamily: t.body, overflowX: 'hidden' }}>
+<PropertySchema nome="Due Fratelli Residencial" slug="due-fratelli-centro-criciuma-sc" construtora_slug="fontana" cidade="Criciúma" uf="SC" bairro="Centro" descricao="Residencial com 2 e 3 dormítórios de 91 a 256 m² privativos no Centro de Criciúma/SC." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/due-fratelli-centro-criciuma-sc.jpg" faq={FAQ_ITEMS} />
 
 <style>{`
 html { scroll-behavior: smooth; }
@@ -178,9 +178,9 @@ details.df-menu > summary::-webkit-details-marker { display: none; }
 <div style={{ maxWidth: 1080, margin: '0 auto', textAlign: 'center' }}>
 <p className="df-eyebrow" style={{ color: t.onDark, marginBottom: 18 }}>As Residências</p>
 <h2 className="df-h2" style={{ color: t.onDark }}>Espaço para a sua família</h2>
-<p className="df-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 56 }}>2 e 3 dormítórios com até 92 m² privativos.</p>
+<p className="df-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 56 }}>2 e 3 dormítórios de 91 a 256 m² privativos.</p>
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 'clamp(28px,5vw,64px)', marginBottom: 56 }}>
-{[{n:'2 e 3',l:'Dormítórios'},{n:'1',l:'Suíte'},{n:'até 92',l:'m² privativos'},{n:'2',l:'Elevadores'}].map((it,i)=>(
+{[{n:'2 e 3',l:'Dormítórios'},{n:'1',l:'Suíte'},{n:'91–256',l:'m² privativos'},{n:'2',l:'Elevadores'}].map((it,i)=>(
 <div key={i}><div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 'clamp(34px,5vw,58px)', letterSpacing: '0.04em', lineHeight: 1 }}>{it.n}</div><div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDarkMuted, marginTop: 12 }}>{it.l}</div></div>
 ))}
 </div>
@@ -267,7 +267,7 @@ details.df-menu > summary::-webkit-details-marker { display: none; }
 </a>
 
 {/* SEO FAQ */}
-<PropertyFAQ items={[{"pergunta":"Como funciona o pagamento do Due Fratelli Residencial?","resposta":"Entrada de 20%, saldo parcelado diretamente com a construtora em até 180 meses, com correção IGPM + 0,75% a.m."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Sim. Além do financiamento direto com a construtora, é possível optar por financiamento bancário. Fale com o Stiven pelo WhatsApp para simular as duas opções."},{"pergunta":"Onde fica o Due Fratelli Residencial?","resposta":"O Due Fratelli Residencial está localizado na Rua Princesa Isabel, no Centro de Criciúma/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"O empreendimento oferece apartamentos com 2 e 3 dormitórios (com suíte) e sacada com churrasqueira, com até 92 m² privativos."}]} accent="#3A5068" />
+<PropertyFAQ items={FAQ_ITEMS} accent="#3A5068" />
 <RelatedProperties atualSlug="due-fratelli-centro-criciuma-sc" cidade="Criciúma" />
 
 
