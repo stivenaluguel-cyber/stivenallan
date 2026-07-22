@@ -25,6 +25,13 @@ const t = {
 
 const D = 'https://lh3.googleusercontent.com/d/'
 
+const FAQ_ITEMS = [
+  { pergunta: 'Como funciona o pagamento do Rocca Pietore Residencial?', resposta: 'Condições de pagamento sob consulta. Fale com um corretor para receber a composição comercial e a disponibilidade atualizadas.' },
+  { pergunta: 'Posso usar financiamento bancário ou FGTS?', resposta: 'Fale com um corretor para confirmar as modalidades de pagamento disponíveis, incluindo financiamento bancário e FGTS.' },
+  { pergunta: 'Onde fica o Rocca Pietore Residencial?', resposta: 'O Rocca Pietore Residencial está localizado na Rua Siderúrgica, no Centro de Siderópolis/SC.' },
+  { pergunta: 'Quais as plantas e metragens disponíveis?', resposta: 'O empreendimento oferece apartamentos com 2 ou 3 dormitórios (1 suíte), de 71 a 91 m² privativos, com hall sofisticado e áreas de lazer.' },
+]
+
 const IMG = {
   hero:  D + '1KSAQZxT2-vTIMRXxOUtUmUqtfLECIZuq',
   hero2: D + '1W-Xo_llBhK6P6bMl4xNBAp7fKbhRzGCM',
@@ -116,7 +123,7 @@ const SCHEMA = {
 export default function Page() {
   return (
     <main style={{ fontFamily: t.body, background: t.bg, color: t.ink, overflowX: 'hidden' }}>
-<PropertySchema nome="Rocca Pietore Residencial" slug="rocca-pietore-centro-sideropolis-sc" construtora_slug="fontana" cidade="Siderópolis" uf="SC" bairro="Centro" descricao="Rocca Pietore Residencial — 2 ou 3 dormitórios (1 suíte), 71 a 91 m² privativos no Centro de Siderópolis/SC. Financiamento direto Fontana." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/rocca-pietore-centro-sideropolis-sc.jpg" faq={[{"pergunta":"Como funciona o pagamento do Rocca Pietore Residencial?","resposta":"Entrada de 20%, saldo parcelado diretamente com a construtora em até 180 meses, com correção IGPM + 0,75% a.m."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Sim. Além do financiamento direto com a construtora, é possível optar por financiamento bancário. Fale com o Stiven pelo WhatsApp para simular as duas opções."},{"pergunta":"Onde fica o Rocca Pietore Residencial?","resposta":"O Rocca Pietore Residencial está localizado na Rua Siderúrgica, no Centro de Siderópolis/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"O empreendimento oferece apartamentos com 2 ou 3 dormitórios (1 suíte), de 71 a 91 m² privativos, com hall sofisticado e áreas de lazer."}]} />
+<PropertySchema nome="Rocca Pietore Residencial" slug="rocca-pietore-centro-sideropolis-sc" construtora_slug="fontana" cidade="Siderópolis" uf="SC" bairro="Centro" descricao="Rocca Pietore Residencial — 2 ou 3 dormitórios (1 suíte), 71 a 91 m² privativos no Centro de Siderópolis/SC. Financiamento direto Fontana." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/rocca-pietore-centro-sideropolis-sc.jpg" faq={FAQ_ITEMS} />
 
       
       <style>{`
@@ -287,6 +294,9 @@ export default function Page() {
       </section>
 
       <RelatedProperties atualSlug="rocca-pietore-centro-sideropolis-sc" cidade="Siderópolis" />
+
+      {/* SEO FAQ */}
+      <PropertyFAQ items={FAQ_ITEMS} accent={t.navy} />
 
       <footer style={{ background:t.navyDark, padding:'48px 32px', textAlign:'center' }}>
         <p style={{ color:t.onDarkMuted, fontSize:12, letterSpacing:'0.2em', textTransform:'uppercase', margin:'0 0 8px' }}>Stiven Allan</p>

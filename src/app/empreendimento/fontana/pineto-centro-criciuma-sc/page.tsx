@@ -33,7 +33,7 @@ const GALERIA = [
 ]
 
 const DIFERENCIAIS = [
-  '2 dormitórios com 1 suíte — 75 a 76 m² de área privativa',
+  '2 dormitórios com 1 suíte — 75 a 77 m² de área privativa',
   'Living integrado com sacada e guarda-corpo em vidro',
   'Hall de entrada com pé-direito duplo',
   'Academia, coworking e espaço ioga',
@@ -57,16 +57,16 @@ const AMENIDADES = [
 
 export const metadata: Metadata = {
   title: 'Pineto Residencial | Apartamentos no Centro de Criciúma SC | Fontana',
-  description: 'Pineto Residencial: apartamentos de 2 dormitórios (1 suíte), 75 a 76 m², no Centro de Criciúma/SC. Academia, coworking, espaço ioga e financiamento direto com a construtora.',
+  description: 'Pineto Residencial: apartamentos de 2 dormitórios (1 suíte), 75 a 77 m², no Centro de Criciúma/SC. Academia, coworking, espaço ioga e financiamento direto com a construtora.',
   alternates: { canonical: `${SITE_URL}/empreendimento/fontana/pineto-centro-criciuma-sc` },
   openGraph: {
     title: 'Pineto Residencial | Centro de Criciúma SC | Stiven Allan',
-    description: 'Apartamentos 2 dorms (1 suíte), 75–76 m², no Centro de Criciúma. Academia, coworking, espaço ioga e financiamento direto com a Construtora Fontana.',
+    description: 'Apartamentos 2 dorms (1 suíte), 75–77 m², no Centro de Criciúma. Academia, coworking, espaço ioga e financiamento direto com a Construtora Fontana.',
     url: `${SITE_URL}/empreendimento/fontana/pineto-centro-criciuma-sc`,
     images: [{ url: '/images/empreendimentos/pineto-centro-criciuma-sc/pineto-residencial-68249cd5dfc70.jpg', width: 1200, height: 630, alt: 'Pineto Residencial' }],
     type: 'website',
   },
-  twitter: { card: 'summary_large_image', title: 'Pineto Residencial | Criciúma SC | Stiven Allan', description: 'Aptos 2 dorms (1 suíte) · 75–76 m² · Centro de Criciúma' },
+  twitter: { card: 'summary_large_image', title: 'Pineto Residencial | Criciúma SC | Stiven Allan', description: 'Aptos 2 dorms (1 suíte) · 75–77 m² · Centro de Criciúma' },
   robots: { index: true, follow: true },
 }
 
@@ -76,7 +76,7 @@ const SCHEMA = {
     {
       '@type': 'RealEstateListing',
       name: 'Pineto Residencial',
-      description: 'Apartamentos de 2 dormitórios (1 suíte), 75 a 76 m², no Centro de Criciúma/SC. Academia, coworking, espaço ioga e acabamento premium.',
+      description: 'Apartamentos de 2 dormitórios (1 suíte), 75 a 77 m², no Centro de Criciúma/SC. Academia, coworking, espaço ioga e acabamento premium.',
       url: `${SITE_URL}/empreendimento/fontana/pineto-centro-criciuma-sc`,
       image: '/images/empreendimentos/pineto-centro-criciuma-sc/pineto-residencial-68249cd5dfc70.jpg',
       address: {
@@ -101,7 +101,7 @@ const SCHEMA = {
 export default function Page() {
   return (
     <main style={{ fontFamily: t.body, background: t.bg, color: t.ink, overflowX: 'hidden' }}>
-<PropertySchema nome="Pineto Residencial" slug="pineto-centro-criciuma-sc" construtora_slug="fontana" cidade="Criciúma" uf="SC" bairro="Centro" descricao="Pineto Residencial — 2 dormitórios (1 suíte), 75 a 76 m² privativos no Centro de Criciúma/SC. Financiamento direto Fontana." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/pineto-centro-criciuma-sc.jpg" faq={[{"pergunta":"Como funciona o financiamento direto do Pineto Residencial?","resposta":"Entrada de 20%, saldo em até 72 parcelas mensais e 6 reforços anuais (cada reforço equivale a 5 parcelas mensais), com correção pelo CUB/SC durante a obra. Sem análise de banco."},{"pergunta":"Qual a previsão de entrega do Pineto Residencial?","resposta":"A previsão de entrega é novembro de 2029, em Centro, Criciúma/SC."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Sim. Além do financiamento direto com a construtora, é possível optar por financiamento bancário. Fale com o Stiven pelo WhatsApp para simular as duas opções."},{"pergunta":"Onde fica o Pineto Residencial?","resposta":"O Pineto Residencial está localizado na Rua Itajaí, 185, no Centro de Criciúma/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"O empreendimento oferece apartamentos com 2 dormitórios (1 suíte), de 75 a 76 m² privativos, com academia, coworking e áreas de lazer."}]} />
+<PropertySchema nome="Pineto Residencial" slug="pineto-centro-criciuma-sc" construtora_slug="fontana" cidade="Criciúma" uf="SC" bairro="Centro" descricao="Pineto Residencial — 2 dormitórios (1 suíte), 75 a 77 m² privativos no Centro de Criciúma/SC. Financiamento direto Fontana." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/pineto-centro-criciuma-sc.jpg" faq={[{"pergunta":"Como funciona o financiamento direto do Pineto Residencial?","resposta":"Condições de pagamento sob consulta. Fale com um corretor para receber a composição comercial e a disponibilidade atualizadas."},{"pergunta":"Qual a previsão de entrega do Pineto Residencial?","resposta":"A previsão de entrega é novembro de 2029, em Centro, Criciúma/SC."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Fale com um corretor para confirmar as modalidades de pagamento disponíveis, incluindo financiamento bancário e FGTS."},{"pergunta":"Onde fica o Pineto Residencial?","resposta":"O Pineto Residencial está localizado na Rua Itajaí, 185, no Centro de Criciúma/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"O empreendimento oferece apartamentos com 2 dormitórios (1 suíte), de 75 a 77 m² privativos, com academia, coworking e áreas de lazer."}]} />
 
       
       <style>{`
@@ -149,10 +149,10 @@ export default function Page() {
           <p className="pn-eyebrow" style={{ color:t.navy, marginBottom:20 }}>O Empreendimento</p>
           <h2 className="pn-h2" style={{ color:t.ink, margin:'0 0 28px' }}>As Residências</h2>
           <p style={{ color:t.muted, lineHeight:1.8, marginBottom:24 }}>
-            O Pineto Residencial entrega <strong>2 dormitórios</strong> com 1 suíte em plantas de <strong>75 a 76 m²</strong>, no Centro de Criciúma. Com living integrado, sacada em vidro e acabamento premium, foi projetado para quem valoriza originalidade e qualidade em cada detalhe.
+            O Pineto Residencial entrega <strong>2 dormitórios</strong> com 1 suíte em plantas de <strong>75 a 77 m²</strong>, no Centro de Criciúma. Com living integrado, sacada em vidro e acabamento premium, foi projetado para quem valoriza originalidade e qualidade em cada detalhe.
           </p>
           <ul style={{ listStyle:'none', padding:0, margin:'0 0 36px', display:'flex', flexDirection:'column', gap:10 }}>
-            {['2 dormitórios · 1 suíte master','75 a 76 m² de área privativa','Living integrado à sacada','Sacada com guarda-corpo em vidro','Porcelanato retificado e rebaixo em gesso','Tubulação para água quente'].map((f,i) => (
+            {['2 dormitórios · 1 suíte master','75 a 77 m² de área privativa','Living integrado à sacada','Sacada com guarda-corpo em vidro','Porcelanato retificado e rebaixo em gesso','Tubulação para água quente'].map((f,i) => (
               <li key={i} style={{ display:'flex', alignItems:'center', gap:10, fontSize:14, color:t.ink }}>
                 <span style={{ width:6, height:6, borderRadius:'50%', background:t.navy, flexShrink:0, display:'inline-block' }} />
                 {f}
@@ -185,7 +185,7 @@ export default function Page() {
           <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:48, marginBottom:48 }}>
             <div>
               <p style={{ color:t.onDarkMuted, lineHeight:1.8, marginBottom:32 }}>
-                Planta única de <strong style={{ color:t.onDark }}>2 dormitórios</strong> com 1 suíte e <strong style={{ color:t.onDark }}>75 a 76 m²</strong> de área privativa. Hall de entrada com pé-direito duplo e living que se integra à sacada.
+                Planta única de <strong style={{ color:t.onDark }}>2 dormitórios</strong> com 1 suíte e <strong style={{ color:t.onDark }}>75 a 77 m²</strong> de área privativa. Hall de entrada com pé-direito duplo e living que se integra à sacada.
               </p>
               <div style={{ display:'flex', gap:32 }}>
                 {[['2','Dorm.'],['1','Suíte'],['76','m² máx']].map(([n,l]) => (
@@ -285,7 +285,7 @@ export default function Page() {
         </svg>
       </a>
       {/* SEO FAQ */}
-      <PropertyFAQ items={[{"pergunta":"Como funciona o financiamento direto do Pineto Residencial?","resposta":"Entrada de 20%, saldo em até 72 parcelas mensais e 6 reforços anuais (cada reforço equivale a 5 parcelas mensais), com correção pelo CUB/SC durante a obra. Sem análise de banco."},{"pergunta":"Qual a previsão de entrega do Pineto Residencial?","resposta":"A previsão de entrega é novembro de 2029, em Centro, Criciúma/SC."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Sim. Além do financiamento direto com a construtora, é possível optar por financiamento bancário. Fale com o Stiven pelo WhatsApp para simular as duas opções."},{"pergunta":"Onde fica o Pineto Residencial?","resposta":"O Pineto Residencial está localizado na Rua Itajaí, 185, no Centro de Criciúma/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"O empreendimento oferece apartamentos com 2 dormitórios (1 suíte), de 75 a 76 m² privativos, com academia, coworking e áreas de lazer."}]} accent="#3D5C38" />
+      <PropertyFAQ items={[{"pergunta":"Como funciona o financiamento direto do Pineto Residencial?","resposta":"Condições de pagamento sob consulta. Fale com um corretor para receber a composição comercial e a disponibilidade atualizadas."},{"pergunta":"Qual a previsão de entrega do Pineto Residencial?","resposta":"A previsão de entrega é novembro de 2029, em Centro, Criciúma/SC."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Fale com um corretor para confirmar as modalidades de pagamento disponíveis, incluindo financiamento bancário e FGTS."},{"pergunta":"Onde fica o Pineto Residencial?","resposta":"O Pineto Residencial está localizado na Rua Itajaí, 185, no Centro de Criciúma/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"O empreendimento oferece apartamentos com 2 dormitórios (1 suíte), de 75 a 77 m² privativos, com academia, coworking e áreas de lazer."}]} accent="#3D5C38" />
       <RelatedProperties atualSlug="pineto-centro-criciuma-sc" cidade="Criciúma" />
 
     </main>
