@@ -84,8 +84,8 @@ images: ['/images/empreendimentos/due-fratelli-centro-criciuma-sc/due-fratelli-r
 robots: { index: true, follow: true },
 }
 const FAQ_ITEMS = [
-{ pergunta: 'Como funciona o pagamento do Due Fratelli Residencial?', resposta: 'O pagamento pode ser via financiamento bancário ou parcelamento direto em até 180 meses, corrigido pelo IGPM + 0,75% ao mês. Condições variam conforme unidade e modalidade — consulte a tabela vigente para valores e disponibilidade, sujeita à atualização. Fale com o Stiven pelo WhatsApp para simular as opções.' },
-{ pergunta: 'Posso usar financiamento bancário ou FGTS?', resposta: 'Sim. O financiamento bancário é uma das opções de pagamento disponíveis. Fale com o Stiven pelo WhatsApp para simular.' },
+{ pergunta: 'Como funciona o pagamento do Due Fratelli Residencial?', resposta: 'Condições de pagamento sob consulta. Fale com um corretor para receber a composição comercial e a disponibilidade atualizadas.' },
+{ pergunta: 'Posso usar financiamento bancário ou FGTS?', resposta: 'Fale com um corretor para confirmar as modalidades de pagamento disponíveis, incluindo financiamento bancário e FGTS.' },
 { pergunta: 'Onde fica o Due Fratelli Residencial?', resposta: 'O Due Fratelli Residencial está localizado na Rua Princesa Isabel, no Centro de Criciúma/SC.' },
 { pergunta: 'Quais as plantas e metragens disponíveis?', resposta: 'O empreendimento oferece apartamentos com 2 dormitórios (1 suíte, de 91 a 160 m² privativos) ou 3 dormitórios (1 suíte, de 91 a 256 m² privativos), com sacada e churrasqueira.' },
 ]

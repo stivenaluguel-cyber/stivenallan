@@ -48,9 +48,9 @@ const AMENIDADES = [
 ]
 
 const FAQ_ITEMS = [
-{ pergunta: 'Como funciona o financiamento direto do Mar di Atrani Residencial?', resposta: 'O plano padrão é entrada em parcela única + 72 parcelas mensais + 6 reforços anuais, negociado diretamente com a Construtora Fontana, sem análise de banco. Também há modalidades alternativas: 15% de desconto para pagamento à vista, ou 10% de desconto + 40% até as chaves + saldo em até 180 meses. Condições variam conforme unidade e modalidade — consulte a tabela vigente para valores e disponibilidade, sujeita à atualização. Fale com o Stiven pelo WhatsApp para simular a melhor opção para você.' },
+{ pergunta: 'Como funciona o financiamento direto do Mar di Atrani Residencial?', resposta: 'Condições de pagamento sob consulta. Fale com um corretor para receber a composição comercial e a disponibilidade atualizadas.' },
 { pergunta: 'Qual a previsão de entrega do Mar di Atrani Residencial?', resposta: 'A previsão de entrega é outubro de 2028, em Centro, Balneário Rincão/SC.' },
-{ pergunta: 'Posso usar financiamento bancário ou FGTS?', resposta: 'Fale com o Stiven pelo WhatsApp para simular as opções de pagamento e verificar a disponibilidade de financiamento bancário para esta unidade.' },
+{ pergunta: 'Posso usar financiamento bancário ou FGTS?', resposta: 'Fale com um corretor para confirmar as modalidades de pagamento disponíveis, incluindo financiamento bancário e FGTS.' },
 { pergunta: 'Onde fica o Mar di Atrani Residencial?', resposta: 'O Mar di Atrani Residencial está localizado na Rua Rio de Janeiro, 230, esq. Rua Urussanga, no Centro de Balneário Rincão/SC.' },
 { pergunta: 'Quais as plantas e metragens disponíveis?', resposta: 'O empreendimento oferece apartamentos com 3 dormitórios (1 suíte), de 100 a 102 m² privativos, a 250 metros da beira-mar.' },
 ]
