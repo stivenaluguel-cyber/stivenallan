@@ -42,7 +42,7 @@ const GALERIA = [
 
 const DIFERENCIAIS = [
   'Opções de 1, 2 ou 3 dormitórios para todos os perfis',
-  'Apartamentos de 52 a 79 m² com plantas inteligentes',
+  'Apartamentos de 52 a 80 m² com plantas inteligentes',
   '4 torres com lazer completo e infraestrutura compartilhada',
   'Espaço pet, playground e minicampo de futebol',
   'Salas comerciais integradas ao empreendimento',
@@ -64,16 +64,16 @@ const AMENIDADES = [
 
 export const metadata: Metadata = {
   title: 'Pavia Residencial | Apartamentos no Rio Maina Criciúma SC | Fontana',
-  description: 'Pavia Residencial: apartamentos de 1, 2 ou 3 dormitórios, 52 a 79 m², no Rio Maina em Criciúma/SC. 4 torres, lazer completo, playground, espaço pet e financiamento direto com a construtora.',
+  description: 'Pavia Residencial: apartamentos de 1, 2 ou 3 dormitórios, 52 a 80 m², no Rio Maina em Criciúma/SC. 4 torres, lazer completo, playground, espaço pet e financiamento direto com a construtora.',
   alternates: { canonical: `${SITE_URL}/empreendimento/fontana/pavia-rio-maina-criciuma-sc` },
   openGraph: {
     title: 'Pavia Residencial | Rio Maina · Criciúma SC | Stiven Allan',
-    description: 'Apartamentos de 1, 2 ou 3 dorms, 52–79 m², no Rio Maina em Criciúma. 4 torres, lazer completo e financiamento direto com a construtora.',
+    description: 'Apartamentos de 1, 2 ou 3 dorms, 52–80 m², no Rio Maina em Criciúma. 4 torres, lazer completo e financiamento direto com a construtora.',
     url: `${SITE_URL}/empreendimento/fontana/pavia-rio-maina-criciuma-sc`,
     images: [{ url: '/images/empreendimentos/pavia-rio-maina-criciuma-sc/pavia-residencial-636b9e731f40c.jpg', width: 1200, height: 630, alt: 'Pavia Residencial' }],
     type: 'website',
   },
-  twitter: { card: 'summary_large_image', title: 'Pavia Residencial | Criciúma SC | Stiven Allan', description: 'Aptos 1, 2 ou 3 dorms · 52–79 m² · Rio Maina · Criciúma' },
+  twitter: { card: 'summary_large_image', title: 'Pavia Residencial | Criciúma SC | Stiven Allan', description: 'Aptos 1, 2 ou 3 dorms · 52–80 m² · Rio Maina · Criciúma' },
   robots: { index: true, follow: true },
 }
 
@@ -83,7 +83,7 @@ const SCHEMA = {
     {
       '@type': 'RealEstateListing',
       name: 'Pavia Residencial',
-      description: 'Apartamentos de 1, 2 ou 3 dormitórios, 52 a 79 m², no Rio Maina em Criciúma/SC. 4 torres com lazer completo.',
+      description: 'Apartamentos de 1, 2 ou 3 dormitórios, 52 a 80 m², no Rio Maina em Criciúma/SC. 4 torres com lazer completo.',
       url: `${SITE_URL}/empreendimento/fontana/pavia-rio-maina-criciuma-sc`,
       image: '/images/empreendimentos/pavia-rio-maina-criciuma-sc/pavia-residencial-636b9e731f40c.jpg',
       address: {
@@ -108,7 +108,7 @@ const SCHEMA = {
 export default function Page() {
   return (
     <main style={{ fontFamily: t.body, background: t.bg, color: t.ink, overflowX: 'hidden' }}>
-<PropertySchema nome="Pavia Residencial" slug="pavia-rio-maina-criciuma-sc" construtora_slug="fontana" cidade="Criciúma" uf="SC" bairro="Rio Maina" descricao="Pavia Residencial — 1, 2 ou 3 dormitórios, 52 a 79 m² privativos, no Rio Maina em Criciúma/SC. 4 torres, lazer completo. Financiamento direto Fontana." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/pavia-rio-maina-criciuma-sc.jpg" faq={[{"pergunta":"Como funciona o pagamento do Pavia Residencial?","resposta":"Entrada de 15%, saldo parcelado diretamente com a construtora em até 240 meses, com correção IGPM + 0,75% a.m."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Sim. Além do financiamento direto com a construtora, é possível optar por financiamento bancário. Fale com o Stiven pelo WhatsApp para simular as duas opções."},{"pergunta":"Onde fica o Pavia Residencial?","resposta":"O Pavia Residencial está localizado na Avenida dos Imigrantes, esq. Rua João Colombo, no Rio Maina, Criciúma/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"O empreendimento oferece apartamentos com 1, 2 ou 3 dormitórios, de 52 a 79 m² privativos, em 4 torres."}]} />
+<PropertySchema nome="Pavia Residencial" slug="pavia-rio-maina-criciuma-sc" construtora_slug="fontana" cidade="Criciúma" uf="SC" bairro="Rio Maina" descricao="Pavia Residencial — 1, 2 ou 3 dormitórios, 52 a 80 m² privativos, no Rio Maina em Criciúma/SC. 4 torres, lazer completo. Financiamento direto Fontana." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/pavia-rio-maina-criciuma-sc.jpg" faq={[{"pergunta":"Como funciona o pagamento do Pavia Residencial?","resposta":"Condições de pagamento sob consulta. Fale com um corretor para receber a composição comercial e a disponibilidade atualizadas."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Fale com um corretor para confirmar as modalidades de pagamento disponíveis, incluindo financiamento bancário e FGTS."},{"pergunta":"Onde fica o Pavia Residencial?","resposta":"O Pavia Residencial está localizado na Avenida dos Imigrantes, esq. Rua João Colombo, no Rio Maina, Criciúma/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"O empreendimento oferece apartamentos com 1, 2 ou 3 dormitórios, de 52 a 80 m² privativos, em 4 torres."}]} />
 
       
       <style>{`
@@ -156,10 +156,10 @@ export default function Page() {
           <p className="pv-eyebrow" style={{ color:t.navy, marginBottom:20 }}>O Empreendimento</p>
           <h2 className="pv-h2" style={{ color:t.ink, margin:'0 0 28px' }}>As Residências</h2>
           <p style={{ color:t.muted, lineHeight:1.8, marginBottom:24 }}>
-            O Pavia Residencial é formado por <strong>4 torres</strong> com apartamentos de <strong>1, 2 ou 3 dormitórios</strong> e áreas de <strong>52 a 79 m²</strong>, no Rio Maina em Criciúma. Inspirado na comuna italiana de Pavia, o empreendimento une funcionalidade, lazer completo e localização estratégica.
+            O Pavia Residencial é formado por <strong>4 torres</strong> com apartamentos de <strong>1, 2 ou 3 dormitórios</strong> e áreas de <strong>52 a 80 m²</strong>, no Rio Maina em Criciúma. Inspirado na comuna italiana de Pavia, o empreendimento une funcionalidade, lazer completo e localização estratégica.
           </p>
           <ul style={{ listStyle:'none', padding:0, margin:'0 0 36px', display:'flex', flexDirection:'column', gap:10 }}>
-            {['1, 2 ou 3 dormitórios — múltiplas tipologias','52 a 79 m² de área privativa','4 torres com infraestrutura completa','Lazer com playground, quadra e espaço pet','Salas comerciais no empreendimento','Localização no Rio Maina — Criciúma'].map((f,i) => (
+            {['1, 2 ou 3 dormitórios — múltiplas tipologias','52 a 80 m² de área privativa','4 torres com infraestrutura completa','Lazer com playground, quadra e espaço pet','Salas comerciais no empreendimento','Localização no Rio Maina — Criciúma'].map((f,i) => (
               <li key={i} style={{ display:'flex', alignItems:'center', gap:10, fontSize:14, color:t.ink }}>
                 <span style={{ width:6, height:6, borderRadius:'50%', background:t.navy, flexShrink:0, display:'inline-block' }} />
                 {f}
@@ -192,7 +192,7 @@ export default function Page() {
           <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:48, marginBottom:48 }}>
             <div>
               <p style={{ color:t.onDarkMuted, lineHeight:1.8, marginBottom:32 }}>
-                Três tipologias — <strong style={{ color:t.onDark }}>1, 2 ou 3 dormitórios</strong> — com plantas de <strong style={{ color:t.onDark }}>52 a 79 m²</strong>, projetadas para otimizar cada metro quadrado.
+                Três tipologias — <strong style={{ color:t.onDark }}>1, 2 ou 3 dormitórios</strong> — com plantas de <strong style={{ color:t.onDark }}>52 a 80 m²</strong>, projetadas para otimizar cada metro quadrado.
               </p>
               <div style={{ display:'flex', gap:32 }}>
                 {[['1–3','Dorm.'],['79','m² máx'],['4','Torres']].map(([n,l]) => (
@@ -305,7 +305,7 @@ export default function Page() {
         </svg>
       </a>
       {/* SEO FAQ */}
-      <PropertyFAQ items={[{"pergunta":"Como funciona o pagamento do Pavia Residencial?","resposta":"Entrada de 15%, saldo parcelado diretamente com a construtora em até 240 meses, com correção IGPM + 0,75% a.m."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Sim. Além do financiamento direto com a construtora, é possível optar por financiamento bancário. Fale com o Stiven pelo WhatsApp para simular as duas opções."},{"pergunta":"Onde fica o Pavia Residencial?","resposta":"O Pavia Residencial está localizado na Avenida dos Imigrantes, esq. Rua João Colombo, no Rio Maina, Criciúma/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"O empreendimento oferece apartamentos com 1, 2 ou 3 dormitórios, de 52 a 79 m² privativos, em 4 torres."}]} accent="#3D5C38" />
+      <PropertyFAQ items={[{"pergunta":"Como funciona o pagamento do Pavia Residencial?","resposta":"Condições de pagamento sob consulta. Fale com um corretor para receber a composição comercial e a disponibilidade atualizadas."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Fale com um corretor para confirmar as modalidades de pagamento disponíveis, incluindo financiamento bancário e FGTS."},{"pergunta":"Onde fica o Pavia Residencial?","resposta":"O Pavia Residencial está localizado na Avenida dos Imigrantes, esq. Rua João Colombo, no Rio Maina, Criciúma/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"O empreendimento oferece apartamentos com 1, 2 ou 3 dormitórios, de 52 a 80 m² privativos, em 4 torres."}]} accent="#3D5C38" />
       <RelatedProperties atualSlug="pavia-rio-maina-criciuma-sc" cidade="Criciúma" />
     </main>
   )
