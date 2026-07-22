@@ -55,8 +55,8 @@ const AMENIDADES = [
 ]
 
 const FAQ_ITEMS = [
-  { pergunta: 'Como funciona o pagamento do Castellano Residencial?', resposta: 'O pagamento pode ser via financiamento bancário ou parcelamento direto com a Construtora Fontana em até 180 meses, corrigido pelo IGPM + 0,75% ao mês. Condições variam conforme unidade e modalidade — consulte a tabela vigente para valores e disponibilidade, sujeita à atualização. Fale com o Stiven pelo WhatsApp para simular as opções.' },
-  { pergunta: 'Posso usar financiamento bancário ou FGTS?', resposta: 'Sim, o financiamento bancário é uma das opções de pagamento disponíveis para o Castellano Residencial. Fale com o Stiven pelo WhatsApp para simular.' },
+  { pergunta: 'Como funciona o pagamento do Castellano Residencial?', resposta: 'Condições de pagamento sob consulta. Fale com um corretor para receber a composição comercial e a disponibilidade atualizadas.' },
+  { pergunta: 'Posso usar financiamento bancário ou FGTS?', resposta: 'Fale com um corretor para confirmar as modalidades de pagamento disponíveis, incluindo financiamento bancário e FGTS.' },
   { pergunta: 'Onde fica o Castellano Residencial?', resposta: 'O Castellano Residencial está localizado na Rua Pio XII esquina com Rua Duque de Caxias, Centro, Içara/SC.' },
   { pergunta: 'Quais as plantas e metragens disponíveis?', resposta: 'O Castellano oferece apartamentos de 3 dormitórios, sendo 1 suíte, com 109 a 112 m² privativos e 2 sacadas.' },
 ]
