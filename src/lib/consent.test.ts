@@ -5,12 +5,14 @@ import {
   CONSENT_VERSION,
   acceptAllConsent,
   consentModeParams,
+  defaultPrefsCategories,
   getConsent,
   hasAnalyticsConsent,
   hasMarketingConsent,
   onConsentChange,
   rejectNonEssentialConsent,
   saveConsent,
+  type ConsentState,
 } from './consent'
 
 // Stub de browser em ambiente node (sem jsdom), com localStorage + eventos +
@@ -167,6 +169,23 @@ describe('saveConsent', () => {
   it('não explode sem gtag/fbq no window (scripts nunca carregados)', () => {
     mountBrowser()
     expect(() => saveConsent({ analytics: true, marketing: true })).not.toThrow()
+  })
+})
+
+describe('defaultPrefsCategories — estado inicial dos toggles do painel', () => {
+  it('visitante sem decisão salva: toggles DESLIGADOS (nunca pré-marcados)', () => {
+    expect(defaultPrefsCategories(null)).toEqual({ analytics: false, marketing: false })
+  })
+
+  it('consentimento salvo: reflete exatamente os valores persistidos', () => {
+    const stored: ConsentState = {
+      version: CONSENT_VERSION,
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      categories: { analytics: true, marketing: false },
+    }
+    expect(defaultPrefsCategories(stored)).toEqual({ analytics: true, marketing: false })
+    stored.categories = { analytics: false, marketing: true }
+    expect(defaultPrefsCategories(stored)).toEqual({ analytics: false, marketing: true })
   })
 })
 

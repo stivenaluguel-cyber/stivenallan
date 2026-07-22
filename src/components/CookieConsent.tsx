@@ -4,6 +4,7 @@ import Link from 'next/link'
 import {
   CONSENT_OPEN_EVENT,
   acceptAllConsent,
+  defaultPrefsCategories,
   getConsent,
   rejectNonEssentialConsent,
   saveConsent,
@@ -38,23 +39,22 @@ const btnBase: React.CSSProperties = {
 // antes da decisão — o gate real fica em AnalyticsScripts + lib/tracking.
 export function CookieConsent() {
   const [view, setView] = useState<'hidden' | 'banner' | 'prefs'>('hidden')
-  const [analytics, setAnalytics] = useState(true)
-  const [marketing, setMarketing] = useState(true)
+  // Toggles começam DESLIGADOS: visitante sem decisão salva nunca vê caixa
+  // pré-marcada (consentimento fraco). Valores persistidos são restaurados
+  // no mount e a cada reabertura — única fonte: defaultPrefsCategories.
+  const [analytics, setAnalytics] = useState(false)
+  const [marketing, setMarketing] = useState(false)
 
   useEffect(() => {
     const stored = getConsent()
-    if (!stored) {
-      setView('banner')
-    } else {
-      setAnalytics(stored.categories.analytics)
-      setMarketing(stored.categories.marketing)
-    }
+    const prefs = defaultPrefsCategories(stored)
+    setAnalytics(prefs.analytics)
+    setMarketing(prefs.marketing)
+    if (!stored) setView('banner')
     const onOpen = () => {
-      const current = getConsent()
-      if (current) {
-        setAnalytics(current.categories.analytics)
-        setMarketing(current.categories.marketing)
-      }
+      const current = defaultPrefsCategories(getConsent())
+      setAnalytics(current.analytics)
+      setMarketing(current.marketing)
       setView('prefs')
     }
     window.addEventListener(CONSENT_OPEN_EVENT, onOpen)

@@ -54,6 +54,15 @@ export function getConsent(): ConsentState | null {
   }
 }
 
+// Estado inicial dos toggles do painel de preferências: visitante que nunca
+// decidiu vê tudo DESLIGADO (caixa pré-marcada = consentimento fraco, padrão
+// Planet49/GDPR que a ANPD segue); quem já decidiu vê exatamente o que salvou.
+export function defaultPrefsCategories(stored: ConsentState | null): ConsentCategories {
+  return stored
+    ? { analytics: stored.categories.analytics, marketing: stored.categories.marketing }
+    : { analytics: false, marketing: false }
+}
+
 export function hasAnalyticsConsent(): boolean {
   return getConsent()?.categories.analytics === true
 }
