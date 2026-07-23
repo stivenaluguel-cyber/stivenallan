@@ -1,9 +1,30 @@
 'use client'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { ESTAGIOS_FUNIL } from '@/lib/dashboard/estagios'
 import { statsParaGrafico, type CampanhaStats } from '@/lib/dashboard/campanhas-stats'
 import { CampanhaChart } from '@/lib/dashboard/campanhas-chart'
+
+type Empreendimento = { id: string; nome: string; slug: string; construtora: string | null; imagem_capa_url: string | null; ativo: boolean; oculto: boolean }
+
+// Bloco de imagem+texto no mesmo estilo visual da moldura de e-mail
+// (montarHtml em src/lib/cron/email-followup-helpers.ts) — link sempre
+// absoluto pro stivenallan.com.br, já que o e-mail é lido fora do site.
+function blocoEmpreendimentoHtml(emp: Empreendimento): string {
+  const link = `https://stivenallan.com.br/empreendimento/${emp.construtora ?? ''}/${emp.slug}`
+  const imagem = emp.imagem_capa_url
+    ? `<img src="${emp.imagem_capa_url}" alt="${emp.nome}" style="width:100%;max-width:480px;border-radius:12px;display:block;margin:0 auto" />`
+    : ''
+  return `\n<div style="margin:20px 0;text-align:center">\n  ${imagem}\n  <p style="font-weight:700;margin:12px 0 4px">${emp.nome}</p>\n  <p style="margin:0"><a href="${link}" style="color:#1A5C3A;font-weight:700">Ver ${emp.nome} →</a></p>\n</div>\n`
+}
+
+function blocoImagemTextoHtml(url: string, texto: string): string {
+  const imagem = url
+    ? `<img src="${url}" alt="" style="width:100%;max-width:480px;border-radius:12px;display:block;margin:0 auto" />`
+    : ''
+  const paragrafo = texto ? `<p style="margin:12px 0 0">${texto}</p>` : ''
+  return `\n<div style="margin:20px 0;text-align:center">\n  ${imagem}\n  ${paragrafo}\n</div>\n`
+}
 
 const D = {
   bg: '#F3F2EE', surface: '#FAFAF7', ink: '#161512', bronze: '#D24E22',
@@ -48,6 +69,34 @@ export default function CampanhaDetalhePage() {
   const [salvando, setSalvando] = useState(false)
   const [enviando, setEnviando] = useState(false)
   const [msg, setMsg] = useState('')
+
+  const corpoRef = useRef<HTMLTextAreaElement>(null)
+  const [empreendimentos, setEmpreendimentos] = useState<Empreendimento[]>([])
+  const [mostrarPickerEmp, setMostrarPickerEmp] = useState(false)
+  const [empSelecionado, setEmpSelecionado] = useState('')
+  const [mostrarPickerImagem, setMostrarPickerImagem] = useState(false)
+  const [imgUrl, setImgUrl] = useState('')
+  const [imgTexto, setImgTexto] = useState('')
+
+  useEffect(() => {
+    fetch('/api/admin/empreendimentos')
+      .then((r) => r.json())
+      .then((d) => setEmpreendimentos((d.data ?? []).filter((e: Empreendimento) => e.ativo && !e.oculto)))
+      .catch(() => setEmpreendimentos([]))
+  }, [])
+
+  // Insere no cursor (ou no fim, se o textarea nunca ganhou foco) em vez de
+  // só concatenar — evita quebrar o texto se o corretor já estava editando
+  // no meio do corpo.
+  function inserirNoCorpo(html: string) {
+    const el = corpoRef.current
+    setCorpoHtml((atual) => {
+      if (!el) return atual + html
+      const inicio = el.selectionStart ?? atual.length
+      const fim = el.selectionEnd ?? atual.length
+      return atual.slice(0, inicio) + html + atual.slice(fim)
+    })
+  }
 
   const carregar = useCallback(async () => {
     setLoading(true)
@@ -158,7 +207,56 @@ export default function CampanhaDetalhePage() {
             style={{ width: '100%', border: '1px solid ' + D.line, borderRadius: 6, padding: 8, fontSize: 13, marginBottom: 12, boxSizing: 'border-box' }} />
 
           <label style={{ fontSize: 11, color: D.muted, display: 'block', marginBottom: 4 }}>Corpo HTML (use {'{nome}'} / {'{empreendimento}'} como placeholders)</label>
-          <textarea value={corpoHtml} onChange={(e) => setCorpoHtml(e.target.value)} disabled={!editavel} rows={10}
+
+          {editavel && (
+            <div style={{ display: 'flex', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
+              <button type="button" onClick={() => { setMostrarPickerEmp((v) => !v); setMostrarPickerImagem(false) }}
+                style={{ border: '1px dashed ' + D.line, background: mostrarPickerEmp ? D.bg : '#fff', borderRadius: 8, padding: '6px 12px', fontSize: 12, fontWeight: 700, color: D.bronze, cursor: 'pointer' }}>
+                + Empreendimento
+              </button>
+              <button type="button" onClick={() => { setMostrarPickerImagem((v) => !v); setMostrarPickerEmp(false) }}
+                style={{ border: '1px dashed ' + D.line, background: mostrarPickerImagem ? D.bg : '#fff', borderRadius: 8, padding: '6px 12px', fontSize: 12, fontWeight: 700, color: D.bronze, cursor: 'pointer' }}>
+                + Imagem/Texto
+              </button>
+            </div>
+          )}
+
+          {mostrarPickerEmp && (
+            <div style={{ display: 'flex', gap: 8, marginBottom: 10, alignItems: 'center', flexWrap: 'wrap', background: D.bg, borderRadius: 8, padding: 10 }}>
+              <select value={empSelecionado} onChange={(e) => setEmpSelecionado(e.target.value)}
+                style={{ flex: '1 1 220px', border: '1px solid ' + D.line, borderRadius: 6, padding: 7, fontSize: 13 }}>
+                <option value="">Selecione um empreendimento...</option>
+                {empreendimentos.map((e) => (
+                  <option key={e.id} value={e.id}>{e.nome}</option>
+                ))}
+              </select>
+              <button type="button" disabled={!empSelecionado} onClick={() => {
+                const emp = empreendimentos.find((e) => e.id === empSelecionado)
+                if (!emp) return
+                inserirNoCorpo(blocoEmpreendimentoHtml(emp))
+                setMostrarPickerEmp(false); setEmpSelecionado('')
+              }} style={{ background: D.bronze, color: '#fff', border: 'none', borderRadius: 6, padding: '7px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', opacity: empSelecionado ? 1 : 0.5 }}>
+                Inserir
+              </button>
+            </div>
+          )}
+
+          {mostrarPickerImagem && (
+            <div style={{ marginBottom: 10, background: D.bg, borderRadius: 8, padding: 10 }}>
+              <input value={imgUrl} onChange={(e) => setImgUrl(e.target.value)} placeholder="URL da imagem (https://...)"
+                style={{ width: '100%', border: '1px solid ' + D.line, borderRadius: 6, padding: 7, fontSize: 13, marginBottom: 6, boxSizing: 'border-box' }} />
+              <input value={imgTexto} onChange={(e) => setImgTexto(e.target.value)} placeholder="Texto/legenda (opcional)"
+                style={{ width: '100%', border: '1px solid ' + D.line, borderRadius: 6, padding: 7, fontSize: 13, marginBottom: 8, boxSizing: 'border-box' }} />
+              <button type="button" disabled={!imgUrl.trim()} onClick={() => {
+                inserirNoCorpo(blocoImagemTextoHtml(imgUrl.trim(), imgTexto.trim()))
+                setMostrarPickerImagem(false); setImgUrl(''); setImgTexto('')
+              }} style={{ background: D.bronze, color: '#fff', border: 'none', borderRadius: 6, padding: '7px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', opacity: imgUrl.trim() ? 1 : 0.5 }}>
+                Inserir
+              </button>
+            </div>
+          )}
+
+          <textarea ref={corpoRef} value={corpoHtml} onChange={(e) => setCorpoHtml(e.target.value)} disabled={!editavel} rows={10}
             style={{ width: '100%', border: '1px solid ' + D.line, borderRadius: 6, padding: 8, fontSize: 12, fontFamily: 'ui-monospace,SFMono-Regular,Menlo,monospace', resize: 'vertical', boxSizing: 'border-box' }} />
         </section>
 

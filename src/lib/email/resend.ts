@@ -10,10 +10,35 @@ export type EnviarEmailResultado =
   | { ok: true; id?: string }
   | { ok: false; error: string }
 
+// Deliverability: filtros de spam desconfiam mais de e-mail só-HTML sem
+// alternativa em texto puro, principalmente vindo de um remetente novo
+// nesse padrão de envio em lote. Gerada automaticamente a partir do HTML
+// (regex simples — não precisa de parser de verdade pro nosso uso: parágrafos
+// e links viram texto legível, o resto é só limpeza de tag).
+export function htmlParaTexto(html: string): string {
+  return html
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/p>/gi, '\n\n')
+    .replace(/<\/div>/gi, '\n')
+    .replace(/<a[^>]*href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi, '$2 ($1)')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/[ \t]+/g, ' ')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
+}
+
 export async function enviarEmailResend(params: {
   to: string
   subject: string
   html: string
+  text?: string
   headers?: Record<string, string>
 }): Promise<EnviarEmailResultado> {
   const res = await fetch('https://api.resend.com/emails', {
@@ -27,6 +52,7 @@ export async function enviarEmailResend(params: {
       to: [params.to],
       subject: params.subject,
       html: params.html,
+      text: params.text ?? htmlParaTexto(params.html),
       headers: params.headers,
     }),
   })
