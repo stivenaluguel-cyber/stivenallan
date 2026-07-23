@@ -66,6 +66,7 @@ const STATUS_LABELS: Record<string, string> = {
   'em obras': 'Em Obras',
   'pronto': 'Pronto para Morar',
   'entregue': 'Entregue',
+  'sob consulta': 'Sob Consulta',
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -73,6 +74,7 @@ const STATUS_COLORS: Record<string, string> = {
   'em obras': 'bg-blue-500/20 text-blue-400',
   'pronto': 'bg-green-500/20 text-green-400',
   'entregue': 'bg-white/10 text-white',
+  'sob consulta': 'bg-white/10 text-white',
 }
 
 function getEmpreendimentosPorBairro(nomeCidade: string, nomeBairro: string) {
