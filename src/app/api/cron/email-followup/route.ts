@@ -3,6 +3,7 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { logError, logInfo, logWarn } from '@/lib/log'
 import { finishCronRun, startCronRun, type CronRunFinal } from '@/lib/cron/tracker'
 import { buildUnsubscribeUrl, montarHtml } from '@/lib/cron/email-followup-helpers'
+import { enviarEmailResend } from '@/lib/email/resend'
 
 export const dynamic = 'force-dynamic'
 
@@ -72,25 +73,17 @@ function substituirPlaceholders(txt: string, nome: string, empreendimento: strin
 }
 
 async function enviarEmail(para: string, assunto: string, html: string, unsubUrl: string): Promise<boolean> {
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
+  const resultado = await enviarEmailResend({
+    to: para,
+    subject: assunto,
+    html,
     headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+      'List-Unsubscribe': `<${unsubUrl}>`,
+      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
     },
-    body: JSON.stringify({
-      from: process.env.RESEND_FROM,
-      to: [para],
-      subject: assunto,
-      html,
-      headers: {
-        'List-Unsubscribe': `<${unsubUrl}>`,
-        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
-      },
-    }),
   })
-  if (!res.ok) {
-    logError(SOURCE, 'resend send failed', new Error(`status=${res.status} body=${await res.text()}`))
+  if (!resultado.ok) {
+    logError(SOURCE, 'resend send failed', new Error(resultado.error))
     return false
   }
   return true

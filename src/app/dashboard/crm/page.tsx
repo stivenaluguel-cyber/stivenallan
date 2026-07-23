@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
 import { ConversaPanel } from '@/components/dashboard/ConversaPanel'
+import { ESTAGIOS_FUNIL as ESTAGIOS } from '@/lib/dashboard/estagios'
 
 const D = {
   bg: '#F3F2EE', surface: '#FAFAF7', sidebar: '#131211', ink: '#161512',
@@ -24,15 +25,6 @@ type Emp = { id: string; nome: string; status_venda: string; status_obra?: strin
 type Cub = { id: string; mes_referencia: string; valor_m2: number; variacao_mensal?: number; fonte?: string }
 type Evento = { tipo: string; slug?: string; descricao?: string; created_at: string }
 
-const ESTAGIOS = [
-  { key: 'primeiro_contato', label: 'Novo Contato', cor: '#6b7280' },
-  { key: 'qualificado', label: 'Qualificado', cor: '#3b82f6' },
-  { key: 'interessado', label: 'Interessado', cor: '#8b5cf6' },
-  { key: 'proposta_enviada', label: 'Proposta Enviada', cor: '#f59e0b' },
-  { key: 'visita_agendada', label: 'Visita Agendada', cor: '#ec4899' },
-  { key: 'negociacao', label: 'Em Negociação', cor: '#D24E22' },
-  { key: 'fechado', label: 'Fechado', cor: '#22c55e' },
-]
 
 const TEMPERATURAS = [
   { v: 3, label: 'Quente', cor: '#ef4444', emoji: '🔥' },
