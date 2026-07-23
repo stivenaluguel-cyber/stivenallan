@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import Link from 'next/link';
 import { getAttribution, trackLeadEvent, sendLeadToCapi, trackFormStart, trackFormSubmit } from '@/lib/tracking';
+import { getFaixasInvestimento } from '@/lib/faixas-investimento';
 import { createClient } from '@/lib/supabase/client';
 import { getAnonId, getVisitas } from '@/components/VisitTracker';
 
@@ -30,6 +31,7 @@ export default function FormContato({ empreendimento, propertyId, propertySlug, 
   const [status, setStatus] = useState<'idle' | 'enviando' | 'ok' | 'erro'>('idle');
   const startedRef = useRef(false);
   const funilParams = { empreendimento: propertySlug || empreendimento, content_name: empreendimento, form_type: 'contact_form' as const };
+  const faixasInvestimento = getFaixasInvestimento(propertySlug);
 
   function markStarted() {
     if (startedRef.current) return;
@@ -224,10 +226,9 @@ export default function FormContato({ empreendimento, propertyId, propertySlug, 
         <option value="" disabled>
           Faixa de investimento
         </option>
-        <option value="Até R$ 600 mil">Até R$ 600 mil</option>
-        <option value="R$ 600 mil a R$ 1 milhão">R$ 600 mil a R$ 1 milhão</option>
-        <option value="R$ 1 a 2 milhões">R$ 1 a 2 milhões</option>
-        <option value="Acima de R$ 2 milhões">Acima de R$ 2 milhões</option>
+        {faixasInvestimento.map((faixa) => (
+          <option key={faixa} value={faixa}>{faixa}</option>
+        ))}
       </select>
       <select
         value={prazoCompra}
