@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse, after } from 'next/server'
 import { cookies } from 'next/headers'
 import { jwtVerify } from 'jose'
 import { createClient } from '@supabase/supabase-js'
@@ -21,9 +21,14 @@ type Params = { params: Promise<{ id: string }> }
 // e dispara o evento correspondente pro Meta CAPI e pro Google Ads (offline
 // click conversion) — todo avanço real de estágio no Kanban vira sinal de
 // otimização pros dois Gerenciadores de Anúncios, não só o Lead inicial do
-// formulário. Fire-and-forget nos dois: uma falha (token ausente, API fora
-// do ar, lead sem gclid/fbclid) nunca deve impedir o corretor de mover o
-// card no Kanban.
+// formulário. Os disparos rodam dentro de after() (Next.js): a resposta do
+// Kanban não espera por eles (uma falha — token ausente, API fora do ar,
+// lead sem gclid/fbclid — nunca trava o corretor), mas o runtime da Vercel
+// mantém a função viva até completarem. Sem after(), uma promise disparada
+// e não aguardada podia ser congelada assim que a resposta HTTP saía — o
+// Kanban funcionava normal, mas nenhum evento chegava no Meta/Google
+// (achado ao testar em produção: PATCH retornava 200, porém nenhum log de
+// evolution.ts/meta-capi.ts/google-ads-conversion.ts aparecia depois).
 async function registrarMudancaEstagio(id: string, estagioDe: string, estagioPara: string) {
   const client = sb()
   await client.from('leads_interacoes').insert({ lead_id: id, tipo: 'status_change', descricao: 'Movido de ' + estagioDe + ' para ' + estagioPara, estagio_de: estagioDe, estagio_para: estagioPara })
@@ -33,24 +38,26 @@ async function registrarMudancaEstagio(id: string, estagioDe: string, estagioPar
   const { data: lead } = await client.from('leads').select('nome, whatsapp, email, fbclid, gclid').eq('id', id).single()
   if (!lead?.nome || !lead?.whatsapp) return
 
-  sendMetaCapiEvent({
-    eventName,
-    eventId: randomUUID(),
-    nome: lead.nome,
-    telefone: lead.whatsapp,
-    email: lead.email,
-    fbclid: lead.fbclid,
-  }).then((result) => {
+  after(async () => {
+    const result = await sendMetaCapiEvent({
+      eventName,
+      eventId: randomUUID(),
+      nome: lead.nome,
+      telefone: lead.whatsapp,
+      email: lead.email,
+      fbclid: lead.fbclid,
+    })
     if (!result.ok && !('skipped' in result)) logError('admin/leads/registrarMudancaEstagio', 'capi falhou', new Error(result.error))
-  }).catch((err) => logError('admin/leads/registrarMudancaEstagio', 'capi exception', err))
+  })
 
-  sendGoogleAdsConversion({
-    estagioFunil: estagioPara,
-    gclid: lead.gclid ?? '',
-    conversionDateTime: new Date(),
-  }).then((result) => {
+  after(async () => {
+    const result = await sendGoogleAdsConversion({
+      estagioFunil: estagioPara,
+      gclid: lead.gclid ?? '',
+      conversionDateTime: new Date(),
+    })
     if (!result.ok && !('skipped' in result)) logError('admin/leads/registrarMudancaEstagio', 'google ads conversion falhou', new Error(result.error))
-  }).catch((err) => logError('admin/leads/registrarMudancaEstagio', 'google ads conversion exception', err))
+  })
 }
 
 export async function GET(_req: NextRequest, { params }: Params) {
