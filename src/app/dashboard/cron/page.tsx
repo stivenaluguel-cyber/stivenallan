@@ -27,6 +27,8 @@ const T = {
   border: '#e4e4e7',
   ok: '#16a34a',
   okSoft: 'rgba(22,163,74,0.12)',
+  partial: '#ea580c',
+  partialSoft: 'rgba(234,88,12,0.12)',
   skipped: '#d97706',
   skippedSoft: 'rgba(217,119,6,0.12)',
   error: '#dc2626',
@@ -36,10 +38,11 @@ const T = {
 } as const
 
 const STATUS_STYLE: Record<CronRunStatus, { color: string; bg: string; label: string }> = {
-  ok: { color: T.ok, bg: T.okSoft, label: 'ok' },
-  skipped: { color: T.skipped, bg: T.skippedSoft, label: 'skipped' },
-  error: { color: T.error, bg: T.errorSoft, label: 'error' },
-  running: { color: T.running, bg: T.runningSoft, label: 'running' },
+  ok: { color: T.ok, bg: T.okSoft, label: 'sucesso' },
+  partial: { color: T.partial, bg: T.partialSoft, label: 'parcial' },
+  skipped: { color: T.skipped, bg: T.skippedSoft, label: 'ignorado' },
+  error: { color: T.error, bg: T.errorSoft, label: 'falhou' },
+  running: { color: T.running, bg: T.runningSoft, label: 'em andamento' },
 }
 
 function isMissingTable(err: { code?: string; message?: string }): boolean {
@@ -88,14 +91,14 @@ export default async function CronDashboardPage({
         </p>
       </header>
 
-      <main style={{ maxWidth: 1200, margin: '0 auto' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto' }}>
         {result.kind === 'missing_table' && <MissingMigration />}
         {result.kind === 'error' && <ErrorState message={result.message} />}
         {result.kind === 'ok' && result.rows.length === 0 && <EmptyState />}
         {result.kind === 'ok' && result.rows.length > 0 && (
           <Populated rows={result.rows} currentFilter={currentFilter} />
         )}
-      </main>
+      </div>
     </div>
   )
 }
@@ -120,13 +123,22 @@ function Populated({ rows, currentFilter }: { rows: CronRunRow[]; currentFilter:
       >
         <Metric label="Runs (7d)" value={String(stats.total)} />
         <Metric
-          label="Taxa de sucesso"
+          label="Taxa de sucesso (execução)"
           value={`${stats.successRate}%`}
-          hint={`${stats.ok} ok / ${stats.errors} erro / ${stats.skipped} skipped`}
+          hint={`${stats.ok} sucesso / ${stats.partial} parcial / ${stats.errors} falhou / ${stats.skipped} ignorado`}
         />
-        <Metric label="E-mails enviados (7d)" value={String(stats.totalEnviados)} accent />
+        <Metric
+          label="Taxa de entrega (mensagens)"
+          value={`${stats.taxaEntrega}%`}
+          hint={`${stats.totalEnviados} enviada(s) de ${stats.totalEnviados + stats.totalErrosEnvio} tentativa(s)`}
+          accent
+        />
         <Metric label="Erros de envio (7d)" value={String(stats.totalErrosEnvio)} />
       </section>
+      <p style={{ fontSize: 12, color: T.mutedInk, margin: '-14px 0 24px', maxWidth: 1200 }}>
+        As duas taxas medem coisas diferentes: <strong>sucesso de execução</strong> é o job ter terminado sem
+        nenhum erro; <strong>taxa de entrega</strong> é quantas mensagens realmente saíram, mesmo numa run parcial.
+      </p>
 
       <section
         style={{
@@ -147,7 +159,8 @@ function Populated({ rows, currentFilter }: { rows: CronRunRow[]; currentFilter:
       </section>
 
       <section style={{ background: '#fff', border: `1px solid ${T.border}`, borderRadius: 12, overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+        <div style={{ overflowX: 'auto' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, minWidth: 640 }}>
           <thead>
             <tr style={{ background: T.dark, color: T.cream }}>
               <Th>Cron</Th>
@@ -193,6 +206,7 @@ function Populated({ rows, currentFilter }: { rows: CronRunRow[]; currentFilter:
             ))}
           </tbody>
         </table>
+        </div>
       </section>
     </>
   )

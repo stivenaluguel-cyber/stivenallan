@@ -1,17 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
-import { jwtVerify } from 'jose'
 import { createClient } from '@supabase/supabase-js'
+import { autenticado } from '@/lib/dashboard/auth-check'
+import { registrarMudancaEstagio } from '@/lib/leads/registrar-mudanca-estagio'
 
 export const dynamic = 'force-dynamic'
 const sb = () => createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
-async function auth() {
-  const s = await cookies(); const t = s.get('dashboard_token')?.value; if (!t) return false
-  try { await jwtVerify(t, new TextEncoder().encode(process.env.JWT_SECRET!)); return true } catch { return false }
-}
 
 export async function GET(req: NextRequest) {
-  if (!await auth()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!await autenticado()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const { searchParams } = new URL(req.url)
   const lead_id = searchParams.get('lead_id')
   const status = searchParams.get('status')
@@ -35,7 +31,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  if (!await auth()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!await autenticado()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const body = await req.json()
   const { lead_id, empreendimento_id, unidade_id, valor_proposto, entrada, parcelas_qtd, parcelas_valor, baloes, observacoes } = body
 
@@ -53,15 +49,23 @@ export async function POST(req: NextRequest) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  // Atualiza estagio do lead para Proposta
-  await sb().from('leads').update({ estagio_funil: 'proposta', updated_at: new Date().toISOString() }).eq('id', lead_id)
+  // Atualiza estagio do lead para Proposta Enviada — usa o vocabulário
+  // CANÔNICO (src/lib/dashboard/estagios.ts). Antes gravava 'proposta', um
+  // valor que não existe em nenhuma coluna do Kanban: o lead sumia
+  // visualmente de todas as colunas em /dashboard/crm e /dashboard/leads e
+  // caía num bucket "não mapeado" no relatório de funil.
+  const { data: leadAtual } = await sb().from('leads').select('estagio_funil').eq('id', lead_id).single()
+  await sb().from('leads').update({ estagio_funil: 'proposta_enviada', updated_at: new Date().toISOString() }).eq('id', lead_id)
+  if (leadAtual && leadAtual.estagio_funil !== 'proposta_enviada') {
+    await registrarMudancaEstagio(lead_id, leadAtual.estagio_funil, 'proposta_enviada', sb())
+  }
   await sb().from('leads_interacoes').insert({ lead_id, tipo: 'proposta', descricao: 'Proposta criada no valor de R$ ' + Number(valor_proposto).toLocaleString('pt-BR') })
 
   return NextResponse.json({ data }, { status: 201 })
 }
 
 export async function PATCH(req: NextRequest) {
-  if (!await auth()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!await autenticado()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const body = await req.json()
   const { id, ...update } = body
   if (!id) return NextResponse.json({ error: 'id obrigatorio' }, { status: 400 })
@@ -71,7 +75,13 @@ export async function PATCH(req: NextRequest) {
   if (update.status === 'aceita') {
     const { data: prop } = await sb().from('crm_propostas').select('lead_id, valor_proposto').eq('id', id).single()
     if (prop) {
-      await sb().from('leads').update({ estagio_funil: 'fechamento', updated_at: new Date().toISOString() }).eq('id', prop.lead_id)
+      // 'fechado' é o valor canônico (era 'fechamento', que não existe em
+      // nenhuma coluna do Kanban — mesmo bug do POST acima).
+      const { data: leadAtual } = await sb().from('leads').select('estagio_funil').eq('id', prop.lead_id).single()
+      await sb().from('leads').update({ estagio_funil: 'fechado', updated_at: new Date().toISOString() }).eq('id', prop.lead_id)
+      if (leadAtual && leadAtual.estagio_funil !== 'fechado') {
+        await registrarMudancaEstagio(prop.lead_id, leadAtual.estagio_funil, 'fechado', sb())
+      }
       await sb().from('leads_interacoes').insert({ lead_id: prop.lead_id, tipo: 'proposta_aceita', descricao: 'Proposta aceita: R$ ' + Number(prop.valor_proposto).toLocaleString('pt-BR') })
     }
   }

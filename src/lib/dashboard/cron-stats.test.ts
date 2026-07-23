@@ -27,17 +27,19 @@ function row(status: CronRunStatus, extras: Partial<CronRunRow> = {}): CronRunRo
 }
 
 describe('aggregate', () => {
-  it('array vazio → tudo zero, successRate 0', () => {
+  it('array vazio → tudo zero, successRate 0, taxaEntrega 0', () => {
     const s = aggregate([])
     expect(s).toEqual({
       total: 0,
       ok: 0,
+      partial: 0,
       skipped: 0,
       errors: 0,
       running: 0,
       successRate: 0,
       totalEnviados: 0,
       totalErrosEnvio: 0,
+      taxaEntrega: 0,
     })
   })
 
@@ -58,6 +60,19 @@ describe('aggregate', () => {
     expect(s.successRate).toBe(60)
   })
 
+  it('partial NÃO conta como sucesso na successRate — reproduz o bug relatado', () => {
+    // 1 ok + 1 partial → ok/(finished=2) = 50%, mesmo a run partial tendo enviado a maioria
+    const s = aggregate([
+      row('ok', { enviados: 5, erros_envio: 0 }),
+      row('partial', { enviados: 8, erros_envio: 2 }),
+    ])
+    expect(s.ok).toBe(1)
+    expect(s.partial).toBe(1)
+    expect(s.successRate).toBe(50)
+    // mas a taxa de ENTREGA reflete que a maioria das mensagens saiu (13 de 15)
+    expect(s.taxaEntrega).toBe(87)
+  })
+
   it('running é excluído do denominador da successRate', () => {
     // 2 ok + 1 running → ok/(finished=2) = 100%
     const s = aggregate([row('ok'), row('ok'), row('running')])
@@ -75,6 +90,17 @@ describe('aggregate', () => {
     ])
     expect(s.totalEnviados).toBe(10)
     expect(s.totalErrosEnvio).toBe(1)
+  })
+
+  it('taxaEntrega é 0 quando não houve nenhuma tentativa de envio', () => {
+    const s = aggregate([row('skipped'), row('skipped')])
+    expect(s.taxaEntrega).toBe(0)
+  })
+
+  it('taxaEntrega e successRate são métricas independentes — status ok com zero enviados e zero erros não derruba nenhuma das duas', () => {
+    const s = aggregate([row('ok', { enviados: 0, erros_envio: 0 })])
+    expect(s.successRate).toBe(100)
+    expect(s.taxaEntrega).toBe(0)
   })
 })
 
@@ -130,12 +156,14 @@ describe('aggregateByDay', () => {
     const rows = [
       row('ok', { started_at: dayStart }),
       row('ok', { started_at: dayStart }),
+      row('partial', { started_at: dayStart }),
       row('skipped', { started_at: dayStart }),
       row('error', { started_at: dayStart }),
     ]
     const result = aggregateByDay(rows, 7, now)
     const today = result[result.length - 1]
     expect(today.ok).toBe(2)
+    expect(today.partial).toBe(1)
     expect(today.skipped).toBe(1)
     expect(today.errors).toBe(1)
     expect(today.running).toBe(0)

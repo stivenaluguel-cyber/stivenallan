@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { enviarFollowUp, enviarAlertaEscalada } from '@/lib/evolution'
 import { logError, logInfo, logWarn } from '@/lib/log'
-import { finishCronRun, startCronRun, type CronRunFinal } from '@/lib/cron/tracker'
+import { existeExecucaoEmAndamento, finishCronRun, notificarFalhaCron, startCronRun, type CronRunFinal } from '@/lib/cron/tracker'
+import { classificarExecucao, motivoResumido } from '@/lib/cron/classificacao'
+import { MENSAGENS_FOLLOWUP_FALLBACK, INTERVALOS_FALLBACK } from '@/lib/cron/fallback-defaults'
+import { dentroDoHorarioPermitido } from '@/lib/automacoes/horario'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,38 +16,52 @@ export const dynamic = 'force-dynamic'
 const SOURCE = 'followup'
 const CRON_NAME = 'followup'
 
-// Mensagens de follow-up por estagio_funil e dias de espera entre passos.
-// Fonte de verdade agora é o banco (automacao_whatsapp_mensagens /
-// automacao_whatsapp_intervalos, editável em /dashboard/automacoes) — estes
-// dois const abaixo viraram só o FALLBACK, usado se a leitura do banco falhar
-// ou vier vazia (nunca deixar o cron mudo por um erro transitório ou um
-// oops na tela de edição).
-const MENSAGENS_FOLLOWUP_FALLBACK: Record<string, string[]> = {
-  primeiro_contato: [
-    'Oi {nome}! Aqui é o Stiven 😊 Recebi seu interesse no {empreendimento}. Já separei as plantas e as condições direto com a construtora — prefere que eu envie por aqui, ou marcamos 10 minutinhos para eu te mostrar o que cabe no seu plano?',
-    'Oi {nome}! Uma informação importante sobre o {empreendimento}: quando a obra avança de fase, a tabela sobe. Se fizer sentido, te passo as condições de hoje, sem compromisso.',
-    '{nome}, prometo que é minha última mensagem 😄 Se o momento não é agora, tudo bem. Quer que eu te avise quando houver novidade de obra ou condição especial no {empreendimento}? É só responder AVISA.',
-  ],
-  qualificado: [
-    'Oi {nome}! Com base no seu perfil, tenho condicoes especiais para {empreendimento}. Podemos conversar hoje?',
-    'Ola {nome}! Queria compartilhar uma novidade sobre {empreendimento} que pode te interessar muito.',
-  ],
-  interessado: [
-    '{nome}, que tal agendarmos uma visita ao {empreendimento}? Tenho horarios disponiveis essa semana.',
-    'Oi {nome}! Ainda pensando em {empreendimento}? Posso tirar qualquer duvida por aqui.',
-  ],
-  proposta_enviada: [
-    '{nome}, voce teve chance de analisar a proposta do {empreendimento}? Fico a disposicao para tirar qualquer duvida.',
-    'Oi {nome}! Queria saber se surgiu alguma duvida sobre a proposta. Posso agendar uma visita se preferir.',
-  ],
-  visita_agendada: [
-    'Ola {nome}! Confirmando nossa visita ao {empreendimento}. Voce confirma presenca? Qualquer imprevisto me avisa.',
-  ],
+type ConfigFollowUp = { mensagens: Record<string, string[]>; intervalos: number[] }
+
+// Config global de segurança (automacao_config, migration 0015) — pausar
+// tudo, janela de horário permitido, limite diário de envios. Fail-open: se
+// a tabela ainda não existe ou a leitura falhar, usa o mesmo default que a
+// rota /api/admin/automacoes/config expõe pro dashboard.
+type AutomacaoConfig = { pausado: boolean; horario_inicio: string; horario_fim: string; limite_diario: number | null }
+const AUTOMACAO_CONFIG_DEFAULT: AutomacaoConfig = { pausado: false, horario_inicio: '08:00', horario_fim: '20:00', limite_diario: null }
+
+async function carregarAutomacaoConfig(supabase: SupabaseClient): Promise<AutomacaoConfig> {
+  try {
+    const { data, error } = await supabase.from('automacao_config').select('*').eq('id', true).maybeSingle()
+    if (error || !data) return AUTOMACAO_CONFIG_DEFAULT
+    return {
+      pausado: Boolean(data.pausado),
+      horario_inicio: data.horario_inicio ?? AUTOMACAO_CONFIG_DEFAULT.horario_inicio,
+      horario_fim: data.horario_fim ?? AUTOMACAO_CONFIG_DEFAULT.horario_fim,
+      limite_diario: data.limite_diario ?? null,
+    }
+  } catch {
+    return AUTOMACAO_CONFIG_DEFAULT
+  }
 }
 
-const INTERVALOS_FALLBACK = [1, 3, 7, 14]
-
-type ConfigFollowUp = { mensagens: Record<string, string[]>; intervalos: number[] }
+// Quantos follow-ups de WhatsApp já foram enviados HOJE, pra respeitar
+// limite_diario. Simplificação documentada: usamos meia-noite UTC como proxy
+// do início do dia em São Paulo (em vez de calcular o offset exato do
+// timezone) — na pior das hipóteses a janela de contagem erra por até 3h
+// (o offset de Brasília), o que é aceitável para um limite diário aproximado
+// e evita complexidade extra de fuso horário só para essa contagem.
+async function contarEnviosWhatsappHoje(supabase: SupabaseClient): Promise<number> {
+  try {
+    const inicioHoje = new Date().toISOString().slice(0, 10) + 'T00:00:00.000Z'
+    const { count, error } = await supabase
+      .from('interacoes')
+      .select('id', { count: 'exact', head: true })
+      .eq('canal', 'whatsapp')
+      .eq('direcao', 'saida')
+      .eq('processado_por_ia', true)
+      .gte('created_at', inicioHoje)
+    if (error) return 0
+    return count ?? 0
+  } catch {
+    return 0
+  }
+}
 
 async function carregarConfigFollowUp(supabase: SupabaseClient): Promise<ConfigFollowUp> {
   const [{ data: msgsRows, error: msgsErr }, { data: intRows, error: intErr }] = await Promise.all([
@@ -181,8 +198,11 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Configuracao incompleta' }, { status: 503 })
   }
 
-  // 3) Client + start do rastreio
+  // 3) Client + guarda de concorrência (mesmo padrão do email-followup)
   const supabase = createClient(supabaseUrl, serviceRoleKey)
+  if (await existeExecucaoEmAndamento(supabase, CRON_NAME)) {
+    return NextResponse.json({ skipped: true, motivo: 'já existe uma execução deste cron em andamento' })
+  }
   const { runId, startedAt } = await startCronRun(supabase, CRON_NAME)
 
   let result: CronRunFinal | undefined
@@ -195,16 +215,33 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ skipped: true, motivo: result.motivo })
     }
 
+    // Trava manual (/dashboard/automacoes) — pausar tudo ou restringir a
+    // janela de horário permitido. Checada ANTES de carregar leads pra não
+    // gastar uma query à toa quando a resposta já é "não processa nada".
+    const automacaoConfig = await carregarAutomacaoConfig(supabase)
+    if (automacaoConfig.pausado) {
+      result = { status: 'skipped', motivo: 'automações pausadas manualmente em /dashboard/automacoes' }
+      return NextResponse.json({ skipped: true, motivo: result.motivo })
+    }
+    if (!dentroDoHorarioPermitido(new Date(), automacaoConfig.horario_inicio, automacaoConfig.horario_fim)) {
+      result = {
+        status: 'skipped',
+        motivo: `fora do horário permitido (${automacaoConfig.horario_inicio}–${automacaoConfig.horario_fim}, America/Sao_Paulo)`,
+      }
+      return NextResponse.json({ skipped: true, motivo: result.motivo })
+    }
+
     const config = await carregarConfigFollowUp(supabase)
 
     const agora = new Date().toISOString()
-    const { data: leads, error } = await supabase
+    const { data: leadsBrutos, error } = await supabase
       .from('leads')
       .select('id, nome, whatsapp, estagio_funil, tentativas_followup, empreendimento_interesse, property_id, property_name, lead_score')
       .lte('proximo_followup', agora)
       .eq('requer_atencao', false)
       .in('status', ['novo', 'ativo', 'qualificado'])
       .not('whatsapp', 'is', null)
+      .is('unsubscribed_at', null)
       .limit(50)
 
     if (error) {
@@ -213,15 +250,35 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'DB error', details: error.message }, { status: 500 })
     }
 
-    if (!leads || leads.length === 0) {
+    if (!leadsBrutos || leadsBrutos.length === 0) {
       const summary = { processados: 0, enviados: 0, escalados: 0, erros_envio: 0 }
-      logInfo(SOURCE, 'run summary', summary)
+      logInfo(SOURCE, 'run summary', { ...summary, status: 'ok' })
       result = { status: 'ok', ...summary }
       return NextResponse.json({ message: 'Nenhum lead para follow-up.', processados: 0 })
     }
 
+    // Limite diário (opcional) — corta a lista ANTES do loop de processamento.
+    // É um corte intencional (não uma falha), então não afeta o status final.
+    let leads = leadsBrutos as LeadRow[]
+    let cortadosPorLimiteDiario = 0
+    if (automacaoConfig.limite_diario !== null) {
+      const enviadosHoje = await contarEnviosWhatsappHoje(supabase)
+      const restam = Math.max(0, automacaoConfig.limite_diario - enviadosHoje)
+      if (leads.length > restam) {
+        cortadosPorLimiteDiario = leads.length - restam
+        leads = leads.slice(0, restam)
+      }
+    }
+
+    if (leads.length === 0) {
+      const summary = { processados: 0, enviados: 0, escalados: 0, erros_envio: 0 }
+      logInfo(SOURCE, 'run summary', { ...summary, status: 'ok', cortados_por_limite_diario: cortadosPorLimiteDiario })
+      result = { status: 'ok', ...summary, details: { escalados: 0, cortados_por_limite_diario: cortadosPorLimiteDiario } }
+      return NextResponse.json({ message: 'Limite diário de WhatsApp atingido.', processados: 0 })
+    }
+
     const resultados: Array<{ id: string; acao: 'mensagem_enviada' | 'escalado' | 'erro' }> = []
-    for (const lead of leads as LeadRow[]) {
+    for (const lead of leads) {
       const resultado = await processarLeadFollowUp(supabase, lead, config)
       resultados.push(resultado)
       await new Promise((r) => setTimeout(r, 2000))
@@ -231,9 +288,17 @@ export async function GET(req: NextRequest) {
     const escalados = resultados.filter((r) => r.acao === 'escalado').length
     const erros_envio = resultados.filter((r) => r.acao === 'erro').length
     const summary = { processados: leads.length, enviados, escalados, erros_envio }
-    logInfo(SOURCE, 'run summary', summary)
-    result = { status: 'ok', processados: leads.length, enviados, erros_envio, details: { escalados } }
-    return NextResponse.json({ message: 'Follow-ups processados.', ...summary })
+    const status = classificarExecucao({ enviados, erros_envio })
+    logInfo(SOURCE, 'run summary', { ...summary, status, cortados_por_limite_diario: cortadosPorLimiteDiario })
+    result = {
+      status,
+      motivo: motivoResumido(status, { enviados, erros_envio }),
+      processados: leads.length,
+      enviados,
+      erros_envio,
+      details: { escalados, cortados_por_limite_diario: cortadosPorLimiteDiario },
+    }
+    return NextResponse.json({ message: 'Follow-ups processados.', ...summary, status, cortados_por_limite_diario: cortadosPorLimiteDiario })
   } catch (err: unknown) {
     logError(SOURCE, 'run failed', err)
     result = { status: 'error', motivo: err instanceof Error ? err.message : String(err) }
@@ -241,6 +306,7 @@ export async function GET(req: NextRequest) {
   } finally {
     if (result) {
       await finishCronRun(supabase, runId, startedAt, result)
+      await notificarFalhaCron(supabase, CRON_NAME, result)
     }
   }
 }

@@ -5,6 +5,7 @@ import { middleware } from './middleware'
 function makeRequest(pathname: string): NextRequest {
   return {
     nextUrl: { pathname },
+    url: 'https://stivenallan.com.br' + pathname,
     cookies: { get: () => undefined },
   } as unknown as NextRequest
 }
@@ -39,5 +40,30 @@ describe('middleware — 410 para unidades descontinuadas confirmadas', () => {
   it('não retorna 410 para a home', async () => {
     const res = await middleware(makeRequest('/'))
     expect(res.status).not.toBe(410)
+  })
+})
+
+describe('middleware — headers de segurança do dashboard', () => {
+  it('/dashboard/login (rota pública) recebe X-Robots-Tag noindex mesmo sem estar autenticado', async () => {
+    const res = await middleware(makeRequest('/dashboard/login'))
+    expect(res.headers.get('X-Robots-Tag')).toBe('noindex, nofollow')
+  })
+
+  it('/dashboard sem cookie (redirect pro login) ainda recebe X-Robots-Tag', async () => {
+    const res = await middleware(makeRequest('/dashboard'))
+    expect(res.status).toBe(307) // redirect
+    expect(res.headers.get('X-Robots-Tag')).toBe('noindex, nofollow')
+  })
+
+  it('/api/admin/* sem cookie recebe X-Robots-Tag e Cache-Control: private, no-store', async () => {
+    const res = await middleware(makeRequest('/api/admin/leads'))
+    expect(res.headers.get('X-Robots-Tag')).toBe('noindex, nofollow')
+    expect(res.headers.get('Cache-Control')).toBe('private, no-store')
+  })
+
+  it('rotas fora de /dashboard e /api/admin não ganham os headers (não é o escopo deles)', async () => {
+    const res = await middleware(makeRequest('/'))
+    expect(res.headers.get('X-Robots-Tag')).toBeNull()
+    expect(res.headers.get('Cache-Control')).toBeNull()
   })
 })

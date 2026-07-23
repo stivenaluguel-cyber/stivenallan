@@ -1,23 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
-import { jwtVerify } from 'jose'
 import { createClient } from '@supabase/supabase-js'
 import { computeWeeklyGates, type WeeklyMetric } from '@/lib/dashboard/instagram-gates'
+import { adminIdAutenticado } from '@/lib/dashboard/auth-check'
 
 export const dynamic = 'force-dynamic'
 const sb = () => createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
-
-async function auth(): Promise<string | null> {
-  const s = await cookies()
-  const t = s.get('dashboard_token')?.value
-  if (!t) return null
-  try {
-    const { payload } = await jwtVerify(t, new TextEncoder().encode(process.env.JWT_SECRET!))
-    return (payload.adminId as string) ?? null
-  } catch {
-    return null
-  }
-}
 
 // Roda os gatilhos G2/G3/G6/G7/G9 pro snapshot recém-salvo contra o histórico
 // anterior, e grava alerta novo em crm_notificacoes (dedupe por gate+semana).
@@ -61,7 +48,7 @@ async function checkAndNotifyGates(adminId: string, semanaInicio: string) {
 }
 
 export async function GET(req: NextRequest) {
-  if (!(await auth())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!(await adminIdAutenticado())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const { searchParams } = new URL(req.url)
   const limit = parseInt(searchParams.get('limit') || '12')
 
@@ -76,7 +63,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const adminId = await auth()
+  const adminId = await adminIdAutenticado()
   if (!adminId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const body = await req.json()
   const { semana_inicio } = body
@@ -89,7 +76,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  const adminId = await auth()
+  const adminId = await adminIdAutenticado()
   if (!adminId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const body = await req.json()
   const { id, ...update } = body

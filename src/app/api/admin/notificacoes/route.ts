@@ -1,25 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
-import { jwtVerify } from 'jose'
 import { createClient } from '@supabase/supabase-js'
+import { autenticado } from '@/lib/dashboard/auth-check'
 
 export const dynamic = 'force-dynamic'
 const sb = () => createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
-async function auth(): Promise<boolean> {
-  const s = await cookies()
-  const t = s.get('dashboard_token')?.value
-  if (!t) return false
-  try {
-    await jwtVerify(t, new TextEncoder().encode(process.env.JWT_SECRET!))
-    return true
-  } catch {
-    return false
-  }
-}
-
 export async function GET(req: NextRequest) {
-  if (!(await auth())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!(await autenticado())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const { searchParams } = new URL(req.url)
   const tipo = searchParams.get('tipo')
   const apenasNaoLidas = searchParams.get('lida') === 'false'
@@ -34,7 +21,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  if (!(await auth())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!(await autenticado())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const body = await req.json()
   const { id, lida } = body
   if (!id) return NextResponse.json({ error: 'id obrigatorio' }, { status: 400 })

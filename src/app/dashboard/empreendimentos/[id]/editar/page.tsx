@@ -6,16 +6,21 @@ interface Diferencial { icone: string; titulo: string; descricao: string; }
 
 interface EmpreendimentoForm {
   nome: string; construtora: string; cidade: string; bairro: string;
-  endereco: string; tipo: string; status: string; descricao_curta: string;
+  endereco: string; status_obra: string; status_venda: string; descricao_curta: string;
   descricao_completa: string; imagem_principal: string; video_url: string;
   preco_a_partir: string; preco_a_partir_de: string; preco_ate: string;
   dormitorios_min: string; dormitorios_max: string; suites: string; vagas: string;
   area_privativa_m2: string; area_total_m2: string; diferenciais: Diferencial[];
 }
 
+// status_obra/status_venda são colunas INDEPENDENTES (migration 0017) — o
+// bug real que este formulário causava era mandar campos "tipo"/"status"
+// que a API nunca lia pra decidir o status de verdade, então toda edição
+// zerava o status de obra do empreendimento pra null (silenciosamente, sem
+// erro nenhum na tela). Mesmo vocabulário de .../empreendimentos/novo/novo-view.tsx.
 const defaultForm: EmpreendimentoForm = {
-  nome: '', construtora: '', cidade: '', bairro: '', endereco: '', tipo: 'lancamento',
-  status: 'lancamento', descricao_curta: '', descricao_completa: '',
+  nome: '', construtora: '', cidade: '', bairro: '', endereco: '',
+  status_obra: 'lancamento', status_venda: 'ativo', descricao_curta: '', descricao_completa: '',
   imagem_principal: '', video_url: '', preco_a_partir: '', preco_a_partir_de: '',
   preco_ate: '', dormitorios_min: '', dormitorios_max: '', suites: '', vagas: '',
   area_privativa_m2: '', area_total_m2: '',
@@ -175,21 +180,20 @@ export default function EditarEmpreendimento() {
           <div style={{ marginBottom: 16 }}><label style={lbl}>Endereço</label><input style={inp} value={form.endereco} onChange={e => setField('endereco', e.target.value)} placeholder="Rua, número..." /></div>
           <div style={{ ...row, gridTemplateColumns: '1fr 1fr' }}>
             <div>
-              <label style={lbl}>Tipo</label>
-              <select style={inp} value={form.tipo} onChange={e => setField('tipo', e.target.value)}>
+              <label style={lbl} htmlFor="edit-status-obra">Status da obra</label>
+              <select id="edit-status-obra" style={inp} value={form.status_obra} onChange={e => setField('status_obra', e.target.value)}>
                 <option value="lancamento">Lançamento</option>
-                <option value="em_construcao">Em Construção</option>
-                <option value="pronto">Pronto para Morar</option>
-                <option value="terreno">Terreno</option>
+                <option value="em_obras">Em Obras</option>
+                <option value="pronto">Pronto</option>
+                <option value="loteamento">Loteamento</option>
               </select>
             </div>
             <div>
-              <label style={lbl}>Status</label>
-              <select style={inp} value={form.status} onChange={e => setField('status', e.target.value)}>
-                <option value="lancamento">Lançamento</option>
-                <option value="em_construcao">Em Construção</option>
-                <option value="breve_lancamento">Breve Lançamento</option>
-                <option value="concluido">Concluído</option>
+              <label style={lbl} htmlFor="edit-status-venda">Status de venda</label>
+              <select id="edit-status-venda" style={inp} value={form.status_venda} onChange={e => setField('status_venda', e.target.value)}>
+                <option value="ativo">Ativo</option>
+                <option value="pausado">Pausado</option>
+                <option value="encerrado">Encerrado</option>
               </select>
             </div>
           </div>

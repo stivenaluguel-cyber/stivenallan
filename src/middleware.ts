@@ -33,6 +33,20 @@ const GONE_PATHS = new Set([
   '/imovel/terrenos-em-condominio-fechado-de-alto-padrao-no-bairro-sao-simao-criciuma-sc-161/TE0006-161',
 ])
 
+// Aplica os headers de segurança/cache do dashboard em QUALQUER resposta
+// desta rota (next(), redirect ou 401) — sem isso, uma página autenticada
+// podia ser indexada pelo Google se alguém linkasse pra ela (o robots.txt só
+// bloqueia rastreamento, não impede indexação de uma URL descoberta por
+// link externo), e respostas de API com dado de lead/proposta podiam ficar
+// em cache de CDN/proxy compartilhado.
+function comHeadersDashboard(response: NextResponse, isAdminApi: boolean): NextResponse {
+  response.headers.set('X-Robots-Tag', 'noindex, nofollow')
+  if (isAdminApi) {
+    response.headers.set('Cache-Control', 'private, no-store')
+  }
+  return response
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
@@ -49,22 +63,22 @@ export async function middleware(request: NextRequest) {
 
   // Verificar se eh rota publica
   if (PUBLIC_PATHS.some(p => pathname.startsWith(p))) {
-    return NextResponse.next()
+    return comHeadersDashboard(NextResponse.next(), isAdminApi)
   }
 
   const token = request.cookies.get('dashboard_token')?.value
 
   if (!token) {
-    return NextResponse.redirect(new URL('/dashboard/login', request.url))
+    return comHeadersDashboard(NextResponse.redirect(new URL('/dashboard/login', request.url)), isAdminApi)
   }
 
   try {
     await jwtVerify(token, JWT_SECRET)
-    return NextResponse.next()
+    return comHeadersDashboard(NextResponse.next(), isAdminApi)
   } catch {
     const response = NextResponse.redirect(new URL('/dashboard/login', request.url))
     response.cookies.delete('dashboard_token')
-    return response
+    return comHeadersDashboard(response, isAdminApi)
   }
 }
 

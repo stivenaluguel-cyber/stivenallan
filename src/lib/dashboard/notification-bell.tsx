@@ -151,9 +151,10 @@ export function NotificationBell({ variant = 'dark' }: { variant?: 'dark' | 'lig
                 <button
                   onClick={() => marcarLida(n.id)}
                   title="Marcar como lida"
+                  aria-label={`Marcar "${n.titulo}" como lida`}
                   style={{ flexShrink: 0, background: 'none', border: `1px solid ${T.border}`, borderRadius: 6, width: 22, height: 22, cursor: 'pointer', color: T.mutedInk, fontSize: 12, lineHeight: 1 }}
                 >
-                  ✓
+                  <span aria-hidden="true">✓</span>
                 </button>
               </div>
             ))

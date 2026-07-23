@@ -1,20 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
-import { jwtVerify } from 'jose'
 import { createClient } from '@supabase/supabase-js'
 import { enviarMensagem } from '@/lib/evolution'
+import { autenticado } from '@/lib/dashboard/auth-check'
 
 export const dynamic = 'force-dynamic'
 const sb = () => createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
-async function auth() {
-  const s = await cookies(); const t = s.get('dashboard_token')?.value; if (!t) return false
-  try { await jwtVerify(t, new TextEncoder().encode(process.env.JWT_SECRET!)); return true } catch { return false }
-}
 
 type Params = { params: Promise<{ id: string }> }
 
 export async function GET(_req: NextRequest, { params }: Params) {
-  if (!await auth()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!await autenticado()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const { id } = await params
   const [{ data, error }, { data: lead }] = await Promise.all([
     sb()
@@ -32,7 +27,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
 // Envio manual pelo painel — pausa a IA automaticamente (atendimento_humano_ativo=true)
 // pra não ter bot e corretor respondendo em paralelo.
 export async function POST(req: NextRequest, { params }: Params) {
-  if (!await auth()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!await autenticado()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const { id } = await params
   const body = await req.json()
   const texto = typeof body.texto === 'string' ? body.texto.trim() : ''

@@ -5,8 +5,13 @@ import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis
 // Recharts é client-only — mesmo padrão de funil-chart.tsx/cron-chart.tsx.
 
 export function CampanhaChart({ data }: { data: { key: string; label: string; total: number; cor: string }[] }) {
+  const resumoTexto = data.length > 0
+    ? `Engajamento da campanha: ${data.map((d) => `${d.label} ${d.total}`).join(', ')}.`
+    : 'Sem dados de engajamento para exibir.'
+
   return (
     <div style={{ width: '100%', height: 220 }}>
+      <p style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap' }}>{resumoTexto}</p>
       <ResponsiveContainer>
         <BarChart data={data} margin={{ top: 12, right: 12, bottom: 4, left: -12 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e4e4e7" vertical={false} />

@@ -53,17 +53,18 @@ export default async function RelatoriosPage() {
   return (
     <div style={{ padding: '32px clamp(16px,4vw,40px)', background: '#fff', minHeight: '100vh' }}>
       <header style={{ maxWidth: 1200, margin: '0 auto 28px' }}>
-        <h1 style={{ fontSize: 24, fontWeight: 700, color: T.ink, margin: 0 }}>Relatório de conversão por etapa</h1>
+        <h1 style={{ fontSize: 24, fontWeight: 700, color: T.ink, margin: 0 }}>Distribuição atual do funil</h1>
         <p style={{ fontSize: 14, color: T.mutedInk, margin: '6px 0 0' }}>
-          Distribuição atual do funil + tempo médio por etapa (histórico de transição só existe a partir de {' '}
+          Não é uma taxa de conversão por coorte — mostra onde os leads estão agora, mais o tempo médio por etapa
+          (histórico de transição só existe a partir de {' '}
           <a href="#nota-historico" style={{ color: T.bronze }}>agora — veja a nota abaixo</a>).
         </p>
       </header>
 
-      <main style={{ maxWidth: 1200, margin: '0 auto' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto' }}>
         {result.kind === 'error' && <ErrorState message={result.message} />}
         {result.kind === 'ok' && <Populated leads={result.leads} transicoes={result.transicoes} />}
-      </main>
+      </div>
     </div>
   )
 }
@@ -105,33 +106,35 @@ function Populated({ leads, transicoes }: { leads: LeadStageRow[]; transicoes: S
       </section>
 
       <section style={{ background: '#fff', border: `1px solid ${T.border}`, borderRadius: 12, overflow: 'hidden', marginBottom: 24 }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-          <thead>
-            <tr style={{ background: T.ink, color: T.cream }}>
-              <Th>Etapa</Th>
-              <Th align="right">Leads hoje</Th>
-              <Th align="right">% do total</Th>
-              <Th align="right">Cascata (chegou até aqui)</Th>
-              <Th align="right">Tempo médio na etapa</Th>
-              <Th align="right">Amostras</Th>
-            </tr>
-          </thead>
-          <tbody>
-            {snapshot.map((s, i) => {
-              const t = tempos.find((x) => x.estagio === s.key)
-              return (
-                <tr key={s.key} style={{ background: i % 2 === 0 ? '#fff' : T.bronzeSoft }}>
-                  <Td>{s.label}</Td>
-                  <Td align="right" mono>{s.total}</Td>
-                  <Td align="right" mono>{s.pct}%</Td>
-                  <Td align="right" mono>{s.key === 'outros' ? '—' : `${s.cascataPct}%`}</Td>
-                  <Td align="right" mono>{t?.mediaDias != null ? `${t.mediaDias}d` : '—'}</Td>
-                  <Td align="right" mono muted>{t?.amostras ?? 0}</Td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, minWidth: 560 }}>
+            <thead>
+              <tr style={{ background: T.ink, color: T.cream }}>
+                <Th>Etapa</Th>
+                <Th align="right">Leads hoje</Th>
+                <Th align="right">% do total</Th>
+                <Th align="right">Cascata (chegou até aqui)</Th>
+                <Th align="right">Tempo médio na etapa</Th>
+                <Th align="right">Amostras</Th>
+              </tr>
+            </thead>
+            <tbody>
+              {snapshot.map((s, i) => {
+                const t = tempos.find((x) => x.estagio === s.key)
+                return (
+                  <tr key={s.key} style={{ background: i % 2 === 0 ? '#fff' : T.bronzeSoft }}>
+                    <Td>{s.label}</Td>
+                    <Td align="right" mono>{s.total}</Td>
+                    <Td align="right" mono>{s.pct}%</Td>
+                    <Td align="right" mono>{s.key === 'outros' ? '—' : `${s.cascataPct}%`}</Td>
+                    <Td align="right" mono>{t?.mediaDias != null ? `${t.mediaDias}d` : '—'}</Td>
+                    <Td align="right" mono muted>{t?.amostras ?? 0}</Td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
       </section>
 
       <p id="nota-historico" style={{ fontSize: 12, color: T.mutedInk, maxWidth: 720, lineHeight: 1.6 }}>

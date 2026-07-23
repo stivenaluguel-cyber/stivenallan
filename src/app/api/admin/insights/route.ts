@@ -1,18 +1,12 @@
 import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
-import { jwtVerify } from 'jose'
 import { createClient } from '@supabase/supabase-js'
 import OpenAI from 'openai'
+import { autenticado } from '@/lib/dashboard/auth-check'
 
 export const dynamic = 'force-dynamic'
 
-async function auth() {
-  const s = await cookies(); const t = s.get('dashboard_token')?.value; if (!t) return false
-  try { await jwtVerify(t, new TextEncoder().encode(process.env.JWT_SECRET!)); return true } catch { return false }
-}
-
 export async function GET() {
-  if (!await auth()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!await autenticado()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const apiKey = process.env.OPENAI_API_KEY
   if (!apiKey) {
@@ -33,6 +27,16 @@ export async function GET() {
 
   if (!leads || leads.length === 0) {
     return NextResponse.json({ insights: 'Nenhum lead ainda no pipeline.' })
+  }
+
+  // Abaixo disso a "análise" seria a IA extrapolando tendência de 1-2 leads —
+  // mesmo limite usado no botão em /dashboard (src/app/dashboard/dashboard-view.tsx).
+  const MIN_LEADS_PARA_INSIGHTS = 3
+  if (leads.length < MIN_LEADS_PARA_INSIGHTS) {
+    return NextResponse.json(
+      { erro: `Dados insuficientes: cadastre pelo menos ${MIN_LEADS_PARA_INSIGHTS} leads para uma análise significativa (hoje há ${leads.length}).` },
+      { status: 422 },
+    )
   }
 
   const resumo = {

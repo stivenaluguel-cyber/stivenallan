@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
-import { jwtVerify } from 'jose'
 import { createClient } from '@supabase/supabase-js'
+import { autenticado } from '@/lib/dashboard/auth-check'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,19 +9,6 @@ function getSupabase() {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
-}
-
-async function checkAuth() {
-  const cookieStore = await cookies()
-  const token = cookieStore.get('dashboard_token')?.value
-  if (!token) return false
-  try {
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET!)
-    await jwtVerify(token, secret)
-    return true
-  } catch {
-    return false
-  }
 }
 
 // Remonta o shape que o formulario do Dashboard espera, a partir de uma linha de properties
@@ -38,11 +24,12 @@ function toFormShape(p: any) {
     endereco: p.endereco,
     descricao_curta: p.descricao_curta,
     descricao_completa: p.descricao,
-    // status/tipo: properties tem uma unica coluna status
+    // status (obra) e status_venda são colunas independentes desde a
+    // migration 0017 (antes status_venda não existia de verdade — era só um
+    // alias do mesmo `status`, e por isso as duas coisas se sobrescreviam).
     status: p.status,
-    tipo: p.status,
     status_obra: p.status,
-    status_venda: p.status,
+    status_venda: p.status_venda ?? 'ativo',
     exibir_preco: p.exibir_preco,
     preco_a_partir: p.preco,
     preco_a_partir_de: p.preco,
@@ -68,25 +55,30 @@ function toFormShape(p: any) {
     diferenciais: (p.diferenciais || []).map((d: any) => ({ descricao: d })),
     oculto: p.oculto,
     ativo: p.ativo,
+    created_at: p.created_at,
     tipologias: [],
   };
 }
 
 export async function GET(request: NextRequest) {
-  const auth = await checkAuth()
+  const auth = await autenticado()
   if (!auth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const supabase = getSupabase()
-  const { data, error } = await supabase
-    .from('properties')
-    .select('*')
-    .order('ordem', { ascending: true })
+  // Soft delete (ver DELETE em [id]/route.ts): por padrão a listagem
+  // principal esconde os "excluídos" (ativo=false). ?incluirExcluidos=true
+  // deixa o filtro passar pra um caso de uso futuro de ver/restaurar
+  // excluídos — não filtra nada além da tabela toda.
+  const incluirExcluidos = new URL(request.url).searchParams.get('incluirExcluidos') === 'true'
+  let query = supabase.from('properties').select('*').order('ordem', { ascending: true })
+  if (!incluirExcluidos) query = query.eq('ativo', true)
+  const { data, error } = await query
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   const mapped = (data || []).map(toFormShape)
   return NextResponse.json({ data: mapped })
 }
 
 export async function POST(request: NextRequest) {
-  const auth = await checkAuth()
+  const auth = await autenticado()
   if (!auth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const body = await request.json()
   const supabase = getSupabase()
@@ -117,7 +109,9 @@ export async function POST(request: NextRequest) {
     vagas: form.vagas ?? (t0 && t0.vagas != null ? String(t0.vagas) : null),
     metragem: form.area_privativa_m2 || form.metragem || (t0 && t0.area_privativa_m2 != null ? String(t0.area_privativa_m2) : null),
     previsao_entrega: form.previsao_entrega ?? null,
-    status: form.status_venda ?? form.status_obra ?? null,
+    // status (obra) e status_venda: colunas independentes — ver migration 0017.
+    status: form.status_obra ?? null,
+    status_venda: form.status_venda ?? 'ativo',
     exibir_preco: form.exibir_preco ?? false,
     preco: form.preco_a_partir_de ?? form.preco_a_partir ?? null,
     oculto: form.oculto ?? false,

@@ -61,7 +61,13 @@ type MockConfig = {
   selectError?: { code?: string; message?: string } | null
   cronRunsMissing?: boolean // simula tabela cron_runs ausente (migration 0006 pendente)
   automacaoEmailPassos?: Array<Record<string, unknown>>
+  // undefined → default wide-open (pausado=false, horário 00:00–23:59, sem
+  // limite) pra testes existentes não dependerem da hora real de execução.
+  automacaoConfig?: Record<string, unknown> | null
+  enviosHojeCount?: number
 }
+
+const AUTOMACAO_CONFIG_ABERTA = { pausado: false, horario_inicio: '00:00', horario_fim: '23:59', limite_diario: null }
 
 function makeSupabase(cfg: MockConfig = {}) {
   const filters: Array<{ op: string; args: unknown[] }> = []
@@ -101,7 +107,19 @@ function makeSupabase(cfg: MockConfig = {}) {
     from(table: string) {
       if (table === 'leads') {
         return {
-          select: () => selectChain(),
+          select: (_cols?: string, opts?: { count?: string; head?: boolean }) => {
+            // contarEnviosEmailHoje: select('id', {count, head}).gte(...) — sem
+            // as outras cláusulas da query principal de leads elegíveis.
+            if (opts?.count) {
+              return {
+                gte: async (field: string, val: unknown) => {
+                  filters.push({ op: 'count-gte', args: [field, val] })
+                  return { count: cfg.enviosHojeCount ?? 0, error: null }
+                },
+              }
+            }
+            return selectChain()
+          },
           update: (row: Record<string, unknown>) => {
             updates.push(row)
             return updateChain()
@@ -113,6 +131,15 @@ function makeSupabase(cfg: MockConfig = {}) {
           select: () => ({
             eq: () => ({
               maybeSingle: async () => ({ data: null, error: null }),
+            }),
+          }),
+        }
+      }
+      if (table === 'automacao_config') {
+        return {
+          select: () => ({
+            eq: () => ({
+              maybeSingle: async () => ({ data: cfg.automacaoConfig !== undefined ? cfg.automacaoConfig : AUTOMACAO_CONFIG_ABERTA, error: null }),
             }),
           }),
         }
@@ -362,5 +389,88 @@ describe('GET /api/cron/email-followup', () => {
     // Insert foi tentado mas errou; finishCronRun early-return (runId=null)
     expect(mock.cronRunInserts).toHaveLength(1)
     expect(mock.cronRunUpdates).toHaveLength(0)
+  })
+
+  // ---- automacao_config (migration 0015): pausar / janela de horário / limite diário ----
+
+  it('skipped quando automacao_config.pausado=true — nenhum e-mail é enviado', async () => {
+    const mock = makeSupabase({
+      leads: [{ id: 'lead-1', nome: 'Ana', email: 'ana@example.com', created_at: new Date(Date.now() - 3 * 86400000).toISOString(), email_followup_etapa: 0, status: 'novo' }],
+      automacaoConfig: { pausado: true, horario_inicio: '00:00', horario_fim: '23:59', limite_diario: null },
+    })
+    supabaseHolder.current = mock
+
+    const fetchSpy = vi.spyOn(global, 'fetch').mockResolvedValue(new Response('', { status: 200 }))
+    const res = await GET(makeReq({ authorization: 'Bearer cron-secret' }))
+    const json = (await res.json()) as { skipped?: boolean; motivo?: string }
+
+    expect(json.skipped).toBe(true)
+    expect(json.motivo).toMatch(/pausadas manualmente/)
+    expect(fetchSpy).not.toHaveBeenCalled()
+  })
+
+  it('skipped quando o horário atual está fora da janela permitida', async () => {
+    // 12:00 UTC = 09:00 América/São_Paulo (UTC-3, sem horário de verão) — fora de 10:00–11:00.
+    vi.useFakeTimers({ now: new Date('2026-07-23T12:00:00.000Z') })
+    const mock = makeSupabase({
+      leads: [{ id: 'lead-1', nome: 'Ana', email: 'ana@example.com', created_at: new Date(Date.now() - 3 * 86400000).toISOString(), email_followup_etapa: 0, status: 'novo' }],
+      automacaoConfig: { pausado: false, horario_inicio: '10:00', horario_fim: '11:00', limite_diario: null },
+    })
+    supabaseHolder.current = mock
+
+    const fetchSpy = vi.spyOn(global, 'fetch').mockResolvedValue(new Response('', { status: 200 }))
+    const res = await GET(makeReq({ authorization: 'Bearer cron-secret' }))
+    const json = (await res.json()) as { skipped?: boolean; motivo?: string }
+    vi.useRealTimers()
+
+    expect(json.skipped).toBe(true)
+    expect(json.motivo).toMatch(/fora do horário permitido/)
+    expect(fetchSpy).not.toHaveBeenCalled()
+  })
+
+  it('limite_diario corta a lista de leads antes do loop e reporta cortados_por_limite_diario', async () => {
+    const mock = makeSupabase({
+      leads: [
+        { id: 'lead-1', nome: 'Ana', email: 'ana@example.com', created_at: new Date(Date.now() - 3 * 86400000).toISOString(), email_followup_etapa: 0, status: 'novo' },
+        { id: 'lead-2', nome: 'Beto', email: 'beto@example.com', created_at: new Date(Date.now() - 3 * 86400000).toISOString(), email_followup_etapa: 0, status: 'novo' },
+      ],
+      automacaoConfig: { pausado: false, horario_inicio: '00:00', horario_fim: '23:59', limite_diario: 1 },
+      enviosHojeCount: 0,
+    })
+    supabaseHolder.current = mock
+
+    const fetchSpy = vi.spyOn(global, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify({ id: 'msg-1' }), { status: 200 }),
+    )
+
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    const p = GET(makeReq({ authorization: 'Bearer cron-secret' }))
+    await vi.runAllTimersAsync()
+    const res = await p
+    vi.useRealTimers()
+
+    const json = (await res.json()) as { processados: number; enviados: number; cortados_por_limite_diario: number }
+    expect(json.processados).toBe(1)
+    expect(json.enviados).toBe(1)
+    expect(json.cortados_por_limite_diario).toBe(1)
+    expect(fetchSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('limite_diario já atingido hoje — nenhum e-mail enviado, sem erro', async () => {
+    const mock = makeSupabase({
+      leads: [{ id: 'lead-1', nome: 'Ana', email: 'ana@example.com', created_at: new Date(Date.now() - 3 * 86400000).toISOString(), email_followup_etapa: 0, status: 'novo' }],
+      automacaoConfig: { pausado: false, horario_inicio: '00:00', horario_fim: '23:59', limite_diario: 5 },
+      enviosHojeCount: 5,
+    })
+    supabaseHolder.current = mock
+
+    const fetchSpy = vi.spyOn(global, 'fetch').mockResolvedValue(new Response('', { status: 200 }))
+    const res = await GET(makeReq({ authorization: 'Bearer cron-secret' }))
+    const json = (await res.json()) as { processados: number; enviados: number; cortados_por_limite_diario: number }
+
+    expect(res.status).toBe(200)
+    expect(json.processados).toBe(0)
+    expect(json.cortados_por_limite_diario).toBe(1)
+    expect(fetchSpy).not.toHaveBeenCalled()
   })
 })

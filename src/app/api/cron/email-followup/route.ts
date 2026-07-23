@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { logError, logInfo, logWarn } from '@/lib/log'
-import { finishCronRun, startCronRun, type CronRunFinal } from '@/lib/cron/tracker'
+import { existeExecucaoEmAndamento, finishCronRun, notificarFalhaCron, startCronRun, type CronRunFinal } from '@/lib/cron/tracker'
+import { classificarExecucao, motivoResumido } from '@/lib/cron/classificacao'
 import { buildUnsubscribeUrl, montarHtml } from '@/lib/cron/email-followup-helpers'
 import { enviarEmailResend } from '@/lib/email/resend'
+import { ETAPAS_EMAIL_FALLBACK, type EtapaEmailFallback } from '@/lib/cron/fallback-defaults'
+import { dentroDoHorarioPermitido } from '@/lib/automacoes/horario'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,37 +21,12 @@ export const dynamic = 'force-dynamic'
 
 const SOURCE = 'email-followup'
 const CRON_NAME = 'email-followup'
-const WPP_LINK = 'https://wa.me/5548991642332'
 
 // Fonte de verdade agora é o banco (automacao_email_passos, editável em
-// /dashboard/automacoes) — ETAPAS_FALLBACK abaixo só é usado se a leitura
-// falhar ou vier vazia. Placeholders {nome}/{empreendimento}, mesma convenção
-// já usada no cron de WhatsApp.
-type EtapaEmail = { diasMinimos: number; assunto: string; corpoHtml: string }
-
-const ETAPAS_FALLBACK: EtapaEmail[] = [
-  {
-    diasMinimos: 2,
-    assunto: 'Por que ninguém te explicou o financiamento sem banco?',
-    corpoHtml: `
-      <p>Olá {nome},</p>
-      <p>A pergunta que mais recebo é sempre a mesma: <strong>"como assim, comprar apartamento sem banco?"</strong></p>
-      <p>É mais simples do que parece — e escrevi um guia completo explicando: entrada de 20%, parcelas durante a obra corrigidas pelo CUB/SC, e nenhuma análise bancária no processo.</p>
-      <p><a href="https://stivenallan.com.br/guia/financiamento-direto-construtora" style="color:#1A5C3A;font-weight:700">→ Leia o guia do financiamento direto</a></p>
-      <p>Se ficou qualquer dúvida sobre o {empreendimento}, <a href="${WPP_LINK}" style="color:#1A5C3A">me chama no WhatsApp</a> que eu explico com os números do seu caso.</p>
-    `,
-  },
-  {
-    diasMinimos: 7,
-    assunto: 'A tabela do {empreendimento} muda com a obra',
-    corpoHtml: `
-      <p>Olá {nome},</p>
-      <p>Um aviso honesto antes de eu parar de te escrever: <strong>a tabela do {empreendimento} é reajustada a cada fase da obra</strong>. As condições que eu te apresentaria hoje não são as mesmas do mês que vem.</p>
-      <p>Se o momento não é agora, tudo bem — o link no rodapé te tira desta régua sem compromisso.</p>
-      <p><a href="${WPP_LINK}" style="color:#1A5C3A;font-weight:700">→ Ver os números de hoje no WhatsApp</a></p>
-    `,
-  },
-]
+// /dashboard/automacoes) — ETAPAS_EMAIL_FALLBACK (src/lib/cron/fallback-defaults.ts)
+// só é usado se a leitura falhar ou vier vazia. Placeholders
+// {nome}/{empreendimento}, mesma convenção já usada no cron de WhatsApp.
+type EtapaEmail = EtapaEmailFallback
 
 async function carregarConfigEmail(supabase: SupabaseClient): Promise<EtapaEmail[]> {
   const { data, error } = await supabase
@@ -58,14 +36,53 @@ async function carregarConfigEmail(supabase: SupabaseClient): Promise<EtapaEmail
 
   if (error) {
     logWarn(SOURCE, 'automacao_email_passos indisponivel, usando fallback hardcoded', { db_message: error.message })
-    return ETAPAS_FALLBACK
+    return ETAPAS_EMAIL_FALLBACK
   }
-  if (!data || data.length === 0) return ETAPAS_FALLBACK
+  if (!data || data.length === 0) return ETAPAS_EMAIL_FALLBACK
   return (data as { dias_minimos: number; assunto: string; corpo_html: string }[]).map((r) => ({
     diasMinimos: r.dias_minimos,
     assunto: r.assunto,
     corpoHtml: r.corpo_html,
   }))
+}
+
+// Config global de segurança (automacao_config, migration 0015) — mesmo
+// helper conceitual do cron de WhatsApp (src/app/api/cron/followup/route.ts),
+// duplicado aqui em vez de extraído pra lib porque cada cron já tem seu
+// próprio SOURCE de log e o helper é pequeno o bastante pra não justificar
+// mais um arquivo compartilhado.
+type AutomacaoConfig = { pausado: boolean; horario_inicio: string; horario_fim: string; limite_diario: number | null }
+const AUTOMACAO_CONFIG_DEFAULT: AutomacaoConfig = { pausado: false, horario_inicio: '08:00', horario_fim: '20:00', limite_diario: null }
+
+async function carregarAutomacaoConfig(supabase: SupabaseClient): Promise<AutomacaoConfig> {
+  try {
+    const { data, error } = await supabase.from('automacao_config').select('*').eq('id', true).maybeSingle()
+    if (error || !data) return AUTOMACAO_CONFIG_DEFAULT
+    return {
+      pausado: Boolean(data.pausado),
+      horario_inicio: data.horario_inicio ?? AUTOMACAO_CONFIG_DEFAULT.horario_inicio,
+      horario_fim: data.horario_fim ?? AUTOMACAO_CONFIG_DEFAULT.horario_fim,
+      limite_diario: data.limite_diario ?? null,
+    }
+  } catch {
+    return AUTOMACAO_CONFIG_DEFAULT
+  }
+}
+
+// Ver comentário no ponto de uso: `leads.email_followup_em` como proxy de
+// "e-mails de follow-up enviados hoje" (não existe log de envio separado).
+async function contarEnviosEmailHoje(supabase: SupabaseClient): Promise<number> {
+  try {
+    const inicioHoje = new Date().toISOString().slice(0, 10) + 'T00:00:00.000Z'
+    const { count, error } = await supabase
+      .from('leads')
+      .select('id', { count: 'exact', head: true })
+      .gte('email_followup_em', inicioHoje)
+    if (error) return 0
+    return count ?? 0
+  } catch {
+    return 0
+  }
 }
 
 function substituirPlaceholders(txt: string, nome: string, empreendimento: string): string {
@@ -103,8 +120,13 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Configuracao incompleta' }, { status: 503 })
   }
 
-  // 3) Client + start do rastreio
+  // 3) Client + guarda de concorrência — se já tem uma execução rodando pra
+  // este cron, não inicia outra em paralelo (evita processar/enviar o mesmo
+  // lead duas vezes se o cron for disparado manualmente enquanto o agendado roda)
   const supabase = createClient(supabaseUrl, serviceRoleKey)
+  if (await existeExecucaoEmAndamento(supabase, CRON_NAME)) {
+    return NextResponse.json({ skipped: true, motivo: 'já existe uma execução deste cron em andamento' })
+  }
   const { runId, startedAt } = await startCronRun(supabase, CRON_NAME)
 
   // 4) Result acumulado — sempre setado em cada return path, finally usa
@@ -123,9 +145,25 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ skipped: true, motivo: result.motivo })
     }
 
+    // Trava manual (/dashboard/automacoes) — mesma lógica do cron de WhatsApp
+    // (src/app/api/cron/followup/route.ts): pausar tudo ou restringir a
+    // janela de horário permitido, checada antes de carregar leads.
+    const automacaoConfig = await carregarAutomacaoConfig(supabase)
+    if (automacaoConfig.pausado) {
+      result = { status: 'skipped', motivo: 'automações pausadas manualmente em /dashboard/automacoes' }
+      return NextResponse.json({ skipped: true, motivo: result.motivo })
+    }
+    if (!dentroDoHorarioPermitido(new Date(), automacaoConfig.horario_inicio, automacaoConfig.horario_fim)) {
+      result = {
+        status: 'skipped',
+        motivo: `fora do horário permitido (${automacaoConfig.horario_inicio}–${automacaoConfig.horario_fim}, America/Sao_Paulo)`,
+      }
+      return NextResponse.json({ skipped: true, motivo: result.motivo })
+    }
+
     const ETAPAS = await carregarConfigEmail(supabase)
 
-    const { data: leads, error } = await supabase
+    const { data: leadsBrutos, error } = await supabase
       .from('leads')
       .select('id, nome, email, created_at, email_followup_etapa, property_id, property_name, status')
       .not('email', 'is', null)
@@ -145,10 +183,27 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'DB error', details: error.message }, { status: 500 })
     }
 
+    // Limite diário (opcional) — corta a lista ANTES do loop, mesmo padrão do
+    // cron de WhatsApp. Simplificação documentada: não existe uma tabela de
+    // log de envio de e-mail separada, então usamos `leads.email_followup_em`
+    // (atualizado a cada envio bem-sucedido, logo abaixo no loop) como proxy
+    // de "e-mails de follow-up enviados hoje" — meia-noite UTC como proxy do
+    // início do dia em São Paulo, mesma aproximação aceitável do cron de WhatsApp.
+    let leads = leadsBrutos ?? []
+    let cortadosPorLimiteDiario = 0
+    if (automacaoConfig.limite_diario !== null) {
+      const enviadosHoje = await contarEnviosEmailHoje(supabase)
+      const restam = Math.max(0, automacaoConfig.limite_diario - enviadosHoje)
+      if (leads.length > restam) {
+        cortadosPorLimiteDiario = leads.length - restam
+        leads = leads.slice(0, restam)
+      }
+    }
+
     const agora = Date.now()
     const resultados: Array<{ id: string; acao: string }> = []
 
-    for (const lead of leads ?? []) {
+    for (const lead of leads) {
       const etapaAtual: number = lead.email_followup_etapa ?? 0
       const etapa = ETAPAS[etapaAtual]
       if (!etapa) continue
@@ -198,9 +253,15 @@ export async function GET(req: NextRequest) {
     const pulados = resultados.filter((r) => r.acao === 'aguardando').length
     const erros_envio = resultados.filter((r) => r.acao === 'erro_envio').length
     const summary = { processados: resultados.length, enviados, pulados, erros_envio }
-    logInfo(SOURCE, 'run summary', summary)
-    result = { status: 'ok', ...summary }
-    return NextResponse.json(summary)
+    const status = classificarExecucao({ enviados, erros_envio })
+    logInfo(SOURCE, 'run summary', { ...summary, status, cortados_por_limite_diario: cortadosPorLimiteDiario })
+    result = {
+      status,
+      motivo: motivoResumido(status, { enviados, erros_envio }),
+      ...summary,
+      details: { cortados_por_limite_diario: cortadosPorLimiteDiario },
+    }
+    return NextResponse.json({ ...summary, status, cortados_por_limite_diario: cortadosPorLimiteDiario })
   } catch (err: unknown) {
     logError(SOURCE, 'run failed', err)
     result = { status: 'error', motivo: err instanceof Error ? err.message : String(err) }
@@ -208,6 +269,7 @@ export async function GET(req: NextRequest) {
   } finally {
     if (result) {
       await finishCronRun(supabase, runId, startedAt, result)
+      await notificarFalhaCron(supabase, CRON_NAME, result)
     }
   }
 }

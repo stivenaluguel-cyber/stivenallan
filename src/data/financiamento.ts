@@ -1,8 +1,5 @@
 // Regras de financiamento direto Construtora Fontana (tabelas jun/2026)
 
-// CUB/SC jun/2026: R$ 3.096,25 — atualizar mensalmente
-export const CUB_ATUAL = 3096.25
-
 // Taxa mensal IGPM estimada para simulação da Parcela B (pós-chaves)
 export const IGPM_MENSAL_REF = 0.005 // 0,5% a.m.
 export const TAXA_POS_CHAVES_IGPM = 0.0075 // 0,75% a.m. contratual sobre saldo
@@ -419,4 +416,54 @@ export function tabelaGiassi(saldo: number) {
     reforcoFixo: null,
     maximo: resolverLinhaPrice(saldo, p, construtoras.giassi.taxaMensal),
   }))
+}
+
+
+// ─── Memória de cálculo (cronograma mês a mês) — Parcela A ─────────────────
+// Deriva exclusivamente dos parâmetros que simular() já calcula (qtdMensais,
+// valorMensal, qtdReforcos, valorReforco) -- não introduz fórmula de juros
+// nova. O "saldo devedor estimado" aqui é nominal (soma simples do que falta
+// pagar), não descontado a valor presente -- é só um livro-caixa do que já
+// foi pago, útil para a memória de cálculo exibida ao corretor/cliente.
+
+export type LinhaMemoriaCalculo = {
+  mes: number
+  parcelaMensal: number
+  isReforco: boolean
+  valorReforco: number
+  saldoDevedorEstimado: number
+}
+
+/**
+ * Gera o cronograma mês a mês da Parcela A (SPC-JS), assumindo reforços
+ * anuais nos meses 12, 24, ..., 12·qtdReforcos (mesma premissa de
+ * fatorReforco). Blindado contra parâmetros inválidos: qtdMensais <= 0,
+ * negativo ou NaN simplesmente resulta em array vazio (sem loop infinito,
+ * sem lançar erro).
+ */
+export function gerarMemoriaCalculo(
+  saldoA: number,
+  qtdMensais: number,
+  valorMensal: number,
+  qtdReforcos: number,
+  valorReforco: number
+): LinhaMemoriaCalculo[] {
+  const linhas: LinhaMemoriaCalculo[] = []
+  const n = Number.isFinite(qtdMensais) ? Math.floor(qtdMensais) : 0
+  const m = Number.isFinite(qtdReforcos) ? Math.floor(qtdReforcos) : 0
+  let saldo = saldoA
+
+  for (let mes = 1; mes <= n; mes++) {
+    const isReforco = m > 0 && mes % 12 === 0 && mes / 12 <= m
+    const valorReforcoMes = isReforco ? valorReforco : 0
+    saldo -= valorMensal + valorReforcoMes
+    linhas.push({
+      mes,
+      parcelaMensal: valorMensal,
+      isReforco,
+      valorReforco: valorReforcoMes,
+      saldoDevedorEstimado: Math.max(0, saldo),
+    })
+  }
+  return linhas
 }

@@ -42,6 +42,35 @@ const nextConfig: NextConfig = {
         { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
         { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
         { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+        // CSP compatível com o que o site REALMENTE carrega (auditado nesta
+        // sessão): GA4 (gtag.js) + Meta Pixel via <Script>/inline em
+        // src/components/AnalyticsScripts.tsx, embeds de YouTube nas páginas
+        // de empreendimento, imagens do Supabase Storage + fontes externas já
+        // listadas em next.config images.remotePatterns, Sentry (client) via
+        // NEXT_PUBLIC_SENTRY_DSN. 'unsafe-inline' em script-src/style-src é
+        // uma concessão pragmática: o app usa estilo inline (`style={{}}`)
+        // em praticamente todo componente e o Next injeta script de
+        // hidratação inline — uma CSP restrita de verdade (nonce/hash)
+        // exigiria instrumentar nonces no middleware pra cada request, uma
+        // mudança maior que fica registrada como próximo passo, não feita
+        // aqui pra não arriscar quebrar o site inteiro sem poder testar
+        // cada página manualmente antes do deploy.
+        {
+          key: 'Content-Security-Policy',
+          value: [
+            "default-src 'self'",
+            "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://connect.facebook.net",
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+            "font-src 'self' https://fonts.gstatic.com data:",
+            "img-src 'self' data: blob: https://*.supabase.co https://images.unsplash.com https://lh3.googleusercontent.com https://estilofontana.com.br https://*.estilofontana.com.br https://drive.google.com https://*.googleusercontent.com https://www.facebook.com https://www.google-analytics.com",
+            "connect-src 'self' https://*.supabase.co https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com https://connect.facebook.net https://graph.facebook.com https://*.ingest.sentry.io https://*.ingest.us.sentry.io",
+            "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com",
+            "frame-ancestors 'none'",
+            "base-uri 'self'",
+            "form-action 'self'",
+            "object-src 'none'",
+          ].join('; '),
+        },
       ],
     },
     { source: '/_next/static/(.*)', headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }] },
