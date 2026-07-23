@@ -1,10 +1,19 @@
 import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
+import { jwtVerify } from 'jose'
 import { createClient } from '@supabase/supabase-js'
 import OpenAI from 'openai'
 
 export const dynamic = 'force-dynamic'
 
+async function auth() {
+  const s = await cookies(); const t = s.get('dashboard_token')?.value; if (!t) return false
+  try { await jwtVerify(t, new TextEncoder().encode(process.env.JWT_SECRET!)); return true } catch { return false }
+}
+
 export async function GET() {
+  if (!await auth()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
   const apiKey = process.env.OPENAI_API_KEY
   if (!apiKey) {
     return NextResponse.json({ erro: 'OPENAI_API_KEY nao configurada' }, { status: 503 })

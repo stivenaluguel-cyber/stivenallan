@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
+import { ConversaPanel } from '@/components/dashboard/ConversaPanel'
 
 const D = {
   bg: '#F3F2EE', surface: '#FAFAF7', ink: '#161512',
@@ -340,6 +341,12 @@ style={{ position: 'absolute', top: '14px', right: '14px', width: '30px', height
 )}
 <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#52525b', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '6px', marginTop: '16px' }}>Radar de navegação</label>
 {eventos.length === 0 ? (<p style={{ fontSize: '13px', color: '#8a8a85', marginBottom: '16px' }}>Nenhuma atividade registrada.</p>) : (<div style={{ maxHeight: '160px', overflowY: 'auto', marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '4px' }}>{eventos.map((ev, i) => (<div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 8px', borderRadius: '6px', background: ev.tipo === 'download' ? '#FFF7ED' : 'transparent' }}><span>{ev.tipo === 'download' ? '⬇' : '👁'}</span><span style={{ fontSize: '13px', color: '#18181b', flex: 1 }}>{(ev.slug||'').replace(/-/g,' ')}</span><span style={{ fontSize: '11px', color: '#8a8a85', whiteSpace: 'nowrap' }}>{ev.created_at ? new Date(ev.created_at).toLocaleString('pt-BR') : ''}</span></div>))}</div>)}
+<label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#52525b', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '6px' }}>
+Conversa WhatsApp
+</label>
+<div style={{ marginBottom: '16px' }}>
+<ConversaPanel leadId={selectedLead.id} />
+</div>
 <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#52525b', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '6px' }}>
 Anotações
 </label>

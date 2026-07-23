@@ -29,6 +29,8 @@ const GRUPOS: { titulo: string; itens: NavItem[] }[] = [
       { href: '/dashboard/empreendimentos', label: 'Empreendimentos', icon: '🏢' },
       { href: '/dashboard/leads', label: 'Leads', icon: '🎯' },
       { href: '/dashboard/simulador', label: 'Simulador', icon: '🧮' },
+      { href: '/dashboard/relatorios', label: 'Relatórios', icon: '📊' },
+      { href: '/dashboard/automacoes', label: 'Automações', icon: '⚙️' },
       { href: '/dashboard/cron', label: 'Cron', icon: '⏱️' },
     ],
   },
@@ -45,6 +47,7 @@ const PAGE_LABELS: Record<string, string> = {
   '/dashboard/propostas': 'Propostas', '/dashboard/agenda': 'Agenda',
   '/dashboard/financeiro': 'Financeiro', '/dashboard/empreendimentos': 'Empreendimentos',
   '/dashboard/leads': 'Leads', '/dashboard/simulador': 'Simulador',
+  '/dashboard/relatorios': 'Relatórios', '/dashboard/automacoes': 'Automações',
   '/dashboard/cron': 'Cron', '/dashboard/instagram': 'Instagram',
   '/dashboard/instagram/calendario': 'Calendário Instagram',
 };

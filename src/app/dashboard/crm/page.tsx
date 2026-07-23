@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
+import { ConversaPanel } from '@/components/dashboard/ConversaPanel'
 
 const D = {
   bg: '#F3F2EE', surface: '#FAFAF7', sidebar: '#131211', ink: '#161512',
@@ -474,8 +475,11 @@ function LeadModal({ lead, onClose, onUpdated, onDeleted }: { lead: Lead; onClos
             </div>
           )}
 
+          <label style={labelCss}>Conversa WhatsApp</label>
+          <ConversaPanel leadId={lead.id} />
+
           <a href={'https://wa.me/55' + (lead.whatsapp || '').replace(/\D/g, '')} target="_blank" rel="noopener noreferrer" style={{ display: 'block', marginTop: 18, background: '#25D366', color: '#fff', borderRadius: 10, padding: 12, fontSize: 14, fontWeight: 700, textAlign: 'center', textDecoration: 'none' }}>
-            Chamar no WhatsApp
+            Abrir no WhatsApp (app)
           </a>
         </div>
       </div>

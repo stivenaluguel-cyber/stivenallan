@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { logError, logInfo, logWarn } from '@/lib/log'
 import { finishCronRun, startCronRun, type CronRunFinal } from '@/lib/cron/tracker'
 import { buildUnsubscribeUrl, montarHtml } from '@/lib/cron/email-followup-helpers'
@@ -19,35 +19,57 @@ const SOURCE = 'email-followup'
 const CRON_NAME = 'email-followup'
 const WPP_LINK = 'https://wa.me/5548991642332'
 
-type EtapaEmail = {
-  diasMinimos: number
-  assunto: (emp: string) => string
-  corpo: (nome: string, emp: string) => string
-}
+// Fonte de verdade agora é o banco (automacao_email_passos, editável em
+// /dashboard/automacoes) — ETAPAS_FALLBACK abaixo só é usado se a leitura
+// falhar ou vier vazia. Placeholders {nome}/{empreendimento}, mesma convenção
+// já usada no cron de WhatsApp.
+type EtapaEmail = { diasMinimos: number; assunto: string; corpoHtml: string }
 
-const ETAPAS: EtapaEmail[] = [
+const ETAPAS_FALLBACK: EtapaEmail[] = [
   {
     diasMinimos: 2,
-    assunto: () => 'Por que ninguém te explicou o financiamento sem banco?',
-    corpo: (nome, emp) => `
-      <p>Olá ${nome},</p>
+    assunto: 'Por que ninguém te explicou o financiamento sem banco?',
+    corpoHtml: `
+      <p>Olá {nome},</p>
       <p>A pergunta que mais recebo é sempre a mesma: <strong>"como assim, comprar apartamento sem banco?"</strong></p>
       <p>É mais simples do que parece — e escrevi um guia completo explicando: entrada de 20%, parcelas durante a obra corrigidas pelo CUB/SC, e nenhuma análise bancária no processo.</p>
       <p><a href="https://stivenallan.com.br/guia/financiamento-direto-construtora" style="color:#1A5C3A;font-weight:700">→ Leia o guia do financiamento direto</a></p>
-      <p>Se ficou qualquer dúvida sobre o ${emp}, <a href="${WPP_LINK}" style="color:#1A5C3A">me chama no WhatsApp</a> que eu explico com os números do seu caso.</p>
+      <p>Se ficou qualquer dúvida sobre o {empreendimento}, <a href="${WPP_LINK}" style="color:#1A5C3A">me chama no WhatsApp</a> que eu explico com os números do seu caso.</p>
     `,
   },
   {
     diasMinimos: 7,
-    assunto: (emp) => `A tabela do ${emp} muda com a obra`,
-    corpo: (nome, emp) => `
-      <p>Olá ${nome},</p>
-      <p>Um aviso honesto antes de eu parar de te escrever: <strong>a tabela do ${emp} é reajustada a cada fase da obra</strong>. As condições que eu te apresentaria hoje não são as mesmas do mês que vem.</p>
+    assunto: 'A tabela do {empreendimento} muda com a obra',
+    corpoHtml: `
+      <p>Olá {nome},</p>
+      <p>Um aviso honesto antes de eu parar de te escrever: <strong>a tabela do {empreendimento} é reajustada a cada fase da obra</strong>. As condições que eu te apresentaria hoje não são as mesmas do mês que vem.</p>
       <p>Se o momento não é agora, tudo bem — o link no rodapé te tira desta régua sem compromisso.</p>
       <p><a href="${WPP_LINK}" style="color:#1A5C3A;font-weight:700">→ Ver os números de hoje no WhatsApp</a></p>
     `,
   },
 ]
+
+async function carregarConfigEmail(supabase: SupabaseClient): Promise<EtapaEmail[]> {
+  const { data, error } = await supabase
+    .from('automacao_email_passos')
+    .select('ordem, dias_minimos, assunto, corpo_html')
+    .order('ordem', { ascending: true })
+
+  if (error) {
+    logWarn(SOURCE, 'automacao_email_passos indisponivel, usando fallback hardcoded', { db_message: error.message })
+    return ETAPAS_FALLBACK
+  }
+  if (!data || data.length === 0) return ETAPAS_FALLBACK
+  return (data as { dias_minimos: number; assunto: string; corpo_html: string }[]).map((r) => ({
+    diasMinimos: r.dias_minimos,
+    assunto: r.assunto,
+    corpoHtml: r.corpo_html,
+  }))
+}
+
+function substituirPlaceholders(txt: string, nome: string, empreendimento: string): string {
+  return txt.replace(/{nome}/g, nome).replace(/{empreendimento}/g, empreendimento)
+}
 
 async function enviarEmail(para: string, assunto: string, html: string, unsubUrl: string): Promise<boolean> {
   const res = await fetch('https://api.resend.com/emails', {
@@ -108,6 +130,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ skipped: true, motivo: result.motivo })
     }
 
+    const ETAPAS = await carregarConfigEmail(supabase)
+
     const { data: leads, error } = await supabase
       .from('leads')
       .select('id, nome, email, created_at, email_followup_etapa, property_id, property_name, status')
@@ -156,8 +180,8 @@ export async function GET(req: NextRequest) {
       const unsubUrl = buildUnsubscribeUrl(lead.id)
       const ok = await enviarEmail(
         lead.email,
-        etapa.assunto(nomeEmp),
-        montarHtml(etapa.corpo(primeiroNome, nomeEmp), unsubUrl),
+        substituirPlaceholders(etapa.assunto, primeiroNome, nomeEmp),
+        montarHtml(substituirPlaceholders(etapa.corpoHtml, primeiroNome, nomeEmp), unsubUrl),
         unsubUrl,
       )
 

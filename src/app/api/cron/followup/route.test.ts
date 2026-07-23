@@ -25,6 +25,8 @@ type MockConfig = {
   leads?: Array<Record<string, unknown>>
   selectError?: { code?: string; message?: string } | null
   cronRunsMissing?: boolean
+  automacaoMensagens?: Array<Record<string, unknown>>
+  automacaoIntervalos?: Array<Record<string, unknown>>
 }
 
 function makeSupabase(cfg: MockConfig = {}) {
@@ -67,6 +69,14 @@ function makeSupabase(cfg: MockConfig = {}) {
             return { error: null }
           },
         }
+      }
+      // Config de automação (0011): vazio por padrão nos testes → cron cai
+      // no fallback hardcoded, que é o que os testes existentes já esperam.
+      if (table === 'automacao_whatsapp_mensagens') {
+        return { select: () => ({ order: async () => ({ data: cfg.automacaoMensagens ?? [], error: null }) }) }
+      }
+      if (table === 'automacao_whatsapp_intervalos') {
+        return { select: () => ({ order: async () => ({ data: cfg.automacaoIntervalos ?? [], error: null }) }) }
       }
       if (table === 'properties' || table === 'empreendimentos') {
         return {

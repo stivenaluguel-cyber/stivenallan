@@ -13,8 +13,13 @@ export const dynamic = 'force-dynamic'
 const SOURCE = 'followup'
 const CRON_NAME = 'followup'
 
-// Mensagens de follow-up por estagio_funil
-const MENSAGENS_FOLLOWUP: Record<string, string[]> = {
+// Mensagens de follow-up por estagio_funil e dias de espera entre passos.
+// Fonte de verdade agora é o banco (automacao_whatsapp_mensagens /
+// automacao_whatsapp_intervalos, editável em /dashboard/automacoes) — estes
+// dois const abaixo viraram só o FALLBACK, usado se a leitura do banco falhar
+// ou vier vazia (nunca deixar o cron mudo por um erro transitório ou um
+// oops na tela de edição).
+const MENSAGENS_FOLLOWUP_FALLBACK: Record<string, string[]> = {
   primeiro_contato: [
     'Oi {nome}! Aqui é o Stiven 😊 Recebi seu interesse no {empreendimento}. Já separei as plantas e as condições direto com a construtora — prefere que eu envie por aqui, ou marcamos 10 minutinhos para eu te mostrar o que cabe no seu plano?',
     'Oi {nome}! Uma informação importante sobre o {empreendimento}: quando a obra avança de fase, a tabela sobe. Se fizer sentido, te passo as condições de hoje, sem compromisso.',
@@ -37,8 +42,40 @@ const MENSAGENS_FOLLOWUP: Record<string, string[]> = {
   ],
 }
 
-function getMensagemFollowUp(estagio: string, tentativa: number, nome: string, empreendimento: string): string | null {
-  const msgs = MENSAGENS_FOLLOWUP[estagio]
+const INTERVALOS_FALLBACK = [1, 3, 7, 14]
+
+type ConfigFollowUp = { mensagens: Record<string, string[]>; intervalos: number[] }
+
+async function carregarConfigFollowUp(supabase: SupabaseClient): Promise<ConfigFollowUp> {
+  const [{ data: msgsRows, error: msgsErr }, { data: intRows, error: intErr }] = await Promise.all([
+    supabase.from('automacao_whatsapp_mensagens').select('estagio_funil, ordem, mensagem').order('ordem', { ascending: true }),
+    supabase.from('automacao_whatsapp_intervalos').select('ordem, dias').order('ordem', { ascending: true }),
+  ])
+
+  let mensagens = MENSAGENS_FOLLOWUP_FALLBACK
+  if (!msgsErr && msgsRows && msgsRows.length > 0) {
+    const agrupado: Record<string, string[]> = {}
+    for (const r of msgsRows as { estagio_funil: string; ordem: number; mensagem: string }[]) {
+      agrupado[r.estagio_funil] = agrupado[r.estagio_funil] ?? []
+      agrupado[r.estagio_funil].push(r.mensagem)
+    }
+    mensagens = agrupado
+  } else if (msgsErr) {
+    logWarn(SOURCE, 'automacao_whatsapp_mensagens indisponivel, usando fallback hardcoded', { db_message: msgsErr.message })
+  }
+
+  let intervalos = INTERVALOS_FALLBACK
+  if (!intErr && intRows && intRows.length > 0) {
+    intervalos = (intRows as { ordem: number; dias: number }[]).map((r) => r.dias)
+  } else if (intErr) {
+    logWarn(SOURCE, 'automacao_whatsapp_intervalos indisponivel, usando fallback hardcoded', { db_message: intErr.message })
+  }
+
+  return { mensagens, intervalos }
+}
+
+function getMensagemFollowUp(mensagens: Record<string, string[]>, estagio: string, tentativa: number, nome: string, empreendimento: string): string | null {
+  const msgs = mensagens[estagio]
   if (!msgs || tentativa >= msgs.length) return null
   return msgs[tentativa]
     .replace(/{nome}/g, nome.split(' ')[0])
@@ -57,7 +94,7 @@ type LeadRow = {
   lead_score?: number | null
 }
 
-async function processarLeadFollowUp(supabase: SupabaseClient, lead: LeadRow) {
+async function processarLeadFollowUp(supabase: SupabaseClient, lead: LeadRow, config: ConfigFollowUp) {
   const {
     id,
     nome,
@@ -87,7 +124,7 @@ async function processarLeadFollowUp(supabase: SupabaseClient, lead: LeadRow) {
     if (emp) nomeEmpreendimento = emp.nome
   }
 
-  const mensagem = getMensagemFollowUp(estagio_funil, tentativas_followup ?? 0, nome ?? 'amigo', nomeEmpreendimento)
+  const mensagem = getMensagemFollowUp(config.mensagens, estagio_funil, tentativas_followup ?? 0, nome ?? 'amigo', nomeEmpreendimento)
 
   // Sem mais mensagens — escalar para Stiven
   if (!mensagem) {
@@ -107,9 +144,8 @@ async function processarLeadFollowUp(supabase: SupabaseClient, lead: LeadRow) {
     return { id, acao: 'erro' as const }
   }
 
-  const intervalos = [1, 3, 7, 14]
-  const idxIntervalo = Math.min((tentativas_followup ?? 0) + 1, intervalos.length - 1)
-  const proximoIntervalo = intervalos[idxIntervalo]
+  const idxIntervalo = Math.min((tentativas_followup ?? 0) + 1, config.intervalos.length - 1)
+  const proximoIntervalo = config.intervalos[idxIntervalo]
   const proximoFollowup = new Date()
   proximoFollowup.setDate(proximoFollowup.getDate() + proximoIntervalo)
 
@@ -159,6 +195,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ skipped: true, motivo: result.motivo })
     }
 
+    const config = await carregarConfigFollowUp(supabase)
+
     const agora = new Date().toISOString()
     const { data: leads, error } = await supabase
       .from('leads')
@@ -184,7 +222,7 @@ export async function GET(req: NextRequest) {
 
     const resultados: Array<{ id: string; acao: 'mensagem_enviada' | 'escalado' | 'erro' }> = []
     for (const lead of leads as LeadRow[]) {
-      const resultado = await processarLeadFollowUp(supabase, lead)
+      const resultado = await processarLeadFollowUp(supabase, lead, config)
       resultados.push(resultado)
       await new Promise((r) => setTimeout(r, 2000))
     }

@@ -16,6 +16,7 @@ type Lead = {
   orcamento_max?: number; origem?: string; created_at?: string
 }
 type Cub = { valor_m2: number; mes_referencia: string; variacao_mensal?: number }
+type Insights = { insights: string; resumo?: { score_medio: number; requer_atencao: number; total: number } }
 
 const ESTAGIOS = [
   { key: 'primeiro_contato', label: 'Novo Contato', cor: '#6b7280' },
@@ -41,6 +42,23 @@ export default function DashboardHome() {
   const [leads, setLeads] = useState<Lead[]>([])
   const [cub, setCub] = useState<Cub | null>(null)
   const [loading, setLoading] = useState(true)
+  const [insights, setInsights] = useState<Insights | null>(null)
+  const [insightsLoading, setInsightsLoading] = useState(false)
+  const [insightsErro, setInsightsErro] = useState('')
+
+  const gerarInsights = useCallback(async () => {
+    setInsightsLoading(true); setInsightsErro('')
+    try {
+      const res = await fetch('/api/admin/insights')
+      const data = await res.json()
+      if (!res.ok) { setInsightsErro(data.erro || 'Nao foi possivel gerar insights agora.'); return }
+      setInsights(data)
+    } catch {
+      setInsightsErro('Falha ao conectar com o servico de insights.')
+    } finally {
+      setInsightsLoading(false)
+    }
+  }, [])
 
   const load = useCallback(async () => {
     try {
@@ -122,6 +140,32 @@ export default function DashboardHome() {
               )
             })}
           </div>
+        </div>
+
+        <div style={{ background: D.surface, border: '1px solid ' + D.line, borderRadius: 12, padding: 20, marginBottom: 28 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: insights || insightsErro ? 16 : 0, flexWrap: 'wrap', gap: 12 }}>
+            <div>
+              <h2 style={{ fontFamily: "'Bricolage Grotesque',system-ui", fontSize: 16, fontWeight: 700, margin: 0, color: D.ink }}>Insights de IA</h2>
+              <p style={{ margin: '4px 0 0', fontSize: 13, color: D.muted }}>Análise executiva do pipeline gerada sob demanda.</p>
+            </div>
+            <button onClick={gerarInsights} disabled={insightsLoading}
+              style={{ background: D.bronze, color: '#fff', border: 'none', borderRadius: 8, padding: '10px 18px', fontWeight: 700, fontSize: 13, cursor: insightsLoading ? 'default' : 'pointer', opacity: insightsLoading ? 0.6 : 1, whiteSpace: 'nowrap' }}>
+              {insightsLoading ? 'Gerando...' : (insights ? 'Gerar novamente' : 'Gerar análise')}
+            </button>
+          </div>
+          {insightsErro && <p style={{ margin: 0, fontSize: 13, color: D.red }}>{insightsErro}</p>}
+          {insights && (
+            <div>
+              {insights.resumo && (
+                <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 14, fontSize: 12, color: D.muted }}>
+                  <span>Total: <strong style={{ color: D.ink }}>{insights.resumo.total}</strong></span>
+                  <span>Score médio: <strong style={{ color: D.ink }}>{insights.resumo.score_medio}/100</strong></span>
+                  <span>Requer atenção: <strong style={{ color: D.ink }}>{insights.resumo.requer_atencao}</strong></span>
+                </div>
+              )}
+              <p style={{ margin: 0, fontSize: 14, lineHeight: 1.6, color: D.ink, whiteSpace: 'pre-wrap' }}>{insights.insights}</p>
+            </div>
+          )}
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: 12 }}>

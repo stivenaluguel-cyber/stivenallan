@@ -60,6 +60,7 @@ type MockConfig = {
   }>
   selectError?: { code?: string; message?: string } | null
   cronRunsMissing?: boolean // simula tabela cron_runs ausente (migration 0006 pendente)
+  automacaoEmailPassos?: Array<Record<string, unknown>>
 }
 
 function makeSupabase(cfg: MockConfig = {}) {
@@ -115,6 +116,11 @@ function makeSupabase(cfg: MockConfig = {}) {
             }),
           }),
         }
+      }
+      // Config de automação (0011): vazio por padrão → cron cai no fallback
+      // hardcoded, que é o que os testes existentes já esperam.
+      if (table === 'automacao_email_passos') {
+        return { select: () => ({ order: async () => ({ data: cfg.automacaoEmailPassos ?? [], error: null }) }) }
       }
       if (table === 'cron_runs') {
         return {
