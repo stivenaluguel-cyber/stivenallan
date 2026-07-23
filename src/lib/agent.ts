@@ -95,7 +95,7 @@ const tools: OpenAI.Chat.Completions.ChatCompletionTool[] = [
           orcamento_min: { type: 'number' },
           orcamento_max: { type: 'number' },
           prazo_compra: { type: 'string', enum: ['imediato', '3_meses', '6_meses', '1_ano', 'sem_prazo'] },
-          estagio_funil: { type: 'string', enum: ['novo', 'qualificando', 'interessado', 'visita_agendada', 'proposta', 'fechado', 'perdido'] },
+          estagio_funil: { type: 'string', description: 'Mesmo vocabulario das colunas do Kanban do CRM.', enum: ['primeiro_contato', 'qualificado', 'interessado', 'proposta_enviada', 'visita_agendada', 'negociacao', 'fechado'] },
           empreendimento_interesse: { type: 'string' },
           lead_score: { type: 'number', minimum: 0, maximum: 100 },
           observacoes_ia: { type: 'string' },
