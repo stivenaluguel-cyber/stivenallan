@@ -21,7 +21,7 @@ export async function enviarMensagem(para: string, texto: string): Promise<boole
       },
       body: JSON.stringify({
         number: para,
-        textMessage: { text: texto },
+        text: texto,
         options: {
           delay: 1200,           // simula digitacao humana (1.2s)
           presence: 'composing', // mostra 'digitando...'
