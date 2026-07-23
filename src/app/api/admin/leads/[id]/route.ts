@@ -4,6 +4,7 @@ import { jwtVerify } from 'jose'
 import { createClient } from '@supabase/supabase-js'
 import { randomUUID } from 'crypto'
 import { sendMetaCapiEvent } from '@/lib/meta-capi'
+import { sendGoogleAdsConversion } from '@/lib/google-ads-conversion'
 import { ESTAGIO_META_EVENT } from '@/lib/dashboard/estagios'
 import { logError } from '@/lib/log'
 
@@ -17,19 +18,21 @@ async function auth() {
 type Params = { params: Promise<{ id: string }> }
 
 // Loga a transição no histórico do lead (relatório de conversão por etapa)
-// e dispara o evento correspondente pro Meta CAPI — todo avanço real de
-// estágio no Kanban vira sinal de otimização pro Gerenciador de Anúncios,
-// não só o Lead inicial do formulário. Fire-and-forget: uma falha no CAPI
-// (ex: token ausente, Graph API fora do ar) nunca deve impedir o corretor
-// de mover o card no Kanban.
+// e dispara o evento correspondente pro Meta CAPI e pro Google Ads (offline
+// click conversion) — todo avanço real de estágio no Kanban vira sinal de
+// otimização pros dois Gerenciadores de Anúncios, não só o Lead inicial do
+// formulário. Fire-and-forget nos dois: uma falha (token ausente, API fora
+// do ar, lead sem gclid/fbclid) nunca deve impedir o corretor de mover o
+// card no Kanban.
 async function registrarMudancaEstagio(id: string, estagioDe: string, estagioPara: string) {
   const client = sb()
   await client.from('leads_interacoes').insert({ lead_id: id, tipo: 'status_change', descricao: 'Movido de ' + estagioDe + ' para ' + estagioPara, estagio_de: estagioDe, estagio_para: estagioPara })
 
   const eventName = ESTAGIO_META_EVENT[estagioPara as keyof typeof ESTAGIO_META_EVENT]
   if (!eventName) return
-  const { data: lead } = await client.from('leads').select('nome, whatsapp, email, fbclid').eq('id', id).single()
+  const { data: lead } = await client.from('leads').select('nome, whatsapp, email, fbclid, gclid').eq('id', id).single()
   if (!lead?.nome || !lead?.whatsapp) return
+
   sendMetaCapiEvent({
     eventName,
     eventId: randomUUID(),
@@ -40,6 +43,14 @@ async function registrarMudancaEstagio(id: string, estagioDe: string, estagioPar
   }).then((result) => {
     if (!result.ok && !('skipped' in result)) logError('admin/leads/registrarMudancaEstagio', 'capi falhou', new Error(result.error))
   }).catch((err) => logError('admin/leads/registrarMudancaEstagio', 'capi exception', err))
+
+  sendGoogleAdsConversion({
+    estagioFunil: estagioPara,
+    gclid: lead.gclid ?? '',
+    conversionDateTime: new Date(),
+  }).then((result) => {
+    if (!result.ok && !('skipped' in result)) logError('admin/leads/registrarMudancaEstagio', 'google ads conversion falhou', new Error(result.error))
+  }).catch((err) => logError('admin/leads/registrarMudancaEstagio', 'google ads conversion exception', err))
 }
 
 export async function GET(_req: NextRequest, { params }: Params) {
