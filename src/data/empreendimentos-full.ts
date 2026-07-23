@@ -532,7 +532,7 @@ export const EMPREENDIMENTOS_FULL: EmpreendimentoFull[] = [
     vagas: null,
     suites: "3",
     previsao_entrega: null,
-    status: "pronto",
+    status: "sob consulta",
   },
   {
     slug: "pineto-centro-criciuma-sc",

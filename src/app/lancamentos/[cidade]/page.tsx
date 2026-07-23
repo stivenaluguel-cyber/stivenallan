@@ -105,12 +105,12 @@ const CONTEUDO_POR_CIDADE: Record<
 > = {
   'icara': {
     mercado:
-      'Içara concentra hoje três empreendimentos ativos da Construtora Fontana, todos no Centro da cidade: o Castellano Residencial, com apartamentos de 3 dormitórios e 109 a 112 m² privativos, em obras; o Pianezze Residencial, com unidades de 2 e 3 dormitórios (1 suíte) e 66 a 86 m², já pronto para morar; e o Piazza Castello Residencial, com 3 dormitórios (3 suítes) e até 172 m² privativos, também pronto para morar. A combinação de um lançamento em obras com dois empreendimentos já prontos dá a quem procura imóvel em Içara a opção de comprar na planta com parcelas menores ou mudar em pouco tempo para um apartamento pronto.',
+      'Içara concentra hoje três empreendimentos ativos da Construtora Fontana, todos no Centro da cidade: o Castellano Residencial, com apartamentos de 3 dormitórios e 109 a 112 m² privativos, em obras; o Pianezze Residencial, com unidades de 2 e 3 dormitórios (1 suíte) e 66 a 86 m², já pronto para morar; e o Piazza Castello Residencial, com 3 dormitórios (3 suítes) e até 172 m² privativos. A combinação de um lançamento em obras com um empreendimento já pronto dá a quem procura imóvel em Içara a opção de comprar na planta com parcelas menores ou mudar em pouco tempo para um apartamento pronto — fale com o corretor para confirmar a disponibilidade e o status atualizado de cada empreendimento.',
     faqs: [
       {
         pergunta: 'Quais empreendimentos da Fontana estão ativos em Içara hoje?',
         resposta:
-          'Castellano Residencial (em obras), Pianezze Residencial (pronto para morar) e Piazza Castello Residencial (pronto para morar), todos no Centro de Içara/SC.',
+          'Castellano Residencial (em obras), Pianezze Residencial (pronto para morar) e Piazza Castello Residencial (consulte o status atualizado), todos no Centro de Içara/SC.',
       },
       {
         pergunta: 'Como funciona o financiamento direto da Fontana em Içara?',
@@ -120,7 +120,7 @@ const CONTEUDO_POR_CIDADE: Record<
       {
         pergunta: 'Qual a diferença entre o Castellano e os outros dois empreendimentos em Içara?',
         resposta:
-          'O Castellano Residencial ainda está em obras, com parcelas menores durante a construção. O Pianezze Residencial e o Piazza Castello Residencial já estão prontos para morar, no mesmo bairro Centro.',
+          'O Castellano Residencial ainda está em obras, com parcelas menores durante a construção. O Pianezze Residencial já está pronto para morar, no mesmo bairro Centro; consulte o corretor para o status atualizado do Piazza Castello Residencial.',
       },
     ],
   },
@@ -200,6 +200,7 @@ function statusParaFase(status: string): string {
   if (status === 'em obras') return 'Em obras'
   if (status === 'entregue') return 'Entregue'
   if (status === 'pronto') return 'Pronto para morar'
+  if (status === 'sob consulta') return 'Sob consulta'
   return status
 }
 

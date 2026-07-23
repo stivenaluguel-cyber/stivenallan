@@ -54,7 +54,7 @@ const COMO_FUNCIONA = [
 // que continua acessível em /empreendimentos. Slugs de src/data/imoveis.ts;
 // se um destaque sair da vitrine (ativo: false), ele simplesmente não renderiza.
 const DESTAQUES_HOME = [
-  { slug: 'piazza-castello-centro-icara-sc', motivo: 'Pronto para morar' },
+  { slug: 'piazza-castello-centro-icara-sc', motivo: 'No coração de Içara' },
   { slug: 'mar-positano-centro-balneario-rincao-sc', motivo: 'Para viver o mar' },
   { slug: 'monte-leone-centro-criciuma-sc', motivo: 'Para viver o centro' },
 ]
@@ -65,6 +65,7 @@ function StatusBadge({ status }: { status: string }) {
     'em obras':  { label: 'Em obras',  bg: 'rgba(184,155,94,0.12)', color: '#8A7240' },
     'pronto':    { label: 'Pronto',    bg: 'rgba(40,120,60,0.10)',  color: '#2a7840' },
     'entregue':  { label: 'Entregue',  bg: 'rgba(40,120,60,0.10)',  color: '#2a7840' },
+    'sob consulta': { label: 'Sob consulta', bg: 'rgba(0,0,0,0.06)', color: '#5a5a52' },
   }
   const s = map[status] || map['na planta']
   return (

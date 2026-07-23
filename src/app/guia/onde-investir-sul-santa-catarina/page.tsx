@@ -188,7 +188,7 @@ export const metadata: Metadata = {
                             </p>
 
 <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
-O estágio de obra também varia por região. Em Icara, os tres estágios convivem: o Castellano Residencial está em obras, enquanto o Pianezze Residencial e o Piazza Castello Residencial já estao prontos. Em Sideropolis, o Avezzano Residencial e o Rocca Pietore Residencial estao na planta. Já em Balneario Rincao e em Laguna, os lancamentos ativos estao concentrados na fase de obras, assim como o Aguas de Marano Residencial em Balneario Picarras e o Campos da Montanha Residencial em Bom Jardim da Serra. Essa diversidade de estágios entre as regioes reforca a importância de conversar com Stiven Allan antes de decidir, para alinhar o momento da compra ao perfil de cada empreendimento.
+O estágio de obra também varia por região. Em Icara, o Castellano Residencial está em obras e o Pianezze Residencial já está pronto; consulte o corretor para o status atualizado do Piazza Castello Residencial. Em Sideropolis, o Avezzano Residencial e o Rocca Pietore Residencial estao na planta. Já em Balneario Rincao e em Laguna, os lancamentos ativos estao concentrados na fase de obras, assim como o Aguas de Marano Residencial em Balneario Picarras e o Campos da Montanha Residencial em Bom Jardim da Serra. Essa diversidade de estágios entre as regioes reforca a importância de conversar com Stiven Allan antes de decidir, para alinhar o momento da compra ao perfil de cada empreendimento.
 </p>
 
 
