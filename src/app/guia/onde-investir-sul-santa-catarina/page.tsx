@@ -128,7 +128,7 @@ export const metadata: Metadata = {
                             Icara é um município vizinho a Criciuma, com os lancamentos Fontana concentrados no bairro Centro. É uma opção para quem busca proximidade com o polo econômico regional em um município próprio.
                             </p>
                             <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
-                            Os empreendimentos ativos em Icara são o Castellano Residencial, o Pianezze Residencial e o Piazza Castello Residencial, este último com apenas 2 apartamentos por andar, segundo sua propria frase de marketing.
+                            Os empreendimentos ativos em Icara são o Castellano Residencial, o Pianezze Residencial e o Piazza Castello Residencial.
                             </p>
 
                             <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Sideropolis - cidade do interior</h2>

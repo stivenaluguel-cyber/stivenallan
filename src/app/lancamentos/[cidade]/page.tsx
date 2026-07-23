@@ -105,7 +105,7 @@ const CONTEUDO_POR_CIDADE: Record<
 > = {
   'icara': {
     mercado:
-      'Içara concentra hoje três empreendimentos ativos da Construtora Fontana, todos no Centro da cidade: o Castellano Residencial, com apartamentos de 3 dormitórios e 109 a 112 m² privativos, em obras; o Pianezze Residencial, com unidades de 2 e 3 dormitórios (1 suíte) e 66 a 86 m², já pronto para morar; e o Piazza Castello Residencial, com apenas 2 apartamentos por andar, 3 dormitórios (3 suítes) e até 172 m² privativos, também pronto para morar. A combinação de um lançamento em obras com dois empreendimentos já prontos dá a quem procura imóvel em Içara a opção de comprar na planta com parcelas menores ou mudar em pouco tempo para um apartamento pronto.',
+      'Içara concentra hoje três empreendimentos ativos da Construtora Fontana, todos no Centro da cidade: o Castellano Residencial, com apartamentos de 3 dormitórios e 109 a 112 m² privativos, em obras; o Pianezze Residencial, com unidades de 2 e 3 dormitórios (1 suíte) e 66 a 86 m², já pronto para morar; e o Piazza Castello Residencial, com 3 dormitórios (3 suítes) e até 172 m² privativos, também pronto para morar. A combinação de um lançamento em obras com dois empreendimentos já prontos dá a quem procura imóvel em Içara a opção de comprar na planta com parcelas menores ou mudar em pouco tempo para um apartamento pronto.',
     faqs: [
       {
         pergunta: 'Quais empreendimentos da Fontana estão ativos em Içara hoje?',
