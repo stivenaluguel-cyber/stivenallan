@@ -77,6 +77,29 @@ export default function CampanhaDetalhePage() {
   const [mostrarPickerImagem, setMostrarPickerImagem] = useState(false)
   const [imgUrl, setImgUrl] = useState('')
   const [imgTexto, setImgTexto] = useState('')
+  const [enviandoImagem, setEnviandoImagem] = useState(false)
+  const [erroImagem, setErroImagem] = useState('')
+
+  // Reaproveita o mesmo endpoint de upload que a tela de Empreendimentos já
+  // usa (Supabase Storage, bucket "midias") — empreendimentoId é só um
+  // prefixo de pasta ali dentro, então passar o id da campanha funciona sem
+  // precisar de rota nova.
+  async function anexarImagem(file: File) {
+    setEnviandoImagem(true); setErroImagem('')
+    try {
+      const fd = new FormData()
+      fd.append('empreendimentoId', 'campanhas/' + id)
+      fd.append('files', file)
+      const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
+      const data = await res.json()
+      if (!res.ok || !data.urls?.[0]) { setErroImagem(data.error || 'Falha ao enviar imagem.'); return }
+      setImgUrl(data.urls[0])
+    } catch {
+      setErroImagem('Falha ao conectar.')
+    } finally {
+      setEnviandoImagem(false)
+    }
+  }
 
   useEffect(() => {
     fetch('/api/admin/empreendimentos')
@@ -243,13 +266,24 @@ export default function CampanhaDetalhePage() {
 
           {mostrarPickerImagem && (
             <div style={{ marginBottom: 10, background: D.bg, borderRadius: 8, padding: 10 }}>
-              <input value={imgUrl} onChange={(e) => setImgUrl(e.target.value)} placeholder="URL da imagem (https://...)"
+              <label style={{ fontSize: 11, color: D.muted, display: 'block', marginBottom: 4 }}>Anexar imagem do computador</label>
+              <input type="file" accept="image/*" disabled={enviandoImagem}
+                onChange={(e) => { const f = e.target.files?.[0]; if (f) anexarImagem(f) }}
+                style={{ width: '100%', fontSize: 13, marginBottom: 8 }} />
+              {enviandoImagem && <p style={{ fontSize: 12, color: D.muted, margin: '0 0 8px' }}>Enviando imagem...</p>}
+              {erroImagem && <p style={{ fontSize: 12, color: D.red, margin: '0 0 8px' }}>{erroImagem}</p>}
+
+              <label style={{ fontSize: 11, color: D.muted, display: 'block', marginBottom: 4 }}>ou cole a URL de uma imagem já hospedada</label>
+              <input value={imgUrl} onChange={(e) => setImgUrl(e.target.value)} placeholder="https://..."
                 style={{ width: '100%', border: '1px solid ' + D.line, borderRadius: 6, padding: 7, fontSize: 13, marginBottom: 6, boxSizing: 'border-box' }} />
+              {imgUrl && (
+                <img src={imgUrl} alt="Pré-visualização" style={{ maxWidth: '100%', maxHeight: 140, borderRadius: 6, display: 'block', marginBottom: 8 }} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
+              )}
               <input value={imgTexto} onChange={(e) => setImgTexto(e.target.value)} placeholder="Texto/legenda (opcional)"
                 style={{ width: '100%', border: '1px solid ' + D.line, borderRadius: 6, padding: 7, fontSize: 13, marginBottom: 8, boxSizing: 'border-box' }} />
-              <button type="button" disabled={!imgUrl.trim()} onClick={() => {
+              <button type="button" disabled={!imgUrl.trim() || enviandoImagem} onClick={() => {
                 inserirNoCorpo(blocoImagemTextoHtml(imgUrl.trim(), imgTexto.trim()))
-                setMostrarPickerImagem(false); setImgUrl(''); setImgTexto('')
+                setMostrarPickerImagem(false); setImgUrl(''); setImgTexto(''); setErroImagem('')
               }} style={{ background: D.bronze, color: '#fff', border: 'none', borderRadius: 6, padding: '7px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', opacity: imgUrl.trim() ? 1 : 0.5 }}>
                 Inserir
               </button>
