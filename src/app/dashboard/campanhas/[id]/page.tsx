@@ -20,7 +20,7 @@ function blocoEmpreendimentoHtml(emp: Empreendimento): string {
 
 function blocoImagemTextoHtml(url: string, texto: string): string {
   const imagem = url
-    ? `<img src="${url}" alt="" style="width:100%;max-width:480px;border-radius:12px;display:block;margin:0 auto" />`
+    ? `<img src="${url}" alt="${texto || ''}" style="width:100%;max-width:480px;border-radius:12px;display:block;margin:0 auto" />`
     : ''
   const paragrafo = texto ? `<p style="margin:12px 0 0">${texto}</p>` : ''
   return `\n<div style="margin:20px 0;text-align:center">\n  ${imagem}\n  ${paragrafo}\n</div>\n`
@@ -90,6 +90,7 @@ export default function CampanhaDetalhePage() {
       const fd = new FormData()
       fd.append('empreendimentoId', 'campanhas/' + id)
       fd.append('files', file)
+      fd.append('perfil', 'email')
       const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
       const data = await res.json()
       if (!res.ok || !data.urls?.[0]) { setErroImagem(data.error || 'Falha ao enviar imagem.'); return }
