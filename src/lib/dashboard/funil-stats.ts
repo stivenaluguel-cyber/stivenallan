@@ -1,12 +1,13 @@
 // Agregações puras sobre leads + leads_interacoes — testáveis 100% sem DB.
 //
-// ATENÇÃO ESTAGIO_FUNIL: este arquivo é a 4ª cópia do array de estágios do
-// Kanban (as outras 3: src/app/dashboard/page.tsx, src/app/dashboard/crm/page.tsx,
-// src/app/dashboard/leads/page.tsx — nenhuma delas importa de um lugar
-// compartilhado). Existe TAMBÉM um 3º vocabulário incompatível de estagio_funil
-// na tool atualizar_lead da IA (src/lib/agent.ts) que não bate com nenhum dos 7
-// valores abaixo — leads que a IA marcar com esses valores caem no bucket
-// "outros" em vez de quebrar o relatório ou desaparecer silenciosamente.
+// Existe um vocabulário incompatível de estagio_funil na tool atualizar_lead
+// da IA anterior a esta correção — já alinhado com ESTAGIOS_FUNIL em
+// src/lib/agent.ts, mas leads antigos ou fontes futuras que fujam do
+// vocabulário caem no bucket "outros" em vez de quebrar o relatório ou
+// desaparecer silenciosamente.
+
+import { ESTAGIOS_FUNIL } from './estagios'
+export { ESTAGIOS_FUNIL }
 
 export type LeadStageRow = {
   id: string
@@ -19,16 +20,6 @@ export type StageTransitionRow = {
   estagio_para: string | null
   created_at: string
 }
-
-export const ESTAGIOS_FUNIL = [
-  { key: 'primeiro_contato', label: 'Novo Contato', cor: '#6b7280' },
-  { key: 'qualificado', label: 'Qualificado', cor: '#3b82f6' },
-  { key: 'interessado', label: 'Interessado', cor: '#8b5cf6' },
-  { key: 'proposta_enviada', label: 'Proposta Enviada', cor: '#f59e0b' },
-  { key: 'visita_agendada', label: 'Visita Agendada', cor: '#ec4899' },
-  { key: 'negociacao', label: 'Em Negociação', cor: '#D24E22' },
-  { key: 'fechado', label: 'Fechado', cor: '#22c55e' },
-] as const
 
 const OUTROS = { key: 'outros', label: 'Outros / não mapeado', cor: '#a1a1aa' } as const
 

@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
 import { ConversaPanel } from '@/components/dashboard/ConversaPanel'
+import { ESTAGIOS_FUNIL as ESTAGIOS } from '@/lib/dashboard/estagios'
 
 const D = {
   bg: '#F3F2EE', surface: '#FAFAF7', ink: '#161512',
@@ -18,15 +19,6 @@ anotacoes?: string | null; created_at?: string; property_name?: string | null
 visitas?: number; downloads?: number
 }
 
-const ESTAGIOS = [
-  { key: 'primeiro_contato', label: 'Novo Contato', cor: '#6b7280' },
-  { key: 'qualificado', label: 'Qualificado', cor: '#3b82f6' },
-  { key: 'interessado', label: 'Interessado', cor: '#8b5cf6' },
-  { key: 'proposta_enviada', label: 'Proposta Enviada', cor: '#f59e0b' },
-  { key: 'visita_agendada', label: 'Visita Agendada', cor: '#ec4899' },
-  { key: 'negociacao', label: 'Em Negociação', cor: '#D24E22' },
-  { key: 'fechado', label: 'Fechado', cor: '#22c55e' },
-]
 
 const ORIGENS = ['Instagram', 'Indicacao', 'Portal', 'Anuncio', 'Evento', 'Site', 'Whatsapp', 'Outro']
 
