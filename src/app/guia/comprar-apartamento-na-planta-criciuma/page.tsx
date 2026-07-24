@@ -61,7 +61,7 @@ const FAQ_SCHEMA = {
     {
       '@type': 'Question',
       name: 'Como funciona o pagamento de apartamento na planta?',
-      acceptedAnswer: { '@type': 'Answer', text: 'No financiamento direto Fontana: entrada de 20% no ato, saldo dividido em parcelas mensais e reforços anuais, todos corrigidos pelo CUB/SC durante a obra. Sem necessidade de aprovação bancária.' },
+      acceptedAnswer: { '@type': 'Answer', text: 'No financiamento direto Fontana: entrada de 20% no ato, saldo dividido em parcelas mensais e reforços anuais, todos corrigidos pelo CUB/SC durante a obra. Sem depender de financiamento bancário; a construtora poderá realizar análise cadastral e de capacidade de pagamento conforme suas políticas, e a aprovação não é automática.' },
     },
     {
       '@type': 'Question',
@@ -107,6 +107,7 @@ export default function GuiaComprarNaPlantaPage() {
           updatedISO={UPDATED_ISO}
           updatedLabel={UPDATED_LABEL}
           fontes={[
+            <>CUB/SC (série histórica compilada, não é fonte oficial primária): <a href="https://www.senge-sc.org.br/tabela-do-cub/" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>Tabela do CUB — SENGE-SC</a></>,
             'Condições comerciais: tabela vigente informada pela Construtora Fontana, sujeita a alteração',
             <>Registro de incorporação: <a href="https://www.planalto.gov.br/ccivil_03/leis/l4591compilado.htm" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>Lei 4.591/1964, art. 32</a></>,
           ]}
@@ -123,7 +124,7 @@ export default function GuiaComprarNaPlantaPage() {
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Etapas para comprar na planta</h2>
         <ol style={{ fontSize: 15, lineHeight: 2.2, color: '#333', paddingLeft: 24 }}>
           <li><strong>Escolha o empreendimento:</strong> Verifique a localização, a construtora, a tipologia e a previsão de entrega do imóvel. Em Criciúma e no Sul Catarinense, os lançamentos Fontana vão de bairros como Michel e Centro até empreendimentos de veraneio no litoral. Compare a planta, o padrão de acabamento e a data prevista de conclusão antes de decidir.</li>
-          <li><strong>Conheça o plano de financiamento:</strong> O plano padrão Fontana tem entrada de 20%, até 72 parcelas mensais corrigidas pelo CUB/SC e até 6 reforços anuais. Cada reforço anual equivale a 5 parcelas mensais. Como o financiamento é direto com a construtora, não há necessidade de aprovação bancária, o que agiliza o processo.</li>
+          <li><strong>Conheça o plano de financiamento:</strong> O plano padrão Fontana tem entrada de 20%, até 72 parcelas mensais corrigidas pelo CUB/SC e até 6 reforços anuais. Cada reforço anual equivale a 5 parcelas mensais. Sem depender de financiamento bancário; a construtora poderá realizar análise cadastral e de capacidade de pagamento conforme suas políticas, e a aprovação não é automática.</li>
           <li><strong>Analise o contrato (reserva):</strong> Feita a reserva da unidade, analise o contrato com atenção antes de assinar. Confirme que a incorporação está registrada no cartório de registro de imóveis (memorial de incorporação, art. 32 da Lei 4.591/1964) e que o contrato traz a cláusula de correção pelo CUB/SC, o prazo de entrega e a tolerância previstos. Confira também a especificação técnica do acabamento.</li>
           <li><strong>Pague a entrada:</strong> A entrada corresponde a 20% do valor do imóvel e é paga no ato da assinatura do contrato. Num apartamento de R$ 500.000, por exemplo, isso equivale a R$ 100.000. É esse pagamento inicial que garante a reserva da unidade escolhida.</li>
           <li><strong>Pague as parcelas durante a obra:</strong> Durante a construção, você paga parcelas mensais corrigidas pelo CUB/SC, além dos reforços anuais equivalentes a 5 parcelas cada. As parcelas menores durante a obra são uma das principais vantagens de comprar na planta. O saldo de 80% é diluído ao longo de até 72 meses.</li>
@@ -133,7 +134,7 @@ export default function GuiaComprarNaPlantaPage() {
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Como funciona o financiamento direto na planta?</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-          O plano padrão Fontana divide o pagamento em entrada de 20%, até 72 parcelas mensais corrigidas pelo CUB/SC e até 6 reforços anuais (cada reforço equivale a 5 parcelas mensais). Não é necessário aprovação bancária.
+          O plano padrão Fontana divide o pagamento em entrada de 20%, até 72 parcelas mensais corrigidas pelo CUB/SC e até 6 reforços anuais (cada reforço equivale a 5 parcelas mensais). Sem depender de financiamento bancário; a construtora poderá realizar análise cadastral e de capacidade de pagamento conforme suas políticas, e a aprovação não é automática.
         </p>
         <div style={{ background: '#F0F7F0', borderRadius: 2, padding: '24px 28px', margin: '24px 0' }}>
           <p style={{ fontSize: 14, fontWeight: 600, color: '#1A5C3A', marginTop: 0, marginBottom: 8 }}>Exemplo: apartamento de R$ 500.000</p>
@@ -146,7 +147,7 @@ export default function GuiaComprarNaPlantaPage() {
           </ul>
         </div>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-          O CUB/SC (Custo Unitário Básico do Sinduscon-SC) corrige as parcelas todo mês. Em junho de 2026, o CUB/SC estava em R$ 3.096,25/m2. A variação histórica fica entre 0,4% e 0,8% ao mês.
+          O CUB/SC (Custo Unitário Básico do Sinduscon-SC) corrige as parcelas todo mês. Em junho de 2026, o CUB/SC estava em R$ 3.121,62/m2 (alta de 0,82% frente a maio/2026, quando estava em R$ 3.096,25/m2). A variação muda mês a mês — consulte a série histórica para o valor real de cada período, não uma média fixa.
         </p>
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Principais bairros e regiões com lançamentos em Criciúma</h2>
@@ -178,7 +179,7 @@ export default function GuiaComprarNaPlantaPage() {
               <li>Parcelas corrigidas pelo CUB/SC podem subir</li>
               <li>Prazo de entrega pode ser prorrogado</li>
               <li>Não dá para morar durante a obra</li>
-              <li>Verificar registro do contrato em cartório</li>
+              <li>Verificar o registro da incorporação/memorial de incorporação no Registro de Imóveis, conforme o art. 32 da Lei 4.591/1964</li>
               <li>Pesquisar histórico de entregas da construtora</li>
             </ul>
           </div>

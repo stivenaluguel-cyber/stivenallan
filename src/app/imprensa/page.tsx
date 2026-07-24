@@ -33,8 +33,11 @@ const SCHEMA = {
     name: 'Stiven Allan',
     url: SITE_URL,
     jobTitle: 'Corretor de imóveis',
-    // hasCredential removido: Gate B (validação oficial do CRECI) aberto —
-    // nenhuma afirmação de credencial publicada até validação. Ver PR #17.
+    // hasCredential (schema estruturado) removido: Gate B (validação
+    // oficial do CRECI) aberto. O texto simples "CRECI 60.275" ainda
+    // aparece em outras páginas do site (não é apagado automaticamente) —
+    // Gate B permanece aberto até validação oficial e padronização
+    // completa. Ver PR #17.
     sameAs: ['https://www.instagram.com/stivenallan.ofc'],
     knowsAbout: [
       'Financiamento direto com construtora',

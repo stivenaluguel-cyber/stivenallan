@@ -57,7 +57,7 @@ const FAQ_SCHEMA = {
     {
       '@type': 'Question',
       name: 'O que é o CUB/SC e como afeta minhas parcelas?',
-      acceptedAnswer: { '@type': 'Answer', text: 'O CUB (Custo Unitário Básico) do Sinduscon-SC e o índice que corrige as parcelas durante a obra. Em junho/2026, o CUB/SC estava em R$ 3.096,25/m2. As parcelas sobem mensalmente de acordo com a variação do CUB.' },
+      acceptedAnswer: { '@type': 'Answer', text: 'O CUB (Custo Unitário Básico) do Sinduscon-SC e o índice que corrige as parcelas durante a obra. Em junho/2026, o CUB/SC estava em R$ 3.121,62/m2 (alta de 0,82% frente a maio/2026, quando estava em R$ 3.096,25/m2). As parcelas sobem mensalmente de acordo com a variação do CUB.' },
     },
     {
       '@type': 'Question',
@@ -108,7 +108,8 @@ export default function GuiaFinanciamentoDiretoPage() {
           updatedISO={UPDATED_ISO}
           updatedLabel={UPDATED_LABEL}
           fontes={[
-            <>CUB/SC: <a href="https://www.sindusconcriciuma.com.br/" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>Sinduscon Sul Catarinense</a></>,
+            <>CUB/SC (entidade calculadora): <a href="https://www.sindusconcriciuma.com.br/" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>Sinduscon Sul Catarinense</a></>,
+            <>CUB/SC (série histórica compilada, não é fonte oficial primária): <a href="https://www.senge-sc.org.br/tabela-do-cub/" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>Tabela do CUB — SENGE-SC</a></>,
             <>FGTS: <a href="https://www.caixa.gov.br/voce/habitacao/Paginas/utilizacao-fgts.aspx" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>Caixa Econômica Federal</a></>,
             <>Registro de incorporação: <a href="https://www.planalto.gov.br/ccivil_03/leis/l4591compilado.htm" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>Lei 4.591/1964, art. 32</a></>,
             'Condições comerciais: tabela vigente informada pela Construtora Fontana, sujeita a alteração',
@@ -131,7 +132,7 @@ export default function GuiaFinanciamentoDiretoPage() {
           <li><strong>Entrada:</strong> 20% do valor do imóvel, paga no ato da assinatura do contrato.</li>
           <li><strong>Parcelas mensais:</strong> Até 72 mensais durante a obra, corrigidas mensalmente pelo CUB/SC.</li>
           <li><strong>Reforços anuais:</strong> Até 6 reforços, cada um equivalente a 5 parcelas mensais, pagos uma vez por ano.</li>
-          <li><strong>CUB/SC jun/2026:</strong> R$ 3.096,25/m2, fonte: Sinduscon-SC (base de correção das parcelas — consulte sempre o índice do mês vigente).</li>
+          <li><strong>CUB/SC jun/2026:</strong> R$ 3.121,62/m2 (maio/2026: R$ 3.096,25/m2, alta de 0,82%), fonte: série histórica compilada pelo SENGE-SC — consulte sempre o índice do mês vigente.</li>
         </ul>
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Simulação prática: imóvel de R$ 600.000</h2>
@@ -154,7 +155,7 @@ export default function GuiaFinanciamentoDiretoPage() {
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>O que é o CUB/SC?</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-          O CUB (Custo Unitário Básico) é publicado mensalmente pelo Sinduscon-SC e reflete o custo de construção civil no estado de Santa Catarina. Em junho de 2026, o CUB/SC estava em <strong>R$ 3.096,25/m2</strong>. As parcelas do financiamento direto Fontana sobem mensalmente de acordo com a variação do CUB: se o CUB subir 0,6% no mês, suas parcelas também sobem 0,6%.
+          O CUB (Custo Unitário Básico) é publicado mensalmente pelo Sinduscon-SC e reflete o custo de construção civil no estado de Santa Catarina. Em junho de 2026, o CUB/SC estava em <strong>R$ 3.121,62/m2</strong> (alta de 0,82% frente a maio/2026, R$ 3.096,25/m2). As parcelas do financiamento direto Fontana sobem mensalmente de acordo com a variação do CUB: se o CUB subir 0,6% no mês, suas parcelas também sobem 0,6%.
         </p>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
           É importante distinguir o CUB/SC do INCC (nacional, calculado pela FGV) e do IGPM. Na Fontana, as parcelas durante a obra são corrigidas pelo CUB/SC, e o saldo direto pós-chaves é corrigido pelo IGPM mais 0,75% a.m. Essa previsibilidade permite ao comprador planejar seu fluxo de caixa com mais clareza do que em contratos indexados a índices de inflação geral.

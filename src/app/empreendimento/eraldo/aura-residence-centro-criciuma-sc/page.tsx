@@ -145,7 +145,7 @@ const PLANTAS_GRUPOS = [
 ]
 
 const FAQ = [
-  { pergunta: 'Como funciona o financiamento direto do Aura Residence?', resposta: 'Parcelamento direto com a construtora: 20% de entrada, reforços anuais e o saldo em parcelas mensais corrigidas pelo CUB/SC, sem necessidade de aprovação bancária. Há também condição com desconto para pagamento à vista. Fale com Stiven para as condições atualizadas.' },
+  { pergunta: 'Como funciona o financiamento direto do Aura Residence?', resposta: 'Parcelamento direto com a construtora: 20% de entrada, reforços anuais e o saldo em parcelas mensais corrigidas pelo CUB/SC, sem depender de financiamento bancário — a construtora poderá realizar análise cadastral e de capacidade de pagamento conforme suas políticas. Há também condição com desconto para pagamento à vista. Fale com Stiven para as condições atualizadas.' },
   { pergunta: 'Qual a previsão de entrega do Aura Residence?', resposta: 'Entrega prevista para abril de 2029, no Centro de Criciúma/SC.' },
   { pergunta: 'O Aura Residence já iniciou as obras?', resposta: 'É um lançamento — a obra está na fase inicial. Fale com Stiven para saber a etapa atual e as condições de lançamento, normalmente as mais vantajosas.' },
   { pergunta: 'Quantos pavimentos e apartamentos tem o Aura Residence?', resposta: '17 pavimentos, com 40 apartamentos tipo e 4 coberturas duplex — 4 unidades por andar.' },

@@ -73,9 +73,12 @@ const schemaAgent = {
   description: 'Corretor de imóveis especialista em lançamentos com financiamento direto da construtora em Criciúma e Sul de Santa Catarina.',
   // email removido (2026-07-24): stivenallan.com.br não tem registro MX —
   // não recebe e-mail, então não deve ser declarado como contato aqui.
-  // hasCredential removido (2026-07-24): Gate B (validação oficial da
-  // situação cadastral do CRECI) segue aberto — nenhuma afirmação de
-  // credencial é publicada até validação. Ver PR #17.
+  // hasCredential (schema estruturado) removido (2026-07-24): Gate B
+  // (validação oficial da situação cadastral do CRECI) segue aberto.
+  // Isso NÃO remove o texto simples "CRECI 60.275" que continua visível em
+  // várias páginas do site (rodapés, /sobre, páginas de empreendimento) —
+  // só a afirmação estruturada em JSON-LD. Gate B permanece aberto até
+  // validação oficial e padronização completa. Ver PR #17.
   areaServed: [
     { '@type': 'City', name: 'Criciúma' },
     { '@type': 'City', name: 'Balneário Rincão' },

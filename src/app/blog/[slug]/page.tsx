@@ -218,7 +218,8 @@ export default async function BlogPostPage({ params }: Props) {
       '@type': 'Person',
       name: post.autor,
       jobTitle: 'Corretor de Imóveis',
-      hasCredential: 'CRECI 60.275',
+      // hasCredential removido: Gate B (validação oficial do CRECI) aberto —
+      // nenhuma afirmação estruturada de credencial até validação. Ver PR #17.
       url: 'https://stivenallan.com.br',
     },
     publisher: {

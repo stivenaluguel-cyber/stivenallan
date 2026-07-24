@@ -11,8 +11,10 @@ interface GuiaMetaProps {
 /**
  * Bloco de autoria/data/fontes visível, exibido no topo de cada guia.
  * Datas vêm do histórico real do projeto (git), nunca inventadas — ver /imprensa.
- * Não exibe CRECI: Gate B (validação oficial da situação cadastral) está
- * aberto — nenhuma afirmação de credencial até validação. Ver PR #17.
+ * Esta linha de autoria não cita CRECI (Gate B, validação oficial da situação
+ * cadastral, está aberto). Isso NÃO remove outras menções de "CRECI 60.275"
+ * que continuam no corpo dos guias (CTAs, rodapé) — Gate B permanece aberto
+ * até validação oficial e padronização completa em todo o projeto. Ver PR #17.
  */
 export default function GuiaMeta({ publishedISO, publishedLabel, updatedISO, updatedLabel, fontes = [] }: GuiaMetaProps) {
   return (

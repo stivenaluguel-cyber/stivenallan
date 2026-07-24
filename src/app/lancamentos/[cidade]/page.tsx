@@ -115,7 +115,7 @@ const CONTEUDO_POR_CIDADE: Record<
       {
         pergunta: 'Como funciona o financiamento direto da Fontana em Içara?',
         resposta:
-          'O modelo prevê entrada de 20% no ato da assinatura, saldo parcelado mensalmente com reforços anuais e correção pelo CUB/SC durante a obra, sem necessidade de aprovação bancária.',
+          'O modelo prevê entrada de 20% no ato da assinatura, saldo parcelado mensalmente com reforços anuais e correção pelo CUB/SC durante a obra, sem depender de financiamento bancário — a construtora poderá realizar análise cadastral e de capacidade de pagamento conforme suas políticas.',
       },
       {
         pergunta: 'Qual a diferença entre o Castellano e os outros dois empreendimentos em Içara?',
@@ -136,7 +136,7 @@ const CONTEUDO_POR_CIDADE: Record<
       {
         pergunta: 'Como funciona o financiamento direto da Fontana em Balneário Rincão?',
         resposta:
-          'O modelo prevê entrada de 20% no ato da assinatura, saldo parcelado mensalmente com reforços anuais e correção pelo CUB/SC durante a obra, sem necessidade de aprovação bancária.',
+          'O modelo prevê entrada de 20% no ato da assinatura, saldo parcelado mensalmente com reforços anuais e correção pelo CUB/SC durante a obra, sem depender de financiamento bancário — a construtora poderá realizar análise cadastral e de capacidade de pagamento conforme suas políticas.',
       },
       {
         pergunta: 'Os empreendimentos da Fontana em Balneário Rincão são frente mar?',
@@ -157,7 +157,7 @@ const CONTEUDO_POR_CIDADE: Record<
       {
         pergunta: 'Como funciona o financiamento direto da Fontana em Laguna?',
         resposta:
-          'O modelo prevê entrada de 20% no ato da assinatura, saldo parcelado mensalmente com reforços anuais e correção pelo CUB/SC durante a obra, sem necessidade de aprovação bancária.',
+          'O modelo prevê entrada de 20% no ato da assinatura, saldo parcelado mensalmente com reforços anuais e correção pelo CUB/SC durante a obra, sem depender de financiamento bancário — a construtora poderá realizar análise cadastral e de capacidade de pagamento conforme suas políticas.',
       },
       {
         pergunta: 'Onde ficam os empreendimentos da Fontana em Laguna?',
@@ -177,7 +177,7 @@ const CONTEUDO_POR_CIDADE: Record<
       {
         pergunta: 'Como funciona o financiamento direto da Fontana em Balneário Piçarras?',
         resposta:
-          'O modelo prevê entrada de 20% no ato da assinatura, saldo parcelado mensalmente com reforços anuais e correção pelo CUB/SC durante a obra, sem necessidade de aprovação bancária.',
+          'O modelo prevê entrada de 20% no ato da assinatura, saldo parcelado mensalmente com reforços anuais e correção pelo CUB/SC durante a obra, sem depender de financiamento bancário — a construtora poderá realizar análise cadastral e de capacidade de pagamento conforme suas políticas.',
       },
       {
         pergunta: 'Qual a previsão de entrega do Águas de Marano Residencial?',
@@ -402,7 +402,7 @@ export default async function LancamentosCidadePage({ params }: Props) {
               </div>
               <div>
                 <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Como funciona o financiamento direto da Fontana em Criciúma?</h3>
-                <p style={{ fontSize: 15, color: '#a7adb4', lineHeight: 1.7 }}>O modelo de financiamento direto prevê entrada de 20% no ato da assinatura, saldo parcelado mensalmente com reforços anuais, e correção pelo CUB/SC durante toda a obra, sem necessidade de aprovação bancária.</p>
+                <p style={{ fontSize: 15, color: '#a7adb4', lineHeight: 1.7 }}>O modelo de financiamento direto prevê entrada de 20% no ato da assinatura, saldo parcelado mensalmente com reforços anuais, e correção pelo CUB/SC durante toda a obra, sem depender de financiamento bancário — a construtora poderá realizar análise cadastral e de capacidade de pagamento conforme suas políticas.</p>
               </div>
               <div>
                 <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Qual a diferença entre comprar um lançamento na planta e um empreendimento pronto em Criciúma?</h3>

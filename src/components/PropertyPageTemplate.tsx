@@ -195,7 +195,7 @@ export default function PropertyPageTemplate({ data, relacionados }: { data: Pro
           <h2 style={{ fontFamily: t.display, fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.04em', fontSize: 'clamp(24px,3.4vw,40px)', textAlign: 'center', color: '#FFFFFF', marginBottom: 48 }}>Financiamento direto em 3 passos</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 'clamp(20px,3vw,40px)' }}>
             {[
-              { n: '01', tit: 'Entrada de 20%', txt: 'Você garante a unidade com entrada de 20% no ato do contrato, sem aprovação bancária.' },
+              { n: '01', tit: 'Entrada de 20%', txt: 'Você garante a unidade com entrada de 20% no ato do contrato, sem depender de financiamento bancário — a construtora poderá realizar análise cadastral e de capacidade de pagamento conforme suas políticas.' },
               { n: '02', tit: 'Parcelas na obra', txt: 'Até 72 parcelas mensais corrigidas pelo CUB/SC, com até 6 reforços anuais durante a construção.' },
               { n: '03', tit: 'Saldo pós-chaves', txt: 'Na entrega, o saldo pode ser financiado direto com a construtora ou por financiamento bancário.' },
             ].map((p) => (

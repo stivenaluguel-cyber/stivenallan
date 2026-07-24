@@ -121,7 +121,8 @@ export default function BlogPage() {
       '@type': 'Person',
       name: 'Stiven Allan',
       jobTitle: 'Corretor de Imóveis',
-      hasCredential: 'CRECI 60.275',
+      // hasCredential removido: Gate B (validação oficial do CRECI) aberto —
+      // nenhuma afirmação estruturada de credencial até validação. Ver PR #17.
     },
   }
 

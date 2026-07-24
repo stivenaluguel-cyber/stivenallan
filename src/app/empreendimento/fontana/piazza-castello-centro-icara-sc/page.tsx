@@ -227,7 +227,7 @@ export default function PiazzaCastelloPage() {
 
       <footer className="pc-footer">
         <p className="pc-footer-logo">Stiven Allan · Corretor de Imóveis</p>
-        <p>CRECI 60.275 · Parceiro Oficial Construtora Fontana</p>
+        <p>CRECI 60.275 · Empreendimentos Fontana em Criciúma e região</p>
         <p style={{marginTop:'.5rem'}}><a href={WA} target="_blank" rel="noopener noreferrer" style={{color:'#25D366',textDecoration:'none'}}>WhatsApp: (48) 99164-2332</a></p>
         <p style={{marginTop:'.5rem',fontSize:'.75rem'}}><a href="/" style={{color:'#666',textDecoration:'none'}}>← Ver todos os empreendimentos</a></p>
       </footer>
