@@ -147,9 +147,9 @@ const PLANTAS_GRUPOS = [
 const FAQ = [
   { pergunta: 'Como funciona o financiamento direto do Aura Residence?', resposta: 'Parcelamento direto com a construtora: 20% de entrada, reforços anuais e o saldo em parcelas mensais corrigidas pelo CUB/SC, sem depender de financiamento bancário — a construtora poderá realizar análise cadastral e de capacidade de pagamento conforme suas políticas. Há também condição com desconto para pagamento à vista. Fale com Stiven para as condições atualizadas.' },
   { pergunta: 'Qual a previsão de entrega do Aura Residence?', resposta: 'Entrega prevista para abril de 2029, no Centro de Criciúma/SC.' },
-  { pergunta: 'O Aura Residence já iniciou as obras?', resposta: 'É um lançamento — a obra está na fase inicial. Fale com Stiven para saber a etapa atual e as condições de lançamento, normalmente as mais vantajosas.' },
+  { pergunta: 'O Aura Residence já iniciou as obras?', resposta: 'É um lançamento — a obra está na fase inicial. Fale com Stiven para saber a etapa atual e as condições disponíveis conforme a tabela vigente de lançamento.' },
   { pergunta: 'Quantos pavimentos e apartamentos tem o Aura Residence?', resposta: '17 pavimentos, com 40 apartamentos tipo e 4 coberturas duplex — 4 unidades por andar.' },
-  { pergunta: 'Quem é a construtora do Aura Residence?', resposta: 'Eraldo Construções, com atuação em Tubarão, Criciúma, Laguna, Imbituba e Balneário Rincão. Stiven Allan atende como corretor parceiro para este e outros lançamentos da Eraldo.' },
+  { pergunta: 'Quem é a construtora do Aura Residence?', resposta: 'Eraldo Construções, com atuação em Tubarão, Criciúma, Laguna, Imbituba e Balneário Rincão. Stiven Allan comercializa empreendimentos da Eraldo na região.' },
 ]
 
 export default function AuraResidencePage() {
@@ -442,7 +442,7 @@ export default function AuraResidencePage() {
             {[
               { n: '01', titulo: 'Escolha a sua unidade', desc: 'Conheça as plantas disponíveis e reserve a unidade ideal para o seu momento.' },
               { n: '02', titulo: 'Simulação personalizada', desc: 'Stiven estrutura as condições de pagamento com a construtora, de acordo com o seu perfil.' },
-              { n: '03', titulo: 'Contrato direto', desc: 'Documentação simplificada, sem intermediários.' },
+              { n: '03', titulo: 'Contrato com a construtora', desc: 'Revise a documentação e as condições contratuais antes de assinar.' },
             ].map(({ n, titulo, desc }) => (
               <div key={n} style={{ display: 'flex', gap: 24, alignItems: 'flex-start' }}>
                 <span style={{ fontFamily: 'var(--font-bricolage), system-ui, sans-serif', fontSize: 36, fontWeight: 300, color: 'rgba(156,95,46,0.25)', lineHeight: 1, flexShrink: 0, width: 48 }}>{n}</span>
