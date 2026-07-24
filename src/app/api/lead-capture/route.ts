@@ -4,6 +4,7 @@ import { normalizeEmail, normalizePhone, normalizeString } from '@/lib/leads/nor
 import { extractIp, isBotSubmission } from '@/lib/leads/anti-spam'
 import { checkRateLimit } from '@/lib/leads/rate-limit'
 import { logError, logWarn } from '@/lib/log'
+import { confirmarRecebimentoLead } from '@/lib/leads/confirmar-recebimento-lead'
 
 export const dynamic = 'force-dynamic'
 
@@ -86,6 +87,12 @@ export async function POST(req: NextRequest) {
     if (error) {
       logError(SOURCE, 'supabase insert failed', error)
       return NextResponse.json({ error: 'Erro ao salvar lead' }, { status: 500 })
+    }
+
+    try {
+      await confirmarRecebimentoLead({ nome, email, propertyName })
+    } catch (confirmErr) {
+      logError(SOURCE, 'falha ao confirmar recebimento ao lead', confirmErr)
     }
 
     return NextResponse.json({ id: data?.id }, { status: 201 })

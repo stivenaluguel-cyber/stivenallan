@@ -4,6 +4,7 @@ import { normalizeEmail, normalizePhone, normalizeString } from '@/lib/leads/nor
 import { extractIp, isBotSubmission } from '@/lib/leads/anti-spam'
 import { checkRateLimit } from '@/lib/leads/rate-limit'
 import { notificarNovoLead } from '@/lib/leads/notificar-novo-lead'
+import { confirmarRecebimentoLead } from '@/lib/leads/confirmar-recebimento-lead'
 import { logError, logWarn } from '@/lib/log'
 
 export const dynamic = 'force-dynamic'
@@ -139,6 +140,11 @@ export async function POST(req: NextRequest) {
       await notificarNovoLead({ nome, whatsapp, email, propertyName: resolvedPropertyName })
     } catch (notifyErr) {
       logError(SOURCE, 'falha ao notificar novo lead', notifyErr)
+    }
+    try {
+      await confirmarRecebimentoLead({ nome, email, propertyName: resolvedPropertyName })
+    } catch (confirmErr) {
+      logError(SOURCE, 'falha ao confirmar recebimento ao lead', confirmErr)
     }
 
     return NextResponse.json({ success: true, id: data?.id ?? null }, { status: 201 })
