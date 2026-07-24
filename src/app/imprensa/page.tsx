@@ -7,16 +7,16 @@ const CONTATO_EMAIL = 'contato@stivenallan.com.br'
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20sou%20jornalista%2Feditor%20e%20gostaria%20de%20falar%20sobre%20uma%20pauta.'
 
 export const metadata: Metadata = {
-  title: 'Imprensa — Stiven Allan',
+  title: 'Imprensa',
   description: 'Informações para imprensa: quem é Stiven Allan, áreas sobre as quais pode comentar, contato editorial e política de correção dos conteúdos publicados neste site.',
   alternates: { canonical: CANONICAL },
   openGraph: {
-    title: 'Imprensa — Stiven Allan',
+    title: 'Imprensa | Stiven Allan',
     description: 'Informações para imprensa, contato editorial e política de correção de conteúdo.',
     url: CANONICAL,
     type: 'profile',
   },
-  twitter: { card: 'summary_large_image', title: 'Imprensa — Stiven Allan' },
+  twitter: { card: 'summary_large_image', title: 'Imprensa | Stiven Allan' },
 }
 
 const SCHEMA = {
