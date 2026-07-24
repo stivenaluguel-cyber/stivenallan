@@ -293,7 +293,7 @@ export default async function HomePage() {
           <p className="home-eyebrow" style={{ color: t.champagne, marginBottom: 24 }}>Próximo passo</p>
           <h2 className="home-serif" style={{ color: t.onDark, fontSize: 'clamp(32px,5.5vw,60px)', fontStyle: 'italic', fontWeight: 300, letterSpacing: '0.01em', lineHeight: 1.15 }}>Seu próximo investimento começa aqui.</h2>
           <p className="home-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(16px,1.9vw,21px)', margin: '24px 0 40px', lineHeight: 1.65 }}>
-            Empreendimentos que valorizam antes mesmo das chaves. Fale com Stiven e descubra como fazer seu capital trabalhar com inteligência.
+            Empreendimentos com potencial de valorização já durante a obra, conforme o mercado e a fase de cada lançamento — sem garantia de retorno. Fale com Stiven e descubra como avaliar cada oportunidade.
           </p>
           <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
             <a href={WPP_MSG} data-wpp="1" target="_blank" rel="noopener noreferrer" className="home-btn" style={{ background: t.champagne, borderColor: t.champagne, color: t.ink }}>Falar com Stiven</a>

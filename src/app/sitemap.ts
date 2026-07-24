@@ -41,6 +41,7 @@ export function buildSitemap(ativos: ImovelVitrine[]): MetadataRoute.Sitemap {
     { url: SITE_URL, changeFrequency: 'weekly', priority: 1 },
     { url: SITE_URL + '/empreendimentos', changeFrequency: 'weekly', priority: 0.9 },
     { url: SITE_URL + '/sobre', changeFrequency: 'monthly', priority: 0.5 },
+    { url: SITE_URL + '/imprensa', changeFrequency: 'monthly', priority: 0.5 },
     { url: SITE_URL + '/contato', changeFrequency: 'monthly', priority: 0.5 },
     { url: SITE_URL + '/politica-de-privacidade', changeFrequency: 'yearly', priority: 0.3 },
   ]

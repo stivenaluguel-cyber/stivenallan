@@ -1,10 +1,18 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { SITE_URL } from '@/lib/site'
+import GuiaMeta from '@/components/GuiaMeta'
 
 const SLUG = 'apartamento-na-planta-vs-pronto'
 const CANONICAL = `${SITE_URL}/guia/${SLUG}`
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20quero%20entender%20a%20diferen%C3%A7a%20entre%20comprar%20na%20planta%20e%20pronto.'
+
+// Datas reais (git log --follow): criação 2026-07-08. dateModified 2026-07-24
+// porque autoria/datas e ressalva de tabela vigente foram adicionadas hoje (Gate A).
+const PUBLISHED_ISO = '2026-07-08'
+const PUBLISHED_LABEL = '08/07/2026'
+const UPDATED_ISO = '2026-07-24'
+const UPDATED_LABEL = '24/07/2026'
 
 export const metadata: Metadata = {
   title: 'Apartamento na Planta vs. Pronto: Qual Comprar?',
@@ -25,6 +33,8 @@ export const metadata: Metadata = {
                             headline: 'Apartamento na Planta vs. Pronto: Vantagens e Diferenças Reais',
                             description: 'Comparação factual entre comprar um apartamento na planta e um imóvel pronto na região Sul de Santa Catarina.',
                             url: CANONICAL,
+                            datePublished: PUBLISHED_ISO,
+                            dateModified: UPDATED_ISO,
                             author: { '@type': 'Person', name: 'Stiven Allan', url: SITE_URL },
                             publisher: { '@type': 'Organization', name: 'Stiven Allan Imoveis', url: SITE_URL },
                             }
@@ -101,6 +111,14 @@ export const metadata: Metadata = {
 
                             {/* CONTEÚDO */}
                             <article style={{ maxWidth: 800, margin: '0 auto', padding: 'clamp(48px,8vh,96px) clamp(18px,5vw,64px)' }}>
+
+                            <GuiaMeta
+                              publishedISO={PUBLISHED_ISO}
+                              publishedLabel={PUBLISHED_LABEL}
+                              updatedISO={UPDATED_ISO}
+                              updatedLabel={UPDATED_LABEL}
+                              fontes={['Entrada, desconto e prazos por empreendimento: tabela vigente informada pela Construtora Fontana, sujeita a alteração']}
+                            />
 
                             <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Os estágios reais dos empreendimentos da região</h2>
                             <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>

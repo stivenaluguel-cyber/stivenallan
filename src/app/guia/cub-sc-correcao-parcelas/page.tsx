@@ -1,10 +1,18 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { SITE_URL } from '@/lib/site'
+import GuiaMeta from '@/components/GuiaMeta'
 
 const SLUG = 'cub-sc-correcao-parcelas'
 const CANONICAL = `${SITE_URL}/guia/${SLUG}`
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20quero%20entender%20como%20o%20CUB%2FSC%20afeta%20minhas%20parcelas.'
+
+// Datas reais (git log --follow): criação 2026-07-02. dateModified 2026-07-24
+// porque autoria/datas foram adicionadas hoje (Gate A).
+const PUBLISHED_ISO = '2026-07-02'
+const PUBLISHED_LABEL = '02/07/2026'
+const UPDATED_ISO = '2026-07-24'
+const UPDATED_LABEL = '24/07/2026'
 
 const CUB_JUNHO_2026 = 3096.25
 const CUB_VALOR = 3121.62
@@ -30,6 +38,8 @@ const SCHEMA = {
   headline: 'CUB/SC e Correção de Parcelas no Financiamento Direto',
   description: 'Guia completo sobre o CUB/SC e como ele afeta as parcelas do financiamento direto em Criciuma/SC.',
   url: CANONICAL,
+  datePublished: PUBLISHED_ISO,
+  dateModified: UPDATED_ISO,
   author: { '@type': 'Person', name: 'Stiven Allan', url: SITE_URL },
   publisher: { '@type': 'Organization', name: 'Stiven Allan Imoveis', url: SITE_URL },
 }
@@ -99,6 +109,14 @@ export default function GuiaCubScPage() {
 
       {/* CONTEÚDO */}
       <article style={{ maxWidth: 800, margin: '0 auto', padding: 'clamp(48px,8vh,96px) clamp(18px,5vw,64px)' }}>
+
+      <GuiaMeta
+        publishedISO={PUBLISHED_ISO}
+        publishedLabel={PUBLISHED_LABEL}
+        updatedISO={UPDATED_ISO}
+        updatedLabel={UPDATED_LABEL}
+        fontes={[<>CUB/SC: <a href="https://www.sindusconcriciuma.com.br/" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>Sinduscon Sul Catarinense</a></>]}
+      />
 
       <p style={{ background: '#FFF4CC', border: '1px solid #E0C04C', borderRadius: 2, padding: '16px 20px', margin: '0 0 32px', fontSize: 15, lineHeight: 1.6, color: '#333', fontWeight: 600 }}>{`CUB/SC residencial em ${CUB_MES}: R$ ${CUB_VALOR.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}/m² (variação mensal de ${CUB_VARIACAO}). Fonte: Sinduscon/SC. Valor de referência — consulte sempre o índice do mês vigente.`}</p>
 

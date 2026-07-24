@@ -1,10 +1,18 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { SITE_URL } from '@/lib/site'
+import GuiaMeta from '@/components/GuiaMeta'
 
 const SLUG = 'comprar-apartamento-na-planta-criciuma'
 const CANONICAL = `${SITE_URL}/guia/${SLUG}`
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20quero%20saber%20mais%20sobre%20apartamentos%20na%20planta%20em%20Crici%C3%BAma.'
+
+// Datas reais (git log --follow): criação 2026-07-02. dateModified 2026-07-24
+// porque o conteúdo foi revisado hoje (correção de claims absolutos).
+const PUBLISHED_ISO = '2026-07-02'
+const PUBLISHED_LABEL = '02/07/2026'
+const UPDATED_ISO = '2026-07-24'
+const UPDATED_LABEL = '24/07/2026'
 
 export const metadata: Metadata = {
     title: 'Comprar Apartamento na Planta em Criciúma',
@@ -25,6 +33,8 @@ const SCHEMA = {
   headline: 'Como Comprar Apartamento na Planta em Criciúma/SC',
   description: 'Guia completo para comprar apartamento na planta em Criciúma/SC com financiamento direto Fontana.',
   url: CANONICAL,
+  datePublished: PUBLISHED_ISO,
+  dateModified: UPDATED_ISO,
   author: { '@type': 'Person', name: 'Stiven Allan', url: SITE_URL },
   publisher: { '@type': 'Organization', name: 'Stiven Allan Imoveis', url: SITE_URL },
 }
@@ -46,7 +56,7 @@ const FAQ_SCHEMA = {
     {
       '@type': 'Question',
       name: 'É seguro comprar na planta em Criciúma?',
-      acceptedAnswer: { '@type': 'Answer', text: 'Sim, desde que a construtora seja registrada no CRECI, o empreendimento esteja registrado em cartório e o contrato seja registrado. A Construtora Fontana atua há décadas na região sul catarinense com histórico de entregas.' },
+      acceptedAnswer: { '@type': 'Answer', text: 'A segurança da compra depende de fatores verificáveis: o empreendimento deve estar registrado em cartório (incorporação) e o contrato deve ser registrado, com cláusulas claras de correção, prazo e multa por atraso. Verifique o histórico de entregas da construtora antes de decidir, independentemente de quem for.' },
     },
     {
       '@type': 'Question',
@@ -91,12 +101,20 @@ export default function GuiaComprarNaPlantaPage() {
       {/* CONTEÚDO */}
       <article style={{ maxWidth: 800, margin: '0 auto', padding: 'clamp(48px,8vh,96px) clamp(18px,5vw,64px)' }}>
 
+        <GuiaMeta
+          publishedISO={PUBLISHED_ISO}
+          publishedLabel={PUBLISHED_LABEL}
+          updatedISO={UPDATED_ISO}
+          updatedLabel={UPDATED_LABEL}
+          fontes={['Condições comerciais: tabela vigente informada pela Construtora Fontana, sujeita a alteração']}
+        />
+
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Por que comprar na planta em Criciúma?</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-          Comprar na planta permite pagar o imóvel em parcelas menores durante a obra, com possibilidade de ganho de valorização até a entrega. Em Criciúma, os empreendimentos Fontana têm entregado imóveis com valorização relevante em relação ao preço de lançamento. Além disso, o financiamento direto da Fontana dispensa aprovação bancária, o que agiliza muito o processo de aquisição.
+          Comprar na planta permite pagar o imóvel em parcelas menores durante a obra, com potencial de valorização até a entrega — a tabela de venda costuma subir a cada fase da obra concluída, mas essa valorização não é garantida e depende do mercado, da região e do momento da compra. Além disso, a negociação do financiamento direto da Fontana é feita diretamente com a construtora, sem depender de banco — a construtora poderá realizar sua própria análise cadastral e de capacidade de pagamento, conforme suas políticas.
         </p>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
-          Criciúma é o maior polo econômico do sul catarinense, com mercado imobiliário aquecido e crescente demanda por apartamentos modernos. A Construtora Fontana, com décadas de atuação na região, é a principal construtora com lançamentos em vários bairros da cidade e no litoral sul catarinense.
+          Criciúma é o maior polo econômico do sul catarinense, com mercado imobiliário aquecido e demanda por apartamentos modernos. A Construtora Fontana é uma das principais construtoras com lançamentos em vários bairros da cidade e no litoral sul catarinense.
         </p>
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Etapas para comprar na planta</h2>
