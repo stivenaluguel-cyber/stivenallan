@@ -1,10 +1,18 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { SITE_URL } from '@/lib/site'
+import GuiaMeta from '@/components/GuiaMeta'
 
 const SLUG = 'financiamento-direto-vs-bancario'
 const CANONICAL = `${SITE_URL}/guia/${SLUG}`
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20quero%20entender%20a%20diferen%C3%A7a%20entre%20financiamento%20direto%20e%20banc%C3%A1rio.'
+
+// Datas reais (git log --follow): criação 2026-07-08. dateModified 2026-07-24
+// porque o conteúdo foi revisado hoje (correção de claims absolutos).
+const PUBLISHED_ISO = '2026-07-08'
+const PUBLISHED_LABEL = '08/07/2026'
+const UPDATED_ISO = '2026-07-24'
+const UPDATED_LABEL = '24/07/2026'
 
 export const metadata: Metadata = {
   title: 'Financiamento Direto vs. Bancário: Qual Escolher?',
@@ -25,6 +33,8 @@ export const metadata: Metadata = {
                             headline: 'Financiamento Direto vs. Financiamento Bancário',
                             description: 'Comparação factual entre o financiamento direto com a construtora e o financiamento bancário tradicional.',
                             url: CANONICAL,
+                            datePublished: PUBLISHED_ISO,
+                            dateModified: UPDATED_ISO,
                             author: { '@type': 'Person', name: 'Stiven Allan', url: SITE_URL },
                             publisher: { '@type': 'Organization', name: 'Stiven Allan Imoveis', url: SITE_URL },
                             }
@@ -51,7 +61,7 @@ export const metadata: Metadata = {
                             {
                             '@type': 'Question',
                             name: 'Posso usar FGTS no financiamento direto com a construtora?',
-                            acceptedAnswer: { '@type': 'Answer', text: 'No financiamento direto com a Fontana, não ha necessidade de usar o FGTS durante a obra. O financiamento bancário, por outro lado, permite o uso do FGTS para compor a entrada ou amortizar o saldo devedor.' },
+                            acceptedAnswer: { '@type': 'Answer', text: 'Durante a obra, o financiamento direto com a Fontana não usa FGTS. No financiamento bancário, o uso do FGTS para compor a entrada ou amortizar o saldo devedor pode ser possível, sujeito às regras vigentes, à elegibilidade do comprador, do imóvel e à aprovação da instituição financeira — consulte a Caixa Econômica Federal ou o agente operador.' },
                             },
                             {
                             '@type': 'Question',
@@ -102,9 +112,21 @@ export const metadata: Metadata = {
                             {/* CONTEÚDO */}
                             <article style={{ maxWidth: 800, margin: '0 auto', padding: 'clamp(48px,8vh,96px) clamp(18px,5vw,64px)' }}>
 
+                            <GuiaMeta
+                              publishedISO={PUBLISHED_ISO}
+                              publishedLabel={PUBLISHED_LABEL}
+                              updatedISO={UPDATED_ISO}
+                              updatedLabel={UPDATED_LABEL}
+                              fontes={[
+                                'Sistemas e taxas das construtoras terceiras (Corbetta, Locks, Giassi, Perego) informados pelas próprias construtoras e sujeitos a alteração — confirme diretamente antes de decidir',
+                                <>FGTS: <a href="https://www.caixa.gov.br/voce/habitacao/Paginas/utilizacao-fgts.aspx" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>Caixa Econômica Federal</a></>,
+                                <>IOF em crédito habitacional: <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del2407.htm" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>Decreto-Lei 2.407/1988</a></>,
+                              ]}
+                            />
+
                             <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>O que é o financiamento direto com a construtora?</h2>
                             <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-                            No financiamento direto, o comprador paga o imóvel diretamente a construtora, sem passar por banco e sem análise de crédito ou de renda. No modelo padrão da Construtora Fontana, a entrada corresponde a 20% do valor do imóvel, paga no ato da assinatura do contrato. O saldo é dividido em até 72 parcelas mensais e até 6 reforços anuais, sendo que cada reforço equivale a 5 vezes o valor da parcela mensal.
+                            No financiamento direto, a negociação ocorre diretamente com a construtora, sem depender de financiamento bancário. A construtora poderá realizar análise cadastral e de capacidade de pagamento conforme suas políticas. No modelo padrão da Construtora Fontana, a entrada corresponde a 20% do valor do imóvel, paga no ato da assinatura do contrato. O saldo é dividido em até 72 parcelas mensais e até 6 reforços anuais, sendo que cada reforço equivale a 5 vezes o valor da parcela mensal. Condições, aprovação, entrada, parcelas, índices e prazos variam por empreendimento e tabela vigente.
                             </p>
                             <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
                             Durante a obra, as parcelas são corrigidas mensalmente pelo CUB/SC (Custo Unitário Básico do Sinduscon-SC). Após a entrega das chaves, o saldo remanescente pode ser financiado diretamente com a construtora, corrigido por IGPM + 0,75% a.m., em prazos de até 180 ou 240 meses, conforme o empreendimento.
@@ -112,10 +134,10 @@ export const metadata: Metadata = {
 
                             <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>O que é o financiamento bancário tradicional?</h2>
                             <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-                            No financiamento bancário, o banco analisa a renda e o historico de crédito do comprador antes de aprovar o contrato. O cálculo das parcelas segue sistemas de juros compostos, geralmente pelas tabelas Price ou SAC. Diferente do financiamento direto, o financiamento bancário permite o uso do FGTS para composição da entrada ou amortização do saldo devedor.
+                            No financiamento bancário, o banco analisa a renda e o historico de crédito do comprador antes de aprovar o contrato. O cálculo das parcelas segue sistemas de juros compostos, geralmente pelas tabelas Price ou SAC. O uso do FGTS para composição da entrada ou amortização do saldo devedor pode ser possível no financiamento bancário, sujeito às regras vigentes, à elegibilidade do comprador, do imóvel e à aprovação da instituição financeira.
                             </p>
                             <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
-                            Por outro lado, o financiamento bancário envolve custos que não existem no financiamento direto com a construtora, como IOF, tarifa de abertura de crédito e, em muitos casos, seguro obrigatório embutido na prestação mensal.
+                            Os custos, seguros e tarifas variam conforme a modalidade, a instituição e o contrato. Compare o Custo Efetivo Total (CET) e confirme cada item na minuta contratual antes de decidir.
                             </p>
 
                             <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Três sistemas de cálculo: SPC-JS, Price e SAC</h2>
@@ -164,20 +186,20 @@ export const metadata: Metadata = {
                             <div style={{ background: '#FBEEE2', padding: 24, borderRadius: 2 }}>
                             <h3 style={{ fontSize: 14, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#C1682E', marginTop: 0 }}>Financiamento Direto</h3>
                             <ul style={{ fontSize: 14, lineHeight: 2, color: '#333', paddingLeft: 20, margin: 0 }}>
-                            <li>Sem aprovação bancária nem análise de renda</li>
-                            <li>Sem IOF e sem tarifa de abertura de crédito</li>
+                            <li>Sem financiamento bancário — a construtora faz sua própria análise cadastral e de capacidade de pagamento</li>
+                            <li>Custos e encargos variam por contrato — confirme cada item na minuta antes de assinar</li>
                             <li>Negociação direta com a construtora</li>
                             <li>Parcelas corrigidas pelo CUB/SC podem subir mês a mês</li>
-                            <li>Não ha uso de FGTS durante a obra</li>
+                            <li>Não há uso de FGTS durante a obra</li>
                             </ul>
                             </div>
                             <div style={{ background: '#F0F0F0', padding: 24, borderRadius: 2 }}>
                             <h3 style={{ fontSize: 14, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#555', marginTop: 0 }}>Financiamento Bancário</h3>
                             <ul style={{ fontSize: 14, lineHeight: 2, color: '#333', paddingLeft: 20, margin: 0 }}>
-                            <li>Permite uso do FGTS na entrada ou amortização</li>
+                            <li>Uso do FGTS na entrada ou amortização pode ser possível, sujeito às regras vigentes e à aprovação da instituição financeira</li>
                             <li>Taxas contratuais fixas (Price/SAC), sem correção pelo CUB</li>
                             <li>Exige aprovação de crédito e comprovação de renda</li>
-                            <li>Incide IOF, tarifas e, em muitos casos, seguro obrigatório</li>
+                            <li>Custos e encargos variam por contrato e instituição — confirme cada item na minuta antes de assinar</li>
                             <li>Juros compostos podem elevar o custo total conforme o prazo</li>
                             </ul>
                             </div>
@@ -185,7 +207,7 @@ export const metadata: Metadata = {
 
                             <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Qual modelo escolher?</h2>
                             <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-                            A escolha depende do perfil do comprador. Quem ainda não tem aprovação bancária ou busca agilidade tende a se beneficiar do financiamento direto durante a obra, como o modelo praticado pela Fontana, Corbetta e Locks. Quem ja tem FGTS disponível e prefere uma taxa contratual fixa pode considerar o financiamento bancário, seja no momento da compra ou após a entrega das chaves, quando o saldo remanescente do financiamento direto também pode ser substituido por um financiamento bancário convencional.
+                            A escolha depende do perfil do comprador. Quem busca agilidade ou prefere não depender de um banco tende a considerar o financiamento direto durante a obra, como o modelo praticado pela Fontana, Corbetta e Locks — sempre sujeito à análise cadastral da construtora. Quem ja tem FGTS disponível e prefere uma taxa contratual fixa pode considerar o financiamento bancário, seja no momento da compra ou após a entrega das chaves, quando o saldo remanescente do financiamento direto também pode ser substituido por um financiamento bancário convencional.
                             </p>
                             <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
                             Empreendimentos como o <Link href="/empreendimento/fontana/bellante-comerciario-criciuma-sc" style={{ color: '#C1682E' }}>Bellante Residencial</Link>, com plano de 2 reforços anuais e 60 parcelas mensais, o <Link href="/empreendimento/fontana/thiene-centro-criciuma-sc" style={{ color: '#C1682E' }}>Thiene Residencial</Link>, com entrada reduzida de 10%, e o <Link href="/empreendimento/fontana/pavia-rio-maina-criciuma-sc" style={{ color: '#C1682E' }}>Pavia Residencial</Link>, ja pronto e com entrada de 15%, mostram como as condições variam conforme o estagio e o plano de cada lancamento. Fale com Stiven Allan, CRECI 60.275, para simular o cenário mais adequado ao seu perfil.

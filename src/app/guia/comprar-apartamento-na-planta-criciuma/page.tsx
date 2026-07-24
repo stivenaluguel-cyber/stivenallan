@@ -1,10 +1,18 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { SITE_URL } from '@/lib/site'
+import GuiaMeta from '@/components/GuiaMeta'
 
 const SLUG = 'comprar-apartamento-na-planta-criciuma'
 const CANONICAL = `${SITE_URL}/guia/${SLUG}`
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20quero%20saber%20mais%20sobre%20apartamentos%20na%20planta%20em%20Crici%C3%BAma.'
+
+// Datas reais (git log --follow): criação 2026-07-02. dateModified 2026-07-24
+// porque o conteúdo foi revisado hoje (correção de claims absolutos).
+const PUBLISHED_ISO = '2026-07-02'
+const PUBLISHED_LABEL = '02/07/2026'
+const UPDATED_ISO = '2026-07-24'
+const UPDATED_LABEL = '24/07/2026'
 
 export const metadata: Metadata = {
     title: 'Comprar Apartamento na Planta em Criciúma',
@@ -25,6 +33,8 @@ const SCHEMA = {
   headline: 'Como Comprar Apartamento na Planta em Criciúma/SC',
   description: 'Guia completo para comprar apartamento na planta em Criciúma/SC com financiamento direto Fontana.',
   url: CANONICAL,
+  datePublished: PUBLISHED_ISO,
+  dateModified: UPDATED_ISO,
   author: { '@type': 'Person', name: 'Stiven Allan', url: SITE_URL },
   publisher: { '@type': 'Organization', name: 'Stiven Allan Imoveis', url: SITE_URL },
 }
@@ -46,12 +56,12 @@ const FAQ_SCHEMA = {
     {
       '@type': 'Question',
       name: 'É seguro comprar na planta em Criciúma?',
-      acceptedAnswer: { '@type': 'Answer', text: 'Sim, desde que a construtora seja registrada no CRECI, o empreendimento esteja registrado em cartório e o contrato seja registrado. A Construtora Fontana atua há décadas na região sul catarinense com histórico de entregas.' },
+      acceptedAnswer: { '@type': 'Answer', text: 'A segurança da compra depende de fatores verificáveis: antes de comercializar as unidades, a incorporação deve estar registrada no cartório de registro de imóveis (memorial de incorporação, conforme o art. 32 da Lei 4.591/1964), e o contrato deve trazer cláusulas claras de correção, prazo e multa por atraso. Verifique o histórico de entregas da construtora antes de decidir, independentemente de quem for.' },
     },
     {
       '@type': 'Question',
       name: 'Como funciona o pagamento de apartamento na planta?',
-      acceptedAnswer: { '@type': 'Answer', text: 'No financiamento direto Fontana: entrada de 20% no ato, saldo dividido em parcelas mensais e reforços anuais, todos corrigidos pelo CUB/SC durante a obra. Sem necessidade de aprovação bancária.' },
+      acceptedAnswer: { '@type': 'Answer', text: 'No financiamento direto Fontana: entrada de 20% no ato, saldo dividido em parcelas mensais e reforços anuais, todos corrigidos pelo CUB/SC durante a obra. Sem depender de financiamento bancário; a construtora poderá realizar análise cadastral e de capacidade de pagamento conforme suas políticas, e a aprovação não é automática.' },
     },
     {
       '@type': 'Question',
@@ -91,19 +101,31 @@ export default function GuiaComprarNaPlantaPage() {
       {/* CONTEÚDO */}
       <article style={{ maxWidth: 800, margin: '0 auto', padding: 'clamp(48px,8vh,96px) clamp(18px,5vw,64px)' }}>
 
+        <GuiaMeta
+          publishedISO={PUBLISHED_ISO}
+          publishedLabel={PUBLISHED_LABEL}
+          updatedISO={UPDATED_ISO}
+          updatedLabel={UPDATED_LABEL}
+          fontes={[
+            <>CUB/SC (série histórica compilada, não é fonte oficial primária): <a href="https://www.senge-sc.org.br/tabela-do-cub/" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>Tabela do CUB — SENGE-SC</a></>,
+            'Condições comerciais: tabela vigente informada pela Construtora Fontana, sujeita a alteração',
+            <>Registro de incorporação: <a href="https://www.planalto.gov.br/ccivil_03/leis/l4591compilado.htm" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>Lei 4.591/1964, art. 32</a></>,
+          ]}
+        />
+
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Por que comprar na planta em Criciúma?</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-          Comprar na planta permite pagar o imóvel em parcelas menores durante a obra, com possibilidade de ganho de valorização até a entrega. Em Criciúma, os empreendimentos Fontana têm entregado imóveis com valorização relevante em relação ao preço de lançamento. Além disso, o financiamento direto da Fontana dispensa aprovação bancária, o que agiliza muito o processo de aquisição.
+          Comprar na planta permite pagar o imóvel em parcelas menores durante a obra, com potencial de valorização até a entrega — a tabela de venda costuma subir a cada fase da obra concluída, mas essa valorização não é garantida e depende do mercado, da região e do momento da compra. Além disso, a negociação do financiamento direto da Fontana é feita diretamente com a construtora, sem depender de banco — a construtora poderá realizar sua própria análise cadastral e de capacidade de pagamento, conforme suas políticas.
         </p>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
-          Criciúma é o maior polo econômico do sul catarinense, com mercado imobiliário aquecido e crescente demanda por apartamentos modernos. A Construtora Fontana, com décadas de atuação na região, é a principal construtora com lançamentos em vários bairros da cidade e no litoral sul catarinense.
+          Criciúma é o maior polo econômico do sul catarinense, com mercado imobiliário aquecido e demanda por apartamentos modernos. A Construtora Fontana é uma das principais construtoras com lançamentos em vários bairros da cidade e no litoral sul catarinense.
         </p>
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Etapas para comprar na planta</h2>
         <ol style={{ fontSize: 15, lineHeight: 2.2, color: '#333', paddingLeft: 24 }}>
           <li><strong>Escolha o empreendimento:</strong> Verifique a localização, a construtora, a tipologia e a previsão de entrega do imóvel. Em Criciúma e no Sul Catarinense, os lançamentos Fontana vão de bairros como Michel e Centro até empreendimentos de veraneio no litoral. Compare a planta, o padrão de acabamento e a data prevista de conclusão antes de decidir.</li>
-          <li><strong>Conheça o plano de financiamento:</strong> O plano padrão Fontana tem entrada de 20%, até 72 parcelas mensais corrigidas pelo CUB/SC e até 6 reforços anuais. Cada reforço anual equivale a 5 parcelas mensais. Como o financiamento é direto com a construtora, não há necessidade de aprovação bancária, o que agiliza o processo.</li>
-          <li><strong>Analise o contrato (reserva):</strong> Feita a reserva da unidade, analise o contrato com atenção antes de assinar. O contrato deve ser registrado em cartório para sua proteção jurídica e precisa trazer a cláusula de correção pelo CUB/SC, o prazo de entrega e a tolerância previstos. Confira também a especificação técnica do acabamento.</li>
+          <li><strong>Conheça o plano de financiamento:</strong> O plano padrão Fontana tem entrada de 20%, até 72 parcelas mensais corrigidas pelo CUB/SC e até 6 reforços anuais. Cada reforço anual equivale a 5 parcelas mensais. Sem depender de financiamento bancário; a construtora poderá realizar análise cadastral e de capacidade de pagamento conforme suas políticas, e a aprovação não é automática.</li>
+          <li><strong>Analise o contrato (reserva):</strong> Feita a reserva da unidade, analise o contrato com atenção antes de assinar. Confirme que a incorporação está registrada no cartório de registro de imóveis (memorial de incorporação, art. 32 da Lei 4.591/1964) e que o contrato traz a cláusula de correção pelo CUB/SC, o prazo de entrega e a tolerância previstos. Confira também a especificação técnica do acabamento.</li>
           <li><strong>Pague a entrada:</strong> A entrada corresponde a 20% do valor do imóvel e é paga no ato da assinatura do contrato. Num apartamento de R$ 500.000, por exemplo, isso equivale a R$ 100.000. É esse pagamento inicial que garante a reserva da unidade escolhida.</li>
           <li><strong>Pague as parcelas durante a obra:</strong> Durante a construção, você paga parcelas mensais corrigidas pelo CUB/SC, além dos reforços anuais equivalentes a 5 parcelas cada. As parcelas menores durante a obra são uma das principais vantagens de comprar na planta. O saldo de 80% é diluído ao longo de até 72 meses.</li>
           <li><strong>Receba as chaves:</strong> Concluída a obra, faça a vistoria da unidade, confirme se o acabamento corresponde a especificação do contrato e assine o auto de entrega. É o momento de checar todos os itens antes de receber o imóvel. Eventuais ajustes devem ser registrados na própria vistoria.</li>
@@ -112,7 +134,7 @@ export default function GuiaComprarNaPlantaPage() {
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Como funciona o financiamento direto na planta?</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-          O plano padrão Fontana divide o pagamento em entrada de 20%, até 72 parcelas mensais corrigidas pelo CUB/SC e até 6 reforços anuais (cada reforço equivale a 5 parcelas mensais). Não é necessário aprovação bancária.
+          O plano padrão Fontana divide o pagamento em entrada de 20%, até 72 parcelas mensais corrigidas pelo CUB/SC e até 6 reforços anuais (cada reforço equivale a 5 parcelas mensais). Sem depender de financiamento bancário; a construtora poderá realizar análise cadastral e de capacidade de pagamento conforme suas políticas, e a aprovação não é automática.
         </p>
         <div style={{ background: '#F0F7F0', borderRadius: 2, padding: '24px 28px', margin: '24px 0' }}>
           <p style={{ fontSize: 14, fontWeight: 600, color: '#1A5C3A', marginTop: 0, marginBottom: 8 }}>Exemplo: apartamento de R$ 500.000</p>
@@ -125,7 +147,7 @@ export default function GuiaComprarNaPlantaPage() {
           </ul>
         </div>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-          O CUB/SC (Custo Unitário Básico do Sinduscon-SC) corrige as parcelas todo mês. Em junho de 2026, o CUB/SC estava em R$ 3.096,25/m2. A variação histórica fica entre 0,4% e 0,8% ao mês.
+          O CUB/SC (Custo Unitário Básico do Sinduscon-SC) corrige as parcelas todo mês. Em junho de 2026, o CUB/SC estava em R$ 3.121,62/m2 (alta de 0,82% frente a maio/2026, quando estava em R$ 3.096,25/m2). A variação muda mês a mês — consulte a série histórica para o valor real de cada período, não uma média fixa.
         </p>
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Principais bairros e regiões com lançamentos em Criciúma</h2>
@@ -146,7 +168,7 @@ export default function GuiaComprarNaPlantaPage() {
             <ul style={{ fontSize: 14, lineHeight: 2, color: '#333', paddingLeft: 20, margin: 0 }}>
               <li>Preço de lançamento geralmente menor</li>
               <li>Parcelas menores durante a obra</li>
-              <li>Sem aprovação bancária (financiamento direto)</li>
+              <li>Sem depender de banco (financiamento direto) — a construtora pode fazer sua própria análise cadastral</li>
               <li>Possibilidade de personalização do acabamento</li>
               <li>Potencial de valorização até a entrega</li>
             </ul>
@@ -157,7 +179,7 @@ export default function GuiaComprarNaPlantaPage() {
               <li>Parcelas corrigidas pelo CUB/SC podem subir</li>
               <li>Prazo de entrega pode ser prorrogado</li>
               <li>Não dá para morar durante a obra</li>
-              <li>Verificar registro do contrato em cartório</li>
+              <li>Verificar o registro da incorporação/memorial de incorporação no Registro de Imóveis, conforme o art. 32 da Lei 4.591/1964</li>
               <li>Pesquisar histórico de entregas da construtora</li>
             </ul>
           </div>
@@ -165,7 +187,7 @@ export default function GuiaComprarNaPlantaPage() {
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>O que verificar antes de assinar?</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-          Antes de assinar o contrato de compra de um apartamento na planta, verifique: registro do empreendimento na prefeitura e cartório; CRECI do corretor (Stiven Allan: CRECI 60.275); cláusulas de correção das parcelas (deve ser CUB/SC na Fontana); prazo de entrega e tolerância prevista no contrato; especificação técnica do acabamento e dos materiais; forma de quitação do saldo pós-chaves via saldo direto ou financiamento bancário.
+          Antes de assinar o contrato de compra de um apartamento na planta, verifique: registro da incorporação no cartório de registro de imóveis (memorial de incorporação, art. 32 da Lei 4.591/1964); CRECI do corretor (Stiven Allan: CRECI 60.275); cláusulas de correção das parcelas (deve ser CUB/SC na Fontana); prazo de entrega e tolerância prevista no contrato; especificação técnica do acabamento e dos materiais; forma de quitação do saldo pós-chaves via saldo direto ou financiamento bancário.
         </p>
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Perguntas Frequentes</h2>

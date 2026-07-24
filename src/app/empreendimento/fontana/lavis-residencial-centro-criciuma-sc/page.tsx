@@ -343,7 +343,7 @@ export default function LavisPage() {
         <div style={{ maxWidth: 1080, margin: '0 auto', textAlign: 'center' }}>
           <p className="lv-eyebrow" style={{ color: t.onDark, marginBottom: 18 }}>Financiamento Direto</p>
           <h2 className="lv-h2" style={{ color: t.onDark }}>A liberdade de comprar sem banco</h2>
-          <p className="lv-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 40 }}>Sem burocracia, sem intermediários. Direto com a construtora.</p>
+          <p className="lv-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 40 }}>Negociação direta com a construtora, sem intermediários.</p>
           <p style={{ color: t.onDarkMuted, fontSize: 17, lineHeight: 1.7, maxWidth: 720, margin: '0 auto 16px' }}>{COMERCIAL.principal}</p>
           <p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.7, maxWidth: 720, margin: '0 auto 20px' }}>{COMERCIAL.correcaoPrincipal}</p>
           <p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.7, maxWidth: 720, margin: '0 auto 40px' }}>{COMERCIAL.alternativa}</p>
@@ -351,7 +351,7 @@ export default function LavisPage() {
             {[
               { n: '01', ti: 'Converse com o corretor', d: 'Atendimento exclusivo e personalizado para entender o seu momento e as melhores condições.' },
               { n: '02', ti: 'Escolha a sua unidade', d: 'Personalize a planta e defina o apartamento ideal para o seu estilo de vida.' },
-              { n: '03', ti: 'Negocie direto com a Fontana', d: 'Condições facilitadas, sem banco e sem burocracia. Privilégio de quem compra com liberdade.' },
+              { n: '03', ti: 'Negocie direto com a Fontana', d: 'Condições negociadas direto com a construtora, sem depender de banco.' },
             ].map((s, i) => (
               <div key={i} style={{ textAlign: 'left' }}>
                 <div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 40, opacity: 0.55, marginBottom: 14 }}>{s.n}</div>

@@ -234,7 +234,7 @@ export default function CastellanoPage() {
           <div className="cs-rule" style={{ background: 'rgba(239,233,246,0.5)' }} />
           <h2 className="cs-h2" style={{ fontSize: 'clamp(24px,3.5vw,44px)', color: t.onDark, margin: '0 0 48px' }}>Financiamento<br />Direto com a Construtora</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 32, marginBottom: 48 }}>
-            {[['01','Escolha seu imóvel','Selecione a planta ideal para você e sua família.'],['02','Fale com Stiven','Tire dúvidas pelo WhatsApp — rápido e sem burocracia.'],['03','Realize seu sonho','Condições personalizadas para o seu perfil.']].map(([n,t1,t2])=>(
+            {[['01','Escolha seu imóvel','Selecione a planta ideal para você e sua família.'],['02','Fale com Stiven','Tire dúvidas pelo WhatsApp — atendimento direto e rápido.'],['03','Realize seu sonho','Condições personalizadas para o seu perfil.']].map(([n,t1,t2])=>(
               <div key={n}>
                 <div style={{ fontFamily: t.display, fontSize: 36, fontWeight: 200, color: 'rgba(239,233,246,0.4)', marginBottom: 12 }}>{n}</div>
                 <p style={{ fontFamily: t.display, fontSize: 14, letterSpacing: '.12em', textTransform: 'uppercase', color: t.onDark, margin: '0 0 8px' }}>{t1}</p>

@@ -17,6 +17,10 @@ export const metadata: Metadata = {
     title: 'Blog Imobiliário | Stiven Allan',
     description: 'Dicas, tendências e notícias do mercado imobiliário no sul de Santa Catarina.',
   },
+  // noindex temporário (2026-07-24): posts com regras de FGTS/SFH e taxas sem
+  // fonte oficial citada, pendente de revisão completa — ver pendência
+  // registrada na PR #17. Remover só depois da revisão.
+  robots: { index: false, follow: false },
 }
 
 interface Post {
@@ -117,7 +121,8 @@ export default function BlogPage() {
       '@type': 'Person',
       name: 'Stiven Allan',
       jobTitle: 'Corretor de Imóveis',
-      hasCredential: 'CRECI 60.275',
+      // hasCredential removido: Gate B (validação oficial do CRECI) aberto —
+      // nenhuma afirmação estruturada de credencial até validação. Ver PR #17.
     },
   }
 

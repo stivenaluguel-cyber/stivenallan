@@ -1,19 +1,31 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { SITE_URL } from '@/lib/site'
+import GuiaMeta from '@/components/GuiaMeta'
 
 const SLUG = 'cub-sc-correcao-parcelas'
 const CANONICAL = `${SITE_URL}/guia/${SLUG}`
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20quero%20entender%20como%20o%20CUB%2FSC%20afeta%20minhas%20parcelas.'
 
-const CUB_JUNHO_2026 = 3096.25
-const CUB_VALOR = 3121.62
-const CUB_MES = 'julho de 2026'
-const CUB_VARIACAO = '+0,82%'
+// Datas reais (git log --follow): criação 2026-07-02. dateModified 2026-07-24
+// porque autoria/datas foram adicionadas hoje (Gate A).
+const PUBLISHED_ISO = '2026-07-02'
+const PUBLISHED_LABEL = '02/07/2026'
+const UPDATED_ISO = '2026-07-24'
+const UPDATED_LABEL = '24/07/2026'
+
+// Valores reais confirmados (2026-07-24) na série histórica compilada pelo
+// SENGE-SC — https://www.senge-sc.org.br/tabela-do-cub/ — que NÃO é a fonte
+// oficial primária (essa é o Sinduscon-SC/entidade calculadora); é só onde a
+// série mensal completa está publicada de forma acessível. Não publicar o
+// valor de julho/2026 (ou qualquer mês seguinte) até essa série confirmar.
+const CUB_MAIO_2026 = 3096.25
+const CUB_JUNHO_2026 = 3121.62
+const CUB_VARIACAO_MAIO_JUNHO = '+0,82%'
 
 export const metadata: Metadata = {
   title: 'CUB/SC e Correção de Parcelas no Financiamento Direto: Guia Completo',
-  description: 'Entenda o que é o CUB/SC, como ele corrige as parcelas do financiamento direto Fontana e como calcular o impacto na sua prestação. CUB/SC jun/2026: R$ 3.096,25/m2.',
+  description: 'Entenda o que é o CUB/SC, como ele corrige as parcelas do financiamento direto Fontana e como calcular o impacto na sua prestação. CUB/SC junho/2026: R$ 3.121,62/m2 (+0,82% frente a maio/2026).',
   alternates: { canonical: CANONICAL },
   openGraph: {
     title: 'CUB/SC e Correção de Parcelas no Financiamento Direto | Stiven Allan',
@@ -30,6 +42,8 @@ const SCHEMA = {
   headline: 'CUB/SC e Correção de Parcelas no Financiamento Direto',
   description: 'Guia completo sobre o CUB/SC e como ele afeta as parcelas do financiamento direto em Criciuma/SC.',
   url: CANONICAL,
+  datePublished: PUBLISHED_ISO,
+  dateModified: UPDATED_ISO,
   author: { '@type': 'Person', name: 'Stiven Allan', url: SITE_URL },
   publisher: { '@type': 'Organization', name: 'Stiven Allan Imoveis', url: SITE_URL },
 }
@@ -41,7 +55,7 @@ const FAQ_SCHEMA = {
     {
       '@type': 'Question',
       name: 'O que é o CUB/SC?',
-      acceptedAnswer: { '@type': 'Answer', text: 'O CUB (Custo Unitário Básico) e um índice publicado mensalmente pelo Sinduscon-SC que reflete o custo de construção civil em Santa Catarina. Em junho de 2026, o CUB/SC estava em R$ 3.096,25/m2.' },
+      acceptedAnswer: { '@type': 'Answer', text: 'O CUB (Custo Unitário Básico) e um índice publicado mensalmente pelo Sinduscon-SC que reflete o custo de construção civil em Santa Catarina. Em junho de 2026, o CUB/SC estava em R$ 3.121,62/m2 (alta de 0,82% frente a maio/2026, quando estava em R$ 3.096,25/m2).' },
     },
     {
       '@type': 'Question',
@@ -56,7 +70,7 @@ const FAQ_SCHEMA = {
     {
       '@type': 'Question',
       name: 'Quanto o CUB/SC varia por mês, em média?',
-      acceptedAnswer: { '@type': 'Answer', text: 'A variação historica do CUB/SC fica em torno de 0,4% a 0,8% ao mês, mas pode variar. Em anos de alta inflação na construção civil, a variação pode ser maior. Consulte o Sinduscon-SC para valores atualizados.' },
+      acceptedAnswer: { '@type': 'Answer', text: 'A variação do CUB/SC muda mês a mês, conforme o custo real da construção civil apurado pelo Sinduscon-SC — não há uma faixa fixa. Consulte a série histórica completa para ver a variação real de cada período.' },
     },
     {
       '@type': 'Question',
@@ -100,14 +114,25 @@ export default function GuiaCubScPage() {
       {/* CONTEÚDO */}
       <article style={{ maxWidth: 800, margin: '0 auto', padding: 'clamp(48px,8vh,96px) clamp(18px,5vw,64px)' }}>
 
-      <p style={{ background: '#FFF4CC', border: '1px solid #E0C04C', borderRadius: 2, padding: '16px 20px', margin: '0 0 32px', fontSize: 15, lineHeight: 1.6, color: '#333', fontWeight: 600 }}>{`CUB/SC residencial em ${CUB_MES}: R$ ${CUB_VALOR.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}/m² (variação mensal de ${CUB_VARIACAO}). Fonte: Sinduscon/SC. Valor de referência — consulte sempre o índice do mês vigente.`}</p>
+      <GuiaMeta
+        publishedISO={PUBLISHED_ISO}
+        publishedLabel={PUBLISHED_LABEL}
+        updatedISO={UPDATED_ISO}
+        updatedLabel={UPDATED_LABEL}
+        fontes={[
+          <>CUB/SC (entidade calculadora): <a href="https://www.sindusconcriciuma.com.br/" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>Sinduscon Sul Catarinense</a></>,
+          <>CUB/SC (série histórica compilada, não é fonte oficial primária): <a href="https://www.senge-sc.org.br/tabela-do-cub/" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>Tabela do CUB — SENGE-SC</a></>,
+        ]}
+      />
+
+      <p style={{ background: '#FFF4CC', border: '1px solid #E0C04C', borderRadius: 2, padding: '16px 20px', margin: '0 0 32px', fontSize: 15, lineHeight: 1.6, color: '#333', fontWeight: 600 }}>{`CUB/SC residencial: maio/2026 R$ ${CUB_MAIO_2026.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}/m² → junho/2026 R$ ${CUB_JUNHO_2026.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}/m² (variação de ${CUB_VARIACAO_MAIO_JUNHO}). Fonte: série histórica compilada pelo SENGE-SC — não é a fonte oficial primária. Não há valor de julho/2026 confirmado ainda; consulte sempre o índice do mês vigente.`}</p>
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>O que é o CUB/SC?</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
           O <strong>CUB (Custo Unitário Básico)</strong> e um índice publicado mensalmente pelo <strong>Sinduscon-SC</strong> (Sindicato da Indústria da Construção Civil de Santa Catarina). Ele mede o custo médio de construção residencial no estado e serve como base de correção monetaria nos contratos de compra de imoveis na planta com a Construtora Fontana.
         </p>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
-          Em junho de 2026, o CUB/SC estava em <strong>R$ {CUB_JUNHO_2026.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}/m2</strong>. Este valor e atualizado todo mês e publicado pelo Sinduscon-SC no site oficial. A Construtora Fontana usa o CUB/SC como indexador das parcelas mensais durante a obra, diferentemente de muitas construtoras do Sudeste que usam o INCC nacional.
+          Em maio de 2026, o CUB/SC estava em R$ {CUB_MAIO_2026.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}/m2; em junho de 2026, subiu para <strong>R$ {CUB_JUNHO_2026.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}/m2</strong> (variação de {CUB_VARIACAO_MAIO_JUNHO}). Este valor e atualizado todo mês e publicado pelo Sinduscon-SC. A Construtora Fontana usa o CUB/SC como indexador das parcelas mensais durante a obra, diferentemente de muitas construtoras do Sudeste que usam o INCC nacional.
         </p>
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Como o CUB/SC corrige as parcelas?</h2>
@@ -121,22 +146,22 @@ export default function GuiaCubScPage() {
           </p>
         </div>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-          O impacto acumulado do CUB ao longo de 72 meses de obra pode ser significativo. Assumindo uma variação média mensal de 0,5%, o CUB acumularia cerca de 43% em 72 meses. Isso significa que uma parcela que comeca em R$ 2.000 pode chegar proxima de R$ 2.860 ao final da obra. Por isso é importante planejar o fluxo de caixa com essa correção em mente.
+          O impacto acumulado do CUB ao longo de uma obra de 72 meses pode ser relevante: como a correção incide mês a mês sobre a parcela já corrigida, o efeito é composto (cada aumento soma sobre o valor já reajustado, não sobre o valor original). O total acumulado real depende da variação de cada mês — não existe uma média fixa —, então o jeito correto de dimensionar o impacto é consultar a série histórica completa do CUB/SC, não estimar com uma taxa hipotética única.
+        </p>
         <h3 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: 'clamp(16px,2vw,20px)', marginTop: 32, marginBottom: 12 }}>Como acompanhar o CUB mês a mês</h3>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
           Acompanhar a correção evita surpresas no boleto e ajuda a conferir se o valor cobrado esta correto. Como o CUB/SC (Custo Unitário Básico do Sinduscon-SC) e divulgado mensalmente, da para prever a proxima parcela com boa precisao. O processo e simples e pode ser feito todo mês:
         </p>
         <ol style={{ fontSize: 16, lineHeight: 1.8, color: '#333', paddingLeft: 20 }}>
-          <li>Consulte o valor atualizado do CUB/SC no site do Sinduscon-SC, que divulga o índice de cada mês. Foi la que saiu o valor de junho de 2026, de R$ 3.096,25 por metro quadrado.</li>
+          <li>Consulte o valor atualizado do CUB/SC na série histórica compilada pelo SENGE-SC (fonte acima) ou direto com o Sinduscon-SC, que divulga o índice de cada mês. O valor de junho/2026 confirmado é R$ 3.121,62 por metro quadrado.</li>
           <li>Confira no seu contrato qual e o índice de correção previsto. No financiamento direto da Fontana, esse índice e o CUB/SC, e não outro como INCC ou IGP-M.</li>
-          <li>Recalcule a parcela aplicando a formula da pagina: parcela nova = parcela anterior x (CUB do mês / CUB do mês anterior). A variação historica costuma ficar entre 0,4% e 0,8% ao mês.</li>
+          <li>Recalcule a parcela aplicando a formula da pagina: parcela nova = parcela anterior x (CUB do mês / CUB do mês anterior). A variação muda mês a mês — confira o valor real de cada mês na série histórica, não use uma média fixa.</li>
           <li>Compare o resultado com o valor do boleto para confirmar que a correção foi aplicada corretamente e registrar qualquer divergencia.</li>
         </ol>
-        </p>
 
-        <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Simulacao: impacto do CUB em 36 meses</h2>
+        <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Cenário hipotético: impacto do CUB em 36 meses</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-          Para um financiamento de 36 meses de obra com parcela inicial de R$ 2.000:
+          O exemplo abaixo é inteiramente hipotético — usa uma variação fixa de 0,5% ao mês só para ilustrar como a fórmula de correção funciona na prática. Não é uma previsão nem uma média histórica real do CUB/SC; a variação de cada mês está na série histórica compilada citada acima. Para um financiamento de 36 meses de obra com parcela inicial de R$ 2.000, num cenário hipotético de +0,5% a.m. constante:
         </p>
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
@@ -158,13 +183,13 @@ export default function GuiaCubScPage() {
             </tbody>
           </table>
         </div>
-        <p style={{ fontSize: 13, color: '#666', marginTop: 8 }}>Simulacao ilustrativa com variação mensal hipotetica de 0,5%. Variação real do CUB/SC pode ser maior ou menor.</p>
-        <h3 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: 'clamp(16px,2vw,20px)', marginTop: 32, marginBottom: 12 }}>Passo a passo da simulacao</h3>
+        <p style={{ fontSize: 13, color: '#666', marginTop: 8 }}>Cenário 100% hipotético com variação mensal fixa de 0,5%, só para fins didáticos. A variação real do CUB/SC muda mês a mês — não é constante — e pode ser maior ou menor. Consulte a série histórica compilada citada acima para os valores reais.</p>
+        <h3 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: 'clamp(16px,2vw,20px)', marginTop: 32, marginBottom: 12 }}>Passo a passo do cenário hipotético</h3>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
           Veja como a formula acima gera os valores da tabela, partindo de uma parcela inicial de R$ 2.000 com variação de 0,5% ao mês. No mês 1, a parcela e de R$ 2.000. No mês 2, multiplicamos R$ 2.000 por 1,005 (o equivalente a +0,5%), chegando a cerca de R$ 2.010. No mês 3, aplicamos 0,5% de novo sobre R$ 2.010, alcancando aproximadamente R$ 2.020. Repetindo esse calculo mês a mês, a correção se acumula: por volta do mês 12 a parcela chega perto de R$ 2.124, no mês 24 fica proxima de R$ 2.254 e no mês 36 alcanca cerca de R$ 2.393, exatamente como mostra a tabela. Note que cada aumento incide sobre a parcela ja corrigida, por isso o efeito e composto ao longo da obra.
         </p>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-          Esse mesmo mecanismo explica por que o impacto acumulado importa tanto: assumindo uma variação média de 0,5% ao mês, o CUB/SC pode acumular cerca de 43% em 72 meses de obra. Por isso vale simular o cenario completo antes de fechar o contrato, para dimensionar quanto a parcela pode crescer da primeira ate a ultima prestação e planejar o orcamento com folga.
+          Esse mesmo mecanismo (juros/correção compostos) explica por que o impacto acumulado importa tanto ao longo de uma obra mais longa. Como a variação real do CUB/SC muda mês a mês, o jeito correto de dimensionar quanto a parcela pode crescer não é assumir uma taxa fixa — é consultar a série histórica compilada citada acima e, idealmente, pedir uma simulação personalizada antes de fechar o contrato.
         </p>
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>CUB/SC vs INCC vs IGPM</h2>
@@ -205,7 +230,7 @@ export default function GuiaCubScPage() {
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Como planejar o orcamento com a correção do CUB?</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-          Para se preparar para a correção pelo CUB/SC, planeje suas parcelas com uma margem de segurança de 10 a 15% acima do valor inicial. Isso significa que se sua parcela inicial e de R$ 2.000, você deve ter capacidade de pagar ate R$ 2.200 a R$ 2.300 por mês ao final da obra, dependendo do prazo e da variação real do CUB.
+          Para se preparar para a correção pelo CUB/SC, não existe um percentual de margem que sirva para todo mundo — o quanto sua parcela pode subir depende do prazo de obra e da variação real do índice nesse período, que muda mês a mês. Consulte a série histórica compilada citada acima para dimensionar cenários com dados reais, e peça uma simulação personalizada para o prazo do seu empreendimento antes de assinar.
         </p>
         <h3 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: 'clamp(16px,2vw,20px)', marginTop: 32, marginBottom: 12 }}>Conte com uma simulacao personalizada</h3>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>

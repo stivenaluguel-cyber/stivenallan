@@ -115,7 +115,7 @@ const CONTEUDO_POR_CIDADE: Record<
       {
         pergunta: 'Como funciona o financiamento direto da Fontana em Içara?',
         resposta:
-          'O modelo prevê entrada de 20% no ato da assinatura, saldo parcelado mensalmente com reforços anuais e correção pelo CUB/SC durante a obra, sem necessidade de aprovação bancária.',
+          'O modelo prevê entrada de 20% no ato da assinatura, saldo parcelado mensalmente com reforços anuais e correção pelo CUB/SC durante a obra, sem depender de financiamento bancário — a construtora poderá realizar análise cadastral e de capacidade de pagamento conforme suas políticas.',
       },
       {
         pergunta: 'Qual a diferença entre o Castellano e os outros dois empreendimentos em Içara?',
@@ -136,7 +136,7 @@ const CONTEUDO_POR_CIDADE: Record<
       {
         pergunta: 'Como funciona o financiamento direto da Fontana em Balneário Rincão?',
         resposta:
-          'O modelo prevê entrada de 20% no ato da assinatura, saldo parcelado mensalmente com reforços anuais e correção pelo CUB/SC durante a obra, sem necessidade de aprovação bancária.',
+          'O modelo prevê entrada de 20% no ato da assinatura, saldo parcelado mensalmente com reforços anuais e correção pelo CUB/SC durante a obra, sem depender de financiamento bancário — a construtora poderá realizar análise cadastral e de capacidade de pagamento conforme suas políticas.',
       },
       {
         pergunta: 'Os empreendimentos da Fontana em Balneário Rincão são frente mar?',
@@ -157,7 +157,7 @@ const CONTEUDO_POR_CIDADE: Record<
       {
         pergunta: 'Como funciona o financiamento direto da Fontana em Laguna?',
         resposta:
-          'O modelo prevê entrada de 20% no ato da assinatura, saldo parcelado mensalmente com reforços anuais e correção pelo CUB/SC durante a obra, sem necessidade de aprovação bancária.',
+          'O modelo prevê entrada de 20% no ato da assinatura, saldo parcelado mensalmente com reforços anuais e correção pelo CUB/SC durante a obra, sem depender de financiamento bancário — a construtora poderá realizar análise cadastral e de capacidade de pagamento conforme suas políticas.',
       },
       {
         pergunta: 'Onde ficam os empreendimentos da Fontana em Laguna?',
@@ -177,7 +177,7 @@ const CONTEUDO_POR_CIDADE: Record<
       {
         pergunta: 'Como funciona o financiamento direto da Fontana em Balneário Piçarras?',
         resposta:
-          'O modelo prevê entrada de 20% no ato da assinatura, saldo parcelado mensalmente com reforços anuais e correção pelo CUB/SC durante a obra, sem necessidade de aprovação bancária.',
+          'O modelo prevê entrada de 20% no ato da assinatura, saldo parcelado mensalmente com reforços anuais e correção pelo CUB/SC durante a obra, sem depender de financiamento bancário — a construtora poderá realizar análise cadastral e de capacidade de pagamento conforme suas políticas.',
       },
       {
         pergunta: 'Qual a previsão de entrega do Águas de Marano Residencial?',
@@ -377,7 +377,7 @@ export default async function LancamentosCidadePage({ params }: Props) {
 
             <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 16 }}>Por que financiamento direto com a construtora</h2>
             <p style={{ fontSize: 16, color: '#a7adb4', lineHeight: 1.8, marginBottom: 40, maxWidth: 760 }}>
-              A maior parte dos lançamentos da Fontana em Criciúma é comercializada com financiamento direto com a construtora, sem depender da aprovação de um banco. Na prática, o modelo funciona com entrada de 20% no ato da assinatura do contrato, saldo dividido em parcelas mensais e reforços anuais, todos corrigidos pelo CUB/SC ao longo da obra. Para quem tem restrição de crédito, renda informal ou simplesmente prefere não esperar meses por uma análise bancária, esse formato reduz a burocracia e agiliza o processo de compra. Ao final da obra, o comprador pode optar por quitar o saldo devedor à vista ou migrar para um financiamento bancário tradicional, conforme sua necessidade. Esse modelo tem sido um dos principais motivos pelos quais famílias da região Sul Catarinense — e também de outras cidades — têm escolhido comprar apartamentos na planta em Criciúma diretamente com a Fontana.
+              A maior parte dos lançamentos da Fontana em Criciúma é comercializada com financiamento direto com a construtora. A negociação ocorre diretamente com a construtora, sem depender de financiamento bancário. A construtora poderá realizar análise cadastral e de capacidade de pagamento conforme suas políticas, e a aprovação não é automática. Entrada, parcelas, reforços, índices, prazos e demais condições variam conforme o empreendimento, o contrato e a tabela vigente. Na prática, o modelo padrão funciona com entrada de 20% no ato da assinatura do contrato, saldo dividido em parcelas mensais e reforços anuais, todos corrigidos pelo CUB/SC ao longo da obra — confirme sempre a tabela vigente de cada empreendimento. Ao final da obra, o comprador pode optar por quitar o saldo devedor à vista ou migrar para um financiamento bancário tradicional, conforme sua necessidade. Esse modelo tem sido um dos principais motivos pelos quais famílias da região Sul Catarinense — e também de outras cidades — têm escolhido comprar apartamentos na planta em Criciúma diretamente com a Fontana.
             </p>
 
             <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 16 }}>Bairros com lançamentos ativos em Criciúma</h2>
@@ -402,7 +402,7 @@ export default async function LancamentosCidadePage({ params }: Props) {
               </div>
               <div>
                 <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Como funciona o financiamento direto da Fontana em Criciúma?</h3>
-                <p style={{ fontSize: 15, color: '#a7adb4', lineHeight: 1.7 }}>O modelo de financiamento direto prevê entrada de 20% no ato da assinatura, saldo parcelado mensalmente com reforços anuais, e correção pelo CUB/SC durante toda a obra, sem necessidade de aprovação bancária.</p>
+                <p style={{ fontSize: 15, color: '#a7adb4', lineHeight: 1.7 }}>O modelo de financiamento direto prevê entrada de 20% no ato da assinatura, saldo parcelado mensalmente com reforços anuais, e correção pelo CUB/SC durante toda a obra, sem depender de financiamento bancário — a construtora poderá realizar análise cadastral e de capacidade de pagamento conforme suas políticas.</p>
               </div>
               <div>
                 <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Qual a diferença entre comprar um lançamento na planta e um empreendimento pronto em Criciúma?</h3>
@@ -436,7 +436,7 @@ export default async function LancamentosCidadePage({ params }: Props) {
 
             <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 16 }}>Por que financiamento direto com a construtora</h2>
             <p style={{ fontSize: 16, color: '#a7adb4', lineHeight: 1.8, marginBottom: 40, maxWidth: 760 }}>
-              A maior parte dos lançamentos da Fontana em {info.nome} é comercializada com financiamento direto com a construtora, sem depender da aprovação de um banco. Na prática, o modelo funciona com entrada de 20% no ato da assinatura do contrato, saldo dividido em parcelas mensais e reforços anuais, todos corrigidos pelo CUB/SC ao longo da obra. Para quem tem restrição de crédito, renda informal ou simplesmente prefere não esperar meses por uma análise bancária, esse formato reduz a burocracia e agiliza o processo de compra. Ao final da obra, o comprador pode optar por quitar o saldo devedor à vista ou migrar para um financiamento bancário tradicional, conforme sua necessidade.
+              A maior parte dos lançamentos da Fontana em {info.nome} é comercializada com financiamento direto com a construtora. A negociação ocorre diretamente com a construtora, sem depender de financiamento bancário. A construtora poderá realizar análise cadastral e de capacidade de pagamento conforme suas políticas, e a aprovação não é automática. Entrada, parcelas, reforços, índices, prazos e demais condições variam conforme o empreendimento, o contrato e a tabela vigente. Na prática, o modelo padrão funciona com entrada de 20% no ato da assinatura do contrato, saldo dividido em parcelas mensais e reforços anuais, todos corrigidos pelo CUB/SC ao longo da obra — confirme sempre a tabela vigente de cada empreendimento. Ao final da obra, o comprador pode optar por quitar o saldo devedor à vista ou migrar para um financiamento bancário tradicional, conforme sua necessidade.
             </p>
 
             <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 16 }}>Perguntas frequentes sobre lançamentos em {info.nome}</h2>

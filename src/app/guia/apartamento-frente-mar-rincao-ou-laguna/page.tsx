@@ -1,10 +1,18 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { SITE_URL } from '@/lib/site'
+import GuiaMeta from '@/components/GuiaMeta'
 
 const SLUG = 'apartamento-frente-mar-rincao-ou-laguna'
 const CANONICAL = `${SITE_URL}/guia/${SLUG}`
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20quero%20saber%20mais%20sobre%20apartamentos%20frente%20mar%20no%20litoral%20sul%20de%20SC.'
+
+// Datas reais (git log --follow): criação 2026-07-08. dateModified 2026-07-24
+// porque as ressalvas de valorização foram revisadas hoje (Gate A).
+const PUBLISHED_ISO = '2026-07-08'
+const PUBLISHED_LABEL = '08/07/2026'
+const UPDATED_ISO = '2026-07-24'
+const UPDATED_LABEL = '24/07/2026'
 
 export const metadata: Metadata = {
   title: 'Balneário Rincão ou Laguna: Onde Comprar Apartamento Frente Mar',
@@ -25,6 +33,8 @@ const SCHEMA = {
   headline: 'Balneário Rincão ou Laguna: Onde Comprar Apartamento Frente Mar no Sul de SC',
   description: 'Comparativo completo entre Balneário Rincão e Laguna (Mar Grosso) para quem quer comprar apartamento na planta no litoral sul de Santa Catarina.',
   url: CANONICAL,
+  datePublished: PUBLISHED_ISO,
+  dateModified: UPDATED_ISO,
   author: { '@type': 'Person', name: 'Stiven Allan', url: SITE_URL },
   publisher: { '@type': 'Organization', name: 'Stiven Allan Imóveis', url: SITE_URL },
 }
@@ -46,7 +56,7 @@ const FAQ_SCHEMA = {
     {
       '@type': 'Question',
       name: 'Vale mais a pena comprar apartamento em Balneário Rincão ou em Laguna?',
-      acceptedAnswer: { '@type': 'Answer', text: 'Depende do objetivo. Balneário Rincão é o município mais jovem de SC, com preços de entrada menores e maior potencial de valorização por estar em fase de verticalização. Laguna (Mar Grosso) é praia consolidada, com infraestrutura pronta, comércio o ano todo e liquidez maior para revenda e locação. Para investir em valorização, Rincão; para uso próprio imediato e renda de aluguel, Laguna.' },
+      acceptedAnswer: { '@type': 'Answer', text: 'Depende do objetivo. Balneário Rincão é o município mais jovem de SC, com preços de entrada menores e uma tese de potencial de valorização ligada à verticalização da orla — não garantida, e sujeita ao ritmo real das obras na região. Laguna (Mar Grosso) é praia consolidada, com infraestrutura pronta, comércio o ano todo e liquidez maior para revenda e locação. Para quem prioriza a tese de valorização, Rincão; para uso próprio imediato e renda de aluguel, Laguna.' },
     },
     {
       '@type': 'Question',
@@ -56,12 +66,12 @@ const FAQ_SCHEMA = {
     {
       '@type': 'Question',
       name: 'Dá para comprar apartamento na praia sem financiamento bancário?',
-      acceptedAnswer: { '@type': 'Answer', text: 'Sim. Nos empreendimentos Fontana do litoral sul, a compra é por financiamento direto com a construtora: entrada de 20%, parcelas mensais corrigidas pelo CUB/SC durante a obra e reforços anuais — sem aprovação de banco, sem IOF e sem seguro embutido.' },
+      acceptedAnswer: { '@type': 'Answer', text: 'Sim. Nos empreendimentos Fontana do litoral sul, a compra é por financiamento direto com a construtora: entrada de 20%, parcelas mensais corrigidas pelo CUB/SC durante a obra e reforços anuais — sem depender de financiamento bancário. Os custos e encargos variam conforme o contrato; confirme cada item na minuta antes de assinar.' },
     },
     {
       '@type': 'Question',
       name: 'Por que os preços sobem durante a obra?',
-      acceptedAnswer: { '@type': 'Answer', text: 'A tabela de venda é reajustada a cada fase da obra: fundação, estrutura, acabamento e entrega. Quem compra em fase inicial paga o menor preço da história daquele empreendimento. Esse é o principal mecanismo de valorização de quem compra na planta.' },
+      acceptedAnswer: { '@type': 'Answer', text: 'A tabela de venda é reajustada a cada fase da obra: fundação, estrutura, acabamento e entrega. Quem compra em fase inicial normalmente paga um preço de tabela menor do que nas fases seguintes. Esse reajuste programado é diferente de valorização de mercado — a valorização real do imóvel depois da compra depende do mercado e não é garantida.' },
     },
     {
       '@type': 'Question',
@@ -105,6 +115,14 @@ export default function GuiaRincaoOuLagunaPage() {
       {/* CONTEUDO */}
       <article style={{ maxWidth: 800, margin: '0 auto', padding: 'clamp(48px,8vh,96px) clamp(18px,5vw,64px)' }}>
 
+        <GuiaMeta
+          publishedISO={PUBLISHED_ISO}
+          publishedLabel={PUBLISHED_LABEL}
+          updatedISO={UPDATED_ISO}
+          updatedLabel={UPDATED_LABEL}
+          fontes={['Preços de tabela, datas de entrega e condições: informados pela Construtora Fontana, sujeitos a alteração']}
+        />
+
         <p style={P}>
           Quem procura apartamento frente mar em Santa Catarina pensa primeiro em Balneário Camboriú ou Itapema — e encontra preços que já passaram do teto. O litoral sul do estado conta outra história: <strong>Balneário Rincão</strong> e <strong>Laguna (Mar Grosso)</strong> ainda têm lançamentos na planta com financiamento direto da construtora, a menos de uma hora de Criciúma, com valores de entrada que o litoral norte não vê há uma década.
         </p>
@@ -114,10 +132,10 @@ export default function GuiaRincaoOuLagunaPage() {
 
         <h2 style={H2}>Balneário Rincão: a praia em construção</h2>
         <p style={P}>
-          Emancipado de Içara em 2013, Balneário Rincão é o município mais jovem de Santa Catarina — e isso é exatamente a tese de investimento. A orla está em plena verticalização: onde hoje há terrenos e casas de veraneio, os próximos anos verão uma linha de edifícios frente mar. Quem compra na planta agora compra o metro quadrado de uma orla que ainda vai se valorizar com cada prédio novo, cada calçadão revitalizado e cada verão mais movimentado.
+          Emancipado de Içara em 2013, Balneário Rincão é o município mais jovem de Santa Catarina — e essa é a tese de investimento por trás da região. A orla está em fase de verticalização: onde hoje há terrenos e casas de veraneio, os próximos anos devem ver mais edifícios frente mar. Quem compra na planta agora aposta numa orla com potencial de valorização à medida que a verticalização avança — um cenário provável, mas não garantido, e que depende do ritmo real das obras e do mercado.
         </p>
         <p style={{ ...P, marginTop: 16 }}>
-          O Rincão tem 13 km de praia, as lagoas de Esteves e do Faxinal para esportes náuticos, e a proximidade de Criciúma (35 minutos) que garante demanda de locação de veraneio da própria região. A Construtora Fontana concentra ali quatro empreendimentos: <Link href="/empreendimento/fontana/mar-di-arienzo-centro-balneario-rincao-sc" style={{ color: '#1A5C3A' }}>Mar di Arienzo</Link>, <Link href="/empreendimento/fontana/mar-di-atrani-centro-balneario-rincao-sc" style={{ color: '#1A5C3A' }}>Mar di Atrani</Link>, <Link href="/empreendimento/fontana/mar-positano-centro-balneario-rincao-sc" style={{ color: '#1A5C3A' }}>Mar Positano</Link> e <Link href="/empreendimento/fontana/villammare-residencial-balneario-rincao-sc" style={{ color: '#1A5C3A' }}>Villammare</Link> — todos em obras, todos com financiamento direto.
+          O Rincão tem 13 km de praia, as lagoas de Esteves e do Faxinal para esportes náuticos, e a proximidade de Criciúma (35 minutos), o que pode favorecer a demanda de locação de veraneio da própria região. A Construtora Fontana concentra ali quatro empreendimentos: <Link href="/empreendimento/fontana/mar-di-arienzo-centro-balneario-rincao-sc" style={{ color: '#1A5C3A' }}>Mar di Arienzo</Link>, <Link href="/empreendimento/fontana/mar-di-atrani-centro-balneario-rincao-sc" style={{ color: '#1A5C3A' }}>Mar di Atrani</Link>, <Link href="/empreendimento/fontana/mar-positano-centro-balneario-rincao-sc" style={{ color: '#1A5C3A' }}>Mar Positano</Link> e <Link href="/empreendimento/fontana/villammare-residencial-balneario-rincao-sc" style={{ color: '#1A5C3A' }}>Villammare</Link> — todos com financiamento direto; confira a fase de obra atualizada na página de cada empreendimento.
         </p>
         <p style={{ ...P, marginTop: 16 }}>
           Cada um desses quatro lançamentos tem sua própria data de entrega prevista, o que ajuda a escolher o prazo de obra mais adequado ao seu planejamento: o Mar di Atrani está previsto para outubro de 2028, o Mar Positano para agosto de 2029, o Villammare para setembro de 2029 e o Mar di Arienzo para agosto de 2030. As próprias frases de marketing reforçam a proposta de cada um: "Amplie seu horizonte" no Mar di Arienzo, "A vida no agora" no Mar di Atrani e "Um verdadeiro mergulho em sensações únicas" no Mar Positano.
@@ -125,7 +143,7 @@ export default function GuiaRincaoOuLagunaPage() {
 
         <h2 style={H2}>Laguna (Mar Grosso): a praia consolidada</h2>
         <p style={P}>
-          Laguna é cidade histórica de mais de 340 anos, e o Mar Grosso é a sua praia urbana consolidada: comércio aberto o ano inteiro, restaurantes, farmácias e supermercados a pé, avenida beira-mar estruturada. Para quem quer usar o apartamento em qualquer estação — não só no verão — ou quer renda de locação por temporada com procura garantida, o Mar Grosso entrega infraestrutura pronta hoje.
+          Laguna é cidade histórica de mais de 340 anos, e o Mar Grosso é a sua praia urbana consolidada: comércio aberto o ano inteiro, restaurantes, farmácias e supermercados a pé, avenida beira-mar estruturada. Para quem quer usar o apartamento em qualquer estação — não só no verão — ou considerar renda de locação por temporada, o Mar Grosso já tem infraestrutura pronta hoje (a procura por locação não é garantida e varia por temporada).
         </p>
         <p style={{ ...P, marginTop: 16 }}>
           A Fontana tem dois empreendimentos na quadra do mar: <Link href="/empreendimento/fontana/mar-di-licata-mar-grosso-laguna-sc" style={{ color: '#1A5C3A' }}>Mar di Licata</Link> e <Link href="/empreendimento/fontana/mar-di-nizza-mar-grosso-laguna-sc" style={{ color: '#1A5C3A' }}>Mar di Nizza</Link>, ambos em obras. Laguna também está a caminho do encontro entre a BR-101 duplicada e as praias do Rosa e Ibiraquera — o eixo turístico que mais cresce no estado passa na porta.
@@ -165,7 +183,7 @@ export default function GuiaRincaoOuLagunaPage() {
 
         <h2 style={H2}>O fator que vale para as duas: comprar na fase certa</h2>
         <p style={P}>
-          Nos dois destinos, o mecanismo de ganho é o mesmo: <strong>a tabela sobe a cada fase da obra</strong>. Fundação, estrutura, acabamento, entrega — cada etapa vencida reajusta o preço das unidades restantes. Quem entra na fase inicial paga o menor preço que aquele empreendimento jamais terá, e ainda dilui o pagamento em parcelas durante toda a construção, sem banco no meio.
+          Nos dois destinos, o mecanismo de reajuste é o mesmo: <strong>a tabela de venda sobe a cada fase da obra</strong>. Fundação, estrutura, acabamento, entrega — cada etapa vencida reajusta o preço de tabela das unidades restantes, conforme a política da construtora. Quem entra na fase inicial normalmente paga o menor preço de tabela daquele empreendimento até então, e ainda dilui o pagamento em parcelas durante toda a construção, sem depender de banco. Esse reajuste de tabela não deve ser confundido com valorização de mercado, que não é garantida.
         </p>
         <p style={{ ...P, marginTop: 16 }}>
           O plano padrão Fontana é entrada de 20%, até 72 parcelas mensais corrigidas pelo CUB/SC e reforços anuais. Os detalhes de como funciona a correção estão no nosso <Link href="/guia/financiamento-direto-construtora" style={{ color: '#1A5C3A' }}>guia completo de financiamento direto</Link>.

@@ -1,18 +1,27 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { SITE_URL } from '@/lib/site'
+import GuiaMeta from '@/components/GuiaMeta'
 
 const SLUG = 'financiamento-direto-construtora'
 const CANONICAL = `${SITE_URL}/guia/${SLUG}`
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20quero%20saber%20mais%20sobre%20financiamento%20direto%20com%20a%20construtora.'
 
+// Datas reais (histórico do projeto — git log --follow, não CMS): criação
+// 2026-07-02, última alteração de conteúdo antes desta revisão 2026-07-10.
+// dateModified atualizado nesta correção porque o conteúdo mudou de fato hoje.
+const PUBLISHED_ISO = '2026-07-02'
+const PUBLISHED_LABEL = '02/07/2026'
+const UPDATED_ISO = '2026-07-24'
+const UPDATED_LABEL = '24/07/2026'
+
 export const metadata: Metadata = {
   title: 'Financiamento Direto com a Construtora: Guia Completo',
-  description: 'Entenda como funciona o financiamento direto Fontana em Criciuma/SC: entrada 20%, parcelas corrigidas pelo CUB/SC, reforços anuais e sem necessidade de aprovação bancária.',
+  description: 'Entenda como funciona o financiamento direto Fontana em Criciuma/SC: entrada 20%, parcelas corrigidas pelo CUB/SC, reforços anuais. Condições sujeitas a análise da construtora e à tabela vigente.',
   alternates: { canonical: CANONICAL },
   openGraph: {
     title: 'Financiamento Direto com a Construtora - Guia Completo | Stiven Allan',
-    description: 'Tudo sobre o financiamento direto da Construtora Fontana em Criciuma/SC. Sem banco, sem burocracia.',
+    description: 'Como funciona o financiamento direto da Construtora Fontana em Criciuma/SC: condições, análise da construtora e fontes oficiais.',
     url: CANONICAL,
     type: 'article',
   },
@@ -25,6 +34,8 @@ const SCHEMA = {
   headline: 'Financiamento Direto com a Construtora: Guia Completo',
   description: 'Entenda como funciona o financiamento direto da Construtora Fontana em Criciuma/SC.',
   url: CANONICAL,
+  datePublished: PUBLISHED_ISO,
+  dateModified: UPDATED_ISO,
   author: { '@type': 'Person', name: 'Stiven Allan', url: SITE_URL },
   publisher: { '@type': 'Organization', name: 'Stiven Allan Imoveis', url: SITE_URL },
 }
@@ -36,27 +47,27 @@ const FAQ_SCHEMA = {
     {
       '@type': 'Question',
       name: 'O que é financiamento direto com a construtora?',
-      acceptedAnswer: { '@type': 'Answer', text: 'É quando você compra o imóvel pagando diretamente a construtora, sem passar por banco. Você paga uma entrada, parcelas mensais e reforos anuais. As parcelas são corrigidas pelo CUB/SC durante a obra.' },
+      acceptedAnswer: { '@type': 'Answer', text: 'É quando a negociação ocorre diretamente com a construtora, sem depender de financiamento bancário. Você paga uma entrada, parcelas mensais e reforços anuais. A construtora poderá realizar análise cadastral e de capacidade de pagamento conforme suas políticas. As parcelas são corrigidas pelo CUB/SC durante a obra.' },
     },
     {
       '@type': 'Question',
       name: 'Qual a entrada para financiamento direto na Construtora Fontana?',
-      acceptedAnswer: { '@type': 'Answer', text: 'Na maioria dos empreendimentos Fontana, a entrada é de 20% do valor do imóvel, paga no ato. Alguns empreendimentos tem condições especiais.' },
+      acceptedAnswer: { '@type': 'Answer', text: 'Na maioria dos empreendimentos Fontana, a entrada é de 20% do valor do imóvel, paga no ato. Alguns empreendimentos têm condições especiais. Condições, entrada e prazos variam por empreendimento e tabela vigente — confirme sempre com o corretor.' },
     },
     {
       '@type': 'Question',
       name: 'O que é o CUB/SC e como afeta minhas parcelas?',
-      acceptedAnswer: { '@type': 'Answer', text: 'O CUB (Custo Unitário Básico) do Sinduscon-SC e o índice que corrige as parcelas durante a obra. Em junho/2026, o CUB/SC estava em R$ 3.096,25/m2. As parcelas sobem mensalmente de acordo com a variação do CUB.' },
+      acceptedAnswer: { '@type': 'Answer', text: 'O CUB (Custo Unitário Básico) do Sinduscon-SC e o índice que corrige as parcelas durante a obra. Em junho/2026, o CUB/SC estava em R$ 3.121,62/m2 (alta de 0,82% frente a maio/2026, quando estava em R$ 3.096,25/m2). As parcelas sobem mensalmente de acordo com a variação do CUB.' },
     },
     {
       '@type': 'Question',
-      name: 'O que são os reforos anuais no financiamento direto?',
-      acceptedAnswer: { '@type': 'Answer', text: 'São pagamentos extras anuais, geralmente equivalentes a 5 vezes o valor da parcela mensal, pagos uma vez por ano durante a obra. O número de reforos varia conforme o prazo de entrega.' },
+      name: 'O que são os reforços anuais no financiamento direto?',
+      acceptedAnswer: { '@type': 'Answer', text: 'São pagamentos extras anuais, geralmente equivalentes a 5 vezes o valor da parcela mensal, pagos uma vez por ano durante a obra. O número de reforços varia conforme o prazo de entrega e o empreendimento.' },
     },
     {
       '@type': 'Question',
       name: 'Posso usar FGTS no financiamento direto com a construtora?',
-      acceptedAnswer: { '@type': 'Answer', text: 'No financiamento direto com a Fontana, não há necessidade de usar o FGTS durante a obra. Após as chaves, é possível fazer um financiamento bancário e usar o FGTS nessa transação.' },
+      acceptedAnswer: { '@type': 'Answer', text: 'Durante a obra, o financiamento direto com a Fontana não usa FGTS. O uso do FGTS pode ser possível após a entrega, sujeito às regras vigentes, à elegibilidade do comprador, do imóvel e à aprovação da instituição financeira — consulte a Caixa Econômica Federal ou o agente operador para confirmar sua situação.' },
     },
   ],
 }
@@ -83,7 +94,7 @@ export default function GuiaFinanciamentoDiretoPage() {
             Financiamento Direto com a Construtora
           </h1>
           <p style={{ fontSize: 'clamp(16px,2vw,20px)', color: 'rgba(245,242,237,0.75)', marginTop: 24, lineHeight: 1.6 }}>
-            Sem banco, sem burocracia. Entenda como funciona o financiamento direto da Construtora Fontana em Criciuma e região.
+            Entenda como funciona o financiamento direto da Construtora Fontana em Criciuma e região: condições, análise da construtora e fontes oficiais.
           </p>
         </div>
       </section>
@@ -91,23 +102,37 @@ export default function GuiaFinanciamentoDiretoPage() {
       {/* CONTEÚDO */}
       <article style={{ maxWidth: 800, margin: '0 auto', padding: 'clamp(48px,8vh,96px) clamp(18px,5vw,64px)' }}>
 
+        <GuiaMeta
+          publishedISO={PUBLISHED_ISO}
+          publishedLabel={PUBLISHED_LABEL}
+          updatedISO={UPDATED_ISO}
+          updatedLabel={UPDATED_LABEL}
+          fontes={[
+            <>CUB/SC (entidade calculadora): <a href="https://www.sindusconcriciuma.com.br/" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>Sinduscon Sul Catarinense</a></>,
+            <>CUB/SC (série histórica compilada, não é fonte oficial primária): <a href="https://www.senge-sc.org.br/tabela-do-cub/" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>Tabela do CUB — SENGE-SC</a></>,
+            <>FGTS: <a href="https://www.caixa.gov.br/voce/habitacao/Paginas/utilizacao-fgts.aspx" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>Caixa Econômica Federal</a></>,
+            <>Registro de incorporação: <a href="https://www.planalto.gov.br/ccivil_03/leis/l4591compilado.htm" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>Lei 4.591/1964, art. 32</a></>,
+            'Condições comerciais: tabela vigente informada pela Construtora Fontana, sujeita a alteração',
+          ]}
+        />
+
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>O que é financiamento direto?</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-          No financiamento direto, você compra o imóvel pagando diretamente a construtora sem passar por banco, sem aprovação de crédito bancária, sem análise de renda. As parcelas são corrigidas pelo <strong>CUB/SC (Custo Unitário Básico do Sinduscon-SC)</strong> durante a obra. Ao contrário do financiamento bancário, não há IOF, não há tarifa de abertura de crédito e não há seguro obrigatório embutido na prestação.
+          A negociação ocorre diretamente com a construtora, sem depender de financiamento bancário. A construtora poderá realizar análise cadastral e de capacidade de pagamento conforme suas políticas — a aprovação não é automática. As parcelas são corrigidas pelo <strong>CUB/SC (Custo Unitário Básico do Sinduscon-SC)</strong> durante a obra. Os custos e encargos variam conforme o contrato e podem ser diferentes dos encontrados no financiamento bancário. Compare o custo total e confirme cada item na minuta contratual.
         </p>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
-          O modelo é especialmente atrativo para quem ainda não tem score bancário suficiente para financiamento convencional, para investidores que querem maximizar o retorno sobre o capital investido durante a obra, ou para quem prefere negociar condições personalizadas diretamente com a construtora. Em Criciuma e região, a Construtora Fontana é referência nesse modelo há décadas.
+          O modelo pode ser uma alternativa para quem não atende aos critérios de um financiamento bancário convencional, para investidores avaliando o retorno sobre o capital investido durante a obra, ou para quem prefere negociar condições diretamente com a construtora. A Construtora Fontana atua com esse modelo em Criciuma e região.
         </p>
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Como funciona o plano padrão Fontana?</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-          O plano padrão da Construtora Fontana para imóveis em obras divide o pagamento em três partes: <strong>entrada (Parcela A - ato)</strong>, <strong>parcelas mensais</strong> e <strong>reforos anuais</strong>.
+          O plano padrão da Construtora Fontana para imóveis em obras divide o pagamento em três partes: <strong>entrada (Parcela A - ato)</strong>, <strong>parcelas mensais</strong> e <strong>reforços anuais</strong>.
         </p>
         <ul style={{ fontSize: 15, lineHeight: 2, color: '#333', paddingLeft: 24 }}>
           <li><strong>Entrada:</strong> 20% do valor do imóvel, paga no ato da assinatura do contrato.</li>
           <li><strong>Parcelas mensais:</strong> Até 72 mensais durante a obra, corrigidas mensalmente pelo CUB/SC.</li>
-          <li><strong>Reforos anuais:</strong> Até 6 reforos, cada um equivalente a 5 parcelas mensais, pagos uma vez por ano.</li>
-          <li><strong>CUB/SC jun/2026:</strong> R$ 3.096,25/m2 (base de correção das parcelas).</li>
+          <li><strong>Reforços anuais:</strong> Até 6 reforços, cada um equivalente a 5 parcelas mensais, pagos uma vez por ano.</li>
+          <li><strong>CUB/SC jun/2026:</strong> R$ 3.121,62/m2 (maio/2026: R$ 3.096,25/m2, alta de 0,82%), fonte: série histórica compilada pelo SENGE-SC — consulte sempre o índice do mês vigente.</li>
         </ul>
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Simulação prática: imóvel de R$ 600.000</h2>
@@ -119,18 +144,18 @@ export default function GuiaFinanciamentoDiretoPage() {
             <li><strong>Entrada (20%):</strong> R$ 120.000 no ato</li>
             <li><strong>Saldo financiado (80%):</strong> R$ 480.000</li>
             <li><strong>72 parcelas mensais base:</strong> aproximadamente R$ 4.000/mês (corrigidas pelo CUB/SC)</li>
-            <li><strong>6 reforos anuais (5x parcela):</strong> aproximadamente R$ 20.000/ano</li>
-            <li><strong>Total pago durante a obra:</strong> R$ 120.000 (entrada) + aprox. R$ 288.000 (parcelas) + aprox. R$ 120.000 (reforos)</li>
+            <li><strong>6 reforços anuais (5x parcela):</strong> aproximadamente R$ 20.000/ano</li>
+            <li><strong>Total pago durante a obra:</strong> R$ 120.000 (entrada) + aprox. R$ 288.000 (parcelas) + aprox. R$ 120.000 (reforços)</li>
           </ul>
-          <p style={{ fontSize: 13, color: '#666', marginTop: 12, marginBottom: 0 }}>Simulação ilustrativa. Valores reais variam conforme o empreendimento e a variação do CUB/SC. Consulte Stiven para simulação personalizada.</p>
+          <p style={{ fontSize: 13, color: '#666', marginTop: 12, marginBottom: 0 }}>Simulação ilustrativa e não vinculante. Valores reais variam conforme o empreendimento e a tabela vigente, e a correção real depende da variação efetiva do CUB/SC. Consulte Stiven para simulação personalizada com dados atualizados.</p>
         </div>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-          Note que o saldo restante ao final da obra pode ser quitado com recursos próprios, com FGTS via financiamento bancário, ou financiado diretamente com a Fontana pelo saldo direto corrigido por IGPM mais 0,75% a.m., em prazos de até 180 ou 240 meses.
+          Note que o saldo restante ao final da obra pode ser quitado com recursos próprios, com financiamento bancário (o uso do FGTS nessa etapa depende das regras vigentes e da aprovação da instituição financeira), ou financiado diretamente com a Fontana pelo saldo direto corrigido por IGPM mais 0,75% a.m., em prazos de até 180 ou 240 meses.
         </p>
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>O que é o CUB/SC?</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-          O CUB (Custo Unitário Básico) é publicado mensalmente pelo Sinduscon-SC e reflete o custo de construção civil no estado de Santa Catarina. Em junho de 2026, o CUB/SC estava em <strong>R$ 3.096,25/m2</strong>. As parcelas do financiamento direto Fontana sobem mensalmente de acordo com a variação do CUB: se o CUB subir 0,6% no mês, suas parcelas também sobem 0,6%.
+          O CUB (Custo Unitário Básico) é publicado mensalmente pelo Sinduscon-SC e reflete o custo de construção civil no estado de Santa Catarina. Em junho de 2026, o CUB/SC estava em <strong>R$ 3.121,62/m2</strong> (alta de 0,82% frente a maio/2026, R$ 3.096,25/m2). As parcelas do financiamento direto Fontana sobem mensalmente de acordo com a variação do CUB: se o CUB subir 0,6% no mês, suas parcelas também sobem 0,6%.
         </p>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
           É importante distinguir o CUB/SC do INCC (nacional, calculado pela FGV) e do IGPM. Na Fontana, as parcelas durante a obra são corrigidas pelo CUB/SC, e o saldo direto pós-chaves é corrigido pelo IGPM mais 0,75% a.m. Essa previsibilidade permite ao comprador planejar seu fluxo de caixa com mais clareza do que em contratos indexados a índices de inflação geral.
@@ -139,23 +164,25 @@ export default function GuiaFinanciamentoDiretoPage() {
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Passo a passo para comprar com financiamento direto</h2>
         <ol style={{ fontSize: 15, lineHeight: 2.2, color: '#333', paddingLeft: 24 }}>
           <li><strong>Escolha o empreendimento:</strong> Verifique localização, tipologia, prazo de entrega e valores de partida.</li>
-          <li><strong>Simulação personalizada:</strong> Stiven calcula as parcelas mensais e reforos anuais de acordo com o imóvel e seu perfil de pagamento.</li>
-          <li><strong>Análise do contrato:</strong> O contrato é registrado em cartório para sua segurança. Verifique cláusulas de correção, prazo de entrega e multas.</li>
+          <li><strong>Simulação personalizada:</strong> Stiven calcula as parcelas mensais e reforços anuais de acordo com o imóvel e a tabela vigente.</li>
+          <li><strong>Análise do contrato:</strong> Confirme que a incorporação está registrada no cartório de registro de imóveis (memorial de incorporação, art. 32 da Lei 4.591/1964). Verifique cláusulas de correção, prazo de entrega e multas.</li>
           <li><strong>Pagamento da entrada (20%):</strong> Paga no ato da assinatura do contrato de compra e venda.</li>
-          <li><strong>Parcelas durante a obra:</strong> Mensais corrigidas pelo CUB/SC mais reforos anuais pagos ao longo da construção.</li>
-          <li><strong>Entrega das chaves:</strong> Ao concluir a obra, você faz a vistoria e recebe as chaves. O saldo devedor pode ser quitado com recursos próprios, FGTS ou financiamento bancário.</li>
+          <li><strong>Parcelas durante a obra:</strong> Mensais corrigidas pelo CUB/SC mais reforços anuais pagos ao longo da construção.</li>
+          <li><strong>Entrega das chaves:</strong> Ao concluir a obra, você faz a vistoria e recebe as chaves. O saldo devedor pode ser quitado com recursos próprios ou financiamento bancário — o uso do FGTS nessa etapa depende das regras vigentes e da aprovação da instituição financeira.</li>
           <li><strong>Registro do imóvel:</strong> Após quitar o saldo, você registra o imóvel em seu nome no cartório de imóveis.</li>
         </ol>
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Vantagens do financiamento direto</h2>
         <ul style={{ fontSize: 15, lineHeight: 2, color: '#333', paddingLeft: 24 }}>
-          <li>Sem aprovação bancária: qualquer pessoa pode comprar, independente de score de crédito.</li>
-          <li>Sem IOF, sem taxa de abertura de crédito, sem seguro obrigatório embutido.</li>
-          <li>Negociação direta com a construtora, com mais flexibilidade nas condições.</li>
-          <li>Possibilidade de quitar antecipadamente com desconto negociado.</li>
-          <li>Parcelas menores durante a obra em comparação com o valor total financiado por banco.</li>
-          <li>Após a entrega das chaves, você pode fazer um financiamento bancário e usar o FGTS se disponível.</li>
+          <li>Negociação direta com a construtora, sem depender de financiamento bancário, com mais flexibilidade nas condições — a construtora poderá fazer sua própria análise cadastral e de capacidade de pagamento, conforme suas políticas.</li>
+          <li>Os custos e encargos variam conforme o contrato e podem ser diferentes dos encontrados no financiamento bancário — compare o custo total e confirme cada item na minuta contratual.</li>
+          <li>Possibilidade de quitar antecipadamente com desconto negociado, quando previsto pela construtora.</li>
+          <li>Parcelas durante a obra que, no plano padrão, tendem a ser menores que uma parcela de financiamento bancário equivalente — a comparação real depende do valor, do prazo e da taxa vigente em cada caso.</li>
+          <li>Após a entrega das chaves, é possível fazer um financiamento bancário. O uso do FGTS pode ser possível após a entrega, sujeito às regras vigentes, à elegibilidade do comprador, do imóvel e à aprovação da instituição financeira.</li>
         </ul>
+        <p style={{ fontSize: 14, lineHeight: 1.8, color: '#666', marginTop: 12 }}>
+          Condições, aprovação, entrada, parcelas, índices e prazos variam por empreendimento e tabela vigente. Consulte sempre as condições atualizadas com o corretor antes de decidir. Regras de uso do FGTS: <a href="https://www.caixa.gov.br/voce/habitacao/Paginas/utilizacao-fgts.aspx" target="_blank" rel="noopener noreferrer" style={{ color: '#1A5C3A' }}>Caixa Econômica Federal</a>.
+        </p>
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Empreendimentos com financiamento direto em Criciuma e região</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>

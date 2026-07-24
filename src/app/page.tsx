@@ -11,7 +11,7 @@ const WPP_MSG = WPP + '?text=Ol%C3%A1+Stiven!+Vi+seu+site+e+quero+conhecer+as+co
 
 export const metadata = {
   title: 'Apartamentos na Planta com Financiamento Direto em Criciúma/SC',
-  description: 'Empreendimentos com financiamento direto da construtora, sem burocracia bancária. Sul de SC: Criciúma, Laguna, Rincão, Nova Veneza.',
+  description: 'Empreendimentos com financiamento direto da construtora, negociado diretamente. Sul de SC: Criciúma, Laguna, Rincão, Nova Veneza.',
   alternates: { canonical: SITE_URL },
   openGraph: {
     title: 'Morar bem não deveria depender de um banco. | Stiven Allan',
@@ -41,7 +41,7 @@ const t = {
 const DEPOIMENTOS = [
   { nome: 'Rafael T.', cidade: 'Criciúma, SC', texto: 'Nunca imaginei que compraria um apartamento sem depender de banco. O processo foi simples, rápido e as condições são incríveis.' },
   { nome: 'Camila S.', cidade: 'Içara, SC', texto: 'O Stiven apresentou um empreendimento perfeito para mim e estruturou um pagamento que coube no meu orçamento. Recomendo muito.' },
-  { nome: 'Fernando B.', cidade: 'Nova Veneza, SC', texto: 'A flexibilidade do financiamento direto foi o que fez a diferença. Sem filas, sem burocracia, só resultado.' },
+  { nome: 'Fernando B.', cidade: 'Nova Veneza, SC', texto: 'A flexibilidade do financiamento direto foi o que fez a diferença. Negociação direta com a construtora, sem depender de banco.' },
 ]
 
 const COMO_FUNCIONA = [
@@ -181,14 +181,14 @@ export default async function HomePage() {
         <div style={{ position: 'relative', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: 'calc(68px + 2vh) clamp(24px,6vw,80px) 4vh' }}>
           <p className="home-eyebrow fade-in" style={{ color: 'rgba(184,155,94,0.85)', marginBottom: 24, textShadow: '0 1px 8px rgba(0,0,0,0.5)' }}>Stiven Allan · CRECI 60.275</p>
           <h1 className="home-h1 fade-in fade-in-1" style={{ fontSize: 'clamp(30px,3.6vw,52px)', lineHeight: 1.08, color: '#FFFFFF', textShadow: '0 2px 8px rgba(0,0,0,0.5), 0 2px 32px rgba(0,0,0,0.60)', maxWidth: '28ch' }}>
-            Apartamentos na planta com financiamento direto — sem banco, sem burocracia
+            Apartamentos na planta com financiamento direto — negociado direto com a construtora
           </h1>
           <hr className="home-rule fade-in fade-in-2" style={{ margin: '20px auto' }} />
           <p className="home-serif fade-in fade-in-2" style={{ fontSize: 'clamp(16px,2.2vw,22px)', color: '#FFFFFF', maxWidth: 560, margin: '0 0 20px', lineHeight: 1.6, textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
             Morar bem não deveria depender de um banco.
           </p>
           <p className="fade-in fade-in-2" style={{ fontFamily: t.body, fontSize: 'clamp(13px,1.6vw,16px)', color: 'rgba(245,241,234,0.82)', maxWidth: 620, margin: '0 0 28px', lineHeight: 1.7, textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
-            Empreendimentos de alto padrão com financiamento direto da construtora em Criciúma, Balneário Rincão, Laguna e todo o Sul de Santa Catarina. Sem banco, sem burocracia.
+            Empreendimentos de alto padrão com financiamento direto da construtora em Criciúma, Balneário Rincão, Laguna e todo o Sul de Santa Catarina. Sem depender de banco.
           </p>
           <div className="fade-in fade-in-3" style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
             <Link href="/#empreendimentos" className="home-btn" style={{ background: 'rgba(245,241,234,0.12)', borderColor: 'rgba(245,241,234,0.40)', color: '#FFFFFF', backdropFilter: 'blur(8px)' }}>Explorar empreendimentos</Link>
@@ -293,7 +293,7 @@ export default async function HomePage() {
           <p className="home-eyebrow" style={{ color: t.champagne, marginBottom: 24 }}>Próximo passo</p>
           <h2 className="home-serif" style={{ color: t.onDark, fontSize: 'clamp(32px,5.5vw,60px)', fontStyle: 'italic', fontWeight: 300, letterSpacing: '0.01em', lineHeight: 1.15 }}>Seu próximo investimento começa aqui.</h2>
           <p className="home-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(16px,1.9vw,21px)', margin: '24px 0 40px', lineHeight: 1.65 }}>
-            Empreendimentos que valorizam antes mesmo das chaves. Fale com Stiven e descubra como fazer seu capital trabalhar com inteligência.
+            Empreendimentos com potencial de valorização já durante a obra, conforme o mercado e a fase de cada lançamento — sem garantia de retorno. Fale com Stiven e descubra como avaliar cada oportunidade.
           </p>
           <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
             <a href={WPP_MSG} data-wpp="1" target="_blank" rel="noopener noreferrer" className="home-btn" style={{ background: t.champagne, borderColor: t.champagne, color: t.ink }}>Falar com Stiven</a>

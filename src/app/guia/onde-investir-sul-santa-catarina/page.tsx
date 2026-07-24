@@ -1,10 +1,19 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { SITE_URL } from '@/lib/site'
+import GuiaMeta from '@/components/GuiaMeta'
 
 const SLUG = 'onde-investir-sul-santa-catarina'
 const CANONICAL = `${SITE_URL}/guia/${SLUG}`
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20quero%20saber%20mais%20sobre%20as%20regi%C3%B5es%20com%20empreendimentos%20no%20Sul%20de%20SC.'
+
+// Datas reais (git log --follow): criação 2026-07-08, última alteração de
+// conteúdo real 2026-07-23 (Faixas por tier). dateModified 2026-07-24 porque
+// autoria/datas e ressalva de valorização foram adicionadas hoje (Gate A).
+const PUBLISHED_ISO = '2026-07-08'
+const PUBLISHED_LABEL = '08/07/2026'
+const UPDATED_ISO = '2026-07-24'
+const UPDATED_LABEL = '24/07/2026'
 
 export const metadata: Metadata = {
   title: 'Onde Investir no Sul de Santa Catarina: Guia por Região',
@@ -25,6 +34,8 @@ export const metadata: Metadata = {
                             headline: 'Onde Investir no Sul de Santa Catarina: Guia por Região',
                             description: 'Guia regional factual das cidades com empreendimentos ativos da Construtora Fontana no Sul de Santa Catarina.',
                             url: CANONICAL,
+                            datePublished: PUBLISHED_ISO,
+                            dateModified: UPDATED_ISO,
                             author: { '@type': 'Person', name: 'Stiven Allan', url: SITE_URL },
                             publisher: { '@type': 'Organization', name: 'Stiven Allan Imoveis', url: SITE_URL },
                             }
@@ -101,6 +112,14 @@ export const metadata: Metadata = {
 
                             {/* CONTEÚDO */}
                             <article style={{ maxWidth: 800, margin: '0 auto', padding: 'clamp(48px,8vh,96px) clamp(18px,5vw,64px)' }}>
+
+                            <GuiaMeta
+                              publishedISO={PUBLISHED_ISO}
+                              publishedLabel={PUBLISHED_LABEL}
+                              updatedISO={UPDATED_ISO}
+                              updatedLabel={UPDATED_LABEL}
+                              fontes={['Empreendimentos e bairros: catálogo de empreendimentos ativos da Construtora Fontana informado pela própria construtora']}
+                            />
 
                             <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Criciuma - o polo urbano central</h2>
                             <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
@@ -184,7 +203,7 @@ export const metadata: Metadata = {
                             Fale com Stiven Allan, CRECI 60.275, para conhecer os detalhes de cada empreendimento e encontrar a região mais alinhada ao seu objetivo, seja moradia, veraneio ou diversificação de patrimônio.
                             </p>
                             <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
-                            Cada região tem sua propria dinamica: Criciuma reune a maior diversidade de bairros e tipologias, enquanto as cidades litoraneas concentram empreendimentos voltados a segunda residência e a valorização de longo prazo junto ao mar. Já Icara e Sideropolis funcionam como extensao natural do polo criciumense, com opções de bom custo-benefício em municípios proprios. Bom Jardim da Serra, por sua vez, atende quem busca algo bem diferente do litoral e do centro urbano, com clima ameno e paisagem de montanha. Antes de decidir, vale considerar não apenas o perfil da região, mas também o estágio do empreendimento (planta, quase pronto ou pronto) e as condições de pagamento de cada lançamento.
+                            Cada região tem sua propria dinamica: Criciuma reune a maior diversidade de bairros e tipologias, enquanto as cidades litoraneas concentram empreendimentos voltados a segunda residência, com potencial de valorização de longo prazo junto ao mar — não garantido, e dependente do mercado e da região. Já Icara e Sideropolis funcionam como extensao natural do polo criciumense, com opções de bom custo-benefício em municípios proprios. Bom Jardim da Serra, por sua vez, atende quem busca algo bem diferente do litoral e do centro urbano, com clima ameno e paisagem de montanha. Antes de decidir, vale considerar não apenas o perfil da região, mas também o estágio do empreendimento (planta, quase pronto ou pronto) e as condições de pagamento de cada lançamento.
                             </p>
 
 <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>

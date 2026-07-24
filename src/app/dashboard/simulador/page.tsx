@@ -230,7 +230,7 @@ export default function SimuladorPage() {
             Simulador de Financiamento Direto
           </h1>
           <p style={{ fontSize: 13, color: D.muted, margin: 0 }}>
-            Parcelas com a construtora — sem banco, sem burocracia.
+            Parcelas negociadas direto com a construtora, sem depender de banco.
           </p>
         </div>
 
