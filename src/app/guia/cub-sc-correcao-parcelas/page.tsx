@@ -161,7 +161,7 @@ export default function GuiaCubScPage() {
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Cenário hipotético: impacto do CUB em 36 meses</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-          O exemplo abaixo é inteiramente hipotético — usa uma variação fixa de 0,5% ao mês só para ilustrar como a fórmula de correção funciona na prática. Não é uma previsão nem uma média histórica real do CUB/SC; a variação de cada mês está na série histórica oficial (fontes acima). Para um financiamento de 36 meses de obra com parcela inicial de R$ 2.000, num cenário hipotético de +0,5% a.m. constante:
+          O exemplo abaixo é inteiramente hipotético — usa uma variação fixa de 0,5% ao mês só para ilustrar como a fórmula de correção funciona na prática. Não é uma previsão nem uma média histórica real do CUB/SC; a variação de cada mês está na série histórica compilada citada acima. Para um financiamento de 36 meses de obra com parcela inicial de R$ 2.000, num cenário hipotético de +0,5% a.m. constante:
         </p>
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
@@ -183,13 +183,13 @@ export default function GuiaCubScPage() {
             </tbody>
           </table>
         </div>
-        <p style={{ fontSize: 13, color: '#666', marginTop: 8 }}>Cenário 100% hipotético com variação mensal fixa de 0,5%, só para fins didáticos. A variação real do CUB/SC muda mês a mês — não é constante — e pode ser maior ou menor. Consulte a série histórica oficial (fontes acima) para os valores reais.</p>
+        <p style={{ fontSize: 13, color: '#666', marginTop: 8 }}>Cenário 100% hipotético com variação mensal fixa de 0,5%, só para fins didáticos. A variação real do CUB/SC muda mês a mês — não é constante — e pode ser maior ou menor. Consulte a série histórica compilada citada acima para os valores reais.</p>
         <h3 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: 'clamp(16px,2vw,20px)', marginTop: 32, marginBottom: 12 }}>Passo a passo do cenário hipotético</h3>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
           Veja como a formula acima gera os valores da tabela, partindo de uma parcela inicial de R$ 2.000 com variação de 0,5% ao mês. No mês 1, a parcela e de R$ 2.000. No mês 2, multiplicamos R$ 2.000 por 1,005 (o equivalente a +0,5%), chegando a cerca de R$ 2.010. No mês 3, aplicamos 0,5% de novo sobre R$ 2.010, alcancando aproximadamente R$ 2.020. Repetindo esse calculo mês a mês, a correção se acumula: por volta do mês 12 a parcela chega perto de R$ 2.124, no mês 24 fica proxima de R$ 2.254 e no mês 36 alcanca cerca de R$ 2.393, exatamente como mostra a tabela. Note que cada aumento incide sobre a parcela ja corrigida, por isso o efeito e composto ao longo da obra.
         </p>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-          Esse mesmo mecanismo (juros/correção compostos) explica por que o impacto acumulado importa tanto ao longo de uma obra mais longa. Como a variação real do CUB/SC muda mês a mês, o jeito correto de dimensionar quanto a parcela pode crescer não é assumir uma taxa fixa — é consultar a série histórica oficial (fontes acima) e, idealmente, pedir uma simulação personalizada antes de fechar o contrato.
+          Esse mesmo mecanismo (juros/correção compostos) explica por que o impacto acumulado importa tanto ao longo de uma obra mais longa. Como a variação real do CUB/SC muda mês a mês, o jeito correto de dimensionar quanto a parcela pode crescer não é assumir uma taxa fixa — é consultar a série histórica compilada citada acima e, idealmente, pedir uma simulação personalizada antes de fechar o contrato.
         </p>
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>CUB/SC vs INCC vs IGPM</h2>
@@ -230,7 +230,7 @@ export default function GuiaCubScPage() {
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Como planejar o orcamento com a correção do CUB?</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-          Para se preparar para a correção pelo CUB/SC, não existe um percentual de margem que sirva para todo mundo — o quanto sua parcela pode subir depende do prazo de obra e da variação real do índice nesse período, que muda mês a mês. Consulte a série histórica oficial (fontes acima) para dimensionar cenários com dados reais, e peça uma simulação personalizada para o prazo do seu empreendimento antes de assinar.
+          Para se preparar para a correção pelo CUB/SC, não existe um percentual de margem que sirva para todo mundo — o quanto sua parcela pode subir depende do prazo de obra e da variação real do índice nesse período, que muda mês a mês. Consulte a série histórica compilada citada acima para dimensionar cenários com dados reais, e peça uma simulação personalizada para o prazo do seu empreendimento antes de assinar.
         </p>
         <h3 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: 'clamp(16px,2vw,20px)', marginTop: 32, marginBottom: 12 }}>Conte com uma simulacao personalizada</h3>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>

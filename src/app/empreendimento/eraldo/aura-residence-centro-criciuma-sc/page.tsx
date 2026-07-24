@@ -465,7 +465,7 @@ export default function AuraResidencePage() {
           </h2>
           <hr className="ar-rule" style={{ margin: '0 auto 32px' }} />
           <p style={{ fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 'clamp(15px,1.8vw,18px)', color: 'rgba(245,238,230,0.65)', lineHeight: 1.7, marginBottom: 40 }}>
-            O Aura Residence está em fase de lançamento — as melhores condições costumam valer só nesta etapa. Fale com Stiven para conhecer plantas, valores e condições de pagamento direto com a Eraldo Construções.
+            O Aura Residence está em fase de lançamento. Plantas, valores, disponibilidade e condições de pagamento variam conforme a tabela vigente da Eraldo Construções. Fale com Stiven para conhecer plantas, valores e condições de pagamento direto com a Eraldo Construções.
           </p>
           <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
             <a href={WPP} target="_blank" rel="noopener noreferrer" className="ar-btn ar-btn--solid" data-wpp="cta_final" data-wpp-emp={SLUG} data-wpp-nome={NOME}>Falar com Stiven</a>
