@@ -50,7 +50,7 @@ export default async function LandingPage({ params }: Props) {
       <section style={{ maxWidth: 640, margin: '0 auto', padding: '28px 20px 8px' }}>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: 10 }}>
           {[
-            'Sem banco e sem aprovação bancária: contrato direto com a Construtora Fontana',
+            'Sem banco: contrato direto com a Construtora Fontana, que pode fazer sua própria análise cadastral',
             'Entrada de 20% e parcelas durante a obra — condições reveladas na conversa',
             'A tabela sobe a cada fase da obra: quem entra antes, entra melhor',
           ].map((b) => (

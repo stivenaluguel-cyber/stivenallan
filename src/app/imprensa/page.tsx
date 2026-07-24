@@ -33,7 +33,8 @@ const SCHEMA = {
     name: 'Stiven Allan',
     url: SITE_URL,
     jobTitle: 'Corretor de imóveis',
-    hasCredential: 'CRECI 60.275',
+    // hasCredential removido: Gate B (validação oficial do CRECI) aberto —
+    // nenhuma afirmação de credencial publicada até validação. Ver PR #17.
     sameAs: ['https://www.instagram.com/stivenallan.ofc'],
     knowsAbout: [
       'Financiamento direto com construtora',
@@ -75,7 +76,7 @@ export default function ImprensaPage() {
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 0, marginBottom: 16 }}>Quem é</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-          <strong>Stiven Allan</strong>, corretor de imóveis, CRECI 60.275. Atua na intermediação de empreendimentos na planta e de alto padrão das construtoras Fontana e Eraldo no Sul de Santa Catarina — o catálogo completo está em <Link href="/empreendimentos" style={{ color: '#1A5C3A' }}>/empreendimentos</Link>.
+          <strong>Stiven Allan</strong>, corretor de imóveis. Atua na intermediação de empreendimentos na planta e de alto padrão das construtoras Fontana e Eraldo no Sul de Santa Catarina — o catálogo completo está em <Link href="/empreendimentos" style={{ color: '#1A5C3A' }}>/empreendimentos</Link>.
         </p>
         <p style={{ fontSize: 14, lineHeight: 1.8, color: '#666', marginTop: 12 }}>
           Este site ainda não publica números de anos de atuação, quantidade de clientes atendidos ou vínculos institucionais formais (associações, sindicatos, conselhos) nesta página, porque não temos comprovação documental pronta para citar de forma verificável. Quando essa documentação existir, ela será publicada aqui com a fonte.

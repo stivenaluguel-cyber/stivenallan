@@ -56,7 +56,7 @@ const FAQ_SCHEMA = {
     {
       '@type': 'Question',
       name: 'É seguro comprar na planta em Criciúma?',
-      acceptedAnswer: { '@type': 'Answer', text: 'A segurança da compra depende de fatores verificáveis: o empreendimento deve estar registrado em cartório (incorporação) e o contrato deve ser registrado, com cláusulas claras de correção, prazo e multa por atraso. Verifique o histórico de entregas da construtora antes de decidir, independentemente de quem for.' },
+      acceptedAnswer: { '@type': 'Answer', text: 'A segurança da compra depende de fatores verificáveis: antes de comercializar as unidades, a incorporação deve estar registrada no cartório de registro de imóveis (memorial de incorporação, conforme o art. 32 da Lei 4.591/1964), e o contrato deve trazer cláusulas claras de correção, prazo e multa por atraso. Verifique o histórico de entregas da construtora antes de decidir, independentemente de quem for.' },
     },
     {
       '@type': 'Question',
@@ -106,7 +106,10 @@ export default function GuiaComprarNaPlantaPage() {
           publishedLabel={PUBLISHED_LABEL}
           updatedISO={UPDATED_ISO}
           updatedLabel={UPDATED_LABEL}
-          fontes={['Condições comerciais: tabela vigente informada pela Construtora Fontana, sujeita a alteração']}
+          fontes={[
+            'Condições comerciais: tabela vigente informada pela Construtora Fontana, sujeita a alteração',
+            <>Registro de incorporação: <a href="https://www.planalto.gov.br/ccivil_03/leis/l4591compilado.htm" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>Lei 4.591/1964, art. 32</a></>,
+          ]}
         />
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Por que comprar na planta em Criciúma?</h2>
@@ -121,7 +124,7 @@ export default function GuiaComprarNaPlantaPage() {
         <ol style={{ fontSize: 15, lineHeight: 2.2, color: '#333', paddingLeft: 24 }}>
           <li><strong>Escolha o empreendimento:</strong> Verifique a localização, a construtora, a tipologia e a previsão de entrega do imóvel. Em Criciúma e no Sul Catarinense, os lançamentos Fontana vão de bairros como Michel e Centro até empreendimentos de veraneio no litoral. Compare a planta, o padrão de acabamento e a data prevista de conclusão antes de decidir.</li>
           <li><strong>Conheça o plano de financiamento:</strong> O plano padrão Fontana tem entrada de 20%, até 72 parcelas mensais corrigidas pelo CUB/SC e até 6 reforços anuais. Cada reforço anual equivale a 5 parcelas mensais. Como o financiamento é direto com a construtora, não há necessidade de aprovação bancária, o que agiliza o processo.</li>
-          <li><strong>Analise o contrato (reserva):</strong> Feita a reserva da unidade, analise o contrato com atenção antes de assinar. O contrato deve ser registrado em cartório para sua proteção jurídica e precisa trazer a cláusula de correção pelo CUB/SC, o prazo de entrega e a tolerância previstos. Confira também a especificação técnica do acabamento.</li>
+          <li><strong>Analise o contrato (reserva):</strong> Feita a reserva da unidade, analise o contrato com atenção antes de assinar. Confirme que a incorporação está registrada no cartório de registro de imóveis (memorial de incorporação, art. 32 da Lei 4.591/1964) e que o contrato traz a cláusula de correção pelo CUB/SC, o prazo de entrega e a tolerância previstos. Confira também a especificação técnica do acabamento.</li>
           <li><strong>Pague a entrada:</strong> A entrada corresponde a 20% do valor do imóvel e é paga no ato da assinatura do contrato. Num apartamento de R$ 500.000, por exemplo, isso equivale a R$ 100.000. É esse pagamento inicial que garante a reserva da unidade escolhida.</li>
           <li><strong>Pague as parcelas durante a obra:</strong> Durante a construção, você paga parcelas mensais corrigidas pelo CUB/SC, além dos reforços anuais equivalentes a 5 parcelas cada. As parcelas menores durante a obra são uma das principais vantagens de comprar na planta. O saldo de 80% é diluído ao longo de até 72 meses.</li>
           <li><strong>Receba as chaves:</strong> Concluída a obra, faça a vistoria da unidade, confirme se o acabamento corresponde a especificação do contrato e assine o auto de entrega. É o momento de checar todos os itens antes de receber o imóvel. Eventuais ajustes devem ser registrados na própria vistoria.</li>
@@ -164,7 +167,7 @@ export default function GuiaComprarNaPlantaPage() {
             <ul style={{ fontSize: 14, lineHeight: 2, color: '#333', paddingLeft: 20, margin: 0 }}>
               <li>Preço de lançamento geralmente menor</li>
               <li>Parcelas menores durante a obra</li>
-              <li>Sem aprovação bancária (financiamento direto)</li>
+              <li>Sem depender de banco (financiamento direto) — a construtora pode fazer sua própria análise cadastral</li>
               <li>Possibilidade de personalização do acabamento</li>
               <li>Potencial de valorização até a entrega</li>
             </ul>
@@ -183,7 +186,7 @@ export default function GuiaComprarNaPlantaPage() {
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>O que verificar antes de assinar?</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-          Antes de assinar o contrato de compra de um apartamento na planta, verifique: registro do empreendimento na prefeitura e cartório; CRECI do corretor (Stiven Allan: CRECI 60.275); cláusulas de correção das parcelas (deve ser CUB/SC na Fontana); prazo de entrega e tolerância prevista no contrato; especificação técnica do acabamento e dos materiais; forma de quitação do saldo pós-chaves via saldo direto ou financiamento bancário.
+          Antes de assinar o contrato de compra de um apartamento na planta, verifique: registro da incorporação no cartório de registro de imóveis (memorial de incorporação, art. 32 da Lei 4.591/1964); CRECI do corretor (Stiven Allan: CRECI 60.275); cláusulas de correção das parcelas (deve ser CUB/SC na Fontana); prazo de entrega e tolerância prevista no contrato; especificação técnica do acabamento e dos materiais; forma de quitação do saldo pós-chaves via saldo direto ou financiamento bancário.
         </p>
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Perguntas Frequentes</h2>

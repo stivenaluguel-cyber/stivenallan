@@ -158,7 +158,7 @@ export default async function EmpreendimentosPage() {
           <h1 className="cat-h2 fade-in fade-in-1" style={{ color: t.onDark, maxWidth: '20ch' }}>Empreendimentos em Criciúma e região</h1>
           <hr className="cat-rule fade-in fade-in-2" style={{ margin: '24px 0' }} />
           <p className="cat-serif fade-in fade-in-2" style={{ color: t.onDarkMuted, fontSize: 'clamp(15px,1.8vw,19px)', maxWidth: 560, lineHeight: 1.65 }}>
-            {lista.length} empreendimentos em {totalCidades} cidades do Sul de Santa Catarina, todos com financiamento direto da construtora — sem banco, sem burocracia.
+            {lista.length} empreendimentos em {totalCidades} cidades do Sul de Santa Catarina, todos com financiamento direto da construtora, sem depender de banco.
           </p>
         </div>
       </section>

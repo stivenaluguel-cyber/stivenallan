@@ -185,7 +185,7 @@ export const metadata: Metadata = {
                             <ul style={{ fontSize: 14, lineHeight: 2, color: '#333', paddingLeft: 20, margin: 0 }}>
                             <li>Parcelas menores durante a obra</li>
                             <li>Possibilidade de personalização do acabamento</li>
-                            <li>Sem aprovação bancária (financiamento direto)</li>
+                            <li>Sem depender de banco (financiamento direto) — a construtora pode fazer sua própria análise cadastral</li>
                             <li>Preco de lançamento geralmente menor</li>
                             </ul>
                             </div>

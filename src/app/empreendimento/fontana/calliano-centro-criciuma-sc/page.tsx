@@ -288,7 +288,7 @@ export default function CallianoPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 32, marginBottom: 48 }}>
             {[
               ['01','Escolha seu imóvel','Selecione a planta ideal para você e sua família.'],
-              ['02','Fale com Stiven','Tire todas as dúvidas pelo WhatsApp — rápido e sem burocracia.'],
+              ['02','Fale com Stiven','Tire todas as dúvidas pelo WhatsApp — atendimento direto e rápido.'],
               ['03','Realize seu sonho','Condições personalizadas para o seu perfil.'],
             ].map(([n,t1,t2]) => (
               <div key={n}>

@@ -224,7 +224,7 @@ export default function AvezzanoPage() {
           <h2 style={{ fontSize: 'clamp(1.8rem,3vw,2.5rem)', fontWeight: 300, marginBottom: '1rem' }}>
             Financiamento <strong style={{ fontWeight: 700 }}>Direto Fontana</strong>
           </h2>
-          <p style={{ color: 'rgba(255,255,255,0.7)', marginBottom: '2rem', fontSize: '1rem' }}>Sem burocracia. Condições sob medida para você.</p>
+          <p style={{ color: 'rgba(255,255,255,0.7)', marginBottom: '2rem', fontSize: '1rem' }}>Negociação direta com a construtora. Condições sob medida para você.</p>
           <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: '1rem', lineHeight: 1.8, maxWidth: '640px', margin: '0 auto 1rem' }}>{COMERCIAL.texto}</p>
           <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', lineHeight: 1.8, maxWidth: '640px', margin: '0 auto 3rem' }}>{COMERCIAL.saldo}</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem', marginBottom: '3rem' }}>

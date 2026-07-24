@@ -257,7 +257,7 @@ export default function Page() {
           <p className="vv-eyebrow" style={{ color:t.onDarkMuted, marginBottom:20 }}>Financiamento</p>
           <h2 className="vv-h2" style={{ color:t.onDark, margin:'0 0 24px' }}>Direto com a Construtora</h2>
           <p style={{ color:t.onDarkMuted, fontSize:16, lineHeight:1.8, maxWidth:640, margin:'0 auto 48px' }}>
-            O Villaggio Verde oferece financiamento direto com a Construtora Fontana — condições especiais, entrada facilitada e processo sem burocracia. Fale comigo para uma proposta personalizada.
+            O Villaggio Verde oferece financiamento direto com a Construtora Fontana — condições especiais e entrada facilitada, negociadas diretamente. Fale comigo para uma proposta personalizada.
           </p>
           <a href={WPP} target="_blank" rel="noopener noreferrer" className="vv-cta" style={{ color:t.onDark, borderColor:'rgba(245,242,237,0.4)' }}>
             Consultar Condições

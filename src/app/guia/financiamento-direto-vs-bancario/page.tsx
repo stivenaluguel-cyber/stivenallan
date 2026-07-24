@@ -120,6 +120,7 @@ export const metadata: Metadata = {
                               fontes={[
                                 'Sistemas e taxas das construtoras terceiras (Corbetta, Locks, Giassi, Perego) informados pelas próprias construtoras e sujeitos a alteração — confirme diretamente antes de decidir',
                                 <>FGTS: <a href="https://www.caixa.gov.br/voce/habitacao/Paginas/utilizacao-fgts.aspx" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>Caixa Econômica Federal</a></>,
+                                <>IOF em crédito habitacional: <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del2407.htm" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>Decreto-Lei 2.407/1988</a></>,
                               ]}
                             />
 
@@ -136,7 +137,7 @@ export const metadata: Metadata = {
                             No financiamento bancário, o banco analisa a renda e o historico de crédito do comprador antes de aprovar o contrato. O cálculo das parcelas segue sistemas de juros compostos, geralmente pelas tabelas Price ou SAC. O uso do FGTS para composição da entrada ou amortização do saldo devedor pode ser possível no financiamento bancário, sujeito às regras vigentes, à elegibilidade do comprador, do imóvel e à aprovação da instituição financeira.
                             </p>
                             <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
-                            Os custos e encargos variam conforme o contrato e a instituição — no financiamento bancário podem incluir itens como IOF, tarifa de abertura de crédito e seguro, que nem sempre estão presentes da mesma forma no financiamento direto com a construtora. Compare o custo total e confirme cada item na minuta contratual antes de decidir.
+                            Os custos, seguros e tarifas variam conforme a modalidade, a instituição e o contrato. Compare o Custo Efetivo Total (CET) e confirme cada item na minuta contratual antes de decidir.
                             </p>
 
                             <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Três sistemas de cálculo: SPC-JS, Price e SAC</h2>

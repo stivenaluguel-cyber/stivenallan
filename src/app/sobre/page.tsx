@@ -2,23 +2,23 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'Sobre Stiven Allan — Corretor de Imóveis CRECI/RS 60.275 | Criciúma SC',
-    description: 'Conheça Stiven Allan, corretor de imóveis especializado em lançamentos e empreendimentos em Criciúma e região. CRECI/RS 60.275. Atendimento premium e personalizado.',
+  title: 'Sobre Stiven Allan — Corretor de Imóveis CRECI 60.275 | Criciúma SC',
+    description: 'Conheça Stiven Allan, corretor de imóveis especializado em lançamentos e empreendimentos em Criciúma e região. CRECI 60.275. Atendimento premium e personalizado.',
       alternates: { canonical: 'https://stivenallan.com.br/sobre' },
         openGraph: {
-            title: 'Sobre Stiven Allan — Corretor CRECI/RS 60.275 | Stiven Allan',
+            title: 'Sobre Stiven Allan — Corretor CRECI 60.275 | Stiven Allan',
                 description: 'Especialista em lançamentos imobiliários em Criciúma e região sul catarinense.',
                     url: 'https://stivenallan.com.br/sobre',
                         siteName: 'Stiven Allan — Corretor de Imóveis',
                             locale: 'pt_BR',
                                 type: 'profile',
                                   },
-                                      twitter: { card: 'summary_large_image', title: 'Sobre Stiven Allan — Corretor CRECI/RS 60.275 | Stiven Allan' },
+                                      twitter: { card: 'summary_large_image', title: 'Sobre Stiven Allan — Corretor CRECI 60.275 | Stiven Allan' },
                                   }
 
                                   const stats = [
-                                                                                                      { value: 'Fontana', label: 'Construtora parceira' },
-                                                                                                        { value: 'Eraldo', label: 'Construtora parceira' },
+                                                                                                      { value: 'Fontana', label: 'Construtora no catálogo' },
+                                                                                                        { value: 'Eraldo', label: 'Construtora no catálogo' },
                                                                                                           { value: 'Sul de SC', label: 'Região de atuação' },
                                                                                                             { value: 'CRECI', label: '60.275' },
                                                                                                             ]

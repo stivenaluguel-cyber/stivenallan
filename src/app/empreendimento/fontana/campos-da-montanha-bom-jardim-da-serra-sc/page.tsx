@@ -212,7 +212,7 @@ html { scroll-behavior: smooth; }
 <section style={{ background:t.dark, padding:'80px 32px', textAlign:'center' }}>
 <p className="cm-eyebrow" style={{ color:t.onDarkMuted, marginBottom:16 }}>Seu Corretor</p>
 <h2 className="cm-h2" style={{ color:t.onDark, marginBottom:16 }}>Stiven Allan</h2>
-<p style={{ color:t.onDarkMuted, fontSize:15, maxWidth:480, margin:'0 auto 40px' }}>Especialista em imóveis premium no litoral e serra de Santa Catarina. Atendimento personalizado, sem burocracia.</p>
+<p style={{ color:t.onDarkMuted, fontSize:15, maxWidth:480, margin:'0 auto 40px' }}>Especialista em imóveis premium no litoral e serra de Santa Catarina. Atendimento direto e personalizado.</p>
 <div style={{ display:'flex', gap:16, justifyContent:'center', flexWrap:'wrap' }}>
 <a href={WPP} className="cm-cta cm-cta-light">Falar no WhatsApp</a>
 <Link href="/" className="cm-cta" style={{ color:t.onDark, borderColor:'rgba(232,242,232,0.3)' }}>Ver todos os imóveis</Link>

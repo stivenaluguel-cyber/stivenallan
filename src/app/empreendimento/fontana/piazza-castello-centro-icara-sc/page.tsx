@@ -162,7 +162,7 @@ export default function PiazzaCastelloPage() {
           </div>
           <div style={{marginTop:'2.5rem',padding:'1.5rem',background:'#f9f9f9',borderLeft:`4px solid ${COR}`,borderRadius:'0 4px 4px 0'}}>
             <p style={{margin:0,fontSize:'.95rem',color:'#444',fontWeight:600}}>Financiamento direto com a Construtora Fontana</p>
-            <p style={{margin:'.5rem 0 0',fontSize:'.9rem',color:'#666'}}>Negocie diretamente com a construtora — sem burocracia de banco.</p>
+            <p style={{margin:'.5rem 0 0',fontSize:'.9rem',color:'#666'}}>Negocie diretamente com a construtora, sem depender de banco.</p>
           </div>
         </div>
       </section>

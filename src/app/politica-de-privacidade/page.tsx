@@ -217,7 +217,6 @@ export default function PoliticaDePrivacidadePage() {
           <p>Para dúvidas sobre esta política ou para exercer seus direitos como titular de dados, fale diretamente com Stiven Allan:</p>
           <ul style={{ margin: 0, paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 6 }}>
             <li>WhatsApp: <a href="https://wa.me/5548991642332" target="_blank" rel="noopener noreferrer" style={{ color: C.accent }}>(48) 99164-2332</a></li>
-            <li>E-mail: <a href="mailto:contato@stivenallan.com.br" style={{ color: C.accent }}>contato@stivenallan.com.br</a></li>
             <li>CRECI 60.275 — Criciúma, Santa Catarina</li>
           </ul>
         </Secao>

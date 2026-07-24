@@ -110,6 +110,7 @@ export default function GuiaFinanciamentoDiretoPage() {
           fontes={[
             <>CUB/SC: <a href="https://www.sindusconcriciuma.com.br/" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>Sinduscon Sul Catarinense</a></>,
             <>FGTS: <a href="https://www.caixa.gov.br/voce/habitacao/Paginas/utilizacao-fgts.aspx" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>Caixa Econômica Federal</a></>,
+            <>Registro de incorporação: <a href="https://www.planalto.gov.br/ccivil_03/leis/l4591compilado.htm" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>Lei 4.591/1964, art. 32</a></>,
             'Condições comerciais: tabela vigente informada pela Construtora Fontana, sujeita a alteração',
           ]}
         />
@@ -163,7 +164,7 @@ export default function GuiaFinanciamentoDiretoPage() {
         <ol style={{ fontSize: 15, lineHeight: 2.2, color: '#333', paddingLeft: 24 }}>
           <li><strong>Escolha o empreendimento:</strong> Verifique localização, tipologia, prazo de entrega e valores de partida.</li>
           <li><strong>Simulação personalizada:</strong> Stiven calcula as parcelas mensais e reforços anuais de acordo com o imóvel e a tabela vigente.</li>
-          <li><strong>Análise do contrato:</strong> O contrato é registrado em cartório para sua segurança. Verifique cláusulas de correção, prazo de entrega e multas.</li>
+          <li><strong>Análise do contrato:</strong> Confirme que a incorporação está registrada no cartório de registro de imóveis (memorial de incorporação, art. 32 da Lei 4.591/1964). Verifique cláusulas de correção, prazo de entrega e multas.</li>
           <li><strong>Pagamento da entrada (20%):</strong> Paga no ato da assinatura do contrato de compra e venda.</li>
           <li><strong>Parcelas durante a obra:</strong> Mensais corrigidas pelo CUB/SC mais reforços anuais pagos ao longo da construção.</li>
           <li><strong>Entrega das chaves:</strong> Ao concluir a obra, você faz a vistoria e recebe as chaves. O saldo devedor pode ser quitado com recursos próprios ou financiamento bancário — o uso do FGTS nessa etapa depende das regras vigentes e da aprovação da instituição financeira.</li>

@@ -335,7 +335,7 @@ Tendo o bem-estar e a natureza como seus melhores vizinhos. O Parque da Prefeitu
 <div style={{ maxWidth: 1080, margin: '0 auto', textAlign: 'center' }}>
 <p className="ps-eyebrow" style={{ color: t.onDark, marginBottom: 18 }}>Financiamento Direto</p>
 <h2 className="ps-h2" style={{ color: t.onDark }}>A liberdade de comprar sem banco</h2>
-<p className="ps-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 40 }}>Sem burocracia, sem intermediários. Direto com a construtora.</p>
+<p className="ps-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 40 }}>Negociação direta com a construtora, sem intermediários.</p>
 <p style={{ color: t.onDarkMuted, fontSize: 17, lineHeight: 1.7, maxWidth: 720, margin: '0 auto 16px' }}>{COMERCIAL.padrao}</p>
 <p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.7, maxWidth: 720, margin: '0 auto 20px' }}>{COMERCIAL.correcaoPadrao}</p>
 <p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.7, maxWidth: 720, margin: '0 auto 40px' }}>{COMERCIAL.alternativas}</p>

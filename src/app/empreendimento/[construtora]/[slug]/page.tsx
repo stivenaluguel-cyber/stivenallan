@@ -350,7 +350,7 @@ export default async function EmpreendimentoPage({ params }: PageProps) {
             {precoLabel(emp)}
           </p>
           <p style={{ fontSize: 14, color: '#5a5246', margin: '0 0 20px' }}>
-            Condições negociadas direto com a construtora, sem aprovação bancária.
+            Condições negociadas direto com a construtora, sem depender de banco — a construtora pode fazer sua própria análise cadastral.
           </p>
           <a
             href={waLink(emp)}
