@@ -25,6 +25,7 @@ export default function FormContato({ empreendimento, propertyId, propertySlug, 
   const [telefone, setTelefone] = useState('');
   const [email, setEmail] = useState('');
   const [faixaInvestimento, setFaixaInvestimento] = useState('');
+  const [veiculoTroca, setVeiculoTroca] = useState('');
   const [prazoCompra, setPrazoCompra] = useState('');
   const [entradaDisponivel, setEntradaDisponivel] = useState('');
   const [hp, setHp] = useState(''); // honeypot: usuário real nunca vê, bot preenche → server responde 400
@@ -32,6 +33,9 @@ export default function FormContato({ empreendimento, propertyId, propertySlug, 
   const startedRef = useRef(false);
   const funilParams = { empreendimento: propertySlug || empreendimento, content_name: empreendimento, form_type: 'contact_form' as const };
   const faixasInvestimento = getFaixasInvestimento(propertySlug);
+  // Casa Guaíba Park tem preço fixo (R$990 mil) — "faixa de investimento" não faz
+  // sentido pra um imóvel único; pergunta veículo na negociação em vez disso.
+  const isCasaGuaiba = propertySlug === 'casa-guaiba-park';
 
   function markStarted() {
     if (startedRef.current) return;
@@ -44,7 +48,9 @@ export default function FormContato({ empreendimento, propertyId, propertySlug, 
     const detalhes = [
       nome && `Nome: ${nome}`,
       telefone && `Telefone: ${telefone}`,
-      faixaInvestimento && `Faixa de investimento: ${faixaInvestimento}`,
+      isCasaGuaiba
+        ? veiculoTroca && `Veículo para negociação: ${veiculoTroca}`
+        : faixaInvestimento && `Faixa de investimento: ${faixaInvestimento}`,
       prazoCompra && `Quando pretende comprar: ${prazoCompra}`,
       entradaDisponivel && `Entrada disponível: ${entradaDisponivel}`,
     ].filter(Boolean);
@@ -54,7 +60,8 @@ export default function FormContato({ empreendimento, propertyId, propertySlug, 
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!nome || !telefone || !faixaInvestimento || !prazoCompra || !entradaDisponivel) return;
+    const investimentoValido = isCasaGuaiba ? veiculoTroca : faixaInvestimento;
+    if (!nome || !telefone || !investimentoValido || !prazoCompra || !entradaDisponivel) return;
     setStatus('enviando');
     let leadId: string | null = null;
     // Aba aberta ainda dentro do gesto de clique — Safari bloqueia window.open() chamado após um await
@@ -72,7 +79,8 @@ export default function FormContato({ empreendimento, propertyId, propertySlug, 
           property_slug: propertySlug || null,
           canal_preferido: 'whatsapp',
           pagina_origem: typeof window !== 'undefined' ? window.location.pathname : null,
-          faixa_investimento: faixaInvestimento,
+          faixa_investimento: isCasaGuaiba ? null : faixaInvestimento,
+          veiculo_troca: isCasaGuaiba ? veiculoTroca : null,
           prazo_compra: prazoCompra,
           entrada_disponivel: entradaDisponivel,
           hp_url: hp,
@@ -215,21 +223,39 @@ export default function FormContato({ empreendimento, propertyId, propertySlug, 
         style={inputStyle}
         aria-label="E-mail"
       />
-      <select
-        value={faixaInvestimento}
-        onChange={(e) => setFaixaInvestimento(e.target.value)}
-        onFocus={markStarted}
-        required
-        style={selectStyle}
-        aria-label="Faixa de investimento"
-      >
-        <option value="" disabled>
-          Faixa de investimento
-        </option>
-        {faixasInvestimento.map((faixa) => (
-          <option key={faixa} value={faixa}>{faixa}</option>
-        ))}
-      </select>
+      {isCasaGuaiba ? (
+        <select
+          value={veiculoTroca}
+          onChange={(e) => setVeiculoTroca(e.target.value)}
+          onFocus={markStarted}
+          required
+          style={selectStyle}
+          aria-label="Tem veículo para incluir na negociação?"
+        >
+          <option value="" disabled>
+            Tem veículo para incluir na negociação?
+          </option>
+          <option value="Sim">Sim</option>
+          <option value="Não">Não</option>
+          <option value="Prefiro falar no WhatsApp">Prefiro falar no WhatsApp</option>
+        </select>
+      ) : (
+        <select
+          value={faixaInvestimento}
+          onChange={(e) => setFaixaInvestimento(e.target.value)}
+          onFocus={markStarted}
+          required
+          style={selectStyle}
+          aria-label="Faixa de investimento"
+        >
+          <option value="" disabled>
+            Faixa de investimento
+          </option>
+          {faixasInvestimento.map((faixa) => (
+            <option key={faixa} value={faixa}>{faixa}</option>
+          ))}
+        </select>
+      )}
       <select
         value={prazoCompra}
         onChange={(e) => setPrazoCompra(e.target.value)}

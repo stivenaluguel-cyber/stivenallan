@@ -2,6 +2,7 @@
 // Calibradas pelas tabelas oficiais de julho/2026 (CUB/SC R$ 3.121,62):
 // A: Lavis 1,70–2,28M · Aura 1,76–2,25M (duplex até 4,1M) · Fidenza 2,38–2,68M · Monte Leone 3,33–4,60M
 // B: Calliano 0,90M · Due Fratelli 0,90–1,00M · Parco Savello 1,00–1,17M · Thiene 1,07–1,51M · Tremezzo 1,22–1,57M
+//    Casa Guaíba Park 0,99M (terceiro/administração, fora do catálogo Fontana/Eraldo)
 // C: Pavia 0,57–0,62M · Bosco 0,58–0,68M · Bellante 0,62–0,65M · Pineto 0,66–0,82M · Calalzo 0,71M · Gran Michel 0,65–1,27M
 // Slugs fora do mapa (L'Essence, Villaggio Verde, litoral, Içara, Siderópolis,
 // Tubarão, serra e cadastros futuros do dashboard) usam as faixas padrão.
@@ -21,6 +22,8 @@ const FAIXAS_POR_TIER: Record<TierInvestimento, readonly string[]> = {
 };
 
 const TIER_POR_SLUG: Record<string, TierInvestimento> = {
+  // Casa Guaíba Park (R$990 mil, terceiro/administração — fora do catálogo Fontana/Eraldo)
+  'casa-guaiba-park': 'B',
   // Alto padrão — Criciúma
   'monte-leone-centro-criciuma-sc': 'A',
   'fidenza-residencial-cruzeiro-do-sul-criciuma-sc': 'A',

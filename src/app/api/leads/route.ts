@@ -63,6 +63,7 @@ export async function POST(req: NextRequest) {
     const email = normalizeEmail(body.email)
     const mensagem = normalizeString(body.mensagem)
     const canalPreferido = normalizeString(body.canal_preferido)
+    const veiculoTroca = normalizeString(body.veiculo_troca)
     const paginaOrigem = normalizeString(body.pagina_origem)
     const propertySlug = normalizeString(body.property_slug)
     const propertyIdInput = normalizeString(body.property_id)
@@ -85,7 +86,11 @@ export async function POST(req: NextRequest) {
     }
 
     const anotacoes =
-      [mensagem, canalPreferido ? `Canal preferido: ${canalPreferido}` : null]
+      [
+        mensagem,
+        canalPreferido ? `Canal preferido: ${canalPreferido}` : null,
+        veiculoTroca ? `Veículo para negociação: ${veiculoTroca}` : null,
+      ]
         .filter(Boolean)
         .join(' | ') || null
 
