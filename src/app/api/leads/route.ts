@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import { normalizeEmail, normalizePhone, normalizeString } from '@/lib/leads/normalize'
 import { extractIp, isBotSubmission } from '@/lib/leads/anti-spam'
 import { checkRateLimit } from '@/lib/leads/rate-limit'
+import { notificarNovoLead } from '@/lib/leads/notificar-novo-lead'
 import { logError, logWarn } from '@/lib/log'
 
 export const dynamic = 'force-dynamic'
@@ -125,6 +126,14 @@ export async function POST(req: NextRequest) {
     if (error) {
       logError(SOURCE, 'supabase insert failed', error)
       return NextResponse.json({ error: 'Erro ao salvar lead' }, { status: 500 })
+    }
+
+    // Lead já está salvo — notificação é best-effort, nunca derruba a resposta
+    // de sucesso mesmo se o Resend falhar ou a chave estiver ausente.
+    try {
+      await notificarNovoLead({ nome, whatsapp, email, propertyName: resolvedPropertyName })
+    } catch (notifyErr) {
+      logError(SOURCE, 'falha ao notificar novo lead', notifyErr)
     }
 
     return NextResponse.json({ success: true, id: data?.id ?? null }, { status: 201 })

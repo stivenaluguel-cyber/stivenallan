@@ -20,6 +20,13 @@ Sentry.init({
   replaysSessionSampleRate: 0,
   replaysOnErrorSampleRate: 0,
   debug: false,
+  // Ruído de terceiros, não-acionável: o próprio fbevents.js (Meta Pixel) tenta
+  // usar a bridge window.webkit.messageHandlers quando a página abre dentro do
+  // navegador in-app do Facebook/Instagram no iOS. Não é código nosso e não
+  // impede a captação do lead (confirmado via inserção real na tabela `leads`
+  // com UTM completo durante tráfego pago em /casa-guaiba-park) — só teto de
+  // alerta falso-positivo no Sentry.
+  ignoreErrors: [/window\.webkit\.messageHandlers/i],
 })
 
 // Rastreia transições do App Router — Sentry pede pra vincular exceções ao route
