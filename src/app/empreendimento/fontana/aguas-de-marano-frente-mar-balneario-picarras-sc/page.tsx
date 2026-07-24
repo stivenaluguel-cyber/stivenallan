@@ -257,10 +257,10 @@ return (
 <div style={{ maxWidth: 1080, margin: '0 auto', textAlign: 'center' }}>
 <p className="am-eyebrow" style={{ color: t.onDark, marginBottom: 18 }}>Condições de Pagamento</p>
 <h2 className="am-h2" style={{ color: t.onDark }}>Fale com o corretor</h2>
-<p className="am-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 40 }}>Negociação direta com a construtora, sem intermediários.</p>
+<p className="am-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 40 }}>Condições de pagamento definidas pela Construtora Fontana, conforme a tabela vigente.</p>
 <p style={{ color: t.onDarkMuted, fontSize: 17, lineHeight: 1.7, maxWidth: 640, margin: '0 auto 40px' }}>As condições comerciais deste empreendimento estão em atualização. Fale com o Stiven Allan pelo WhatsApp para receber a tabela vigente e simular as condições disponíveis para a sua unidade.</p>
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px,1fr))', gap: 'clamp(28px,4vw,52px)' }}>
-{[{n:'01',t:'Converse com o corretor',d:'Atendimento exclusivo e personalizado para entender o seu momento.'},{n:'02',t:'Receba a tabela vigente',d:'Stiven Allan envia as condições atualizadas e a disponibilidade por unidade.'},{n:'03',t:'Simule a sua unidade',d:'Condições apresentadas diretamente pela Construtora Fontana, sem intermediários.'}].map((s,i)=>(
+{[{n:'01',t:'Converse com o corretor',d:'Atendimento exclusivo e personalizado para entender o seu momento.'},{n:'02',t:'Receba a tabela vigente',d:'Stiven Allan envia as condições atualizadas e a disponibilidade por unidade.'},{n:'03',t:'Simule a sua unidade',d:'Condições apresentadas conforme a tabela vigente da Construtora Fontana.'}].map((s,i)=>(
 <div key={i} style={{ textAlign: 'left' }}><div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 40, opacity: 0.55, marginBottom: 14 }}>{s.n}</div><h3 style={{ fontFamily: t.display, fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: 17, margin: '0 0 12px' }}>{s.t}</h3><p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.6, margin: 0 }}>{s.d}</p></div>
 ))}
 </div>

@@ -20,17 +20,17 @@ const PASSOS_POR_STATUS: Record<StatusEmpreendimento, { n: string; titulo: strin
   lancamento: [
     { n: '01', titulo: 'Escolha a sua unidade', desc: 'Conheça as plantas disponíveis e reserve a unidade ideal para o seu momento.' },
     { n: '02', titulo: 'Simulação personalizada', desc: 'Stiven estrutura as condições de pagamento com a construtora, de acordo com o seu perfil.' },
-    { n: '03', titulo: 'Contrato direto', desc: 'Documentação simplificada, sem intermediários.' },
+    { n: '03', titulo: 'Contrato com a construtora', desc: 'Revise a documentação e as condições contratuais antes de assinar.' },
   ],
   em_construcao: [
     { n: '01', titulo: 'Escolha a sua unidade', desc: 'Conheça as plantas disponíveis e reserve a unidade ideal para o seu momento.' },
     { n: '02', titulo: 'Simulação personalizada', desc: 'Stiven estrutura as condições de pagamento com a construtora, de acordo com o seu perfil.' },
-    { n: '03', titulo: 'Contrato direto', desc: 'Documentação simplificada, sem intermediários.' },
+    { n: '03', titulo: 'Contrato com a construtora', desc: 'Revise a documentação e as condições contratuais antes de assinar.' },
   ],
   entregue: [
     { n: '01', titulo: 'Conheça as unidades disponíveis', desc: 'Veja quais unidades ainda estão disponíveis e agende uma visita ao imóvel pronto.' },
     { n: '02', titulo: 'Simulação personalizada', desc: 'Stiven estrutura as condições de pagamento de acordo com o seu perfil.' },
-    { n: '03', titulo: 'Contrato direto', desc: 'Documentação simplificada, sem intermediários.' },
+    { n: '03', titulo: 'Contrato com a construtora', desc: 'Revise a documentação e as condições contratuais antes de assinar.' },
   ],
 }
 

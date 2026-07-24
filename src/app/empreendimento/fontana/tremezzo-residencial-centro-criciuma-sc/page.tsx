@@ -385,7 +385,7 @@ const CSS = `
             {[
               { n: '01', titulo: 'Escolha a sua unidade', desc: 'Conheça o decorado e selecione a unidade ideal para o seu estilo de vida.' },
               { n: '02', titulo: 'Simulação personalizada', desc: 'Stiven estrutura as condições de pagamento com a construtora, de acordo com o seu perfil.' },
-              { n: '03', titulo: 'Contrato direto', desc: 'Documentação simplificada, sem intermediários.' },
+              { n: '03', titulo: 'Contrato com a construtora', desc: 'Revise a documentação e as condições contratuais antes de assinar.' },
             ].map(({ n, titulo, desc }) => (
               <div key={n} style={{ display: 'flex', gap: 24, alignItems: 'flex-start' }}>
                 <span style={{ fontFamily: "'Jost', system-ui, sans-serif", fontSize: 36, fontWeight: 200, color: 'rgba(107,45,62,0.20)', lineHeight: 1, flexShrink: 0, width: 48 }}>{n}</span>

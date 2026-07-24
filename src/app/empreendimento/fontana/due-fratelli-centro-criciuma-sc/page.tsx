@@ -236,7 +236,7 @@ details.df-menu > summary::-webkit-details-marker { display: none; }
 <div style={{ maxWidth: 1080, margin: '0 auto', textAlign: 'center' }}>
 <p className="df-eyebrow" style={{ color: t.onDark, marginBottom: 18 }}>Investimento</p>
 <h2 className="df-h2" style={{ color: t.onDark }}>A liberdade de comprar sem banco</h2>
-<p className="df-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 60 }}>Negociação direta com a construtora, sem intermediários.</p>
+<p className="df-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 60 }}>Condições de pagamento definidas pela Construtora Fontana, conforme a tabela vigente.</p>
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px,1fr))', gap: 'clamp(28px,4vw,52px)' }}>
 {[{n:'01',tt:'Converse com o corretor',d:'Atendimento exclusivo e personalizado para entender o seu momento e as melhores condições.'},{n:'02',tt:'Escolha a sua planta',d:'Selecione a unidade ideal e defina uma proposta sob medida, sem amarras bancárias.'},{n:'03',tt:'Negocie direto',d:'Condições flexíveis diretamente com a Construtora Fontana, com a liberdade que você merece.'}].map((s,i)=>(
 <div key={i} style={{ textAlign: 'left' }}><div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 40, opacity: 0.55, marginBottom: 14 }}>{s.n}</div><h3 style={{ fontFamily: t.display, fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: 17, margin: '0 0 12px' }}>{s.tt}</h3><p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.6, margin: 0 }}>{s.d}</p></div>
