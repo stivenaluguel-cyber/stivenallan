@@ -3,7 +3,12 @@ import Link from 'next/link'
 import { SITE_URL } from '@/lib/site'
 
 const CANONICAL = `${SITE_URL}/imprensa`
-const CONTATO_EMAIL = 'contato@stivenallan.com.br'
+// contato@stivenallan.com.br NÃO é usado aqui: o domínio stivenallan.com.br
+// não tem registro MX (confirmado via dig em 2026-07-24) — só existe
+// infraestrutura de ENVIO (Resend/SES) no subdomínio send., não de recebimento
+// no domínio raiz. Publicar esse endereço como contato de imprensa faria
+// qualquer resposta de jornalista bater e retornar (bounce). WhatsApp é o
+// único canal de contato confirmado funcional nesta página.
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20sou%20jornalista%2Feditor%20e%20gostaria%20de%20falar%20sobre%20uma%20pauta.'
 
 export const metadata: Metadata = {
@@ -29,7 +34,6 @@ const SCHEMA = {
     url: SITE_URL,
     jobTitle: 'Corretor de imóveis',
     hasCredential: 'CRECI 60.275',
-    email: CONTATO_EMAIL,
     sameAs: ['https://www.instagram.com/stivenallan.ofc'],
     knowsAbout: [
       'Financiamento direto com construtora',
@@ -87,17 +91,12 @@ export default function ImprensaPage() {
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Contato editorial</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-          Para pauta, entrevista ou verificação de dado publicado nos guias deste site: <a href={`mailto:${CONTATO_EMAIL}`} style={{ color: '#1A5C3A' }}>{CONTATO_EMAIL}</a> ou pelo <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ color: '#1A5C3A' }}>WhatsApp</a>.
+          Para pauta, entrevista ou verificação de dado publicado nos guias deste site, o canal confirmado é o <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ color: '#1A5C3A' }}>WhatsApp</a>.
         </p>
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Política de correção</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-          Os guias deste site (<Link href="/guia" style={{ color: '#1A5C3A' }}>/guia</Link>) trazem dados comerciais — condições de financiamento, valores, prazos, índices — que mudam conforme a tabela vigente de cada empreendimento e conforme índices oficiais como o CUB/SC. Encontrou algo desatualizado, incorreto ou sem fonte? Escreva para <a href={`mailto:${CONTATO_EMAIL}`} style={{ color: '#1A5C3A' }}>{CONTATO_EMAIL}</a> com o link da página e o trecho em questão. Correções factuais são aplicadas assim que verificadas; a data de &quot;Atualizado em&quot; de cada guia reflete a última alteração de conteúdo publicada, não a data de build do site.
-        </p>
-
-        <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Verificação de registro profissional</h2>
-        <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-          O CRECI 60.275 pode ser consultado diretamente no site do conselho regional competente. A página <Link href="/sobre" style={{ color: '#1A5C3A' }}>/sobre</Link> traz o registro completo, incluindo a unidade federativa.
+          Os guias deste site (<Link href="/guia" style={{ color: '#1A5C3A' }}>/guia</Link>) trazem dados comerciais — condições de financiamento, valores, prazos, índices — que mudam conforme a tabela vigente de cada empreendimento e conforme índices oficiais como o CUB/SC. Encontrou algo desatualizado, incorreto ou sem fonte? Mande o link da página e o trecho em questão pelo <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ color: '#1A5C3A' }}>WhatsApp</a>. Correções factuais são aplicadas assim que verificadas; a data de &quot;Atualizado em&quot; de cada guia reflete a última alteração de conteúdo publicada, não a data de build do site.
         </p>
 
         {/* CTA */}
@@ -109,9 +108,6 @@ export default function ImprensaPage() {
           <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
             <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', fontSize: 12, letterSpacing: '0.3em', textTransform: 'uppercase', color: '#fff', border: '1px solid rgba(255,255,255,0.55)', padding: '14px 28px', textDecoration: 'none' }}>
               Falar no WhatsApp
-            </a>
-            <a href={`mailto:${CONTATO_EMAIL}`} style={{ display: 'inline-block', fontSize: 12, letterSpacing: '0.3em', textTransform: 'uppercase', color: '#fff', border: '1px solid rgba(255,255,255,0.55)', padding: '14px 28px', textDecoration: 'none' }}>
-              Enviar e-mail
             </a>
           </div>
         </div>

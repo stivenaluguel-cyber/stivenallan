@@ -66,7 +66,7 @@ const FAQ_SCHEMA = {
     {
       '@type': 'Question',
       name: 'Dá para comprar apartamento na praia sem financiamento bancário?',
-      acceptedAnswer: { '@type': 'Answer', text: 'Sim. Nos empreendimentos Fontana do litoral sul, a compra é por financiamento direto com a construtora: entrada de 20%, parcelas mensais corrigidas pelo CUB/SC durante a obra e reforços anuais — sem aprovação de banco, sem IOF e sem seguro embutido.' },
+      acceptedAnswer: { '@type': 'Answer', text: 'Sim. Nos empreendimentos Fontana do litoral sul, a compra é por financiamento direto com a construtora: entrada de 20%, parcelas mensais corrigidas pelo CUB/SC durante a obra e reforços anuais — sem depender de financiamento bancário. Os custos e encargos variam conforme o contrato; confirme cada item na minuta antes de assinar.' },
     },
     {
       '@type': 'Question',

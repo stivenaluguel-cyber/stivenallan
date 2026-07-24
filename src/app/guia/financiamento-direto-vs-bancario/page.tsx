@@ -61,7 +61,7 @@ export const metadata: Metadata = {
                             {
                             '@type': 'Question',
                             name: 'Posso usar FGTS no financiamento direto com a construtora?',
-                            acceptedAnswer: { '@type': 'Answer', text: 'No financiamento direto com a Fontana, não ha necessidade de usar o FGTS durante a obra. O financiamento bancário, por outro lado, permite o uso do FGTS para compor a entrada ou amortizar o saldo devedor.' },
+                            acceptedAnswer: { '@type': 'Answer', text: 'Durante a obra, o financiamento direto com a Fontana não usa FGTS. No financiamento bancário, o uso do FGTS para compor a entrada ou amortizar o saldo devedor pode ser possível, sujeito às regras vigentes, à elegibilidade do comprador, do imóvel e à aprovação da instituição financeira — consulte a Caixa Econômica Federal ou o agente operador.' },
                             },
                             {
                             '@type': 'Question',
@@ -117,7 +117,10 @@ export const metadata: Metadata = {
                               publishedLabel={PUBLISHED_LABEL}
                               updatedISO={UPDATED_ISO}
                               updatedLabel={UPDATED_LABEL}
-                              fontes={['Sistemas e taxas das construtoras terceiras (Corbetta, Locks, Giassi, Perego) informados pelas próprias construtoras e sujeitos a alteração — confirme diretamente antes de decidir']}
+                              fontes={[
+                                'Sistemas e taxas das construtoras terceiras (Corbetta, Locks, Giassi, Perego) informados pelas próprias construtoras e sujeitos a alteração — confirme diretamente antes de decidir',
+                                <>FGTS: <a href="https://www.caixa.gov.br/voce/habitacao/Paginas/utilizacao-fgts.aspx" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>Caixa Econômica Federal</a></>,
+                              ]}
                             />
 
                             <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>O que é o financiamento direto com a construtora?</h2>
@@ -130,10 +133,10 @@ export const metadata: Metadata = {
 
                             <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>O que é o financiamento bancário tradicional?</h2>
                             <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-                            No financiamento bancário, o banco analisa a renda e o historico de crédito do comprador antes de aprovar o contrato. O cálculo das parcelas segue sistemas de juros compostos, geralmente pelas tabelas Price ou SAC. Diferente do financiamento direto, o financiamento bancário permite o uso do FGTS para composição da entrada ou amortização do saldo devedor.
+                            No financiamento bancário, o banco analisa a renda e o historico de crédito do comprador antes de aprovar o contrato. O cálculo das parcelas segue sistemas de juros compostos, geralmente pelas tabelas Price ou SAC. O uso do FGTS para composição da entrada ou amortização do saldo devedor pode ser possível no financiamento bancário, sujeito às regras vigentes, à elegibilidade do comprador, do imóvel e à aprovação da instituição financeira.
                             </p>
                             <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
-                            Por outro lado, o financiamento bancário envolve custos que não existem no financiamento direto com a construtora, como IOF, tarifa de abertura de crédito e, em muitos casos, seguro obrigatório embutido na prestação mensal.
+                            Os custos e encargos variam conforme o contrato e a instituição — no financiamento bancário podem incluir itens como IOF, tarifa de abertura de crédito e seguro, que nem sempre estão presentes da mesma forma no financiamento direto com a construtora. Compare o custo total e confirme cada item na minuta contratual antes de decidir.
                             </p>
 
                             <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Três sistemas de cálculo: SPC-JS, Price e SAC</h2>
@@ -183,19 +186,19 @@ export const metadata: Metadata = {
                             <h3 style={{ fontSize: 14, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#C1682E', marginTop: 0 }}>Financiamento Direto</h3>
                             <ul style={{ fontSize: 14, lineHeight: 2, color: '#333', paddingLeft: 20, margin: 0 }}>
                             <li>Sem financiamento bancário — a construtora faz sua própria análise cadastral e de capacidade de pagamento</li>
-                            <li>Sem IOF e sem tarifa de abertura de crédito</li>
+                            <li>Custos e encargos variam por contrato — confirme cada item na minuta antes de assinar</li>
                             <li>Negociação direta com a construtora</li>
                             <li>Parcelas corrigidas pelo CUB/SC podem subir mês a mês</li>
-                            <li>Não ha uso de FGTS durante a obra</li>
+                            <li>Não há uso de FGTS durante a obra</li>
                             </ul>
                             </div>
                             <div style={{ background: '#F0F0F0', padding: 24, borderRadius: 2 }}>
                             <h3 style={{ fontSize: 14, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#555', marginTop: 0 }}>Financiamento Bancário</h3>
                             <ul style={{ fontSize: 14, lineHeight: 2, color: '#333', paddingLeft: 20, margin: 0 }}>
-                            <li>Permite uso do FGTS na entrada ou amortização</li>
+                            <li>Uso do FGTS na entrada ou amortização pode ser possível, sujeito às regras vigentes e à aprovação da instituição financeira</li>
                             <li>Taxas contratuais fixas (Price/SAC), sem correção pelo CUB</li>
                             <li>Exige aprovação de crédito e comprovação de renda</li>
-                            <li>Incide IOF, tarifas e, em muitos casos, seguro obrigatório</li>
+                            <li>Custos e encargos variam por contrato e instituição — confirme cada item na minuta antes de assinar</li>
                             <li>Juros compostos podem elevar o custo total conforme o prazo</li>
                             </ul>
                             </div>

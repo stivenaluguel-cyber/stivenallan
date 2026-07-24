@@ -86,7 +86,6 @@ O mercado imobiliário do sul de Santa Catarina vive um momento de crescimento e
 ## Por Que Investir na Região?
 
 - **Crescimento econômico:** polo tecnológico, saúde e educação em expansão
-- **Valorização consistente:** imóveis na região valorizaram 25% nos últimos 3 anos
 - **Qualidade de vida:** infraestrutura completa com custo de vida menor que capitais
 
 ## Principais Cidades Para Investir
@@ -179,6 +178,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       authors: [post.autor],
     },
     keywords: post.tags.join(', '),
+    // noindex temporário (2026-07-24): conteúdo com regras de FGTS/SFH e taxas
+    // sem fonte oficial citada, pendente de revisão completa — ver pendência
+    // registrada na PR #17. Remover só depois da revisão.
+    robots: { index: false, follow: false },
   }
 }
 

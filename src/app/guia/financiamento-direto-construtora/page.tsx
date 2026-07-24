@@ -67,7 +67,7 @@ const FAQ_SCHEMA = {
     {
       '@type': 'Question',
       name: 'Posso usar FGTS no financiamento direto com a construtora?',
-      acceptedAnswer: { '@type': 'Answer', text: 'No financiamento direto com a Fontana, não há necessidade de usar o FGTS durante a obra. Após as chaves, é possível fazer um financiamento bancário e usar o FGTS nessa transação.' },
+      acceptedAnswer: { '@type': 'Answer', text: 'Durante a obra, o financiamento direto com a Fontana não usa FGTS. O uso do FGTS pode ser possível após a entrega, sujeito às regras vigentes, à elegibilidade do comprador, do imóvel e à aprovação da instituição financeira — consulte a Caixa Econômica Federal ou o agente operador para confirmar sua situação.' },
     },
   ],
 }
@@ -109,13 +109,14 @@ export default function GuiaFinanciamentoDiretoPage() {
           updatedLabel={UPDATED_LABEL}
           fontes={[
             <>CUB/SC: <a href="https://www.sindusconcriciuma.com.br/" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>Sinduscon Sul Catarinense</a></>,
+            <>FGTS: <a href="https://www.caixa.gov.br/voce/habitacao/Paginas/utilizacao-fgts.aspx" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>Caixa Econômica Federal</a></>,
             'Condições comerciais: tabela vigente informada pela Construtora Fontana, sujeita a alteração',
           ]}
         />
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>O que é financiamento direto?</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-          A negociação ocorre diretamente com a construtora, sem depender de financiamento bancário. A construtora poderá realizar análise cadastral e de capacidade de pagamento conforme suas políticas — a aprovação não é automática. As parcelas são corrigidas pelo <strong>CUB/SC (Custo Unitário Básico do Sinduscon-SC)</strong> durante a obra. Diferente do financiamento bancário tradicional, esse modelo não envolve IOF nem tarifa de abertura de crédito, e normalmente não tem seguro obrigatório embutido na prestação — mas isso pode variar por empreendimento e tabela vigente, e deve ser confirmado no contrato.
+          A negociação ocorre diretamente com a construtora, sem depender de financiamento bancário. A construtora poderá realizar análise cadastral e de capacidade de pagamento conforme suas políticas — a aprovação não é automática. As parcelas são corrigidas pelo <strong>CUB/SC (Custo Unitário Básico do Sinduscon-SC)</strong> durante a obra. Os custos e encargos variam conforme o contrato e podem ser diferentes dos encontrados no financiamento bancário. Compare o custo total e confirme cada item na minuta contratual.
         </p>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
           O modelo pode ser uma alternativa para quem não atende aos critérios de um financiamento bancário convencional, para investidores avaliando o retorno sobre o capital investido durante a obra, ou para quem prefere negociar condições diretamente com a construtora. A Construtora Fontana atua com esse modelo em Criciuma e região.
@@ -147,7 +148,7 @@ export default function GuiaFinanciamentoDiretoPage() {
           <p style={{ fontSize: 13, color: '#666', marginTop: 12, marginBottom: 0 }}>Simulação ilustrativa e não vinculante. Valores reais variam conforme o empreendimento e a tabela vigente, e a correção real depende da variação efetiva do CUB/SC. Consulte Stiven para simulação personalizada com dados atualizados.</p>
         </div>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-          Note que o saldo restante ao final da obra pode ser quitado com recursos próprios, com FGTS via financiamento bancário, ou financiado diretamente com a Fontana pelo saldo direto corrigido por IGPM mais 0,75% a.m., em prazos de até 180 ou 240 meses.
+          Note que o saldo restante ao final da obra pode ser quitado com recursos próprios, com financiamento bancário (o uso do FGTS nessa etapa depende das regras vigentes e da aprovação da instituição financeira), ou financiado diretamente com a Fontana pelo saldo direto corrigido por IGPM mais 0,75% a.m., em prazos de até 180 ou 240 meses.
         </p>
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>O que é o CUB/SC?</h2>
@@ -165,21 +166,20 @@ export default function GuiaFinanciamentoDiretoPage() {
           <li><strong>Análise do contrato:</strong> O contrato é registrado em cartório para sua segurança. Verifique cláusulas de correção, prazo de entrega e multas.</li>
           <li><strong>Pagamento da entrada (20%):</strong> Paga no ato da assinatura do contrato de compra e venda.</li>
           <li><strong>Parcelas durante a obra:</strong> Mensais corrigidas pelo CUB/SC mais reforços anuais pagos ao longo da construção.</li>
-          <li><strong>Entrega das chaves:</strong> Ao concluir a obra, você faz a vistoria e recebe as chaves. O saldo devedor pode ser quitado com recursos próprios, FGTS ou financiamento bancário.</li>
+          <li><strong>Entrega das chaves:</strong> Ao concluir a obra, você faz a vistoria e recebe as chaves. O saldo devedor pode ser quitado com recursos próprios ou financiamento bancário — o uso do FGTS nessa etapa depende das regras vigentes e da aprovação da instituição financeira.</li>
           <li><strong>Registro do imóvel:</strong> Após quitar o saldo, você registra o imóvel em seu nome no cartório de imóveis.</li>
         </ol>
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Vantagens do financiamento direto</h2>
         <ul style={{ fontSize: 15, lineHeight: 2, color: '#333', paddingLeft: 24 }}>
-          <li>Negociação direta com a construtora, sem depender de financiamento bancário — a construtora poderá fazer sua própria análise cadastral e de capacidade de pagamento, conforme suas políticas.</li>
-          <li>Geralmente sem IOF, sem taxa de abertura de crédito e sem seguro obrigatório embutido — confirme no contrato de cada empreendimento.</li>
-          <li>Negociação direta com a construtora, com mais flexibilidade nas condições.</li>
+          <li>Negociação direta com a construtora, sem depender de financiamento bancário, com mais flexibilidade nas condições — a construtora poderá fazer sua própria análise cadastral e de capacidade de pagamento, conforme suas políticas.</li>
+          <li>Os custos e encargos variam conforme o contrato e podem ser diferentes dos encontrados no financiamento bancário — compare o custo total e confirme cada item na minuta contratual.</li>
           <li>Possibilidade de quitar antecipadamente com desconto negociado, quando previsto pela construtora.</li>
           <li>Parcelas durante a obra que, no plano padrão, tendem a ser menores que uma parcela de financiamento bancário equivalente — a comparação real depende do valor, do prazo e da taxa vigente em cada caso.</li>
-          <li>Após a entrega das chaves, é possível fazer um financiamento bancário e usar o FGTS, se disponível.</li>
+          <li>Após a entrega das chaves, é possível fazer um financiamento bancário. O uso do FGTS pode ser possível após a entrega, sujeito às regras vigentes, à elegibilidade do comprador, do imóvel e à aprovação da instituição financeira.</li>
         </ul>
         <p style={{ fontSize: 14, lineHeight: 1.8, color: '#666', marginTop: 12 }}>
-          Condições, aprovação, entrada, parcelas, índices e prazos variam por empreendimento e tabela vigente. Consulte sempre as condições atualizadas com o corretor antes de decidir.
+          Condições, aprovação, entrada, parcelas, índices e prazos variam por empreendimento e tabela vigente. Consulte sempre as condições atualizadas com o corretor antes de decidir. Regras de uso do FGTS: <a href="https://www.caixa.gov.br/voce/habitacao/Paginas/utilizacao-fgts.aspx" target="_blank" rel="noopener noreferrer" style={{ color: '#1A5C3A' }}>Caixa Econômica Federal</a>.
         </p>
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Empreendimentos com financiamento direto em Criciuma e região</h2>
