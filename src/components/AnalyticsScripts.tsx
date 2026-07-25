@@ -1,9 +1,10 @@
 'use client'
 import Script from 'next/script'
 import { useEffect, useRef, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { getConsent, onConsentChange, type ConsentCategories } from '@/lib/consent'
 import { applyGtagConfigs, newGtagConfigured, type GtagFn } from '@/lib/gtag-config'
-import { GA4_ID, GADS_ID, META_PIXEL_ID } from '@/lib/tracking-config'
+import { GA4_ID, GADS_ID, META_PIXEL_ID, PAGE_META_PIXEL_IDS } from '@/lib/tracking-config'
 
 // Carrega GA4 / Meta Pixel / Google Ads SOMENTE depois do consentimento da
 // categoria correspondente (LGPD). Antes do aceite, nada é baixado nem dispara —
@@ -19,6 +20,8 @@ import { GA4_ID, GADS_ID, META_PIXEL_ID } from '@/lib/tracking-config'
 // primeira execução — por isso o TrackingProvider não manda page_view no
 // primeiro render.
 export function AnalyticsScripts() {
+  const pathname = usePathname()
+  const extraPixelId = pathname ? PAGE_META_PIXEL_IDS[pathname] : undefined
   const [cats, setCats] = useState<ConsentCategories | null>(null)
   // Estado por-pageload das configs já aplicadas (sobrevive a re-renders e a
   // revogar+reconceder — não reconfigura, só o consent update volta a valer).
@@ -57,7 +60,7 @@ export function AnalyticsScripts() {
         <Script src={`https://www.googletagmanager.com/gtag/js?id=${gtagSrcId.current}`} strategy="afterInteractive" />
       )}
       {marketing && (
-        <Script id="meta-pixel" strategy="afterInteractive">{`!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('consent','grant');fbq('init','${META_PIXEL_ID}');fbq('track','PageView');`}</Script>
+        <Script id={extraPixelId ? `meta-pixel-${extraPixelId}` : 'meta-pixel'} strategy="afterInteractive">{`!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('consent','grant');fbq('init','${META_PIXEL_ID}');${extraPixelId ? `fbq('init','${extraPixelId}');` : ''}fbq('track','PageView');`}</Script>
       )}
     </>
   )
