@@ -37,6 +37,15 @@
 -- reverte todo o bloco automaticamente, incluindo o UPDATE se a contagem
 -- pós-update também não bater). Destinada exclusivamente ao Supabase MCP
 -- apply_migration.
+--
+-- NUMERAÇÃO: este arquivo foi renumerado de 0020 para 0024 em 2026-07-26,
+-- depois que a PR #22 ("Modo Foco") foi mergeada em main enquanto esta PR
+-- ainda estava aberta, ocupando 0020-0023
+-- (0020_modo_foco.sql, 0021_modo_foco_client_event_id.sql,
+-- 0022_modo_foco_hardening.sql, 0023_agenda_idempotencia.sql) — nenhuma
+-- delas toca automacao_email_passos ou qualquer tabela desta migration.
+-- 0024 confirmado livre em todas as branches locais/remotas e no banco
+-- remoto no momento desta renumeração.
 
 do $$
 declare
