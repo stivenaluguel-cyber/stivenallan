@@ -56,20 +56,19 @@
 -- colisão em nenhuma branch local ou remota no momento desta revisão.
 -- Renumerar antes do merge se a numeração final da main divergir disso.
 --
--- ATOMICIDADE: nem Supabase CLI, nem Docker, nem Supabase Branching (exige
--- plano Pro — indisponível neste projeto) puderam ser usados para verificar
--- empiricamente se o mecanismo real de aplicação desta migration encapsula
--- todos os comandos numa única transação. Sem essa confirmação, o script é
--- deliberadamente envolto num BEGIN/COMMIT explícito para garantir
--- atomicidade independente do executor: se o executor já abrir sua própria
--- transação, o BEGIN aqui apenas emite um aviso inofensivo do Postgres
--- ("there is already a transaction in progress") e continua na mesma
--- transação — não há transação aninhada real, nem erro, nem risco de
--- contenção parcial em nenhum dos dois cenários. Todos os comandos deste
--- arquivo (ENABLE ROW LEVEL SECURITY, REVOKE, ALTER DEFAULT PRIVILEGES) são
--- válidos dentro de um bloco de transação no Postgres.
-
-begin;
+-- ATOMICIDADE: esta migration não contém BEGIN/COMMIT explícitos. Postgres
+-- não tem transação aninhada real via BEGIN — se o executor já estiver
+-- dentro de uma transação, um BEGIN extra só emite um aviso, mas um COMMIT
+-- extra encerraria a transação do próprio executor antes da hora (inclusive
+-- antes do COMMIT final que o executor daria), quebrando a garantia de
+-- atomicidade em vez de reforçá-la. Por isso BEGIN/COMMIT no arquivo NÃO é
+-- "compatível com qualquer executor", ao contrário do que uma revisão
+-- anterior desta migration presumiu.
+--
+-- A aplicação em produção deverá ocorrer exclusivamente pelo Supabase MCP
+-- apply_migration/Management API, que registra a migration e reverte as
+-- alterações se a execução falhar. Não aplicar por execute_sql, SQL Editor
+-- ou outro mecanismo não rastreado.
 
 -- A) Habilita RLS nas 6 tabelas — sem policies, ou seja, nega todo acesso
 --    de anon/authenticated e mantém `service_role`, que ignora RLS.
@@ -100,5 +99,3 @@ revoke all privileges on table public.campanha_eventos from anon, authenticated;
 --    próprio antes de qualquer mudança.
 alter default privileges for role postgres in schema public
   revoke all privileges on tables from anon, authenticated;
-
-commit;
