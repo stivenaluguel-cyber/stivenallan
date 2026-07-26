@@ -29,23 +29,23 @@ type EtapaEmail = { diasMinimos: number; assunto: string; corpoHtml: string }
 const ETAPAS_FALLBACK: EtapaEmail[] = [
   {
     diasMinimos: 2,
-    assunto: 'Por que ninguém te explicou o financiamento sem banco?',
+    assunto: 'Como funciona a negociação direta com a construtora',
     corpoHtml: `
       <p>Olá {nome},</p>
-      <p>A pergunta que mais recebo é sempre a mesma: <strong>"como assim, comprar apartamento sem banco?"</strong></p>
-      <p>É mais simples do que parece — e escrevi um guia completo explicando: entrada de 20%, parcelas durante a obra corrigidas pelo CUB/SC, e nenhuma análise bancária no processo.</p>
-      <p><a href="https://stivenallan.com.br/guia/financiamento-direto-construtora" style="color:#1A5C3A;font-weight:700">→ Leia o guia do financiamento direto</a></p>
-      <p>Se ficou qualquer dúvida sobre o {empreendimento}, <a href="${WPP_LINK}" style="color:#1A5C3A">me chama no WhatsApp</a> que eu explico com os números do seu caso.</p>
+      <p>Na compra direta, a negociação ocorre com a construtora, sem depender de financiamento bancário.</p>
+      <p>A construtora poderá realizar análise cadastral e de capacidade de pagamento conforme suas políticas — a aprovação não é automática. As condições de entrada, parcelas, índices, prazos e disponibilidade variam conforme o empreendimento e a tabela vigente.</p>
+      <p><a href="https://stivenallan.com.br/guia/financiamento-direto-construtora" style="color:#1A5C3A;font-weight:700">→ Entenda a negociação direta com a construtora</a></p>
+      <p>Se quiser confirmar as condições atuais de {empreendimento}, <a href="${WPP_LINK}" style="color:#1A5C3A">fale comigo pelo WhatsApp</a>.</p>
     `,
   },
   {
     diasMinimos: 7,
-    assunto: 'A tabela do {empreendimento} muda com a obra',
+    assunto: 'Confira as condições atuais de {empreendimento}',
     corpoHtml: `
       <p>Olá {nome},</p>
-      <p>Um aviso honesto antes de eu parar de te escrever: <strong>a tabela do {empreendimento} é reajustada a cada fase da obra</strong>. As condições que eu te apresentaria hoje não são as mesmas do mês que vem.</p>
-      <p>Se o momento não é agora, tudo bem — o link no rodapé te tira desta régua sem compromisso.</p>
-      <p><a href="${WPP_LINK}" style="color:#1A5C3A;font-weight:700">→ Ver os números de hoje no WhatsApp</a></p>
+      <p>As condições comerciais de {empreendimento} podem ser atualizadas pela construtora conforme a tabela vigente.</p>
+      <p>Se quiser, posso confirmar os valores, os prazos e a disponibilidade informados atualmente pela construtora. A consulta não cria compromisso de compra.</p>
+      <p><a href="${WPP_LINK}" style="color:#1A5C3A;font-weight:700">→ Consultar condições pelo WhatsApp</a></p>
     `,
   },
 ]

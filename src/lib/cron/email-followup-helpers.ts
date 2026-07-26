@@ -18,7 +18,7 @@ export function montarHtml(corpo: string, unsubUrl: string): string {
       </div>
       <div style="padding:28px 24px;color:#333;font-size:15px;line-height:1.7">
         ${corpo}
-        <p style="margin-top:24px">Um abraço,<br/><strong>Stiven Allan</strong> — CRECI 60.275<br/>
+        <p style="margin-top:24px">Um abraço,<br/><strong>Stiven Allan</strong> — CRECI-RS 60.275<br/>
         <a href="https://stivenallan.com.br" style="color:#1A5C3A">stivenallan.com.br</a></p>
       </div>
       <div style="padding:14px 24px;background:#FAFAF8;border-top:1px solid #eee">
