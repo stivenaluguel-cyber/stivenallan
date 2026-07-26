@@ -43,6 +43,13 @@ describe('montarHtml', () => {
     expect(html).toContain('href="https://example.com/api/unsubscribe?x=1"')
     expect(html).toContain('Descadastrar')
   })
+
+  it('assina com CRECI-RS 60.275 (Gate C0 — UF explícita, sem CRECI-SC)', () => {
+    const html = montarHtml('<p>corpo</p>', 'https://example.com/api/unsubscribe?x=1')
+    expect(html).toContain('CRECI-RS 60.275')
+    expect(html).not.toContain('CRECI-SC')
+    expect(html).not.toMatch(/CRECI\s+60\.275(?!\s*<\/strong>)/) // não deve sobrar "CRECI 60.275" sem UF
+  })
 })
 
 // ---- Integration test do GET ----
@@ -362,5 +369,101 @@ describe('GET /api/cron/email-followup', () => {
     // Insert foi tentado mas errou; finishCronRun early-return (runId=null)
     expect(mock.cronRunInserts).toHaveLength(1)
     expect(mock.cronRunUpdates).toHaveLength(0)
+  })
+
+  // ---- Gate C0: conteúdo da régua sem claims de crédito absoluto/urgência ----
+
+  const FRASES_PROIBIDAS_GATE_C0 = [
+    /nenhuma an[aá]lise banc[aá]ria/i,
+    /sem an[aá]lise banc[aá]ria/i,
+    /entrada de 20%/i,
+    /como assim,?\s*comprar apartamento sem banco/i,
+    /por que ningu[eé]m te explicou o financiamento sem banco/i,
+    /as condi[cç][oõ]es que eu te apresentaria hoje n[aã]o s[aã]o as mesmas do m[eê]s que vem/i,
+    /tabela sobe/i,
+    /condi[cç][oõ]es especiais/i,
+  ]
+
+  it('Gate C0 — etapa 0 (D+2): assunto e corpo novos, sem nenhuma frase proibida', async () => {
+    const mock = makeSupabase({
+      leads: [
+        {
+          id: 'lead-c0-0',
+          nome: 'Carla Souza',
+          email: 'carla@example.com',
+          created_at: new Date(Date.now() - 3 * 86400000).toISOString(),
+          email_followup_etapa: 0,
+          property_name: 'Monte Leone',
+          status: 'novo',
+        },
+      ],
+    })
+    supabaseHolder.current = mock
+    const fetchSpy = vi.spyOn(global, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify({ id: 'msg-0' }), { status: 200 }),
+    )
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    const p = GET(makeReq({ authorization: 'Bearer cron-secret' }))
+    await vi.runAllTimersAsync()
+    await p
+    vi.useRealTimers()
+
+    const [, opts] = fetchSpy.mock.calls[0] as [string, RequestInit]
+    const body = JSON.parse(opts.body as string)
+
+    expect(body.subject).toBe('Como funciona a negociação direta com a construtora')
+    expect(body.html).toContain('Olá Carla,') // {nome} substituído
+    expect(body.html).toContain('Monte Leone') // {empreendimento} substituído
+    expect(body.html).toContain('href="https://stivenallan.com.br/guia/financiamento-direto-construtora"')
+    expect(body.html).toContain('href="https://wa.me/5548991642332"')
+    expect(body.html).toContain('a aprovação não é automática')
+    expect(body.html).toContain('Descadastrar') // link de descadastro preservado
+    expect(body.headers['List-Unsubscribe']).toMatch(/api\/unsubscribe\?lead_id=lead-c0-0&token=/)
+
+    for (const frase of FRASES_PROIBIDAS_GATE_C0) {
+      expect(body.subject).not.toMatch(frase)
+      expect(body.html).not.toMatch(frase)
+    }
+  })
+
+  it('Gate C0 — etapa 1 (D+7): assunto e corpo novos, sem nenhuma frase proibida', async () => {
+    const mock = makeSupabase({
+      leads: [
+        {
+          id: 'lead-c0-1',
+          nome: 'Diego',
+          email: 'diego@example.com',
+          created_at: new Date(Date.now() - 8 * 86400000).toISOString(),
+          email_followup_etapa: 1,
+          property_name: 'Fidenza Residencial',
+          status: 'novo',
+        },
+      ],
+    })
+    supabaseHolder.current = mock
+    const fetchSpy = vi.spyOn(global, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify({ id: 'msg-1' }), { status: 200 }),
+    )
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    const p = GET(makeReq({ authorization: 'Bearer cron-secret' }))
+    await vi.runAllTimersAsync()
+    await p
+    vi.useRealTimers()
+
+    const [, opts] = fetchSpy.mock.calls[0] as [string, RequestInit]
+    const body = JSON.parse(opts.body as string)
+
+    expect(body.subject).toBe('Confira as condições atuais de Fidenza Residencial') // {empreendimento} no assunto
+    expect(body.html).toContain('Olá Diego,')
+    expect(body.html).toContain('Fidenza Residencial')
+    expect(body.html).toContain('href="https://wa.me/5548991642332"')
+    expect(body.html).toContain('A consulta não cria compromisso de compra')
+    expect(body.html).toContain('Descadastrar')
+    expect(body.headers['List-Unsubscribe']).toMatch(/api\/unsubscribe\?lead_id=lead-c0-1&token=/)
+
+    for (const frase of FRASES_PROIBIDAS_GATE_C0) {
+      expect(body.subject).not.toMatch(frase)
+      expect(body.html).not.toMatch(frase)
+    }
   })
 })
