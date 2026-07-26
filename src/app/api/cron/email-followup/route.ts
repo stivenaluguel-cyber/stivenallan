@@ -33,7 +33,7 @@ const ETAPAS_FALLBACK: EtapaEmail[] = [
     corpoHtml: `
       <p>Olá {nome},</p>
       <p>Na compra direta, a negociação ocorre com a construtora, sem depender de financiamento bancário.</p>
-      <p>A construtora poderá realizar análise cadastral e de capacidade de pagamento conforme suas políticas — a aprovação não é automática. Entrada, parcelas, índices, prazos e disponibilidade variam conforme o {empreendimento} e a tabela vigente.</p>
+      <p>A construtora poderá realizar análise cadastral e de capacidade de pagamento conforme suas políticas — a aprovação não é automática. As condições de entrada, parcelas, índices, prazos e disponibilidade variam conforme o empreendimento e a tabela vigente.</p>
       <p><a href="https://stivenallan.com.br/guia/financiamento-direto-construtora" style="color:#1A5C3A;font-weight:700">→ Entenda a negociação direta com a construtora</a></p>
       <p>Se quiser confirmar as condições atuais de {empreendimento}, <a href="${WPP_LINK}" style="color:#1A5C3A">fale comigo pelo WhatsApp</a>.</p>
     `,
