@@ -1,0 +1,14 @@
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+.env.test
+!.env.example
+node_modules/
+.next/
+.vercel/
+coverage/
+*.log
+supabase/.temp/
+supabase/.branches/
