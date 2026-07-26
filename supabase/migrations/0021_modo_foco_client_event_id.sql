@@ -1,4 +1,6 @@
--- Auditoria pré-deploy encontrou dois problemas reais na migration 0013:
+-- Auditoria pré-deploy encontrou dois problemas reais na migration 0020
+-- (renumerada de 0013 para 0020 antes do merge, para não colidir com os
+-- números 0013-0018 reivindicados pela branch fix/dashboard-hardening-audit):
 --
 -- 1) idempotency_key = "sessão:lead:ação" bloqueava ações LEGÍTIMAS repetidas
 --    no mesmo lead dentro da mesma sessão (uma segunda anotação, um segundo
