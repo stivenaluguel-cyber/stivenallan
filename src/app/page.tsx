@@ -47,7 +47,7 @@ const DEPOIMENTOS = [
 const COMO_FUNCIONA = [
   { n: '01', titulo: 'Escolha o imóvel', desc: 'Comece pelos destaques ou navegue pelo portfólio completo e escolha o empreendimento ideal para o seu momento.' },
   { n: '02', titulo: 'Simulação personalizada', desc: 'Stiven estrutura um plano de pagamento sob medida, sem intermediação bancária.' },
-  { n: '03', titulo: 'Contrato direto e chaves na mão', desc: 'Documentação simplificada, sem intermediários, com acompanhamento completo até a entrega.' },
+  { n: '03', titulo: 'Contrato com a construtora', desc: 'Revise a documentação e as condições contratuais antes de assinar.' },
 ]
 
 // Curadoria da home: 3 pontos de partida em vez do catálogo completo,
