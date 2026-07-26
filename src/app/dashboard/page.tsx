@@ -76,12 +76,12 @@ export default function DashboardHome() {
     .reduce((s, l) => s + (l.orcamento_max ?? 0), 0)
 
   const KPIS = [
-    { l: 'Total de Leads', v: String(total), cor: D.blue },
-    { l: 'Leads Quentes', v: String(quentes), cor: D.red },
-    { l: 'Em Negociação', v: String(negociacao), cor: D.bronze },
-    { l: 'Fechados', v: String(fechados), cor: D.green },
-    { l: 'Requer Atenção', v: String(atencao), cor: '#f59e0b' },
-    { l: 'Pipeline Estimado', v: fmt(pipeline), cor: D.ink },
+    { l: 'Total de Leads', v: String(total), cor: D.blue, href: '/dashboard/crm' },
+    { l: 'Leads Quentes', v: String(quentes), cor: D.red, href: '/dashboard/crm' },
+    { l: 'Em Negociação', v: String(negociacao), cor: D.bronze, href: '/dashboard/crm' },
+    { l: 'Fechados', v: String(fechados), cor: D.green, href: '/dashboard/crm' },
+    { l: 'Requer Atenção', v: String(atencao), cor: '#f59e0b', href: '/dashboard/crm/foco' },
+    { l: 'Pipeline Estimado', v: fmt(pipeline), cor: D.ink, href: '/dashboard/crm' },
   ]
 
   return (
@@ -106,11 +106,11 @@ export default function DashboardHome() {
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: 12, marginBottom: 28 }}>
-          {KPIS.map(({ l, v, cor }) => (
-            <div key={l} style={{ background: D.surface, border: '1px solid ' + D.line, borderRadius: 12, padding: '16px 18px', borderTop: '3px solid ' + cor }}>
+          {KPIS.map(({ l, v, cor, href }) => (
+            <button key={l} onClick={() => router.push(href)} style={{ textAlign: 'left', background: D.surface, border: '1px solid ' + D.line, borderRadius: 12, padding: '16px 18px', borderTop: '3px solid ' + cor, cursor: 'pointer' }}>
               <div style={{ fontSize: 11, color: D.muted, textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 8 }}>{l}</div>
               <div style={{ fontFamily: "'Bricolage Grotesque',system-ui", fontSize: 26, fontWeight: 800, color: cor }}>{loading ? '—' : v}</div>
-            </div>
+            </button>
           ))}
         </div>
 

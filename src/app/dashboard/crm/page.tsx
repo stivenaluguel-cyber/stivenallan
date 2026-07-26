@@ -1,7 +1,10 @@
 'use client'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Crosshair } from 'lucide-react'
 import { ConversaPanel } from '@/components/dashboard/ConversaPanel'
 import { ESTAGIOS_FUNIL as ESTAGIOS } from '@/lib/dashboard/estagios'
+import { isEligibleForFocusQueue } from '@/lib/dashboard/focus-queue'
 
 const D = {
   bg: '#F3F2EE', surface: '#FAFAF7', sidebar: '#131211', ink: '#161512',
@@ -482,6 +485,16 @@ function LeadModal({ lead, onClose, onUpdated, onDeleted }: { lead: Lead; onClos
 type Tab = 'funil' | 'disponibilidade' | 'simulador' | 'clientes'
 
 export default function CrmPage() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: '100vh', background: '#F3F2EE' }} />}>
+      <CrmPageInner />
+    </Suspense>
+  )
+}
+
+function CrmPageInner() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [leads, setLeads] = useState<Lead[]>([])
   const [emps, setEmps] = useState<Emp[]>([])
   const [cub, setCub] = useState<Cub | null>(null)
@@ -507,6 +520,17 @@ export default function CrmPage() {
   }, [])
 
   useEffect(() => { load() }, [load])
+
+  // Deep link do Modo Foco (link "Detalhes completos" do card) — abre
+  // direto o modal do lead sem precisar caçar ele no Kanban.
+  useEffect(() => {
+    const leadId = searchParams.get('lead')
+    if (!leadId || leads.length === 0) return
+    const lead = leads.find(l => l.id === leadId)
+    if (lead) setSelected(lead)
+  }, [searchParams, leads])
+
+  const focoCount = leads.filter(isEligibleForFocusQueue).length
 
   async function moverLead(id: string, estagio: string) {
     setLeads(prev => prev.map(l => l.id === id ? { ...l, estagio_funil: estagio } : l))
@@ -563,8 +587,15 @@ export default function CrmPage() {
               ))}
             </div>
 
-            <div style={{ marginBottom: 16 }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 16, alignItems: 'center' }}>
               <input value={busca} onChange={e => setBusca(e.target.value)} placeholder="Buscar nome ou WhatsApp..." style={{ padding: '10px 12px', borderRadius: 8, border: '1px solid ' + D.line, background: '#fff', color: D.ink, fontSize: 14, outline: 'none', minWidth: 260 }} />
+              <button
+                onClick={() => router.push('/dashboard/crm/foco')}
+                disabled={focoCount === 0}
+                style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 8, background: focoCount === 0 ? D.line : D.bronze, color: focoCount === 0 ? D.muted : '#fff', border: 'none', borderRadius: 8, padding: '10px 18px', fontWeight: 700, fontSize: 14, cursor: focoCount === 0 ? 'default' : 'pointer', minHeight: 44 }}
+              >
+                <Crosshair size={16} /> Modo Foco · {focoCount} lead{focoCount === 1 ? '' : 's'}
+              </button>
             </div>
 
             <Kanban leads={leadsFiltrados} dragId={dragId} onDragStart={setDragId} onDrop={onDrop} onSelect={setSelected} />
