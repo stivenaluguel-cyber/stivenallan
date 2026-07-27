@@ -52,6 +52,7 @@ const FAQ_ITEMS = [
 export const metadata: Metadata = {
   title: 'Avezzano Residencial | Centro Siderópolis SC',
   description: 'Avezzano Residencial — 3 dormitórios (1 suíte e 2 demi-suítes), 127 m², Centro de Siderópolis/SC. Financiamento direto Fontana. Conheça com Stiven Allan.',
+  alternates: { canonical: `${SITE_URL}/empreendimento/fontana/avezzano-centro-sideropolis-sc` },
   openGraph: {
     title: 'Avezzano Residencial | Centro Siderópolis SC | Stiven Allan',
     description: 'Permita-se viver no melhor. Apartamentos de 127 m² no coração de Siderópolis.',
