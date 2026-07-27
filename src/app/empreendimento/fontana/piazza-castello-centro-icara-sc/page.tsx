@@ -6,6 +6,7 @@ import { LeadCaptureButton } from '@/components/LeadCaptureButton'
 import { PropertySchema } from '@/components/PropertySchema'
 import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
+import { SITE_URL } from '@/lib/site'
 
 const COR = '#5B2333'
 const CDN = '/images/empreendimentos/piazza-castello-centro-icara-sc/'
@@ -16,6 +17,7 @@ const CATALOGO = 'https://drive.google.com/file/d/1q_66Ex_z0HJLQG_hvC0bau8sqILvv
 export const metadata: Metadata = {
   title: 'Piazza Castello Residencial — Centro · Içara/SC | Construtora Fontana',
   description: 'Piazza Castello Residencial: apartamentos com 3 dormitórios (3 suítes) e até 172 m² privativos, no Centro de Içara/SC. Localização central, lazer completo e financiamento direto com a Construtora Fontana.',
+  alternates: { canonical: `${SITE_URL}/empreendimento/fontana/piazza-castello-centro-icara-sc` },
   openGraph: {
     title: 'Piazza Castello Residencial — Centro · Içara/SC | Stiven Allan',
     description: 'Apartamentos de 3 suítes e até 172 m² no coração de Içara/SC. Localização central e lazer completo.',

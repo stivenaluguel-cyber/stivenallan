@@ -6,10 +6,12 @@ import { LeadCaptureButton } from '@/components/LeadCaptureButton'
 import { PropertySchema } from '@/components/PropertySchema'
 import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
+import { SITE_URL } from '@/lib/site'
 
 export const metadata: Metadata = {
   title: 'Mar di Nizza Residencial | Mar Grosso Laguna SC',
   description: 'Mar di Nizza Residencial em Mar Grosso, Laguna/SC. 2 e 3 dormitórios (1 suíte), 65 a 92 m² privativos. Salão de Festas com Deck Externo, Espaço Fitness com Terraço, Living Integrado. Preço sob consulta.',
+  alternates: { canonical: `${SITE_URL}/empreendimento/fontana/mar-di-nizza-mar-grosso-laguna-sc` },
   keywords: ['Mar di Nizza Residencial', 'Mar Grosso', 'Laguna SC', 'apartamento Laguna', 'Construtora Fontana', 'Stiven Allan', 'imóvel litoral SC'],
   openGraph: {
     title: 'Mar di Nizza Residencial | Mar Grosso Laguna SC | Stiven Allan',
