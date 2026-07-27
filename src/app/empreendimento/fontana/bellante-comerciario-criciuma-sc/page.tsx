@@ -281,7 +281,7 @@ export default function BellantePage() {
       {/* FOOTER */}
       <footer style={{ background: '#0d0d0d', color: 'rgba(255,255,255,0.55)', padding: '3rem 1.5rem', textAlign: 'center' }}>
         <p style={{ fontWeight: 700, color: '#fff', marginBottom: '0.5rem', fontSize: '1rem', letterSpacing: '0.1em' }}>STIVEN ALLAN</p>
-        <p style={{ fontSize: '0.8rem', marginBottom: '0.25rem' }}>CRECI/SC 60.275</p>
+        <p style={{ fontSize: '0.8rem', marginBottom: '0.25rem' }}>CRECI-RS 60.275</p>
         <a href={WA} target="_blank" rel="noopener" style={{ color: '#25D366', textDecoration: 'none', fontSize: '0.85rem' }}>WhatsApp: (48) 99164-2332</a>
         <p style={{ marginTop: '1.5rem', fontSize: '0.75rem', color: 'rgba(255,255,255,0.3)' }}>Bellante Residencial · Comerciário, Criciúma/SC · Construtora Fontana</p>
       </footer>
