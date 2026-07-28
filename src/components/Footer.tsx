@@ -129,6 +129,9 @@ export default function Footer() {
             <Link href="/politica-de-privacidade" style={{ color: C.muted, textDecoration: 'underline' }}>
               Política de Privacidade
             </Link>
+            <Link href="/indicadores" style={{ color: C.muted, textDecoration: 'underline' }}>
+              Indicadores
+            </Link>
             <CookiePreferencesLink style={{ color: C.muted, fontSize: '12px' }} />
             <span>Criciúma, Santa Catarina</span>
           </p>

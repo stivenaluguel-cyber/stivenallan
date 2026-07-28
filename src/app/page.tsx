@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { SITE_URL } from '@/lib/site'
 import { HeroImage } from '@/components/HeroImage'
 import { CookiePreferencesLink } from '@/components/CookiePreferencesLink'
+import { buscarCub } from '@/lib/cub-sinduscon'
 
 const WPP = 'https://wa.me/5548991642332'
 const WPP_MSG = WPP + '?text=Ol%C3%A1+Stiven!+Vi+seu+site+e+quero+conhecer+as+condi%C3%A7%C3%B5es+de+financiamento+direto.'
@@ -111,7 +112,10 @@ function EmpCard({ emp }: { emp: typeof imoveis[0] }) {
 }
 
 export default async function HomePage() {
-  const imoveisVitrine = await getVitrineImoveis();
+  const [imoveisVitrine, cub] = await Promise.all([
+    getVitrineImoveis(),
+    buscarCub(),
+  ])
   const ativos = imoveisVitrine.filter(e => e.ativo)
   const totalEmpreendimentos = ativos.length
   const totalCidades = new Set(ativos.map(e => e.cidade)).size
@@ -286,6 +290,16 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* INDICADOR CUB/SC — faixa compacta, sem seção grande */}
+      <div style={{ background: '#F5F1EA', borderTop: '1px solid rgba(26,24,20,0.08)', borderBottom: '1px solid rgba(26,24,20,0.08)', padding: '16px clamp(18px,4vw,40px)' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, flexWrap: 'wrap', fontFamily: t.body, fontSize: 13, color: t.muted }}>
+          <span style={{ letterSpacing: '0.08em', textTransform: 'uppercase', fontSize: 11, color: '#8A7240', fontWeight: 600 }}>CUB/SC</span>
+          <span style={{ color: t.ink, fontWeight: 500 }}>R$ {cub.valor_m2.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/m²</span>
+          <span>· {cub.usar_em_label}</span>
+          <Link href="/indicadores" style={{ color: '#8A7240', textDecoration: 'underline', marginLeft: 4 }}>ver mais indicadores →</Link>
+        </div>
+      </div>
 
       {/* CTA FINAL */}
       <section style={{ background: t.dark, color: t.onDark, padding: 'clamp(80px,14vh,140px) clamp(18px,4vw,40px)', textAlign: 'center' }}>
