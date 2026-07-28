@@ -13,15 +13,17 @@ type Props = {
   onAgendar: (payload: AgendarVisitaPayload) => Promise<void>
   onConcluir: (agendaId: string) => Promise<void>
   onNaoOcorreu: (agendaId: string) => Promise<void>
+  localSugerido?: string
+  observacaoSugerida?: string
 }
 
-export function VisitModal({ proximaVisita, onClose, onAgendar, onConcluir, onNaoOcorreu }: Props) {
+export function VisitModal({ proximaVisita, onClose, onAgendar, onConcluir, onNaoOcorreu, localSugerido, observacaoSugerida }: Props) {
   const [mode, setMode] = useState<Mode>(proximaVisita ? 'concluir' : 'agendar')
   const amanha = new Date(Date.now() + 86_400_000).toISOString().slice(0, 10)
   const [data, setData] = useState(amanha)
   const [horario, setHorario] = useState('14:00')
-  const [local, setLocal] = useState('')
-  const [observacao, setObservacao] = useState('')
+  const [local, setLocal] = useState(localSugerido ?? '')
+  const [observacao, setObservacao] = useState(observacaoSugerida ?? '')
   const [salvando, setSalvando] = useState(false)
   const [erro, setErro] = useState('')
 

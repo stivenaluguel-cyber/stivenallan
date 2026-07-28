@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { normalizeEmail, normalizePhone, normalizeString } from './normalize'
+import { normalizeEmail, normalizePhone, normalizeString, temWhatsappReal } from './normalize'
 
 describe('normalizeString', () => {
   it('trims surrounding whitespace', () => {
@@ -67,5 +67,21 @@ describe('normalizeEmail', () => {
     // Contrato antigo do endpoint aceitava "não tenho" ou qualquer string;
     // aqui só normalizamos. Validação de formato fica para uma pilha posterior.
     expect(normalizeEmail('nao-eh-email')).toBe('nao-eh-email')
+  })
+})
+
+describe('temWhatsappReal', () => {
+  it('aceita numeros normalizados normais', () => {
+    expect(temWhatsappReal('5548991642332')).toBe(true)
+  })
+
+  it('rejeita o placeholder de lead vindo de DM do Instagram', () => {
+    expect(temWhatsappReal('ig:17841400000000000')).toBe(false)
+  })
+
+  it('rejeita ausencia de valor', () => {
+    expect(temWhatsappReal(null)).toBe(false)
+    expect(temWhatsappReal(undefined)).toBe(false)
+    expect(temWhatsappReal('')).toBe(false)
   })
 })

@@ -13,20 +13,30 @@ function isHoje(iso: string): boolean {
 
 // Nunca depende só de cor (requisito de acessibilidade do briefing) — cada
 // badge tem ícone + texto explícito, a cor é só reforço visual.
-export function buildLeadBadges(item: Pick<FocusQueueItem, 'followupVencido' | 'requerAtencao' | 'nuncaContatado' | 'diasSemContato' | 'proximoEvento'>): Badge[] {
+//
+// O card já mostra a razão PRINCIPAL da fila no bloco "Por que está aqui"
+// (focus-guidance.ts) — repetir essa mesma razão aqui como badge seria
+// informação duplicada concorrendo no topo do card. Por isso só vira badge
+// o sinal que NÃO é o motivo já explicado ali (ex.: um lead com follow-up
+// vencido E requer_atencao mostra "Follow-up vencido" no bloco principal e
+// só "Requer atenção" como badge secundário). "Compromisso/visita hoje" é
+// sempre mostrado: é uma informação de agenda complementar, não uma
+// duplicata textual de nenhuma das mensagens de prioridade.
+export function buildLeadBadges(item: Pick<FocusQueueItem, 'followupVencido' | 'requerAtencao' | 'nuncaContatado' | 'diasSemContato' | 'proximoEvento' | 'prioridade'>): Badge[] {
   const badges: Badge[] = []
+  const motivoPrincipal = item.prioridade?.title
 
-  if (item.followupVencido) {
+  if (item.followupVencido && motivoPrincipal !== 'Follow-up vencido') {
     badges.push({ key: 'followup', label: 'Follow-up vencido', icon: <AlarmClock size={12} />, bg: 'rgba(239,68,68,0.12)', fg: D.red })
   }
   if (item.proximoEvento && isHoje(item.proximoEvento.inicio)) {
     const label = item.proximoEvento.tipo === 'visita' ? 'Visita hoje' : 'Compromisso hoje'
     badges.push({ key: 'hoje', label, icon: <CalendarClock size={12} />, bg: 'rgba(245,158,11,0.14)', fg: D.amber })
   }
-  if (item.requerAtencao) {
+  if (item.requerAtencao && motivoPrincipal !== 'Requer atenção') {
     badges.push({ key: 'atencao', label: 'Requer atenção', icon: <Star size={12} />, bg: 'rgba(210,78,34,0.12)', fg: D.bronze })
   }
-  if (item.nuncaContatado) {
+  if (item.nuncaContatado && motivoPrincipal !== 'Ainda sem contato') {
     const dias = item.diasSemContato ?? 0
     const label = dias <= 2 ? 'Novo lead' : `Sem ação há ${dias} dias`
     const icon = dias <= 2 ? <Sparkles size={12} /> : <Clock size={12} />

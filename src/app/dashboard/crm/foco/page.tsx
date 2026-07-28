@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Filter } from 'lucide-react'
-import { D } from '@/components/dashboard/focus/tokens'
+import { D, tempInfo } from '@/components/dashboard/focus/tokens'
 import { FocusModeHeader } from '@/components/dashboard/focus/FocusModeHeader'
 import { FocusLeadCard } from '@/components/dashboard/focus/FocusLeadCard'
 import { FocusPrimaryActions } from '@/components/dashboard/focus/FocusPrimaryActions'
@@ -17,10 +17,23 @@ import { useFocusActionRunner } from '@/lib/dashboard/use-focus-action-runner'
 import type { FocusQueueFilters } from '@/lib/dashboard/focus-queue'
 import { createAgendaEvento, patchAgendaEvento, patchLead, postFocusEvent, salvarNotaIdempotente } from '@/lib/dashboard/focus-client'
 import { ESTAGIOS_FUNIL } from '@/lib/dashboard/estagios'
+import { temWhatsappReal } from '@/lib/leads/normalize'
 
 const FILTROS_STORAGE_KEY = 'modo-foco-filtros-v1'
 
+// Filtro de temperatura como toggle sempre visível na abertura do Modo
+// Foco (não escondido dentro do painel "Filtros") — é o filtro mais usado
+// pra recortar a fila rapidamente. `v` é o mesmo valor numérico de
+// lead.temperatura (tokens.ts); reaproveitar tempInfo(v) evita duplicar
+// cor/emoji/label que já existem lá.
+const TEMP_FILTROS: { value: NonNullable<FocusQueueFilters['temperatura']>; v: number }[] = [
+  { value: 'quente', v: 3 },
+  { value: 'morno', v: 2 },
+  { value: 'frio', v: 1 },
+]
+
 type ModalAberto = 'followup' | 'visita' | 'perdido' | 'stagechange' | null
+type Feedback = { mensagem: string; href?: string; cta?: string }
 
 function carregarFiltrosSalvos(): FocusQueueFilters {
   if (typeof window === 'undefined') return {}
@@ -32,6 +45,29 @@ function carregarFiltrosSalvos(): FocusQueueFilters {
   }
 }
 
+function primeiroNome(nome?: string | null) {
+  return nome?.trim().split(/\s+/)[0] || 'tudo bem'
+}
+
+function interessePrincipal(lead: { empreendimentos?: { nome?: string } | null; property_name?: string | null }) {
+  return lead.empreendimentos?.nome ?? lead.property_name ?? null
+}
+
+// A situação usada aqui é a MESMA razão já mostrada no bloco "Por que está
+// aqui" do card (mesma ordem de prioridade de focus-guidance.ts) — a
+// mensagem só traduz esse motivo real para um texto que o corretor pode
+// editar antes de enviar, nunca inventa contexto que não exista nos dados.
+function mensagemWhatsApp(item: NonNullable<ReturnType<typeof useFocusQueue>['current']>) {
+  const nome = primeiroNome(item.lead.nome)
+  const interesse = interessePrincipal(item.lead)
+  const sobre = interesse ? ` sobre o ${interesse}` : ''
+  if (item.followupVencido) return `Olá, ${nome}! Tudo bem? Passando para retomar nosso contato${sobre}. Posso te ajudar com alguma informação?`
+  if (item.agendaVencida) return `Olá, ${nome}! Tudo bem? Vi que ficamos de nos falar${sobre} e o compromisso ficou pendente. Podemos remarcar?`
+  if (item.nuncaContatado) return `Olá, ${nome}! Tudo bem? Sou da Stiven Allan. Vi seu interesse${sobre} e estou à disposição para te ajudar.`
+  if (item.quente) return `Olá, ${nome}! Tudo bem? Notei seu interesse${sobre} e queria entender melhor o que você procura — posso te ajudar agora?`
+  return `Olá, ${nome}! Tudo bem? Estou passando para saber se ainda faz sentido conversarmos${sobre}.`
+}
+
 export default function FocusModePage() {
   const router = useRouter()
   const [filters, setFilters] = useState<FocusQueueFilters>(() => carregarFiltrosSalvos())
@@ -40,6 +76,7 @@ export default function FocusModePage() {
   const [contatoPendenteLeadId, setContatoPendenteLeadId] = useState<string | null>(null)
   const [encerrada, setEncerrada] = useState(false)
   const [breakdown, setBreakdown] = useState<FocusSessionBreakdown | null>(null)
+  const [feedback, setFeedback] = useState<Feedback | null>(null)
 
   const { session, monthPoints, loading: sessionLoading, error: sessionError, start, finish, applyDelta, reload: reloadSession } = useFocusSession()
   const { items, current, loading: queueLoading, error: queueError, refetch, advancePast, updateLeadLocally } = useFocusQueue(filters)
@@ -50,6 +87,12 @@ export default function FocusModePage() {
   useEffect(() => {
     window.localStorage.setItem(FILTROS_STORAGE_KEY, JSON.stringify(filters))
   }, [filters])
+
+  useEffect(() => {
+    if (!feedback) return
+    const timer = window.setTimeout(() => setFeedback(null), 6000)
+    return () => window.clearTimeout(timer)
+  }, [feedback])
 
   // Inicia a sessão automaticamente assim que soubermos quantos leads
   // existem na fila — só uma vez (o ref evita criar uma segunda sessão em
@@ -93,13 +136,21 @@ export default function FocusModePage() {
       const { data } = await postFocusEvent({ sessionId: session.id, leadId, actionType: 'pular', clientEventId })
       applyDelta({ points: data.points, skipped: true })
       advancePast(leadId)
+      setFeedback({ mensagem: 'Lead pulado. Ele continua disponível no CRM.' })
     }).catch(() => {})
   }, [current, session, runner, applyDelta, advancePast])
 
   const handleAbrirWhatsApp = useCallback(() => {
     if (!current) return
-    window.open('https://wa.me/55' + current.lead.whatsapp.replace(/\D/g, ''), '_blank', 'noopener,noreferrer')
+    // Lead veio de DM do Instagram (placeholder ig:<igsid> em vez de
+    // telefone real) — não há como montar um link wa.me válido.
+    if (!temWhatsappReal(current.lead.whatsapp)) return
+    const telefone = current.lead.whatsapp.replace(/\D/g, '')
+    const numero = telefone.startsWith('55') ? telefone : '55' + telefone
+    const texto = mensagemWhatsApp(current)
+    window.open('https://wa.me/' + numero + '?text=' + encodeURIComponent(texto), '_blank', 'noopener,noreferrer')
     setContatoPendenteLeadId(current.lead.id)
+    setFeedback({ mensagem: 'Mensagem sugerida aberta no WhatsApp. Confirme o contato apenas depois de enviar.' })
   }, [current])
 
   function handlePerdido(payload: LostReasonPayload): Promise<void> {
@@ -124,6 +175,7 @@ export default function FocusModePage() {
       applyDelta({ points: data.points, processed: true })
       advancePast(lead.id)
       setModal(null)
+      setFeedback({ mensagem: 'Lead marcado como perdido. O histórico foi preservado.', href: '/dashboard/crm?lead=' + lead.id, cta: 'Rever no CRM' })
     })
   }
 
@@ -152,6 +204,7 @@ export default function FocusModePage() {
       applyDelta({ points: data.points, processed: true })
       advancePast(lead.id)
       setModal(null)
+      setFeedback({ mensagem: 'Follow-up agendado e vinculado à Agenda.', href: '/dashboard/agenda', cta: 'Ver agenda' })
     })
   }
 
@@ -173,6 +226,7 @@ export default function FocusModePage() {
       applyDelta({ points: data.points, processed: true })
       advancePast(lead.id)
       setModal(null)
+      setFeedback({ mensagem: 'Visita agendada e vinculada à Agenda.', href: '/dashboard/agenda', cta: 'Ver agenda' })
     })
   }
 
@@ -190,6 +244,7 @@ export default function FocusModePage() {
       })
       applyDelta({ points: data.points, processed: true })
       setModal('stagechange')
+      setFeedback({ mensagem: 'Visita registrada como realizada. Escolha agora a próxima etapa.' })
     })
   }
 
@@ -204,6 +259,7 @@ export default function FocusModePage() {
       applyDelta({ points: data.points, processed: true })
       advancePast(leadId)
       setModal(null)
+      setFeedback({ mensagem: 'Visita registrada como não ocorrida. O histórico foi atualizado.' })
     })
   }
 
@@ -226,6 +282,7 @@ export default function FocusModePage() {
       applyDelta({ points: data.points })
       advancePast(leadId)
       setModal(null)
+      setFeedback({ mensagem: 'Etapa mantida. Lead atualizado no CRM.' })
     }).catch(() => {})
   }
 
@@ -239,6 +296,7 @@ export default function FocusModePage() {
       const { data } = await postFocusEvent({ sessionId: session.id, leadId: lead.id, actionType: 'anotacao', clientEventId })
       applyDelta({ points: data.points })
       updateLeadLocally(lead.id, { anotacoes: novasAnotacoes })
+      setFeedback({ mensagem: 'Anotação salva no histórico do lead.' })
     }).catch(() => {})
   }
 
@@ -253,6 +311,7 @@ export default function FocusModePage() {
       })
       applyDelta({ points: data.points })
       updateLeadLocally(lead.id, { estagio_funil: novoEstagio })
+      setFeedback({ mensagem: 'Etapa atualizada no CRM.' })
     }).catch(() => {})
   }
 
@@ -269,6 +328,7 @@ export default function FocusModePage() {
       applyDelta({ points: data.points })
       updateLeadLocally(lead.id, { ultimo_contato: agora })
       setContatoPendenteLeadId(null)
+      setFeedback({ mensagem: 'Contato confirmado e registrado no histórico.' })
     }).catch(() => {})
   }
 
@@ -327,27 +387,39 @@ export default function FocusModePage() {
       />
 
       <div style={{ maxWidth: 640, margin: '0 auto', padding: '20px clamp(14px,3vw,24px) 100px' }}>
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            {TEMP_FILTROS.map(({ value, v }) => {
+              const info = tempInfo(v)
+              const ativo = filters.temperatura === value
+              return (
+                <button
+                  key={value}
+                  onClick={() => setFilters((f) => ({ ...f, temperatura: ativo ? undefined : value }))}
+                  aria-pressed={ativo}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 5, borderRadius: 999, padding: '7px 12px',
+                    fontSize: 12.5, fontWeight: 700, cursor: 'pointer', minHeight: 36,
+                    border: '1.5px solid ' + (ativo ? info.cor : D.line),
+                    background: ativo ? info.cor + '1c' : '#fff',
+                    color: ativo ? info.cor : D.ink,
+                  }}
+                >
+                  {info.emoji} {info.label}
+                </button>
+              )
+            })}
+          </div>
           <button
             onClick={() => setFiltrosAbertos((v) => !v)}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: filtrosAbertos ? D.bronze : '#fff', color: filtrosAbertos ? '#fff' : D.ink, border: '1px solid ' + D.line, borderRadius: 8, padding: '7px 12px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: filtrosAbertos ? D.bronze : '#fff', color: filtrosAbertos ? '#fff' : D.ink, border: '1px solid ' + D.line, borderRadius: 8, padding: '7px 12px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', minHeight: 36 }}
           >
-            <Filter size={13} /> Filtros
+            <Filter size={13} /> Mais filtros
           </button>
         </div>
 
         {filtrosAbertos && (
           <div style={{ background: '#fff', border: '1px solid ' + D.line, borderRadius: 12, padding: 16, marginBottom: 16, display: 'flex', flexWrap: 'wrap', gap: 10 }}>
-            <select
-              value={filters.temperatura ?? ''}
-              onChange={(e) => setFilters((f) => ({ ...f, temperatura: (e.target.value || undefined) as FocusQueueFilters['temperatura'] }))}
-              style={{ padding: '8px 10px', borderRadius: 8, border: '1px solid ' + D.line, fontSize: 13 }}
-            >
-              <option value="">Todas temperaturas</option>
-              <option value="quente">Quentes</option>
-              <option value="morno">Mornos</option>
-              <option value="frio">Frios</option>
-            </select>
             <select
               value={filters.estagioFunil ?? ''}
               onChange={(e) => setFilters((f) => ({ ...f, estagioFunil: e.target.value || undefined }))}
@@ -385,10 +457,19 @@ export default function FocusModePage() {
           </div>
         )}
 
+        {feedback && (
+          <div role="status" style={{ background: '#ECFDF5', border: '1px solid #A7F3D0', color: '#065F46', borderRadius: 10, padding: '10px 14px', marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, fontSize: 13, fontWeight: 600, flexWrap: 'wrap' }}>
+            <span>{feedback.mensagem}</span>
+            {feedback.href && (
+              <a href={feedback.href} style={{ color: '#047857', fontWeight: 800, whiteSpace: 'nowrap', padding: '6px 4px', minHeight: 32, display: 'inline-flex', alignItems: 'center' }}>{feedback.cta ?? 'Abrir'}</a>
+            )}
+          </div>
+        )}
+
         {loading ? (
           <div aria-live="polite" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {[0, 1].map((i) => (
-              <div key={i} style={{ height: 220, borderRadius: 16, background: 'linear-gradient(90deg, #eee, #f6f6f6, #eee)', backgroundSize: '200% 100%', animation: 'focus-skeleton 1.4s ease infinite' }} />
+              <div key={i} className="focus-skeleton" style={{ height: 220, borderRadius: 16, background: '#eee', backgroundSize: '200% 100%' }} />
             ))}
           </div>
         ) : !current ? (
@@ -417,6 +498,7 @@ export default function FocusModePage() {
         <div style={{ position: 'fixed', left: 0, right: 0, bottom: 0 }}>
           <FocusPrimaryActions
             disabled={runner.processando}
+            recommendedAction={current.recomendacao.action}
             onPerdido={() => setModal('perdido')}
             onPular={handlePular}
             onFollowUp={() => setModal('followup')}
@@ -425,7 +507,13 @@ export default function FocusModePage() {
         </div>
       )}
 
-      {modal === 'followup' && <FollowUpModal onClose={() => setModal(null)} onSubmit={handleFollowUp} />}
+      {modal === 'followup' && current && (
+        <FollowUpModal
+          onClose={() => setModal(null)}
+          onSubmit={handleFollowUp}
+          contexto={interessePrincipal(current.lead) ? `Retomar interesse em ${interessePrincipal(current.lead)}.` : current.recomendacao.detail}
+        />
+      )}
       {modal === 'visita' && current && (
         <VisitModal
           proximaVisita={current.proximaVisita}
@@ -433,6 +521,8 @@ export default function FocusModePage() {
           onAgendar={handleVisitaAgendar}
           onConcluir={handleVisitaConcluir}
           onNaoOcorreu={handleVisitaNaoOcorreu}
+          localSugerido={interessePrincipal(current.lead) ?? ''}
+          observacaoSugerida={current.recomendacao.detail}
         />
       )}
       {modal === 'perdido' && current && (
@@ -443,10 +533,14 @@ export default function FocusModePage() {
       )}
 
       <style>{`
-        @keyframes focus-skeleton { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
         @media (prefers-reduced-motion: no-preference) {
           .focus-card-enter { animation: focus-card-in .22s ease; }
           @keyframes focus-card-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+          .focus-skeleton { background-image: linear-gradient(90deg, #eee, #f6f6f6, #eee); animation: focus-skeleton-pulse 1.4s ease infinite; }
+          @keyframes focus-skeleton-pulse { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .focus-skeleton { background: #eee; }
         }
       `}</style>
     </div>

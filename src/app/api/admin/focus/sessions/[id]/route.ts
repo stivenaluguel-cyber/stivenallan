@@ -48,6 +48,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
       mudancasDeEtapa: porTipo['etapa_alterada'] ?? 0,
       perdidos: porTipo['perdido'] ?? 0,
       propostas: porTipo['proposta_enviada'] ?? 0,
+      contatosConfirmados: porTipo['contato_confirmado'] ?? 0,
     },
   })
 }

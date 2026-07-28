@@ -1,5 +1,5 @@
 'use client'
-import { CalendarClock, CheckCircle2, Repeat, SkipForward, Sparkles, Timer, TrendingDown, Trophy } from 'lucide-react'
+import { CalendarClock, CheckCircle2, MessageCircle, Repeat, SkipForward, Sparkles, Timer, TrendingDown, Trophy } from 'lucide-react'
 import { D } from './tokens'
 import type { FocusSession } from '@/lib/dashboard/use-focus-session'
 
@@ -9,6 +9,7 @@ export type FocusSessionBreakdown = {
   mudancasDeEtapa: number
   perdidos: number
   propostas: number
+  contatosConfirmados: number
 }
 
 function duracao(inicio: string, fim: string | null): string {
@@ -34,9 +35,11 @@ export function FocusSessionSummary({
     { label: 'Leads processados', valor: session.processed_leads, icon: <CheckCircle2 size={16} />, cor: D.green },
     { label: 'Pulados', valor: session.skipped_leads, icon: <SkipForward size={16} />, cor: D.muted },
     { label: 'Follow-ups agendados', valor: breakdown.followupsAgendados, icon: <CalendarClock size={16} />, cor: D.blue },
+    { label: 'Contatos confirmados', valor: breakdown.contatosConfirmados, icon: <MessageCircle size={16} />, cor: D.green },
     { label: 'Visitas', valor: breakdown.visitas, icon: <Sparkles size={16} />, cor: D.amber },
     { label: 'Mudanças de etapa', valor: breakdown.mudancasDeEtapa, icon: <Repeat size={16} />, cor: D.bronze },
     { label: 'Perdidos', valor: breakdown.perdidos, icon: <TrendingDown size={16} />, cor: D.red },
+    { label: 'Propostas enviadas', valor: breakdown.propostas, icon: <Sparkles size={16} />, cor: D.bronze },
   ]
 
   return (

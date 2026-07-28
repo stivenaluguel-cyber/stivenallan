@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import { jwtVerify } from 'jose'
 import { createClient } from '@supabase/supabase-js'
 import { buildFocusQueue, type AgendaOverdueInfo, type FocusQueueFilters } from '@/lib/dashboard/focus-queue'
+import { explainFocusPriority, recommendFocusAction } from '@/lib/dashboard/focus-guidance'
 
 export const dynamic = 'force-dynamic'
 const sb = () => createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
@@ -75,6 +76,8 @@ export async function GET(req: NextRequest) {
     nuncaContatado: e.nuncaContatado,
     quente: e.quente,
     diasSemContato: Number.isFinite(e.diasSemContato) ? Math.round(e.diasSemContato) : null,
+    prioridade: explainFocusPriority(e),
+    recomendacao: recommendFocusAction(e),
     proximoEvento: agendaPorLead[e.lead.id]?.proximoEvento ?? null,
     proximaVisita: proximaVisitaPorLead[e.lead.id] ?? null,
   }))

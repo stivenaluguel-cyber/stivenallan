@@ -5,6 +5,7 @@ import { Crosshair } from 'lucide-react'
 import { ConversaPanel } from '@/components/dashboard/ConversaPanel'
 import { ESTAGIOS_FUNIL as ESTAGIOS } from '@/lib/dashboard/estagios'
 import { isEligibleForFocusQueue } from '@/lib/dashboard/focus-queue'
+import { temWhatsappReal } from '@/lib/leads/normalize'
 
 const D = {
   bg: '#F3F2EE', surface: '#FAFAF7', sidebar: '#131211', ink: '#161512',
@@ -273,8 +274,12 @@ function LeadCard({ lead, onDragStart, onSelect }: { lead: Lead; onDragStart: (i
         </div>
       </div>
       <div style={{ display: 'flex', gap: 5, marginTop: 9 }}>
-        <a href={'https://wa.me/55' + (lead.whatsapp || '').replace(/\D/g, '')} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}
-          style={{ flex: 1, background: '#25d366', color: '#fff', borderRadius: 6, padding: '5px 0', fontSize: 11, textAlign: 'center', textDecoration: 'none', fontWeight: 700, minHeight: 26, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>WhatsApp</a>
+        {temWhatsappReal(lead.whatsapp) ? (
+          <a href={'https://wa.me/55' + (lead.whatsapp || '').replace(/\D/g, '')} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}
+            style={{ flex: 1, background: '#25d366', color: '#fff', borderRadius: 6, padding: '5px 0', fontSize: 11, textAlign: 'center', textDecoration: 'none', fontWeight: 700, minHeight: 26, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>WhatsApp</a>
+        ) : (
+          <span title="Lead veio do Instagram — ainda sem telefone" style={{ flex: 1, background: D.line, color: D.muted, borderRadius: 6, padding: '5px 0', fontSize: 11, textAlign: 'center', fontWeight: 700, minHeight: 26, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>📷 Instagram</span>
+        )}
         <button onClick={(e) => { e.stopPropagation(); onSelect(lead) }} style={{ flex: 1, background: D.bg, color: D.ink, border: '1px solid ' + D.line, borderRadius: 6, padding: '5px 0', fontSize: 11, fontWeight: 700, cursor: 'pointer', minHeight: 26 }}>Abrir</button>
       </div>
     </div>
@@ -433,7 +438,9 @@ function LeadModal({ lead, onClose, onUpdated, onDeleted }: { lead: Lead; onClos
             <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 10 }}>
               <tbody>
                 {[
-                  ['WhatsApp', <a key="w" href={'https://wa.me/55' + (lead.whatsapp || '').replace(/\D/g, '')} target="_blank" rel="noopener noreferrer" style={{ color: '#25D366', textDecoration: 'none' }}>{lead.whatsapp} ↗</a>],
+                  ['WhatsApp', temWhatsappReal(lead.whatsapp)
+                    ? <a key="w" href={'https://wa.me/55' + (lead.whatsapp || '').replace(/\D/g, '')} target="_blank" rel="noopener noreferrer" style={{ color: '#25D366', textDecoration: 'none' }}>{lead.whatsapp} ↗</a>
+                    : <span key="w" style={{ color: '#8a8a85' }}>Só Instagram — sem telefone ainda</span>],
                   ['E-mail', lead.email ? <a key="e" href={'mailto:' + lead.email} style={{ color: D.bronze, textDecoration: 'none' }}>{lead.email}</a> : '—'],
                   ['Empreendimento', lead.empreendimentos?.nome ?? lead.property_name ?? '—'],
                   ['Orçamento', lead.orcamento_max ? fmt(lead.orcamento_max) : '—'],
@@ -473,9 +480,15 @@ function LeadModal({ lead, onClose, onUpdated, onDeleted }: { lead: Lead; onClos
           <label style={labelCss}>Conversa WhatsApp</label>
           <ConversaPanel leadId={lead.id} />
 
-          <a href={'https://wa.me/55' + (lead.whatsapp || '').replace(/\D/g, '')} target="_blank" rel="noopener noreferrer" style={{ display: 'block', marginTop: 18, background: '#25D366', color: '#fff', borderRadius: 10, padding: 12, fontSize: 14, fontWeight: 700, textAlign: 'center', textDecoration: 'none' }}>
-            Abrir no WhatsApp (app)
-          </a>
+          {temWhatsappReal(lead.whatsapp) ? (
+            <a href={'https://wa.me/55' + (lead.whatsapp || '').replace(/\D/g, '')} target="_blank" rel="noopener noreferrer" style={{ display: 'block', marginTop: 18, background: '#25D366', color: '#fff', borderRadius: 10, padding: 12, fontSize: 14, fontWeight: 700, textAlign: 'center', textDecoration: 'none' }}>
+              Abrir no WhatsApp (app)
+            </a>
+          ) : (
+            <div style={{ display: 'block', marginTop: 18, background: '#F3F2EE', color: '#8a8a85', borderRadius: 10, padding: 12, fontSize: 13, textAlign: 'center' }}>
+              📷 Lead veio do Instagram — edite acima quando conseguir o telefone
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -520,6 +533,26 @@ function CrmPageInner() {
   }, [])
 
   useEffect(() => { load() }, [load])
+
+  // O Next.js App Router reaproveita a árvore de componentes já montada ao
+  // voltar de outra rota (ex.: Modo Foco → CRM pelo botão "voltar" ou pelo
+  // link "Detalhes completos"), então o useEffect acima não roda de novo —
+  // o Kanban ficava mostrando o `leads` capturado na primeira visita, sem a
+  // anotação/etapa/etc. feita no meio do caminho. Refazer o load() sempre
+  // que a aba volta a ficar visível cobre esse caso (e qualquer outro lugar
+  // do dashboard que também tenha mudado um lead) sem precisar de um cache
+  // ou de passar dado entre rotas.
+  useEffect(() => {
+    function onVisivel() {
+      if (document.visibilityState === 'visible') load()
+    }
+    document.addEventListener('visibilitychange', onVisivel)
+    window.addEventListener('focus', onVisivel)
+    return () => {
+      document.removeEventListener('visibilitychange', onVisivel)
+      window.removeEventListener('focus', onVisivel)
+    }
+  }, [load])
 
   // Deep link do Modo Foco (link "Detalhes completos" do card) — abre
   // direto o modal do lead sem precisar caçar ele no Kanban.
