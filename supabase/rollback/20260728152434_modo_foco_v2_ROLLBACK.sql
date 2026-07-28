@@ -1,4 +1,4 @@
--- ROLLBACK REVISADO da migration 20260728041224_modo_foco_v2_sessao_persistente
+-- ROLLBACK REVISADO da migration 20260728152434_modo_foco_v2_sessao_persistente
 --
 -- ⚠️ NÃO EXECUTADO. Documento de contingência.
 -- Execute apenas se a V2 precisar ser revertida DEPOIS de já aplicada.
