@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { ESTAGIOS_FUNIL as ESTAGIOS } from '@/lib/dashboard/estagios'
+import { MetasDiarias } from '@/components/dashboard/MetasDiarias'
 
 const D = {
   bg: '#F3F2EE', surface: '#FAFAF7', sidebar: '#131211', ink: '#161512',
@@ -91,6 +92,8 @@ export default function DashboardHome() {
           <h1 style={{ fontFamily: "'Bricolage Grotesque',system-ui", fontSize: 'clamp(1.5rem,3vw,2rem)', fontWeight: 800, margin: 0, color: D.ink }}>Painel · SA Imóveis</h1>
           <p style={{ margin: '6px 0 0', fontSize: 14, color: D.muted }}>Visão geral da sua operação de vendas.</p>
         </div>
+
+        <MetasDiarias />
 
         <div style={{ background: D.sidebar, borderRadius: 12, padding: '16px 22px', marginBottom: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
           <div>

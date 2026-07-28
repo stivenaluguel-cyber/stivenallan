@@ -8,7 +8,7 @@
 
 export type TimelineKind =
   | 'anotacao' | 'mudanca_etapa' | 'proposta' | 'mensagem'
-  | 'compromisso' | 'acao_foco' | 'contato' | 'perdido'
+  | 'compromisso' | 'acao_foco' | 'contato' | 'perdido' | 'simulacao'
 
 export type TimelineItem = {
   id: string
@@ -83,13 +83,14 @@ export function buildLeadTimeline(sources: TimelineSources): TimelineItem[] {
   for (const it of sources.interacoesLead ?? []) {
     const ehEtapa = it.tipo === 'status_change'
     const ehProposta = it.tipo === 'proposta' || it.tipo === 'proposta_aceita'
+    const ehSimulacao = it.tipo === 'simulacao'
     itens.push({
       id: 'interacao:' + it.id,
-      kind: ehEtapa ? 'mudanca_etapa' : ehProposta ? 'proposta' : 'anotacao',
+      kind: ehEtapa ? 'mudanca_etapa' : ehProposta ? 'proposta' : ehSimulacao ? 'simulacao' : 'anotacao',
       data: it.created_at,
-      titulo: ehEtapa ? 'Mudança de etapa' : ehProposta ? 'Proposta' : 'Anotação',
+      titulo: ehEtapa ? 'Mudança de etapa' : ehProposta ? 'Proposta' : ehSimulacao ? 'Simulação' : 'Anotação',
       descricao: it.descricao,
-      origem: ehEtapa ? 'CRM' : ehProposta ? 'Propostas' : 'Anotação',
+      origem: ehEtapa ? 'CRM' : ehProposta ? 'Propostas' : ehSimulacao ? 'Simulador' : 'Anotação',
     })
   }
 

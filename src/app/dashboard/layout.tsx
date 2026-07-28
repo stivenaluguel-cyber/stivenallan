@@ -27,6 +27,7 @@ const GRUPOS: { titulo: string; itens: NavItem[] }[] = [
     titulo: 'GESTÃO',
     itens: [
       { href: '/dashboard/financeiro', label: 'Financeiro', icon: '💰' },
+      { href: '/dashboard/comissoes', label: 'Comissões', icon: '🤝' },
       { href: '/dashboard/empreendimentos', label: 'Empreendimentos', icon: '🏢' },
       { href: '/dashboard/leads', label: 'Leads', icon: '🎯' },
       { href: '/dashboard/simulador', label: 'Simulador', icon: '🧮' },
@@ -47,7 +48,8 @@ const GRUPOS: { titulo: string; itens: NavItem[] }[] = [
 const PAGE_LABELS: Record<string, string> = {
   '/dashboard': 'Painel', '/dashboard/crm': 'CRM', '/dashboard/clientes': 'Clientes',
   '/dashboard/propostas': 'Propostas', '/dashboard/agenda': 'Agenda',
-  '/dashboard/financeiro': 'Financeiro', '/dashboard/empreendimentos': 'Empreendimentos',
+  '/dashboard/financeiro': 'Financeiro', '/dashboard/comissoes': 'Comissões',
+  '/dashboard/empreendimentos': 'Empreendimentos',
   '/dashboard/leads': 'Leads', '/dashboard/simulador': 'Simulador',
   '/dashboard/relatorios': 'Relatórios', '/dashboard/automacoes': 'Automações',
   '/dashboard/campanhas': 'Campanhas',

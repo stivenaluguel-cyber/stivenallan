@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAdmin } from '@/lib/dashboard/admin-auth'
+import { agruparBairrosPorCidade, contarFiltrosAtivos, filtrarImoveis, filtrosDaQueryString } from '@/lib/imoveis/filtros'
 
 export const dynamic = 'force-dynamic'
 
@@ -67,8 +68,21 @@ export async function GET(request: NextRequest) {
     .select('*')
     .order('ordem', { ascending: true })
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  const mapped = (data || []).map(toFormShape)
-  return NextResponse.json({ data: mapped })
+
+  // Filtragem em memória: são ~36 imóveis, e a mesma função pura roda no
+  // servidor e nos testes, sem duplicar a regra em SQL.
+  const filtros = filtrosDaQueryString(new URL(request.url).searchParams)
+  const filtrados = filtrarImoveis(data ?? [], filtros)
+
+  return NextResponse.json({
+    data: filtrados.map(toFormShape),
+    total: filtrados.length,
+    totalSemFiltro: (data ?? []).length,
+    // Alimenta o seletor de bairro agrupado por cidade — calculado sobre a
+    // lista COMPLETA, senão as opções sumiriam conforme o filtro aperta.
+    bairrosPorCidade: agruparBairrosPorCidade(data ?? []),
+    filtrosAtivos: contarFiltrosAtivos(filtros),
+  })
 }
 
 export async function POST(request: NextRequest) {

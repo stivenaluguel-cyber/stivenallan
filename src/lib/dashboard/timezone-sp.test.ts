@@ -6,6 +6,8 @@ import {
   amanhaSaoPaulo,
   toSaoPauloDateString,
   endOfSaoPauloDayISOString,
+  hojeEmSaoPaulo,
+  horaEmSaoPaulo,
 } from './timezone-sp'
 
 describe('spLocalToISOString', () => {
@@ -90,5 +92,27 @@ describe('endOfSaoPauloDayISOString', () => {
     const iso = endOfSaoPauloDayISOString('2026-08-05')
     expect(iso).toBe('2026-08-05T23:59:59-03:00')
     expect(new Date(iso).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' })).toBe('05/08/2026')
+  })
+})
+
+describe('hojeEmSaoPaulo / horaEmSaoPaulo', () => {
+  it('às 22h de SP ainda é o mesmo dia, mesmo o UTC já tendo virado', () => {
+    // 2026-07-28 22:30 BRT = 2026-07-29 01:30 UTC
+    const instante = new Date('2026-07-29T01:30:00Z')
+    expect(hojeEmSaoPaulo(instante)).toBe('2026-07-28')
+    expect(instante.toISOString().slice(0, 10)).toBe('2026-07-29') // o erro que evitamos
+  })
+
+  it('logo após a meia-noite em SP já é o dia novo', () => {
+    expect(hojeEmSaoPaulo(new Date('2026-07-29T03:10:00Z'))).toBe('2026-07-29')
+  })
+
+  it('hora local em SP fica 3h atrás do UTC', () => {
+    expect(horaEmSaoPaulo(new Date('2026-07-28T12:00:00Z'))).toBe(9)
+    expect(horaEmSaoPaulo(new Date('2026-07-29T01:30:00Z'))).toBe(22)
+  })
+
+  it('meia-noite em SP é hora 0, não 21', () => {
+    expect(horaEmSaoPaulo(new Date('2026-07-29T03:00:00Z'))).toBe(0)
   })
 })
