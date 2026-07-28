@@ -1,5 +1,6 @@
 'use client'
 import { useState, useMemo } from 'react'
+import { SalvarSimulacaoLead } from '@/components/dashboard/SalvarSimulacaoLead'
 import { imoveis } from '@/data/imoveis'
 import { simular, planos, tabelaCorbetta, tabelaSplit, tabelaGiassi, construtoras } from '@/data/financiamento'
 import type { CorrecaoB, OpcoesParcela } from '@/data/financiamento'
@@ -94,6 +95,25 @@ export default function SimuladorPage() {
     () => imoveisAtivos.find(i => i.slug === slug) ?? null,
     [slug]
   )
+
+  // Cenário achatado para virar registro no histórico do lead. `detalhes`
+  // guarda o resto (avisos, parcela pós-chaves, opções) para conseguir
+  // reabrir a simulação como ela foi apresentada ao cliente.
+  const dadosSimulacao = useMemo(() => ({
+    empreendimento_slug: slug || null,
+    empreendimento_nome: imovelSelecionado?.nome ?? null,
+    valor_imovel: valorImovel,
+    entrada: sim?.parcelaA.entrada ?? null,
+    parcelas_qtd: sim?.parcelaA.qtdMensais ?? null,
+    parcelas_valor: sim?.parcelaA.valorMensal ?? null,
+    reforcos_qtd: sim?.parcelaA.qtdReforcos ?? null,
+    reforcos_valor: sim?.parcelaA.valorReforco ?? null,
+    chaves_valor: null,
+    correcao: correcaoB,
+    detalhes: sim
+      ? { parcelaA: sim.parcelaA, parcelaB: sim.parcelaB ?? null, valorAVista: sim.valorAVista, descontoAVista: sim.descontoAVista, avisos: sim.avisos, opcoes }
+      : {},
+  }), [slug, imovelSelecionado, valorImovel, sim, correcaoB, opcoes])
 
   // ── Cálculo Corbetta ─────────────────────────────────────────────────────
   const corbEntrada = useMemo(() => {
@@ -391,6 +411,9 @@ export default function SimuladorPage() {
               }}>
                 {copiado ? '✅ Copiado!' : '📋 Copiar proposta'}
               </button>
+              <div style={{ marginTop: 10 }}>
+                <SalvarSimulacaoLead dados={dadosSimulacao} />
+              </div>
             </div>
           </div>
         )}

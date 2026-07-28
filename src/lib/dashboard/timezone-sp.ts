@@ -46,3 +46,17 @@ export function endOfSaoPauloDayISOString(dataString: string): string {
 export function formatSaoPauloDateTime(iso: string): string {
   return new Date(iso).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })
 }
+
+// "Hoje" pro corretor, não pro servidor. Entre 21h e meia-noite em SP o
+// calendário UTC já virou — usar toISOString().slice(0,10) aqui jogaria as
+// atividades da noite no dia seguinte.
+export function hojeEmSaoPaulo(baseDate: Date = new Date()): string {
+  return addDaysSaoPauloDateString(baseDate, 0)
+}
+
+// Hora local em SP (0–23), usada pra decidir quando faz sentido cobrar o
+// que falta no dia.
+export function horaEmSaoPaulo(baseDate: Date = new Date()): number {
+  const deslocado = new Date(baseDate.getTime() + SP_OFFSET_MINUTES * 60_000)
+  return deslocado.getUTCHours()
+}
