@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { SITE_URL } from '@/lib/site'
 import { VisitTracker } from '@/components/VisitTracker'
 import { TrackingProvider } from '@/components/TrackingProvider'
@@ -62,6 +62,26 @@ export const metadata: Metadata = {
     googleBot: { index: true, follow: true, 'max-video-preview': -1, 'max-image-preview': 'large', 'max-snippet': -1 },
   },
   alternates: { canonical: SITE_URL },
+  manifest: '/manifest.webmanifest',
+  icons: {
+    icon: [
+      { url: '/icons/favicon-16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/icons/favicon-32.png', sizes: '32x32', type: 'image/png' },
+    ],
+    apple: [{ url: '/icons/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
+  },
+  // "Adicionar à Tela de Início" no Safari do iPhone: sem isso o ícone
+  // salvo é só um screenshot da página e abre dentro do Safari (com barra
+  // de endereço); com isso, abre em tela cheia como um app instalado.
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'SA Painel',
+  },
+}
+
+export const viewport: Viewport = {
+  themeColor: '#D24E22',
 }
 
 const schemaAgent = {
@@ -111,6 +131,12 @@ try{var sc=JSON.parse(localStorage.getItem('sa_consent'));if(sc&&sc.version===1&
         <link rel="dns-prefetch" href="https://xpkznaqgctfkoonqpcye.supabase.co" />
         <link rel="preconnect" href="https://xpkznaqgctfkoonqpcye.supabase.co" crossOrigin="anonymous" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
+        {/* Next.js Metadata API só emite a meta tag padrão "mobile-web-app-capable"
+            (appleWebApp.capable acima) — o prefixo "apple-" continua sendo o que
+            o Safari do iOS de fato lê pra abrir em tela cheia sem a barra de
+            endereço ao instalar pela Tela de Início; sem ele, versões mais
+            antigas do iOS abrem como uma aba normal do Safari. */}
+        <meta name="apple-mobile-web-app-capable" content="yes" />
       </head>
       <body><VisitTracker /><TrackingProvider />{children}
 {/* GA4/Meta/Google Ads carregam SÓ após consentimento (LGPD) — ver AnalyticsScripts.
