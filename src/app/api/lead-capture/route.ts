@@ -5,6 +5,7 @@ import { extractIp, isBotSubmission } from '@/lib/leads/anti-spam'
 import { checkRateLimit } from '@/lib/leads/rate-limit'
 import { logError, logWarn } from '@/lib/log'
 import { confirmarRecebimentoLead } from '@/lib/leads/confirmar-recebimento-lead'
+import { notificarLeadNovo } from '@/lib/leads/notificar-lead-novo'
 
 export const dynamic = 'force-dynamic'
 
@@ -93,6 +94,11 @@ export async function POST(req: NextRequest) {
       await confirmarRecebimentoLead({ nome, email, propertyName })
     } catch (confirmErr) {
       logError(SOURCE, 'falha ao confirmar recebimento ao lead', confirmErr)
+    }
+    if (data?.id) {
+      notificarLeadNovo(supabaseAdmin, { id: data.id, nome, origem: 'Site' }).catch((notifyErr) =>
+        logError(SOURCE, 'falha ao notificar lead novo (push)', notifyErr),
+      )
     }
 
     return NextResponse.json({ id: data?.id }, { status: 201 })

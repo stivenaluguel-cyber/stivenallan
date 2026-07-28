@@ -7,6 +7,7 @@ import {
   extrairCamposLeadMeta,
 } from '@/lib/leads/meta-leadgen-webhook'
 import { upsertAdsLead } from '@/lib/leads/upsert-ads-lead'
+import { notificarLeadNovo } from '@/lib/leads/notificar-lead-novo'
 import { logError, logInfo, logWarn } from '@/lib/log'
 
 export const dynamic = 'force-dynamic'
@@ -82,6 +83,11 @@ export async function POST(req: NextRequest) {
       })
 
       logInfo(SOURCE, 'lead do meta processado', { leadgenId: change.leadgenId, status: resultado.status })
+      if (resultado.status === 'created') {
+        notificarLeadNovo(supabase, { id: resultado.id, nome: campos.nome, origem: 'Meta Ads' }).catch((err) =>
+          logError(SOURCE, 'falha ao notificar lead novo (push)', err),
+        )
+      }
     } catch (err) {
       logError(SOURCE, 'falha ao processar leadgen_id', err, { leadgenId: change.leadgenId })
     }

@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import { verificarAssinaturaMeta, resolverDesafioVerificacaoMeta } from '@/lib/leads/meta-leadgen-webhook'
 import { extrairMensagensInstagram } from '@/lib/leads/instagram-dm-webhook'
 import { resolveOrCreateInstagramLead } from '@/lib/leads/upsert-instagram-lead'
+import { notificarLeadNovo } from '@/lib/leads/notificar-lead-novo'
 import { logError, logInfo, logWarn } from '@/lib/log'
 
 export const dynamic = 'force-dynamic'
@@ -86,6 +87,11 @@ export async function POST(req: NextRequest) {
       })
 
       logInfo(SOURCE, 'mensagem do instagram processada', { senderId: msg.senderId, leadStatus: resultado.status })
+      if (resultado.status === 'created') {
+        notificarLeadNovo(supabase, { id: resultado.id, nome: nomeSugerido, origem: 'Instagram DM' }).catch((err) =>
+          logError(SOURCE, 'falha ao notificar lead novo (push)', err),
+        )
+      }
     } catch (err) {
       logError(SOURCE, 'falha ao processar mensagem do instagram', err, { senderId: msg.senderId })
     }

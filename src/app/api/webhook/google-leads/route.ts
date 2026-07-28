@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { verificarChaveGoogle, extrairCamposLeadGoogle, type PayloadLeadGoogle } from '@/lib/leads/google-leads-webhook'
 import { upsertAdsLead } from '@/lib/leads/upsert-ads-lead'
+import { notificarLeadNovo } from '@/lib/leads/notificar-lead-novo'
 import { logError, logInfo } from '@/lib/log'
 
 export const dynamic = 'force-dynamic'
@@ -46,6 +47,11 @@ export async function POST(req: NextRequest) {
       source: `google_lead_ads:${formId}`,
     })
     logInfo(SOURCE, 'lead do google processado', { leadId: payload.lead_id, status: resultado.status })
+    if (resultado.status === 'created') {
+      notificarLeadNovo(supabase, { id: resultado.id, nome: campos.nome, origem: 'Google Ads' }).catch((err) =>
+        logError(SOURCE, 'falha ao notificar lead novo (push)', err),
+      )
+    }
   } catch (err) {
     logError(SOURCE, 'falha ao processar lead do google', err, { leadId: payload.lead_id })
   }
