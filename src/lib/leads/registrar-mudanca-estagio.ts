@@ -22,6 +22,35 @@ import { logError } from '@/lib/log'
 // congelada assim que a resposta HTTP saia. A conversao em cliente roda
 // SINCRONA (nao dentro de after()) — e um dado de negocio, nao telemetria de
 // anuncio, entao nao deve ser "best effort e pode sumir silenciosamente".
+// leads.anotacoes tem DOIS formatos convivendo: um array JSON
+// [{ data, texto, clientEventId }] (mais recente primeiro) e texto puro
+// (legado). Sem tratar isso, o JSON cru ia parar dentro do campo de notas do
+// cliente — visto em producao no primeiro teste real da conversao.
+// Mesma leitura defensiva de parseUltimaNota em FocusLeadCard.tsx.
+export function formatarAnotacoes(raw: unknown): string | null {
+  if (typeof raw !== 'string' || !raw.trim()) return null
+  let parsed: unknown
+  try {
+    parsed = JSON.parse(raw)
+  } catch {
+    return raw.trim() // texto puro (legado)
+  }
+  if (!Array.isArray(parsed)) return raw.trim()
+
+  const linhas = parsed
+    .map((n) => {
+      const texto = typeof (n as { texto?: unknown })?.texto === 'string' ? (n as { texto: string }).texto.trim() : ''
+      if (!texto) return null
+      const dataRaw = (n as { data?: unknown })?.data
+      const data = typeof dataRaw === 'string' && dataRaw ? new Date(dataRaw) : null
+      const dataLabel = data && !Number.isNaN(data.getTime()) ? data.toLocaleDateString('pt-BR') + ': ' : ''
+      return dataLabel + texto
+    })
+    .filter((l): l is string => Boolean(l))
+
+  return linhas.length > 0 ? linhas.join('\n') : null
+}
+
 export async function registrarMudancaEstagio(
   client: SupabaseClient<any, any, any>,
   id: string,
@@ -49,7 +78,7 @@ export async function registrarMudancaEstagio(
     const empNome = (lead as { empreendimentos?: { nome?: string } | null }).empreendimentos?.nome
     const notas = [
       `Convertido automaticamente do lead em ${new Date().toLocaleDateString('pt-BR')}${empNome ? ' — interesse em ' + empNome : ''}.`,
-      lead.anotacoes || null,
+      formatarAnotacoes(lead.anotacoes),
     ].filter(Boolean).join('\n\n')
 
     const { error: clienteError } = await client.from('crm_clientes').upsert(

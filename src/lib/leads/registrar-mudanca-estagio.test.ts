@@ -6,7 +6,7 @@ vi.mock('@/lib/google-ads-conversion', () => ({ sendGoogleAdsConversion: vi.fn(a
 // executa o callback direto (mesma semântica de "roda em algum momento").
 vi.mock('next/server', () => ({ after: (cb: () => unknown) => { cb() } }))
 
-import { registrarMudancaEstagio } from './registrar-mudanca-estagio'
+import { formatarAnotacoes, registrarMudancaEstagio } from './registrar-mudanca-estagio'
 
 type Row = Record<string, unknown>
 
@@ -94,5 +94,53 @@ describe('registrarMudancaEstagio', () => {
     const sb = makeSupabase({ nome: null, whatsapp: null, email: null, fbclid: null, gclid: null, origem: null, orcamento_max: null, anotacoes: null, empreendimentos: null })
     await registrarMudancaEstagio(sb as any, 'lead-4', 'negociacao', 'fechado')
     expect(sb.upserts).toHaveLength(0)
+  })
+
+  // Regressão: o primeiro teste real em produção despejou o array JSON de
+  // anotações cru dentro das notas do cliente.
+  it('não deixa JSON cru vazar pras notas do cliente', async () => {
+    const anotacoesJson = JSON.stringify([
+      { data: '2026-07-27T17:19:26.717Z', texto: 'teste refetch kanban 20h13', clientEventId: '9c1a723a' },
+      { data: '2026-07-27T14:32:53.675Z', texto: 'quer uma casa', clientEventId: 'fc28fd6a' },
+    ])
+    const sb = makeSupabase({ nome: 'Dora', whatsapp: '5548911111111', email: null, fbclid: null, gclid: null, origem: 'Site', orcamento_max: null, anotacoes: anotacoesJson, empreendimentos: null })
+
+    await registrarMudancaEstagio(sb as any, 'lead-5', 'negociacao', 'fechado')
+
+    const notas = sb.upserts[0].row.notas as string
+    expect(notas).not.toContain('clientEventId')
+    expect(notas).not.toContain('{')
+    expect(notas).toContain('quer uma casa')
+    expect(notas).toContain('teste refetch kanban 20h13')
+  })
+})
+
+describe('formatarAnotacoes', () => {
+  it('converte o array JSON em linhas legíveis com data', () => {
+    const raw = JSON.stringify([{ data: '2026-07-27T14:32:53.675Z', texto: 'quer uma casa', clientEventId: 'x' }])
+    expect(formatarAnotacoes(raw)).toBe('27/07/2026: quer uma casa')
+  })
+
+  it('mantém texto puro (formato legado) como está', () => {
+    expect(formatarAnotacoes('  cliente prefere contato à noite  ')).toBe('cliente prefere contato à noite')
+  })
+
+  it('ignora entradas sem texto e devolve null quando não sobra nada', () => {
+    expect(formatarAnotacoes(JSON.stringify([{ data: '2026-07-27T14:32:53.675Z', texto: '   ' }]))).toBeNull()
+  })
+
+  it('aceita entrada sem data, sem quebrar', () => {
+    const raw = JSON.stringify([{ data: '', texto: 'Interesse no empreendimento Casa Guaíba Park' }])
+    expect(formatarAnotacoes(raw)).toBe('Interesse no empreendimento Casa Guaíba Park')
+  })
+
+  it('devolve null para vazio/nulo', () => {
+    expect(formatarAnotacoes(null)).toBeNull()
+    expect(formatarAnotacoes('')).toBeNull()
+    expect(formatarAnotacoes('   ')).toBeNull()
+  })
+
+  it('não quebra com JSON válido que não é array', () => {
+    expect(formatarAnotacoes('{"texto":"oi"}')).toBe('{"texto":"oi"}')
   })
 })
