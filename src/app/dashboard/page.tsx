@@ -19,6 +19,11 @@ type Lead = {
 }
 type Cub = { valor_m2: number; mes_referencia: string; variacao_mensal?: number }
 type Insights = { insights: string; resumo?: { score_medio: number; requer_atencao: number; total: number } }
+// Scraping do Sinduscon usado no site público (/indicadores e home) — distinto
+// do CUB/SC acima (configuracoes_cub, mantido manualmente pra correção de
+// contrato). online:false significa que o scraping falhou e a página pública
+// está mostrando um valor de fallback (pode estar desatualizado).
+type CubScraper = { valor_m2: number; usar_em_label: string; online: boolean }
 
 const ATALHOS = [
   { href: '/dashboard/crm', label: 'Abrir CRM', icon: '🗂️' },
@@ -33,6 +38,7 @@ export default function DashboardHome() {
   const router = useRouter()
   const [leads, setLeads] = useState<Lead[]>([])
   const [cub, setCub] = useState<Cub | null>(null)
+  const [cubScraper, setCubScraper] = useState<CubScraper | null>(null)
   const [loading, setLoading] = useState(true)
   const [insights, setInsights] = useState<Insights | null>(null)
   const [insightsLoading, setInsightsLoading] = useState(false)
@@ -54,12 +60,14 @@ export default function DashboardHome() {
 
   const load = useCallback(async () => {
     try {
-      const [lRes, cRes] = await Promise.all([
+      const [lRes, cRes, cubScraperRes] = await Promise.all([
         fetch('/api/admin/leads').then(r => r.json()),
         fetch('/api/admin/cub').then(r => r.json()).catch(() => ({})),
+        fetch('/api/cub').then(r => r.json()).catch(() => null),
       ])
       setLeads(Array.isArray(lRes) ? lRes : (lRes.data ?? []))
       setCub(cRes.vigente ?? null)
+      setCubScraper(cubScraperRes)
     } finally {
       setLoading(false)
     }
@@ -94,6 +102,19 @@ export default function DashboardHome() {
         </div>
 
         <MetasDiarias />
+
+        {cubScraper && !cubScraper.online && (
+          <div style={{ background: '#FEF3C7', border: '1px solid #F5C542', borderRadius: 10, padding: '14px 18px', marginBottom: 24, display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+            <span style={{ fontSize: 18 }}>⚠️</span>
+            <div>
+              <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#8A5A00' }}>CUB/SC do site público pode estar desatualizado</p>
+              <p style={{ margin: '4px 0 0', fontSize: 13, color: '#8A5A00', lineHeight: 1.5 }}>
+                O scraping automático do Sinduscon (usado em /indicadores e na home) falhou nesta checagem. O site está mostrando um valor de fallback ({fmt(cubScraper.valor_m2)}/m², ref. {cubScraper.usar_em_label}) — confira manualmente em{' '}
+                <a href="https://sinduscon-fpolis.org.br/" target="_blank" rel="noopener noreferrer" style={{ color: '#8A5A00', textDecoration: 'underline' }}>sinduscon-fpolis.org.br</a>.
+              </p>
+            </div>
+          </div>
+        )}
 
         <div style={{ background: D.sidebar, borderRadius: 12, padding: '16px 22px', marginBottom: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
           <div>
