@@ -1,7 +1,13 @@
 import { createHash } from 'crypto'
 import { logError, logInfo } from '@/lib/log'
 
-const PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID || '364836344657445'
+// Sem fallback de propósito. Havia aqui um ID fixo ('364836344657445') que NÃO
+// corresponde a nenhum dos 12 pixels da conta de anúncios do Stiven (auditado em
+// 28/07/2026 — o pixel que leva o nome do site disparou pela última vez em
+// jun/2023). Um fallback nesse campo é pior que erro: se o token for cadastrado
+// sem o ID do pixel, os eventos de conversão — com dados pessoais hasheados dos
+// leads — seriam enviados para um pixel de terceiro, em silêncio. Melhor pular.
+const PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID
 const SOURCE = 'lib/meta-capi'
 
 function sha256(value: string) {
@@ -57,6 +63,9 @@ export type SendMetaCapiEventResult =
 export async function sendMetaCapiEvent(input: SendMetaCapiEventInput): Promise<SendMetaCapiEventResult> {
   const token = process.env.META_CAPI_TOKEN
   if (!token) return { ok: false, skipped: true }
+  // Os dois são obrigatórios: sem o pixel não há para onde enviar, e enviar
+  // para o pixel errado é pior do que não enviar.
+  if (!PIXEL_ID) return { ok: false, skipped: true }
 
   // F-Match-Verify: classifica origem do _fbc pra agregar match quality no log.
   //   cookie = Pixel plantou (melhor)

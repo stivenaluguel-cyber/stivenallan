@@ -93,3 +93,37 @@ describe('sendMetaCapiEvent', () => {
     expect(result).toEqual({ ok: false, error: 'CAPI falhou' })
   }, 15000)
 })
+
+// Regressão: existia um PIXEL_ID fixo como fallback ('364836344657445') que não
+// pertence a nenhum pixel da conta do Stiven (auditoria 28/07/2026). Com token
+// configurado e pixel ausente, os eventos — que carregam dados pessoais
+// hasheados dos leads — iriam para um pixel de terceiro, sem aviso nenhum.
+describe('meta capi — pixel obrigatório', () => {
+  it('pula o envio quando o ID do pixel não está configurado', async () => {
+    delete process.env.NEXT_PUBLIC_META_PIXEL_ID
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+    vi.resetModules()
+
+    const { sendMetaCapiEvent } = await import('./meta-capi')
+    const r = await sendMetaCapiEvent({
+      eventName: 'Lead', eventId: 'e1', nome: 'Ana Silva', telefone: '48999999999',
+    })
+
+    expect(r).toEqual({ ok: false, skipped: true })
+    expect(fetchMock, 'não pode chamar a Graph API sem pixel definido').not.toHaveBeenCalled()
+  })
+
+  it('nunca usa um ID de pixel embutido no código', async () => {
+    delete process.env.NEXT_PUBLIC_META_PIXEL_ID
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => ({}) })
+    vi.stubGlobal('fetch', fetchMock)
+    vi.resetModules()
+
+    const { sendMetaCapiEvent } = await import('./meta-capi')
+    await sendMetaCapiEvent({ eventName: 'Lead', eventId: 'e2', nome: 'Bruno', telefone: '48988888888' })
+
+    const urlsChamadas = fetchMock.mock.calls.map((c) => String(c[0])).join(' ')
+    expect(urlsChamadas).not.toContain('364836344657445')
+  })
+})
