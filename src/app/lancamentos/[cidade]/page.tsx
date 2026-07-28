@@ -5,6 +5,8 @@ import { imoveis } from '@/data/imoveis'
 import { granPalazzo } from '@/data/eraldo/gran-palazzo'
 import { play } from '@/data/eraldo/play'
 import type { Empreendimento as EmpreendimentoEraldo } from '@/data/eraldo/types'
+import { getVitrineImoveis } from '@/lib/vitrine'
+import { slugificar } from '@/lib/imoveis/normalizar'
 
 // Cidades suportadas
 const CIDADES: Record<string, { nome: string; uf: string; descricao: string }> = {
@@ -219,6 +221,32 @@ function statusEraldoParaFase(status: EmpreendimentoEraldo['status']): string {
   return status
 }
 
+// Empreendimentos cadastrados pelo painel (tabela properties) que ficam nesta
+// cidade. Sem isto, um empreendimento de construtora nova tinha página própria e
+// entrava no sitemap, mas NUNCA aparecia na página da sua cidade — as listas
+// acima são fixas no código e só contemplam Fontana e Eraldo.
+async function getEmpreendimentosDoBanco(cityKey: string, jaListados: Set<string>) {
+  try {
+    const vitrine = await getVitrineImoveis()
+    return vitrine
+      .filter((i) => i.ativo && i.slug && !jaListados.has(i.slug))
+      .filter((i) => slugificar(i.cidade) === cityKey)
+      .map((i) => ({
+        nome: i.nome,
+        fase: statusParaFase(i.status),
+        slug: '/empreendimento/' + i.construtora_slug + '/' + i.slug,
+        construtora: (i.construtora || i.construtora_slug || '').replace(/^Construtora\s+/, ''),
+        dorms: '',
+        exibir_preco: Boolean(i.exibir_preco),
+        preco_a_partir_de: i.preco ?? null,
+      }))
+  } catch {
+    // A página não pode quebrar por indisponibilidade do banco: os
+    // empreendimentos estáticos continuam sendo listados normalmente.
+    return []
+  }
+}
+
 function getEmpreendimentosDaCidade(cityKey: string) {
   const slugs = SLUGS_POR_CIDADE[cityKey]
   const fontana = !slugs
@@ -258,11 +286,43 @@ function formatPreco(exibir_preco: boolean, preco_a_partir_de: number | null): s
 }
 
 
+type CidadeInfo = { nome: string; uf: string; descricao: string }
+
+/**
+ * Resolve os dados da cidade. Primeiro a curadoria editorial de CIDADES;
+ * se não houver, deriva de um empreendimento real cadastrado no painel.
+ *
+ * Sem esse fallback, cadastrar um empreendimento numa cidade fora da lista fixa
+ * publicava a URL no sitemap (que sai de `ativos`) e a página respondia 404 —
+ * link quebrado dentro do próprio sitemap. A exigência de ter pelo menos um
+ * empreendimento real preserva a intenção original da lista: nunca gerar página
+ * de cidade vazia.
+ */
+async function resolverCidade(cidadeSlug: string): Promise<CidadeInfo | null> {
+  const curada = CIDADES[cidadeSlug]
+  if (curada) return curada
+
+  const cityKey = cidadeSlug.replace(/-[a-z]{2}$/, '')
+  try {
+    const vitrine = await getVitrineImoveis()
+    const match = vitrine.find((i) => i.ativo && i.cidade && slugificar(i.cidade) === cityKey)
+    if (!match) return null
+    const uf = (match.uf || '').toUpperCase()
+    return {
+      nome: match.cidade,
+      uf,
+      descricao: `Empreendimentos e lançamentos imobiliários em ${match.cidade}${uf ? '/' + uf : ''}.`,
+    }
+  } catch {
+    return null
+  }
+}
+
 type Props = { params: Promise<{ cidade: string }> }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { cidade } = await params
-  const info = CIDADES[cidade]
+  const info = await resolverCidade(cidade)
   if (!info) return {}
   return {
     title: `Lançamentos Imobiliários em ${info.nome}/${info.uf}`,
@@ -282,21 +342,24 @@ export async function generateStaticParams() {
 
 export default async function LancamentosCidadePage({ params }: Props) {
   const { cidade } = await params
-  const info = CIDADES[cidade]
+  const info = await resolverCidade(cidade)
   const wppUrl = 'https://wa.me/5548991642332?text=Ol%C3%A1+Stiven!+Vi+o+site+e+quero+saber+dos+lan%C3%A7amentos.'
 
-  // Sem entrada em CIDADES = sem dados reais o suficiente pra montar uma página —
-  // 404 de verdade em vez do 200 com "Cidade não encontrada" que existia aqui antes
-  // (achado da auditoria SEO 2026-07-21: /lancamentos/tubarao-sc aparecia no sitemap
-  // com esse fallback, retornando 200 com conteúdo de erro). Qualquer cidade nova que
-  // apareça via Supabase antes de ganhar uma entrada em CIDADES cai aqui — 404 real,
-  // nunca mais um soft-404 disfarçado de 200.
+  // Cidade sem curadoria editorial E sem nenhum empreendimento real = 404 de
+  // verdade, em vez do 200 com "Cidade não encontrada" que existia aqui antes
+  // (achado da auditoria SEO 2026-07-21). O que mudou: uma cidade que tenha
+  // empreendimento cadastrado no painel agora RENDERIZA (resolverCidade deriva
+  // nome/UF do próprio registro), porque a página tem conteúdo real — antes ela
+  // caía neste 404 mesmo estando publicada no sitemap.
   if (!info) {
     notFound()
   }
 
-  const cityKey = cidade.replace('-sc', '')
-  const empreendimentos = getEmpreendimentosDaCidade(cityKey)
+  // Tira o sufixo de UF (-sc, -rs, ...) pra casar com as chaves de CIDADES.
+  const cityKey = cidade.replace(/-[a-z]{2}$/, '')
+  const estaticos = getEmpreendimentosDaCidade(cityKey)
+  const doBanco = await getEmpreendimentosDoBanco(cityKey, new Set(estaticos.map((e) => e.slug.split('/').pop() ?? '')))
+  const empreendimentos = [...estaticos, ...doBanco]
   const breadcrumbSchema = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -332,8 +395,9 @@ export default async function LancamentosCidadePage({ params }: Props) {
           </ol>
         </nav>
 
+        {/* "Região Sul Catarinense" só faz sentido em SC — o painel aceita 15 UFs. */}
         <p style={{ fontSize: 13, letterSpacing: '0.12em', color: '#c9a24b', textTransform: 'uppercase', marginBottom: 16 }}>
-          {info.uf} — Região Sul Catarinense
+          {info.uf === 'SC' ? `${info.uf} — Região Sul Catarinense` : info.uf}
         </p>
         <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 800, lineHeight: 1.1, marginBottom: 20 }}>
           Lançamentos em{' '}

@@ -87,6 +87,10 @@ export const viewport: Viewport = {
 const schemaAgent = {
   '@context': 'https://schema.org',
   '@type': 'RealEstateAgent',
+  // @id fixo para que cada empreendimento possa apontar `provider` para cá
+  // (ver PropertySchema). Sem isso, buscadores e IAs não ligavam a listagem
+  // ao corretor responsável por ela.
+  '@id': `${SITE_URL}#corretor`,
   name: 'Stiven Allan',
   url: SITE_URL,
   telephone: '+5548991642332',

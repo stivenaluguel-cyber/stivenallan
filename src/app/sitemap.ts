@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next'
 import { getVitrineImoveis, type ImovelVitrine } from '@/lib/vitrine'
 import { SITE_URL } from '@/lib/site'
+import { slugificar } from '@/lib/imoveis/normalizar'
 import { arbor } from '@/data/eraldo/arbor'
 import { granMichel } from '@/data/eraldo/gran-michel'
 import { granPalazzo } from '@/data/eraldo/gran-palazzo'
@@ -10,14 +11,13 @@ import { lessence } from '@/data/eraldo/lessence'
 import { play } from '@/data/eraldo/play'
 import { symphony } from '@/data/eraldo/symphony'
 
-function cidadeSlug(cidade: string): string {
-  return (
-    cidade
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[̀-ͯ]/g, '')
-      .replace(/\s+/g, '-') + '-sc'
-  )
+// A UF vem do próprio empreendimento — antes era '-sc' fixo, então um imóvel
+// cadastrado em outro estado (o painel aceita 15 UFs) gerava no sitemap uma URL
+// tipo /lancamentos/porto-alegre-sc, que não existe e retorna 404.
+function cidadeSlug(cidade: string, uf?: string): string {
+  const base = slugificar(cidade)
+  const sufixo = slugificar(uf) || 'sc'
+  return base ? base + '-' + sufixo : ''
 }
 
 // Lançamentos Eraldo com página bespoke própria e arquivo de dados real em
@@ -53,9 +53,9 @@ export function buildSitemap(ativos: ImovelVitrine[]): MetadataRoute.Sitemap {
   // `ativos` porque não vem de @/data/imoveis nem depende do Supabase). Sem essa
   // união, uma cidade só-Eraldo (ex.: Tubarão) nunca apareceria no sitemap local,
   // mesmo a página já tendo conteúdo real — achado da auditoria SEO 2026-07-21.
-  const cidadesFontanaOuSupabase = ativos.map((i) => cidadeSlug(i.cidade))
-  const cidadesEraldoEstatico = ERALDO_COM_DADOS_PROPRIOS.map((e) => cidadeSlug(e.cidade))
-  const cidades = Array.from(new Set([...cidadesFontanaOuSupabase, ...cidadesEraldoEstatico]))
+  const cidadesFontanaOuSupabase = ativos.map((i) => cidadeSlug(i.cidade, i.uf))
+  const cidadesEraldoEstatico = ERALDO_COM_DADOS_PROPRIOS.map((e) => cidadeSlug(e.cidade, e.uf))
+  const cidades = Array.from(new Set([...cidadesFontanaOuSupabase, ...cidadesEraldoEstatico])).filter(Boolean)
   const cidadePages: MetadataRoute.Sitemap = cidades.map((slug) => ({
     url: SITE_URL + '/lancamentos/' + slug,
     changeFrequency: 'weekly' as const,

@@ -75,9 +75,16 @@ export default function PropertyPageTemplate({ data, relacionados }: { data: Pro
         cidade={data.cidade}
         uf={data.uf}
         bairro={data.bairro}
+        endereco={data.endereco}
         descricao={data.descricao_curta || data.descricao}
         imagem={hero}
         faq={data.faq}
+        dormitorios={data.dormitorios}
+        suites={data.suites}
+        metragem={data.metragem}
+        vagas={data.vagas}
+        lazer={data.lazer}
+        diferenciais={data.diferenciais}
       />
 
       {/* HERO */}
@@ -212,8 +219,9 @@ export default function PropertyPageTemplate({ data, relacionados }: { data: Pro
       {/* FAQ */}
       {data.faq && data.faq.length > 0 && (
         <section style={{ padding: 'clamp(72px,12vh,120px) clamp(20px,5vw,48px)' }}>
+          {/* O h2 "Perguntas frequentes" vive dentro do PropertyFAQ — ter os
+              dois renderizava o mesmo título duas vezes seguidas na página. */}
           <div style={{ maxWidth: 820, margin: '0 auto' }}>
-            <h2 style={{ fontFamily: t.display, fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.04em', fontSize: 'clamp(24px,3.4vw,40px)', textAlign: 'center', marginBottom: 40 }}>Perguntas frequentes</h2>
             <PropertyFAQ items={data.faq} accent={acento} />
           </div>
         </section>

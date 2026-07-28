@@ -162,3 +162,28 @@ describe('sitemap (wrapper com I/O real, ambiente sem Supabase)', () => {
     }
   })
 })
+
+// Regressão: cidadeSlug concatenava '-sc' fixo, então um empreendimento
+// cadastrado em outro estado (o painel aceita 15 UFs) publicava no sitemap uma
+// URL de cidade inexistente — /lancamentos/porto-alegre-sc — que dá 404.
+describe('buildSitemap — UF da cidade', () => {
+  it('usa a UF real do empreendimento, não "sc" fixo', () => {
+    const entries = buildSitemap([
+      fixtureEraldo({ slug: 'novo-fora-de-sc', cidade: 'Porto Alegre', uf: 'RS', construtora_slug: 'acme' }),
+    ])
+    const urls = entries.map((e) => e.url)
+    expect(urls).toContain('https://stivenallan.com.br/lancamentos/porto-alegre-rs')
+    expect(urls).not.toContain('https://stivenallan.com.br/lancamentos/porto-alegre-sc')
+  })
+
+  it('mantém -sc para empreendimentos catarinenses', () => {
+    const entries = buildSitemap([fixtureEraldo({ slug: 'x', cidade: 'Criciúma', uf: 'SC' })])
+    expect(entries.map((e) => e.url)).toContain('https://stivenallan.com.br/lancamentos/criciuma-sc')
+  })
+
+  it('não publica URL de cidade quando a cidade vem vazia', () => {
+    const entries = buildSitemap([fixtureEraldo({ slug: 'sem-cidade', cidade: '', uf: '' })])
+    expect(entries.map((e) => e.url)).not.toContain('https://stivenallan.com.br/lancamentos/')
+    expect(entries.every((e) => !e.url.endsWith('/lancamentos/'))).toBe(true)
+  })
+})
