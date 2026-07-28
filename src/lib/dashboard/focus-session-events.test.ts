@@ -1,38 +1,79 @@
 import { describe, expect, it } from 'vitest'
 import { recordFocusEvent } from './focus-session-events'
 
-type MockSession = { processed_leads: number; skipped_leads: number; earned_points: number }
+type MockSession = { processed_leads: number; skipped_leads: number; earned_points: number; total_leads: number }
+type MockItem = { status: string; snoozed_until?: string | null; primary_action?: string | null }
 
-// Reproduz em memória o MESMO contrato da função Postgres record_focus_event
-// (migrations 0014/0015): ON CONFLICT (session_id, client_event_id) do
-// nothing, e só quando o insert é novo é que os contadores da sessão
-// avançam. Isso deixa o teste validar exatamente o comportamento que a
-// auditoria pediu — clique duplo/retry vs. repetição legítima — sem
-// precisar de um Postgres real.
-function makeMockClient(sessoesIniciais: Record<string, MockSession> = { 'sess-1': { processed_leads: 0, skipped_leads: 0, earned_points: 0 } }) {
+// Reproduz em memória o contrato da função Postgres
+// advance_focus_session_lead (validada contra um Postgres real): além da
+// idempotência por (session_id, client_event_id) que já existia em
+// record_focus_event, ela TRAVA a linha do item da fila e recusa ações
+// primárias em item já processado — o que resolve duas abas agindo no mesmo
+// lead com client_event_ids DIFERENTES.
+function makeMockClient(opts: {
+  sessoes?: Record<string, MockSession>
+  itens?: Record<string, MockItem>
+} = {}) {
+  const sessoes = new Map<string, MockSession>(
+    Object.entries(opts.sessoes ?? { 'sess-1': { processed_leads: 0, skipped_leads: 0, earned_points: 0, total_leads: 3 } }),
+  )
+  const itens = new Map<string, MockItem>(
+    Object.entries(opts.itens ?? { 'sess-1:lead-1': { status: 'pendente' } }),
+  )
   const eventosGravados = new Set<string>()
-  const sessoes = new Map<string, MockSession>(Object.entries(sessoesIniciais))
+
   return {
     sessoes,
+    itens,
     async rpc(fn: string, args: Record<string, unknown>) {
-      if (fn !== 'record_focus_event') throw new Error('rpc inesperada: ' + fn)
-      const chave = args.p_session_id + ':' + args.p_client_event_id
-      if (eventosGravados.has(chave)) {
+      if (fn !== 'advance_focus_session_lead') throw new Error('rpc inesperada: ' + fn)
+      const sessionId = args.p_session_id as string
+      const leadId = args.p_lead_id as string
+      const chaveItem = sessionId + ':' + leadId
+      const item = itens.get(chaveItem)
+
+      if (args.p_is_primary) {
+        if (!item) return { data: { error: 'item_nao_pertence_a_sessao' }, error: null }
+        if (!['pendente', 'adiado'].includes(item.status)) {
+          return { data: { alreadyProcessed: true, points: 0, sessionLeadStatus: item.status }, error: null }
+        }
+      }
+
+      const chaveEvento = sessionId + ':' + args.p_client_event_id
+      if (eventosGravados.has(chaveEvento)) {
         return { data: { alreadyProcessed: true, points: 0 }, error: null }
       }
-      eventosGravados.add(chave)
-      const sessao = sessoes.get(args.p_session_id as string)
+      eventosGravados.add(chaveEvento)
+
+      const sessao = sessoes.get(sessionId)
       if (sessao) {
         sessao.processed_leads += args.p_is_primary && !args.p_is_skip ? 1 : 0
         sessao.skipped_leads += args.p_is_skip ? 1 : 0
         sessao.earned_points += args.p_points as number
       }
-      return { data: { alreadyProcessed: false, points: args.p_points }, error: null }
+      if (args.p_is_primary && item) {
+        item.status = (args.p_target_status as string) ?? 'processado'
+        item.primary_action = args.p_action_type as string
+        item.snoozed_until = (args.p_snoozed_until as string) ?? null
+      }
+      return { data: { alreadyProcessed: false, points: args.p_points, sessionLeadStatus: args.p_target_status }, error: null }
     },
-  } as unknown as { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: any; error: any }>; sessoes: Map<string, MockSession> }
+    from() {
+      return {
+        select: () => ({
+          eq: () => ({ maybeSingle: async () => ({ data: sessoes.get('sess-1') ?? null, error: null }) }),
+        }),
+      }
+    },
+  } as unknown as {
+    rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: any; error: any }>
+    from: () => any
+    sessoes: Map<string, MockSession>
+    itens: Map<string, MockItem>
+  }
 }
 
-describe('recordFocusEvent — clique duplo e retry (mesmo client_event_id)', () => {
+describe('recordFocusEvent — retry (mesmo client_event_id)', () => {
   it('a segunda chamada com o mesmo client_event_id não pontua de novo', async () => {
     const client = makeMockClient()
     const primeira = await recordFocusEvent(client as any, {
@@ -42,91 +83,123 @@ describe('recordFocusEvent — clique duplo e retry (mesmo client_event_id)', ()
       sessionId: 'sess-1', leadId: 'lead-1', adminId: 'admin-1', actionType: 'anotacao', clientEventId: 'evt-1',
     })
 
-    expect(primeira).toEqual({ alreadyProcessed: false, points: 3 })
-    expect(retry).toEqual({ alreadyProcessed: true, points: 0 })
-    expect(client.sessoes.get('sess-1')?.earned_points).toBe(3) // não dobrou
+    expect(primeira.alreadyProcessed).toBe(false)
+    expect(primeira.points).toBe(3)
+    expect(retry.alreadyProcessed).toBe(true)
+    expect(retry.points).toBe(0)
+    expect(client.sessoes.get('sess-1')?.earned_points).toBe(3)
   })
 
-  it('duas ações de tipos diferentes com o mesmo client_event_id (bug de implementação do chamador) ainda são protegidas pela chave', async () => {
-    // Se o chamador acidentalmente reusar o id certo mas mudar o payload,
-    // o índice único ainda impede um segundo registro — o insert é
-    // rejeitado independentemente do conteúdo, só pela chave (sessão+id).
+  it('repetição LEGÍTIMA (novo client_event_id) numa ação secundária pontua de novo', async () => {
     const client = makeMockClient()
     await recordFocusEvent(client as any, { sessionId: 'sess-1', leadId: 'lead-1', adminId: 'a', actionType: 'anotacao', clientEventId: 'evt-1' })
-    const segunda = await recordFocusEvent(client as any, { sessionId: 'sess-1', leadId: 'lead-1', adminId: 'a', actionType: 'contato_confirmado', clientEventId: 'evt-1' })
-    expect(segunda.alreadyProcessed).toBe(true)
-  })
-})
-
-describe('recordFocusEvent — repetição legítima (client_event_id diferente)', () => {
-  it('uma segunda anotação no MESMO lead, na MESMA sessão, pontua de novo', async () => {
-    const client = makeMockClient()
-    const primeira = await recordFocusEvent(client as any, {
-      sessionId: 'sess-1', leadId: 'lead-1', adminId: 'admin-1', actionType: 'anotacao', clientEventId: 'evt-1',
-    })
-    const segunda = await recordFocusEvent(client as any, {
-      sessionId: 'sess-1', leadId: 'lead-1', adminId: 'admin-1', actionType: 'anotacao', clientEventId: 'evt-2',
-    })
-
-    expect(primeira.alreadyProcessed).toBe(false)
-    expect(segunda.alreadyProcessed).toBe(false)
-    expect(segunda.points).toBe(3)
+    await recordFocusEvent(client as any, { sessionId: 'sess-1', leadId: 'lead-1', adminId: 'a', actionType: 'anotacao', clientEventId: 'evt-2' })
     expect(client.sessoes.get('sess-1')?.earned_points).toBe(6)
   })
+})
 
-  it('um segundo follow-up (mesmo lead, mesma sessão) depois de reagendar pontua de novo', async () => {
+describe('recordFocusEvent — duas abas no mesmo item (client_event_ids diferentes)', () => {
+  it('a segunda aba é recusada: o lead conta UMA vez só', async () => {
     const client = makeMockClient()
-    await recordFocusEvent(client as any, { sessionId: 'sess-1', leadId: 'lead-1', adminId: 'a', actionType: 'followup_agendado', clientEventId: 'evt-1' })
-    const reagendado = await recordFocusEvent(client as any, { sessionId: 'sess-1', leadId: 'lead-1', adminId: 'a', actionType: 'followup_agendado', clientEventId: 'evt-2' })
-    expect(reagendado.alreadyProcessed).toBe(false)
-    expect(client.sessoes.get('sess-1')?.earned_points).toBe(16) // 8 + 8
+
+    const aba1 = await recordFocusEvent(client as any, {
+      sessionId: 'sess-1', leadId: 'lead-1', adminId: 'a', actionType: 'followup_agendado', clientEventId: 'evt-aba-1',
+    })
+    // Outra aba, outra intenção, outro UUID — a idempotência por
+    // client_event_id sozinha deixaria passar como ação nova e legítima.
+    const aba2 = await recordFocusEvent(client as any, {
+      sessionId: 'sess-1', leadId: 'lead-1', adminId: 'a', actionType: 'visita_agendada', clientEventId: 'evt-aba-2',
+    })
+
+    expect(aba1.alreadyProcessed).toBe(false)
+    expect(aba2.alreadyProcessed).toBe(true)
+    expect(aba2.points).toBe(0)
+    expect(client.sessoes.get('sess-1')?.processed_leads).toBe(1)
+    expect(client.sessoes.get('sess-1')?.earned_points).toBe(8) // só o follow-up
+    expect(client.itens.get('sess-1:lead-1')?.primary_action).toBe('followup_agendado')
   })
 
-  it('a mesma ação em LEADS diferentes nunca colide (client_event_id sempre distinto)', async () => {
+  it('ação SECUNDÁRIA continua permitida depois do item processado', async () => {
+    const client = makeMockClient({ itens: { 'sess-1:lead-1': { status: 'processado' } } })
+    const r = await recordFocusEvent(client as any, {
+      sessionId: 'sess-1', leadId: 'lead-1', adminId: 'a', actionType: 'anotacao', clientEventId: 'evt-1',
+    })
+    expect(r.alreadyProcessed).toBe(false)
+    expect(r.points).toBe(3)
+  })
+
+  it('item que não pertence à sessão é recusado sem gravar nada', async () => {
     const client = makeMockClient()
-    const a = await recordFocusEvent(client as any, { sessionId: 'sess-1', leadId: 'lead-1', adminId: 'a', actionType: 'pular', clientEventId: 'evt-1' })
-    const b = await recordFocusEvent(client as any, { sessionId: 'sess-1', leadId: 'lead-2', adminId: 'a', actionType: 'pular', clientEventId: 'evt-2' })
-    expect(a.alreadyProcessed).toBe(false)
-    expect(b.alreadyProcessed).toBe(false)
+    const r = await recordFocusEvent(client as any, {
+      sessionId: 'sess-1', leadId: 'lead-de-outra-sessao', adminId: 'a', actionType: 'pular', clientEventId: 'evt-1',
+    })
+    expect(r.error).toBe('item_nao_pertence_a_sessao')
+    expect(client.sessoes.get('sess-1')?.skipped_leads).toBe(0)
   })
 })
 
-describe('recordFocusEvent — contadores da sessão', () => {
-  it('pular soma em skipped_leads, não em processed_leads', async () => {
+describe('recordFocusEvent — contadores por tipo de ação', () => {
+  it('pular conta em skipped_leads, não em processed_leads', async () => {
     const client = makeMockClient()
     await recordFocusEvent(client as any, { sessionId: 'sess-1', leadId: 'lead-1', adminId: 'a', actionType: 'pular', clientEventId: 'evt-1' })
-    expect(client.sessoes.get('sess-1')).toMatchObject({ processed_leads: 0, skipped_leads: 1 })
+    expect(client.sessoes.get('sess-1')?.skipped_leads).toBe(1)
+    expect(client.sessoes.get('sess-1')?.processed_leads).toBe(0)
   })
 
-  it('perdido é ação primária e soma em processed_leads', async () => {
+  it('perdido conta como lead processado', async () => {
     const client = makeMockClient()
-    await recordFocusEvent(client as any, { sessionId: 'sess-1', leadId: 'lead-1', adminId: 'a', actionType: 'perdido', nextStage: 'perdido', clientEventId: 'evt-1' })
-    expect(client.sessoes.get('sess-1')).toMatchObject({ processed_leads: 1, skipped_leads: 0 })
+    await recordFocusEvent(client as any, { sessionId: 'sess-1', leadId: 'lead-1', adminId: 'a', actionType: 'perdido', clientEventId: 'evt-1' })
+    expect(client.sessoes.get('sess-1')?.processed_leads).toBe(1)
   })
 
-  it('ações secundárias (anotação, contato confirmado) não mexem em processed/skipped', async () => {
+  it('adiar marca o item como adiado com a data de retorno, sem pontuar', async () => {
+    const client = makeMockClient()
+    await recordFocusEvent(client as any, {
+      sessionId: 'sess-1', leadId: 'lead-1', adminId: 'a', actionType: 'adiado',
+      clientEventId: 'evt-1', snoozedUntil: '2026-08-05T23:59:59-03:00',
+    })
+    const item = client.itens.get('sess-1:lead-1')
+    expect(item?.status).toBe('adiado')
+    expect(item?.snoozed_until).toBe('2026-08-05T23:59:59-03:00')
+    expect(client.sessoes.get('sess-1')?.earned_points).toBe(0)
+  })
+
+  it('lead adiado pode ser retomado depois (status adiado ainda aceita ação)', async () => {
+    const client = makeMockClient({ itens: { 'sess-1:lead-1': { status: 'adiado' } } })
+    const r = await recordFocusEvent(client as any, {
+      sessionId: 'sess-1', leadId: 'lead-1', adminId: 'a', actionType: 'followup_agendado', clientEventId: 'evt-2',
+    })
+    expect(r.alreadyProcessed).toBe(false)
+    expect(client.itens.get('sess-1:lead-1')?.status).toBe('processado')
+  })
+
+  it('ações secundárias não mexem em processed/skipped', async () => {
     const client = makeMockClient()
     await recordFocusEvent(client as any, { sessionId: 'sess-1', leadId: 'lead-1', adminId: 'a', actionType: 'anotacao', clientEventId: 'evt-1' })
     await recordFocusEvent(client as any, { sessionId: 'sess-1', leadId: 'lead-1', adminId: 'a', actionType: 'contato_confirmado', clientEventId: 'evt-2' })
-    expect(client.sessoes.get('sess-1')).toMatchObject({ processed_leads: 0, skipped_leads: 0 })
+    const s = client.sessoes.get('sess-1')
+    expect(s?.processed_leads).toBe(0)
+    expect(s?.skipped_leads).toBe(0)
+    expect(s?.earned_points).toBe(8) // 3 + 5
   })
 
-  it('etapa_alterada para fechado pontua 100 mesmo sendo uma ação secundária (não mexe em processed_leads)', async () => {
+  it('etapa_alterada para fechado pontua 100 sem contar como lead processado', async () => {
     const client = makeMockClient()
     const r = await recordFocusEvent(client as any, {
       sessionId: 'sess-1', leadId: 'lead-1', adminId: 'a', actionType: 'etapa_alterada',
-      previousStage: 'negociacao', nextStage: 'fechado', clientEventId: 'evt-1',
+      nextStage: 'fechado', clientEventId: 'evt-1',
     })
     expect(r.points).toBe(100)
-    expect(client.sessoes.get('sess-1')).toMatchObject({ processed_leads: 0, earned_points: 100 })
+    expect(client.sessoes.get('sess-1')?.processed_leads).toBe(0)
   })
 })
 
-describe('recordFocusEvent — erro do RPC', () => {
-  it('propaga erro do banco como Error JS', async () => {
-    const client = { rpc: async () => ({ data: null, error: { message: 'conexão recusada' } }) }
-    await expect(
-      recordFocusEvent(client as any, { sessionId: 's', leadId: 'l', adminId: null, actionType: 'pular', clientEventId: 'e' }),
-    ).rejects.toThrow('conexão recusada')
+describe('recordFocusEvent — contadores autoritativos', () => {
+  it('devolve os contadores da sessão lidos do servidor, não um delta local', async () => {
+    const client = makeMockClient()
+    const r = await recordFocusEvent(client as any, {
+      sessionId: 'sess-1', leadId: 'lead-1', adminId: 'a', actionType: 'followup_agendado', clientEventId: 'evt-1',
+    })
+    expect(r.session).toEqual({ processed_leads: 1, skipped_leads: 0, earned_points: 8, total_leads: 3 })
   })
 })

@@ -2,44 +2,41 @@
 import { CalendarClock, CheckCircle2, MessageCircle, Repeat, SkipForward, Sparkles, Timer, TrendingDown, Trophy } from 'lucide-react'
 import { D } from './tokens'
 import type { FocusSession } from '@/lib/dashboard/use-focus-session'
+import type { FocusSessionResumo } from '@/lib/dashboard/focus-summary'
 
-export type FocusSessionBreakdown = {
-  followupsAgendados: number
-  visitas: number
-  mudancasDeEtapa: number
-  perdidos: number
-  propostas: number
-  contatosConfirmados: number
-}
-
-function duracao(inicio: string, fim: string | null): string {
-  const ms = new Date(fim ?? new Date()).getTime() - new Date(inicio).getTime()
-  const min = Math.round(ms / 60_000)
-  if (min < 1) return '< 1 min'
-  if (min < 60) return `${min} min`
-  return `${Math.floor(min / 60)}h ${min % 60}min`
+function duracao(minutos: number | null): string {
+  if (minutos === null) return '—'
+  if (minutos < 1) return '< 1 min'
+  if (minutos < 60) return `${Math.round(minutos)} min`
+  return `${Math.floor(minutos / 60)}h ${Math.round(minutos % 60)}min`
 }
 
 export function FocusSessionSummary({
   session,
-  breakdown,
+  resumo,
   onVoltarCrm,
   onNovaSessao,
 }: {
   session: FocusSession
-  breakdown: FocusSessionBreakdown
+  resumo: FocusSessionResumo
   onVoltarCrm: () => void
   onNovaSessao: () => void
 }) {
+  // Cada tipo de visita é uma linha própria — agendar e realizar a MESMA
+  // visita não pode somar como se fossem duas.
   const itens = [
-    { label: 'Leads processados', valor: session.processed_leads, icon: <CheckCircle2 size={16} />, cor: D.green },
-    { label: 'Pulados', valor: session.skipped_leads, icon: <SkipForward size={16} />, cor: D.muted },
-    { label: 'Follow-ups agendados', valor: breakdown.followupsAgendados, icon: <CalendarClock size={16} />, cor: D.blue },
-    { label: 'Contatos confirmados', valor: breakdown.contatosConfirmados, icon: <MessageCircle size={16} />, cor: D.green },
-    { label: 'Visitas', valor: breakdown.visitas, icon: <Sparkles size={16} />, cor: D.amber },
-    { label: 'Mudanças de etapa', valor: breakdown.mudancasDeEtapa, icon: <Repeat size={16} />, cor: D.bronze },
-    { label: 'Perdidos', valor: breakdown.perdidos, icon: <TrendingDown size={16} />, cor: D.red },
-    { label: 'Propostas enviadas', valor: breakdown.propostas, icon: <Sparkles size={16} />, cor: D.bronze },
+    { label: 'Leads tratados', valor: resumo.leadsProcessadosUnicos, icon: <CheckCircle2 size={16} />, cor: D.green },
+    { label: 'Follow-ups agendados', valor: resumo.followupsAgendados, icon: <CalendarClock size={16} />, cor: D.blue },
+    { label: 'Contatos confirmados', valor: resumo.contatosConfirmados, icon: <MessageCircle size={16} />, cor: D.green },
+    { label: 'Visitas agendadas', valor: resumo.visitasAgendadas, icon: <CalendarClock size={16} />, cor: D.amber },
+    { label: 'Visitas realizadas', valor: resumo.visitasRealizadas, icon: <Sparkles size={16} />, cor: D.green },
+    { label: 'Visitas não ocorridas', valor: resumo.visitasNaoOcorreram, icon: <TrendingDown size={16} />, cor: D.muted },
+    { label: 'Mudanças de etapa', valor: resumo.mudancasDeEtapa, icon: <Repeat size={16} />, cor: D.bronze },
+    { label: 'Propostas enviadas', valor: resumo.propostas, icon: <Sparkles size={16} />, cor: D.bronze },
+    { label: 'Anotações', valor: resumo.anotacoes, icon: <MessageCircle size={16} />, cor: D.muted },
+    { label: 'Adiados', valor: resumo.adiados, icon: <Timer size={16} />, cor: D.muted },
+    { label: 'Pulados', valor: resumo.pulados, icon: <SkipForward size={16} />, cor: D.muted },
+    { label: 'Perdidos', valor: resumo.perdidos, icon: <TrendingDown size={16} />, cor: D.red },
   ]
 
   return (
@@ -49,13 +46,17 @@ export function FocusSessionSummary({
           <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 52, height: 52, borderRadius: '50%', background: 'rgba(210,78,34,0.18)', color: D.orange, marginBottom: 12 }}>
             <Trophy size={26} />
           </span>
-          <div style={{ fontFamily: "'Bricolage Grotesque',system-ui", fontSize: 22, fontWeight: 800, color: D.onDark }}>Sessão concluída</div>
-          <div style={{ fontSize: 13, color: D.onDarkMuted, marginTop: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-            <Timer size={13} /> {duracao(session.started_at, session.finished_at)} · {session.earned_points} pontos conquistados
+          <div style={{ fontFamily: "'Bricolage Grotesque',system-ui", fontSize: 22, fontWeight: 800, color: D.onDark }}>
+            {session.status === 'concluida' ? 'Sessão concluída' : 'Sessão encerrada'}
+          </div>
+          <div style={{ fontSize: 13, color: D.onDarkMuted, marginTop: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, flexWrap: 'wrap' }}>
+            <Timer size={13} /> {duracao(resumo.duracaoMinutos)} · {resumo.pontos} pontos
+            {resumo.percentualDaFila !== null && <> · {resumo.percentualDaFila}% da fila</>}
+            {resumo.itensPorMinuto !== null && resumo.itensPorMinuto > 0 && <> · {resumo.itensPorMinuto}/min</>}
           </div>
         </div>
 
-        <div style={{ padding: 24, display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))', gap: 12 }}>
+        <div style={{ padding: 24, display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(140px,1fr))', gap: 12 }}>
           {itens.map((it) => (
             <div key={it.label} style={{ border: '1px solid ' + D.line, borderRadius: 10, padding: '12px 14px', borderTop: '3px solid ' + it.cor }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: it.cor, marginBottom: 6 }}>{it.icon}</div>

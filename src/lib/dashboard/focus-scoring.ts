@@ -14,8 +14,17 @@ export const FOCUS_POINTS = {
   fechado: 100,
   perdido: 2,
   pular: 0,
+  adiado: 0, // adiar organiza a fila, não é trabalho comercial — nunca pontua
   etapa_alterada: 0, // mudança de etapa "neutra" — quando o destino é 'fechado', ver regra especial abaixo
 } as const
+
+// Ações que o frontend NUNCA pode registrar direto pelo endpoint público de
+// eventos: elas só valem se existir o registro real correspondente no banco
+// (uma linha em crm_propostas), e por isso são disparadas apenas pelo fluxo
+// que cria esse registro (/api/admin/propostas). Sem esta lista, bastava um
+// POST manual em /api/admin/focus/events com actionType='proposta_enviada'
+// pra ganhar 25 pontos sem proposta nenhuma.
+export const FOCUS_ACTIONS_SOMENTE_SERVIDOR = new Set<FocusActionType>(['proposta_enviada'])
 
 export type FocusActionType = keyof typeof FOCUS_POINTS
 
@@ -30,9 +39,18 @@ export const FOCUS_PRIMARY_ACTIONS = new Set<FocusActionType>([
   'visita_agendada',
   'visita_concluida',
   'visita_nao_ocorreu',
+  'adiado',
 ])
 
 export const FOCUS_SKIP_ACTIONS = new Set<FocusActionType>(['pular'])
+
+// Status que o item da fila assume depois de cada ação primária. 'adiado'
+// volta pra fila depois de snoozed_until; os demais saem de vez da sessão.
+export function targetStatusForAction(actionType: FocusActionType): 'processado' | 'pulado' | 'adiado' | null {
+  if (actionType === 'pular') return 'pulado'
+  if (actionType === 'adiado') return 'adiado'
+  return FOCUS_PRIMARY_ACTIONS.has(actionType) ? 'processado' : null
+}
 
 type ScoringMetadata = { nextStage?: string | null }
 

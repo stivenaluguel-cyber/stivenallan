@@ -1,18 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
-import { jwtVerify } from 'jose'
 import { createClient } from '@supabase/supabase-js'
+import { requireAdmin } from '@/lib/dashboard/admin-auth'
 
 export const dynamic = 'force-dynamic'
 const sb = () => createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
-async function auth() {
-  const s = await cookies(); const t = s.get('dashboard_token')?.value; if (!t) return false
-  try { await jwtVerify(t, new TextEncoder().encode(process.env.JWT_SECRET!)); return true } catch { return false }
-}
 
 // GET /api/admin/unidades?empreendimento_id=xxx
 export async function GET(req: NextRequest) {
-  if (!await auth()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!await requireAdmin()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const empId = new URL(req.url).searchParams.get('empreendimento_id')
   if (!empId) return NextResponse.json({ error: 'empreendimento_id obrigatorio' }, { status: 400 })
   const { data, error } = await sb()
@@ -28,7 +23,7 @@ export async function GET(req: NextRequest) {
 
 // POST — cria unidade
 export async function POST(req: NextRequest) {
-  if (!await auth()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!await requireAdmin()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const body = await req.json()
   if (!body.empreendimento_id || !body.unidade || !body.metragem)
     return NextResponse.json({ error: 'empreendimento_id, unidade e metragem obrigatorios' }, { status: 400 })
@@ -39,7 +34,7 @@ export async function POST(req: NextRequest) {
 
 // PATCH — atualiza disponibilidade ou valor
 export async function PATCH(req: NextRequest) {
-  if (!await auth()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!await requireAdmin()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const body = await req.json()
   const { id, ...updates } = body
   if (!id) return NextResponse.json({ error: 'id obrigatorio' }, { status: 400 })

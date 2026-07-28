@@ -6,6 +6,19 @@ import { ConversaPanel } from '@/components/dashboard/ConversaPanel'
 import { ESTAGIOS_FUNIL as ESTAGIOS } from '@/lib/dashboard/estagios'
 import { isEligibleForFocusQueue } from '@/lib/dashboard/focus-queue'
 import { temWhatsappReal } from '@/lib/leads/normalize'
+import type { TimelineItem, TimelineKind } from '@/lib/dashboard/lead-timeline'
+
+const CORES_TIMELINE: Partial<Record<TimelineKind | 'evento', string>> = {
+  anotacao: '#D24E22',
+  mudanca_etapa: '#7C3AED',
+  proposta: '#0891B2',
+  mensagem: '#16A34A',
+  compromisso: '#2563EB',
+  acao_foco: '#64748B',
+  contato: '#16A34A',
+  perdido: '#DC2626',
+  evento: '#94A3B8',
+}
 
 const D = {
   bg: '#F3F2EE', surface: '#FAFAF7', sidebar: '#131211', ink: '#161512',
@@ -328,20 +341,27 @@ function LeadModal({ lead, onClose, onUpdated, onDeleted }: { lead: Lead; onClos
   const [temp, setTemp] = useState<number>(lead.temperatura ?? 1)
   const [form, setForm] = useState({ nome: lead.nome ?? '', whatsapp: lead.whatsapp ?? '', email: lead.email ?? '', origem: lead.origem ?? 'Site', orcamento_max: lead.orcamento_max != null ? String(lead.orcamento_max) : '' })
 
-  const parseNotas = (raw?: string | null): { data: string; texto: string }[] => {
-    if (!raw) return []
-    try { const j = JSON.parse(raw); if (Array.isArray(j)) return j } catch {}
-    return raw.trim() ? [{ data: '', texto: raw }] : []
-  }
-  const [notas, setNotas] = useState(parseNotas(lead.anotacoes))
+  const [timelineUnificada, setTimelineUnificada] = useState<TimelineItem[]>([])
 
-  useEffect(() => {
-    fetch('/api/admin/leads/' + lead.id + '/eventos').then(r => r.json()).then(d => setEventos(d.eventos ?? [])).catch(() => setEventos([]))
+  // Timeline vinda do servidor, combinando TODAS as fontes (anotações novas e
+  // legadas, mudanças de etapa, propostas, mensagens de qualquer canal,
+  // compromissos e ações do Modo Foco). Antes esta tela juntava só as
+  // anotações do JSON com lead_eventos, e tudo o mais ficava invisível.
+  const carregarTimeline = useCallback(() => {
+    fetch('/api/admin/leads/' + lead.id + '/timeline')
+      .then(r => r.json()).then(d => setTimelineUnificada(d.data ?? [])).catch(() => setTimelineUnificada([]))
   }, [lead.id])
 
+  useEffect(() => {
+    carregarTimeline()
+    fetch('/api/admin/leads/' + lead.id + '/eventos').then(r => r.json()).then(d => setEventos(d.eventos ?? [])).catch(() => setEventos([]))
+  }, [lead.id, carregarTimeline])
+
+  // Rastreamento de navegação no site (lead_eventos) segue numa fonte
+  // separada — não é histórico de atendimento, é comportamento no site.
   const timeline = [
-    ...notas.map(n => ({ kind: 'nota' as const, data: n.data, texto: n.texto })),
-    ...eventos.map(e => ({ kind: 'evento' as const, data: e.created_at, texto: e.descricao || (e.tipo === 'download' ? 'Baixou catálogo' : e.tipo === 'visita' ? 'Visitou página' : (e.slug || e.tipo || '').replace(/-/g, ' ')) })),
+    ...timelineUnificada.map(t => ({ kind: t.kind, data: t.data, texto: t.descricao ? t.titulo + ' — ' + t.descricao : t.titulo, origem: t.origem })),
+    ...eventos.map(e => ({ kind: 'evento' as const, data: e.created_at, origem: 'Site', texto: e.descricao || (e.tipo === 'download' ? 'Baixou catálogo' : e.tipo === 'visita' ? 'Visitou página' : (e.slug || e.tipo || '').replace(/-/g, ' ')) })),
   ].sort((a, b) => (b.data || '').localeCompare(a.data || ''))
 
   async function salvarTemp(v: number) {
@@ -350,14 +370,21 @@ function LeadModal({ lead, onClose, onUpdated, onDeleted }: { lead: Lead; onClos
     onUpdated({ ...lead, temperatura: v })
   }
 
+  // Insere UMA linha nova em vez de reescrever o array inteiro de anotações.
+  // O fluxo antigo (montar [nova, ...notas] a partir de um estado que foi
+  // carregado quando o modal abriu, e mandar tudo de volta num PATCH)
+  // apagava silenciosamente qualquer nota criada nesse meio-tempo em outra
+  // aba, no Modo Foco ou por outra pessoa.
   async function adicionarNota() {
     if (!novaNota.trim()) return
     setSaving(true)
-    const nova = { data: new Date().toISOString(), texto: novaNota.trim() }
-    const atual = [nova, ...notas]
-    const res = await fetch('/api/admin/leads/' + lead.id, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ anotacoes: JSON.stringify(atual) }) })
+    const res = await fetch('/api/admin/leads/' + lead.id + '/anotacoes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ texto: novaNota.trim(), clientEventId: crypto.randomUUID() }),
+    })
     setSaving(false)
-    if (res.ok) { setNotas(atual); setNovaNota(''); onUpdated({ ...lead, anotacoes: JSON.stringify(atual) }) }
+    if (res.ok) { setNovaNota(''); carregarTimeline() }
   }
 
   async function salvarEdicao() {
@@ -469,9 +496,11 @@ function LeadModal({ lead, onClose, onUpdated, onDeleted }: { lead: Lead; onClos
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0, maxHeight: 240, overflowY: 'auto', borderLeft: '2px solid ' + D.line, paddingLeft: 14, marginLeft: 4 }}>
               {timeline.map((item, i) => (
                 <div key={i} style={{ position: 'relative', paddingBottom: 14 }}>
-                  <span style={{ position: 'absolute', left: -21, top: 3, width: 10, height: 10, borderRadius: '50%', background: item.kind === 'nota' ? D.bronze : D.blue, border: '2px solid #fff' }} />
+                  <span style={{ position: 'absolute', left: -21, top: 3, width: 10, height: 10, borderRadius: '50%', background: CORES_TIMELINE[item.kind] ?? D.blue, border: '2px solid #fff' }} />
                   <div style={{ fontSize: 13, color: D.ink, lineHeight: 1.4 }}>{item.texto}</div>
-                  <div style={{ fontSize: 11, color: '#8a8a85', marginTop: 2 }}>{item.kind === 'nota' ? '📝 ' : '👁 '}{item.data ? new Date(item.data).toLocaleString('pt-BR') : ''}</div>
+                  <div style={{ fontSize: 11, color: '#8a8a85', marginTop: 2 }}>
+                    {item.origem} · {item.data ? new Date(item.data).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }) : 'sem data'}
+                  </div>
                 </div>
               ))}
             </div>

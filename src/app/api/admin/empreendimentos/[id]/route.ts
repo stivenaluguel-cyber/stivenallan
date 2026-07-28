@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { jwtVerify } from 'jose';
 import { createClient } from '@supabase/supabase-js';
+import { requireAdmin } from '@/lib/dashboard/admin-auth'
 
 export const dynamic = 'force-dynamic';
 
@@ -10,19 +9,6 @@ function getSupabase() {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
-}
-
-async function checkAuth() {
-  const cookieStore = await cookies()
-  const token = cookieStore.get('dashboard_token')?.value
-  if (!token) return false
-  try {
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET!)
-    await jwtVerify(token, secret)
-    return true
-  } catch {
-    return false
-  }
 }
 
 function toFormShape(p: any) {
@@ -69,7 +55,7 @@ function toFormShape(p: any) {
 }
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const auth = await checkAuth()
+  const auth = await requireAdmin()
   if (!auth) return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
   const { id } = await params
   const supabase = getSupabase()
@@ -83,7 +69,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 }
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const auth = await checkAuth()
+  const auth = await requireAdmin()
   if (!auth) return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
   const { id } = await params
   const body = await request.json()
@@ -137,7 +123,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 }
 
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const auth = await checkAuth()
+  const auth = await requireAdmin()
   if (!auth) return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
   const { id } = await params
   const supabase = getSupabase()

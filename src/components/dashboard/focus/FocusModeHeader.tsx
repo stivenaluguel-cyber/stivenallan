@@ -9,12 +9,14 @@ export function FocusModeHeader({
   sessionPoints,
   monthPoints,
   onClose,
+  onEncerrar,
 }: {
   posicaoAtual: number
   total: number
   sessionPoints: number
   monthPoints: number
   onClose: () => void
+  onEncerrar: () => void
 }) {
   return (
     <header style={{ position: 'sticky', top: 0, zIndex: 10, background: D.sidebar, borderBottom: '1px solid ' + D.lineDark, padding: '14px clamp(14px,3vw,28px)' }}>
@@ -36,11 +38,21 @@ export function FocusModeHeader({
             <div style={{ fontSize: 10, color: D.onDarkMuted, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Mês</div>
             <div style={{ fontFamily: "'Bricolage Grotesque',system-ui", fontSize: 15, fontWeight: 800, color: D.onDark }}>{monthPoints} pts</div>
           </div>
+          {/* Pausar e encerrar são coisas distintas e ficam explícitas: o X
+              sozinho parecia "concluir a sessão", quando na prática só saía
+              da tela e deixava a sessão aberta. */}
+          <button
+            onClick={onEncerrar}
+            title="Encerrar esta sessão"
+            style={{ background: 'none', border: '1px solid rgba(245,241,234,0.25)', borderRadius: 8, cursor: 'pointer', color: D.onDark, fontSize: 12, fontWeight: 700, padding: '9px 12px', minHeight: 44, whiteSpace: 'nowrap' }}
+          >
+            Encerrar
+          </button>
           <button
             onClick={onClose}
-            aria-label="Sair do Modo Foco e continuar depois"
-            title="Sair e continuar depois"
-            style={{ width: 34, height: 34, borderRadius: '50%', background: 'rgba(245,241,234,0.1)', border: 'none', cursor: 'pointer', color: D.onDark, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            aria-label="Pausar e continuar depois"
+            title="Pausar e continuar depois"
+            style={{ width: 44, height: 44, borderRadius: '50%', background: 'rgba(245,241,234,0.1)', border: 'none', cursor: 'pointer', color: D.onDark, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
           >
             <X size={18} />
           </button>

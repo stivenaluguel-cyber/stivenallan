@@ -1,6 +1,5 @@
 'use client'
-import { useCallback, useEffect, useState } from 'react'
-import type { FocusQueueFilters } from './focus-queue'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 export type FocusQueueLeadFull = {
   id: string
@@ -22,6 +21,8 @@ export type FocusQueueLeadFull = {
   property_name?: string | null
 }
 
+export type AgendaRef = { id: string; titulo: string; inicio: string; tipo?: string; status?: string }
+
 export type FocusQueueItem = {
   lead: FocusQueueLeadFull
   followupVencido: boolean
@@ -33,47 +34,86 @@ export type FocusQueueItem = {
   prioridade: { title: string; detail: string; level: 'urgent' | 'attention' | 'normal' }
   recomendacao: { action: 'whatsapp' | 'followup' | 'visita' | 'atualizar_etapa'; title: string; detail: string }
   proximoEvento: { titulo: string; inicio: string; tipo: string } | null
-  proximaVisita: { id: string; titulo: string; inicio: string } | null
+  compromissoVencido: AgendaRef | null
+  // Separados de propósito: só visitaVencida pode ser marcada como realizada.
+  visitaVencida: AgendaRef | null
+  visitaFutura: AgendaRef | null
+  posicao: number
 }
 
-// A fila SEMPRE mostra items[0] como o lead atual: toda ação primária
-// (pular/perdido/follow-up/visita) remove o lead processado da frente da
-// fila via advancePast — isso evita qualquer contador de índice que possa
-// dessincronizar, e garante que "pular todo mundo" termina naturalmente
-// (a fila só encolhe, nunca dá loop).
-export function useFocusQueue(filters: FocusQueueFilters) {
+// A fila agora vem do SNAPSHOT da sessão (crm_focus_session_leads), não de um
+// recálculo ao vivo a cada carga: um lead já tratado não reaparece depois de
+// um reload, e a ordem não muda no meio da sessão.
+export function useFocusQueue(sessionId: string | null) {
   const [items, setItems] = useState<FocusQueueItem[]>([])
+  const [pendentesTotal, setPendentesTotal] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-
-  const filtersKey = JSON.stringify(filters)
+  // "A fila já carregou com sucesso ao menos uma vez?" — sem isso, o estado
+  // inicial (zero itens, zero pendentes, sem erro ainda) é indistinguível de
+  // "a fila acabou", e quem observa esse estado conclui a sessão antes de a
+  // primeira resposta chegar. Foi exatamente esse o bug que encerrou uma
+  // sessão real: a busca da fila falhou, mas no instante ANTES do erro ser
+  // registrado o estado já parecia uma fila vazia legítima.
+  const [carregouComSucesso, setCarregouComSucesso] = useState(false)
+  // Sequência monotônica: descarta a resposta de um fetch antigo que
+  // chegue depois de um mais novo (senão a fila pisca de volta pro estado
+  // anterior). O AbortController cancela o que der pra cancelar.
+  const seqRef = useRef(0)
+  const abortRef = useRef<AbortController | null>(null)
 
   const load = useCallback(async () => {
+    if (!sessionId) { setItems([]); setPendentesTotal(0); setLoading(false); setCarregouComSucesso(false); return }
+    const seq = ++seqRef.current
+    abortRef.current?.abort()
+    const controller = new AbortController()
+    abortRef.current = controller
+
     setLoading(true); setError('')
     try {
-      const params = new URLSearchParams()
-      if (filters.temperatura) params.set('temperatura', filters.temperatura)
-      if (filters.estagioFunil) params.set('estagioFunil', filters.estagioFunil)
-      if (filters.origem) params.set('origem', filters.origem)
-      if (filters.apenasFollowupVencido) params.set('apenasFollowupVencido', 'true')
-      if (typeof filters.semAcaoDias === 'number') params.set('semAcaoDias', String(filters.semAcaoDias))
-
-      const res = await fetch('/api/admin/leads/foco?' + params.toString())
+      const res = await fetch('/api/admin/leads/foco?sessionId=' + sessionId, { signal: controller.signal })
       const json = await res.json()
-      if (!res.ok) throw new Error(json.error || 'Falha ao carregar a fila do Modo Foco')
+      if (seq !== seqRef.current) return
+      if (!res.ok) throw new Error(json.error || 'Falha ao carregar a fila')
       setItems(json.data ?? [])
+      setPendentesTotal(json.pendentesTotal ?? 0)
+      setCarregouComSucesso(true)
     } catch (e) {
+      if ((e as Error)?.name === 'AbortError' || seq !== seqRef.current) return
+      // Erro de carregamento NÃO esvazia a fila nem encerra a sessão —
+      // mantém o que já estava na tela e oferece retry.
       setError(e instanceof Error ? e.message : 'Falha ao carregar a fila')
     } finally {
-      setLoading(false)
+      if (seq === seqRef.current) setLoading(false)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filtersKey])
+  }, [sessionId])
 
   useEffect(() => { load() }, [load])
 
+  // Refetch ao voltar pra aba (progresso feito em outra aba aparece aqui),
+  // com dedupe: focus e visibilitychange disparam quase juntos e sem isso
+  // fariam duas requisições idênticas.
+  useEffect(() => {
+    if (!sessionId) return
+    let ultimo = 0
+    function aoVoltar() {
+      if (document.visibilityState !== 'visible') return
+      const agora = Date.now()
+      if (agora - ultimo < 1500) return
+      ultimo = agora
+      load()
+    }
+    document.addEventListener('visibilitychange', aoVoltar)
+    window.addEventListener('focus', aoVoltar)
+    return () => {
+      document.removeEventListener('visibilitychange', aoVoltar)
+      window.removeEventListener('focus', aoVoltar)
+    }
+  }, [sessionId, load])
+
   const advancePast = useCallback((leadId: string) => {
     setItems((prev) => prev.filter((it) => it.lead.id !== leadId))
+    setPendentesTotal((n) => Math.max(0, n - 1))
   }, [])
 
   const updateLeadLocally = useCallback((leadId: string, patch: Partial<FocusQueueLeadFull>) => {
@@ -83,9 +123,10 @@ export function useFocusQueue(filters: FocusQueueFilters) {
   return {
     items,
     current: items[0] ?? null,
-    remaining: items.length,
+    pendentesTotal,
     loading,
     error,
+    carregouComSucesso,
     refetch: load,
     advancePast,
     updateLeadLocally,

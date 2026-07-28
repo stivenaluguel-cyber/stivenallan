@@ -1,28 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
-import { jwtVerify } from 'jose'
 import { createClient } from '@supabase/supabase-js'
+import { requireAdmin } from '@/lib/dashboard/admin-auth'
 
 export const dynamic = 'force-dynamic'
 const sb = () => createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
-
-async function auth(): Promise<string | null> {
-  const s = await cookies()
-  const t = s.get('dashboard_token')?.value
-  if (!t) return null
-  try {
-    const { payload } = await jwtVerify(t, new TextEncoder().encode(process.env.JWT_SECRET!))
-    return (payload.adminId as string) ?? null
-  } catch {
-    return null
-  }
-}
 
 // Recebe o PushSubscription.toJSON() do browser: { endpoint, keys: { p256dh, auth } }.
 // Upsert por endpoint — reinstalar o app no mesmo aparelho gera o mesmo
 // endpoint (o navegador reaproveita), então isso nunca duplica assinatura.
 export async function POST(req: NextRequest) {
-  const adminId = await auth()
+  const adminId = await requireAdmin()
   if (!adminId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await req.json().catch(() => null)
@@ -50,7 +37,7 @@ export async function POST(req: NextRequest) {
 // Chamado quando o corretor desativa notificações manualmente (ou o
 // browser invalida a assinatura) — remove só a linha desse endpoint.
 export async function DELETE(req: NextRequest) {
-  const adminId = await auth()
+  const adminId = await requireAdmin()
   if (!adminId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await req.json().catch(() => null)

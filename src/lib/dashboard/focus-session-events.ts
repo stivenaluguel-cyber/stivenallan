@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { FOCUS_PRIMARY_ACTIONS, FOCUS_SKIP_ACTIONS, pointsForAction, type FocusActionType } from './focus-scoring'
+import { FOCUS_PRIMARY_ACTIONS, FOCUS_SKIP_ACTIONS, pointsForAction, targetStatusForAction, type FocusActionType } from './focus-scoring'
 
 type RecordFocusEventInput = {
   sessionId: string
@@ -16,9 +16,21 @@ type RecordFocusEventInput = {
   // sempre recebe outro id. É isso, e não mais "sessão+lead+ação", que
   // define o que é duplicata: repetições legítimas nunca são bloqueadas.
   clientEventId: string
+  // Só para 'adiado': quando o lead volta pra fila.
+  snoozedUntil?: string | null
 }
 
-export type RecordFocusEventResult = { alreadyProcessed: boolean; points: number }
+export type RecordFocusEventResult = {
+  alreadyProcessed: boolean
+  points: number
+  sessionLeadStatus?: string | null
+  error?: string
+  // Contadores AUTORITATIVOS lidos da sessão depois da gravação — o
+  // frontend substitui o estado local por eles em vez de somar um delta
+  // otimista (que dessincroniza entre abas e recontava depois de um
+  // alreadyProcessed).
+  session?: { processed_leads: number; skipped_leads: number; earned_points: number; total_leads: number } | null
+}
 
 // Núcleo idempotente do Modo Foco: toda ação (do card, do modal de follow-up,
 // ou do gancho automático em Propostas) passa por aqui. A gravação do
@@ -35,7 +47,13 @@ export async function recordFocusEvent(
   const isSkip = FOCUS_SKIP_ACTIONS.has(input.actionType)
   const isPrimary = FOCUS_PRIMARY_ACTIONS.has(input.actionType)
 
-  const { data, error } = await client.rpc('record_focus_event', {
+  // advance_focus_session_lead envolve record_focus_event: além da
+  // idempotência por client_event_id (que já existia), ela trava a linha do
+  // item na fila e recusa a ação se ele já foi processado. Isso é o que
+  // resolve DUAS ABAS agindo no mesmo lead com client_event_ids diferentes
+  // — caso em que a idempotência sozinha deixaria as duas passarem como
+  // ações novas e legítimas, contando o lead duas vezes.
+  const { data, error } = await client.rpc('advance_focus_session_lead', {
     p_session_id: input.sessionId,
     p_lead_id: input.leadId,
     p_admin_id: input.adminId,
@@ -47,11 +65,26 @@ export async function recordFocusEvent(
     p_client_event_id: input.clientEventId,
     p_is_skip: isSkip,
     p_is_primary: isPrimary,
+    p_target_status: targetStatusForAction(input.actionType),
+    p_snoozed_until: input.snoozedUntil ?? null,
   })
 
   if (error) throw new Error(error.message)
+  if (data?.error) return { alreadyProcessed: false, points: 0, error: data.error }
 
-  return { alreadyProcessed: !!data.alreadyProcessed, points: data.points ?? 0 }
+  // Contadores autoritativos numa leitura só, depois da gravação.
+  const { data: sessao } = await client
+    .from('crm_focus_sessions')
+    .select('processed_leads, skipped_leads, earned_points, total_leads')
+    .eq('id', input.sessionId)
+    .maybeSingle()
+
+  return {
+    alreadyProcessed: !!data.alreadyProcessed,
+    points: data.points ?? 0,
+    sessionLeadStatus: data.sessionLeadStatus ?? null,
+    session: sessao ?? null,
+  }
 }
 
 // Usado pelo gancho automático em /api/admin/propostas: se o corretor tiver

@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { FOCUS_POINTS, pointsForAction, resolveTrustedNextStage } from './focus-scoring'
+import {
+  FOCUS_POINTS,
+  FOCUS_ACTIONS_SOMENTE_SERVIDOR,
+  FOCUS_PRIMARY_ACTIONS,
+  FOCUS_SKIP_ACTIONS,
+  pointsForAction,
+  resolveTrustedNextStage,
+  targetStatusForAction,
+} from './focus-scoring'
 
 describe('pointsForAction', () => {
   it('retorna o peso configurado para cada ação simples', () => {
@@ -43,5 +51,43 @@ describe('resolveTrustedNextStage — fronteira de confiança contra pontuação
   it('composição com pointsForAction: forjar nextStage não rende os 100 pontos de fechado', () => {
     const nextStageConfiavel = resolveTrustedNextStage('etapa_alterada', 'negociacao', 'fechado')
     expect(pointsForAction('etapa_alterada', { nextStage: nextStageConfiavel })).toBe(0)
+  })
+})
+
+describe('ações restritas ao fluxo real (sem pontuação avulsa)', () => {
+  it('proposta_enviada não pode ser registrada pelo endpoint público de eventos', () => {
+    // 25 pontos só valem se existir uma proposta de verdade — o registro
+    // vem do fluxo que cria a proposta, nunca de um POST direto.
+    expect(FOCUS_ACTIONS_SOMENTE_SERVIDOR.has('proposta_enviada')).toBe(true)
+  })
+
+  it('as demais ações continuam disponíveis pela tela', () => {
+    for (const acao of ['pular', 'perdido', 'anotacao', 'followup_agendado', 'adiado'] as const) {
+      expect(FOCUS_ACTIONS_SOMENTE_SERVIDOR.has(acao)).toBe(false)
+    }
+  })
+})
+
+describe('targetStatusForAction', () => {
+  it('mapeia cada ação primária para o status certo do item na fila', () => {
+    expect(targetStatusForAction('pular')).toBe('pulado')
+    expect(targetStatusForAction('adiado')).toBe('adiado')
+    expect(targetStatusForAction('followup_agendado')).toBe('processado')
+    expect(targetStatusForAction('perdido')).toBe('processado')
+    expect(targetStatusForAction('visita_concluida')).toBe('processado')
+  })
+
+  it('ação secundária não altera o status do item', () => {
+    expect(targetStatusForAction('anotacao')).toBeNull()
+    expect(targetStatusForAction('contato_confirmado')).toBeNull()
+    expect(targetStatusForAction('etapa_alterada')).toBeNull()
+  })
+})
+
+describe('adiar', () => {
+  it('é ação primária (tira o lead da fila) mas não conta como "pulado" nem pontua', () => {
+    expect(FOCUS_PRIMARY_ACTIONS.has('adiado')).toBe(true)
+    expect(FOCUS_SKIP_ACTIONS.has('adiado')).toBe(false)
+    expect(pointsForAction('adiado')).toBe(0)
   })
 })
