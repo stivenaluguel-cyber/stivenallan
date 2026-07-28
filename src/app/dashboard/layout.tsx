@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { NotificationBell } from '@/lib/dashboard/notification-bell';
+import { PushNotificationManager } from '@/lib/dashboard/push-notification-manager';
 
 const D = {
   sidebar: '#131211', bronze: '#D24E22',
@@ -154,6 +155,9 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       )}
 
       <main className="sa-main" style={{ marginLeft: 236, minHeight: '100vh' }}>
+        <div style={{ padding: '14px 14px 0' }}>
+          <PushNotificationManager />
+        </div>
         {children}
       </main>
 
