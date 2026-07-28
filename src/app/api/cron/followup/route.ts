@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
-import { enviarFollowUp, enviarAlertaEscalada } from '@/lib/evolution'
+import { enviarFollowUp, enviarAlertaEscalada, verificarInstancia } from '@/lib/evolution'
 import { logError, logInfo, logWarn } from '@/lib/log'
 import { finishCronRun, startCronRun, type CronRunFinal } from '@/lib/cron/tracker'
 
@@ -192,6 +192,17 @@ export async function GET(req: NextRequest) {
     if (!process.env.EVOLUTION_API_URL || !process.env.EVOLUTION_API_KEY || !process.env.EVOLUTION_INSTANCE) {
       logWarn(SOURCE, 'skipped: envs Evolution ausentes')
       result = { status: 'skipped', motivo: 'EVOLUTION_API_URL / _API_KEY / _INSTANCE ausente' }
+      return NextResponse.json({ skipped: true, motivo: result.motivo })
+    }
+
+    // Checa a instância UMA vez, antes de processar qualquer lead — sem isso,
+    // uma instância desconectada gera o mesmo erro repetido por lead (achado
+    // em produção: dias de falha silenciosa até alguém notar). Com a checagem
+    // aqui, o motivo fica visível direto no histórico de /dashboard/cron.
+    const instancia = await verificarInstancia()
+    if (!instancia.ok) {
+      logWarn(SOURCE, 'skipped: instância Evolution indisponível', { motivo: instancia.reason })
+      result = { status: 'skipped', motivo: `Instância Evolution indisponível: ${instancia.reason}` }
       return NextResponse.json({ skipped: true, motivo: result.motivo })
     }
 

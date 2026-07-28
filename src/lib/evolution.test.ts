@@ -48,3 +48,57 @@ describe('evolution enviarMensagem', () => {
     expect(ok).toBe(false)
   })
 })
+
+// Regressão: a instância desconectou do servidor Evolution em produção (sessão
+// do WhatsApp caiu) e o cron de follow-up só descobriu dias depois, por gerar
+// o mesmo erro genérico repetido por lead. verificarInstancia() existia mas
+// nunca era chamada — agora o cron a chama uma vez, no início, com motivo
+// legível persistido no histórico.
+describe('evolution verificarInstancia', () => {
+  it('retorna ok:true quando a instância está com state "open"', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ instance: { state: 'open' } }) })
+    vi.stubGlobal('fetch', fetchMock)
+
+    const { verificarInstancia } = await import('./evolution')
+    const status = await verificarInstancia()
+
+    expect(status).toEqual({ ok: true, state: 'open' })
+    expect(fetchMock.mock.calls[0][0]).toBe('https://evo.example.com/instance/connectionState/stiven')
+  })
+
+  it('retorna ok:false com motivo legível quando a API responde 404 (instância removida do servidor)', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 404,
+      text: async () => JSON.stringify({ status: 'error', code: 404, message: 'Application not found' }),
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    const { verificarInstancia } = await import('./evolution')
+    const status = await verificarInstancia()
+
+    expect(status.ok).toBe(false)
+    expect((status as { ok: false; reason: string }).reason).toMatch(/HTTP 404.*Application not found/)
+  })
+
+  it('retorna ok:false quando a instância existe mas não está "open" (ex: desconectada)', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ instance: { state: 'close' } }) })
+    vi.stubGlobal('fetch', fetchMock)
+
+    const { verificarInstancia } = await import('./evolution')
+    const status = await verificarInstancia()
+
+    expect(status.ok).toBe(false)
+    expect((status as { ok: false; reason: string }).reason).toMatch(/"close"/)
+  })
+
+  it('retorna ok:false sem lançar quando o fetch falha (rede/timeout)', async () => {
+    const fetchMock = vi.fn().mockRejectedValue(new Error('fetch failed'))
+    vi.stubGlobal('fetch', fetchMock)
+
+    const { verificarInstancia } = await import('./evolution')
+    const status = await verificarInstancia()
+
+    expect(status).toEqual({ ok: false, reason: 'fetch failed' })
+  })
+})

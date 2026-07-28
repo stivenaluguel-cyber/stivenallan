@@ -79,14 +79,30 @@ export async function enviarFollowUp(
 // ============================================
 // VERIFICAR STATUS DA INSTANCIA
 // ============================================
-export async function verificarInstancia(): Promise<boolean> {
+// Motivo do reason detalhado: um "Application not found" (instância removida
+// do servidor, ex. sessão do WhatsApp caiu e não foi reconectada via QR Code)
+// já aconteceu em produção e só foi descoberto dias depois, por gerar um erro
+// idêntico e repetido por lead no cron de follow-up. Chamado no início do
+// cron (route.ts) pra falhar uma vez só, com o motivo visível direto no
+// histórico de /dashboard/cron — sem precisar vasculhar log de runtime.
+export type InstanciaStatus =
+  | { ok: true; state: string }
+  | { ok: false; reason: string }
+
+export async function verificarInstancia(): Promise<InstanciaStatus> {
   try {
     const res = await fetch(`${BASE_URL}/instance/connectionState/${INSTANCE}`, {
       headers: { 'apikey': API_KEY },
     })
+    if (!res.ok) {
+      const detail = await res.text()
+      return { ok: false, reason: `HTTP ${res.status}: ${detail.slice(0, 200)}` }
+    }
     const data = await res.json()
-    return data?.instance?.state === 'open'
-  } catch {
-    return false
+    const state = data?.instance?.state
+    if (state === 'open') return { ok: true, state }
+    return { ok: false, reason: `instância no estado "${state ?? 'desconhecido'}" (esperado "open" — provável desconexão do WhatsApp, precisa reconectar via QR Code)` }
+  } catch (err) {
+    return { ok: false, reason: err instanceof Error ? err.message : String(err) }
   }
 }
