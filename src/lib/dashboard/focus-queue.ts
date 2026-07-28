@@ -53,9 +53,17 @@ function estagioIndex(estagio: string | null): number {
   return idx === -1 ? 0 : idx
 }
 
+export type AgendaEventoRef = { id: string; titulo: string; inicio: string; tipo: string; status: string }
+
 export type AgendaOverdueInfo = {
   vencidoCount: number
   proximoEvento?: { titulo: string; inicio: string; tipo: string } | null
+  // O compromisso vencido EXATO (o mais atrasado), não uma contagem solta —
+  // é sobre ele que a UI age. Antes só existia vencidoCount, e a UI acabava
+  // agindo sobre "a visita mais próxima no tempo", que podia ser uma visita
+  // FUTURA (bug: modal abria em "marcar realizada" pra visita que ainda não
+  // aconteceu).
+  compromissoVencido?: AgendaEventoRef | null
 }
 
 export type FocusQueueOptions = {
@@ -95,6 +103,10 @@ export type FocusQueueEntry = {
   nuncaContatado: boolean
   quente: boolean
   diasSemContato: number
+  // Tipo do compromisso vencido, quando há um. Um follow-up atrasado
+  // (tipo 'ligacao'/'outro') não deve abrir o fluxo de visita — antes,
+  // agendaVencida era um booleano cego que tratava os dois igual.
+  compromissoVencidoTipo?: string | null
 }
 
 // Prioridade em CAMADAS (não uma média ponderada): a camada 1 sempre vence a
@@ -139,6 +151,7 @@ export function buildFocusQueue(leads: FocusQueueLead[], options: FocusQueueOpti
         nuncaContatado: !lead.ultimo_contato,
         quente: lead.temperatura === 3,
         diasSemContato: diasDesde(lead.ultimo_contato ?? lead.created_at, now),
+        compromissoVencidoTipo: agenda?.compromissoVencido?.tipo ?? null,
       }
     })
 

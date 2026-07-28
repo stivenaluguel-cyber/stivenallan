@@ -40,19 +40,46 @@ export function explainFocusPriority(entry: FocusQueueEntry): FocusPriority {
   return { title: 'Prioridade da fila', detail: 'Este lead está entre os mais relevantes pelos critérios de etapa, score e tempo de espera.', level: 'normal' }
 }
 
+// Recomendação de ação — percorre a MESMA ordem de camadas de
+// explainFocusPriority/sortKey (follow-up vencido → requer atenção →
+// compromisso vencido → nunca contatado → quente → ...). Antes esta função
+// checava agendaVencida ANTES de followupVencido, então um lead com os dois
+// sinais mostrava "Por que está aqui: Follow-up vencido" ao lado de
+// "Próxima ação: Conferir compromisso" — dois motivos diferentes lado a
+// lado, e a ação sugerida abria o fluxo de visita para um follow-up
+// atrasado. Agora a ordem é única; quando a melhor ação não corresponde
+// à primeira camada, `motivoDivergente` explica isso no card em vez de
+// deixar a contradição implícita.
+//
 // Lead vindo de DM do Instagram ainda não tem telefone real (ver
 // temWhatsappReal em lib/leads/normalize.ts) — nunca recomendar "WhatsApp"
 // pra ele; a alternativa honesta é registrar um follow-up (responder a
 // conversa no próprio Instagram é uma ação fora do Modo Foco por enquanto).
 export function recommendFocusAction(entry: FocusQueueEntry): FocusRecommendation {
   const temWhatsapp = temWhatsappReal(entry.lead.whatsapp)
+  const contatoInicial: FocusRecommendation = temWhatsapp
+    ? { action: 'whatsapp', title: 'Retomar pelo WhatsApp', detail: 'O follow-up venceu; uma mensagem curta é o próximo passo mais direto.' }
+    : { action: 'followup', title: 'Responder no Instagram', detail: 'O follow-up venceu; responda a conversa no Instagram e registre o retorno aqui.' }
 
-  if (entry.agendaVencida) return { action: 'visita', title: 'Conferir compromisso', detail: 'Verifique se a visita ou compromisso pendente aconteceu.' }
-  if (entry.followupVencido) {
+  if (entry.followupVencido) return contatoInicial
+
+  if (entry.requerAtencao) {
     return temWhatsapp
-      ? { action: 'whatsapp', title: 'Retomar pelo WhatsApp', detail: 'O follow-up venceu; uma mensagem curta é o próximo passo mais direto.' }
-      : { action: 'followup', title: 'Responder no Instagram', detail: 'O follow-up venceu; responda a conversa no Instagram e registre o retorno aqui.' }
+      ? { action: 'whatsapp', title: 'Falar com o lead agora', detail: 'Este lead foi sinalizado para acompanhamento prioritário.' }
+      : { action: 'followup', title: 'Responder no Instagram', detail: 'Este lead foi sinalizado para acompanhamento prioritário.' }
   }
+
+  // Só um compromisso do tipo 'visita' abre o fluxo de visita. Um follow-up
+  // atrasado (tipo 'ligacao'/'outro') vira uma ação de follow-up, não de
+  // visita — era exatamente essa confusão que levava o corretor ao modal de
+  // visita errado.
+  if (entry.agendaVencida) {
+    if (entry.compromissoVencidoTipo === 'visita') {
+      return { action: 'visita', title: 'Conferir a visita atrasada', detail: 'A visita marcada já passou — registre se ela aconteceu ou não.' }
+    }
+    return { action: 'followup', title: 'Conferir compromisso atrasado', detail: 'Há um compromisso pendente que já passou do horário — confirme o que aconteceu.' }
+  }
+
   if (entry.nuncaContatado) {
     return temWhatsapp
       ? { action: 'whatsapp', title: 'Fazer o primeiro contato', detail: 'Apresente-se e confirme o interesse antes de avançar o funil.' }

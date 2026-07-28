@@ -1,15 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
-import { jwtVerify } from 'jose'
 import { createClient } from '@supabase/supabase-js'
 import { filtrarLeadsPorSegmento, parseSegmento, type LeadParaSegmento } from '@/lib/campanhas/segmento'
+import { requireAdmin } from '@/lib/dashboard/admin-auth'
 
 export const dynamic = 'force-dynamic'
 const sb = () => createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
-async function auth() {
-  const s = await cookies(); const t = s.get('dashboard_token')?.value; if (!t) return false
-  try { await jwtVerify(t, new TextEncoder().encode(process.env.JWT_SECRET!)); return true } catch { return false }
-}
 
 type Params = { params: Promise<{ id: string }> }
 
@@ -17,7 +12,7 @@ type Params = { params: Promise<{ id: string }> }
 // salvo (o editor chama isso a cada toggle de checkbox). Sem o parâmetro,
 // usa o segmento já salvo da campanha.
 export async function GET(req: NextRequest, { params }: Params) {
-  if (!await auth()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!await requireAdmin()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const { id } = await params
 
   const segmentoParam = req.nextUrl.searchParams.get('segmento')

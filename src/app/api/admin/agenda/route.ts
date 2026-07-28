@@ -1,14 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
-import { jwtVerify } from 'jose'
 import { createClient } from '@supabase/supabase-js'
+import { requireAdmin } from '@/lib/dashboard/admin-auth'
 
 export const dynamic = 'force-dynamic'
 const sb = () => createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
-async function auth() {
-  const s = await cookies(); const t = s.get('dashboard_token')?.value; if (!t) return false
-  try { await jwtVerify(t, new TextEncoder().encode(process.env.JWT_SECRET!)); return true } catch { return false }
-}
 
 // O schema real de crm_agenda usa `inicio`/`fim` (timestamptz), nao `data_hora`
 // — a tabela foi criada direto no Supabase sem migration versionada, e o
@@ -19,7 +14,7 @@ async function auth() {
 // (zero mudanca de contrato pro frontend) e mapeamos para `inicio` na
 // query/insert/update, que e a coluna que de fato existe.
 export async function GET(req: NextRequest) {
-  if (!await auth()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!await requireAdmin()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const { searchParams } = new URL(req.url)
   const data_ini = searchParams.get('data_ini') || new Date().toISOString().slice(0,10)
   const data_fim = searchParams.get('data_fim') || data_ini
@@ -43,7 +38,7 @@ export async function GET(req: NextRequest) {
 // compromisso — o cache anterior só protegia contra retry SEM reload. A
 // tela de Agenda humana não manda esse campo e continua funcionando igual.
 export async function POST(req: NextRequest) {
-  if (!await auth()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!await requireAdmin()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const body = await req.json()
   const { titulo, data_hora, tipo, lead_id, local, descricao, lembrete_min, client_event_id } = body
 
@@ -79,12 +74,35 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ data: data ? { ...data, data_hora: data.inicio } : data }, { status: 201 })
 }
 
+const STATUS_VALIDOS = new Set(['agendado', 'concluido', 'nao_compareceu', 'cancelado'])
+
 export async function PATCH(req: NextRequest) {
-  if (!await auth()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!await requireAdmin()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const body = await req.json()
-  const { id, data_hora, ...update } = body
+  const { id, data_hora, confirmarAntecipado, ...update } = body
   if (!id) return NextResponse.json({ error: 'id obrigatorio' }, { status: 400 })
   if (data_hora) update.inicio = data_hora
+
+  if (update.status !== undefined && !STATUS_VALIDOS.has(update.status)) {
+    return NextResponse.json({ error: 'status invalido: ' + update.status }, { status: 400 })
+  }
+
+  // Um compromisso só pode ser dado como realizado/não-comparecido depois
+  // que o horário dele passou. Sem esta checagem, o corretor podia (e o
+  // Modo Foco pedia) confirmar como "realizada" uma visita ainda futura —
+  // gerando pontos e histórico de algo que não aconteceu. `confirmarAntecipado`
+  // é a exceção explícita (visita que aconteceu antes da hora marcada), nunca
+  // o caminho padrão.
+  if ((update.status === 'concluido' || update.status === 'nao_compareceu') && confirmarAntecipado !== true) {
+    const { data: evento } = await sb().from('crm_agenda').select('inicio').eq('id', id).single()
+    if (evento && new Date(evento.inicio).getTime() > Date.now()) {
+      return NextResponse.json(
+        { error: 'Compromisso ainda nao aconteceu', inicio: evento.inicio, requerConfirmacaoAntecipada: true },
+        { status: 409 },
+      )
+    }
+  }
+
   update.updated_at = new Date().toISOString()
   const { data, error } = await sb().from('crm_agenda').update(update).eq('id', id).select().single()
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
@@ -92,7 +110,7 @@ export async function PATCH(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  if (!await auth()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!await requireAdmin()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const { searchParams } = new URL(req.url)
   const id = searchParams.get('id')
   if (!id) return NextResponse.json({ error: 'id obrigatorio' }, { status: 400 })

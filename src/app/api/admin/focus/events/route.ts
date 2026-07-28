@@ -1,25 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
-import { jwtVerify } from 'jose'
 import { createClient } from '@supabase/supabase-js'
+import { requireAdmin } from '@/lib/dashboard/admin-auth'
 import { recordFocusEvent } from '@/lib/dashboard/focus-session-events'
-import { resolveTrustedNextStage, type FocusActionType } from '@/lib/dashboard/focus-scoring'
+import { FOCUS_ACTIONS_SOMENTE_SERVIDOR, resolveTrustedNextStage, type FocusActionType } from '@/lib/dashboard/focus-scoring'
 
 export const dynamic = 'force-dynamic'
 const sb = () => createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
-async function auth(): Promise<string | null> {
-  const s = await cookies(); const t = s.get('dashboard_token')?.value; if (!t) return null
-  try {
-    const { payload } = await jwtVerify(t, new TextEncoder().encode(process.env.JWT_SECRET!))
-    return (payload.adminId as string) ?? null
-  } catch { return null }
-}
-
 const ACTION_TYPES = new Set<FocusActionType>([
   'pular', 'perdido', 'followup_agendado', 'visita_agendada',
   'visita_concluida', 'visita_nao_ocorreu', 'contato_confirmado',
-  'anotacao', 'etapa_alterada', 'proposta_enviada',
+  'anotacao', 'etapa_alterada', 'proposta_enviada', 'adiado',
 ])
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -47,7 +38,7 @@ function sanitizeMetadata(raw: unknown): Record<string, unknown> {
 // chamada ser feita pelo frontend — esta rota nunca duplica essa lógica,
 // só registra que a ação aconteceu dentro da sessão e pontua.
 export async function POST(req: NextRequest) {
-  const adminId = await auth()
+  const adminId = await requireAdmin()
   if (!adminId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await req.json().catch(() => null)
@@ -59,6 +50,16 @@ export async function POST(req: NextRequest) {
   }
   if (!ACTION_TYPES.has(actionType)) {
     return NextResponse.json({ error: 'actionType desconhecido: ' + actionType }, { status: 400 })
+  }
+  // 'proposta_enviada' vale 25 pontos e só é legítima se existir uma
+  // proposta de verdade — ela é registrada pelo fluxo que cria a proposta
+  // (/api/admin/propostas), nunca aqui. Sem esta trava, um POST manual
+  // neste endpoint rendia os pontos sem proposta nenhuma.
+  if (FOCUS_ACTIONS_SOMENTE_SERVIDOR.has(actionType)) {
+    return NextResponse.json(
+      { error: 'actionType so pode ser registrado pelo fluxo real correspondente: ' + actionType },
+      { status: 403 },
+    )
   }
   // clientEventId é a chave de idempotência: um UUID por INTENÇÃO do
   // usuário, gerado no frontend. Um clique duplo ou um retry de rede da
@@ -106,7 +107,11 @@ export async function POST(req: NextRequest) {
       nextStage: nextStageConfiavel,
       metadata: sanitizeMetadata(body.metadata),
       clientEventId,
+      snoozedUntil: typeof body.snoozedUntil === 'string' ? body.snoozedUntil : null,
     })
+    if (result.error === 'item_nao_pertence_a_sessao') {
+      return NextResponse.json({ error: 'Este lead não faz parte da sessão atual' }, { status: 409 })
+    }
     return NextResponse.json({ data: result })
   } catch (e) {
     return NextResponse.json({ error: e instanceof Error ? e.message : 'Erro ao registrar evento' }, { status: 500 })

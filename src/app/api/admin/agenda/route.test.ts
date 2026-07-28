@@ -21,7 +21,7 @@ vi.mock('@supabase/supabase-js', () => ({
 }))
 
 // Import DEPOIS dos vi.mock (hoistados pro topo do arquivo).
-import { POST } from './route'
+import { POST, PATCH } from './route'
 
 // Simula crm_agenda em memória, incluindo o comportamento do unique index
 // PARCIAL em client_event_id (migration 0016): duas linhas com o mesmo
@@ -138,5 +138,79 @@ describe('POST /api/admin/agenda — idempotência por client_event_id', () => {
     expect(resultado.status).toBe(200)
     expect(resultado.json.data.id).toBe('agenda-race')
     expect(supabaseHolder.current.rows).toHaveLength(1)
+  })
+})
+
+// Mock separado pro PATCH: precisa de select().eq().single() e de update().
+function makeSupabasePatch(inicio: string) {
+  const atualizacoes: Record<string, unknown>[] = []
+  return {
+    atualizacoes,
+    from(table: string) {
+      if (table !== 'crm_agenda') throw new Error('Tabela inesperada no teste: ' + table)
+      return {
+        select: () => ({ eq: () => ({ single: async () => ({ data: { id: 'agenda-1', inicio }, error: null }) }) }),
+        update(patch: Record<string, unknown>) {
+          atualizacoes.push(patch)
+          return { eq: () => ({ select: () => ({ single: async () => ({ data: { id: 'agenda-1', inicio, ...patch }, error: null }) }) }) }
+        },
+      }
+    },
+  }
+}
+
+async function callPatch(body: unknown) {
+  const res = await PATCH({ json: async () => body } as unknown as NextRequest)
+  return { status: res.status, json: await res.json() }
+}
+
+describe('PATCH /api/admin/agenda — visita futura não pode ser dada como realizada', () => {
+  beforeEach(() => {
+    process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://test'
+    process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-key'
+    process.env.JWT_SECRET = 'test-secret'
+  })
+
+  const futuro = new Date(Date.now() + 3 * 86_400_000).toISOString()
+  const passado = new Date(Date.now() - 3 * 86_400_000).toISOString()
+
+  it('recusa (409) marcar como concluída uma visita que ainda não aconteceu', async () => {
+    supabaseHolder.current = makeSupabasePatch(futuro) as never
+    const r = await callPatch({ id: 'agenda-1', status: 'concluido' })
+    expect(r.status).toBe(409)
+    expect(r.json.requerConfirmacaoAntecipada).toBe(true)
+    expect((supabaseHolder.current as never as ReturnType<typeof makeSupabasePatch>).atualizacoes).toHaveLength(0)
+  })
+
+  it('recusa também "não compareceu" antes da hora', async () => {
+    supabaseHolder.current = makeSupabasePatch(futuro) as never
+    expect((await callPatch({ id: 'agenda-1', status: 'nao_compareceu' })).status).toBe(409)
+  })
+
+  it('permite concluir uma visita cujo horário JÁ passou', async () => {
+    supabaseHolder.current = makeSupabasePatch(passado) as never
+    const r = await callPatch({ id: 'agenda-1', status: 'concluido' })
+    expect(r.status).toBe(200)
+    expect(r.json.data.status).toBe('concluido')
+  })
+
+  it('permite confirmação antecipada explícita (visita que aconteceu antes da hora marcada)', async () => {
+    supabaseHolder.current = makeSupabasePatch(futuro) as never
+    const r = await callPatch({ id: 'agenda-1', status: 'concluido', confirmarAntecipado: true })
+    expect(r.status).toBe(200)
+    // O flag é consumido pela rota, não vai parar na coluna do banco.
+    const patch = (supabaseHolder.current as never as ReturnType<typeof makeSupabasePatch>).atualizacoes[0]
+    expect(patch).not.toHaveProperty('confirmarAntecipado')
+  })
+
+  it('recusa status fora do conjunto conhecido', async () => {
+    supabaseHolder.current = makeSupabasePatch(passado) as never
+    expect((await callPatch({ id: 'agenda-1', status: 'inventado' })).status).toBe(400)
+  })
+
+  it('reagendar (sem mudar status) não passa pela checagem de horário', async () => {
+    supabaseHolder.current = makeSupabasePatch(futuro) as never
+    const r = await callPatch({ id: 'agenda-1', data_hora: '2026-09-01T10:00:00-03:00' })
+    expect(r.status).toBe(200)
   })
 })

@@ -1,5 +1,5 @@
 'use client'
-import { CalendarClock, MapPin, SkipForward, XCircle } from 'lucide-react'
+import { CalendarClock, Clock, MapPin, SkipForward, XCircle } from 'lucide-react'
 import { D } from './tokens'
 
 type Props = {
@@ -7,43 +7,59 @@ type Props = {
   recommendedAction?: 'followup' | 'visita' | 'whatsapp' | 'atualizar_etapa'
   onPerdido: () => void
   onPular: () => void
+  onAdiar: () => void
   onFollowUp: () => void
   onVisita: () => void
 }
 
-// As 4 ações que avançam a fila. Fixas na base no mobile (área de toque
-// ≥44px, requisito do briefing), em linha normal no desktop. Cada botão tem
-// ícone + texto + atalho de teclado indicado no title (os atalhos de fato
-// são tratados no componente pai, pra funcionar mesmo com o foco fora
-// destes botões).
-export function FocusPrimaryActions({ disabled, recommendedAction, onPerdido, onPular, onFollowUp, onVisita }: Props) {
+// Hierarquia visual explícita: a ação recomendada em destaque, Pular e
+// Adiar como secundárias neutras, e Perdido (destrutiva, irreversível na
+// prática) com o menor peso visual — antes ela dividia o mesmo destaque das
+// demais e era o primeiro botão da linha.
+//
+// Não existe "desfazer": nenhuma dessas ações tem operação de reversão real
+// no backend, e um botão de desfazer que não desfaz seria pior que nenhum.
+export function FocusPrimaryActions({ disabled, recommendedAction, onPerdido, onPular, onAdiar, onFollowUp, onVisita }: Props) {
   const base: React.CSSProperties = {
-    flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4,
     padding: '10px 6px', minHeight: 56, borderRadius: 10, border: '1px solid ' + D.line,
-    background: '#fff', cursor: disabled ? 'default' : 'pointer', opacity: disabled ? 0.5 : 1,
+    background: '#fff', cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.5 : 1,
     fontSize: 12, fontWeight: 700,
   }
+  const destaque = (acao: 'followup' | 'visita', cor: string): React.CSSProperties =>
+    recommendedAction === acao
+      ? { borderColor: cor, borderWidth: 2, boxShadow: '0 0 0 3px ' + cor + '22', background: cor + '0d' }
+      : {}
+
   return (
-    <div className="focus-primary-actions" style={{ display: 'flex', gap: 8, padding: '10px clamp(14px,3vw,28px)', background: D.surface, borderTop: '1px solid ' + D.line }}>
-      <button disabled={disabled} onClick={onPerdido} title="Perdido (P)" aria-label="Marcar lead como perdido" style={{ ...base, color: D.red }}>
-        <XCircle size={20} />
-        Perdido
+    <div className="focus-primary-actions" style={{ display: 'flex', gap: 8, padding: '10px clamp(14px,3vw,28px) calc(10px + env(safe-area-inset-bottom))', background: D.surface, borderTop: '1px solid ' + D.line }}>
+      <button disabled={disabled} onClick={onFollowUp} title="Follow-up (F)" aria-label="Agendar follow-up" style={{ ...base, flex: 1.3, color: D.blue, ...destaque('followup', D.blue) }}>
+        <CalendarClock size={20} />
+        {recommendedAction === 'followup' ? 'Follow-up ·  recomendado' : 'Follow-up'}
       </button>
-      <button disabled={disabled} onClick={onPular} title="Pular (Espaço)" aria-label="Pular este lead" style={{ ...base, color: D.muted }}>
+      <button disabled={disabled} onClick={onVisita} title="Visita (V)" aria-label="Registrar visita" style={{ ...base, flex: 1.3, color: D.green, ...destaque('visita', D.green) }}>
+        <MapPin size={20} />
+        {recommendedAction === 'visita' ? 'Visita ·  recomendada' : 'Visita'}
+      </button>
+      <button disabled={disabled} onClick={onAdiar} title="Adiar (A)" aria-label="Adiar este lead" style={{ ...base, flex: 1, color: D.muted }}>
+        <Clock size={20} />
+        Adiar
+      </button>
+      <button disabled={disabled} onClick={onPular} title="Pular (Espaço)" aria-label="Pular este lead" style={{ ...base, flex: 1, color: D.muted }}>
         <SkipForward size={20} />
         Pular
       </button>
-      <button disabled={disabled} onClick={onFollowUp} title="Follow-up (F)" aria-label="Agendar follow-up" style={{ ...base, color: D.blue, borderColor: recommendedAction === 'followup' ? D.blue : D.line, boxShadow: recommendedAction === 'followup' ? '0 0 0 2px rgba(59,130,246,0.14)' : 'none' }}>
-        <CalendarClock size={20} />
-        {recommendedAction === 'followup' ? 'Follow-up · recomendado' : 'Follow-up'}
-      </button>
-      <button disabled={disabled} onClick={onVisita} title="Visita (V)" aria-label="Registrar visita" style={{ ...base, color: D.green, borderColor: recommendedAction === 'visita' ? D.green : D.line, boxShadow: recommendedAction === 'visita' ? '0 0 0 2px rgba(34,197,94,0.14)' : 'none' }}>
-        <MapPin size={20} />
-        {recommendedAction === 'visita' ? 'Visita · recomendada' : 'Visita'}
+      <button disabled={disabled} onClick={onPerdido} title="Perdido (P)" aria-label="Marcar lead como perdido" style={{ ...base, flex: 0.85, color: D.red, background: 'transparent', borderColor: 'transparent', fontWeight: 600 }}>
+        <XCircle size={18} />
+        Perdido
       </button>
       <style>{`
         @media (max-width: 640px) {
           .focus-primary-actions { position: sticky; bottom: 0; z-index: 10; box-shadow: 0 -2px 10px rgba(0,0,0,0.06); }
+        }
+        @media (max-width: 380px) {
+          .focus-primary-actions { flex-wrap: wrap; }
+          .focus-primary-actions > button { flex: 1 1 30% !important; }
         }
       `}</style>
     </div>

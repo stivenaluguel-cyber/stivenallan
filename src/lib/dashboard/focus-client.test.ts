@@ -1,77 +1,60 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { appendNota, salvarNotaIdempotente } from './focus-client'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { salvarNota } from './focus-client'
 
-describe('appendNota', () => {
-  it('prepend uma nota nova, preservando as anteriores', () => {
-    const anteriores = JSON.stringify([{ data: '2026-01-01T00:00:00.000Z', texto: 'nota antiga' }])
-    const resultado = JSON.parse(appendNota(anteriores, 'nota nova'))
-    expect(resultado).toHaveLength(2)
-    expect(resultado[0].texto).toBe('nota nova')
-    expect(resultado[1].texto).toBe('nota antiga')
-  })
+afterEach(() => { vi.restoreAllMocks() })
 
-  it('embute clientEventId na nota quando fornecido, sem quebrar o shape esperado por outros leitores', () => {
-    const resultado = JSON.parse(appendNota(null, 'texto', 'evt-1'))
-    expect(resultado[0]).toMatchObject({ texto: 'texto', clientEventId: 'evt-1' })
-    expect(typeof resultado[0].data).toBe('string')
-  })
-})
-
-describe('salvarNotaIdempotente', () => {
-  const originalFetch = global.fetch
-
-  beforeEach(() => {
-    global.fetch = vi.fn()
-  })
-
-  afterEach(() => {
-    global.fetch = originalFetch
-  })
-
-  function mockGetLead(anotacoes: string | null) {
-    ;(global.fetch as ReturnType<typeof vi.fn>).mockImplementation(async (url: string, init?: RequestInit) => {
-      if (!init || init.method === undefined) {
-        // GET /api/admin/leads/{id}
-        return { ok: true, json: async () => ({ data: { id: 'lead-1', anotacoes } }) }
-      }
-      // PATCH /api/admin/leads/{id}
-      return { ok: true, json: async () => ({ data: { id: 'lead-1' } }) }
+describe('salvarNota — anotação atômica (sem lost update)', () => {
+  it('faz UM POST de inserção, sem ler-e-reescrever o histórico inteiro', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ data: { id: 'n1', created_at: '2026-07-28T12:00:00Z', descricao: 'nota nova' }, alreadyExists: false }),
     })
-  }
+    vi.stubGlobal('fetch', fetchMock)
 
-  it('busca o lead FRESCO do servidor e acrescenta a nota quando o client_event_id ainda não existe', async () => {
-    mockGetLead(null)
-    const resultado = await salvarNotaIdempotente('lead-1', 'primeira nota', 'evt-1')
-    const notas = JSON.parse(resultado)
-    expect(notas).toHaveLength(1)
-    expect(notas[0]).toMatchObject({ texto: 'primeira nota', clientEventId: 'evt-1' })
+    await salvarNota('lead-1', 'nota nova', '00000000-0000-4000-8000-000000000001')
 
-    // Confirma que o PATCH foi de fato chamado (persistiu).
-    const patchCall = (global.fetch as ReturnType<typeof vi.fn>).mock.calls.find(([, init]) => init?.method === 'PATCH')
-    expect(patchCall).toBeTruthy()
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    const [url, init] = fetchMock.mock.calls[0]
+    expect(url).toBe('/api/admin/leads/lead-1/anotacoes')
+    expect(init.method).toBe('POST')
+    // A garantia central: o corpo carrega só o texto da nota nova — nunca o
+    // array inteiro de anotações. É isso que impede sobrescrever a nota que
+    // outra aba criou entre a leitura e a escrita.
+    const body = JSON.parse(init.body)
+    expect(body).toEqual({ texto: 'nota nova', clientEventId: '00000000-0000-4000-8000-000000000001' })
   })
 
-  it('retry após reload: se uma nota com este client_event_id JÁ existe (persistida antes da falha seguinte), não duplica', async () => {
-    const anotacoesComNotaJaSalva = JSON.stringify([{ data: '2026-07-26T10:00:00.000Z', texto: 'nota que já foi salva', clientEventId: 'evt-1' }])
-    mockGetLead(anotacoesComNotaJaSalva)
+  it('nota concorrente de outra aba não é perdida: cada uma é um POST independente', async () => {
+    const recebidos: string[] = []
+    const fetchMock = vi.fn().mockImplementation((_url: string, init: { body: string }) => {
+      recebidos.push(JSON.parse(init.body).texto)
+      return Promise.resolve({ ok: true, json: async () => ({ data: { id: 'x' }, alreadyExists: false }) })
+    })
+    vi.stubGlobal('fetch', fetchMock)
 
-    const resultado = await salvarNotaIdempotente('lead-1', 'nota que já foi salva', 'evt-1')
-    const notas = JSON.parse(resultado)
-    expect(notas).toHaveLength(1) // não duplicou
+    await Promise.all([
+      salvarNota('lead-1', 'nota da aba A', '00000000-0000-4000-8000-00000000000a'),
+      salvarNota('lead-1', 'nota da aba B', '00000000-0000-4000-8000-00000000000b'),
+    ])
 
-    // Não deve ter chamado PATCH — a nota já estava lá, nada a persistir de novo.
-    const patchCall = (global.fetch as ReturnType<typeof vi.fn>).mock.calls.find(([, init]) => init?.method === 'PATCH')
-    expect(patchCall).toBeUndefined()
+    expect(recebidos).toHaveLength(2)
+    expect(recebidos).toContain('nota da aba A')
+    expect(recebidos).toContain('nota da aba B')
   })
 
-  it('repetição legítima: uma SEGUNDA nota real (client_event_id diferente) é acrescentada normalmente', async () => {
-    const anotacoesComPrimeiraNota = JSON.stringify([{ data: '2026-07-26T10:00:00.000Z', texto: 'primeira nota', clientEventId: 'evt-1' }])
-    mockGetLead(anotacoesComPrimeiraNota)
+  it('retry com o mesmo clientEventId devolve alreadyExists sem criar duplicata', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ data: { id: 'n1', created_at: '2026-07-28T12:00:00Z', descricao: 'nota' }, alreadyExists: true }),
+    })
+    vi.stubGlobal('fetch', fetchMock)
 
-    const resultado = await salvarNotaIdempotente('lead-1', 'segunda nota, de verdade nova', 'evt-2')
-    const notas = JSON.parse(resultado)
-    expect(notas).toHaveLength(2)
-    expect(notas[0]).toMatchObject({ texto: 'segunda nota, de verdade nova', clientEventId: 'evt-2' })
-    expect(notas[1]).toMatchObject({ texto: 'primeira nota', clientEventId: 'evt-1' })
+    const r = await salvarNota('lead-1', 'nota', '00000000-0000-4000-8000-000000000001')
+    expect(r.alreadyExists).toBe(true)
+  })
+
+  it('propaga erro do servidor em vez de fingir sucesso', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 500, json: async () => ({ error: 'falhou' }) }))
+    await expect(salvarNota('lead-1', 'nota', '00000000-0000-4000-8000-000000000001')).rejects.toThrow('falhou')
   })
 })

@@ -60,56 +60,41 @@ export async function postFocusEvent(input: {
   // novo a cada ação legítima e por REAPROVEITAR o mesmo id só quando está
   // de fato re-tentando a mesma requisição (ver useFocusActionRunner).
   clientEventId: string
+  // Só para 'adiado': quando o lead volta pra fila.
+  snoozedUntil?: string | null
 }) {
   const res = await fetch('/api/admin/focus/events', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input),
   })
-  return parseJson(res) as Promise<{ data: { alreadyProcessed: boolean; points: number } }>
+  // `session` traz os contadores AUTORITATIVOS pós-gravação — o chamador
+  // substitui o estado local por eles em vez de somar um delta otimista.
+  return parseJson(res) as Promise<{
+    data: {
+      alreadyProcessed: boolean
+      points: number
+      sessionLeadStatus?: string | null
+      session?: { processed_leads: number; skipped_leads: number; earned_points: number; total_leads: number } | null
+    }
+  }>
 }
 
-type Nota = { data: string; texto: string; clientEventId?: string }
-
-function parseNotas(anotacoesRaw: string | null | undefined): Nota[] {
-  if (!anotacoesRaw) return []
-  try {
-    const parsed = JSON.parse(anotacoesRaw)
-    if (Array.isArray(parsed)) return parsed
-  } catch {
-    if (anotacoesRaw.trim()) return [{ data: '', texto: anotacoesRaw }]
-  }
-  return []
-}
-
-// Mesmo formato {data:[{data,texto}]} usado por LeadModal.parseNotas em
-// src/app/dashboard/crm/page.tsx — replicar o shape (não o código) garante
-// que a nova anotação apareça corretamente na linha do tempo existente.
-// `clientEventId` é um campo extra opcional no objeto da nota — invisível
-// pros outros leitores desse JSON (só leem .data/.texto), usado aqui só
-// para a checagem de idempotência de salvarNotaIdempotente.
-export function appendNota(anotacoesRaw: string | null | undefined, texto: string, clientEventId?: string): string {
-  const notas = parseNotas(anotacoesRaw)
-  const nova: Nota = { data: new Date().toISOString(), texto }
-  if (clientEventId) nova.clientEventId = clientEventId
-  return JSON.stringify([nova, ...notas])
-}
-
-// Idempotência persistente pra anotações: sem isso, "nota salva → evento de
-// pontuação falha → página recarrega → tenta de novo" reexecutaria
-// appendNota em cima do valor JÁ ATUALIZADO (a nota já está lá) e
-// duplicaria a mesma anotação. Busca o lead FRESCO do servidor (não um
-// valor capturado em closure antes do reload) e só acrescenta se uma nota
-// com este client_event_id ainda não existir.
-export async function salvarNotaIdempotente(leadId: string, texto: string, clientEventId: string): Promise<string> {
-  const res = await fetch('/api/admin/leads/' + leadId)
-  const json = await parseJson(res)
-  const anotacoesAtuais: string | null = json.data?.anotacoes ?? null
-  const notas = parseNotas(anotacoesAtuais)
-  if (notas.some((n) => n.clientEventId === clientEventId)) {
-    return anotacoesAtuais ?? JSON.stringify(notas)
-  }
-  const novasAnotacoes = appendNota(anotacoesAtuais, texto, clientEventId)
-  await patchLead(leadId, { anotacoes: novasAnotacoes })
-  return novasAnotacoes
+// Anotação atômica: uma linha nova, nunca um append ao JSON inteiro.
+//
+// A versão anterior (GET do lead → append no array → PATCH do array
+// inteiro) tinha uma janela de lost update: entre o GET e o PATCH, uma nota
+// criada em outra aba/por outro corretor era sobrescrita e perdida
+// silenciosamente. Reler antes de escrever reduzia a janela, mas não
+// eliminava — só o INSERT de uma linha própria elimina.
+//
+// A idempotência agora é do banco (índice único em client_event_id), não de
+// uma checagem otimista em JS.
+export async function salvarNota(leadId: string, texto: string, clientEventId: string) {
+  const res = await fetch('/api/admin/leads/' + leadId + '/anotacoes', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ texto, clientEventId }),
+  })
+  return parseJson(res) as Promise<{ data: { id: string; created_at: string; descricao: string } | null; alreadyExists: boolean }>
 }

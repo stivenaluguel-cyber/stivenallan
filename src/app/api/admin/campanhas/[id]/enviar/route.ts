@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
-import { jwtVerify } from 'jose'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { filtrarLeadsPorSegmento, parseSegmento, type LeadParaSegmento } from '@/lib/campanhas/segmento'
 import { montarHtml, buildUnsubscribeUrl } from '@/lib/cron/email-followup-helpers'
 import { enviarEmailResend } from '@/lib/email/resend'
+import { requireAdmin } from '@/lib/dashboard/admin-auth'
 
 export const dynamic = 'force-dynamic'
 // Nenhuma rota do projeto declarava isso antes (rodando no default da
@@ -13,10 +12,6 @@ export const dynamic = 'force-dynamic'
 export const maxDuration = 60
 
 const sb = () => createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
-async function auth() {
-  const s = await cookies(); const t = s.get('dashboard_token')?.value; if (!t) return false
-  try { await jwtVerify(t, new TextEncoder().encode(process.env.JWT_SECRET!)); return true } catch { return false }
-}
 
 const LOTE = 50 // ~50 * 600ms de throttle + rede cabe com folga em maxDuration=60s
 
@@ -34,7 +29,7 @@ async function resolverNomeEmpreendimento(supabase: SupabaseClient, lead: LeadEn
 }
 
 export async function POST(_req: NextRequest, { params }: Params) {
-  if (!await auth()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!await requireAdmin()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const { id } = await params
   const supabase = sb()
 

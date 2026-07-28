@@ -12,9 +12,8 @@ const CANAIS = [
   { value: 'outro', label: 'Outro' },
 ]
 
-export function FollowUpModal({ onClose, onSubmit, contexto }: { onClose: () => void; onSubmit: (payload: FollowUpPayload) => Promise<void>; contexto?: string }) {
-  const amanha = new Date(Date.now() + 86_400_000).toISOString().slice(0, 10)
-  const [data, setData] = useState(amanha)
+export function FollowUpModal({ onClose, onSubmit, contexto, dataPadrao }: { onClose: () => void; onSubmit: (payload: FollowUpPayload) => Promise<void>; contexto?: string; dataPadrao: string }) {
+  const [data, setData] = useState(dataPadrao)
   const [horario, setHorario] = useState('09:00')
   const [canal, setCanal] = useState('whatsapp')
   const [observacao, setObservacao] = useState(contexto ?? '')

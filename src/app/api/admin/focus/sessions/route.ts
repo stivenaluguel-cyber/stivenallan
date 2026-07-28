@@ -1,37 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
-import { jwtVerify } from 'jose'
 import { createClient } from '@supabase/supabase-js'
+import { requireAdmin } from '@/lib/dashboard/admin-auth'
+import { normalizarFiltrosFoco } from '@/lib/dashboard/focus-filters'
+import { montarFilaServidor } from '@/lib/dashboard/focus-queue-server'
 
 export const dynamic = 'force-dynamic'
 const sb = () => createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
-async function auth(): Promise<string | null> {
-  const s = await cookies(); const t = s.get('dashboard_token')?.value; if (!t) return null
-  try {
-    const { payload } = await jwtVerify(t, new TextEncoder().encode(process.env.JWT_SECRET!))
-    return (payload.adminId as string) ?? null
-  } catch { return null }
-}
-
 async function pontosDoMes(client: ReturnType<typeof sb>, adminId: string): Promise<number> {
-  const inicioMes = new Date()
-  inicioMes.setDate(1)
-  inicioMes.setHours(0, 0, 0, 0)
-  const { data } = await client
-    .from('crm_focus_events')
-    .select('points')
-    .eq('admin_id', adminId)
-    .gte('created_at', inicioMes.toISOString())
-  return (data ?? []).reduce((soma, ev) => soma + (ev.points ?? 0), 0)
+  // Agregado no banco (função sum_focus_points_month), não carregando todos
+  // os eventos do mês no JS. A fronteira do mês é calculada em
+  // America/Sao_Paulo — o servidor roda em UTC, então perto da virada do mês
+  // o cálculo antigo (new Date() local do processo) mudava o resultado.
+  const { data } = await client.rpc('sum_focus_points_month', { p_admin_id: adminId })
+  return typeof data === 'number' ? data : 0
 }
 
-// GET ?active=true — usado ao entrar em /dashboard/crm/foco: se já existir
-// uma sessão 'ativa' deste admin, o front retoma o progresso em vez de
-// começar do zero (satisfaz "atualizar a página não apaga o progresso").
-// Sempre inclui monthPoints (gamificação mensal, exibida no cabeçalho).
 export async function GET(req: NextRequest) {
-  const adminId = await auth()
+  const adminId = await requireAdmin()
   if (!adminId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const { searchParams } = new URL(req.url)
   const client = sb()
@@ -60,35 +46,28 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({ data, monthPoints })
 }
 
+// Início de sessão: o servidor monta a fila, calcula total_leads e grava o
+// snapshot — tudo numa RPC atômica. O `totalLeads` que o frontend mandava
+// antes era aceito como verdade (dava pra inflar o denominador do progresso
+// só mandando outro número) e não existia snapshot nenhum: a fila era
+// recalculada ao vivo a cada carga, então um lead tratado voltava a aparecer
+// se o estado dele mudasse, e filtros alterados no meio da sessão trocavam a
+// fila por baixo do corretor.
 export async function POST(req: NextRequest) {
-  const adminId = await auth()
+  const adminId = await requireAdmin()
   if (!adminId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const body = await req.json().catch(() => ({}))
-  const { totalLeads, filtros } = body
+  const filtros = normalizarFiltrosFoco(body.filtros)
 
-  // Uma sessão ativa por admin — se já existir uma, reaproveita em vez de
-  // criar uma segunda (evita duas sessões "ativa" competindo pela mesma
-  // fila caso o corretor clique em "Modo Foco" duas vezes/duas abas).
-  const { data: existente } = await sb()
-    .from('crm_focus_sessions')
-    .select('*')
-    .eq('admin_id', adminId)
-    .eq('status', 'ativa')
-    .order('started_at', { ascending: false })
-    .limit(1)
-    .maybeSingle()
-  if (existente) return NextResponse.json({ data: existente })
+  const client = sb()
+  const leadIds = await montarFilaServidor(client, filtros)
 
-  const { data, error } = await sb()
-    .from('crm_focus_sessions')
-    .insert({
-      admin_id: adminId,
-      status: 'ativa',
-      total_leads: typeof totalLeads === 'number' ? totalLeads : 0,
-      filtros: filtros ?? {},
-    })
-    .select()
-    .single()
+  const { data, error } = await client.rpc('start_focus_session', {
+    p_admin_id: adminId,
+    p_filtros: filtros,
+    p_lead_ids: leadIds,
+  })
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json({ data }, { status: 201 })
+
+  return NextResponse.json({ data: data.session, reused: data.reused === true }, { status: data.reused ? 200 : 201 })
 }
