@@ -88,7 +88,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         <NotificationBell variant="dark" align="left" />
       </div>
 
-      <nav style={{ display: 'flex', flexDirection: 'column', gap: 18, flex: 1 }}>
+      <nav style={{ display: 'flex', flexDirection: 'column', gap: 18, flex: 1, minHeight: 0, overflowY: 'auto' }}>
         {GRUPOS.map(grupo => (
           <div key={grupo.titulo}>
             <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', color: D.onDarkMuted, padding: '0 8px', marginBottom: 8 }}>{grupo.titulo}</div>
@@ -125,7 +125,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
     <div style={{ minHeight: '100vh', background: '#F3F2EE', fontFamily: 'Inter, system-ui, sans-serif' }}>
       <aside className="sa-sidebar"
-        style={{ position: 'fixed', top: 0, left: 0, bottom: 0, width: 236, background: D.sidebar, borderRight: '1px solid ' + D.lineDark, padding: '20px 14px', display: 'flex', flexDirection: 'column', zIndex: 50, overflowY: 'auto' }}>
+        style={{ position: 'fixed', top: 0, left: 0, bottom: 0, width: 236, background: D.sidebar, borderRight: '1px solid ' + D.lineDark, padding: '20px 14px', display: 'flex', flexDirection: 'column', zIndex: 50 }}>
         {SidebarContent}
       </aside>
 
@@ -150,7 +150,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       {menuOpen && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 60 }} onClick={() => setMenuOpen(false)}>
           <aside onClick={e => e.stopPropagation()}
-            style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: 250, background: D.sidebar, padding: '20px 14px', display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
+            style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: 250, background: D.sidebar, padding: '20px 14px', display: 'flex', flexDirection: 'column' }}>
             {SidebarContent}
           </aside>
         </div>
