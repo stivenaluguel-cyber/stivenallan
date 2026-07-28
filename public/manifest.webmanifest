@@ -1,0 +1,15 @@
+{
+  "name": "Stiven Allan — Painel",
+  "short_name": "SA Painel",
+  "description": "Painel de gestão de leads e CRM de Stiven Allan Imóveis.",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#F3F2EE",
+  "theme_color": "#D24E22",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
