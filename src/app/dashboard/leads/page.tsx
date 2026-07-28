@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { ConversaPanel } from '@/components/dashboard/ConversaPanel'
 import { ESTAGIOS_FUNIL as ESTAGIOS } from '@/lib/dashboard/estagios'
+import { temWhatsappReal } from '@/lib/leads/normalize'
 
 const D = {
   bg: '#F3F2EE', surface: '#FAFAF7', ink: '#161512',
@@ -125,7 +126,11 @@ function LeadCard({ lead, onDragStart, onToggleAtencao, onSelect }: { lead: Lead
       </div>
       {(lead.visitas ?? 0) > 0 || (lead.downloads ?? 0) > 0 ? (<div style={{ display: 'flex', gap: '6px', marginTop: '6px' }}>{(lead.visitas ?? 0) > 0 && (<span style={{ fontSize: '11px', background: '#EFF6FF', color: '#1D4ED8', padding: '2px 8px', borderRadius: '999px', fontWeight: 600 }}>👁 {lead.visitas} {lead.visitas === 1 ? 'visita' : 'visitas'}</span>)}{(lead.downloads ?? 0) > 0 && (<span style={{ fontSize: '11px', background: '#FFF7ED', color: '#C2410C', padding: '2px 8px', borderRadius: '999px', fontWeight: 600 }}>⬇ {lead.downloads} {lead.downloads === 1 ? 'catálogo' : 'catálogos'}</span>)}</div>) : null}<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
         <span style={{ fontSize: 11, color: D.muted }}>Score: {lead.lead_score ?? 0}</span>
-        <a href={whatsappLink} target='_blank' rel='noopener noreferrer' onClick={(e) => e.stopPropagation()} style={{ fontSize: 12, fontWeight: 600, color: D.green, textDecoration: 'none' }}>WhatsApp →</a>
+        {temWhatsappReal(lead.whatsapp) ? (
+          <a href={whatsappLink} target='_blank' rel='noopener noreferrer' onClick={(e) => e.stopPropagation()} style={{ fontSize: 12, fontWeight: 600, color: D.green, textDecoration: 'none' }}>WhatsApp →</a>
+        ) : (
+          <span style={{ fontSize: 12, fontWeight: 600, color: D.muted }}>📷 Instagram</span>
+        )}
       </div>
     </div>
   )
@@ -297,9 +302,11 @@ style={{ position: 'absolute', top: '14px', right: '14px', width: '30px', height
 <tr>
 <td style={{ color: '#8a8a85', padding: '8px 0', borderBottom: '1px solid #F3F2EE', fontSize: '13px', width: '38%' }}>WhatsApp</td>
 <td style={{ padding: '8px 0', borderBottom: '1px solid #F3F2EE', fontSize: '14px', fontWeight: 600 }}>
+{temWhatsappReal(selectedLead.whatsapp) ? (
 <a href={`https://wa.me/55${selectedLead.whatsapp}`} target="_blank" rel="noopener noreferrer" style={{ color: '#25D366', textDecoration: 'none' }}>
 {selectedLead.whatsapp} ↗
 </a>
+) : <span style={{ color: '#8a8a85' }}>Só Instagram — sem telefone ainda</span>}
 </td>
 </tr>
 <tr>
@@ -367,6 +374,7 @@ style={{ flex: 1, background: '#D24E22', color: '#fff', border: 'none', borderRa
 >
 {savingNotes ? 'Aguarde...' : 'Salvar anotações'}
 </button>
+{temWhatsappReal(selectedLead.whatsapp) ? (
 <a
 href={`https://wa.me/55${selectedLead.whatsapp}`}
 target="_blank"
@@ -375,6 +383,11 @@ style={{ flex: 1, background: '#25D366', color: '#fff', borderRadius: '10px', pa
 >
 Chamar no WhatsApp
 </a>
+) : (
+<div style={{ flex: 1, background: '#F3F2EE', color: '#8a8a85', borderRadius: '10px', padding: '12px', fontSize: '13px', textAlign: 'center' }}>
+📷 Veio do Instagram — edite acima quando tiver o telefone
+</div>
+)}
 </div>
 </div>
 </div>

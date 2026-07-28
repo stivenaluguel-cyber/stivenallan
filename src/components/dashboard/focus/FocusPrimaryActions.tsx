@@ -4,6 +4,7 @@ import { D } from './tokens'
 
 type Props = {
   disabled?: boolean
+  recommendedAction?: 'followup' | 'visita' | 'whatsapp' | 'atualizar_etapa'
   onPerdido: () => void
   onPular: () => void
   onFollowUp: () => void
@@ -15,7 +16,7 @@ type Props = {
 // ícone + texto + atalho de teclado indicado no title (os atalhos de fato
 // são tratados no componente pai, pra funcionar mesmo com o foco fora
 // destes botões).
-export function FocusPrimaryActions({ disabled, onPerdido, onPular, onFollowUp, onVisita }: Props) {
+export function FocusPrimaryActions({ disabled, recommendedAction, onPerdido, onPular, onFollowUp, onVisita }: Props) {
   const base: React.CSSProperties = {
     flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
     padding: '10px 6px', minHeight: 56, borderRadius: 10, border: '1px solid ' + D.line,
@@ -32,13 +33,13 @@ export function FocusPrimaryActions({ disabled, onPerdido, onPular, onFollowUp, 
         <SkipForward size={20} />
         Pular
       </button>
-      <button disabled={disabled} onClick={onFollowUp} title="Follow-up (F)" aria-label="Agendar follow-up" style={{ ...base, color: D.blue }}>
+      <button disabled={disabled} onClick={onFollowUp} title="Follow-up (F)" aria-label="Agendar follow-up" style={{ ...base, color: D.blue, borderColor: recommendedAction === 'followup' ? D.blue : D.line, boxShadow: recommendedAction === 'followup' ? '0 0 0 2px rgba(59,130,246,0.14)' : 'none' }}>
         <CalendarClock size={20} />
-        Follow-up
+        {recommendedAction === 'followup' ? 'Follow-up · recomendado' : 'Follow-up'}
       </button>
-      <button disabled={disabled} onClick={onVisita} title="Visita (V)" aria-label="Registrar visita" style={{ ...base, color: D.green }}>
+      <button disabled={disabled} onClick={onVisita} title="Visita (V)" aria-label="Registrar visita" style={{ ...base, color: D.green, borderColor: recommendedAction === 'visita' ? D.green : D.line, boxShadow: recommendedAction === 'visita' ? '0 0 0 2px rgba(34,197,94,0.14)' : 'none' }}>
         <MapPin size={20} />
-        Visita
+        {recommendedAction === 'visita' ? 'Visita · recomendada' : 'Visita'}
       </button>
       <style>{`
         @media (max-width: 640px) {

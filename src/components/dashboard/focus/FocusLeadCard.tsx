@@ -1,10 +1,11 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
-import { ArrowUpRight, Building2, CalendarDays, MessageCircle, PenLine, Repeat, Wallet } from 'lucide-react'
+import { ArrowUpRight, Building2, CalendarDays, CircleAlert, Lightbulb, MessageCircle, PenLine, Repeat, Wallet } from 'lucide-react'
 import { D, fmt, tempInfo } from './tokens'
 import { LeadAttentionBadges } from './LeadAttentionBadge'
 import { ESTAGIOS_FUNIL } from '@/lib/dashboard/estagios'
+import { temWhatsappReal } from '@/lib/leads/normalize'
 import type { FocusQueueItem } from '@/lib/dashboard/use-focus-queue'
 
 function iniciais(nome?: string | null, whatsapp?: string) {
@@ -80,6 +81,23 @@ export function FocusLeadCard({ item, contatoPendenteConfirmacao, processando, o
         <div style={{ marginTop: 12 }}>
           <LeadAttentionBadges item={item} />
         </div>
+
+        <div style={{ marginTop: 14, display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 8 }}>
+          <div style={{ background: item.prioridade.level === 'urgent' ? '#FFF7ED' : '#F7F7F5', border: '1px solid ' + (item.prioridade.level === 'urgent' ? '#FED7AA' : D.line), borderRadius: 10, padding: '10px 11px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5, color: item.prioridade.level === 'urgent' ? '#C2410C' : D.muted, fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <CircleAlert size={12} /> Por que está aqui
+            </div>
+            <div style={{ color: D.ink, fontSize: 13, fontWeight: 750, marginTop: 4 }}>{item.prioridade.title}</div>
+            <div style={{ color: D.muted, fontSize: 12, marginTop: 2, lineHeight: 1.35 }}>{item.prioridade.detail}</div>
+          </div>
+          <div style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 10, padding: '10px 11px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#15803D', fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <Lightbulb size={12} /> Próxima melhor ação
+            </div>
+            <div style={{ color: D.ink, fontSize: 13, fontWeight: 750, marginTop: 4 }}>{item.recomendacao.title}</div>
+            <div style={{ color: D.muted, fontSize: 12, marginTop: 2, lineHeight: 1.35 }}>{item.recomendacao.detail}</div>
+          </div>
+        </div>
       </div>
 
       <div style={{ padding: '16px 22px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(140px,1fr))', gap: 12, borderBottom: '1px solid ' + D.line }}>
@@ -134,12 +152,21 @@ export function FocusLeadCard({ item, contatoPendenteConfirmacao, processando, o
 
       <div style={{ padding: '14px 22px', display: 'flex', flexDirection: 'column', gap: 10 }}>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          <button
-            onClick={onAbrirWhatsApp}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#25D366', color: '#fff', border: 'none', borderRadius: 8, padding: '9px 14px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', minHeight: 40 }}
-          >
-            <MessageCircle size={14} /> WhatsApp
-          </button>
+          {temWhatsappReal(lead.whatsapp) ? (
+            <button
+              onClick={onAbrirWhatsApp}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#25D366', color: '#fff', border: item.recomendacao.action === 'whatsapp' ? '2px solid #15803D' : 'none', borderRadius: 8, padding: '9px 14px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', minHeight: 40, boxShadow: item.recomendacao.action === 'whatsapp' ? '0 0 0 2px rgba(34,197,94,0.16)' : 'none' }}
+            >
+              <MessageCircle size={14} /> {item.recomendacao.action === 'whatsapp' ? 'WhatsApp · recomendado' : 'WhatsApp'}
+            </button>
+          ) : (
+            <span
+              title="Lead veio de DM do Instagram — ainda sem telefone. Responda por lá e edite o lead quando conseguir o número."
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: D.bg, color: D.muted, border: '1px solid ' + D.line, borderRadius: 8, padding: '9px 14px', fontSize: 12.5, fontWeight: 700, minHeight: 40 }}
+            >
+              <MessageCircle size={14} /> Só Instagram (sem telefone)
+            </span>
+          )}
           <button
             onClick={() => setNotaAberta((v) => !v)}
             style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: D.bg, color: D.ink, border: '1px solid ' + D.line, borderRadius: 8, padding: '9px 14px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', minHeight: 40 }}

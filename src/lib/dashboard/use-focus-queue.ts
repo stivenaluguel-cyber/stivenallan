@@ -30,6 +30,8 @@ export type FocusQueueItem = {
   nuncaContatado: boolean
   quente: boolean
   diasSemContato: number | null
+  prioridade: { title: string; detail: string; level: 'urgent' | 'attention' | 'normal' }
+  recomendacao: { action: 'whatsapp' | 'followup' | 'visita' | 'atualizar_etapa'; title: string; detail: string }
   proximoEvento: { titulo: string; inicio: string; tipo: string } | null
   proximaVisita: { id: string; titulo: string; inicio: string } | null
 }

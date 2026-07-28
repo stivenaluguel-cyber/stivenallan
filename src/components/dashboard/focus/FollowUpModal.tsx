@@ -12,12 +12,12 @@ const CANAIS = [
   { value: 'outro', label: 'Outro' },
 ]
 
-export function FollowUpModal({ onClose, onSubmit }: { onClose: () => void; onSubmit: (payload: FollowUpPayload) => Promise<void> }) {
+export function FollowUpModal({ onClose, onSubmit, contexto }: { onClose: () => void; onSubmit: (payload: FollowUpPayload) => Promise<void>; contexto?: string }) {
   const amanha = new Date(Date.now() + 86_400_000).toISOString().slice(0, 10)
   const [data, setData] = useState(amanha)
   const [horario, setHorario] = useState('09:00')
   const [canal, setCanal] = useState('whatsapp')
-  const [observacao, setObservacao] = useState('')
+  const [observacao, setObservacao] = useState(contexto ?? '')
   const [salvando, setSalvando] = useState(false)
   const [erro, setErro] = useState('')
 
