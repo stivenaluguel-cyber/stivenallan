@@ -105,10 +105,10 @@ export default function DashboardHome() {
 
         {cubScraper && !cubScraper.online && (
           <div style={{ background: '#FEF3C7', border: '1px solid #F5C542', borderRadius: 10, padding: '14px 18px', marginBottom: 24, display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-            <span style={{ fontSize: 18 }}>⚠️</span>
-            <div>
+            <span style={{ fontSize: 18, flexShrink: 0 }}>⚠️</span>
+            <div style={{ flex: 1, minWidth: 0 }}>
               <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#8A5A00' }}>CUB/SC do site público pode estar desatualizado</p>
-              <p style={{ margin: '4px 0 0', fontSize: 13, color: '#8A5A00', lineHeight: 1.5 }}>
+              <p style={{ margin: '4px 0 0', fontSize: 13, color: '#8A5A00', lineHeight: 1.5, overflowWrap: 'break-word' }}>
                 O scraping automático do Sinduscon (usado em /indicadores e na home) falhou nesta checagem. O site está mostrando um valor de fallback ({fmt(cubScraper.valor_m2)}/m², ref. {cubScraper.usar_em_label}) — confira manualmente em{' '}
                 <a href="https://sinduscon-fpolis.org.br/" target="_blank" rel="noopener noreferrer" style={{ color: '#8A5A00', textDecoration: 'underline' }}>sinduscon-fpolis.org.br</a>.
               </p>

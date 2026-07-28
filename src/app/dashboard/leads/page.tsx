@@ -233,8 +233,8 @@ const [savingNotes, setSavingNotes] = useState(false)
           <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: D.ink }}>Pipeline de Leads</h1>
           <p style={{ margin: '4px 0 0', fontSize: 13, color: D.muted }}>{filtrados.length} lead(s){busca ? ' encontrados' : ''}</p>
         </div>
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-          <input value={busca} onChange={(e) => setBusca(e.target.value)} placeholder='Buscar nome ou WhatsApp...' style={{ padding: '10px 12px', borderRadius: 8, border: '1px solid ' + D.line, background: '#fff', color: D.ink, fontSize: 14, outline: 'none', minWidth: 220 }} />
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+          <input value={busca} onChange={(e) => setBusca(e.target.value)} placeholder='Buscar nome ou WhatsApp...' style={{ padding: '10px 12px', borderRadius: 8, border: '1px solid ' + D.line, background: '#fff', color: D.ink, fontSize: 14, outline: 'none', flex: '1 1 200px', minWidth: 0 }} />
           <button onClick={exportCSV} style={{ padding: '10px 14px', borderRadius: 8, border: '1px solid ' + D.line, background: '#fff', color: D.ink, fontWeight: 600, cursor: 'pointer', fontSize: 13, whiteSpace: 'nowrap' }}>Exportar CSV</button>
         <button onClick={() => setModalAberto(true)} style={{ padding: '10px 18px', borderRadius: 8, border: 'none', background: D.bronze, color: '#fff', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>+ Novo Lead</button>
         </div>
@@ -283,9 +283,9 @@ onClick={(e) => { if (e.target === e.currentTarget) setSelectedLead(null) }}
 style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)', padding: '16px' }}
 >
 <div style={{ position: 'relative', width: '100%', maxWidth: '520px', maxHeight: '85vh', overflowY: 'auto', backgroundColor: '#ffffff', borderRadius: '16px', boxShadow: '0 20px 60px rgba(0,0,0,0.25)' }}>
-<div style={{ background: '#D24E22', padding: '20px 24px', borderRadius: '16px 16px 0 0' }}>
-<h2 style={{ color: '#fff', fontSize: '20px', fontWeight: 700, margin: 0 }}>{selectedLead.nome ?? 'Sem nome'}</h2>
-<p style={{ color: 'rgba(255,255,255,0.85)', fontSize: '13px', margin: '4px 0 0' }}>
+<div style={{ background: '#D24E22', padding: '20px 190px 20px 24px', borderRadius: '16px 16px 0 0' }}>
+<h2 style={{ color: '#fff', fontSize: '20px', fontWeight: 700, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{selectedLead.nome ?? 'Sem nome'}</h2>
+<p style={{ color: 'rgba(255,255,255,0.85)', fontSize: '13px', margin: '4px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
 {selectedLead.estagio_funil?.replace(/_/g, ' ')} · {selectedLead.origem ?? 'origem desconhecida'}
 </p>
 </div>

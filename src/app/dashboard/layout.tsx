@@ -85,7 +85,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           <span style={{ width: 34, height: 34, borderRadius: 9, background: D.bronze, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 15, fontWeight: 800, flexShrink: 0 }}>SA</span>
           <span style={{ fontSize: 15, color: D.onDark, fontWeight: 700, whiteSpace: 'nowrap' }}>SA Imóveis</span>
         </button>
-        <NotificationBell variant="dark" />
+        <NotificationBell variant="dark" align="left" />
       </div>
 
       <nav style={{ display: 'flex', flexDirection: 'column', gap: 18, flex: 1 }}>
@@ -125,7 +125,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
     <div style={{ minHeight: '100vh', background: '#F3F2EE', fontFamily: 'Inter, system-ui, sans-serif' }}>
       <aside className="sa-sidebar"
-        style={{ position: 'fixed', top: 0, left: 0, bottom: 0, width: 236, background: D.sidebar, borderRight: '1px solid ' + D.lineDark, padding: '20px 14px', display: 'flex', flexDirection: 'column', zIndex: 50 }}>
+        style={{ position: 'fixed', top: 0, left: 0, bottom: 0, width: 236, background: D.sidebar, borderRight: '1px solid ' + D.lineDark, padding: '20px 14px', display: 'flex', flexDirection: 'column', zIndex: 50, overflowY: 'auto' }}>
         {SidebarContent}
       </aside>
 
@@ -150,7 +150,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       {menuOpen && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 60 }} onClick={() => setMenuOpen(false)}>
           <aside onClick={e => e.stopPropagation()}
-            style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: 250, background: D.sidebar, padding: '20px 14px', display: 'flex', flexDirection: 'column' }}>
+            style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: 250, background: D.sidebar, padding: '20px 14px', display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
             {SidebarContent}
           </aside>
         </div>
