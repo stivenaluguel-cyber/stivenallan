@@ -160,6 +160,9 @@ export default function GuiaFinanciamentoDiretoPage() {
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
           É importante distinguir o CUB/SC do INCC (nacional, calculado pela FGV) e do IGPM. Na Fontana, as parcelas durante a obra são corrigidas pelo CUB/SC, e o saldo direto pós-chaves é corrigido pelo IGPM mais 0,75% a.m. Essa previsibilidade permite ao comprador planejar seu fluxo de caixa com mais clareza do que em contratos indexados a índices de inflação geral.
         </p>
+        <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
+          Para entender em detalhe como a correção pelo CUB/SC afeta suas parcelas mês a mês, veja o <Link href="/guia/cub-sc-correcao-parcelas" style={{ color: '#1A5C3A', fontWeight: 600 }}>guia dedicado sobre CUB/SC e correção de parcelas</Link>.
+        </p>
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Passo a passo para comprar com financiamento direto</h2>
         <ol style={{ fontSize: 15, lineHeight: 2.2, color: '#333', paddingLeft: 24 }}>
@@ -183,10 +186,16 @@ export default function GuiaFinanciamentoDiretoPage() {
         <p style={{ fontSize: 14, lineHeight: 1.8, color: '#666', marginTop: 12 }}>
           Condições, aprovação, entrada, parcelas, índices e prazos variam por empreendimento e tabela vigente. Consulte sempre as condições atualizadas com o corretor antes de decidir. Regras de uso do FGTS: <a href="https://www.caixa.gov.br/voce/habitacao/Paginas/utilizacao-fgts.aspx" target="_blank" rel="noopener noreferrer" style={{ color: '#1A5C3A' }}>Caixa Econômica Federal</a>.
         </p>
+        <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
+          Se você está avaliando financiamento direto com a construtora versus financiamento bancário tradicional, veja a <Link href="/guia/financiamento-direto-vs-bancario" style={{ color: '#1A5C3A', fontWeight: 600 }}>comparação completa entre os dois modelos</Link>.
+        </p>
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Empreendimentos com financiamento direto em Criciuma e região</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
           A Construtora Fontana tem empreendimentos com financiamento direto em Criciuma (bairros Centro, Michel, Rio Maina, Santa Barbara, Cruzeiro do Sul), Icara, Sideropolis, Laguna, Balneario Rincao e Balneario Picarras. Cada empreendimento tem seu próprio plano de pagamento: alguns com entrega mais próxima e parcelas menores, outros em fase inicial com mais prazo e condições diferenciadas de entrada.
+        </p>
+        <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
+          Nas cidades do litoral (Laguna e Balneário Rincão), veja também o <Link href="/guia/apartamento-frente-mar-rincao-ou-laguna" style={{ color: '#1A5C3A', fontWeight: 600 }}>guia comparativo de apartamentos frente-mar</Link>.
         </p>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
           Para saber qual empreendimento tem a melhor combinação de localização, prazo de entrega e condições de pagamento para o seu perfil, o ideal é conversar diretamente com Stiven Allan, CRECI 60.275, que acompanha todos os lançamentos Fontana e monta simulações personalizadas sem custo.

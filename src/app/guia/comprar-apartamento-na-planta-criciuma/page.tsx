@@ -120,6 +120,9 @@ export default function GuiaComprarNaPlantaPage() {
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
           Criciúma é o maior polo econômico do sul catarinense, com mercado imobiliário aquecido e demanda por apartamentos modernos. A Construtora Fontana é uma das principais construtoras com lançamentos em vários bairros da cidade e no litoral sul catarinense.
         </p>
+        <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
+          Se você está em dúvida entre comprar na planta ou um imóvel pronto, veja o <Link href="/guia/apartamento-na-planta-vs-pronto" style={{ color: '#1A5C3A', fontWeight: 600 }}>guia comparativo entre apartamento na planta e pronto para morar</Link>.
+        </p>
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Etapas para comprar na planta</h2>
         <ol style={{ fontSize: 15, lineHeight: 2.2, color: '#333', paddingLeft: 24 }}>
@@ -159,6 +162,9 @@ export default function GuiaComprarNaPlantaPage() {
         </p>
         <p style={{ fontSize: 16, lineHeight: 1.7, color: '#333', marginTop: 12 }}>
           Vale considerar também o perfil de cada região ao comprar na planta. O Centro e o bairro Michel reúnem os empreendimentos de alto padrão, com apartamentos de 3 e 4 suítes e áreas de lazer completas, enquanto Rio Maina e Santa Bárbara concentram opções de melhor custo-benefício com financiamento direto acessível. Já Balneário Rincão, Balneário Piçarras e Laguna são voltados a quem busca imóveis de veraneio no litoral sul catarinense. Definir a região ajuda a alinhar o investimento ao seu objetivo, seja moradia ou valorização.
+        </p>
+        <p style={{ fontSize: 16, lineHeight: 1.7, color: '#333', marginTop: 12 }}>
+          Para uma visão mais ampla de onde investir no Sul de Santa Catarina, considerando cada cidade e perfil de comprador, veja o <Link href="/guia/onde-investir-sul-santa-catarina" style={{ color: '#1A5C3A', fontWeight: 600 }}>guia dedicado</Link>.
         </p>
 
         <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Vantagens e atenções ao comprar na planta</h2>
