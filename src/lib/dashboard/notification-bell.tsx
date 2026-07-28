@@ -26,7 +26,7 @@ function tempoRelativo(iso: string): string {
   return `${Math.floor(h / 24)}d`
 }
 
-export function NotificationBell({ variant = 'dark' }: { variant?: 'dark' | 'light' }) {
+export function NotificationBell({ variant = 'dark', align = 'right' }: { variant?: 'dark' | 'light'; align?: 'left' | 'right' }) {
   const router = useRouter()
   const [items, setItems] = useState<Notificacao[]>([])
   const [open, setOpen] = useState(false)
@@ -116,8 +116,9 @@ export function NotificationBell({ variant = 'dark' }: { variant?: 'dark' | 'lig
           style={{
             position: 'absolute',
             top: '110%',
-            right: 0,
+            ...(align === 'left' ? { left: 0 } : { right: 0 }),
             width: 340,
+            maxWidth: 'calc(100vw - 32px)',
             maxHeight: 420,
             overflowY: 'auto',
             background: '#fff',

@@ -85,7 +85,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           <span style={{ width: 34, height: 34, borderRadius: 9, background: D.bronze, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 15, fontWeight: 800, flexShrink: 0 }}>SA</span>
           <span style={{ fontSize: 15, color: D.onDark, fontWeight: 700, whiteSpace: 'nowrap' }}>SA Imóveis</span>
         </button>
-        <NotificationBell variant="dark" />
+        <NotificationBell variant="dark" align="left" />
       </div>
 
       <nav style={{ display: 'flex', flexDirection: 'column', gap: 18, flex: 1 }}>
