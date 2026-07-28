@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { requireAdmin } from '@/lib/dashboard/admin-auth'
+import {
+  criarAcumuladorParcial,
+  montarConstrutoraSlug,
+  normalizarStatusObra,
+  normalizarStatusVenda,
+} from '@/lib/imoveis/normalizar'
 
 export const dynamic = 'force-dynamic';
 
@@ -25,8 +31,12 @@ function toFormShape(p: any) {
     descricao_completa: p.descricao,
     status: p.status,
     tipo: p.status,
+    // Colunas independentes: `status` é o andamento da OBRA (na planta / em
+    // obras / pronto / entregue) e `status_venda` é o comercial (ativo /
+    // pausado / encerrado). Antes as duas saíam da mesma coluna, o que fazia
+    // o seletor da listagem gravar por cima do status de obra.
     status_obra: p.status,
-    status_venda: p.status,
+    status_venda: p.status_venda ?? 'ativo',
     exibir_preco: p.exibir_preco,
     preco_a_partir: p.preco,
     preco_a_partir_de: p.preco,
@@ -78,38 +88,51 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
   const t0 = Array.isArray(tipologias) && tipologias.length ? tipologias[0] : null
 
-  const row: any = {
-    slug: form.slug,
-    construtora_slug: form.construtora ?? form.construtora_slug ?? null,
-    nome: form.nome ?? null,
-    descricao: form.descricao_completa ?? null,
-    descricao_curta: form.descricao_curta ?? null,
-    cidade: form.cidade ?? null,
-    uf: form.uf ?? null,
-    bairro: form.bairro ?? null,
-    endereco: form.endereco ?? null,
-    cor_acento: form.cor_acento ?? null,
-    video_url: form.video_url ?? null,
-    galeria: Array.isArray(form.imagens_urls) ? form.imagens_urls : [],
-    diferenciais: Array.isArray(diferenciais)
-      ? diferenciais.map((d: any) => (typeof d === 'string' ? d : d?.descricao)).filter(Boolean)
-      : [],
-    faq: Array.isArray(form.faq) ? form.faq : [],
-    dormitorios: form.dormitorios_min || form.dormitorios || (t0 && t0.dormitorios != null ? String(t0.dormitorios) : null),
-    suites: form.suites ?? (t0 && t0.suites != null ? String(t0.suites) : null),
-    vagas: form.vagas ?? (t0 && t0.vagas != null ? String(t0.vagas) : null),
-    metragem: form.area_privativa_m2 || form.metragem || (t0 && t0.area_privativa_m2 != null ? String(t0.area_privativa_m2) : null),
-    previsao_entrega: form.previsao_entrega ?? null,
-    status: form.status_venda ?? form.status_obra ?? null,
-    exibir_preco: form.exibir_preco ?? false,
-    preco: form.preco_a_partir_de ?? form.preco_a_partir ?? null,
-    oculto: form.oculto ?? false,
-    ativo: form.ativo ?? true,
-  }
-  const _capa = form.imagem_principal || form.imagem_capa_url
-  if (_capa) row.cover_image_url = _capa
+  // Update PARCIAL de verdade — ver criarAcumuladorParcial() para o histórico
+  // do bug (uma chamada com só {status_venda} zerava a linha inteira).
+  const { row, set } = criarAcumuladorParcial()
 
-  Object.keys(row).forEach((k) => { if (row[k] === undefined) delete row[k] })
+  set('slug', form.slug)
+  // Slugificado: o valor vai direto pra URL pública. Sem isso, "Acme Construções"
+  // gerava /empreendimento/Acme Construções/... e a página respondia 404.
+  set('construtora_slug', montarConstrutoraSlug(form))
+  set('nome', form.nome)
+  set('descricao', form.descricao_completa)
+  set('descricao_curta', form.descricao_curta)
+  set('cidade', form.cidade)
+  set('uf', form.uf)
+  set('bairro', form.bairro)
+  set('endereco', form.endereco)
+  set('cor_acento', form.cor_acento)
+  set('video_url', form.video_url)
+  set('frase', form.frase)
+  if (Array.isArray(form.imagens_urls)) set('galeria', form.imagens_urls)
+  if (Array.isArray(form.plantas)) set('plantas', form.plantas)
+  if (Array.isArray(form.lazer)) set('lazer', form.lazer)
+  if (Array.isArray(diferenciais)) {
+    set('diferenciais', diferenciais.map((d: any) => (typeof d === 'string' ? d : d?.descricao)).filter(Boolean))
+  }
+  if (Array.isArray(form.faq)) set('faq', form.faq)
+  set('dormitorios', form.dormitorios_min || form.dormitorios || (t0 && t0.dormitorios != null ? String(t0.dormitorios) : undefined))
+  set('suites', form.suites ?? (t0 && t0.suites != null ? String(t0.suites) : undefined))
+  set('vagas', form.vagas ?? (t0 && t0.vagas != null ? String(t0.vagas) : undefined))
+  set('metragem', form.area_privativa_m2 || form.metragem || (t0 && t0.area_privativa_m2 != null ? String(t0.area_privativa_m2) : undefined))
+  set('previsao_entrega', form.previsao_entrega)
+  // status (obra) e status_venda são colunas independentes — uma nunca mais
+  // sobrescreve a outra. normalizar* devolve undefined quando não dá pra
+  // mapear, e aí o campo simplesmente não entra no update.
+  set('status', normalizarStatusObra(form.status_obra) ?? undefined)
+  set('status_venda', normalizarStatusVenda(form.status_venda) ?? undefined)
+  set('exibir_preco', form.exibir_preco)
+  set('preco', form.preco_a_partir_de ?? form.preco_a_partir)
+  set('oculto', form.oculto)
+  set('ativo', form.ativo)
+  const _capa = form.imagem_principal || form.imagem_capa_url
+  if (_capa) set('cover_image_url', _capa)
+
+  if (Object.keys(row).length === 0) {
+    return NextResponse.json({ error: 'Nenhum campo para atualizar.' }, { status: 400 })
+  }
 
   const { data: emp, error: empError } = await supabase
     .from('properties')

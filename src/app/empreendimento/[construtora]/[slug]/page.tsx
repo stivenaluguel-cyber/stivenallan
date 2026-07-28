@@ -14,6 +14,7 @@ import { LeadCaptureModal } from '@/components/LeadCaptureModal';
 import FormContato from './FormContato';
 import Image from 'next/image';
 import PropertyPageTemplate, { type PropertyData } from '@/components/PropertyPageTemplate';
+import { resolverFaq } from '@/lib/imoveis/faq-padrao';
 import { SITE_URL } from '@/lib/site';
 export const dynamic = 'force-dynamic';
 
@@ -123,7 +124,13 @@ export default async function EmpreendimentoPage({ params }: PageProps) {
         .eq('construtora_slug', construtora)
         .maybeSingle();
       if (dbProp && dbProp.oculto !== true && dbProp.ativo !== false) {
-        return <PropertyPageTemplate data={dbProp as unknown as PropertyData} relacionados={false} />;
+        // FAQ garantido: o formulário do painel não tem campo de FAQ, então sem
+        // isso toda página de construtora nova nascia sem FAQPage no JSON-LD e
+        // sem a seção — justamente o formato que mais faz a página ser citada.
+        const comFaq = { ...dbProp, faq: resolverFaq(dbProp.faq, dbProp) };
+        // relacionados agora ligado: a página do banco não tinha NENHUM link
+        // interno de saída, virando um beco sem saída para o rastreador.
+        return <PropertyPageTemplate data={comFaq as unknown as PropertyData} />;
       }
     } catch {
       // tabela/coluna ausente ou erro de conexão: cai no notFound abaixo

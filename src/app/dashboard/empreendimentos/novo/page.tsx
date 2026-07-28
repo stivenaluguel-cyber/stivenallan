@@ -12,6 +12,7 @@ const card: React.CSSProperties = { background: '#202327', borderRadius: 12, pad
 
 type Tipologia = { dormitorios: number; suites: number; vagas: number; area_privativa_m2: number; area_total_m2: number; preco_a_partir_de: number; preco_ate: number }
 type Diferencial = { icone: string; descricao: string; categoria: string }
+type FaqCampo = { pergunta: string; resposta: string }
 
 export default function NovoEmpreendimentoPage() {
   const router = useRouter()
@@ -20,9 +21,9 @@ export default function NovoEmpreendimentoPage() {
   const [form, setForm] = useState({
     nome: '', construtora: '', cidade: '', uf: 'SC', slug: '',
     bairro: '', endereco: '', descricao_curta: '', descricao_completa: '',
-    status_obra: 'lancamento', status_venda: 'ativo',
+    status_obra: 'na planta', status_venda: 'ativo',
     preco_a_partir: '', whatsapp: '5548991642332',
-    imagens_urls: '', video_url: '',
+    imagens_urls: '', video_url: '', imagem_principal: '',
   })
   const [tipologias, setTipologias] = useState<Tipologia[]>([
     { dormitorios: 2, suites: 1, vagas: 1, area_privativa_m2: 60, area_total_m2: 70, preco_a_partir_de: 0, preco_ate: 0 }
@@ -30,6 +31,10 @@ export default function NovoEmpreendimentoPage() {
   const [diferenciais, setDiferenciais] = useState<Diferencial[]>([
     { icone: '🏊', descricao: 'Piscina', categoria: 'lazer' }
   ])
+  // FAQ é o formato que mais faz a página aparecer em resultados enriquecidos e
+  // ser citada por assistentes de IA. Se ficar vazio, o servidor monta um FAQ
+  // básico a partir dos dados preenchidos (ver gerarFaqPadrao).
+  const [faq, setFaq] = useState<FaqCampo[]>([])
 
   function setField(field: string, value: string) {
     setForm(prev => {
@@ -50,6 +55,9 @@ export default function NovoEmpreendimentoPage() {
   function addDif() { setDiferenciais(p => [...p, { icone: '⭐', descricao: '', categoria: 'lazer' }]) }
   function updDif(i: number, f: string, v: string) { setDiferenciais(p => p.map((d, j) => j === i ? { ...d, [f]: v } : d)) }
   function remDif(i: number) { setDiferenciais(p => p.filter((_, j) => j !== i)) }
+  function addFaq() { setFaq(p => [...p, { pergunta: '', resposta: '' }]) }
+  function updFaq(i: number, f: string, v: string) { setFaq(p => p.map((q, j) => j === i ? { ...q, [f]: v } : q)) }
+  function remFaq(i: number) { setFaq(p => p.filter((_, j) => j !== i)) }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -64,6 +72,7 @@ export default function NovoEmpreendimentoPage() {
           imagens_urls: imgs,
           tipologias: tipologias.filter(t => t.area_privativa_m2 > 0),
           diferenciais: diferenciais.filter(d => d.descricao.trim()),
+          faq: faq.filter(q => q.pergunta.trim() && q.resposta.trim()),
         }),
       })
       const json = await res.json()
@@ -109,10 +118,14 @@ export default function NovoEmpreendimentoPage() {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 16 }}>
             <div><label style={lbl}>Status Obra</label>
+              {/* Valores = vocabulário público (StatusObra em @/lib/empreendimentos).
+                  Antes eram lancamento/em_obras, que o site não reconhecia e
+                  exibia como "Sob consulta". */}
               <select style={inp} value={form.status_obra} onChange={e => setField('status_obra', e.target.value)}>
-                <option value="lancamento">Lançamento</option>
-                <option value="em_obras">Em Obras</option>
-                <option value="pronto">Pronto</option>
+                <option value="na planta">Na planta</option>
+                <option value="em obras">Em obras</option>
+                <option value="pronto">Pronto para morar</option>
+                <option value="entregue">Entregue</option>
               </select>
             </div>
             <div><label style={lbl}>Status Venda</label>
@@ -140,6 +153,14 @@ export default function NovoEmpreendimentoPage() {
           <div style={{ marginBottom: 16 }}>
             <label style={lbl}>URLs das Imagens (uma por linha)</label>
             <textarea rows={4} style={{ ...inp, resize: 'vertical', fontFamily: 'monospace', fontSize: 12 } as React.CSSProperties} value={form.imagens_urls} onChange={e => setField('imagens_urls', e.target.value)} placeholder="https://drive.google.com/uc?export=view&id=..." />
+          </div>
+          {/* Sem capa o empreendimento some do catálogo /empreendimentos (o
+              filtro exige imagem) e o card de compartilhamento sai sem foto.
+              Antes esse campo só existia na tela de edição, então todo cadastro
+              novo nascia quebrado até alguém editar de novo. */}
+          <div style={{ marginBottom: 16 }}>
+            <label style={lbl}>Imagem de capa</label>
+            <input style={inp} value={form.imagem_principal} onChange={e => setField('imagem_principal', e.target.value)} placeholder="Deixe em branco para usar a primeira imagem acima" />
           </div>
           <div><label style={lbl}>URL do Vídeo</label><input style={inp} value={form.video_url} onChange={e => setField('video_url', e.target.value)} placeholder="https://youtube.com/embed/..." /></div>
         </div>
@@ -184,6 +205,25 @@ export default function NovoEmpreendimentoPage() {
             </div>
           ))}
           <button type="button" onClick={addDif} style={{ background: 'none', border: '1px dashed #c9a24b', color: '#c9a24b', borderRadius: 8, padding: '8px 16px', cursor: 'pointer', width: '100%' }}>+ Adicionar Diferencial</button>
+        </div>
+
+        {/* Perguntas frequentes */}
+        <div style={card}>
+          <h2 style={{ fontSize: 16, fontWeight: 700, marginBottom: 8, marginTop: 0, color: '#c9a24b' }}>❓ Perguntas Frequentes</h2>
+          <p style={{ fontSize: 13, color: '#a7adb4', marginTop: 0, marginBottom: 20, lineHeight: 1.6 }}>
+            É o que faz a página aparecer no Google com as perguntas em destaque e ser citada por assistentes de IA.
+            Se você deixar em branco, geramos automaticamente a partir dos dados acima (localização, plantas, obra e pagamento).
+          </p>
+          {faq.map((q, idx) => (
+            <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1fr 40px', gap: 12, marginBottom: 12, alignItems: 'start' }}>
+              <div>
+                <input style={{ ...inp, marginBottom: 8 }} value={q.pergunta} onChange={e => updFaq(idx, 'pergunta', e.target.value)} placeholder="Pergunta. Ex: O condomínio aceita pet?" />
+                <textarea rows={2} style={{ ...inp, resize: 'vertical' } as React.CSSProperties} value={q.resposta} onChange={e => updFaq(idx, 'resposta', e.target.value)} placeholder="Resposta completa — é este texto que o Google e as IAs leem." />
+              </div>
+              <button type="button" onClick={() => remFaq(idx)} style={{ background: '#ef444422', border: '1px solid #ef444433', color: '#ef4444', borderRadius: 8, cursor: 'pointer', height: 38, fontSize: 16 }}>✕</button>
+            </div>
+          ))}
+          <button type="button" onClick={addFaq} style={{ background: 'none', border: '1px dashed #c9a24b', color: '#c9a24b', borderRadius: 8, padding: '8px 16px', cursor: 'pointer', width: '100%' }}>+ Adicionar Pergunta</button>
         </div>
 
         <div style={{ display: 'flex', gap: 16, justifyContent: 'flex-end' }}>
