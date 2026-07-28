@@ -6,6 +6,7 @@ const { supabaseHolder, evolutionHolder } = vi.hoisted(() => ({
   evolutionHolder: {
     enviarFollowUp: vi.fn(async () => true),
     enviarAlertaEscalada: vi.fn(async () => true),
+    verificarInstancia: vi.fn(async () => ({ ok: true, state: 'open' }) as { ok: true; state: string } | { ok: false; reason: string }),
   },
 }))
 
@@ -17,6 +18,7 @@ vi.mock('@/lib/evolution', () => ({
   // Testes só checam call count e valor de retorno — args não são inspecionados
   enviarFollowUp: () => evolutionHolder.enviarFollowUp(),
   enviarAlertaEscalada: () => evolutionHolder.enviarAlertaEscalada(),
+  verificarInstancia: () => evolutionHolder.verificarInstancia(),
 }))
 
 import { GET } from './route'
@@ -139,6 +141,8 @@ describe('GET /api/cron/followup', () => {
     vi.spyOn(console, 'error').mockImplementation(() => {})
     evolutionHolder.enviarFollowUp.mockClear()
     evolutionHolder.enviarAlertaEscalada.mockClear()
+    evolutionHolder.verificarInstancia.mockClear()
+    evolutionHolder.verificarInstancia.mockResolvedValue({ ok: true, state: 'open' })
   })
 
   afterEach(() => {
@@ -172,6 +176,24 @@ describe('GET /api/cron/followup', () => {
       status: 'skipped',
       motivo: expect.stringMatching(/EVOLUTION/),
     })
+    expect(evolutionHolder.enviarFollowUp).not.toHaveBeenCalled()
+  })
+
+  it('persiste skipped com motivo claro quando a instância Evolution está desconectada', async () => {
+    evolutionHolder.verificarInstancia.mockResolvedValue({ ok: false, reason: 'HTTP 404: Application not found' })
+    const mock = makeSupabase()
+    supabaseHolder.current = mock
+
+    const res = await GET(makeReq({ authorization: 'Bearer cron-secret' }))
+    const json = (await res.json()) as { skipped?: boolean; motivo?: string }
+
+    expect(json.skipped).toBe(true)
+    expect(json.motivo).toMatch(/instância Evolution indisponível.*Application not found/i)
+    expect(mock.cronRunUpdates[0]).toMatchObject({
+      status: 'skipped',
+      motivo: expect.stringMatching(/instância Evolution indisponível/i),
+    })
+    // Falha rápido, antes de processar qualquer lead — não gera N erros repetidos.
     expect(evolutionHolder.enviarFollowUp).not.toHaveBeenCalled()
   })
 
