@@ -24,6 +24,7 @@ import {
   normalizeFirstNameForHash,
   normalizePhoneForHash,
   sha256Hex,
+  trackFormStart,
   trackLeadEvent,
   trackSpaPageView,
   trackViewContent,
@@ -599,5 +600,82 @@ describe('trackLeadEvent — sinal pro Sentry (F-Match-Verify)', () => {
     expect((options.tags as Record<string, unknown>).check).toBe('match-verify')
     // Breadcrumb não é adicionado nesse path
     expect(sentrySpies.addBreadcrumb).not.toHaveBeenCalled()
+  })
+})
+
+describe('trackFormStart — evento de meio de funil no Pixel', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  const params = {
+    empreendimento: 'monte-leone-centro-criciuma-sc',
+    content_name: 'Monte Leone',
+    form_type: 'contact_form' as const,
+  }
+
+  // O motivo de existir: sem isso a Meta só vê PageView, ViewContent e Lead —
+  // e Lead tem volume baixo demais para montar o público "abriu e não enviou".
+  it('emite FormStart no Pixel como evento customizado', () => {
+    const fbqSpy = vi.fn()
+    mountBrowser({ search: '', fbq: fbqSpy, gtag: vi.fn() })
+
+    trackFormStart(params)
+
+    expect(fbqSpy).toHaveBeenCalledWith('trackCustom', 'FormStart', params)
+  })
+
+  it('continua emitindo form_start no GA4', () => {
+    const gtagSpy = vi.fn()
+    mountBrowser({ search: '', fbq: vi.fn(), gtag: gtagSpy })
+
+    trackFormStart(params)
+
+    expect(gtagSpy).toHaveBeenCalledWith('event', 'form_start', params)
+  })
+
+  // Mesmo gate das outras chamadas de Pixel: sem aceite de MARKETING não sai.
+  it('sem consentimento de marketing, nada vai para o Pixel', () => {
+    const fbqSpy = vi.fn()
+    mountBrowser({
+      search: '',
+      consent: consentJson({ analytics: true, marketing: false }),
+      fbq: fbqSpy,
+      gtag: vi.fn(),
+    })
+
+    trackFormStart(params)
+
+    expect(fbqSpy).not.toHaveBeenCalled()
+  })
+
+  // Analytics negado não pode arrastar o Pixel junto — são categorias separadas.
+  it('sem consentimento de analytics, o Pixel ainda emite e o GA4 não', () => {
+    const fbqSpy = vi.fn()
+    const gtagSpy = vi.fn()
+    mountBrowser({
+      search: '',
+      consent: consentJson({ analytics: false, marketing: true }),
+      fbq: fbqSpy,
+      gtag: gtagSpy,
+    })
+
+    trackFormStart(params)
+
+    expect(fbqSpy).toHaveBeenCalledWith('trackCustom', 'FormStart', params)
+    expect(gtagSpy).not.toHaveBeenCalled()
+  })
+
+  // Guarda de LGPD: o payload que vai para a Meta não pode carregar dado pessoal.
+  it('o payload enviado à Meta não contém nome, telefone ou e-mail', () => {
+    const fbqSpy = vi.fn()
+    mountBrowser({ search: '', fbq: fbqSpy, gtag: vi.fn() })
+
+    trackFormStart(params)
+
+    const enviado = JSON.stringify(fbqSpy.mock.calls[0][2])
+    for (const proibido of ['nome', 'telefone', 'email', 'whatsapp', 'cpf']) {
+      expect(enviado.toLowerCase().includes(proibido), `"${proibido}" não deveria ir para a Meta`).toBe(false)
+    }
   })
 })

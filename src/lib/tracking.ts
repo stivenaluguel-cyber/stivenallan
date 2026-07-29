@@ -378,8 +378,22 @@ export function trackFormOpen(params: FormParams) {
   gtagAnalytics()?.('event', 'form_open', params)
 }
 
+// Além do GA4, emite `FormStart` no Pixel — o único evento de meio de funil que
+// a Meta passa a ver. Serve para PÚBLICO PERSONALIZADO ("abriu o formulário e
+// não enviou"), não para otimização: com ~5 Leads/28 dias medidos no pixel,
+// nenhum evento deste site tem volume para sair da fase de aprendizado (a Meta
+// pede ~50/semana por conjunto).
+//
+// Evento CUSTOMIZADO em vez de reaproveitar um padrão (InitiateCheckout): o
+// nome descreve o que realmente aconteceu e não contamina a semântica dos
+// relatórios. Segue utilizável em público personalizado e, se um dia houver
+// volume, em conversão personalizada.
+//
+// `params` é FormParams — a tipagem já proíbe nome/telefone/e-mail aqui, então
+// nada de dado pessoal atravessa para a Meta por este caminho.
 export function trackFormStart(params: FormParams) {
   gtagAnalytics()?.('event', 'form_start', params)
+  fbq()?.('trackCustom', 'FormStart', params)
 }
 
 export function trackFormSubmit(params: FormParams) {
