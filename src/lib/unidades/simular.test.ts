@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { faixaDeEntrada, planoDoJson, simular, type PlanoPagamento } from './simular'
+import { faixaDeEntrada, planoDoJson, REFORCO_MAXIMO_EM_PARCELAS, simular, type PlanoPagamento } from './simular'
 
 // Plano REAL da unidade 102 do Pineto (tabela Fontana, Julho/2026).
 // Conferido contra o PDF: entrada + 40 parcelas + 4 reforços = 30% do total,
@@ -64,11 +64,18 @@ describe('simular — cliente ajusta a entrada', () => {
     expect(maior.ateAsChaves).toBe(padrao.ateAsChaves)
   })
 
-  it('prazo e reforços ficam intactos — são estrutura do contrato', () => {
+  it('a QUANTIDADE de parcelas e reforços fica intacta — é estrutura do contrato', () => {
     const s = simular(TOTAL_102, PLANO_102, 120000)!
     expect(s.parcelasQtd).toBe(40)
     expect(s.reforcosQtd).toBe(4)
-    expect(s.reforcoValor).toBe(10488.64)
+  })
+
+  it('o VALOR do reforço acompanha a parcela, para não estourar o teto de 5x', () => {
+    // Esta asserção antes exigia reforço fixo em 10.488,64 — era o bug:
+    // com parcela de 1.195,46 aquilo dava 8,77x o limite contratual.
+    const s = simular(TOTAL_102, PLANO_102, 120000)!
+    expect(s.reforcoValor).toBeLessThan(PLANO_102.reforco_valor)
+    expect(s.reforcoValor / s.parcelaValor).toBeCloseTo(3.75, 2)
   })
 
   it('entrada igual à da tabela é tratada como padrão, não como ajuste', () => {
@@ -142,5 +149,68 @@ describe('planoDoJson', () => {
     expect(p?.entrada).toBe(50000)
     expect(p?.parcelas_qtd).toBe(0)
     expect(p?.cub_quantidade).toBeNull()
+  })
+})
+
+// ─────────────────────────────────────────────────────────────────────
+// Teto do reforço: até 5× a parcela mensal.
+//
+// Regra da Fontana, documentada nos guias do próprio site ("cada reforço
+// equivale a 5 vezes o valor da parcela mensal"). O Pineto opera em 3,75×.
+//
+// A primeira versão desta simulação mantinha o reforço FIXO e só derrubava a
+// parcela — com entrada de R$ 120 mil na unidade 102 o reforço virava 8,77×
+// da parcela, um plano que a construtora não assinaria.
+// ─────────────────────────────────────────────────────────────────────
+describe('simular — teto contratual do reforço', () => {
+  it('o plano da tabela já respeita o teto (Pineto opera em 3,75x)', () => {
+    const s = simular(TOTAL_102, PLANO_102)!
+    expect(s.reforcoEmParcelas).toBe(3.75)
+    expect(s.reforcoEmParcelas).toBeLessThanOrEqual(REFORCO_MAXIMO_EM_PARCELAS)
+  })
+
+  it('entrada alta NÃO estoura o teto — o bug que isso corrige', () => {
+    const s = simular(TOTAL_102, PLANO_102, 120000)!
+    expect(s.reforcoValor / s.parcelaValor).toBeLessThanOrEqual(REFORCO_MAXIMO_EM_PARCELAS)
+    // Antes: reforço ficava em 10.488,64 com parcela de 1.195,46 → 8,77x.
+    expect(s.reforcoValor).toBeLessThan(PLANO_102.reforco_valor)
+  })
+
+  it('parcela e reforço caem JUNTOS, preservando a proporção da tabela', () => {
+    for (const entrada of [70000, 100000, 120000, 180000]) {
+      const s = simular(TOTAL_102, PLANO_102, entrada)!
+      expect(s.reforcoEmParcelas, `entrada ${entrada}`).toBeCloseTo(3.75, 2)
+    }
+  })
+
+  it('a fórmula reproduz a própria tabela — prova de que o modelo está certo', () => {
+    // Aplicando a redistribuição com a entrada DA TABELA, a parcela derivada
+    // tem que bater com a parcela impressa no PDF.
+    const s = simular(TOTAL_102, PLANO_102, PLANO_102.entrada + 0.02)!
+    expect(s.padraoDaTabela).toBe(false) // forçou o caminho do recálculo
+    expect(s.parcelaValor).toBeCloseTo(PLANO_102.parcela_valor, 1)
+    expect(s.reforcoValor).toBeCloseTo(PLANO_102.reforco_valor, 1)
+  })
+
+  it('a conta continua fechando com os dois recalculados', () => {
+    const s = simular(TOTAL_102, PLANO_102, 120000)!
+    const soma = s.entrada + s.parcelasQtd * s.parcelaValor + s.reforcosQtd * s.reforcoValor
+    expect(soma).toBeCloseTo(s.ateAsChaves, 0)
+  })
+
+  it('tabela com razão acima de 5 é GRAMPEADA no teto, não propagada', () => {
+    // Plano hipotético fora da regra: reforço de 8x a parcela.
+    const fora = { ...PLANO_102, parcela_valor: 1000, reforco_valor: 8000 }
+    const s = simular(TOTAL_102, fora, 100000)!
+    expect(s.reforcoEmParcelas).toBe(REFORCO_MAXIMO_EM_PARCELAS)
+    expect(s.reforcoValor / s.parcelaValor).toBeCloseTo(5, 2)
+  })
+
+  it('plano sem reforço nenhum não quebra a divisão', () => {
+    const semReforco = { ...PLANO_102, reforcos_qtd: 0, reforco_valor: 0 }
+    const s = simular(TOTAL_102, semReforco, 100000)!
+    expect(s.reforcoValor).toBe(0)
+    expect(Number.isFinite(s.parcelaValor)).toBe(true)
+    expect(s.entrada + s.parcelasQtd * s.parcelaValor).toBeCloseTo(s.ateAsChaves, 0)
   })
 })

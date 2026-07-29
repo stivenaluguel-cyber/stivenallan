@@ -38,7 +38,22 @@ export type Simulacao = {
   saldoFinanciamento: number
   /** true quando é exatamente o plano da tabela, sem ajuste do cliente. */
   padraoDaTabela: boolean
+  /** Reforço em múltiplos da parcela. Teto contratual: 5. */
+  reforcoEmParcelas: number
 }
+
+/**
+ * Teto contratual do reforço: até 5 vezes a parcela mensal.
+ *
+ * É regra da Fontana, documentada nos guias do próprio site ("cada reforço
+ * equivale a 5 vezes o valor da parcela mensal"). O Pineto opera em 3,75×,
+ * dentro do teto.
+ *
+ * Importa aqui porque a primeira versão desta simulação mantinha o reforço
+ * FIXO e só derrubava a parcela: com entrada de R$ 120 mil na unidade 102, o
+ * reforço virava 8,77× a parcela — um plano que a construtora não assinaria.
+ */
+export const REFORCO_MAXIMO_EM_PARCELAS = 5
 
 const cent = (n: number) => Math.round(n * 100) / 100
 
@@ -86,6 +101,8 @@ export function simular(
       ateAsChavesPercentual: pct(ateAsChavesPadrao, valorTotal),
       saldoFinanciamento: cent(plano.saldo_financiamento),
       padraoDaTabela: true,
+      reforcoEmParcelas: plano.parcela_valor > 0
+        ? Math.round((plano.reforco_valor / plano.parcela_valor) * 100) / 100 : 0,
     }
   }
 
@@ -93,11 +110,24 @@ export function simular(
   // que o que precisa estar quitado até as chaves (acima disso já não é
   // entrada, é quitação — outra conversa, com desconto à vista).
   const entrada = Math.min(Math.max(entradaDesejada, 0), ateAsChavesPadrao)
-  const restanteParcelado = ateAsChavesPadrao - entrada - reforcosQtd * plano.reforco_valor
 
-  // Entrada tão alta que os reforços sozinhos já passam do necessário: zera as
-  // parcelas em vez de devolver valor negativo.
-  const parcelaValor = restanteParcelado > 0 ? restanteParcelado / parcelasQtd : 0
+  // Parcela e reforço caem JUNTOS, preservando a proporção da tabela.
+  //
+  // Manter o reforço fixo e só derrubar a parcela — como esta função fazia
+  // antes — inflava a razão reforço/parcela e estourava o teto contratual de
+  // 5×: entrada de R$ 120 mil na unidade 102 do Pineto produzia 8,77×.
+  //
+  // A prova de que a proporção é o modelo certo: aplicando esta mesma fórmula
+  // com a entrada da tabela, a parcela derivada bate ao centavo com a parcela
+  // impressa no PDF.
+  const razaoTabela =
+    plano.parcela_valor > 0 ? plano.reforco_valor / plano.parcela_valor : 0
+  const razao = Math.min(razaoTabela, REFORCO_MAXIMO_EM_PARCELAS)
+
+  const restante = ateAsChavesPadrao - entrada
+  const divisor = parcelasQtd + reforcosQtd * razao
+  const parcelaValor = restante > 0 && divisor > 0 ? restante / divisor : 0
+  const reforcoValor = parcelaValor * razao
 
   return {
     valorTotal: cent(valorTotal),
@@ -106,13 +136,14 @@ export function simular(
     parcelasQtd,
     parcelaValor: cent(parcelaValor),
     reforcosQtd,
-    reforcoValor: cent(plano.reforco_valor),
+    reforcoValor: cent(reforcoValor),
     ateAsChaves: cent(ateAsChavesPadrao),
     ateAsChavesPercentual: pct(ateAsChavesPadrao, valorTotal),
     // O saldo financiado não muda: é o que sobra depois das chaves, e a
     // entrada só redistribui o que vem ANTES delas.
     saldoFinanciamento: cent(plano.saldo_financiamento),
     padraoDaTabela: false,
+    reforcoEmParcelas: Math.round(razao * 100) / 100,
   }
 }
 

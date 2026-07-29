@@ -243,7 +243,14 @@ function ModalUnidade({ unidade, empreendimento, onFechar, onConcluido }: {
                   <dd style={{ margin: 0, fontWeight: 700, textAlign: 'right' }}>{brl(sim.parcelaValor)}</dd>
 
                   {sim.reforcosQtd > 0 && (<>
-                    <dt style={{ color: P.suave }}>{sim.reforcosQtd} reforços anuais</dt>
+                    <dt style={{ color: P.suave }}>
+                      {sim.reforcosQtd} reforços anuais
+                      {/* O múltiplo fica visível: é o teto contratual (5x a
+                          parcela) e é o que o cliente confere com o corretor. */}
+                      <span style={{ display: 'block', fontSize: 11.5, opacity: 0.85 }}>
+                        equivale a {sim.reforcoEmParcelas.toLocaleString('pt-BR')} parcelas
+                      </span>
+                    </dt>
                     <dd style={{ margin: 0, fontWeight: 700, textAlign: 'right' }}>{brl(sim.reforcoValor)}</dd>
                   </>)}
 
