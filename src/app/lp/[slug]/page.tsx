@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { imoveis } from '@/data/imoveis'
 import FormContato from '@/app/empreendimento/[construtora]/[slug]/FormContato'
+import { SITE_URL } from '@/lib/site'
 
 // LP enxuta para tráfego pago frio: 1 oferta + 1 ação, sem navegação.
 // Variante de teste contra a página completa — noindex, só entra quem clica no anúncio.
@@ -21,6 +22,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: `${imovel.nome} — condições direto com a construtora`,
     description: `${imovel.nome}, ${imovel.bairro ? imovel.bairro + ', ' : ''}${imovel.cidade}/${imovel.uf}. Financiamento direto, sem banco. Receba plantas e condições.`,
     robots: { index: false, follow: false },
+    // Canonical próprio: sem isto herda `canonical: SITE_URL` do layout raiz e
+    // declara ao Google que esta LP "é" a home.
+    alternates: { canonical: `${SITE_URL}/lp/${slug}` },
   }
 }
 

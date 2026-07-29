@@ -16,6 +16,9 @@ export const metadata: Metadata = {
   title: 'Casa no Guaíba Park — R$ 990.000',
   description: 'Casa de alto padrão em construção no Guaíba Park, Guaíba/RS. 312m² de terreno, 124,80m² privativos, 3 dormitórios (1 suíte), piscina, espaço gourmet. R$ 990.000.',
   robots: { index: false, follow: false },
+  // Canonical próprio: sem isto herda `canonical: SITE_URL` do layout raiz e
+  // declara ao Google que esta página "é" a home.
+  alternates: { canonical: `${SITE_URL}/casa-guaiba-park` },
   openGraph: {
     title: 'Casa no Guaíba Park — R$ 990.000',
     description: 'Casa de alto padrão em construção no Guaíba Park, Guaíba/RS. Financiável pela Caixa, entrega prevista set/2026. 312m² de terreno, 3 dormitórios, piscina.',
