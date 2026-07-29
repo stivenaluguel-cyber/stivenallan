@@ -11,15 +11,40 @@ interface Proposta {
   created_at: string
   leads?: { nome: string }
   empreendimentos?: { nome: string }
-  recebido?: number
-  a_receber?: number
+  // Nomes reais das colunas. `recebido`/`a_receber` continuam aceitos no
+  // envio (o normalizador traduz), mas o que VOLTA do banco é valor_*.
+  valor_recebido?: number
+  valor_a_receber?: number
+  cliente_nome?: string | null
+  data_venda?: string | null
+  notas?: string | null
 }
+
+// A venda pode vir de um lead do CRM ou ter sido lançada direto no
+// Financeiro; o nome sai de onde existir.
+const nomeCliente = (p: Proposta) => p.cliente_nome || p.leads?.nome || '—'
+const recebidoDe = (p: Proposta) => Number(p.valor_recebido ?? 0)
+const aReceberDe = (p: Proposta) => Number(p.valor_a_receber ?? 0)
 
 interface RegistroCub {
   competencia: string
   competencia_label: string
   valor_m2: number
   atualizado_em: string
+}
+
+// `configuracoes_cub` guarda `mes_referencia` (date); a tela trabalha com
+// competência 'AAAA-MM' e um rótulo legível.
+function linhaParaRegistro(l: { mes_referencia: string; valor_m2: number | string; updated_at?: string; created_at?: string }): RegistroCub {
+  const competencia = String(l.mes_referencia).slice(0, 7)
+  const rotulo = new Date(competencia + '-01T12:00:00Z')
+    .toLocaleDateString('pt-BR', { month: 'long', year: 'numeric', timeZone: 'UTC' })
+  return {
+    competencia,
+    competencia_label: rotulo.charAt(0).toUpperCase() + rotulo.slice(1),
+    valor_m2: Number(l.valor_m2),
+    atualizado_em: l.updated_at || l.created_at || new Date().toISOString(),
+  }
 }
 
 // Stub isolado para futura automacao via API SINDUSCON-SC
@@ -34,6 +59,7 @@ function fmtDateTime(s: string) { return new Date(s).toLocaleString('pt-BR') }
 
 export default function FinanceiroPage() {
   const [propostas, setPropostas] = useState<Proposta[]>([])
+  const [erro, setErro] = useState('')
   const [loading, setLoading] = useState(true)
   const [percComissao, setPercComissao] = useState(3)
   const [cubHistorico, setCubHistorico] = useState<RegistroCub[]>([])
@@ -58,10 +84,21 @@ export default function FinanceiroPage() {
   const [vendaParcelasValor, setVendaParcelasValor] = useState('')
   const [vendaData, setVendaData] = useState(new Date().toISOString().slice(0,10))
 
-  useEffect(() => {
-    const stored = localStorage.getItem('cub_historico')
-    if (stored) setCubHistorico(JSON.parse(stored))
+  // O histórico de CUB já vivia no servidor em `configuracoes_cub`, com rota
+  // pronta em /api/admin/cub. Esta tela mantinha uma cópia paralela no
+  // localStorage — trocar de aparelho mostrava outro CUB.
+  const carregarCub = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/cub')
+      if (!res.ok) return
+      const json = await res.json()
+      setCubHistorico((json.data ?? []).map(linhaParaRegistro))
+    } catch {
+      // Sem CUB a tela ainda funciona: o card mostra "sem CUB cadastrado".
+    }
   }, [])
+
+  useEffect(() => { carregarCub() }, [carregarCub])
 
   const loadPropostas = useCallback(async () => {
     setLoading(true)
@@ -69,14 +106,14 @@ export default function FinanceiroPage() {
       const res = await fetch('/api/admin/propostas?limit=100')
       if (!res.ok) throw new Error()
       const json = await res.json()
-      const apiData = json.data || []
-        // merge with any vendas registradas manualmente (localStorage fallback)
-        const localRaw = localStorage.getItem('propostas_local')
-        const local: any[] = localRaw ? JSON.parse(localRaw).filter((p:any) => !apiData.find((a:any)=>a.id===p.id)) : []
-        setPropostas([...apiData, ...local])
+      setPropostas(json.data || [])
+      setErro('')
     } catch {
-      const stored = localStorage.getItem('propostas_local')
-      setPropostas(stored ? JSON.parse(stored) : [])
+      // Sem fallback em localStorage: ele mascarava a falha da API (era por
+      // isso que produção tinha zero proposta gravada e a tela parecia certa),
+      // e o dado sumia ao trocar de aparelho ou limpar o cache.
+      setPropostas([])
+      setErro('Não foi possível carregar o financeiro. Recarregue a página.')
     }
     setLoading(false)
   }, [])
@@ -88,35 +125,38 @@ export default function FinanceiroPage() {
     if (!vendaCliente.trim() || !valor || isNaN(valor)) return
     setVendaSalvando(true)
     try {
-      const payload: any = {
+      // `cliente_nome` em vez de `leads: {nome}`: aquele objeto era um join,
+      // nunca uma coluna — mandá-lo derrubava o insert inteiro. Venda antiga
+      // não tem lead no CRM e agora não precisa mais ter.
+      const num = (v: string) => v ? parseFloat(v.replace(/[^\d,]/g,'').replace(',','.')) : undefined
+      const payload: Record<string, unknown> = {
         status: 'aceita',
         valor_proposto: valor,
-        entrada: vendaEntrada ? parseFloat(vendaEntrada.replace(/[^\d,]/g,'').replace(',','.')) : undefined,
+        cliente_nome: vendaCliente.trim(),
+        entrada: num(vendaEntrada),
         parcelas_qtd: vendaParcelasQtd ? parseInt(vendaParcelasQtd) : undefined,
-        parcelas_valor: vendaParcelasValor ? parseFloat(vendaParcelasValor.replace(/[^\d,]/g,'').replace(',','.')) : undefined,
-        recebido: vendaRecebido ? parseFloat(vendaRecebido.replace(/[^\d,]/g,'').replace(',','.')) : 0,
-        a_receber: vendaAReceber ? parseFloat(vendaAReceber.replace(/[^\d,]/g,'').replace(',','.')) : 0,
-        created_at: vendaData || new Date().toISOString(),
-        leads: { nome: vendaCliente.trim() },
-        empreendimentos: { nome: vendaEmpreendimento.trim() || '—' },
+        parcelas_valor: num(vendaParcelasValor),
+        recebido: num(vendaRecebido) ?? 0,
+        a_receber: num(vendaAReceber) ?? 0,
+        // Competência do fluxo de caixa: venda de março cadastrada hoje
+        // pertence a março.
+        data_venda: vendaData || new Date().toISOString().slice(0, 10),
+        observacoes: vendaEmpreendimento.trim() || undefined,
       }
-      if (editandoId) {
-        setPropostas(prev => prev.map(p => p.id === editandoId ? { ...p, ...payload, id: editandoId } : p))
-        const arrE = JSON.parse(localStorage.getItem('propostas_local') || '[]')
-        localStorage.setItem('propostas_local', JSON.stringify(arrE.map((p: any) => p.id === editandoId ? { ...p, ...payload } : p)))
-        try { await fetch('/api/admin/propostas/' + editandoId, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }) } catch {}
-      } else {
-        try {
-          const res = await fetch('/api/admin/propostas', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
-          if (res.ok) { await loadPropostas() } else { throw new Error('api') }
-        } catch {
-          const id = crypto.randomUUID()
-          const nova = { id, ...payload }
-          const arr = JSON.parse(localStorage.getItem('propostas_local') || '[]')
-          arr.unshift(nova); localStorage.setItem('propostas_local', JSON.stringify(arr))
-          setPropostas(prev => [nova as any, ...prev])
-        }
+
+      const alvo = editandoId ? '/api/admin/propostas/' + editandoId : '/api/admin/propostas'
+      const res = await fetch(alvo, {
+        method: editandoId ? 'PATCH' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      if (!res.ok) {
+        const j = await res.json().catch(() => null)
+        setErro(j?.error || 'Não foi possível salvar a venda.')
+        return
       }
+      setErro('')
+      await loadPropostas()
       setVendaCliente(''); setVendaEmpreendimento(''); setVendaValor('')
       setVendaEntrada(''); setVendaParcelasQtd(''); setVendaParcelasValor('')
       setVendaRecebido(''); setVendaAReceber('')
@@ -127,24 +167,31 @@ export default function FinanceiroPage() {
 
   function abrirEditar(p: Proposta) {
     setEditandoId(p.id)
-    setVendaCliente(p.leads?.nome || '')
-    setVendaEmpreendimento(p.empreendimentos?.nome || '')
+    setVendaCliente(nomeCliente(p) === '—' ? '' : nomeCliente(p))
+    setVendaEmpreendimento(p.empreendimentos?.nome || p.notas || '')
     setVendaValor(p.valor_proposto ? String(p.valor_proposto) : '')
     setVendaEntrada(p.entrada ? String(p.entrada) : '')
     setVendaParcelasQtd(p.parcelas_qtd ? String(p.parcelas_qtd) : '')
     setVendaParcelasValor(p.parcelas_valor ? String(p.parcelas_valor) : '')
-    setVendaRecebido(p.recebido ? String(p.recebido) : '')
-    setVendaAReceber(p.a_receber ? String(p.a_receber) : '')
-    setVendaData(p.created_at?.slice(0,10) || new Date().toISOString().slice(0,10))
+    setVendaRecebido(recebidoDe(p) ? String(recebidoDe(p)) : '')
+    setVendaAReceber(aReceberDe(p) ? String(aReceberDe(p)) : '')
+    setVendaData(p.data_venda || p.created_at?.slice(0,10) || new Date().toISOString().slice(0,10))
     setModalEditar(true)
   }
 
-  function excluirVenda(id: string) {
-    setPropostas(prev => prev.filter(p => p.id !== id))
-    const arr = JSON.parse(localStorage.getItem('propostas_local') || '[]')
-    localStorage.setItem('propostas_local', JSON.stringify(arr.filter((p: any) => p.id !== id)))
-    try { fetch('/api/admin/propostas/' + id, { method: 'DELETE' }) } catch {}
+  async function excluirVenda(id: string) {
+    // Removia da tela antes de saber se o servidor aceitou; a venda voltava
+    // no próximo carregamento e parecia bug de fantasma.
+    const res = await fetch('/api/admin/propostas/' + id, { method: 'DELETE' })
+    if (!res.ok) {
+      const j = await res.json().catch(() => null)
+      setErro(j?.error || 'Não foi possível excluir.')
+      setConfirmarExcluir(null)
+      return
+    }
+    setErro('')
     setConfirmarExcluir(null)
+    await loadPropostas()
   }
 
     async function atualizarCub() {
@@ -164,11 +211,7 @@ export default function FinanceiroPage() {
         valor_m2: Number(data.valor_m2),
         atualizado_em: new Date().toISOString(),
       }
-      // upsert: nao duplica a mesma competencia
-      const hist = cubHistorico.filter(c => c.competencia !== competencia)
-      hist.unshift(novo)
-      setCubHistorico(hist)
-      localStorage.setItem('cub_historico', JSON.stringify(hist))
+      await persistirCub(competencia, novo.valor_m2)
       setCubStatus(data.online
         ? 'Atualizado pelo SINDUSCON (' + competencia_label + ')'
         : 'SINDUSCON indisponivel — usando ultimo valor conhecido (' + competencia_label + ')')
@@ -179,22 +222,31 @@ export default function FinanceiroPage() {
     }
   }
 
-  function salvarCub() {
+  // Um único caminho de gravação para os dois botões (Atualizar pelo
+  // SINDUSCON e digitar à mão), para não existir uma versão que grava no
+  // servidor e outra que grava só no navegador.
+  async function persistirCub(competencia: string, valor: number) {
+    const res = await fetch('/api/admin/cub', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mes_referencia: competencia + '-01', valor_m2: valor }),
+    })
+    if (!res.ok) throw new Error((await res.json().catch(() => null))?.error || 'Falha ao salvar o CUB')
+    await carregarCub()
+  }
+
+  async function salvarCub() {
     const valor = parseFloat(cubInputValor.replace(/[^\d,]/g, '').replace(',', '.'))
     if (!valor || isNaN(valor)) return
     setCubSalvando(true)
-    const novo: RegistroCub = {
-      competencia: cubCompKey,
-      competencia_label: cubCompLabel,
-      valor_m2: valor,
-      atualizado_em: new Date().toISOString(),
+    try {
+      await persistirCub(cubCompKey, valor)
+      setModalCub(false)
+      setErro('')
+    } catch (e) {
+      setErro(e instanceof Error ? e.message : 'Falha ao salvar o CUB')
+    } finally {
+      setCubSalvando(false)
     }
-    const hist = cubHistorico.filter(c => c.competencia !== cubCompKey)
-    hist.unshift(novo)
-    setCubHistorico(hist)
-    localStorage.setItem('cub_historico', JSON.stringify(hist))
-    setCubSalvando(false)
-    setModalCub(false)
   }
 
   const cubAtual = getCubValue([...cubHistorico])
@@ -207,7 +259,9 @@ export default function FinanceiroPage() {
 
   const porMes: Record<string, number> = {}
   aceitas.forEach(p => {
-    const mes = p.created_at.slice(0,7)
+    // data_venda quando existe: venda antiga cadastrada hoje pertence ao mês
+    // em que aconteceu, não ao mês do cadastro.
+    const mes = (p.data_venda || p.created_at || '').slice(0,7)
     porMes[mes] = (porMes[mes] || 0) + p.valor_proposto
   })
   const meses = Object.keys(porMes).sort().slice(-6)
@@ -231,6 +285,14 @@ export default function FinanceiroPage() {
           <input type="number" min={1} max={6} step={0.5} value={percComissao} onChange={e => setPercComissao(Number(e.target.value))} style={{ width: '70px', padding: '0.4rem 0.5rem', border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: '0.875rem', textAlign: 'center' }} />
         </div>
       </div>
+
+      {/* Falha da API precisa APARECER. O fallback silencioso em localStorage
+          era exatamente o que escondia que nenhuma proposta estava gravando. */}
+      {erro && (
+        <div role="alert" style={{ background: '#FEF2F2', border: '1px solid #FECACA', color: '#991B1B', borderRadius: 10, padding: '10px 14px', marginBottom: '1rem', fontSize: 13, fontWeight: 600 }}>
+          {erro}
+        </div>
+      )}
 
       {/* KPIs */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
@@ -348,12 +410,12 @@ export default function FinanceiroPage() {
               <tbody>
                 {aceitas.map((p, i) => (
                   <tr key={p.id} style={{ borderBottom: i<aceitas.length-1?'1px solid #f3f4f6':'none' }}>
-                <td style={{ padding: '0.6rem 0.75rem', fontWeight: 600, color: '#111' }}>{p.leads?.nome || '—'}</td>
-                <td style={{ padding: '0.6rem 0.75rem', color: '#374151' }}>{p.empreendimentos?.nome || '—'}</td>
+                <td style={{ padding: '0.6rem 0.75rem', fontWeight: 600, color: '#111' }}>{nomeCliente(p)}</td>
+                <td style={{ padding: '0.6rem 0.75rem', color: '#374151' }}>{p.empreendimentos?.nome || p.notas || '—'}</td>
                 <td style={{ padding: '0.6rem 0.75rem', textAlign: 'right', fontWeight: 700, color: '#22c55e' }}>{fmtMoeda(p.valor_proposto)}</td>
                 <td style={{ padding: '0.6rem 0.75rem', textAlign: 'right', color: '#374151' }}>{p.entrada ? fmtMoeda(p.entrada) : '—'}</td>
-                <td style={{ padding: '0.6rem 0.75rem', textAlign: 'right', fontWeight: 600, color: '#16a34a' }}>{(p.recebido||0)>0 ? fmtMoeda(p.recebido!) : <span style={{color:'#9ca3af'}}>—</span>}</td>
-                <td style={{ padding: '0.6rem 0.75rem', textAlign: 'right', fontWeight: 600, color: (p.a_receber||0)>0 ? '#ea580c' : '#9ca3af' }}>{(p.a_receber||0)>0 ? fmtMoeda(p.a_receber!) : <span style={{color:'#9ca3af'}}>—</span>}</td>
+                <td style={{ padding: '0.6rem 0.75rem', textAlign: 'right', fontWeight: 600, color: '#16a34a' }}>{recebidoDe(p)>0 ? fmtMoeda(recebidoDe(p)) : <span style={{color:'#9ca3af'}}>—</span>}</td>
+                <td style={{ padding: '0.6rem 0.75rem', textAlign: 'right', fontWeight: 600, color: aReceberDe(p)>0 ? '#ea580c' : '#9ca3af' }}>{aReceberDe(p)>0 ? fmtMoeda(aReceberDe(p)) : <span style={{color:'#9ca3af'}}>—</span>}</td>
                 <td style={{ padding: '0.6rem 0.75rem', textAlign: 'right', fontWeight: 600, color: '#D24E22' }}>{fmtMoeda(p.valor_proposto * (percComissao / 100))}</td>
                 <td style={{ padding: '0.6rem 0.75rem', color: '#6b7280', fontSize: '0.8rem' }}>{fmtData(p.created_at)}</td>
                 <td style={{ padding: '0.6rem 0.75rem', textAlign: 'center', whiteSpace: 'nowrap' }}>
@@ -368,8 +430,8 @@ export default function FinanceiroPage() {
                 <td colSpan={2} style={{ padding: '0.75rem', color: '#374151' }}>TOTAL ({aceitas.length} venda{aceitas.length !== 1 ? 's' : ''})</td>
                 <td style={{ padding: '0.75rem', textAlign: 'right', color: '#22c55e' }}>{fmtMoeda(totalVendas)}</td>
                 <td style={{ padding: '0.75rem', textAlign: 'right', color: '#374151' }}>{fmtMoeda(totalEntradas)}</td>
-                <td style={{ padding: '0.75rem', textAlign: 'right', color: '#16a34a' }}>{fmtMoeda(aceitas.reduce((s,p)=>s+(p.recebido||0),0))}</td>
-                <td style={{ padding: '0.75rem', textAlign: 'right', color: '#ea580c' }}>{fmtMoeda(aceitas.reduce((s,p)=>s+(p.a_receber||0),0))}</td>
+                <td style={{ padding: '0.75rem', textAlign: 'right', color: '#16a34a' }}>{fmtMoeda(aceitas.reduce((s,p)=>s+recebidoDe(p),0))}</td>
+                <td style={{ padding: '0.75rem', textAlign: 'right', color: '#ea580c' }}>{fmtMoeda(aceitas.reduce((s,p)=>s+aReceberDe(p),0))}</td>
                 <td style={{ padding: '0.75rem', textAlign: 'right', color: '#D24E22' }}>{fmtMoeda(totalComissoes)}</td>
                 <td colSpan={2}></td>
               </tr>

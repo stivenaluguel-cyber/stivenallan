@@ -1,6 +1,6 @@
 'use client'
 import { useCallback, useEffect, useState } from 'react'
-import { Check, Plus, Settings2, X } from 'lucide-react'
+import { CalendarDays, Check, Plus, Settings2, X } from 'lucide-react'
 import { D } from '@/components/dashboard/focus/tokens'
 import type { ProgressoDia, MetasDiarias as Metas } from '@/lib/dashboard/metas-diarias'
 
@@ -13,6 +13,11 @@ export function MetasDiarias() {
   const [erro, setErro] = useState('')
   const [salvando, setSalvando] = useState<string | null>(null)
   const [configAberta, setConfigAberta] = useState(false)
+  // "Editar outro dia": nem toda atividade acontece dentro do sistema, e uma
+  // reunião de sexta lembrada no domingo precisa cair na sexta. O backend já
+  // aceitava a data; faltava a tela oferecer. Lançar em dia passado invalida
+  // o selo do calendário, que é reselado com o número novo.
+  const [outroDia, setOutroDia] = useState('')
 
   const carregar = useCallback(async () => {
     try {
@@ -36,7 +41,7 @@ export function MetasDiarias() {
     try {
       const res = await fetch('/api/admin/metas', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tipo, quantidade: novoValor }),
+        body: JSON.stringify({ tipo, quantidade: novoValor, ...(outroDia ? { data: outroDia } : {}) }),
       })
       if (!res.ok) throw new Error((await res.json()).error || 'Falha ao registrar')
       await carregar()
@@ -92,9 +97,26 @@ export function MetasDiarias() {
             {progresso.diaCompleto && <Check size={17} style={{ marginLeft: 6, verticalAlign: -3 }} />}
           </div>
         </div>
-        <button onClick={() => setConfigAberta((v) => !v)} aria-label="Configurar metas" style={{ ...btnSecundario, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-          <Settings2 size={14} /> Metas
-        </button>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+          <label style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, color: D.muted }}>
+            <CalendarDays size={14} aria-hidden />
+            <span>Lançar em</span>
+            <input
+              type="date"
+              value={outroDia}
+              max={dados.data}
+              onChange={(e) => setOutroDia(e.target.value)}
+              aria-label="Lançar atividade em outro dia"
+              style={{ border: '1px solid ' + D.line, borderRadius: 8, padding: '7px 9px', fontSize: 12, color: D.ink, background: '#fff', minHeight: 38 }}
+            />
+          </label>
+          {outroDia && (
+            <button onClick={() => setOutroDia('')} style={{ ...btnSecundario, padding: '7px 10px' }}>Hoje</button>
+          )}
+          <button onClick={() => setConfigAberta((v) => !v)} aria-label="Configurar metas" style={{ ...btnSecundario, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <Settings2 size={14} /> Metas
+          </button>
+        </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))', gap: 12 }}>

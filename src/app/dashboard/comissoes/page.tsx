@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Plus, Users, X } from 'lucide-react'
 import { STATUS_COMISSAO, calcularDivisao, type StatusComissao } from '@/lib/comissoes/calcular'
+import { ParcelasComissao } from '@/components/dashboard/ParcelasComissao'
 
 const D = {
   bg: '#F3F2EE', surface: '#FAFAF7', sidebar: '#131211', ink: '#161512',
@@ -148,6 +149,24 @@ export default function ComissoesPage() {
                       <button onClick={() => mudarStatus(c.id, 'recebida')} style={{ ...btnSec, borderColor: D.green, color: D.green }}>Marcar recebida</button>
                       <button onClick={() => mudarStatus(c.id, 'cancelada')} style={{ ...btnSec, color: D.red, borderColor: D.line }}>Cancelar</button>
                     </div>
+                  )}
+
+                  {/* Comissão de financiamento direto raramente cai de uma vez:
+                      acompanha o recebimento da incorporadora. */}
+                  {c.status !== 'cancelada' && (
+                    <details style={{ marginTop: 12, borderTop: '1px solid ' + D.line, paddingTop: 10 }}>
+                      <summary style={{ cursor: 'pointer', fontSize: 12.5, fontWeight: 700, color: D.ink, minHeight: 32, display: 'flex', alignItems: 'center' }}>
+                        Plano de recebimento
+                      </summary>
+                      <div style={{ marginTop: 10 }}>
+                        <ParcelasComissao
+                          comissaoId={c.id}
+                          valorComissao={Number(c.valor_comissao)}
+                          dataVenda={c.data_venda}
+                          onMudou={carregar}
+                        />
+                      </div>
+                    </details>
                   )}
                 </div>
               )
