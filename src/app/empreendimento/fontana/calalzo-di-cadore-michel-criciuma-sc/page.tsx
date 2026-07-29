@@ -7,6 +7,7 @@ import { PropertySchema } from '@/components/PropertySchema'
 import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
+import { EspelhoPublico } from '@/components/EspelhoPublico'
 
 const WPP = "https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Calalzo%20Di%20Cadore%20Residencial."
 const CATALOGO_PDF = "https://estilofontana.com.br/upload/empreendimento/catalogo/calalzo-di-cadore-residencial-1603739983.pdf"
@@ -279,6 +280,10 @@ export default function CalalzoDiCadorePage() {
       </a>
             <PropertySchema nome="Calalzo Di Cadore Residencial" slug="calalzo-di-cadore-michel-criciuma-sc" construtora_slug="fontana" cidade="Criciúma" uf="SC" bairro="Michel" descricao="Calalzo Di Cadore Residencial — 2 dormitórios (1 suíte), até 70 m² privativos no Michel, Criciúma/SC. Fale com Stiven Allan." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/calalzo-di-cadore-michel-criciuma-sc.jpg" faq={FAQ_ITEMS} />
             <PropertyFAQ items={FAQ_ITEMS} accent="#3D5C38" />
+            {/* Espelho de vendas — some quando o empreendimento não tem
+                unidades cadastradas, que é o caso da maioria. */}
+            <EspelhoPublico slug="calalzo-di-cadore-michel-criciuma-sc" />
+
             <RelatedProperties atualSlug="calalzo-di-cadore-michel-criciuma-sc" cidade="Criciúma" />
     </main>
   )

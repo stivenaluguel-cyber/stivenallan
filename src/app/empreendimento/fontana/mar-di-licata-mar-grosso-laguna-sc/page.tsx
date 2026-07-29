@@ -8,6 +8,7 @@ import { PropertySchema } from '@/components/PropertySchema'
 import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
+import { EspelhoPublico } from '@/components/EspelhoPublico'
 
 const WPP = "https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Mar%20di%20Licata%20Residencial."
 const CATALOGO_PDF = "https://estilofontana.com.br/upload/empreendimento/catalogo/mar-di-licata-residencial-1701087673.pdf"
@@ -296,6 +297,10 @@ return (
 
 {/* SEO FAQ */}
 <PropertyFAQ items={FAQ_ITEMS} accent="#1A4E72" />
+{/* Espelho de vendas — some quando o empreendimento não tem
+    unidades cadastradas, que é o caso da maioria. */}
+<EspelhoPublico slug="mar-di-licata-mar-grosso-laguna-sc" />
+
 <RelatedProperties atualSlug="mar-di-licata-mar-grosso-laguna-sc" cidade="Laguna" />
 
 

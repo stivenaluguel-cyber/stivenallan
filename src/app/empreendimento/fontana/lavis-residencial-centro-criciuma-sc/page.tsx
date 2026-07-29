@@ -7,6 +7,7 @@ import { PropertySchema } from '@/components/PropertySchema'
 import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
+import { EspelhoPublico } from '@/components/EspelhoPublico'
 
 // Hotsite premium Lavis Residencial (Fontana, Centro de Criciúma/SC). Padrão EPIC — benchmark Aguas de Marano.
 // WhatsApp do corretor Stiven (NAO usar numeros internos da Fontana).
@@ -366,6 +367,10 @@ export default function LavisPage() {
 
       {/* SEO FAQ */}
       <PropertyFAQ items={FAQ_ITEMS} accent={t.terra} />
+
+      {/* Espelho de vendas — some quando o empreendimento não tem
+          unidades cadastradas, que é o caso da maioria. */}
+      <EspelhoPublico slug="lavis-residencial-centro-criciuma-sc" />
 
       <RelatedProperties atualSlug="lavis-residencial-centro-criciuma-sc" cidade="Criciúma" />
 

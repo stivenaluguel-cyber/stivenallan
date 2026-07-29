@@ -7,6 +7,7 @@ import { PropertySchema } from '@/components/PropertySchema'
 import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
+import { EspelhoPublico } from '@/components/EspelhoPublico'
 
 export const metadata: Metadata = {
   title: 'Mar di Nizza Residencial | Mar Grosso Laguna SC',
@@ -305,6 +306,10 @@ export default function MarDiNizzaPage() {
       
 {/* SEO FAQ */}
 <PropertyFAQ items={[{"pergunta":"Como funciona o financiamento direto do Mar di Nizza Residencial?","resposta":"Entrada de 20% (parcela única), 6 reforços anuais, conforme a composição da tabela vigente, e saldo em até 72 parcelas mensais, corrigidas pelo CUB/Sinduscon-SC durante a obra. Para pagamento à vista, desconto de 15% sobre o valor total (sem permuta). Condições conforme tabela de julho/2026, sujeitas à atualização — fale com Stiven para simular sua unidade. Consulte a tabela vigente para valores e disponibilidade por unidade."},{"pergunta":"Qual a previsão de entrega do Mar di Nizza Residencial?","resposta":"A previsão de entrega é dezembro de 2026, em Mar Grosso, Laguna/SC."},{"pergunta":"Como é a correção monetária após a entrega das chaves?","resposta":"O saldo remanescente é corrigido mensalmente, à escolha do comprador, por uma de duas opções: IGPM acrescido de juros compensatórios de 0,75% ao mês, ou apenas pelo CUB/Sinduscon-SC."},{"pergunta":"Onde fica o Mar di Nizza Residencial?","resposta":"O Mar di Nizza Residencial está localizado na Rua Joana Mussi, esq. Rua Moreira Gomes, no Mar Grosso, Laguna/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"2 dormitórios (1 suíte) de 65,89 a 66,51 m² privativos, ou 3 dormitórios (1 suíte) de 87,84 a 92,09 m² privativos, conforme o final do apartamento — confira as plantas oficiais na página."}]} accent="#1B7A72" />
+{/* Espelho de vendas — some quando o empreendimento não tem
+    unidades cadastradas, que é o caso da maioria. */}
+<EspelhoPublico slug="mar-di-nizza-mar-grosso-laguna-sc" />
+
 <RelatedProperties atualSlug="mar-di-nizza-mar-grosso-laguna-sc" cidade="Laguna" />
 
 </div>

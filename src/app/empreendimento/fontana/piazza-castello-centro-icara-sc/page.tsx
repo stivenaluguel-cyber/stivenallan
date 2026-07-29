@@ -7,6 +7,7 @@ import { PropertySchema } from '@/components/PropertySchema'
 import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
+import { EspelhoPublico } from '@/components/EspelhoPublico'
 
 const COR = '#5B2333'
 const CDN = '/images/empreendimentos/piazza-castello-centro-icara-sc/'
@@ -239,6 +240,10 @@ export default function PiazzaCastelloPage() {
       </a>
       {/* SEO FAQ */}
       <PropertyFAQ items={[{"pergunta":"Como funciona o pagamento do Piazza Castello Residencial?","resposta":"Condições de pagamento sob consulta. Fale com um corretor para receber a composição comercial e a disponibilidade atualizadas."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Fale com um corretor para confirmar as modalidades de pagamento disponíveis, incluindo financiamento bancário e FGTS."},{"pergunta":"Onde fica o Piazza Castello Residencial?","resposta":"O Piazza Castello Residencial está localizado na Praça Presidente João Goulart, frente à Praça Castelo Branco, no Centro de Içara/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"O empreendimento oferece apartamentos com 3 dormitórios (3 suítes) e até 172 m² privativos."}]} accent="#3D5C38" />
+      {/* Espelho de vendas — some quando o empreendimento não tem
+          unidades cadastradas, que é o caso da maioria. */}
+      <EspelhoPublico slug="piazza-castello-centro-icara-sc" />
+
       <RelatedProperties atualSlug="piazza-castello-centro-icara-sc" cidade="Içara" />
     </>
   )

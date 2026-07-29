@@ -8,6 +8,7 @@ import { PropertySchema } from '@/components/PropertySchema'
 import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
+import { EspelhoPublico } from '@/components/EspelhoPublico'
 
 const WPP = "https://wa.me/5548991642332?text=Olá!%20Tenho%20interesse%20no%20Villaggio%20Verde%20Residenziale%20em%20Criciúma."
 
@@ -294,6 +295,10 @@ export default function Page() {
       </a>
 
       <PropertyFAQ items={FAQ_ITEMS} accent="#2D4A2D" />
+
+      {/* Espelho de vendas — some quando o empreendimento não tem
+          unidades cadastradas, que é o caso da maioria. */}
+      <EspelhoPublico slug="villaggio-verde-residenziale-grande-prospera-criciuma-sc" />
 
       <RelatedProperties atualSlug="villaggio-verde-residenziale-grande-prospera-criciuma-sc" cidade="Criciúma" />
     </main>

@@ -8,6 +8,7 @@ import { PropertySchema } from '@/components/PropertySchema'
 import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
+import { EspelhoPublico } from '@/components/EspelhoPublico'
 
 const WPP = "https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Mar%20di%20Atrani%20Residencial."
 const CATALOGO_PDF = "https://estilofontana.com.br/upload/empreendimento/catalogo/mar-di-atrani-residencial-1736353105.pdf"
@@ -264,6 +265,10 @@ details.mt-menu > summary::-webkit-details-marker { display: none; }
     />
 {/* SEO FAQ */}
 <PropertyFAQ items={FAQ_ITEMS} accent="#1B5E8B" />
+{/* Espelho de vendas — some quando o empreendimento não tem
+    unidades cadastradas, que é o caso da maioria. */}
+<EspelhoPublico slug="mar-di-atrani-centro-balneario-rincao-sc" />
+
 <RelatedProperties atualSlug="mar-di-atrani-centro-balneario-rincao-sc" cidade="Balneário Rincão" />
 
 

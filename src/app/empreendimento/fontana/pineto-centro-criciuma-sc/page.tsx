@@ -8,6 +8,7 @@ import { PropertySchema } from '@/components/PropertySchema'
 import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
+import { EspelhoPublico } from '@/components/EspelhoPublico'
 
 const WPP = "https://wa.me/5548991642332?text=Olá!%20Tenho%20interesse%20no%20Pineto%20Residencial%20em%20Criciúma."
 const CATALOGO_PDF = "https://estilofontana.com.br/upload/empreendimento/catalogo/pineto-residencial-1747653911.pdf"
@@ -286,6 +287,10 @@ export default function Page() {
       </a>
       {/* SEO FAQ */}
       <PropertyFAQ items={[{"pergunta":"Como funciona o financiamento direto do Pineto Residencial?","resposta":"Condições de pagamento sob consulta. Fale com um corretor para receber a composição comercial e a disponibilidade atualizadas."},{"pergunta":"Qual a previsão de entrega do Pineto Residencial?","resposta":"A previsão de entrega é novembro de 2029, em Centro, Criciúma/SC."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Fale com um corretor para confirmar as modalidades de pagamento disponíveis, incluindo financiamento bancário e FGTS."},{"pergunta":"Onde fica o Pineto Residencial?","resposta":"O Pineto Residencial está localizado na Rua Itajaí, 185, no Centro de Criciúma/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"O empreendimento oferece apartamentos com 2 dormitórios (1 suíte), de 75 a 77 m² privativos, com academia, coworking e áreas de lazer."}]} accent="#3D5C38" />
+      {/* Espelho de vendas — some quando o empreendimento não tem
+          unidades cadastradas, que é o caso da maioria. */}
+      <EspelhoPublico slug="pineto-centro-criciuma-sc" />
+
       <RelatedProperties atualSlug="pineto-centro-criciuma-sc" cidade="Criciúma" />
 
     </main>

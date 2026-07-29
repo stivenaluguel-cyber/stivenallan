@@ -8,6 +8,7 @@ import { PropertySchema } from '@/components/PropertySchema'
 import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
+import { EspelhoPublico } from '@/components/EspelhoPublico'
 
 const WPP = "https://wa.me/5548991642332?text=Olá!%20Tenho%20interesse%20no%20Rocca%20Pietore%20Residencial%20em%20Siderópolis."
 
@@ -292,6 +293,10 @@ export default function Page() {
           </a>
         </div>
       </section>
+
+      {/* Espelho de vendas — some quando o empreendimento não tem
+          unidades cadastradas, que é o caso da maioria. */}
+      <EspelhoPublico slug="rocca-pietore-centro-sideropolis-sc" />
 
       <RelatedProperties atualSlug="rocca-pietore-centro-sideropolis-sc" cidade="Siderópolis" />
 

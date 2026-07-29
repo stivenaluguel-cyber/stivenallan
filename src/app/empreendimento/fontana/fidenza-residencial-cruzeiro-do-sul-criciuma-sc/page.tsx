@@ -8,6 +8,7 @@ import { PropertySchema } from '@/components/PropertySchema'
 import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
+import { EspelhoPublico } from '@/components/EspelhoPublico'
 
 // Hotsite premium Fidenza Residencial (Fontana, Cruzeiro do Sul, Criciúma/SC). Padrão EPIC — benchmark Aguas de Marano.
 // Acento: grafite #2B2B2B com detalhe azul #1E3A8A discreto (motivo Mondrian).
@@ -404,6 +405,10 @@ export default function FidenzaPage() {
 
       {/* SEO FAQ */}
       <PropertyFAQ items={FAQ_ITEMS} accent={t.graphite} />
+
+      {/* Espelho de vendas — some quando o empreendimento não tem
+          unidades cadastradas, que é o caso da maioria. */}
+      <EspelhoPublico slug="fidenza-residencial-cruzeiro-do-sul-criciuma-sc" />
 
       <RelatedProperties atualSlug="fidenza-residencial-cruzeiro-do-sul-criciuma-sc" cidade="Criciúma" />
 
