@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import FormContato from '@/app/empreendimento/[construtora]/[slug]/FormContato'
+import { SITE_URL } from '@/lib/site'
 
 // LP de tráfego pago (Google Search) para o ângulo "financiamento direto, sem
 // banco" — o diferencial que atravessa TODOS os empreendimentos, em vez de
@@ -31,6 +32,12 @@ export const metadata: Metadata = {
   description:
     'Financiamento direto com a construtora: negociação sem intermediação bancária, para quem é autônomo, empresário ou não tem renda formal comprovável. Receba as condições pelo WhatsApp.',
   robots: { index: false, follow: false },
+  // Canonical próprio, apontando para a própria URL. Sem isto a página herda
+  // `alternates.canonical = SITE_URL` do layout raiz (src/app/layout.tsx) e
+  // declara ao Google que este conteúdo "é" a home — sinal errado que pode
+  // confundir a avaliação da própria home. Em página noindex o canonical
+  // importa pouco, mas um canonical ERRADO é pior que nenhum.
+  alternates: { canonical: `${SITE_URL}/lp/financiamento-direto` },
 }
 
 // Números conferidos no banco (36 empreendimentos ativos em 8 cidades).

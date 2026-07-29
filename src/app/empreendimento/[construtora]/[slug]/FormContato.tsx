@@ -261,12 +261,19 @@ export default function FormContato({ empreendimento, propertyId, propertySlug, 
             style={selectStyle}
             aria-label="Entrada disponível"
           >
+            {/* Faixas quebradas na casa dos 20% de propósito. A antiga opção
+                "Até 20% do valor" juntava quem tem 3% e quem tem 19% na mesma
+                resposta — e 20% é justamente o corte do financiamento direto
+                com a construtora. Sem separar, o lead chega sem a única
+                informação que decide se existe negócio. */}
             <option value="" disabled>
               Entrada disponível
             </option>
-            <option value="Até 20% do valor">Até 20% do valor</option>
-            <option value="20% a 50%">20% a 50%</option>
-            <option value="Mais de 50%">Mais de 50%</option>
+            <option value="Menos de 10%">Menos de 10% do valor</option>
+            <option value="10% a 19%">10% a 19% do valor</option>
+            <option value="20% a 29%">20% a 29% do valor</option>
+            <option value="30% ou mais">30% ou mais do valor</option>
+            <option value="Preciso calcular">Preciso calcular</option>
             <option value="Prefiro falar no WhatsApp">Prefiro falar no WhatsApp</option>
           </select>
         </>
