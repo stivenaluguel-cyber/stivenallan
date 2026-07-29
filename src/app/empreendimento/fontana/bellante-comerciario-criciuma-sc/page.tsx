@@ -7,6 +7,7 @@ import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { FontanaCompactNav } from '@/components/FontanaCompactNav'
 import { SITE_URL } from '@/lib/site'
+import { EspelhoPublico } from '@/components/EspelhoPublico'
 
 export const revalidate = 3600;
 
@@ -260,6 +261,10 @@ export default function BellantePage() {
 
       {/* SEO FAQ */}
       <PropertyFAQ items={FAQ_ITEMS} accent={ACCENT} />
+
+      {/* Espelho de vendas — some quando o empreendimento não tem
+          unidades cadastradas, que é o caso da maioria. */}
+      <EspelhoPublico slug="bellante-comerciario-criciuma-sc" />
 
       <RelatedProperties atualSlug="bellante-comerciario-criciuma-sc" cidade="Criciúma" />
 

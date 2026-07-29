@@ -8,6 +8,7 @@ import { PropertySchema } from '@/components/PropertySchema'
 import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
+import { EspelhoPublico } from '@/components/EspelhoPublico'
 
 const WPP = "https://wa.me/5548991642332?text=Olá!%20Tenho%20interesse%20no%20Mar%20Positano%20Residencial%20em%20Balneário%20Rincão."
 const CATALOGO_PDF = "https://estilofontana.com.br/upload/empreendimento/catalogo/mar-positano-residencial-1761677677.pdf"
@@ -362,6 +363,10 @@ export default function Page() {
 
 {/* SEO FAQ */}
 <PropertyFAQ items={[{"pergunta":"Como funciona o financiamento direto do Mar Positano Residencial?","resposta":"Entrada de 20% (parcela única), 6 reforços anuais, conforme a composição da tabela vigente, e saldo em 72 parcelas mensais, corrigidas pelo CUB/SC durante a obra. Condições conforme tabela de julho/2026, sujeitas à atualização — fale com Stiven para simular sua unidade. Consulte a tabela vigente para valores e disponibilidade por unidade."},{"pergunta":"Qual a previsão de entrega do Mar Positano Residencial?","resposta":"A previsão de entrega é agosto de 2029, em Centro, Balneário Rincão/SC."},{"pergunta":"Como é a correção monetária após a entrega das chaves?","resposta":"O saldo remanescente é corrigido mensalmente, à escolha do comprador, por uma de duas opções: IGPM acrescido de juros compensatórios de 0,75% ao mês, ou apenas pelo CUB/SC."},{"pergunta":"Onde fica o Mar Positano Residencial?","resposta":"O Mar Positano Residencial está localizado na Rua Waldemar Carlos Petrini, esq. Rua Espírito Santo, no Centro de Balneário Rincão/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"Apartamentos de 3 dormitórios (1 suíte), de 107,38 a 126 m² privativos, em 5 tipos de planta — confira as plantas oficiais na página."}]} accent="#1B3A5B" />
+{/* Espelho de vendas — some quando o empreendimento não tem
+    unidades cadastradas, que é o caso da maioria. */}
+<EspelhoPublico slug="mar-positano-centro-balneario-rincao-sc" />
+
 <RelatedProperties atualSlug="mar-positano-centro-balneario-rincao-sc" cidade="Balneário Rincão" />
 
 

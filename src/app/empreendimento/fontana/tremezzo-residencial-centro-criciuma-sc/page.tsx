@@ -8,6 +8,7 @@ import { PropertySchema } from '@/components/PropertySchema'
 import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
+import { EspelhoPublico } from '@/components/EspelhoPublico'
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Tremezzo%20Residencial%20em%20Crici%C3%BAma.%20Pode%20me%20passar%20mais%20informa%C3%A7%C3%B5es%3F'
 
 export const metadata: Metadata = {
@@ -444,6 +445,10 @@ const CSS = `
       </a>
 
       <PropertyFAQ items={FAQ_ITEMS} accent="#6B2D3E" />
+
+      {/* Espelho de vendas — some quando o empreendimento não tem
+          unidades cadastradas, que é o caso da maioria. */}
+      <EspelhoPublico slug="tremezzo-residencial-centro-criciuma-sc" />
 
       <RelatedProperties atualSlug="tremezzo-residencial-centro-criciuma-sc" cidade="Criciúma" />
     </>

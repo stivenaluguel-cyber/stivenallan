@@ -7,6 +7,7 @@ import { PropertySchema } from '@/components/PropertySchema'
 import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
+import { EspelhoPublico } from '@/components/EspelhoPublico'
 
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Castellano%20Residencial.'
 const CATALOGO_PDF = 'https://estilofontana.com.br/upload/empreendimento/catalogo/castellano-residencial-1603391644.pdf'
@@ -261,6 +262,10 @@ export default function CastellanoPage() {
 
       {/* SEO FAQ */}
       <PropertyFAQ items={FAQ_ITEMS} accent={t.purple} />
+
+      {/* Espelho de vendas — some quando o empreendimento não tem
+          unidades cadastradas, que é o caso da maioria. */}
+      <EspelhoPublico slug="castellano-centro-icara-sc" />
 
       <RelatedProperties atualSlug="castellano-centro-icara-sc" cidade="Içara" />
 

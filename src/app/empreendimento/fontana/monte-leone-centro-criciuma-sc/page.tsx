@@ -8,6 +8,7 @@ import { PropertySchema } from '@/components/PropertySchema'
 import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
+import { EspelhoPublico } from '@/components/EspelhoPublico'
 
 // Hotsite premium Monte Leone Residencial (Fontana, Centro Criciúma/SC). Padrão EPIC — benchmark Aguas de Marano.
 // WhatsApp do corretor Stiven (NAO usar numeros internos da Fontana).
@@ -392,6 +393,10 @@ No coração nobre de Criciúma, a poucos passos de comércio premium, gastronom
 {/* FOOTER */}
       {/* SEO FAQ */}
       <PropertyFAQ items={FAQ_ITEMS} accent="#33503F" />
+      {/* Espelho de vendas — some quando o empreendimento não tem
+          unidades cadastradas, que é o caso da maioria. */}
+      <EspelhoPublico slug="monte-leone-centro-criciuma-sc" />
+
       <RelatedProperties atualSlug="monte-leone-centro-criciuma-sc" cidade="Criciúma" />
 
 <footer style={{ background: t.greenDark, color: t.onDarkMuted, padding: 'clamp(56px,9vh,96px) clamp(18px,5vw,56px)' }}>

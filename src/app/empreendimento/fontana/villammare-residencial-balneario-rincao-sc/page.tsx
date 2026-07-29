@@ -8,6 +8,7 @@ import { PropertySchema } from '@/components/PropertySchema'
 import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
+import { EspelhoPublico } from '@/components/EspelhoPublico'
 
 const WPP = "https://wa.me/5548991642332?text=Ol%C3%A1!%20Tenho%20interesse%20no%20Villammare%20Residencial%20em%20Balne%C3%A1rio%20Rinc%C3%A3o."
 
@@ -292,6 +293,10 @@ export default function Page() {
         {pergunta:"O Villammare tem vista para o mar?",resposta:"Sim. O Villammare fica a passos da praia em Balneário Rincão com sacada e vista privilegiada para o mar."},
         {pergunta:"Posso usar FGTS ou financiamento bancario no Villammare?",resposta:"Fale com um corretor para confirmar as modalidades de pagamento disponíveis, incluindo financiamento bancário e FGTS."},
       ]} accent="#1B3A4B" />
+
+      {/* Espelho de vendas — some quando o empreendimento não tem
+          unidades cadastradas, que é o caso da maioria. */}
+      <EspelhoPublico slug="villammare-residencial-balneario-rincao-sc" />
 
       <RelatedProperties atualSlug="villammare-residencial-balneario-rincao-sc" cidade="Balneário Rincão" />
     </main>

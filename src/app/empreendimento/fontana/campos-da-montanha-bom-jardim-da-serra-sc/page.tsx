@@ -8,6 +8,7 @@ import { PropertySchema } from '@/components/PropertySchema'
 import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
+import { EspelhoPublico } from '@/components/EspelhoPublico'
 
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Campos%20da%20Montanha%20Residencial.'
 const CATALOGO = 'https://estilofontana.com.br/upload/empreendimento/catalogo/campos-da-montanha-residencial-1668428039.pdf'
@@ -228,6 +229,10 @@ html { scroll-behavior: smooth; }
 
 {/* SEO FAQ */}
 <PropertyFAQ items={[{"pergunta":"Como funciona o pagamento do Campos da Montanha Residencial?","resposta":"Condições de pagamento sob consulta. Fale com um corretor para receber a composição comercial e a disponibilidade atualizadas."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Fale com um corretor para confirmar as modalidades de pagamento disponíveis, incluindo financiamento bancário e FGTS."},{"pergunta":"Onde fica o Campos da Montanha Residencial?","resposta":"O Campos da Montanha Residencial está localizado na Rod. SC-390, em Bom Jardim da Serra/SC."},{"pergunta":"Quais as metragens de lote disponíveis?","resposta":"O condomínio Campos da Montanha possui 130 lotes, com área privativa de 800 até 1.823 m², com infraestrutura completa: água, luz, drenagem e ruas pavimentadas."}]} accent="#2D4A2F" />
+{/* Espelho de vendas — some quando o empreendimento não tem
+    unidades cadastradas, que é o caso da maioria. */}
+<EspelhoPublico slug="campos-da-montanha-bom-jardim-da-serra-sc" />
+
 <RelatedProperties atualSlug="campos-da-montanha-bom-jardim-da-serra-sc" cidade="Bom Jardim da Serra" />
 
 

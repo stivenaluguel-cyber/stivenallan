@@ -8,6 +8,7 @@ import { PropertySchema } from '@/components/PropertySchema'
 import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
+import { EspelhoPublico } from '@/components/EspelhoPublico'
 
 const WPP = "https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20%C3%81guas%20de%20Marano%20Residencial."
 const t = {
@@ -278,6 +279,10 @@ return (
 </section>
       {/* SEO FAQ */}
       <PropertyFAQ items={FAQ_ITEMS} accent={t.navy} />
+      {/* Espelho de vendas — some quando o empreendimento não tem
+          unidades cadastradas, que é o caso da maioria. */}
+      <EspelhoPublico slug="aguas-de-marano-frente-mar-balneario-picarras-sc" />
+
       <RelatedProperties atualSlug="aguas-de-marano-frente-mar-balneario-picarras-sc" cidade="Balneário Piçarras" />
 
 <footer style={{ background: t.navyDark, color: t.onDarkMuted, padding: 'clamp(56px,9vh,96px) clamp(18px,5vw,56px)' }}>

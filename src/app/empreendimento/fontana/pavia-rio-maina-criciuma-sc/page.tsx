@@ -8,6 +8,7 @@ import { PropertySchema } from '@/components/PropertySchema'
 import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
+import { EspelhoPublico } from '@/components/EspelhoPublico'
 
 const WPP = "https://wa.me/5548991642332?text=Olá!%20Tenho%20interesse%20no%20Pavia%20Residencial%20em%20Criciúma."
 const CATALOGO_PDF = "https://estilofontana.com.br/upload/empreendimento/catalogo/pavia-residencial-1691610313.pdf"
@@ -306,6 +307,10 @@ export default function Page() {
       </a>
       {/* SEO FAQ */}
       <PropertyFAQ items={[{"pergunta":"Como funciona o pagamento do Pavia Residencial?","resposta":"Condições de pagamento sob consulta. Fale com um corretor para receber a composição comercial e a disponibilidade atualizadas."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Fale com um corretor para confirmar as modalidades de pagamento disponíveis, incluindo financiamento bancário e FGTS."},{"pergunta":"Onde fica o Pavia Residencial?","resposta":"O Pavia Residencial está localizado na Avenida dos Imigrantes, esq. Rua João Colombo, no Rio Maina, Criciúma/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"O empreendimento oferece apartamentos com 1, 2 ou 3 dormitórios, de 52 a 80 m² privativos, em 4 torres."}]} accent="#3D5C38" />
+      {/* Espelho de vendas — some quando o empreendimento não tem
+          unidades cadastradas, que é o caso da maioria. */}
+      <EspelhoPublico slug="pavia-rio-maina-criciuma-sc" />
+
       <RelatedProperties atualSlug="pavia-rio-maina-criciuma-sc" cidade="Criciúma" />
     </main>
   )

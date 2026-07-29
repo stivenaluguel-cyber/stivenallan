@@ -8,6 +8,7 @@ import { PropertySchema } from '@/components/PropertySchema'
 import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
+import { EspelhoPublico } from '@/components/EspelhoPublico'
 
 // Hotsite premium Thiene Residencial (Fontana, Centro Criciúma/SC). Padrão EPIC.
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Thiene%20Residencial.'
@@ -384,6 +385,10 @@ Com tudo a poucos passos, o Thiene coloca você no centro da vida urbana de Cric
 
 {/* SEO FAQ */}
 <PropertyFAQ items={FAQ_ITEMS} accent="#1C3144" />
+{/* Espelho de vendas — some quando o empreendimento não tem
+    unidades cadastradas, que é o caso da maioria. */}
+<EspelhoPublico slug="thiene-centro-criciuma-sc" />
+
 <RelatedProperties atualSlug="thiene-centro-criciuma-sc" cidade="Criciúma" />
 
 

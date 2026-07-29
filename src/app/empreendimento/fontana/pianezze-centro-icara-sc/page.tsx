@@ -8,6 +8,7 @@ import { PropertySchema } from '@/components/PropertySchema'
 import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
+import { EspelhoPublico } from '@/components/EspelhoPublico'
 
 const WPP = "https://wa.me/5548991642332?text=Olá!%20Tenho%20interesse%20no%20Pianezze%20Residencial%20em%20Içara."
 const CATALOGO_PDF = "https://estilofontana.com.br/upload/empreendimento/catalogo/pianezze-residencial-1668427993.pdf"
@@ -311,6 +312,10 @@ export default function Page() {
   "pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Fale com um corretor para confirmar as modalidades de pagamento disponíveis, incluindo financiamento bancário e FGTS."},{
   "pergunta":"Onde fica o Pianezze Residencial?","resposta":"O Pianezze Residencial está localizado na Av. Dilcio Esmael da Silva, esq. R. João Bonomo, no Centro de Içara/SC."},{
   "pergunta":"Quais as plantas e metragens disponíveis?","resposta":"O empreendimento oferece apartamentos com 2 e 3 dormitórios (1 suíte), de 66 a 86 m² privativos, com piscina, academia e salão de festas."}]} accent="#3D5C38" />
+      {/* Espelho de vendas — some quando o empreendimento não tem
+          unidades cadastradas, que é o caso da maioria. */}
+      <EspelhoPublico slug="pianezze-centro-icara-sc" />
+
       <RelatedProperties atualSlug="pianezze-centro-icara-sc" cidade="Içara" />
 
     </main>
