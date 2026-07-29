@@ -84,11 +84,62 @@ export interface CubResult {
   atualizado_em: string
 }
 
+// ─────────────────────────────────────────────────────────────────────
+// Guardas de sanidade do valor raspado.
+//
+// O scraping pega `valores[0]` da homepage — o primeiro "R$ x,xx" do texto.
+// Se o SINDUSCON puser um banner de evento com preço antes do CUB, o site
+// inteiro passaria a exibir R$ 199,90/m² como indicador oficial, e — pior —
+// qualquer preço derivado de CUB (espelho de vendas) derreteria junto.
+// Hoje o risco é só reputacional; com preço derivado, vira financeiro.
+// ─────────────────────────────────────────────────────────────────────
+
+// Faixa dura: CUB/SC residencial médio orbita R$ 3.0–3.6 mil em 2026.
+// Os limites são largos de propósito — pegam banner e erro de parse, não
+// travam a evolução normal do índice por anos.
+const CUB_MINIMO = 2000
+const CUB_MAXIMO = 6000
+// O CUB é um índice de custo de construção: variação mensal típica fica
+// abaixo de 1,5%. Um salto de 5% num mês é quase certamente erro de leitura.
+const VARIACAO_MENSAL_MAXIMA = 0.05
+
+export type ValidacaoCub = { ok: true } | { ok: false; motivo: string }
+
+export function validarCubColetado(
+  valor: number,
+  anterior: number | null | undefined,
+): ValidacaoCub {
+  if (!Number.isFinite(valor) || valor <= 0) {
+    return { ok: false, motivo: 'valor coletado não é um número válido' }
+  }
+  if (valor < CUB_MINIMO || valor > CUB_MAXIMO) {
+    return {
+      ok: false,
+      motivo: `valor R$ ${valor.toFixed(2)} fora da faixa plausível (${CUB_MINIMO}–${CUB_MAXIMO})`,
+    }
+  }
+  if (anterior && Number.isFinite(anterior) && anterior > 0) {
+    const variacao = Math.abs(valor - anterior) / anterior
+    if (variacao > VARIACAO_MENSAL_MAXIMA) {
+      return {
+        ok: false,
+        motivo: `variação de ${(variacao * 100).toFixed(1)}% sobre o último valor conhecido (R$ ${anterior.toFixed(2)}) excede o máximo mensal de ${VARIACAO_MENSAL_MAXIMA * 100}%`,
+      }
+    }
+  }
+  return { ok: true }
+}
+
 export async function buscarCub(): Promise<CubResult> {
   let dados = FALLBACK
   let online = false
   try {
-    dados = await buscarDoSinduscon()
+    const coletado = await buscarDoSinduscon()
+    // Valor rejeitado = mesma coisa que scraping falhado: fica o fallback e
+    // `online: false` avisa a UI (o dashboard já mostra o alerta amarelo).
+    const v = validarCubColetado(coletado.valor, FALLBACK.valor)
+    if (!v.ok) throw new Error('CUB rejeitado pela guarda: ' + v.motivo)
+    dados = coletado
     online = true
   } catch {
     // mantem fallback; a UI segue funcionando

@@ -379,7 +379,11 @@ function Kanban({ leads, dragId, onDragStart, onDrop, onSelect, onMover }: { lea
                 <span style={{ marginLeft: 'auto', background: col.cor, color: '#fff', borderRadius: 999, padding: '1px 8px', fontSize: 11, fontWeight: 700 }}>{colLeads.length}</span>
               </div>
               {vgvCol > 0 && (
-                <div style={{ fontSize: 11, color: D.muted, marginTop: -4, marginBottom: 8, fontWeight: 600 }}>{fmt(vgvCol)}</div>
+                // "~" e o title deixam claro que é potencial declarado, não
+                // valor de negócio: a soma vem do orçamento máximo que o LEAD
+                // informou, não do imóvel em negociação.
+                <div title="Soma dos orçamentos declarados pelos leads desta etapa"
+                  style={{ fontSize: 11, color: D.muted, marginTop: -4, marginBottom: 8, fontWeight: 600 }}>~{fmt(vgvCol)} potencial</div>
               )}
               <div style={{ display: 'flex', flexDirection: 'column', maxHeight: 560, overflowY: 'auto' }}>
                 {colLeads.length === 0 ? (
