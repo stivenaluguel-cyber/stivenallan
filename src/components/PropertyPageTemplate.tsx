@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import PropertySchema from '@/components/PropertySchema'
 import PropertyFAQ from '@/components/PropertyFAQ'
+import { EspelhoPublico } from '@/components/EspelhoPublico';
 import RelatedProperties from '@/components/RelatedProperties'
 import { LeadCaptureModal } from '@/components/LeadCaptureModal'
 
@@ -226,6 +227,17 @@ export default function PropertyPageTemplate({ data, relacionados }: { data: Pro
           </div>
         </section>
       )}
+
+      {/* ESPELHO DE VENDAS
+          Vive aqui além de na página estática: este template é o caminho de
+          render de todo slug SEM página própria — o Pineto entre eles. Ter o
+          espelho só na outra branch fazia ele nunca aparecer justamente no
+          empreendimento que tem as 54 unidades cadastradas. */}
+      <section style={{ padding: '0 clamp(20px,5vw,48px)' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <EspelhoPublico slug={data.slug} />
+        </div>
+      </section>
 
       {/* RELACIONADOS */}
       {relacionados !== false && data.cidade && (
