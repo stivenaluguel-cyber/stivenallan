@@ -35,7 +35,10 @@ describe('canonical em páginas noindex', () => {
   it.each(paginas)('%s declara canonical próprio', (arquivo) => {
     const src = readFileSync(arquivo, 'utf-8')
     expect(
-      /alternates\s*:\s*\{[^}]*canonical/s.test(src),
+      // Sem o flag `s`: ele exige target ES2018 (o projeto está em ES2017) e
+      // aqui era no-op — o padrão não usa `.`, e `[^}]*` já atravessa
+      // newline por conta própria. Com o flag, `tsc --noEmit` falhava no CI.
+      /alternates\s*:\s*\{[^}]*canonical/.test(src),
       `${arquivo} usa noindex mas não declara alternates.canonical — vai herdar o canonical da home pelo layout raiz`,
     ).toBe(true)
   })
