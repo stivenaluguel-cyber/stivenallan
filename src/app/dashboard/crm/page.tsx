@@ -258,11 +258,12 @@ function TabelaUnidades({ emp, cub }: { emp: Emp; cub: Cub | null }) {
   )
 }
 
-function LeadCard({ lead, onDragStart, onSelect }: { lead: Lead; onDragStart: (id: string) => void; onSelect: (lead: Lead) => void }) {
+function LeadCard({ lead, onDragStart, onSelect, onMover }: { lead: Lead; onDragStart: (id: string) => void; onSelect: (lead: Lead) => void; onMover: (id: string, estagio: string) => void }) {
   const t = tempInfo(lead.temperatura)
   const score = lead.lead_score ?? 0
   const diasDesde = lead.created_at ? Math.floor((Date.now() - new Date(lead.created_at).getTime()) / 86400000) : 0
   const esfriando = diasDesde > 14 && lead.estagio_funil !== 'fechado' && score < 40
+  const [moverAberto, setMoverAberto] = useState(false)
 
   return (
     <div draggable onDragStart={(e) => { e.stopPropagation(); onDragStart(lead.id) }} onClick={() => onSelect(lead)}
@@ -295,11 +296,42 @@ function LeadCard({ lead, onDragStart, onSelect }: { lead: Lead; onDragStart: (i
         )}
         <button onClick={(e) => { e.stopPropagation(); onSelect(lead) }} style={{ flex: 1, background: D.bg, color: D.ink, border: '1px solid ' + D.line, borderRadius: 6, padding: '5px 0', fontSize: 11, fontWeight: 700, cursor: 'pointer', minHeight: 26 }}>Abrir</button>
       </div>
+
+      {/* Arrastar-e-soltar é HTML5 (draggable/onDrop) e NÃO dispara em toque —
+          nenhum navegador móvel implementa. Sem este botão, mover um card era
+          simplesmente impossível no celular. Ele também ajuda no desktop:
+          as colunas ficam num scroll horizontal, então arrastar para uma
+          coluna fora da tela dependia de mira e paciência. */}
+      <div style={{ marginTop: 7 }}>
+        <button
+          onClick={(e) => { e.stopPropagation(); setMoverAberto((v) => !v) }}
+          aria-expanded={moverAberto}
+          aria-label={'Mover ' + (lead.nome || lead.whatsapp) + ' para outra etapa'}
+          style={{ width: '100%', background: moverAberto ? D.bronze : '#fff', color: moverAberto ? '#fff' : D.muted, border: '1px solid ' + (moverAberto ? D.bronze : D.line), borderRadius: 6, padding: '7px 0', fontSize: 11, fontWeight: 700, cursor: 'pointer', minHeight: 44 }}
+        >
+          {moverAberto ? 'Cancelar' : '⇄ Mover etapa'}
+        </button>
+
+        {moverAberto && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 6 }}>
+            {ESTAGIOS.filter((e) => e.key !== lead.estagio_funil).map((e) => (
+              <button
+                key={e.key}
+                onClick={(ev) => { ev.stopPropagation(); onMover(lead.id, e.key); setMoverAberto(false) }}
+                style={{ display: 'flex', alignItems: 'center', gap: 7, width: '100%', background: D.bg, border: '1px solid ' + D.line, borderLeft: '3px solid ' + e.cor, borderRadius: 6, padding: '9px 10px', fontSize: 11.5, fontWeight: 700, color: D.ink, cursor: 'pointer', minHeight: 44, textAlign: 'left' }}
+              >
+                <span style={{ width: 7, height: 7, borderRadius: 999, background: e.cor, flexShrink: 0 }} />
+                {e.label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
 
-function Kanban({ leads, dragId, onDragStart, onDrop, onSelect }: { leads: Lead[]; dragId: string | null; onDragStart: (id: string) => void; onDrop: (estagio: string) => void; onSelect: (lead: Lead) => void }) {
+function Kanban({ leads, dragId, onDragStart, onDrop, onSelect, onMover }: { leads: Lead[]; dragId: string | null; onDragStart: (id: string) => void; onDrop: (estagio: string) => void; onSelect: (lead: Lead) => void; onMover: (id: string, estagio: string) => void }) {
   const [hoverCol, setHoverCol] = useState<string | null>(null)
   return (
     <div style={{ overflowX: 'auto', paddingBottom: 12 }}>
@@ -317,10 +349,12 @@ function Kanban({ leads, dragId, onDragStart, onDrop, onSelect }: { leads: Lead[
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', maxHeight: 560, overflowY: 'auto' }}>
                 {colLeads.length === 0 ? (
-                  <div style={{ color: D.muted, fontSize: 12, textAlign: 'center', padding: '20px 0' }}>{isHover ? 'Solte aqui' : 'Arraste leads para cá'}</div>
+                  // Antes dizia "Arraste leads para cá" — instrução impossível
+                  // de seguir no celular, onde arrastar não funciona.
+                  <div style={{ color: D.muted, fontSize: 12, textAlign: 'center', padding: '20px 0' }}>{isHover ? 'Solte aqui' : 'Nenhum lead nesta etapa'}</div>
                 ) : colLeads.map(lead => (
                   <div key={lead.id} style={{ opacity: dragId === lead.id ? 0.4 : 1 }}>
-                    <LeadCard lead={lead} onDragStart={onDragStart} onSelect={onSelect} />
+                    <LeadCard lead={lead} onDragStart={onDragStart} onSelect={onSelect} onMover={onMover} />
                   </div>
                 ))}
               </div>
@@ -660,7 +694,7 @@ function CrmPageInner() {
               </button>
             </div>
 
-            <Kanban leads={leadsFiltrados} dragId={dragId} onDragStart={setDragId} onDrop={onDrop} onSelect={setSelected} />
+            <Kanban leads={leadsFiltrados} dragId={dragId} onDragStart={setDragId} onDrop={onDrop} onSelect={setSelected} onMover={moverLead} />
           </div>
         )}
 
