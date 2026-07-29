@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAdmin } from '@/lib/dashboard/admin-auth'
-import { calcularProgresso, mensagemDoDia, normalizarMetas, normalizarResumo, METAS_PADRAO, ATIVIDADES, type ChaveAtividade } from '@/lib/dashboard/metas-diarias'
+import { calcularProgresso, mensagemDoDia, normalizarMetas, normalizarResumo } from '@/lib/dashboard/metas-diarias'
 import { hojeEmSaoPaulo, horaEmSaoPaulo } from '@/lib/dashboard/timezone-sp'
 import { logError } from '@/lib/log'
 
@@ -107,6 +107,3 @@ export async function POST(req: NextRequest) {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ data: row }, { status: 201 })
 }
-
-export { METAS_PADRAO, ATIVIDADES }
-export type { ChaveAtividade }
