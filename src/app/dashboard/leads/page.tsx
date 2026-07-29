@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { ConversaPanel } from '@/components/dashboard/ConversaPanel'
 import { ESTAGIOS_FUNIL as ESTAGIOS } from '@/lib/dashboard/estagios'
 import { temWhatsappReal } from '@/lib/leads/normalize'
+import { ImportarLeadsCsv } from '@/components/dashboard/ImportarLeadsCsv'
 
 const D = {
   bg: '#F3F2EE', surface: '#FAFAF7', ink: '#161512',
@@ -236,6 +237,9 @@ const [savingNotes, setSavingNotes] = useState(false)
         <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
           <input value={busca} onChange={(e) => setBusca(e.target.value)} placeholder='Buscar nome ou WhatsApp...' style={{ padding: '10px 12px', borderRadius: 8, border: '1px solid ' + D.line, background: '#fff', color: D.ink, fontSize: 14, outline: 'none', flex: '1 1 200px', minWidth: 0 }} />
           <button onClick={exportCSV} style={{ padding: '10px 14px', borderRadius: 8, border: '1px solid ' + D.line, background: '#fff', color: D.ink, fontWeight: 600, cursor: 'pointer', fontSize: 13, whiteSpace: 'nowrap' }}>Exportar CSV</button>
+          {/* Só existia o caminho de saída. Importar é o que tira o corretor
+              do Excel — e é a dúvida número um de quem tem anos de planilha. */}
+          <ImportarLeadsCsv onImportado={carregar} />
         <button onClick={() => setModalAberto(true)} style={{ padding: '10px 18px', borderRadius: 8, border: 'none', background: D.bronze, color: '#fff', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>+ Novo Lead</button>
         </div>
       </div>

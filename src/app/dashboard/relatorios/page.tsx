@@ -6,6 +6,7 @@ import {
   type StageTransitionRow,
 } from '@/lib/dashboard/funil-stats'
 import { FunilChart } from '@/lib/dashboard/funil-chart'
+import { RelatoriosComerciais } from '@/components/dashboard/RelatoriosComerciais'
 
 export const dynamic = 'force-dynamic'
 
@@ -63,6 +64,11 @@ export default async function RelatoriosPage() {
       <main style={{ maxWidth: 1200, margin: '0 auto' }}>
         {result.kind === 'error' && <ErrorState message={result.message} />}
         {result.kind === 'ok' && <Populated leads={result.leads} transicoes={result.transicoes} />}
+
+        {/* Bloco novo, client-side: VGV, conversão por origem, leads parados e
+            tempo entre movimentações. Fica separado do funil acima porque
+            depende de período escolhido pelo usuário. */}
+        <RelatoriosComerciais />
       </main>
     </div>
   )

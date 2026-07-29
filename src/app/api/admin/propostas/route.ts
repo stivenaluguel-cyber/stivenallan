@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { randomUUID } from 'crypto'
-import { normalizarProposta } from '@/lib/propostas/normalizar-proposta'
+import { normalizarPatchProposta, normalizarProposta } from '@/lib/propostas/normalizar-proposta'
 import { registrarMudancaEstagio } from '@/lib/leads/registrar-mudanca-estagio'
 import { getActiveFocusSession, recordFocusEvent } from '@/lib/dashboard/focus-session-events'
 import { requireAdmin } from '@/lib/dashboard/admin-auth'
+import { recalcularScoreLead } from '@/lib/leads/score-server'
 
 export const dynamic = 'force-dynamic'
 const sb = () => createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
@@ -48,10 +49,15 @@ export async function POST(req: NextRequest) {
 
   const client = sb()
 
-  // O lead precisa existir de verdade — uma proposta órfã contaria pontos
-  // sem ter dono.
-  const { data: leadAtual } = await client.from('leads').select('id, estagio_funil').eq('id', insert.lead_id).maybeSingle()
-  if (!leadAtual) return NextResponse.json({ error: 'Lead nao encontrado' }, { status: 404 })
+  // Quando vem lead, ele precisa existir de verdade — uma proposta órfã
+  // contaria pontos sem ter dono. Sem lead é uma venda lançada direto no
+  // Financeiro (histórico antigo), que não passa pelo funil.
+  let leadAtual: { id: string; estagio_funil: string } | null = null
+  if (insert.lead_id) {
+    const { data } = await client.from('leads').select('id, estagio_funil').eq('id', insert.lead_id).maybeSingle()
+    if (!data) return NextResponse.json({ error: 'Lead nao encontrado' }, { status: 404 })
+    leadAtual = data as { id: string; estagio_funil: string }
+  }
 
   // Retry da MESMA intenção: devolve a proposta que já existe em vez de
   // criar uma segunda. Cobre o caso "proposta gravou, o passo seguinte
@@ -77,24 +83,29 @@ export async function POST(req: NextRequest) {
   }
 
   // Só a partir daqui a proposta existe de fato. Tudo o que vem abaixo é
-  // consequência dela — inclusive a pontuação.
-  if (leadAtual.estagio_funil !== 'proposta_enviada') {
-    await registrarMudancaEstagio(client, insert.lead_id, leadAtual.estagio_funil, 'proposta_enviada')
-    await client.from('leads').update({ estagio_funil: 'proposta_enviada', updated_at: new Date().toISOString() }).eq('id', insert.lead_id)
+  // consequência dela — inclusive a pontuação. Nada disso se aplica a venda
+  // sem lead: não há funil para mover nem timeline onde escrever.
+  if (leadAtual && insert.lead_id) {
+    if (leadAtual.estagio_funil !== 'proposta_enviada') {
+      await registrarMudancaEstagio(client, insert.lead_id, leadAtual.estagio_funil, 'proposta_enviada')
+      await client.from('leads').update({ estagio_funil: 'proposta_enviada', updated_at: new Date().toISOString() }).eq('id', insert.lead_id)
+    }
+    await client.from('leads_interacoes').insert({
+      lead_id: insert.lead_id,
+      tipo: 'proposta',
+      descricao: 'Proposta ' + data.numero + ' criada no valor de ' + Number(insert.valor_proposto).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+    })
+    // Proposta enviada é a ação comercial de maior peso no score.
+    await recalcularScoreLead(client, insert.lead_id)
   }
-  await client.from('leads_interacoes').insert({
-    lead_id: insert.lead_id,
-    tipo: 'proposta',
-    descricao: 'Proposta ' + data.numero + ' criada no valor de ' + Number(insert.valor_proposto).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
-  })
 
   // Pontuação do Modo Foco: só quando existe sessão ativa E o lead faz parte
   // da fila daquela sessão. Sem essa segunda checagem, criar uma proposta
   // para um lead qualquer renderia pontos numa sessão que nem inclui ele.
   // clientEventId derivado do id da proposta: um retry que caia aqui de novo
   // reaproveita a mesma chave e não pontua em dobro.
-  const sessaoAtiva = await getActiveFocusSession(client, adminId)
-  if (sessaoAtiva) {
+  const sessaoAtiva = insert.lead_id ? await getActiveFocusSession(client, adminId) : null
+  if (sessaoAtiva && insert.lead_id) {
     const { data: itemDaSessao } = await client
       .from('crm_focus_session_leads')
       .select('lead_id')
@@ -126,15 +137,25 @@ export async function PATCH(req: NextRequest) {
   const adminId = await requireAdmin()
   if (!adminId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const body = await req.json()
-  const { id, ...update } = body
+  const { id, ...resto } = body
   if (!id) return NextResponse.json({ error: 'id obrigatorio' }, { status: 400 })
 
-  update.updated_at = new Date().toISOString()
+  // Antes, o corpo inteiro ia direto para o update. A tela do Financeiro
+  // manda `leads: {nome}` e `empreendimentos: {nome}` junto com os valores —
+  // não são colunas, o update falhava, e a tela caía num fallback silencioso
+  // em localStorage. Daí produção ter ficado sem financeiro.
+  const normalizado = normalizarPatchProposta(resto)
+  if (!normalizado.ok) return NextResponse.json({ error: normalizado.erro }, { status: 400 })
+
+  const update: Record<string, unknown> = { ...normalizado.update, updated_at: new Date().toISOString() }
   const client = sb()
 
   if (update.status === 'aceita') {
     const { data: prop } = await client.from('crm_propostas').select('lead_id, valor_proposto').eq('id', id).single()
-    if (prop) {
+    // Venda lançada direto no Financeiro não tem lead: não há funil para
+    // mover nem timeline onde registrar, e seguir daqui quebraria no
+    // .eq('id', null).
+    if (prop?.lead_id) {
       const { data: leadAtual } = await client.from('leads').select('estagio_funil').eq('id', prop.lead_id).single()
       if (leadAtual && leadAtual.estagio_funil !== 'fechado') {
         await registrarMudancaEstagio(client, prop.lead_id, leadAtual.estagio_funil, 'fechado')

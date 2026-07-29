@@ -105,5 +105,20 @@ export async function POST(req: NextRequest) {
     .single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  // Lançar atividade de um dia PASSADO ("editar outro dia") invalida o
+  // registro selado daquele dia: o selo guardou o resultado calculado antes
+  // deste lançamento, e sem apagá-lo o calendário continuaria mostrando o dia
+  // como falhado depois de o corretor corrigir. O dia é reselado na próxima
+  // abertura do calendário, já com o número novo.
+  if (data < hojeEmSaoPaulo()) {
+    const { error: erroSelo } = await sb()
+      .from('crm_metas_dia_historico')
+      .delete()
+      .eq('admin_id', adminId)
+      .eq('data', data)
+    if (erroSelo) logError(SOURCE, 'falha ao invalidar selo do dia editado', erroSelo, { data })
+  }
+
   return NextResponse.json({ data: row }, { status: 201 })
 }

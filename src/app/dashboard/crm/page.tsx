@@ -6,6 +6,9 @@ import { ConversaPanel } from '@/components/dashboard/ConversaPanel'
 import { ESTAGIOS_FUNIL as ESTAGIOS } from '@/lib/dashboard/estagios'
 import { isEligibleForFocusQueue } from '@/lib/dashboard/focus-queue'
 import { temWhatsappReal } from '@/lib/leads/normalize'
+import { PainelScore, type DetalheScore } from '@/components/dashboard/PainelScore'
+import { AnexosLead } from '@/components/dashboard/AnexosLead'
+import { CORES_SLA, statusSla } from '@/lib/leads/sla'
 import type { TimelineItem, TimelineKind } from '@/lib/dashboard/lead-timeline'
 
 const CORES_TIMELINE: Partial<Record<TimelineKind | 'evento', string>> = {
@@ -36,6 +39,12 @@ type Lead = {
   temperatura?: number; anotacoes?: string | null; created_at?: string
   empreendimentos?: { nome?: string; cidade?: string } | null
   property_name?: string | null; visitas?: number; downloads?: number
+  // Campos comerciais que já existiam em `leads` e nunca apareciam na tela.
+  // No financiamento direto a entrada é o que decide a venda.
+  entrada_disponivel?: string | null; faixa_investimento?: string | null
+  prazo_compra?: string | null; cidade_interesse?: string | null
+  primeiro_atendimento_em?: string | null
+  lead_score_detalhe?: DetalheScore | null
 }
 type Unidade = { id: string; unidade: string; bloco?: string; metragem: number; dormitorios?: number; disponivel: boolean; valor_tabela?: number; valor_promocional?: number; condicoes_negociacao?: string }
 type Emp = { id: string; nome: string; status_venda: string; status_obra?: string }
@@ -265,6 +274,13 @@ function LeadCard({ lead, onDragStart, onSelect, onMover }: { lead: Lead; onDrag
   const esfriando = diasDesde > 14 && lead.estagio_funil !== 'fechado' && score < 40
   const [moverAberto, setMoverAberto] = useState(false)
 
+  // Cronômetro do primeiro atendimento. Lead de tráfego pago que não é
+  // respondido nos primeiros minutos já mandou mensagem para outros três
+  // corretores. Só aparece enquanto ainda faz diferença: depois de atendido,
+  // o selo some em vez de virar alarme permanente.
+  const sla = statusSla(lead)
+  const mostrarSla = sla.estado !== 'atendido' && sla.texto !== ''
+
   return (
     <div draggable onDragStart={(e) => { e.stopPropagation(); onDragStart(lead.id) }} onClick={() => onSelect(lead)}
       style={{ background: '#fff', borderRadius: 8, padding: '10px 11px', marginBottom: 8, border: '1px solid ' + D.line, borderLeft: '4px solid ' + t.cor, cursor: 'grab', boxShadow: '0 1px 2px rgba(0,0,0,0.04)', position: 'relative' }}>
@@ -278,7 +294,19 @@ function LeadCard({ lead, onDragStart, onSelect, onMover }: { lead: Lead; onDrag
         {typeof lead.orcamento_max === 'number' && lead.orcamento_max > 0 && <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 999, background: D.bg, color: D.muted }}>{fmt(lead.orcamento_max)}</span>}
         {esfriando && <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 999, background: '#EFF6FF', color: '#1D4ED8', fontWeight: 700 }}>❄ esfriando</span>}
         {lead.requer_atencao && <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 999, background: 'rgba(210,78,34,0.12)', color: D.bronze, fontWeight: 700 }}>★ atenção</span>}
+        {/* Entrada é o campo que mais decide venda no financiamento direto:
+            sem entrada não há contrato, por mais quente que o lead pareça. */}
+        {lead.entrada_disponivel && <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 999, background: 'rgba(34,197,94,0.14)', color: '#15803d', fontWeight: 700 }}>entrada {lead.entrada_disponivel}</span>}
+        {lead.prazo_compra && <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 999, background: D.bg, color: D.muted }}>{lead.prazo_compra}</span>}
       </div>
+
+      {mostrarSla && (
+        <div style={{ marginTop: 7 }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 10.5, fontWeight: 700, padding: '3px 8px', borderRadius: 999, background: CORES_SLA[sla.estado].fundo, color: CORES_SLA[sla.estado].texto }}>
+            ⏱ {sla.texto}
+          </span>
+        </div>
+      )}
       <div style={{ marginTop: 9 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: D.muted, marginBottom: 3 }}>
           <span>Score</span><span style={{ fontWeight: 700, color: score >= 60 ? D.green : score >= 30 ? '#f59e0b' : D.muted }}>{score}pts</span>
@@ -338,6 +366,9 @@ function Kanban({ leads, dragId, onDragStart, onDrop, onSelect, onMover }: { lea
       <div style={{ display: 'flex', gap: 12, minWidth: 'max-content', alignItems: 'flex-start' }}>
         {ESTAGIOS.map(col => {
           const colLeads = leads.filter(l => l.estagio_funil === col.key)
+          // VGV da etapa: a contagem sozinha não diz se o funil está gordo ou
+          // magro — dez leads de R$ 200 mil valem menos que dois de R$ 1,5 mi.
+          const vgvCol = colLeads.reduce((s, l) => s + (l.orcamento_max ?? 0), 0)
           const isHover = hoverCol === col.key
           return (
             <div key={col.key} onDragOver={(e) => { e.preventDefault(); setHoverCol(col.key) }} onDragLeave={() => setHoverCol(h => h === col.key ? null : h)} onDrop={() => { onDrop(col.key); setHoverCol(null) }}
@@ -347,6 +378,9 @@ function Kanban({ leads, dragId, onDragStart, onDrop, onSelect, onMover }: { lea
                 <span style={{ fontWeight: 700, fontSize: 12, color: D.ink }}>{col.label}</span>
                 <span style={{ marginLeft: 'auto', background: col.cor, color: '#fff', borderRadius: 999, padding: '1px 8px', fontSize: 11, fontWeight: 700 }}>{colLeads.length}</span>
               </div>
+              {vgvCol > 0 && (
+                <div style={{ fontSize: 11, color: D.muted, marginTop: -4, marginBottom: 8, fontWeight: 600 }}>{fmt(vgvCol)}</div>
+              )}
               <div style={{ display: 'flex', flexDirection: 'column', maxHeight: 560, overflowY: 'auto' }}>
                 {colLeads.length === 0 ? (
                   // Antes dizia "Arraste leads para cá" — instrução impossível
@@ -373,7 +407,15 @@ function LeadModal({ lead, onClose, onUpdated, onDeleted }: { lead: Lead; onClos
   const [eventos, setEventos] = useState<Evento[]>([])
   const [novaNota, setNovaNota] = useState('')
   const [temp, setTemp] = useState<number>(lead.temperatura ?? 1)
-  const [form, setForm] = useState({ nome: lead.nome ?? '', whatsapp: lead.whatsapp ?? '', email: lead.email ?? '', origem: lead.origem ?? 'Site', orcamento_max: lead.orcamento_max != null ? String(lead.orcamento_max) : '' })
+  const [form, setForm] = useState({
+    nome: lead.nome ?? '', whatsapp: lead.whatsapp ?? '', email: lead.email ?? '',
+    origem: lead.origem ?? 'Site', orcamento_max: lead.orcamento_max != null ? String(lead.orcamento_max) : '',
+    // Os três campos que mais pesam no score de financiamento direto e que
+    // até agora só podiam ser preenchidos por webhook.
+    entrada_disponivel: lead.entrada_disponivel ?? '',
+    prazo_compra: lead.prazo_compra ?? '',
+    cidade_interesse: lead.cidade_interesse ?? '',
+  })
 
   const [timelineUnificada, setTimelineUnificada] = useState<TimelineItem[]>([])
 
@@ -423,10 +465,23 @@ function LeadModal({ lead, onClose, onUpdated, onDeleted }: { lead: Lead; onClos
 
   async function salvarEdicao() {
     setSaving(true)
-    const payload = { nome: form.nome, whatsapp: form.whatsapp, email: form.email || null, origem: form.origem, orcamento_max: form.orcamento_max ? Number(form.orcamento_max) : null }
+    const payload = {
+      nome: form.nome, whatsapp: form.whatsapp, email: form.email || null, origem: form.origem,
+      orcamento_max: form.orcamento_max ? Number(form.orcamento_max) : null,
+      entrada_disponivel: form.entrada_disponivel || null,
+      prazo_compra: form.prazo_compra || null,
+      cidade_interesse: form.cidade_interesse || null,
+    }
     const res = await fetch('/api/admin/leads/' + lead.id, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
     setSaving(false)
-    if (res.ok) { const upd = { ...lead, ...payload }; onUpdated(upd); setEditing(false) }
+    if (res.ok) {
+      // A rota devolve o lead já com o score recalculado — qualificar o lead
+      // e continuar vendo o número velho seria confuso justamente no momento
+      // em que ele mais muda.
+      const json = await res.json().catch(() => null)
+      onUpdated({ ...lead, ...payload, ...(json?.data ?? {}) })
+      setEditing(false)
+    }
   }
 
   async function excluir() {
@@ -490,6 +545,15 @@ function LeadModal({ lead, onClose, onUpdated, onDeleted }: { lead: Lead; onClos
               </select>
               <label style={labelCss}>Orçamento máx (R$)</label>
               <input type="number" style={inputCss} value={form.orcamento_max} onChange={e => setForm(p => ({ ...p, orcamento_max: e.target.value }))} />
+              <label style={labelCss}>Entrada disponível</label>
+              <input style={inputCss} placeholder="Ex.: R$ 60.000 ou FGTS + 30 mil" value={form.entrada_disponivel} onChange={e => setForm(p => ({ ...p, entrada_disponivel: e.target.value }))} />
+              <label style={labelCss}>Prazo de compra</label>
+              <select style={inputCss} value={form.prazo_compra} onChange={e => setForm(p => ({ ...p, prazo_compra: e.target.value }))}>
+                <option value="">Não informado</option>
+                {['Imediato', 'Até 3 meses', 'Até 6 meses', 'Até 1 ano', 'Sem pressa'].map(o => <option key={o} value={o}>{o}</option>)}
+              </select>
+              <label style={labelCss}>Cidade de interesse</label>
+              <input style={inputCss} value={form.cidade_interesse} onChange={e => setForm(p => ({ ...p, cidade_interesse: e.target.value }))} />
               <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
                 <button onClick={salvarEdicao} disabled={saving} style={{ flex: 1, background: D.bronze, color: '#fff', border: 'none', borderRadius: 10, padding: 12, fontSize: 14, fontWeight: 700, cursor: 'pointer', opacity: saving ? 0.6 : 1 }}>{saving ? 'Salvando...' : 'Salvar alterações'}</button>
                 <button onClick={() => setEditing(false)} style={{ flex: 1, background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: 10, padding: 12, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Cancelar</button>
@@ -505,7 +569,9 @@ function LeadModal({ lead, onClose, onUpdated, onDeleted }: { lead: Lead; onClos
                   ['E-mail', lead.email ? <a key="e" href={'mailto:' + lead.email} style={{ color: D.bronze, textDecoration: 'none' }}>{lead.email}</a> : '—'],
                   ['Empreendimento', lead.empreendimentos?.nome ?? lead.property_name ?? '—'],
                   ['Orçamento', lead.orcamento_max ? fmt(lead.orcamento_max) : '—'],
-                  ['Score', lead.lead_score ?? '—'],
+                  ['Entrada disponível', lead.entrada_disponivel || '—'],
+                  ['Prazo de compra', lead.prazo_compra || '—'],
+                  ['Cidade de interesse', lead.cidade_interesse || '—'],
                   ['Recebido em', lead.created_at ? new Date(lead.created_at).toLocaleString('pt-BR') : '—'],
                 ].map(([k, v], i) => (
                   <tr key={i}>
@@ -516,6 +582,15 @@ function LeadModal({ lead, onClose, onUpdated, onDeleted }: { lead: Lead; onClos
               </tbody>
             </table>
           )}
+
+          {/* O número do score já aparecia em quatro telas sem dizer de onde
+              vinha. Aqui ele abre a conta e, principalmente, diz qual é a
+              próxima ação. */}
+          <label style={labelCss}>Score</label>
+          <PainelScore score={lead.lead_score ?? 0} detalhe={lead.lead_score_detalhe} compacto />
+
+          <label style={labelCss}>Documentos</label>
+          <AnexosLead leadId={lead.id} onMudou={carregarTimeline} />
 
           <label style={labelCss}>Linha do tempo</label>
           <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>

@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { ESTAGIOS_FUNIL as ESTAGIOS } from '@/lib/dashboard/estagios'
 import { MetasDiarias } from '@/components/dashboard/MetasDiarias'
+import { CalendarioMetas } from '@/components/dashboard/CalendarioMetas'
 
 const D = {
   bg: '#F3F2EE', surface: '#FAFAF7', sidebar: '#131211', ink: '#161512',
@@ -102,6 +103,10 @@ export default function DashboardHome() {
         </div>
 
         <MetasDiarias />
+
+        <div style={{ marginBottom: 24 }}>
+          <CalendarioMetas />
+        </div>
 
         {cubScraper && !cubScraper.online && (
           <div style={{ background: '#FEF3C7', border: '1px solid #F5C542', borderRadius: 10, padding: '14px 18px', marginBottom: 24, display: 'flex', alignItems: 'flex-start', gap: 10 }}>
