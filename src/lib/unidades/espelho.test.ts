@@ -31,6 +31,7 @@ function unidade(sobre: Partial<UnidadeEspelho>): UnidadeEspelho {
     lead_id_reserva: null,
     condicoes_negociacao: null,
     cub_fator: null,
+    plano_pagamento: null,
     ...sobre,
   }
 }
@@ -217,5 +218,34 @@ describe('pickPublico — o que vaza e o que não vaza', () => {
     const pub = pickPublico(interna, true, AGORA)
     expect(pub.preco?.valor).toBe(450000)
     expect(pub.entrada_min).toBe(45000)
+  })
+})
+
+describe('pickPublico — plano de pagamento', () => {
+  const PLANO = {
+    entrada: 55939.43, parcelas_qtd: 40, parcela_valor: 2796.97,
+    reforcos_qtd: 4, reforco_valor: 10488.64, saldo_financiamento: 489470.02,
+    cub_quantidade: 224, percentual_ate_chaves: 30,
+  }
+
+  it('o plano sai no recorte público — está impresso na tabela do plantão', () => {
+    const pub = pickPublico(unidade({ plano_pagamento: PLANO }), true, AGORA)
+    expect(pub.plano).toMatchObject({ entrada: 55939.43, parcelas_qtd: 40, cub_quantidade: 224 })
+  })
+
+  it('com exibir_preco desligado o plano some — parcela sem preço não diz nada', () => {
+    expect(pickPublico(unidade({ plano_pagamento: PLANO }), false, AGORA).plano).toBeNull()
+  })
+
+  it('unidade sem plano cadastrado devolve null, não objeto zerado', () => {
+    expect(pickPublico(unidade({}), true, AGORA).plano).toBeNull()
+  })
+
+  it('condicoes_negociacao continua FORA do público mesmo com plano presente', () => {
+    const pub = pickPublico(
+      unidade({ plano_pagamento: PLANO, condicoes_negociacao: 'aceita carro na entrada' }),
+      true, AGORA,
+    ) as unknown as Record<string, unknown>
+    expect(pub.condicoes_negociacao).toBeUndefined()
   })
 })

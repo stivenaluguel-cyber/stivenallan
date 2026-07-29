@@ -17,6 +17,8 @@
 // 3. O que o público vê é um SUBCONJUNTO explícito (pickPublico): anotações
 //    de negociação, lead da reserva e fator CUB são informação interna.
 
+import { planoDoJson, type PlanoPagamento } from './simular'
+
 export type UnidadeEspelho = {
   id: string
   bloco: string | null
@@ -34,6 +36,7 @@ export type UnidadeEspelho = {
   lead_id_reserva: string | null
   condicoes_negociacao: string | null
   cub_fator: number | null
+  plano_pagamento: unknown
 }
 
 export type StatusUnidade = 'disponivel' | 'reservada' | 'vendida'
@@ -226,6 +229,11 @@ export type UnidadePublica = {
   status: StatusUnidade
   preco: PrecoUnidade | null
   entrada_min: number | null
+  // O plano de pagamento É informação pública: está impresso na tabela que a
+  // construtora entrega ao cliente no plantão. Diferente de
+  // `condicoes_negociacao`, que é texto livre e pode conter recado interno
+  // ("aceita carro na entrada") — esse continua fora.
+  plano: PlanoPagamento | null
 }
 
 /**
@@ -246,5 +254,8 @@ export function pickPublico(u: UnidadeEspelho, exibirPreco: boolean, agora: Date
     status: statusDaUnidade(u, agora),
     preco: exibirPreco ? precoDaUnidade(u) : null,
     entrada_min: exibirPreco ? numeroOuNull(u.valor_entrada_min) : null,
+    // Sem preço exibido não faz sentido mostrar plano de pagamento: seria
+    // dizer a parcela sem dizer o valor.
+    plano: exibirPreco ? planoDoJson(u.plano_pagamento) : null,
   }
 }

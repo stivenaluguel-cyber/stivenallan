@@ -215,12 +215,29 @@ export function parsearTabelaFontana(
  */
 export function paraUnidadeDoBanco(u: UnidadeImportada, empreendimentoId: string) {
   const brl = (n: number) => n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+  const ateAsChaves = u.valor_entrada_min + 40 * u.parcela_mensal + 4 * u.reforco_anual
+
   return {
     empreendimento_id: empreendimentoId,
     unidade: u.unidade,
     andar: u.andar,
     metragem: u.metragem,
     dormitorios: u.dormitorios,
+    // O plano estruturado alimenta a simulação pública. Vai em jsonb porque
+    // cada empreendimento tem forma diferente (Pineto 8%+40+4, Thiene 10% com
+    // condição especial, Aura 40/60) — coluna fixa só caberia no plano de hoje.
+    plano_pagamento: {
+      entrada: u.valor_entrada_min,
+      parcelas_qtd: 40,
+      parcela_valor: u.parcela_mensal,
+      reforcos_qtd: 4,
+      reforco_valor: u.reforco_anual,
+      saldo_financiamento: u.saldo_financiamento,
+      // A quantidade de CUBs vive aqui: `cub_fator` é numeric(6,4) e não
+      // comporta 210–264.
+      cub_quantidade: u.cub_fator,
+      percentual_ate_chaves: Math.round((ateAsChaves / u.valor_tabela) * 100),
+    },
     // A tabela do Pineto diz "02 Dormitórios (01 Suíte)" no rodapé, para todas
     // as unidades — não há coluna por unidade.
     suites: 1,

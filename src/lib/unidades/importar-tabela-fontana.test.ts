@@ -223,9 +223,40 @@ describe('paraUnidadeDoBanco', () => {
       'empreendimento_id', 'bloco', 'unidade', 'andar', 'metragem', 'dormitorios',
       'suites', 'orientacao', 'valor_tabela', 'valor_promocional', 'valor_entrada_min',
       'disponivel', 'reservado_ate', 'lead_id_reserva', 'condicoes_negociacao', 'cub_fator',
+      'plano_pagamento',
     ])
     for (const k of Object.keys(linha)) {
       expect(COLUNAS_REAIS.has(k), `coluna inexistente: ${k}`).toBe(true)
     }
+  })
+})
+
+describe('paraUnidadeDoBanco — plano de pagamento estruturado', () => {
+  const r = parsearTabelaFontana(TABELA, CUB_JULHO)
+  const l = paraUnidadeDoBanco(r.unidades.find((u) => u.unidade === '102')!, 'emp')
+
+  it('grava o plano com os valores exatos da tabela', () => {
+    expect(l.plano_pagamento).toMatchObject({
+      entrada: 55939.43,
+      parcelas_qtd: 40,
+      parcela_valor: 2796.97,
+      reforcos_qtd: 4,
+      reforco_valor: 10488.64,
+      saldo_financiamento: 489470.02,
+    })
+  })
+
+  it('a quantidade de CUBs vai no plano — cub_fator não comporta 224', () => {
+    expect(l.plano_pagamento.cub_quantidade).toBe(224)
+  })
+
+  it('calcula o percentual até as chaves a partir dos próprios valores', () => {
+    expect(l.plano_pagamento.percentual_ate_chaves).toBe(30)
+  })
+
+  it('o plano fecha a conta do contrato', () => {
+    const p = l.plano_pagamento
+    const soma = p.entrada + p.parcelas_qtd * p.parcela_valor + p.reforcos_qtd * p.reforco_valor
+    expect(soma + p.saldo_financiamento).toBeCloseTo(699242.88, 0)
   })
 })
