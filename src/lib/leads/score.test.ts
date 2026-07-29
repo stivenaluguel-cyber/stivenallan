@@ -242,3 +242,78 @@ describe('MAXIMOS', () => {
     expect(Object.values(MAXIMOS).reduce((s, n) => s + n, 0)).toBe(100)
   })
 })
+
+// ─────────────────────────────────────────────────────────────────────
+// Faixas de entrada e o corte dos 20%.
+//
+// 20% é a entrada do plano padrão Fontana e o corte que fecha contrato na
+// maioria dos empreendimentos. Até aqui QUALQUER entrada preenchida valia os
+// 9 pontos cheios: quem declarava 5% pontuava igual a quem declarava 30%, e a
+// fila do Modo Foco não separava lead viável de curioso.
+//
+// O formulário passou a capturar faixas (PR #46) exatamente para isso. Os
+// rótulos ANTIGOS seguem no banco — produção tem hoje um lead com "20% a 50%".
+// ─────────────────────────────────────────────────────────────────────
+describe('calcularScore — faixas de entrada e o corte dos 20%', () => {
+  const s = (entrada: string) => calcularScore({ entrada_disponivel: entrada }, null, AGORA).score
+
+  it('acima do corte pontua mais que abaixo dele', () => {
+    expect(s('30% ou mais')).toBeGreaterThan(s('10% a 19%'))
+    expect(s('20% a 29%')).toBeGreaterThan(s('10% a 19%'))
+    expect(s('10% a 19%')).toBeGreaterThan(s('Menos de 10%'))
+  })
+
+  it('20% e 30% valem o mesmo — os dois fecham negócio no direto', () => {
+    expect(s('20% a 29%')).toBe(s('30% ou mais'))
+  })
+
+  it('reconhece os rótulos antigos que continuam no banco', () => {
+    expect(s('20% a 50%')).toBe(s('30% ou mais'))
+    expect(s('Mais de 50%')).toBe(s('30% ou mais'))
+    // "Até 20% do valor" era ambíguo (3% ou 19%?) — não pode valer como 20%+.
+    expect(s('Até 20% do valor')).toBeLessThan(s('20% a 29%'))
+  })
+
+  it('cobre as 5 opções EXATAS que o formulário emite hoje', () => {
+    // Copiadas do <option value> de FormContato.tsx (PR #46).
+    for (const v of ['Menos de 10%', '10% a 19%', '20% a 29%', '30% ou mais', 'Preciso calcular']) {
+      expect(s(v), `faixa não reconhecida: ${v}`).toBeGreaterThan(0)
+    }
+  })
+
+  it('"preciso calcular" pontua menos que uma faixa acima do corte', () => {
+    expect(s('Preciso calcular')).toBeLessThan(s('20% a 29%'))
+    expect(s('Prefiro falar no WhatsApp')).toBeLessThan(s('20% a 29%'))
+  })
+
+  it('valor concreto em reais digitado no CRM continua sendo sinal alto', () => {
+    // Número apurado pelo corretor vale mais que faixa de formulário.
+    expect(s('R$ 60.000')).toBe(s('30% ou mais'))
+    expect(s('FGTS + 30 mil')).toBe(s('30% ou mais'))
+  })
+
+  it('não declarar entrada continua sendo o pior caso e vira pendência', () => {
+    const vazio = calcularScore({}, null, AGORA)
+    expect(vazio.score).toBeLessThan(s('Menos de 10%'))
+    expect(vazio.negativos.join(' ')).toMatch(/entrada/i)
+  })
+
+  it('abaixo do corte registra pendência nomeada para o corretor', () => {
+    for (const faixa of ['Menos de 10%', '10% a 19%']) {
+      const r = calcularScore({ entrada_disponivel: faixa }, null, AGORA)
+      expect(r.negativos.join(' '), faixa).toMatch(/abaixo de 20%/i)
+    }
+  })
+
+  it('no corte ou acima NÃO gera pendência de entrada', () => {
+    for (const faixa of ['20% a 29%', '30% ou mais', '20% a 50%']) {
+      const r = calcularScore({ entrada_disponivel: faixa }, null, AGORA)
+      expect(r.negativos.join(' '), faixa).not.toMatch(/abaixo de 20%/i)
+    }
+  })
+
+  it('a faixa aparece no rótulo do fator positivo, não um texto genérico', () => {
+    const r = calcularScore({ entrada_disponivel: '30% ou mais' }, null, AGORA)
+    expect(r.positivos.some((p) => /20% ou mais/.test(p.rotulo))).toBe(true)
+  })
+})

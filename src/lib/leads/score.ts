@@ -129,6 +129,56 @@ function pontosPrazo(prazo: string | null | undefined): { pontos: number; rotulo
   return { pontos: 3, rotulo: 'Prazo declarado' }
 }
 
+// Faixa de entrada.
+//
+// 20% é o corte comercial do financiamento direto: é a entrada do plano padrão
+// Fontana, e abaixo dela a maioria dos empreendimentos não fecha contrato.
+//
+// Antes desta função, QUALQUER entrada preenchida valia os 9 pontos cheios —
+// quem declarava 5% pontuava igual a quem declarava 30%, e a fila do Modo Foco
+// não distinguia lead viável de curioso. O formulário passou a capturar faixas
+// (PR #46) justamente para isso ser usado aqui.
+//
+// Trata também os rótulos ANTIGOS que seguem no banco: produção tem hoje um
+// lead com "20% a 50%", vocabulário da versão anterior do formulário.
+function pontosEntrada(entrada: string | null | undefined): {
+  pontos: number
+  rotulo: string | null
+  abaixoDoCorte: boolean
+} {
+  const e = (entrada ?? '').toLowerCase().trim()
+  if (!e) return { pontos: 0, rotulo: null, abaixoDoCorte: false }
+
+  // No corte ou acima — 20% e 30%+ valem o mesmo, os dois fecham negócio.
+  // Inclui os legados "20% a 50%" e "Mais de 50%".
+  if (/30%\s*ou\s*mais|20%\s*a\s*29%|20%\s*a\s*50%|mais\s*de\s*50%/.test(e)) {
+    return { pontos: 9, rotulo: `Entrada de 20% ou mais (${entrada})`, abaixoDoCorte: false }
+  }
+  // Perto do corte: vale conversa — pode fechar em empreendimento de entrada
+  // menor, como o Thiene (10%).
+  if (/10%\s*a\s*19%/.test(e)) {
+    return { pontos: 5, rotulo: 'Entrada entre 10% e 19%', abaixoDoCorte: true }
+  }
+  if (/menos\s*de\s*10%/.test(e)) {
+    return { pontos: 2, rotulo: 'Entrada abaixo de 10%', abaixoDoCorte: true }
+  }
+  // Respondeu, mas não informou nada apurável.
+  if (/preciso\s*calcular|prefiro\s*falar|n[ãa]o\s*sei/.test(e)) {
+    return { pontos: 4, rotulo: 'Entrada ainda a definir', abaixoDoCorte: false }
+  }
+  // Legado "Até 20% do valor": juntava quem tem 3% com quem tem 19%, então
+  // não pode valer como se estivesse no corte.
+  if (/at[ée]\s*20%/.test(e)) {
+    return { pontos: 4, rotulo: 'Entrada em faixa ambígua (até 20%)', abaixoDoCorte: false }
+  }
+  // Valor concreto que o corretor digita no CRM ("R$ 60.000", "FGTS + 30 mil").
+  // Número real é sinal alto: alguém apurou, não é faixa de formulário.
+  if (/r\$|\d/.test(e)) {
+    return { pontos: 9, rotulo: `Entrada declarada: ${entrada}`, abaixoDoCorte: false }
+  }
+  return { pontos: 4, rotulo: `Entrada declarada (${entrada})`, abaixoDoCorte: false }
+}
+
 function pontosOrigem(origem: string | null | undefined): { pontos: number; rotulo: string | null } {
   const o = (origem ?? '').toLowerCase().trim()
   if (!o) return { pontos: 0, rotulo: null }
@@ -166,9 +216,17 @@ export function calcularScore(
   let perfil = 0
 
   // Entrada é o campo que mais decide venda no direto: sem entrada não há
-  // contrato, por mais quente que o lead pareça.
-  if (preenchido(lead.entrada_disponivel)) perfil += add('Entrada disponível declarada', 9)
-  else negativos.push('Não declarou entrada disponível')
+  // contrato, por mais quente que o lead pareça. E a FAIXA importa — 20% é o
+  // corte que fecha negócio.
+  const entrada = pontosEntrada(lead.entrada_disponivel)
+  if (entrada.pontos > 0) {
+    perfil += add(entrada.rotulo, entrada.pontos)
+    // Pendência nomeada: o corretor precisa saber que o lead respondeu, mas
+    // com entrada insuficiente para o plano padrão.
+    if (entrada.abaixoDoCorte) negativos.push('Entrada abaixo de 20% — confira empreendimento com entrada menor')
+  } else {
+    negativos.push('Não declarou entrada disponível')
+  }
 
   const orcamento = numero(lead.orcamento_max) ?? numero(lead.orcamento_min)
   if (orcamento) {

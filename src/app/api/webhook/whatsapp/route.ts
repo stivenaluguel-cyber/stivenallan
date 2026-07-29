@@ -66,12 +66,25 @@ async function processarEResponder(whatsapp: string, texto: string) {
     const { data: lead, error: upsertErr } = await supabase
       .from('leads')
       .upsert({ whatsapp }, { onConflict: 'whatsapp' })
-      .select('id, nome, requer_atencao, lead_score, atendimento_humano_ativo')
+      .select('id, nome, requer_atencao, lead_score, atendimento_humano_ativo, origem, created_at')
       .single()
 
     if (upsertErr || !lead) {
       console.error('[processarEResponder] falha ao resolver lead', whatsapp, upsertErr)
       return
+    }
+
+    // Lead que acabou de nascer neste upsert dispara a notificação — era a
+    // única porta de entrada que não avisava ninguém: quem mandava mensagem
+    // direto no WhatsApp ficava invisível até o corretor abrir o painel.
+    // O upsert não diz se inseriu ou achou; created_at recém-carimbado diz.
+    // Best-effort e fora do caminho da resposta: falha em notificar não pode
+    // atrasar nem derrubar o atendimento da mensagem.
+    const idadeMs = Date.now() - new Date(lead.created_at).getTime()
+    if (Number.isFinite(idadeMs) && idadeMs >= 0 && idadeMs < 90_000) {
+      const { notificarLeadNovo } = await import('@/lib/leads/notificar-lead-novo')
+      notificarLeadNovo(supabase, { id: lead.id, nome: lead.nome, origem: lead.origem ?? 'whatsapp' })
+        .catch((e) => console.error('[processarEResponder] notificacao falhou', e))
     }
 
     // Histórico ANTES de logar a mensagem atual (evita ter que filtrar a

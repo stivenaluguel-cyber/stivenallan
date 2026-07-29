@@ -12,6 +12,7 @@ import { createClient } from '@/lib/supabase/server';
 import { PropertyCardImage } from '@/components/PropertyCardImage';
 import { LeadCaptureModal } from '@/components/LeadCaptureModal';
 import FormContato from './FormContato';
+import { EspelhoPublico } from '@/components/EspelhoPublico';
 import Image from 'next/image';
 import PropertyPageTemplate, { type PropertyData } from '@/components/PropertyPageTemplate';
 import { resolverFaq } from '@/lib/imoveis/faq-padrao';
@@ -413,6 +414,10 @@ export default async function EmpreendimentoPage({ params }: PageProps) {
           <FormContato empreendimento={emp.nome} propertyId={supabaseId} propertySlug={slug} />
         </aside>
       </section>
+
+      {/* Espelho de vendas. Some inteiro quando o empreendimento não tem
+          unidades cadastradas — que é o caso da maioria dos 36 imóveis. */}
+      <EspelhoPublico slug={slug} />
 
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 20px 48px' }}>
         <Link href={cidadeHref} style={{ color: '#8a6d3b', textDecoration: 'none', fontSize: 15 }}>
