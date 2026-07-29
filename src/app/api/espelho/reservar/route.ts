@@ -6,6 +6,7 @@ import { normalizeEmail, normalizePhone, normalizeString } from '@/lib/leads/nor
 import { notificarLeadNovo } from '@/lib/leads/notificar-lead-novo'
 import { recalcularScoreLead } from '@/lib/leads/score-server'
 import { expiraEm, RESERVA_DURACAO_HORAS } from '@/lib/unidades/espelho'
+import { resolverLeadDoEspelho } from '@/lib/unidades/lead-do-espelho'
 import { logError } from '@/lib/log'
 
 export const dynamic = 'force-dynamic'
@@ -89,30 +90,24 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Esta unidade já foi vendida' }, { status: 409 })
     }
 
-    // ── Lead: resolve-ou-cria pelo WhatsApp ──────────────────────────────
-    // Só a coluna `whatsapp` vai no upsert; nada mais é tocado quando o lead
-    // já existe. Sobrescrever nome/origem apagaria a qualificação feita pelo
-    // corretor com o que o comprador digitou às pressas no site.
-    const { data: lead, error: erroLead } = await client
-      .from('leads')
-      .upsert({ whatsapp }, { onConflict: 'whatsapp' })
-      .select('id, nome, origem, created_at')
-      .single()
+    const empNome = (unidade.empreendimentos as { nome?: string } | null)?.nome ?? 'empreendimento'
+    const rotulo = [unidade.bloco, unidade.unidade].filter(Boolean).join(' ')
 
-    if (erroLead || !lead) {
-      logError(SOURCE, 'falha ao resolver lead', erroLead, { unidadeId })
-      return NextResponse.json({ error: 'Não foi possível registrar a reserva' }, { status: 500 })
-    }
-
-    // Preenche só o que está vazio — lead novo ganha nome/email/origem;
-    // lead conhecido preserva o que o corretor já apurou.
-    const completar: Record<string, unknown> = {}
-    if (!lead.nome && nome) completar.nome = nome
-    if (email) completar.email = email
-    if (!lead.origem || lead.origem === 'whatsapp') completar.origem = 'espelho'
-    if (Object.keys(completar).length > 0) {
-      await client.from('leads').update(completar).eq('id', lead.id)
-    }
+    // Mesmo helper da simulação: resolve-ou-cria o lead E carimba o interesse
+    // (empreendimento + unidade) nos campos que o Kanban desenha. Antes o lead
+    // nascia sem isso e o corretor tinha que abrir a timeline para saber qual
+    // apartamento a pessoa queria.
+    const rLead = await resolverLeadDoEspelho(client, {
+      whatsapp,
+      nome,
+      email,
+      empreendimentoId: unidade.empreendimento_id as string | null,
+      empreendimentoNome: empNome,
+      unidadeRotulo: rotulo,
+      origem: 'reserva',
+    })
+    if (!rLead.ok) return NextResponse.json({ error: rLead.erro }, { status: 500 })
+    const lead = { id: rLead.leadId, nome, created_at: new Date().toISOString() }
 
     // Teto por lead, contando só reservas VIGENTES (as vencidas não contam —
     // mesma régua de expiração do resto do módulo).
@@ -157,9 +152,6 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const empNome = (unidade.empreendimentos as { nome?: string } | null)?.nome ?? 'empreendimento'
-    const rotulo = [unidade.bloco, unidade.unidade].filter(Boolean).join(' ')
-
     // Rastro na timeline do lead: sem isso a reserva não aparece em lugar
     // nenhum do CRM e o corretor descobriria pelo espelho, sem contexto.
     await client.from('leads_interacoes').insert({
@@ -170,10 +162,10 @@ export async function POST(req: NextRequest) {
 
     // Notificação e score são best-effort: a reserva já está gravada e não
     // pode ser desfeita por falha em avisar.
-    const nascidoAgora = Date.now() - new Date(lead.created_at).getTime() < 90_000
+    const nascidoAgora = rLead.nasceuAgora
     notificarLeadNovo(client, {
       id: lead.id,
-      nome: lead.nome || nome,
+      nome,
       origem: nascidoAgora ? 'espelho' : 'espelho (lead existente)',
     }).catch((e) => logError(SOURCE, 'notificacao falhou', e))
 
