@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { competenciaDoMes, competenciaLabel, tabelaVencida } from '@/lib/unidades/tabela-precos'
 import { useRouter } from 'next/navigation'
 
 const D = {
@@ -35,6 +36,123 @@ const STATUS_OBRA_LABEL: Record<string, string> = { lancamento: 'Lancamento', em
 const STATUS_VENDA_LABEL: Record<string, string> = { ativo: 'Ativo', pausado: 'Pausado', encerrado: 'Encerrado' }
 const STATUS_VENDA_COLOR: Record<string, string> = { ativo: D.green, pausado: D.amber, encerrado: D.red }
 
+type TabelaPreco = {
+  id: string; competencia: string; nome_arquivo: string
+  tamanho_bytes: number | null; cub_valor_m2: number | null
+  observacao: string | null; url: string | null
+}
+
+/**
+ * PDF da tabela de preços do empreendimento.
+ *
+ * Existe porque a Fontana tira os arquivos do Drive no meio do mês: sem uma
+ * cópia aqui, a condição que foi passada ao cliente na semana anterior fica
+ * sem documento que a comprove.
+ */
+function PainelTabela({ slug, nome, onFechar }: { slug: string; nome: string; onFechar: () => void }) {
+  const [tabelas, setTabelas] = useState<TabelaPreco[]>([])
+  const [carregando, setCarregando] = useState(true)
+  const [enviando, setEnviando] = useState(false)
+  const [erro, setErro] = useState('')
+  const [competencia, setCompetencia] = useState(() => competenciaDoMes(new Date()).slice(0, 7))
+  const [cub, setCub] = useState('')
+  const [arquivo, setArquivo] = useState<File | null>(null)
+
+  const carregar = async () => {
+    setCarregando(true)
+    try {
+      const r = await fetch('/api/admin/empreendimentos/tabela?slug=' + encodeURIComponent(slug))
+      const j = await r.json()
+      setTabelas(j.data ?? [])
+    } catch { setErro('Falha ao carregar') } finally { setCarregando(false) }
+  }
+  useEffect(() => { carregar() }, [slug]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function enviar(e: React.FormEvent) {
+    e.preventDefault()
+    if (!arquivo) { setErro('Escolha o PDF da tabela'); return }
+    setEnviando(true); setErro('')
+    try {
+      const fd = new FormData()
+      fd.append('slug', slug); fd.append('competencia', competencia)
+      fd.append('file', arquivo); if (cub) fd.append('cub', cub)
+      const r = await fetch('/api/admin/empreendimentos/tabela', { method: 'POST', body: fd })
+      const j = await r.json()
+      if (!r.ok) throw new Error(j.error || 'Falha ao enviar')
+      setArquivo(null); setCub('')
+      await carregar()
+    } catch (e: unknown) { setErro(e instanceof Error ? e.message : 'Falha ao enviar') }
+    finally { setEnviando(false) }
+  }
+
+  async function excluir(id: string) {
+    await fetch('/api/admin/empreendimentos/tabela?id=' + id, { method: 'DELETE' })
+    carregar()
+  }
+
+  const rotulo = (t: TabelaPreco) => competenciaLabel(t.competencia)
+  const agora = new Date()
+
+  return (
+    <div style={{ background: '#fff', border: '1px solid ' + D.line, borderRadius: 3, padding: '16px 20px', marginTop: -4 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, gap: 10, flexWrap: 'wrap' }}>
+        <strong style={{ fontSize: 14, color: D.ink }}>Tabela de preços · {nome}</strong>
+        <button onClick={onFechar} style={{ background: 'none', border: 'none', color: D.muted, fontSize: 13, cursor: 'pointer', textDecoration: 'underline' }}>fechar</button>
+      </div>
+
+      {carregando ? (
+        <p style={{ margin: 0, fontSize: 13, color: D.muted }}>Carregando…</p>
+      ) : tabelas.length === 0 ? (
+        <p style={{ margin: '0 0 14px', fontSize: 13, color: D.muted }}>Nenhuma tabela guardada ainda.</p>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 }}>
+          {tabelas.map(t => {
+            const vencida = tabelaVencida(t.competencia, agora)
+            return (
+              <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', border: '1px solid ' + D.line, borderRadius: 3, padding: '9px 12px' }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: vencida ? D.muted : D.ink }}>{rotulo(t)}</span>
+                {vencida
+                  ? <span style={{ fontSize: 11, background: 'rgba(26,24,21,0.06)', color: D.muted, padding: '2px 8px', borderRadius: 20, fontWeight: 600 }}>vencida</span>
+                  : <span style={{ fontSize: 11, background: D.green + '22', color: '#15803d', padding: '2px 8px', borderRadius: 20, fontWeight: 700 }}>vigente</span>}
+                {t.cub_valor_m2 ? <span style={{ fontSize: 12, color: D.muted }}>CUB R$ {Number(t.cub_valor_m2).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span> : null}
+                <span style={{ fontSize: 12, color: D.muted, flex: 1, minWidth: 90, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.nome_arquivo}</span>
+                {t.url && (
+                  <a href={t.url} target="_blank" rel="noopener noreferrer"
+                    style={{ fontSize: 13, color: D.bronze, fontWeight: 700, textDecoration: 'none' }}>abrir PDF</a>
+                )}
+                <button onClick={() => excluir(t.id)} style={{ background: 'none', border: 'none', color: D.red, fontSize: 12, cursor: 'pointer', textDecoration: 'underline' }}>excluir</button>
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      <form onSubmit={enviar} style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+        <label style={{ display: 'grid', gap: 4, fontSize: 12, color: D.muted }}>
+          Mês da tabela
+          <input type="month" value={competencia} onChange={e => setCompetencia(e.target.value)} required
+            style={{ padding: '8px 10px', border: '1px solid ' + D.line, borderRadius: 3, fontSize: 13, font: 'inherit', minHeight: 38 }} />
+        </label>
+        <label style={{ display: 'grid', gap: 4, fontSize: 12, color: D.muted }}>
+          CUB impresso <span style={{ fontWeight: 400 }}>(opcional)</span>
+          <input value={cub} onChange={e => setCub(e.target.value)} placeholder="3121,62" inputMode="decimal"
+            style={{ padding: '8px 10px', border: '1px solid ' + D.line, borderRadius: 3, fontSize: 13, width: 110, minHeight: 38 }} />
+        </label>
+        <label style={{ display: 'grid', gap: 4, fontSize: 12, color: D.muted, flex: '1 1 200px' }}>
+          PDF da tabela
+          <input type="file" accept="application/pdf" onChange={e => setArquivo(e.target.files?.[0] ?? null)}
+            style={{ fontSize: 12, minHeight: 38 }} />
+        </label>
+        <button type="submit" disabled={enviando}
+          style={{ padding: '9px 18px', border: 'none', borderRadius: 3, background: enviando ? D.muted : D.bronze, color: '#fff', fontWeight: 700, fontSize: 13, cursor: enviando ? 'default' : 'pointer', minHeight: 38 }}>
+          {enviando ? 'Enviando…' : 'Guardar tabela'}
+        </button>
+      </form>
+      {erro && <p style={{ margin: '10px 0 0', fontSize: 13, color: D.red }}>{erro}</p>}
+    </div>
+  )
+}
+
 export default function EmpreendimentosPage() {
   const router = useRouter()
   const [empreendimentos, setEmpreendimentos] = useState<Empreendimento[]>([])
@@ -45,6 +163,8 @@ export default function EmpreendimentosPage() {
   const [fBairro, setFBairro] = useState(TODOS)
   const [fConstrutora, setFConstrutora] = useState(TODOS)
   const [busca, setBusca] = useState('')
+  const [painelSlug, setPainelSlug] = useState<string | null>(null)
+  const [tabelaPorSlug, setTabelaPorSlug] = useState<Record<string, string>>({})
 
   useEffect(() => { fetchEmpreendimentos() }, [])
 
@@ -61,6 +181,17 @@ export default function EmpreendimentosPage() {
       })
       .catch(() => {})
   }, [])
+
+  // Qual a competência da tabela mais recente de cada prédio, para o botão
+  // dizer "julho de 2026" em vez de só "PDF".
+  useEffect(() => { recarregarTabelas() }, [])
+
+  function recarregarTabelas() {
+    fetch('/api/admin/empreendimentos/tabela')
+      .then(r => r.ok ? r.json() : null)
+      .then(j => { if (j?.recentePorSlug) setTabelaPorSlug(j.recentePorSlug) })
+      .catch(() => {})
+  }
 
   async function fetchEmpreendimentos() {
     setLoading(true)
@@ -166,7 +297,8 @@ export default function EmpreendimentosPage() {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {lista.map(emp => (
-              <div key={emp.id} style={{ background: D.surface, borderRadius: 3, padding: '18px 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px solid ' + D.line, gap: 12, flexWrap: 'wrap' }}>
+              <div key={emp.id}>
+              <div style={{ background: D.surface, borderRadius: 3, padding: '18px 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px solid ' + D.line, gap: 12, flexWrap: 'wrap' }}>
                 <div style={{ flex: 1, minWidth: 200 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6, flexWrap: 'wrap' }}>
                     <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: D.ink }}>{emp.nome}</h3>
@@ -187,6 +319,16 @@ export default function EmpreendimentosPage() {
                       <span style={{ background: 'rgba(255,255,255,0.22)', borderRadius: 20, padding: '1px 8px', fontSize: 11, fontWeight: 700 }}>{comEspelho[emp.slug]}</span>
                     ) : null}
                   </a>
+                  <button onClick={() => setPainelSlug(painelSlug === emp.slug ? null : emp.slug)}
+                    title={tabelaPorSlug[emp.slug] ? `Tabela de ${competenciaLabel(tabelaPorSlug[emp.slug])}` : 'Nenhum PDF guardado'}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: D.bg, color: tabelaPorSlug[emp.slug] ? D.ink : D.muted, border: '1px solid ' + (painelSlug === emp.slug ? D.bronze : D.line), borderRadius: 3, padding: '8px 12px', fontSize: 13, cursor: 'pointer', minHeight: 36 }}>
+                    PDF
+                    {tabelaPorSlug[emp.slug] && (
+                      <span style={{ fontSize: 11, fontWeight: 700, color: tabelaVencida(tabelaPorSlug[emp.slug], new Date()) ? D.amber : D.green }}>
+                        {tabelaVencida(tabelaPorSlug[emp.slug], new Date()) ? 'vencida' : 'ok'}
+                      </span>
+                    )}
+                  </button>
                   <a href={'/empreendimento/' + emp.construtora?.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') + '/' + emp.slug}
                     target="_blank" rel="noopener noreferrer"
                     style={{ display: 'inline-flex', alignItems: 'center', background: D.bg, color: D.muted, border: '1px solid ' + D.line, borderRadius: 3, padding: '8px 14px', fontSize: 13, textDecoration: 'none', minHeight: 36 }}>Ver</a>
@@ -203,6 +345,11 @@ export default function EmpreendimentosPage() {
                     {deletingId === emp.id ? '...' : 'Excluir'}
                   </button>
                 </div>
+              </div>
+              {painelSlug === emp.slug && (
+                <PainelTabela slug={emp.slug} nome={emp.nome}
+                  onFechar={() => { setPainelSlug(null); recarregarTabelas() }} />
+              )}
               </div>
             ))}
           </div>
