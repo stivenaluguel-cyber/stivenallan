@@ -243,8 +243,49 @@ const PADROES: Record<FormatoLinha, {
  * 04 Suítes)": ali suítes dependem do final da unidade, e chutar um dos dois
  * colocaria número errado em metade do prédio.
  */
+export type RegraPorFinal = { finais: string[]; dormitorios: number; suites: number }
+
+/**
+ * Regras que o rodapé declara POR FINAL da unidade.
+ *
+ *   Monte Leone: "Finais 01 e 02 - 04 Dormitórios (Sendo 03 Suítes)
+ *                 Final 03 - 04 Dormitórios (Sendo 04 Suítes)"
+ *   Calliano:    "Final 1,2,4 e 5 - 03 Dormitórios (01 Suíte)
+ *                 Final 3 e 6 - 02 Dormitórios (01 Suíte)"
+ *
+ * O tamanho do final MUDA de tabela para tabela: Monte Leone escreve dois
+ * dígitos (unidades 301/302/303), Calliano escreve um (unidade 305 → final 5).
+ * Por isso a comparação é pelos últimos N dígitos, com N igual ao tamanho do
+ * token lido — fixar em 2 quebraria o Calliano.
+ *
+ * O `Dorm[íi]t[óo]rios` tolerante não é frescura: o PDF do Due Fratelli
+ * escreve "Dormítórios", com o acento no lugar errado.
+ */
+export function lerRegrasPorFinal(texto: string): RegraPorFinal[] {
+  // `Fina(?:l|is)` e não `Finai?s?`: o segundo NÃO casa "Final" — o "l" fica de
+  // fora —, e o Monte Leone perdia a regra do final 03 silenciosamente.
+  const re = /Fina(?:l|is)\s*:?\s*([\d]+(?:\s*(?:,|e)\s*\d+)*)\s*[-–]\s*(\d{1,2})\s*Dorm[íi]t[óo]rios?\s*\(\s*(?:Sendo\s*)?(\d{1,2})\s*Su[íi]tes?\s*\)/gi
+  const regras: RegraPorFinal[] = []
+  for (const m of texto.matchAll(re)) {
+    const finais = (m[1].match(/\d+/g) ?? []).filter((f) => f.length <= 2)
+    if (finais.length === 0) continue
+    regras.push({ finais, dormitorios: Number(m[2]), suites: Number(m[3]) })
+  }
+  return regras
+}
+
+/** A regra que se aplica a esta unidade, pelos últimos dígitos do número. */
+export function regraDaUnidade(unidade: string, regras: RegraPorFinal[]): RegraPorFinal | null {
+  for (const r of regras) {
+    for (const f of r.finais) {
+      if (unidade.length >= f.length && unidade.slice(-f.length) === f) return r
+    }
+  }
+  return null
+}
+
 export function lerDormitoriosDoRodape(texto: string): { dormitorios: number | null; suites: number | null } {
-  const achados = [...texto.matchAll(/(\d{1,2})\s*Dormit[óo]rios?\s*\(\s*(?:Sendo\s*)?(\d{1,2})\s*Su[íi]tes?\s*\)/gi)]
+  const achados = [...texto.matchAll(/(\d{1,2})\s*Dorm[íi]t[óo]rios?\s*\(\s*(?:Sendo\s*)?(\d{1,2})\s*Su[íi]tes?\s*\)/gi)]
   if (achados.length === 0) return { dormitorios: null, suites: null }
   const uniforme = (vals: number[]) => (new Set(vals).size === 1 ? vals[0] : null)
   return {
@@ -352,6 +393,7 @@ export function parsearTabelaFontana(
   const cabecalho = parseCabecalho(texto)
   const forma = detectarFormatoLinha(texto)
   const doRodape = lerDormitoriosDoRodape(texto)
+  const regrasPorFinal = lerRegrasPorFinal(texto)
   const unidades: UnidadeImportada[] = []
   const rejeitadas: LinhaRejeitadaTabela[] = []
 
@@ -366,7 +408,7 @@ export function parsearTabelaFontana(
     const padrao = PADROES[forma]
     const dormitorios = padrao.dormitorios
       ? Number(chunk.match(padrao.dormitorios)?.[1] ?? 0)
-      : (doRodape.dormitorios ?? 0)
+      : (regraDaUnidade(unidade, regrasPorFinal)?.dormitorios ?? doRodape.dormitorios ?? 0)
     // Só o código, sem o sufixo de pavimento ("89E", não "89E - 3º"): o andar
     // já sai do número da unidade.
     const boxCodigo = chunk.match(padrao.box)?.[1] ?? null
@@ -503,7 +545,9 @@ export function parsearTabelaFontana(
       // O rodapé é a ÚNICA fonte de suítes. Antes ia 1 fixo, herdado do
       // Pineto — e ficava errado no Fidenza (3), Parco Savello (2) e Monte
       // Leone (3). Rodapé que varia por final devolve null e mantém o 1.
-      suites: doRodape.suites ?? 1,
+      // Por final primeiro: o Monte Leone dá 3 suítes nos finais 01 e 02 e 4 no
+      // final 03. Só depois o valor uniforme; e 1 como último recurso.
+      suites: regraDaUnidade(unidade, regrasPorFinal)?.suites ?? doRodape.suites ?? 1,
       andar: andarDe(unidade),
       metragem,
       box_m2: boxM2 ?? null,

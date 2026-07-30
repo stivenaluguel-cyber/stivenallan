@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import {
   paraUnidadeDoBanco, parsearTabelaFontana,
   contarLinhasPelaRepeticaoDoCub, lerDormitoriosDoRodape,
+  lerRegrasPorFinal, regraDaUnidade,
 } from './importar-tabela-fontana'
 
 // TEXTO REAL da tabela Pineto (Julho/2026), extraído do PDF do Drive
@@ -850,5 +851,59 @@ describe('suítes saem do rodapé, não de valor fixo', () => {
     expect(lerDormitoriosDoRodape('sem nada disso')).toEqual({ dormitorios: null, suites: null })
     const r = parsearTabelaFontana(TABELA.replace(/02 Dormitórios \(01 Suíte\)/, ''), CUB_JULHO)
     expect(paraUnidadeDoBanco(r.unidades[0], 'e').suites).toBe(1)
+  })
+})
+
+describe('suítes e dormitórios declarados por final', () => {
+  const MONTE_LEONE = 'Finais 01 e 02 - 04 Dormitórios (Sendo 03 Suítes) Final 03 - 04 Dormitórios (Sendo 04 Suítes)'
+  const CALLIANO = 'Final 1,2,4 e 5 - 03 Dormitórios (01 Suíte) Final 3 e 6 - 02 Dormitórios (01 Suíte)'
+  // O PDF do Due Fratelli escreve "Dormítórios", com o acento fora do lugar.
+  const DUE = 'Apartamento Finais: 1,2,4 e 5 - 03 Dormitórios (01 Suíte) Apartamento Finais: 3 e 6 - 02 Dormítórios (01 Suíte)'
+
+  it('lê as duas regras do Monte Leone', () => {
+    expect(lerRegrasPorFinal(MONTE_LEONE)).toEqual([
+      { finais: ['01', '02'], dormitorios: 4, suites: 3 },
+      { finais: ['03'], dormitorios: 4, suites: 4 },
+    ])
+  })
+
+  it('final de DOIS dígitos casa pelos dois últimos', () => {
+    const r = lerRegrasPorFinal(MONTE_LEONE)
+    expect(regraDaUnidade('301', r)?.suites).toBe(3)   // final 01
+    expect(regraDaUnidade('1002', r)?.suites).toBe(3)  // final 02
+    expect(regraDaUnidade('303', r)?.suites).toBe(4)   // final 03
+    expect(regraDaUnidade('1303', r)?.suites).toBe(4)
+  })
+
+  it('final de UM dígito casa pelo último — não fixar em dois', () => {
+    const r = lerRegrasPorFinal(CALLIANO)
+    expect(regraDaUnidade('305', r)?.dormitorios).toBe(3) // final 5
+    expect(regraDaUnidade('306', r)?.dormitorios).toBe(2) // final 6
+  })
+
+  it('tolera o acento errado do PDF do Due Fratelli', () => {
+    expect(lerRegrasPorFinal(DUE)).toHaveLength(2)
+    expect(regraDaUnidade('306', lerRegrasPorFinal(DUE))?.dormitorios).toBe(2)
+  })
+
+  it('rodapé uniforme não vira regra por final', () => {
+    expect(lerRegrasPorFinal('Nº DORMITÓRIOS UNIDADES 03 Dormitórios ( 03 Suítes)')).toEqual([])
+  })
+
+  it('unidade sem regra aplicável não recebe suíte inventada', () => {
+    expect(regraDaUnidade('307', lerRegrasPorFinal(MONTE_LEONE))).toBeNull()
+  })
+
+  it('a regra por final chega até a linha do banco', () => {
+    const tabela = `Vigência desta tabela: Julho/2026
+CUB06 - Julho - R$ 3.121,62 ENTRADA 1 X REFORÇO ANUAL 6 X PARCELA MENSAL 72 X
+301 4 03D e 10S 253,80 37,50 430,61 744.194,21 3.720.971,04 145.924,08 3.720.971,04 29.183,78 1.192 3.720.971,04 1.192 1.192 303 4 01D e 08S 232,70 40,50 403,67 666.778,03 3.333.890,16 130.744,06 3.333.890,16 26.147,89 1.068 3.333.890,16 1.068 1.068 Observações:
+${MONTE_LEONE}`
+    const r = parsearTabelaFontana(tabela, CUB_JULHO)
+    expect(r.unidades).toHaveLength(2)
+    expect(paraUnidadeDoBanco(r.unidades[0], 'e').suites).toBe(3) // 301
+    expect(paraUnidadeDoBanco(r.unidades[1], 'e').suites).toBe(4) // 303
+    // Dormitórios continuam vindo da COLUNA, que existe nesta tabela.
+    expect(r.unidades.every(u => u.dormitorios === 4)).toBe(true)
   })
 })
