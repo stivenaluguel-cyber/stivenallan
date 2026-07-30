@@ -45,13 +45,20 @@ export function lerPoliticaFinanciamento(texto: string): PoliticaFinanciamento |
   const meses = Number(mMeses[1])
   if (!Number.isFinite(meses) || meses < 1 || meses > 600) return null
 
-  const mJuros = t.match(/JUROS[^%]*?(\d{1,2}(?:[.,]\d{1,3})?)\s*%\s*A\.?\s*M/i)
+  // "0,75% a.m." e "0,75% ao mês" são a MESMA condição, e as tabelas usam as
+  // duas grafias: Calliano escreve "A.M", Bellante escreve "ao mês". Aceitar só
+  // a primeira devolvia `null` para a política inteira — e o Bellante, que
+  // parcela em 240x direto com a construtora, aparecia na tela como se a única
+  // saída fosse o banco. Justamente o produto que a casa anuncia.
+  const mJuros = t.match(/JUROS[^%]*?(\d{1,2}(?:[.,]\d{1,3})?)\s*%\s*(?:A\.?\s*M|AO\s+M[ÊE]S)/i)
   if (!mJuros) return null
   const jurosAoMes = Number(mJuros[1].replace(',', '.')) / 100
   // Acima de 5% a.m. quase certamente é erro de leitura, não condição real.
   if (!Number.isFinite(jurosAoMes) || jurosAoMes <= 0 || jurosAoMes > 0.05) return null
 
-  const mIndice = t.match(/CORRIGIDO\s+PELO\s+([A-ZÇÃÕ\-]{3,12})/i)
+  // Singular ou plural: "sendo corrigido pelo IGPM" (Calliano) e "os valores
+  // remanescentes serão corrigidos pelo IGPM" (Bellante).
+  const mIndice = t.match(/CORRIGIDOS?\s+PELO\s+([A-ZÇÃÕ\-]{3,12})/i)
 
   return { meses, jurosAoMes, indice: mIndice ? mIndice[1].toUpperCase() : null }
 }

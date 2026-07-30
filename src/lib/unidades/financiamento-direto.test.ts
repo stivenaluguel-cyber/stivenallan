@@ -355,3 +355,32 @@ describe('opção comercial com desconto e percentual até as chaves', () => {
     expect(p.saldo).toBe(0)
   })
 })
+
+describe('juros escritos por extenso — "ao mês"', () => {
+  // Bellante (julho/2026). A mesma condição do Calliano, escrita de outro
+  // jeito: "juros compensatórios de 0,75% ao mês" em vez de "0,75% A.M". A
+  // política voltava null inteira, e o parcelamento em 240x direto com a
+  // construtora sumia da tela — sobrava só o financiamento bancário.
+  const BELLANTE = `2) Até a entrega de conclusão do empreendimento, 30% do valor do mesmo deverá estar quitado, sendo que o restante deverá ser liquidado mediante financiamento bancário ou em até 240 meses, diretamente com a construtora. Os valores remanescentes serão corrigidos pelo IGPM e acrescidos de juros compensatórios de 0,75% ao mês.`
+
+  it('lê prazo, juros e índice na grafia por extenso', () => {
+    expect(lerPoliticaFinanciamento(BELLANTE)).toEqual({
+      meses: 240,
+      jurosAoMes: 0.0075,
+      indice: 'IGPM',
+    })
+  })
+
+  it('continua lendo a grafia abreviada', () => {
+    const calliano = 'O SALDO DEVEDOR PODERÁ SER PARCELADO DIRETO COM A CONSTRUTORA EM ATÉ 180 MESES, SENDO CORRIGIDO PELO IGPM E ACRESCIDO DE JUROS COMPENSATÓRIOS DE 0,75% A.M;'
+    expect(lerPoliticaFinanciamento(calliano)).toEqual({
+      meses: 180,
+      jurosAoMes: 0.0075,
+      indice: 'IGPM',
+    })
+  })
+
+  it('tabela que não fala de parcelamento direto continua devolvendo null', () => {
+    expect(lerPoliticaFinanciamento('OPÇÃO 01: FINANCIAMENTO BANCÁRIO')).toBeNull()
+  })
+})

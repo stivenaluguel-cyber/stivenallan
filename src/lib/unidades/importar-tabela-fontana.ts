@@ -45,6 +45,8 @@ export type UnidadeImportada = {
   parcelas_qtd: number
   reforcos_qtd: number
   unidade: string
+  /** Torre, quando o prédio tem mais de uma. `null` em prédio de bloco único. */
+  bloco: string | null
   dormitorios: number
   andar: number | null
   metragem: number
@@ -146,11 +148,16 @@ function parseCabecalho(texto: string): CabecalhoTabela {
 // A legenda das tabelas: S (Simples), D (Duplo), SE (Simples Estendido), DE
 // (Duplo Estendido), com sufixo de pavimento — "23D - T", "105SE - 1º Pav".
 //
-// Duas armadilhas já pagas aqui: restringir a [SE] fazia o fatiador ignorar a
+// Três armadilhas já pagas aqui: restringir a [SE] fazia o fatiador ignorar a
 // tabela inteira do Avezzano (código "23D"); exigir UMA letra ignorava a
 // unidade 102 do Tremezzo ("105SE"), porque o \b não fecha entre S e E. Nos
 // dois casos a tabela voltava vazia em vez de incompatível.
-const INICIO_DE_UNIDADE = /\b\d{3,4}\s+\d\s+\d{1,3}(?:\s*e\s*\d{1,3})?\s*[A-Z]{1,2}\b/
+//
+// A terceira: prédio com mais de uma torre imprime a letra do BLOCO entre o
+// número e os dormitórios — "904 B 2 44S - 2ºSS". Sem o grupo opcional, o
+// fatiador não reconhecia nenhuma linha e a tabela do Bosco del Montello
+// (Torre B) voltava com zero unidades das três.
+const INICIO_DE_UNIDADE = /\b\d{3,4}\s+(?:[A-Z]\s+)?\d\s+\d{1,3}(?:\s*e\s*\d{1,3})?\s*[A-Z]{1,2}\b/
 
 /**
  * Multiplicadores do cabeçalho: "1 X" (entrada), "6 X" (reforços), "72 X"
@@ -199,7 +206,7 @@ function fatiarUnidades(texto: string): string[] {
 function unidadesPerdidas(texto: string, capturadas: Set<string>): string[] {
   const corpo = texto.split(/Observa[çc][õo]es\s*:/i)[0]
   const perdidas: string[] = []
-  for (const m of corpo.matchAll(/\b(\d{3,4})\s+\d\s+\S[^\n]{0,40}?\d[\d.]*,\d{2}/g)) {
+  for (const m of corpo.matchAll(/\b(\d{3,4})\s+(?:[A-Z]\s+)?\d\s+\S[^\n]{0,40}?\d[\d.]*,\d{2}/g)) {
     const n = m[1]
     if (!capturadas.has(n) && !perdidas.includes(n)) perdidas.push(n)
   }
@@ -225,10 +232,13 @@ export function parsearTabelaFontana(
   for (const bruto of fatiarUnidades(texto)) {
     const chunk = bruto.trim()
     const unidade = chunk.match(/^(\d{3,4})/)?.[1] ?? '?'
-    const dormitorios = Number(chunk.match(/^\d{3,4}\s+(\d)/)?.[1] ?? 0)
+    // Letra da torre, quando o prédio tem mais de uma ("904 B 2 44S" → "B").
+    // Vai para a coluna `bloco`, que é como o espelho agrupa a grade.
+    const bloco = chunk.match(/^\d{3,4}\s+([A-Z])\s+\d\s/)?.[1] ?? null
+    const dormitorios = Number(chunk.match(/^\d{3,4}\s+(?:[A-Z]\s+)?(\d)/)?.[1] ?? 0)
     // Só o código, sem o sufixo de pavimento ("89E", não "89E - 3º"): o andar
     // já sai do número da unidade.
-    const boxCodigo = chunk.match(/^\d{3,4}\s+\d\s+(\d{1,3}(?:\s*e\s*\d{1,3})?\s*[A-Z]{1,2})/)?.[1] ?? null
+    const boxCodigo = chunk.match(/^\d{3,4}\s+(?:[A-Z]\s+)?\d\s+(\d{1,3}(?:\s*e\s*\d{1,3})?\s*[A-Z]{1,2})/)?.[1] ?? null
 
     // Tokeniza a PARTIR do primeiro decimal. Antes dele só há ruído numérico
     // ("91S", "3º Pav") que confundiria a contagem de colunas.
@@ -348,6 +358,7 @@ export function parsearTabelaFontana(
       parcelas_qtd: formato === 'parcelado' ? (cabecalho.parcelas_qtd ?? 40) : 0,
       reforcos_qtd: formato === 'parcelado' ? (cabecalho.reforcos_qtd ?? 4) : 0,
       unidade,
+      bloco,
       dormitorios,
       andar: andarDe(unidade),
       metragem,
@@ -413,6 +424,7 @@ export function paraUnidadeDoBanco(
   return {
     empreendimento_id: empreendimentoId,
     unidade: u.unidade,
+    bloco: u.bloco,
     andar: u.andar,
     metragem: u.metragem,
     dormitorios: u.dormitorios,

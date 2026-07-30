@@ -503,3 +503,53 @@ CUB06 - Julho - R$ 3.121,62 ENTRADA 1 X REFORÇO ANUAL 6 X PARCELA MENSAL 72 X
     expect(r.unidades.length + r.rejeitadas.length).toBe(2)
   })
 })
+
+describe('prédio com mais de uma torre — letra do bloco na linha', () => {
+  // Bosco del Montello, Torre B (tabela de julho/2026). A letra da torre vem
+  // entre o número da unidade e os dormitórios: "904 B 2 44S - 2ºSS". Sem
+  // prever esse campo, o fatiador não reconhecia NENHUMA das três linhas e a
+  // importação inteira voltava vazia — 0 de 3, com zero rejeitadas.
+  //
+  // A unidade 1003 é o caso ruim de propósito: o extrator do PDF injeta
+  // "FINANCIAMENTO 1 X -" entre o código do box e os valores.
+  const BOSCO_TORRE_B = `Vigência desta tabela: Julho/2026
+CUB06 - Julho - R$ 3.121,62 ENTRADA 1 X R$ CUB06 100% CUB06 904 B 2 44S - 2ºSS 66,36 12,00 107,35 87.093,20 580.621,32 493.528,12 580.621,32 186 186 1003 B 2 82E - 1ºSS/119S 2ºSS FINANCIAMENTO 1 X - 66,36 32,75 132,25 99.735,76 664.905,06 565.169,30 664.905,06 213 213 1004 B 2 160S e 163E - 2ºSS 66,36 26,00 124,08 102.545,22 683.634,78 581.089,56 683.634,78 219 219 Observações:`
+
+  it('lê as três unidades da torre em vez de voltar vazia', () => {
+    const r = parsearTabelaFontana(BOSCO_TORRE_B, CUB_JULHO)
+    expect(r.unidades.map(u => u.unidade)).toEqual(['904', '1003', '1004'])
+    expect(r.rejeitadas).toEqual([])
+  })
+
+  it('guarda a letra da torre em `bloco`', () => {
+    const r = parsearTabelaFontana(BOSCO_TORRE_B, CUB_JULHO)
+    expect(r.unidades.map(u => u.bloco)).toEqual(['B', 'B', 'B'])
+    expect(paraUnidadeDoBanco(r.unidades[0], 'emp-1').bloco).toBe('B')
+  })
+
+  it('a letra do bloco não vira dormitório nem código de box', () => {
+    const r = parsearTabelaFontana(BOSCO_TORRE_B, CUB_JULHO)
+    expect(r.unidades[0].dormitorios).toBe(2)
+    expect(r.unidades[0].box_codigo).toBe('44S')
+  })
+
+  it('as invariantes continuam valendo com a letra no meio', () => {
+    const r = parsearTabelaFontana(BOSCO_TORRE_B, CUB_JULHO)
+    const u = r.unidades[0]
+    expect(u.formato).toBe('entrada_financiamento')
+    expect(u.valor_tabela).toBeCloseTo(186 * CUB_JULHO, 2)
+    expect(u.valor_entrada_min + u.saldo_financiamento).toBeCloseTo(u.valor_tabela, 2)
+  })
+
+  it('prédio de bloco único continua com bloco nulo', () => {
+    const r = parsearTabelaFontana(TABELA, CUB_JULHO)
+    expect(r.unidades.every(u => u.bloco === null)).toBe(true)
+  })
+
+  it('linha perdida numa tabela com bloco também vira rejeição visível', () => {
+    const estranho = BOSCO_TORRE_B.replace('160S e 163E - 2ºSS', '@@@')
+    const r = parsearTabelaFontana(estranho, CUB_JULHO)
+    expect(r.unidades.map(u => u.unidade)).not.toContain('1004')
+    expect(r.rejeitadas.map(x => x.unidade)).toContain('1004')
+  })
+})
