@@ -1,5 +1,6 @@
 'use client'
-import { useCallback, useEffect, useState } from 'react'
+import { Suspense, useCallback, useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Building2, CircleDollarSign, Clock, Lock, Unlock } from 'lucide-react'
 import { D, fmt } from '@/components/dashboard/focus/tokens'
 import {
@@ -30,6 +31,17 @@ const CORES: Record<StatusUnidade, { fundo: string; borda: string; texto: string
 }
 
 export default function EspelhoPage() {
+  return (
+    <Suspense fallback={null}>
+      <EspelhoConteudo />
+    </Suspense>
+  )
+}
+
+function EspelhoConteudo() {
+  // ?emp=<slug> chega da listagem de Empreendimentos, para abrir direto no
+  // prédio certo em vez de cair sempre no primeiro com unidades.
+  const slugAlvo = useSearchParams().get('emp')
   const [emps, setEmps] = useState<Emp[]>([])
   const [empId, setEmpId] = useState<string>('')
   const [dados, setDados] = useState<Resposta | null>(null)
@@ -42,13 +54,14 @@ export default function EspelhoPage() {
       .then((r) => r.json())
       .then((j) => {
         const lista: Emp[] = j.empreendimentos ?? []
+        const alvo = slugAlvo ? lista.find((e) => e.slug === slugAlvo) : null
         setEmps(lista)
-        // Abre já no primeiro que TEM unidade — cair num espelho vazio faria
-        // a tela parecer quebrada.
-        setEmpId((lista.find((e) => e.unidades > 0) ?? lista[0])?.id ?? '')
+        // Abre no que veio pela URL; senão, no primeiro que TEM unidade —
+        // cair num espelho vazio faria a tela parecer quebrada.
+        setEmpId((alvo ?? lista.find((e) => e.unidades > 0) ?? lista[0])?.id ?? '')
       })
       .catch(() => setErro('Falha ao carregar empreendimentos'))
-  }, [])
+  }, [slugAlvo])
 
   const carregar = useCallback(async (id: string) => {
     if (!id) { setCarregando(false); return }

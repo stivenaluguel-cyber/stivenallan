@@ -6,6 +6,7 @@ import { normalizarCelularBR, normalizeEmail, normalizeString } from '@/lib/lead
 import { notificarLeadNovo } from '@/lib/leads/notificar-lead-novo'
 import { recalcularScoreLead } from '@/lib/leads/score-server'
 import { resolverLeadDoEspelho } from '@/lib/unidades/lead-do-espelho'
+import { precoDaUnidade } from '@/lib/unidades/espelho'
 import { planoDoJson, simular } from '@/lib/unidades/simular'
 import { logError } from '@/lib/log'
 
@@ -67,7 +68,11 @@ export async function POST(req: NextRequest) {
     if (!unidade) return NextResponse.json({ error: 'Unidade não encontrada' }, { status: 404 })
 
     const plano = planoDoJson(unidade.plano_pagamento)
-    const valor = Number(unidade.valor_promocional ?? unidade.valor_tabela ?? 0)
+    // Mesma regra de preço da grade pública. O `??` de antes pegava o
+    // promocional sempre que existisse, mesmo MAIOR que a tabela — a pessoa
+    // veria um preço na grade e receberia o plano calculado sobre outro.
+    // Hoje nenhuma unidade tem promocional, então a divergência era latente.
+    const valor = precoDaUnidade(unidade).valor ?? 0
     const sim = plano ? simular(valor, plano, entradaDesejada) : null
 
     const empNome = (unidade.empreendimentos as { nome?: string } | null)?.nome ?? 'empreendimento'
