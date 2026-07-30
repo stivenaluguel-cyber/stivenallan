@@ -239,6 +239,16 @@ export default function EmpreendimentosPage() {
   )
   const filtrando = Boolean(fCidade || fBairro || fConstrutora || termo)
 
+  // Quem está vendendo e não tem a tabela deste mês guardada.
+  //
+  // O PDF só protege o que foi enviado — o sistema guarda cópia, não busca no
+  // Drive. Sem este aviso, a proteção depende de alguém lembrar todo mês, que
+  // é exatamente como se perdeu a tabela de Águas de Marano em julho/2026.
+  const mesAtual = competenciaDoMes(new Date())
+  const semTabelaDoMes = empreendimentos.filter(
+    e => e.status_venda === 'ativo' && (tabelaPorSlug[e.slug] ?? '') < mesAtual,
+  )
+
   const selectStyle = { background: '#fff', color: D.ink, border: '1px solid ' + D.line, borderRadius: 3, padding: '9px 10px', fontSize: 13, font: 'inherit', minHeight: 40, cursor: 'pointer' } as const
 
   return (
@@ -256,6 +266,22 @@ export default function EmpreendimentosPage() {
             + Novo Empreendimento
           </button>
         </div>
+        {!loading && semTabelaDoMes.length > 0 && (
+          <div style={{ background: '#FEF3C7', border: '1px solid #F5C542', borderRadius: 3, padding: '14px 18px', marginBottom: 16, display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+            <span style={{ fontSize: 18, flexShrink: 0 }}>⚠️</span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ margin: 0, fontSize: 13.5, fontWeight: 700, color: '#8A5A00' }}>
+                {semTabelaDoMes.length} empreendimento{semTabelaDoMes.length !== 1 ? 's' : ''} sem a tabela de {competenciaLabel(mesAtual)} guardada
+              </p>
+              <p style={{ margin: '4px 0 0', fontSize: 13, color: '#8A5A00', lineHeight: 1.5 }}>
+                A construtora pode tirar o PDF do Drive a qualquer momento — foi o que aconteceu com Águas de Marano.
+                Guarde pelo botão <strong>PDF</strong> de cada um: {semTabelaDoMes.slice(0, 6).map(e => e.nome).join(', ')}
+                {semTabelaDoMes.length > 6 ? ` e mais ${semTabelaDoMes.length - 6}` : ''}.
+              </p>
+            </div>
+          </div>
+        )}
+
         {!loading && empreendimentos.length > 0 && (
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center', marginBottom: 16 }}>
             <input value={busca} onChange={e => setBusca(e.target.value)} placeholder="Buscar pelo nome..."

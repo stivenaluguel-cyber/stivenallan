@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
+import { competenciaDoMes } from '@/lib/unidades/tabela-precos'
 import { useRouter } from 'next/navigation'
 import { ESTAGIOS_FUNIL as ESTAGIOS } from '@/lib/dashboard/estagios'
 import { MetasDiarias } from '@/components/dashboard/MetasDiarias'
@@ -53,6 +54,8 @@ export default function DashboardHome() {
   const [leads, setLeads] = useState<Lead[]>([])
   const [cub, setCub] = useState<Cub | null>(null)
   const [cubScraper, setCubScraper] = useState<CubScraper | null>(null)
+  // Quantos empreendimentos ativos estão sem a tabela deste mês guardada.
+  const [semTabela, setSemTabela] = useState(0)
   const [loading, setLoading] = useState(true)
   const [insights, setInsights] = useState<Insights | null>(null)
   const [insightsLoading, setInsightsLoading] = useState(false)
@@ -89,6 +92,22 @@ export default function DashboardHome() {
 
   useEffect(() => { load() }, [load])
 
+  // O aviso mora aqui porque é a tela onde ele entra. Descobrir que a tabela
+  // sumiu na hora de precisar dela é tarde: a construtora já apagou.
+  useEffect(() => {
+    Promise.all([
+      fetch('/api/admin/empreendimentos').then(r => r.ok ? r.json() : null),
+      fetch('/api/admin/empreendimentos/tabela').then(r => r.ok ? r.json() : null),
+    ]).then(([emps, tabs]) => {
+      if (!emps?.data) return
+      const mes = competenciaDoMes(new Date())
+      const porSlug: Record<string, string> = tabs?.recentePorSlug ?? {}
+      setSemTabela(emps.data.filter((e: { slug: string; status_venda?: string }) =>
+        (e.status_venda ?? 'ativo') === 'ativo' && (porSlug[e.slug] ?? '') < mes,
+      ).length)
+    }).catch(() => {})
+  }, [])
+
   const total = leads.length
   const quentes = leads.filter(l => l.temperatura === 3).length
   const negociacao = leads.filter(l => l.estagio_funil === 'negociacao').length
@@ -120,6 +139,21 @@ export default function DashboardHome() {
         <div style={{ marginBottom: 24 }}>
           <CalendarioMetas />
         </div>
+
+        {semTabela > 0 && (
+          <div style={{ background: '#FEF3C7', border: '1px solid #F5C542', borderRadius: 10, padding: '14px 18px', marginBottom: 24, display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+            <span style={{ fontSize: 18, flexShrink: 0 }}>⚠️</span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#8A5A00' }}>
+                {semTabela} empreendimento{semTabela !== 1 ? 's' : ''} sem a tabela deste mês guardada
+              </p>
+              <p style={{ margin: '4px 0 0', fontSize: 13, color: '#8A5A00', lineHeight: 1.5 }}>
+                A construtora tira o PDF do Drive sem avisar. Guarde uma cópia em{' '}
+                <a href="/dashboard/empreendimentos" style={{ color: '#8A5A00', textDecoration: 'underline', fontWeight: 600 }}>Empreendimentos</a>.
+              </p>
+            </div>
+          </div>
+        )}
 
         {cubScraper && !cubScraper.online && (
           <div style={{ background: '#FEF3C7', border: '1px solid #F5C542', borderRadius: 10, padding: '14px 18px', marginBottom: 24, display: 'flex', alignItems: 'flex-start', gap: 10 }}>
