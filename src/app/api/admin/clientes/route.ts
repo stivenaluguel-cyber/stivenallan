@@ -44,7 +44,27 @@ export async function DELETE(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const id = searchParams.get('id')
   if (!id) return NextResponse.json({ error: 'id obrigatorio' }, { status: 400 })
-  const { error } = await sb().from('crm_clientes').delete().eq('id', id)
+  const client = sb()
+
+  // Proposta, compromisso e lead ligados ao cliente são `on delete set null`:
+  // não impedem a exclusão, apenas perdem o dono em silêncio. Uma proposta sem
+  // cliente é um documento que ninguém consegue mais rastrear — então avisa
+  // antes, e só apaga quando a pessoa confirma sabendo o que se desfaz.
+  const contar = async (tabela: string, coluna: string) => {
+    const { count } = await client.from(tabela).select('id', { count: 'exact', head: true }).eq(coluna, id)
+    return count ?? 0
+  }
+  const [propostas, agenda, leads] = await Promise.all([
+    contar('crm_propostas', 'cliente_id'),
+    contar('crm_agenda', 'cliente_id'),
+    contar('leads', 'cliente_id'),
+  ])
+
+  if (!searchParams.get('forcar') && (propostas > 0 || agenda > 0 || leads > 0)) {
+    return NextResponse.json({ error: 'vinculos', vinculos: { propostas, agenda, leads } }, { status: 409 })
+  }
+
+  const { error } = await client.from('crm_clientes').delete().eq('id', id)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json({ success: true })
+  return NextResponse.json({ success: true, desvinculado: { propostas, agenda, leads } })
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAdmin } from '@/lib/dashboard/admin-auth'
+import { resolverIdComUnidades } from '@/lib/unidades/resolver-empreendimento'
 
 export const dynamic = 'force-dynamic'
 const sb = () => createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
@@ -10,14 +11,19 @@ export async function GET(req: NextRequest) {
   if (!await requireAdmin()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const empId = new URL(req.url).searchParams.get('empreendimento_id')
   if (!empId) return NextResponse.json({ error: 'empreendimento_id obrigatorio' }, { status: 400 })
-  const { data, error } = await sb()
+  const client = sb()
+  // A listagem do CRM manda o id de `properties`; as unidades são gravadas com
+  // o id de `empreendimentos`. Mesmo prédio, ids diferentes — ver
+  // resolver-empreendimento.ts.
+  const alvo = await resolverIdComUnidades(client, empId)
+  const { data, error } = await client
     .from('empreendimentos_unidades')
     .select('*')
-    .eq('empreendimento_id', empId)
+    .eq('empreendimento_id', alvo)
     .order('unidade')
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   // Enriquecer com CUB vigente
-  const { data: cub } = await sb().from('configuracoes_cub').select('valor_m2').order('mes_referencia', { ascending: false }).limit(1).single()
+  const { data: cub } = await client.from('configuracoes_cub').select('valor_m2').order('mes_referencia', { ascending: false }).limit(1).single()
   return NextResponse.json({ data, cub_vigente: cub?.valor_m2 ?? null })
 }
 

@@ -10,6 +10,12 @@ import { PainelScore, type DetalheScore } from '@/components/dashboard/PainelSco
 import { AnexosLead } from '@/components/dashboard/AnexosLead'
 import { CORES_SLA, statusSla } from '@/lib/leads/sla'
 import type { TimelineItem, TimelineKind } from '@/lib/dashboard/lead-timeline'
+import {
+  faixaDeEntrada, planoDoJson, REFORCO_MAXIMO_EM_PARCELAS, simular,
+  type PlanoPagamento,
+} from '@/lib/unidades/simular'
+import { montarMensagemSimulacao } from '@/lib/unidades/mensagem-espelho'
+import { precoDaUnidade } from '@/lib/unidades/espelho'
 
 const CORES_TIMELINE: Partial<Record<TimelineKind | 'evento', string>> = {
   anotacao: '#D24E22',
@@ -32,6 +38,19 @@ const D = {
 }
 const fmt = (n: number) => 'R$\u00a0' + Math.round(n).toLocaleString('pt-BR')
 
+/**
+ * CUB com os centavos.
+ *
+ * `fmt` arredonda para o real inteiro, o que serve para VGV e pipeline mas
+ * mente no CUB: R$ 3.121,62/m² virava "R$ 3.122". Não é detalhe estético — o
+ * CUB multiplica a quantidade de CUBs de cada unidade (o Pineto vai de 210 a
+ * 264), então 38 centavos de erro viram até R$ 100 de diferença no valor do
+ * apartamento. É um índice publicado, tem que aparecer como o Sinduscon publica.
+ */
+const fmtCub = (n: number) =>
+  'R$\u00a0' + n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+
+
 type Lead = {
   id: string; nome?: string; whatsapp: string; estagio_funil: string
   lead_score?: number; requer_atencao?: boolean; origem?: string
@@ -46,7 +65,7 @@ type Lead = {
   primeiro_atendimento_em?: string | null
   lead_score_detalhe?: DetalheScore | null
 }
-type Unidade = { id: string; unidade: string; bloco?: string; metragem: number; dormitorios?: number; disponivel: boolean; valor_tabela?: number; valor_promocional?: number; condicoes_negociacao?: string }
+type Unidade = { id: string; unidade: string; bloco?: string; metragem: number; dormitorios?: number; disponivel: boolean; valor_tabela?: number; valor_promocional?: number; condicoes_negociacao?: string; plano_pagamento?: unknown }
 type Emp = { id: string; nome: string; status_venda: string; status_obra?: string }
 type Cub = { id: string; mes_referencia: string; valor_m2: number; variacao_mensal?: number; fonte?: string }
 type Evento = { tipo: string; slug?: string; descricao?: string; created_at: string }
@@ -89,7 +108,7 @@ function WidgetCub({ cub, onSaved }: { cub: Cub | null; onSaved: () => void }) {
     }
   }
 
-  function fmtC(v: number) { return 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }
+  const fmtC = fmtCub
 
   return (
     <div style={{ background: D.sidebar, border: '1px solid ' + D.lineDark, borderRadius: 12, padding: '18px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
@@ -120,72 +139,236 @@ function WidgetCub({ cub, onSaved }: { cub: Cub | null; onSaved: () => void }) {
   )
 }
 
-function SimuladorFluxo({ cub }: { cub: Cub | null }) {
-  const [valorImovel, setValorImovel] = useState(400000)
-  const [entrada, setEntrada] = useState(80000)
-  const [prazo, setPrazo] = useState(120)
-  const [balao, setBalao] = useState(20000)
-  const [freq, setFreq] = useState<'anual' | 'semestral'>('anual')
-  const saldo = Math.max(0, valorImovel - entrada)
-  const nBaloes = freq === 'anual' ? Math.floor(prazo / 12) : Math.floor(prazo / 6)
-  const totalBaloes = Math.min(saldo, nBaloes * balao)
-  const saldoParc = Math.max(0, saldo - totalBaloes)
-  const parcela = prazo > 0 ? saldoParc / prazo : 0
-  const cubAjuste = cub ? cub.valor_m2 : 0
+/**
+ * Simulador Direto — o mesmo motor do site.
+ *
+ * A versão anterior era uma calculadora genérica: dividia o valor inteiro do
+ * imóvel pelo prazo, tratava o balão como um slider solto de até R$ 100 mil e
+ * não conhecia nem o teto contratual do reforço (5× a parcela) nem a divisão
+ * 30% até as chaves / 70% financiado na entrega. Ou seja, produzia condições
+ * que a construtora não assina — e diferentes das que o cliente vê na página
+ * do empreendimento.
+ *
+ * Agora chama `simular()` de @/lib/unidades/simular, o mesmo que roda no
+ * espelho público. O número que ele passa por telefone é o número que o
+ * cliente viu na tela.
+ */
+function SimuladorFluxo({ cub, emps }: { cub: Cub | null; emps: Emp[] }) {
+  const [modo, setModo] = useState<'unidade' | 'manual'>('unidade')
+  const [empId, setEmpId] = useState<string>('')
+  const [unidades, setUnidades] = useState<Unidade[]>([])
+  const [carregando, setCarregando] = useState(false)
+  const [unidadeId, setUnidadeId] = useState<string>('')
+  const [entrada, setEntrada] = useState<number | null>(null)
+
+  // Manual: para os empreendimentos que ainda não têm tabela importada.
+  const [mValor, setMValor] = useState(400000)
+  const [mChaves, setMChaves] = useState(30)
+  const [mParcelas, setMParcelas] = useState(40)
+  const [mReforcos, setMReforcos] = useState(4)
+  const [mRazao, setMRazao] = useState(3.75)
+  const [mEntradaPct, setMEntradaPct] = useState(8)
+
+  useEffect(() => {
+    if (!empId) { setUnidades([]); return }
+    setCarregando(true)
+    fetch('/api/admin/unidades?empreendimento_id=' + empId)
+      .then(r => r.json())
+      .then(d => setUnidades((d.data ?? []) as Unidade[]))
+      .finally(() => setCarregando(false))
+  }, [empId])
+
+  useEffect(() => { setUnidadeId(''); setEntrada(null) }, [empId])
+  useEffect(() => { setEntrada(null) }, [unidadeId])
+
+  const comTabela = unidades.filter(u => planoDoJson(u.plano_pagamento) !== null)
+  const unidade = comTabela.find(u => u.id === unidadeId) ?? null
+
+  // Uma origem de verdade para os dois modos: monta o plano e simula.
+  let plano: PlanoPagamento | null = null
+  let valorTotal = 0
+  if (modo === 'unidade' && unidade) {
+    plano = planoDoJson(unidade.plano_pagamento)
+    valorTotal = precoDaUnidade({
+      valor_tabela: unidade.valor_tabela ?? null,
+      valor_promocional: unidade.valor_promocional ?? null,
+    }).valor ?? 0
+  } else if (modo === 'manual') {
+    valorTotal = mValor
+    const ateChaves = mValor * (mChaves / 100)
+    const entradaBase = mValor * (mEntradaPct / 100)
+    const divisor = mParcelas + mReforcos * mRazao
+    const parcela = divisor > 0 ? Math.max(0, ateChaves - entradaBase) / divisor : 0
+    plano = {
+      entrada: entradaBase,
+      parcelas_qtd: mParcelas,
+      parcela_valor: parcela,
+      reforcos_qtd: mReforcos,
+      reforco_valor: parcela * mRazao,
+      saldo_financiamento: mValor - ateChaves,
+    }
+  }
+
+  const faixa = plano ? faixaDeEntrada(plano) : null
+  const sim = plano && valorTotal > 0 ? simular(valorTotal, plano, entrada) : null
+
+  const rotuloUnidade = unidade ? [unidade.bloco, unidade.unidade].filter(Boolean).join(' ') : ''
+  const empNome = emps.find(e => e.id === empId)?.nome ?? ''
+
+  const textoWhats = sim
+    ? montarMensagemSimulacao({
+        nomeCliente: '',
+        empreendimento: modo === 'unidade' ? empNome : 'empreendimento',
+        unidade: rotuloUnidade || '—',
+        metragem: Number(unidade?.metragem ?? 0),
+        dormitorios: unidade?.dormitorios ?? null,
+        andar: null,
+        simulacao: sim,
+        demonstrouInteresse: false,
+      })
+    : ''
+
+  const Linha = ({ l, v, forte }: { l: string; v: string; forte?: boolean }) => (
+    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, fontSize: 13 }}>
+      <span style={{ color: D.onDarkMuted }}>{l}</span>
+      <strong style={{ color: forte ? D.orange : D.onDark, whiteSpace: 'nowrap' }}>{v}</strong>
+    </div>
+  )
 
   return (
     <div style={{ background: D.surface, border: '1px solid ' + D.line, borderRadius: 3 }}>
-      <div style={{ padding: '14px 20px', borderBottom: '1px solid ' + D.line, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span style={{ fontFamily: "'Bricolage Grotesque',system-ui", fontWeight: 700, fontSize: 14, color: D.ink }}>Simulador de Fluxo Direto</span>
-        {cub && <span style={{ fontSize: 11, color: D.muted }}>CUB: {fmt(cub.valor_m2)}/m²</span>}
+      <div style={{ padding: '14px 20px', borderBottom: '1px solid ' + D.line, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
+        <span style={{ fontFamily: "'Bricolage Grotesque',system-ui", fontWeight: 700, fontSize: 14, color: D.ink }}>
+          Simulador Direto
+          <span style={{ marginLeft: 8, fontWeight: 500, fontSize: 12, color: D.muted }}>mesma conta do site</span>
+        </span>
+        {cub && <span style={{ fontSize: 11, color: D.muted }}>CUB: {fmtCub(cub.valor_m2)}/m²</span>}
       </div>
-      <div style={{ padding: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
-        <div style={{ display: 'grid', gap: 14 }}>
-          {[
-            { label: 'Valor do Imóvel', value: valorImovel, set: setValorImovel, min: 50000, max: 5000000, step: 10000 },
-            { label: 'Entrada', value: entrada, set: setEntrada, min: 0, max: valorImovel * 0.8, step: 5000 },
-            { label: 'Prazo (meses)', value: prazo, set: setPrazo, min: 12, max: 240, step: 12 },
-            { label: 'Valor do Balão', value: balao, set: setBalao, min: 0, max: 100000, step: 2500 },
-          ].map(({ label, value, set, min, max, step }) => (
-            <div key={label}>
+
+      <div style={{ padding: '12px 20px 0', display: 'flex', gap: 8 }}>
+        {([['unidade', 'Unidade real'], ['manual', 'Manual']] as const).map(([k, label]) => (
+          <button key={k} onClick={() => { setModo(k); setEntrada(null) }}
+            style={{ padding: '7px 16px', borderRadius: 2, border: '1px solid ' + (modo === k ? D.bronze : D.line), background: modo === k ? D.bronze : 'transparent', color: modo === k ? '#fff' : D.ink, fontSize: 12, fontWeight: 600, cursor: 'pointer', minHeight: 36 }}>
+            {label}
+          </button>
+        ))}
+      </div>
+
+      <div style={{ padding: 20, display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: 20 }}>
+        <div style={{ display: 'grid', gap: 14, alignContent: 'start' }}>
+          {modo === 'unidade' ? (
+            <>
+              <label style={{ display: 'grid', gap: 5, fontSize: 13, color: D.muted }}>
+                Empreendimento
+                <select value={empId} onChange={e => setEmpId(e.target.value)}
+                  style={{ padding: '9px 10px', borderRadius: 3, border: '1px solid ' + D.line, background: '#fff', color: D.ink, fontSize: 14, minHeight: 40 }}>
+                  <option value="">Selecione…</option>
+                  {emps.map(e => <option key={e.id} value={e.id}>{e.nome}</option>)}
+                </select>
+              </label>
+
+              {empId && (
+                <label style={{ display: 'grid', gap: 5, fontSize: 13, color: D.muted }}>
+                  Unidade
+                  <select value={unidadeId} onChange={e => setUnidadeId(e.target.value)} disabled={carregando || comTabela.length === 0}
+                    style={{ padding: '9px 10px', borderRadius: 3, border: '1px solid ' + D.line, background: '#fff', color: D.ink, fontSize: 14, minHeight: 40 }}>
+                    <option value="">{carregando ? 'Carregando…' : comTabela.length === 0 ? 'Sem tabela importada' : 'Selecione…'}</option>
+                    {comTabela.map(u => (
+                      <option key={u.id} value={u.id}>
+                        {[u.bloco, u.unidade].filter(Boolean).join(' ')} · {u.metragem}m²{u.dormitorios ? ` · ${u.dormitorios} quartos` : ''}{u.disponivel ? '' : ' · indisponível'}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
+
+              {empId && !carregando && comTabela.length === 0 && (
+                <p style={{ margin: 0, fontSize: 13, color: D.muted, lineHeight: 1.5, background: '#fff', border: '1px solid ' + D.line, borderRadius: 3, padding: '12px 14px' }}>
+                  Este empreendimento ainda não tem tabela de preços importada. Importe em{' '}
+                  <a href="/dashboard/espelho" style={{ color: D.bronze, fontWeight: 600 }}>Espelho de vendas</a>{' '}
+                  ou use o modo <strong>Manual</strong> — que segue as mesmas regras de contrato.
+                </p>
+              )}
+            </>
+          ) : (
+            <>
+              {[
+                { label: 'Valor do imóvel', value: mValor, set: setMValor, min: 100000, max: 3000000, step: 5000, fmtv: (v: number) => fmt(v) },
+                { label: 'Entrada da tabela', value: mEntradaPct, set: setMEntradaPct, min: 0, max: 30, step: 1, fmtv: (v: number) => v + '%' },
+                { label: 'Até as chaves', value: mChaves, set: setMChaves, min: 10, max: 100, step: 1, fmtv: (v: number) => v + '%' },
+                { label: 'Parcelas mensais', value: mParcelas, set: setMParcelas, min: 12, max: 120, step: 1, fmtv: (v: number) => v + 'x' },
+                { label: 'Reforços anuais', value: mReforcos, set: setMReforcos, min: 0, max: 10, step: 1, fmtv: (v: number) => String(v) },
+                { label: 'Reforço em parcelas', value: mRazao, set: setMRazao, min: 0, max: REFORCO_MAXIMO_EM_PARCELAS, step: 0.25, fmtv: (v: number) => v.toFixed(2) + '×' },
+              ].map(({ label, value, set, min, max, step, fmtv }) => (
+                <div key={label}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 4 }}>
+                    <span style={{ color: D.muted }}>{label}</span>
+                    <strong style={{ color: D.ink }}>{fmtv(value)}</strong>
+                  </div>
+                  <input type="range" min={min} max={max} step={step} value={value}
+                    onChange={e => { set(Number(e.target.value)); setEntrada(null) }}
+                    style={{ width: '100%', accentColor: D.bronze, height: 4 }} />
+                </div>
+              ))}
+              <p style={{ margin: 0, fontSize: 12, color: D.muted, lineHeight: 1.5 }}>
+                O reforço para em {REFORCO_MAXIMO_EM_PARCELAS}× a parcela: é o teto do contrato da Fontana.
+              </p>
+            </>
+          )}
+
+          {sim && faixa && faixa.max > faixa.min && (
+            <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 4 }}>
-                <span style={{ color: D.muted }}>{label}</span>
-                <strong style={{ color: D.ink }}>{label.includes('Prazo') ? value + ' meses' : fmt(value)}</strong>
+                <span style={{ color: D.muted }}>Entrada do cliente</span>
+                <strong style={{ color: D.ink }}>{fmt(sim.entrada)} · {sim.entradaPercentual}%</strong>
               </div>
-              <input type="range" min={min} max={max} step={step} value={value} onChange={e => set(Number(e.target.value))} style={{ width: '100%', accentColor: D.bronze, height: 4 }} />
+              <input type="range" min={faixa.min} max={faixa.max} step={faixa.passo}
+                value={entrada ?? sim.entrada} onChange={e => setEntrada(Number(e.target.value))}
+                style={{ width: '100%', accentColor: D.bronze, height: 4 }} />
+              {!sim.padraoDaTabela && (
+                <button onClick={() => setEntrada(null)}
+                  style={{ marginTop: 6, background: 'none', border: 'none', padding: 0, color: D.bronze, fontSize: 12, textDecoration: 'underline', cursor: 'pointer' }}>
+                  voltar à entrada da tabela
+                </button>
+              )}
             </div>
-          ))}
-          <div style={{ display: 'flex', gap: 8 }}>
-            {(['anual', 'semestral'] as const).map(f => (
-              <button key={f} onClick={() => setFreq(f)} style={{ flex: 1, padding: '7px 0', borderRadius: 2, border: '1px solid ' + (freq === f ? D.bronze : D.line), background: freq === f ? D.bronze : 'transparent', color: freq === f ? '#fff' : D.ink, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
-                Balão {f}
-              </button>
-            ))}
-          </div>
+          )}
         </div>
+
         <div style={{ background: D.sidebar, borderRadius: 3, padding: 20, color: D.onDark }}>
-          <div style={{ fontSize: 11, color: D.onDarkMuted, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Parcela mensal estimada</div>
-          <div style={{ fontFamily: "'Bricolage Grotesque',system-ui", fontSize: 'clamp(1.8rem,4vw,2.8rem)', fontWeight: 800, color: D.orange, margin: '8px 0', letterSpacing: '-0.025em' }}>{fmt(parcela)}</div>
-          <div style={{ display: 'grid', gap: 8, marginTop: 16, fontSize: 13 }}>
-            {[['Entrada', entrada, D.orange], ['Total balões (' + freq + ')', totalBaloes, '#8a6f49'], ['Saldo parcelado', saldoParc, '#5c5446']].map(([l, v, cor]) => (
-              <div key={String(l)} style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ display: 'flex', alignItems: 'center', gap: 6, color: D.onDarkMuted }}>
-                  <span style={{ width: 8, height: 8, borderRadius: 2, background: String(cor) }} />{String(l)}
-                </span>
-                <strong>{fmt(Number(v))}</strong>
+          {!sim ? (
+            <p style={{ margin: 0, fontSize: 13, color: D.onDarkMuted, lineHeight: 1.6 }}>
+              Escolha uma unidade para ver as condições exatas — as mesmas que o cliente vê na página do empreendimento.
+            </p>
+          ) : (
+            <>
+              <div style={{ fontSize: 11, color: D.onDarkMuted, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Parcela mensal</div>
+              <div style={{ fontFamily: "'Bricolage Grotesque',system-ui", fontSize: 'clamp(1.8rem,4vw,2.6rem)', fontWeight: 800, color: D.orange, margin: '6px 0 4px', letterSpacing: '-0.025em' }}>
+                {sim.parcelasQtd}x {fmt(sim.parcelaValor)}
               </div>
-            ))}
-            {cubAjuste > 0 && (
-              <div style={{ marginTop: 8, padding: '8px 10px', background: 'rgba(210,78,34,0.12)', borderRadius: 2, fontSize: 12 }}>
-                <div style={{ color: D.bronze, fontWeight: 600 }}>Reajuste CUB estimado</div>
-                <div style={{ color: D.onDarkMuted }}>{fmt(parcela * (1 + (cub?.variacao_mensal ?? 0) / 100))}/mês após reajuste anual</div>
+              <div style={{ fontSize: 12, color: D.onDarkMuted, marginBottom: 16 }}>
+                sobre {fmt(sim.valorTotal)}{rotuloUnidade ? ` · unidade ${rotuloUnidade}` : ''}
               </div>
-            )}
-          </div>
-          <a href={'https://api.whatsapp.com/send?phone=5548991642332&text=Ol%C3%A1!%20Simulei%20e%20cabe%20' + encodeURIComponent(fmt(parcela)) + '%20por%20m%C3%AAs.%20Quero%20saber%20mais!'} target="_blank" rel="noopener noreferrer"
-            style={{ marginTop: 20, background: '#25d366', color: '#fff', borderRadius: 2, padding: '11px', textAlign: 'center', textDecoration: 'none', fontWeight: 700, fontSize: 14, minHeight: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            Enviar simulação p/ cliente
-          </a>
+
+              <div style={{ display: 'grid', gap: 9 }}>
+                <Linha l="Entrada" v={`${fmt(sim.entrada)} · ${sim.entradaPercentual}%`} forte />
+                {sim.reforcosQtd > 0 && (
+                  <Linha l={`${sim.reforcosQtd} reforços anuais`} v={`${fmt(sim.reforcoValor)} · ${sim.reforcoEmParcelas.toFixed(2)}× a parcela`} />
+                )}
+                <Linha l={`Até as chaves (${sim.ateAsChavesPercentual}%)`} v={fmt(sim.ateAsChaves)} />
+                <Linha l="Saldo financiado na entrega" v={fmt(sim.saldoFinanciamento)} />
+              </div>
+
+              <p style={{ margin: '16px 0 0', fontSize: 11.5, color: D.onDarkMuted, lineHeight: 1.5 }}>
+                Corrigido pelo CUB/SC até a entrega. Sujeito à tabela vigente e à análise da construtora.
+              </p>
+
+              <a href={'https://wa.me/?text=' + encodeURIComponent(textoWhats)} target="_blank" rel="noopener noreferrer"
+                style={{ marginTop: 18, background: '#25d366', color: '#fff', borderRadius: 2, padding: '11px', textAlign: 'center', textDecoration: 'none', fontWeight: 700, fontSize: 14, minHeight: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                Abrir no WhatsApp com o texto pronto
+              </a>
+            </>
+          )}
         </div>
       </div>
     </div>
@@ -833,7 +1016,7 @@ function CrmPageInner() {
           </div>
         )}
 
-        {!loading && tab === 'simulador' && <SimuladorFluxo cub={cub} />}
+        {!loading && tab === 'simulador' && <SimuladorFluxo cub={cub} emps={emps} />}
 
         {!loading && tab === 'clientes' && (
           <div style={{ background: D.surface, border: '1px solid ' + D.line, borderRadius: 10, padding: 24 }}>

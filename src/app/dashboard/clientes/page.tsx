@@ -24,6 +24,11 @@ export default function ClientesPage() {
   const [clienteSelecionado, setClienteSelecionado] = useState<Cliente | null>(null)
   const [form, setForm] = useState({ nome: '', telefone: '', email: '', cpf: '', cidade: '', perfil_busca: '', renda_mensal: '', estado_civil: 'solteiro', tem_fgts: false, notas: '' })
   const [salvando, setSalvando] = useState(false)
+  // Duas etapas: o primeiro clique pergunta, o segundo apaga. Sem window.confirm,
+  // que alguns navegadores em iframe engolem sem mostrar nada.
+  const [confirmandoExclusao, setConfirmandoExclusao] = useState(false)
+  const [excluindo, setExcluindo] = useState(false)
+  const [vinculos, setVinculos] = useState<{ propostas: number; agenda: number; leads: number } | null>(null)
   const [erro, setErro] = useState('')
   const [pagina, setPagina] = useState(1)
   const [total, setTotal] = useState(0)
@@ -53,6 +58,8 @@ export default function ClientesPage() {
     }
     setModalAberto(true)
     setErro('')
+    setConfirmandoExclusao(false)
+    setVinculos(null)
   }
 
   async function salvarCliente(e: React.FormEvent) {
@@ -72,6 +79,25 @@ export default function ClientesPage() {
       buscarClientes()
     } catch (e: unknown) { setErro(e instanceof Error ? e.message : 'Erro ao salvar') }
     setSalvando(false)
+  }
+
+  async function excluirCliente(forcar = false) {
+    if (!clienteSelecionado) return
+    setExcluindo(true)
+    setErro('')
+    try {
+      const res = await fetch('/api/admin/clientes?id=' + clienteSelecionado.id + (forcar ? '&forcar=1' : ''), { method: 'DELETE' })
+      const j = await res.json().catch(() => ({}))
+      // 409: existe proposta/compromisso/lead ligado. Mostra o que se perde e
+      // deixa ele decidir, em vez de desvincular sem avisar.
+      if (res.status === 409 && j.vinculos) { setVinculos(j.vinculos); return }
+      if (!res.ok) throw new Error(j.error || 'Erro ao excluir')
+      setModalAberto(false)
+      setConfirmandoExclusao(false)
+      setVinculos(null)
+      buscarClientes()
+    } catch (e: unknown) { setErro(e instanceof Error ? e.message : 'Erro ao excluir') }
+    finally { setExcluindo(false) }
   }
 
   function formatTel(t: string) { return t.replace(/\D/g,'').replace(/(\d{2})(\d{5})(\d{4})/,'($1) $2-$3') }
@@ -230,7 +256,31 @@ export default function ClientesPage() {
                 <label style={{ fontSize: '0.8rem', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '0.25rem' }}>Notas</label>
                 <textarea value={form.notas} onChange={e => setForm(f => ({ ...f, notas: e.target.value }))} rows={3} style={{ width: '100%', padding: '0.5rem 0.75rem', border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: '0.875rem', boxSizing: 'border-box', resize: 'vertical' }} />
               </div>
-              <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', paddingTop: '0.5rem' }}>
+              <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', alignItems: 'center', flexWrap: 'wrap', paddingTop: '0.5rem' }}>
+                {clienteSelecionado && (
+                  confirmandoExclusao ? (
+                    <div style={{ marginRight: 'auto', display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: '0.8rem', color: '#b91c1c', fontWeight: 600 }}>
+                        {vinculos
+                          ? `Isto desliga ${[vinculos.propostas && `${vinculos.propostas} proposta(s)`, vinculos.agenda && `${vinculos.agenda} compromisso(s)`, vinculos.leads && `${vinculos.leads} lead(s)`].filter(Boolean).join(', ')}. Excluir mesmo assim?`
+                          : `Excluir ${clienteSelecionado.nome}?`}
+                      </span>
+                      <button type="button" onClick={() => excluirCliente(vinculos !== null)} disabled={excluindo}
+                        style={{ padding: '0.5rem 0.9rem', border: 'none', borderRadius: '6px', background: '#dc2626', color: '#fff', cursor: excluindo ? 'default' : 'pointer', fontWeight: 700, fontSize: '0.8rem' }}>
+                        {excluindo ? 'Excluindo...' : vinculos ? 'Excluir assim mesmo' : 'Sim, excluir'}
+                      </button>
+                      <button type="button" onClick={() => { setConfirmandoExclusao(false); setVinculos(null) }}
+                        style={{ padding: '0.5rem 0.9rem', border: '1px solid #e5e7eb', borderRadius: '6px', background: '#fff', cursor: 'pointer', fontWeight: 500, fontSize: '0.8rem', color: '#374151' }}>
+                        Não
+                      </button>
+                    </div>
+                  ) : (
+                    <button type="button" onClick={() => setConfirmandoExclusao(true)}
+                      style={{ marginRight: 'auto', padding: '0.625rem 0', border: 'none', background: 'none', color: '#b91c1c', cursor: 'pointer', fontWeight: 600, fontSize: '0.8rem', textDecoration: 'underline' }}>
+                      Excluir cliente
+                    </button>
+                  )
+                )}
                 <button type="button" onClick={() => setModalAberto(false)} style={{ padding: '0.625rem 1.25rem', border: '1px solid #e5e7eb', borderRadius: '6px', background: '#fff', cursor: 'pointer', fontWeight: 500, fontSize: '0.875rem', color: '#374151' }}>
                   Cancelar
                 </button>

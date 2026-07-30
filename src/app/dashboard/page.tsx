@@ -13,6 +13,19 @@ const D = {
 }
 const fmt = (n: number) => 'R$\u00a0' + Math.round(n).toLocaleString('pt-BR')
 
+/**
+ * CUB com os centavos.
+ *
+ * `fmt` arredonda para o real inteiro, o que serve para VGV e pipeline mas
+ * mente no CUB: R$ 3.121,62/m² virava "R$ 3.122". Não é detalhe estético — o
+ * CUB multiplica a quantidade de CUBs de cada unidade (o Pineto vai de 210 a
+ * 264), então 38 centavos de erro viram até R$ 100 de diferença no valor do
+ * apartamento. É um índice publicado, tem que aparecer como o Sinduscon publica.
+ */
+const fmtCub = (n: number) =>
+  'R$\u00a0' + n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+
+
 type Lead = {
   id: string; nome?: string; whatsapp: string; estagio_funil: string
   lead_score?: number; requer_atencao?: boolean; temperatura?: number
@@ -114,7 +127,7 @@ export default function DashboardHome() {
             <div style={{ flex: 1, minWidth: 0 }}>
               <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#8A5A00' }}>CUB/SC do site público pode estar desatualizado</p>
               <p style={{ margin: '4px 0 0', fontSize: 13, color: '#8A5A00', lineHeight: 1.5, overflowWrap: 'break-word' }}>
-                O scraping automático do Sinduscon (usado em /indicadores e na home) falhou nesta checagem. O site está mostrando um valor de fallback ({fmt(cubScraper.valor_m2)}/m², ref. {cubScraper.usar_em_label}) — confira manualmente em{' '}
+                O scraping automático do Sinduscon (usado em /indicadores e na home) falhou nesta checagem. O site está mostrando um valor de fallback ({fmtCub(cubScraper.valor_m2)}/m², ref. {cubScraper.usar_em_label}) — confira manualmente em{' '}
                 <a href="https://sinduscon-fpolis.org.br/" target="_blank" rel="noopener noreferrer" style={{ color: '#8A5A00', textDecoration: 'underline' }}>sinduscon-fpolis.org.br</a>.
               </p>
             </div>
@@ -125,7 +138,7 @@ export default function DashboardHome() {
           <div>
             <div style={{ fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', color: D.onDarkMuted, marginBottom: 4 }}>CUB/SC Vigente · SINDUSCON-SC</div>
             <div style={{ fontFamily: "'Bricolage Grotesque',system-ui", fontSize: 'clamp(1.4rem,3vw,2rem)', fontWeight: 800, color: D.bronze }}>
-              {cub ? fmt(cub.valor_m2) + '/m²' : (loading ? '—' : 'Sem CUB cadastrado')}
+              {cub ? fmtCub(cub.valor_m2) + '/m²' : (loading ? '—' : 'Sem CUB cadastrado')}
             </div>
           </div>
           <button onClick={() => router.push('/dashboard/crm')}
