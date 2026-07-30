@@ -31,13 +31,43 @@ function configurarWebPush(): boolean {
 // Best-effort dos dois lados (bell in-app + push real) — nunca lança
 // exceção pro chamador. Um lead já foi salvo com sucesso quando isso é
 // chamado; falha em notificar não pode derrubar a resposta da rota.
-export async function notificarLeadNovo(supabase: SupabaseClient, lead: LeadNovoInfo): Promise<void> {
+export async function notificarLeadNovo(
+  supabase: SupabaseClient,
+  lead: LeadNovoInfo,
+  opcoes?: {
+    /**
+     * Janela em minutos para não repetir notificação do MESMO lead.
+     *
+     * O espelho chama isto até três vezes em segundos — pedir a simulação,
+     * marcar "já quero" e reenviar com a entrada ajustada são três requisições
+     * separadas. No teste de 29/07 o corretor recebeu "Novo lead: teste 4444"
+     * três vezes seguidas. Sem a janela, a notificação vira ruído e ele para
+     * de olhar justamente o canal que deveria acordá-lo.
+     */
+    naoRepetirPorMinutos?: number
+    tituloCustom?: string
+    corpoCustom?: string
+  },
+): Promise<void> {
   try {
     const { data: admin } = await supabase.from('admin_users').select('id').limit(1).maybeSingle()
+
+    const janela = opcoes?.naoRepetirPorMinutos
+    if (janela && janela > 0) {
+      const desde = new Date(Date.now() - janela * 60_000).toISOString()
+      const { data: recente } = await supabase
+        .from('crm_notificacoes')
+        .select('id')
+        .eq('tipo', 'lead_novo')
+        .contains('metadata', { leadId: lead.id })
+        .gte('created_at', desde)
+        .limit(1)
+      if (recente && recente.length > 0) return
+    }
     const nome = lead.nome?.trim() || 'Lead sem nome'
     const origemLabel = (lead.origem && ORIGEM_LABEL[lead.origem]) || lead.origem || 'origem desconhecida'
-    const titulo = `Novo lead: ${nome}`
-    const corpo = `Chegou pelo ${origemLabel}.`
+    const titulo = opcoes?.tituloCustom ?? `Novo lead: ${nome}`
+    const corpo = opcoes?.corpoCustom ?? `Chegou pelo ${origemLabel}.`
     const link = `/dashboard/crm?lead=${lead.id}`
 
     await supabase.from('crm_notificacoes').insert({

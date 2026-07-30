@@ -122,3 +122,82 @@ describe('notificarLeadNovo', () => {
     await expect(notificarLeadNovo(client, { id: 'lead-1', nome: null, origem: null })).resolves.toBeUndefined()
   })
 })
+
+// ─────────────────────────────────────────────────────────────────────
+// Janela anti-repetição.
+//
+// O espelho chama esta função até três vezes em segundos: pedir a simulação,
+// marcar "já quero" e reenviar com a entrada ajustada são requisições
+// separadas. No teste de 29/07 em produção o corretor recebeu "Novo lead:
+// teste 4444" três vezes seguidas.
+// ─────────────────────────────────────────────────────────────────────
+describe('notificarLeadNovo — janela anti-repetição', () => {
+  function clienteFake(recentes: unknown[]) {
+    const inseridas: unknown[] = []
+    const consultas: Record<string, unknown>[] = []
+    const client = {
+      from(tabela: string) {
+        if (tabela === 'admin_users') {
+          return { select: () => ({ limit: () => ({ maybeSingle: async () => ({ data: { id: 'a1' } }) }) }) }
+        }
+        if (tabela === 'crm_push_subscriptions') {
+          return { select: async () => ({ data: [] }) }
+        }
+        return {
+          select: () => ({
+            eq: (_c: string, v: string) => ({
+              contains: (_c2: string, filtro: Record<string, unknown>) => ({
+                gte: (_c3: string, desde: string) => ({
+                  limit: async () => { consultas.push({ tipo: v, filtro, desde }); return { data: recentes } },
+                }),
+              }),
+            }),
+          }),
+          insert: async (linha: unknown) => { inseridas.push(linha); return { error: null } },
+        }
+      },
+    }
+    return { client, inseridas, consultas }
+  }
+
+  it('sem janela, sempre notifica — comportamento antigo preservado', async () => {
+    const { client, inseridas } = clienteFake([{ id: 'ja-existe' }])
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await notificarLeadNovo(client as any, { id: 'l1', nome: 'Ana', origem: 'Site' })
+    expect(inseridas).toHaveLength(1)
+  })
+
+  it('com janela e notificação recente do MESMO lead, não repete', async () => {
+    const { client, inseridas } = clienteFake([{ id: 'ja-existe' }])
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await notificarLeadNovo(client as any, { id: 'l1', nome: 'Ana', origem: 'espelho' }, { naoRepetirPorMinutos: 15 })
+    expect(inseridas).toHaveLength(0)
+  })
+
+  it('com janela e nada recente, notifica normalmente', async () => {
+    const { client, inseridas } = clienteFake([])
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await notificarLeadNovo(client as any, { id: 'l1', nome: 'Ana', origem: 'espelho' }, { naoRepetirPorMinutos: 15 })
+    expect(inseridas).toHaveLength(1)
+  })
+
+  it('a busca é filtrada pelo leadId — lead diferente não bloqueia', async () => {
+    const { client, consultas } = clienteFake([])
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await notificarLeadNovo(client as any, { id: 'lead-xyz', nome: 'Ana', origem: 'espelho' }, { naoRepetirPorMinutos: 15 })
+    expect(consultas[0].filtro).toEqual({ leadId: 'lead-xyz' })
+  })
+
+  it('título e corpo customizados vencem o padrão "Novo lead"', async () => {
+    const { client, inseridas } = clienteFake([])
+    await notificarLeadNovo(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      client as any, { id: 'l1', nome: 'Ana', origem: 'espelho' },
+      { tituloCustom: 'Quer a unidade 1506: Ana', corpoCustom: 'Pineto Residencial.' },
+    )
+    expect(inseridas[0]).toMatchObject({
+      titulo: 'Quer a unidade 1506: Ana',
+      corpo: 'Pineto Residencial.',
+    })
+  })
+})

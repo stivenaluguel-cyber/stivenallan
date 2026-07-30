@@ -7,10 +7,15 @@ import { notificarLeadNovo } from '@/lib/leads/notificar-lead-novo'
 import { recalcularScoreLead } from '@/lib/leads/score-server'
 import { resolverLeadDoEspelho } from '@/lib/unidades/lead-do-espelho'
 import { planoDoJson, simular } from '@/lib/unidades/simular'
+import { montarAvisoCorretor, montarMensagemSimulacao } from '@/lib/unidades/mensagem-espelho'
+import { enviarMensagem } from '@/lib/evolution'
 import { logError } from '@/lib/log'
 
 export const dynamic = 'force-dynamic'
 const SOURCE = 'api/espelho/simular'
+// Mesmo número que src/lib/evolution.ts já usa para o alerta de escalada.
+const CORRETOR_WHATSAPP = '5548991642332'
+
 const sb = () => createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
 /**
@@ -60,7 +65,7 @@ export async function POST(req: NextRequest) {
 
     const { data: unidade } = await client
       .from('empreendimentos_unidades')
-      .select('id, unidade, bloco, valor_tabela, valor_promocional, plano_pagamento, empreendimento_id, empreendimentos(nome)')
+      .select('id, unidade, bloco, andar, metragem, dormitorios, valor_tabela, valor_promocional, plano_pagamento, empreendimento_id, empreendimentos(nome)')
       .eq('id', unidadeId)
       .maybeSingle()
 
@@ -121,11 +126,49 @@ export async function POST(req: NextRequest) {
       })
     }
 
+    // ── A entrega que a página prometeu ──────────────────────────────
+    // "Eu te mando o valor e as condições pelo WhatsApp" era a promessa mais
+    // visível da tela e a única parte que não existia: o lead entrava no CRM e
+    // a pessoa ficava esperando uma mensagem que nunca chegava.
+    //
+    // Best-effort: a simulação já está gravada e o corretor já foi avisado.
+    // Instância do WhatsApp fora do ar não pode derrubar a resposta nem apagar
+    // o lead — ele aparece no CRM do mesmo jeito e o corretor responde na mão.
+    const dadosMensagem = {
+      nomeCliente: nome,
+      empreendimento: empNome,
+      unidade: rotulo,
+      metragem: Number(unidade.metragem ?? 0),
+      dormitorios: unidade.dormitorios as number | null,
+      andar: unidade.andar as number | null,
+      simulacao: sim,
+      demonstrouInteresse: false,
+    }
+
+    // Awaitado de propósito: a resposta diz à tela SE a mensagem saiu, e a
+    // tela só promete o que aconteceu. Dizer "já mandei no seu WhatsApp" com a
+    // instância desconectada seria repetir o erro que acabamos de tirar da
+    // reserva — prometer o que não se pode cumprir.
+    const enviado = await enviarMensagem(whatsapp, montarMensagemSimulacao(dadosMensagem))
+      .catch((e) => { logError(SOURCE, 'falha ao enviar WhatsApp', e); return false })
+
+    if (!enviado) {
+      logError(SOURCE, 'WhatsApp da simulação não foi entregue', null, { leadId: r.leadId })
+    }
+
+    // Aviso para o corretor com o resumo que importa: quem, qual unidade e
+    // quanto a pessoa disse que tem de entrada.
+    enviarMensagem(CORRETOR_WHATSAPP, montarAvisoCorretor({ ...dadosMensagem, whatsappCliente: whatsapp }))
+      .catch((e) => logError(SOURCE, 'falha ao avisar o corretor', e))
+
+    // Janela de 15 min: pedir simulação, marcar "já quero" e reenviar com a
+    // entrada ajustada são três requisições em segundos. Sem isso vira três
+    // notificações iguais — foi o que aconteceu no teste de 29/07.
     notificarLeadNovo(client, {
       id: r.leadId,
       nome,
       origem: r.nasceuAgora ? 'espelho (simulação)' : 'espelho (simulação, lead existente)',
-    }).catch((e) => logError(SOURCE, 'notificacao falhou', e))
+    }, { naoRepetirPorMinutos: 15 }).catch((e) => logError(SOURCE, 'notificacao falhou', e))
 
     recalcularScoreLead(client, r.leadId).catch((e) => logError(SOURCE, 'score falhou', e))
 
@@ -138,6 +181,7 @@ export async function POST(req: NextRequest) {
       valor,
       plano,
       simulacao: sim,
+      whatsappEnviado: enviado,
     }, { status: 201 })
   } catch (e) {
     logError(SOURCE, 'erro inesperado', e)
