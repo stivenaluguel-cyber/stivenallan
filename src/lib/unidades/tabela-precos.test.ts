@@ -7,6 +7,7 @@ import {
   tabelaVencida,
   validarTabela,
   MIME_TABELA,
+  planoDeRetencao,
 } from './tabela-precos'
 
 describe('validarTabela', () => {
@@ -99,5 +100,45 @@ describe('tabelaVencida', () => {
   it('competenciaDoMes acompanha a data informada', () => {
     expect(competenciaDoMes(new Date(2026, 6, 30))).toBe('2026-07-01')
     expect(competenciaDoMes(new Date(2026, 11, 1))).toBe('2026-12-01')
+  })
+})
+
+describe('planoDeRetencao', () => {
+  it('guarda a vigente e a anterior, descarta o resto', () => {
+    const p = planoDeRetencao(['2026-06-01', '2026-05-01'], '2026-07-01')
+    expect(p.manter).toEqual(['2026-07-01', '2026-06-01'])
+    expect(p.descartar).toEqual(['2026-05-01'])
+    expect(p.novaEntra).toBe(true)
+  })
+
+  it('primeira tabela do empreendimento não descarta nada', () => {
+    const p = planoDeRetencao([], '2026-07-01')
+    expect(p.manter).toEqual(['2026-07-01'])
+    expect(p.descartar).toEqual([])
+  })
+
+  it('reenviar o mesmo mês não duplica nem descarta', () => {
+    const p = planoDeRetencao(['2026-07-01', '2026-06-01'], '2026-07-01')
+    expect(p.manter).toEqual(['2026-07-01', '2026-06-01'])
+    expect(p.descartar).toEqual([])
+  })
+
+  it('tabela velha demais é recusada em vez de apagada depois', () => {
+    // Aceitar e apagar em seguida pareceria defeito: o arquivo somiria sozinho
+    // logo depois de "salvo".
+    const p = planoDeRetencao(['2026-07-01', '2026-06-01'], '2026-03-01')
+    expect(p.novaEntra).toBe(false)
+    expect(p.descartar).toContain('2026-03-01')
+  })
+
+  it('descarta várias de uma vez quando o histórico estava grande', () => {
+    const p = planoDeRetencao(['2026-06-01', '2026-05-01', '2026-04-01'], '2026-07-01')
+    expect(p.manter).toEqual(['2026-07-01', '2026-06-01'])
+    expect(p.descartar).toEqual(['2026-05-01', '2026-04-01'])
+  })
+
+  it('limite configurável, e nunca abaixo de uma', () => {
+    expect(planoDeRetencao(['2026-06-01'], '2026-07-01', 1).manter).toEqual(['2026-07-01'])
+    expect(planoDeRetencao(['2026-06-01'], '2026-07-01', 0).manter).toEqual(['2026-07-01'])
   })
 })

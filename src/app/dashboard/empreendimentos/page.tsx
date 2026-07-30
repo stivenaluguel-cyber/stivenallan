@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { competenciaDoMes, competenciaLabel, tabelaVencida } from '@/lib/unidades/tabela-precos'
+import { competenciaDoMes, competenciaLabel, TABELAS_GUARDADAS, tabelaVencida } from '@/lib/unidades/tabela-precos'
 import { useRouter } from 'next/navigation'
 
 const D = {
@@ -149,6 +149,11 @@ function PainelTabela({ slug, nome, onFechar }: { slug: string; nome: string; on
         </button>
       </form>
       {erro && <p style={{ margin: '10px 0 0', fontSize: 13, color: D.red }}>{erro}</p>}
+      <p style={{ margin: '10px 0 0', fontSize: 12, color: D.muted, lineHeight: 1.5 }}>
+        Ficam guardadas as {TABELAS_GUARDADAS} tabelas mais recentes: a vigente e a anterior —
+        que é a que prova a condição de uma proposta feita no mês passado. As mais
+        antigas saem sozinhas quando você envia uma nova.
+      </p>
     </div>
   )
 }

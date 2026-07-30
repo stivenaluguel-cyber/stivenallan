@@ -4,6 +4,9 @@ import { requireAdmin } from '@/lib/dashboard/admin-auth'
 import {
   caminhoTabela,
   competenciaISO,
+  competenciaLabel,
+  planoDeRetencao,
+  TABELAS_GUARDADAS,
   validarTabela,
 } from '@/lib/unidades/tabela-precos'
 import { logError } from '@/lib/log'
@@ -95,6 +98,24 @@ export async function POST(req: NextRequest) {
   if (!validacao.ok) return NextResponse.json({ error: validacao.erro }, { status: 400 })
 
   const client = sb()
+
+  // Retenção decidida ANTES do upload: aceitar uma tabela velha para apagá-la
+  // logo em seguida faria o arquivo sumir sozinho depois de "salvo".
+  const { data: jaGuardadas } = await client
+    .from(TABELA)
+    .select('id, competencia, storage_path')
+    .eq('empreendimento_slug', slug)
+    .order('competencia', { ascending: false })
+
+  const existentes = (jaGuardadas ?? []).map((t) => t.competencia as string)
+  const plano = planoDeRetencao(existentes, competencia)
+
+  if (!plano.novaEntra) {
+    return NextResponse.json({
+      error: `Guardamos as ${TABELAS_GUARDADAS} tabelas mais recentes (${plano.manter.map(competenciaLabel).join(' e ')}). Esta é de ${competenciaLabel(competencia)}.`,
+    }, { status: 409 })
+  }
+
   const caminho = caminhoTabela(slug, competencia, `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`)
 
   const { error: erroUpload } = await client.storage
@@ -105,14 +126,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Não foi possível enviar o arquivo' }, { status: 500 })
   }
 
-  // Guarda o caminho antigo ANTES do upsert: depois de sobrescrever a linha,
-  // não haveria mais como achar o arquivo órfão no bucket.
-  const { data: anterior } = await client
-    .from(TABELA)
-    .select('storage_path')
-    .eq('empreendimento_slug', slug)
-    .eq('competencia', competencia)
-    .maybeSingle()
+  // O caminho antigo do MESMO mês, para apagar depois de sobrescrever a linha.
+  const anterior = (jaGuardadas ?? []).find((t) => t.competencia === competencia) ?? null
 
   const cub = Number(String(cubBruto ?? '').replace(/\./g, '').replace(',', '.'))
 
@@ -138,11 +153,32 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: erroInsert.message }, { status: 500 })
   }
 
+  const arquivosParaApagar: string[] = []
   if (anterior?.storage_path && anterior.storage_path !== caminho) {
-    await client.storage.from(BUCKET).remove([anterior.storage_path as string])
+    arquivosParaApagar.push(anterior.storage_path as string)
   }
 
-  return NextResponse.json({ data: linha }, { status: 201 })
+  // Fora da janela de retenção: sai o registro e sai o arquivo.
+  const vencidas = (jaGuardadas ?? []).filter((t) => plano.descartar.includes(t.competencia as string))
+  if (vencidas.length > 0) {
+    const { error: erroDelete } = await client
+      .from(TABELA)
+      .delete()
+      .in('id', vencidas.map((t) => t.id as string))
+    // Falhar aqui não invalida o envio: a tabela nova está salva. Só sobra
+    // espaço ocupado, que a próxima subida tenta limpar de novo.
+    if (erroDelete) logError(SOURCE, 'falha ao aplicar retencao', erroDelete, { slug })
+    else arquivosParaApagar.push(...vencidas.map((t) => t.storage_path as string))
+  }
+
+  if (arquivosParaApagar.length > 0) {
+    await client.storage.from(BUCKET).remove(arquivosParaApagar)
+  }
+
+  return NextResponse.json({
+    data: linha,
+    descartadas: plano.descartar,
+  }, { status: 201 })
 }
 
 /** DELETE ?id=... — remove o registro e o arquivo. */

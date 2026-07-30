@@ -95,3 +95,44 @@ export function tabelaVencida(competencia: string, agora: Date): boolean {
   const atual = competenciaDoMes(agora)
   return competencia < atual
 }
+
+/**
+ * Quantas tabelas ficam guardadas por empreendimento.
+ *
+ * Duas: a vigente e a anterior. A anterior importa porque proposta feita sob a
+ * tabela do mês passado costuma fechar no mês seguinte — e aí é preciso provar
+ * a condição que foi oferecida.
+ *
+ * Guardar tudo cresce sem teto: ~512 KB por PDF (medida real do Pineto) × 36
+ * imóveis × 12 meses ≈ 216 MB por ano, para sempre. Com o limite de duas, o
+ * total para em ~37 MB e não cresce mais.
+ */
+export const TABELAS_GUARDADAS = 2
+
+export type PlanoRetencao = {
+  /** Competências que continuam guardadas, da mais recente para a mais antiga. */
+  manter: string[]
+  /** Competências que saem — registro e arquivo. */
+  descartar: string[]
+  /** false quando a tabela enviada já nasce fora da janela. */
+  novaEntra: boolean
+}
+
+/**
+ * Decide o que fica e o que sai depois de enviar uma tabela nova.
+ *
+ * `novaEntra: false` acontece quando alguém envia uma tabela mais antiga que as
+ * que já estão guardadas. Aí o certo é recusar antes do upload, e não aceitar
+ * para apagar em seguida — arquivo que some sozinho depois de "salvo" parece
+ * defeito.
+ */
+export function planoDeRetencao(
+  existentes: string[],
+  nova: string,
+  limite: number = TABELAS_GUARDADAS,
+): PlanoRetencao {
+  const todas = [...new Set([...existentes, nova])].sort().reverse()
+  const manter = todas.slice(0, Math.max(1, limite))
+  const descartar = todas.slice(Math.max(1, limite))
+  return { manter, descartar, novaEntra: manter.includes(nova) }
+}
