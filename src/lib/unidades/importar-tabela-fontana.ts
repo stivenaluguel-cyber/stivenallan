@@ -48,6 +48,8 @@ export type UnidadeImportada = {
   /** Torre, quando o prédio tem mais de uma. `null` em prédio de bloco único. */
   bloco: string | null
   dormitorios: number
+  /** Suítes declaradas no rodapé. Não existe coluna por unidade em tabela nenhuma. */
+  suites: number
   andar: number | null
   metragem: number
   box_m2: number | null
@@ -95,6 +97,14 @@ export type ResultadoTabela = {
   // Não é erro de parse: é aviso de que a tabela pode estar velha (ou o CUB do
   // sistema). Quem decide é o corretor.
   conferenciaCub: { impresso: number | null; sistema: number | null; confere: boolean | null }
+  /**
+   * Contagem de linhas obtida SEM o fatiador, pela redundância do PDF.
+   *
+   * `esperado` é null quando a tabela não tem a repetição (nenhuma vista até
+   * hoje, mas não dá para garantir). `confere: false` significa que sumiu
+   * linha: é bloqueio de importação, não aviso.
+   */
+  conferenciaLinhas: { esperado: number | null; lidas: number; confere: boolean | null }
 }
 
 // Uma tabela é feita com o CUB de UM mês; a diferença aceitável entre o valor
@@ -159,6 +169,90 @@ function parseCabecalho(texto: string): CabecalhoTabela {
 // (Torre B) voltava com zero unidades das três.
 const INICIO_DE_UNIDADE = /\b\d{3,4}\s+(?:[A-Z]\s+)?\d\s+\d{1,3}(?:\s*e\s*\d{1,3})?\s*[A-Z]{1,2}\b/
 
+// A quarta: nem toda tabela traz a coluna de dormitórios. O Lavis vai do
+// número da unidade direto para o box — "501 63D - T" — e informa "03
+// Dormitórios ( 03 Suítes)" uma vez só, no rodapé.
+//
+// Este padrão NÃO substitui o de cima: ele é a segunda tentativa. Afrouxar
+// para todo mundo quebrou a varredura anti-sumiço em 14 testes, porque
+// "545 1.701.282,90" (quantidade de CUB seguida do total) passa a parecer
+// início de unidade. O formato se decide UMA VEZ por tabela, e cada um usa o
+// seu par de expressões.
+const INICIO_SEM_DORMITORIOS = /\b\d{3,4}\s+\d{1,3}(?:\s*e\s*\d{1,3})?\s*[A-Z]{1,2}\b/
+
+export type FormatoLinha = 'com_dormitorios' | 'sem_dormitorios'
+
+/**
+ * Qual das duas formas a tabela usa.
+ *
+ * Tenta primeiro a forma com a coluna de dormitórios, que é a da maioria. Só
+ * cai na outra quando NENHUMA linha é reconhecida — assim nenhuma tabela que
+ * já funciona muda de caminho.
+ */
+function detectarFormatoLinha(texto: string): FormatoLinha {
+  const corpo = texto.split(/Observa[çc][õo]es\s*:/i)[0]
+  return INICIO_DE_UNIDADE.test(corpo) ? 'com_dormitorios' : 'sem_dormitorios'
+}
+
+const PADROES: Record<FormatoLinha, {
+  inicio: RegExp
+  perdidas: RegExp
+  dormitorios: RegExp | null
+  box: RegExp
+}> = {
+  com_dormitorios: {
+    inicio: INICIO_DE_UNIDADE,
+    perdidas: /\b(\d{3,4})\s+(?:[A-Z]\s+)?\d\s+\S[^\n]{0,40}?\d[\d.]*,\d{2}/g,
+    dormitorios: /^\d{3,4}\s+(?:[A-Z]\s+)?(\d)\s/,
+    box: /^\d{3,4}\s+(?:[A-Z]\s+)?\d\s+(\d{1,3}(?:\s*e\s*\d{1,3})?\s*[A-Z]{1,2})/,
+  },
+  sem_dormitorios: {
+    inicio: INICIO_SEM_DORMITORIOS,
+    // ATENÇÃO: nesta forma a varredura NÃO tem poder de detecção.
+    //
+    // O que fazia a varredura funcionar era o dígito de dormitórios: ele é uma
+    // âncora redundante, presente na linha de unidade e ausente em qualquer
+    // outro lugar. Sem ele, "545 502 64D - T 125,98" — quantidade de CUB
+    // seguida da PRÓXIMA unidade — é textualmente idêntico a uma linha de
+    // unidade seguida do seu box. Toda tentativa de afrouxar produziu 40
+    // rejeições falsas no Lavis, apontando quantidades de CUB como unidades
+    // perdidas.
+    //
+    // Usar o mesmo padrão do fatiador não inventa rejeição — mas também não
+    // encontra nada que o fatiador não tenha achado. É honesto e inútil, e
+    // está aqui explícito para ninguém supor que esta forma tem a mesma rede
+    // que as outras. A redundância que dá para explorar nestas tabelas é
+    // outra: cada linha termina com a quantidade de CUB repetida duas vezes
+    // depois do total.
+    perdidas: /\b(\d{3,4})\s+\d{1,3}(?:\s*e\s*\d{1,3})?\s*[A-Z]{1,2}\b/g,
+    // A coluna não existe: o número vem do rodapé.
+    dormitorios: null,
+    box: /^\d{3,4}\s+(\d{1,3}(?:\s*e\s*\d{1,3})?\s*[A-Z]{1,2})/,
+  },
+}
+
+/**
+ * Dormitórios e suítes declarados no rodapé, para o prédio inteiro.
+ *
+ * "Nº DORMITÓRIOS UNIDADES 03 Dormitórios ( 03 Suítes)". É a única fonte de
+ * suítes em QUALQUER tabela — não existe coluna por unidade —, e a única fonte
+ * de dormitórios nas tabelas que não trazem a coluna.
+ *
+ * Só devolve o número quando o rodapé é uniforme. Monte Leone escreve "Finais
+ * 01 e 02 - 04 Dormitórios (Sendo 03 Suítes) Final 03 - 04 Dormitórios (Sendo
+ * 04 Suítes)": ali suítes dependem do final da unidade, e chutar um dos dois
+ * colocaria número errado em metade do prédio.
+ */
+export function lerDormitoriosDoRodape(texto: string): { dormitorios: number | null; suites: number | null } {
+  const achados = [...texto.matchAll(/(\d{1,2})\s*Dormit[óo]rios?\s*\(\s*(?:Sendo\s*)?(\d{1,2})\s*Su[íi]tes?\s*\)/gi)]
+  if (achados.length === 0) return { dormitorios: null, suites: null }
+  const uniforme = (vals: number[]) => (new Set(vals).size === 1 ? vals[0] : null)
+  return {
+    dormitorios: uniforme(achados.map((m) => Number(m[1]))),
+    suites: uniforme(achados.map((m) => Number(m[2]))),
+  }
+}
+
 /**
  * Multiplicadores do cabeçalho: "1 X" (entrada), "6 X" (reforços), "72 X"
  * (parcelas).
@@ -183,10 +277,11 @@ function lerQuantidades(texto: string): { parcelas: number | null; reforcos: num
   return { parcelas, reforcos }
 }
 
-function fatiarUnidades(texto: string): string[] {
+function fatiarUnidades(texto: string, forma: FormatoLinha): string[] {
   const corpo = texto.split(/Observa[çc][õo]es\s*:/i)[0]
-  const partes = corpo.split(new RegExp(`(?=${INICIO_DE_UNIDADE.source})`))
-  const comeca = new RegExp(`^${INICIO_DE_UNIDADE.source.replace(/^\\b/, '')}`)
+  const inicio = PADROES[forma].inicio
+  const partes = corpo.split(new RegExp(`(?=${inicio.source})`))
+  const comeca = new RegExp(`^${inicio.source.replace(/^\\b/, '')}`)
   return partes.filter((p) => comeca.test(p.trim()))
 }
 
@@ -203,14 +298,43 @@ function fatiarUnidades(texto: string): string[] {
  * formato de uma linha de unidade — e reporta o que ficou de fora, para virar
  * rejeição visível em vez de sumiço.
  */
-function unidadesPerdidas(texto: string, capturadas: Set<string>): string[] {
+function unidadesPerdidas(texto: string, capturadas: Set<string>, forma: FormatoLinha): string[] {
   const corpo = texto.split(/Observa[çc][õo]es\s*:/i)[0]
   const perdidas: string[] = []
-  for (const m of corpo.matchAll(/\b(\d{3,4})\s+(?:[A-Z]\s+)?\d\s+\S[^\n]{0,40}?\d[\d.]*,\d{2}/g)) {
+  for (const m of corpo.matchAll(PADROES[forma].perdidas)) {
     const n = m[1]
     if (!capturadas.has(n) && !perdidas.includes(n)) perdidas.push(n)
   }
   return perdidas
+}
+
+/**
+ * Conta as linhas de unidade SEM usar o fatiador.
+ *
+ * Toda tabela Fontana — nas quatro formas já vistas — termina cada linha de
+ * unidade com a quantidade de CUB repetida duas vezes, logo depois do total:
+ *
+ *   Pineto   … 489.470,02 224 699.242,88 224 224
+ *   Lavis    … 13.343,26 545 1.701.282,90 545 545
+ *   M. Leone … 29.183,78 1.192 3.720.971,04 1.192 1.192
+ *
+ * Dois inteiros idênticos e adjacentes não aparecem em nenhum outro ponto do
+ * corpo da tabela, e o par fica no FIM da linha — longe do código do box, que
+ * é o que costuma quebrar o reconhecimento. Isso dá um número de linhas que
+ * não depende de nada que o fatiador enxerga.
+ *
+ * É a rede que substitui a varredura de `unidadesPerdidas` nas tabelas sem
+ * coluna de dormitórios, onde aquela heurística não tem âncora e fica inerte.
+ */
+export function contarLinhasPelaRepeticaoDoCub(texto: string): number | null {
+  const corpo = texto.split(/Observa[çc][õo]es\s*:/i)[0]
+  // Os `(?<![\d.,])` e `(?![\d.,])` não são zelo: sem eles, os CENTAVOS de um
+  // valor colam no começo do próximo e inventam um par. No Lavis,
+  // "1.863.607,14 14.616,37" virava "14 14" — duas vezes —, e a conferência
+  // acusava 57 linhas onde há 55, bloqueando uma importação correta.
+  // O par tem que ser de inteiros soltos, não de pedaços de decimal.
+  const pares = [...corpo.matchAll(/(?<![\d.,])(\d{1,3}(?:\.\d{3})*)(?![\d.,])\s+\1(?![\d.,])/g)]
+  return pares.length > 0 ? pares.length : null
 }
 
 /** Andar pela convenção predial: 102 → 1º, 1505 → 15º. */
@@ -226,19 +350,26 @@ export function parsearTabelaFontana(
   cubDoSistema?: number | null,
 ): ResultadoTabela {
   const cabecalho = parseCabecalho(texto)
+  const forma = detectarFormatoLinha(texto)
+  const doRodape = lerDormitoriosDoRodape(texto)
   const unidades: UnidadeImportada[] = []
   const rejeitadas: LinhaRejeitadaTabela[] = []
 
-  for (const bruto of fatiarUnidades(texto)) {
+  for (const bruto of fatiarUnidades(texto, forma)) {
     const chunk = bruto.trim()
     const unidade = chunk.match(/^(\d{3,4})/)?.[1] ?? '?'
     // Letra da torre, quando o prédio tem mais de uma ("904 B 2 44S" → "B").
     // Vai para a coluna `bloco`, que é como o espelho agrupa a grade.
     const bloco = chunk.match(/^\d{3,4}\s+([A-Z])\s+\d\s/)?.[1] ?? null
-    const dormitorios = Number(chunk.match(/^\d{3,4}\s+(?:[A-Z]\s+)?(\d)/)?.[1] ?? 0)
+    // Sem coluna de dormitórios, o número vem do rodapé — é o que a
+    // construtora declara para o prédio inteiro.
+    const padrao = PADROES[forma]
+    const dormitorios = padrao.dormitorios
+      ? Number(chunk.match(padrao.dormitorios)?.[1] ?? 0)
+      : (doRodape.dormitorios ?? 0)
     // Só o código, sem o sufixo de pavimento ("89E", não "89E - 3º"): o andar
     // já sai do número da unidade.
-    const boxCodigo = chunk.match(/^\d{3,4}\s+(?:[A-Z]\s+)?\d\s+(\d{1,3}(?:\s*e\s*\d{1,3})?\s*[A-Z]{1,2})/)?.[1] ?? null
+    const boxCodigo = chunk.match(padrao.box)?.[1] ?? null
 
     // Tokeniza a PARTIR do primeiro decimal. Antes dele só há ruído numérico
     // ("91S", "3º Pav") que confundiria a contagem de colunas.
@@ -369,6 +500,10 @@ export function parsearTabelaFontana(
       unidade,
       bloco,
       dormitorios,
+      // O rodapé é a ÚNICA fonte de suítes. Antes ia 1 fixo, herdado do
+      // Pineto — e ficava errado no Fidenza (3), Parco Savello (2) e Monte
+      // Leone (3). Rodapé que varia por final devolve null e mantém o 1.
+      suites: doRodape.suites ?? 1,
       andar: andarDe(unidade),
       metragem,
       box_m2: boxM2 ?? null,
@@ -387,12 +522,18 @@ export function parsearTabelaFontana(
   // capturou vira rejeição explícita, com o motivo.
   const capturadas = new Set(unidades.map((u) => u.unidade))
   for (const r of rejeitadas) capturadas.add(r.unidade)
-  for (const n of unidadesPerdidas(texto, capturadas)) {
+  for (const n of unidadesPerdidas(texto, capturadas, forma)) {
     rejeitadas.push({
       unidade: n,
       motivo: 'linha não reconhecida — código de box fora do padrão (ex.: "09 e 16S")',
     })
   }
+
+  // Lidas = o que virou registro MAIS o que foi recusado com motivo. As duas
+  // coisas são visíveis; o que não pode existir é linha que não caiu em
+  // nenhuma das duas.
+  const lidas = unidades.length + rejeitadas.length
+  const esperadoPelaRepeticao = contarLinhasPelaRepeticaoDoCub(texto)
 
   const impresso = cabecalho.cub_valor
   const sistema = cubDoSistema ?? null
@@ -404,6 +545,11 @@ export function parsearTabelaFontana(
       impresso,
       sistema,
       confere: impresso === null || sistema === null ? null : Math.abs(impresso - sistema) <= TOLERANCIA_CUB,
+    },
+    conferenciaLinhas: {
+      esperado: esperadoPelaRepeticao,
+      lidas,
+      confere: esperadoPelaRepeticao === null ? null : esperadoPelaRepeticao === lidas,
     },
   }
 }
@@ -468,7 +614,7 @@ export function paraUnidadeDoBanco(
     },
     // A tabela do Pineto diz "02 Dormitórios (01 Suíte)" no rodapé, para todas
     // as unidades — não há coluna por unidade.
-    suites: 1,
+    suites: u.suites,
     valor_tabela: u.valor_tabela,
     valor_entrada_min: u.valor_entrada_min,
     // NUNCA a quantidade de CUBs aqui. A coluna é numeric(6,4) — teto 99,9999

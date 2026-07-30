@@ -87,6 +87,7 @@ export async function POST(req: NextRequest) {
     empreendimento: emp.nome,
     cabecalho: r.cabecalho,
     conferenciaCub: r.conferenciaCub,
+    conferenciaLinhas: r.conferenciaLinhas,
     total: r.unidades.length,
     novas: novas.length,
     alteradas: alteradas.length,
@@ -102,6 +103,25 @@ export async function POST(req: NextRequest) {
 
   if (body?.confirmar !== true) {
     return NextResponse.json({ simulado: true, ...plano })
+  }
+
+  // Sumiço de linha é a falha mais cara deste importador: não aparece como
+  // erro, aparece como unidade que nunca existiu. A contagem pela repetição do
+  // CUB é independente do fatiador, então divergir aqui significa que o PDF tem
+  // linha que o parser não viu — e isso BLOQUEIA, sem escape por flag.
+  if (r.conferenciaLinhas.confere === false) {
+    return NextResponse.json(
+      {
+        error:
+          `Contagem divergente: o PDF tem ${r.conferenciaLinhas.esperado} linhas de unidade ` +
+          `e o parser reconheceu ${r.conferenciaLinhas.lidas} (${r.unidades.length} válidas + ` +
+          `${r.rejeitadas.length} rejeitadas). Alguma linha não foi vista — importar agora ` +
+          'gravaria um espelho incompleto sem avisar.',
+        conferenciaLinhas: r.conferenciaLinhas,
+        rejeitadas: r.rejeitadas,
+      },
+      { status: 409 },
+    )
   }
 
   if (r.conferenciaCub.confere === false && body?.ignorarCubDivergente !== true) {

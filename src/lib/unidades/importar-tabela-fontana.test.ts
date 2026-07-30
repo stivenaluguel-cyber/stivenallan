@@ -1,5 +1,8 @@
 import { describe, it, expect } from 'vitest'
-import { paraUnidadeDoBanco, parsearTabelaFontana } from './importar-tabela-fontana'
+import {
+  paraUnidadeDoBanco, parsearTabelaFontana,
+  contarLinhasPelaRepeticaoDoCub, lerDormitoriosDoRodape,
+} from './importar-tabela-fontana'
 
 // TEXTO REAL da tabela Pineto (Julho/2026), extraído do PDF do Drive
 // (fileId 1J2gzZvym-m3GTlQNZy5bywAy68rqPQPJ). Recortado em 5 unidades para o
@@ -739,5 +742,113 @@ CUB06 - Julho - R$ 3.121,62 ENTRADA 1 X REFORÇO ANUAL 6 X PARCELA MENSAL 72 X
     const semPonto = MONTE_LEONE.replace(/1\.192/g, '1192')
     const r = parsearTabelaFontana(semPonto, CUB_JULHO)
     expect(r.unidades.find(u => u.unidade === '301')!.cub_fator).toBe(1192)
+  })
+})
+
+describe('contagem independente do fatiador', () => {
+  // A rede que substitui `unidadesPerdidas` nas tabelas sem coluna de
+  // dormitórios, onde aquela heurística fica sem âncora. Cada linha de unidade
+  // termina com a quantidade de CUB repetida duas vezes — redundância que o
+  // fatiador não usa, e que por isso serve de conferência independente.
+
+  it('conta as linhas do Pineto sem olhar para o começo delas', () => {
+    const r = parsearTabelaFontana(TABELA, CUB_JULHO)
+    expect(r.conferenciaLinhas).toEqual({ esperado: 5, lidas: 5, confere: true })
+  })
+
+  it('acusa quando o fatiador perde uma linha que o PDF tem', () => {
+    // Destrói o começo da linha da 104 sem tocar no fim: o fatiador deixa de
+    // vê-la, mas a repetição do CUB continua lá.
+    const mutilada = TABELA.replace('104 2 04S - T', '@@@@@@@@@@@@@')
+    const r = parsearTabelaFontana(mutilada, CUB_JULHO)
+    expect(r.unidades.length + r.rejeitadas.length).toBe(4)
+    expect(r.conferenciaLinhas).toEqual({ esperado: 5, lidas: 4, confere: false })
+  })
+
+  it('centavos que colam no número seguinte NÃO viram par', () => {
+    // "1.863.607,14 14.616,37" tem "14 14" no meio, e sem as guardas de
+    // fronteira a conferência acusava 57 linhas onde havia 55 — bloqueando
+    // uma importação correta. Falso positivo aqui é tão ruim quanto falso
+    // negativo: ensina a ignorar o alarme.
+    const comColisao = `CUB06 - Julho - R$ 3.121,62 ENTRADA 1 X REFORÇO ANUAL 6 X PARCELA MENSAL 72 X
+903 116 e 117S 132,00 24,00 226,41 372.721,43 1.863.607,14 73.084,46 1.863.607,14 14.616,37 597 1.863.607,14 597 597 Observações:`
+    expect(contarLinhasPelaRepeticaoDoCub(comColisao)).toBe(1)
+  })
+
+  it('quantidade acima de mil, com separador, também é contada', () => {
+    const monteLeone = `CUB06 - Julho - R$ 3.121,62 ENTRADA 1 X REFORÇO ANUAL 6 X PARCELA MENSAL 72 X
+301 4 03D e 10S - 2ºSS 253,80 37,50 430,61 744.194,21 3.720.971,04 145.924,08 3.720.971,04 29.183,78 1.192 3.720.971,04 1.192 1.192 Observações:`
+    expect(contarLinhasPelaRepeticaoDoCub(monteLeone)).toBe(1)
+  })
+
+  it('texto sem a repetição devolve null em vez de zero', () => {
+    // Zero seria interpretado como "o PDF não tem linha nenhuma" e bloquearia
+    // tudo. Null significa "esta tabela não tem esta redundância".
+    expect(contarLinhasPelaRepeticaoDoCub('Observações: nada aqui')).toBeNull()
+  })
+})
+
+describe('tabela sem coluna de dormitórios (Lavis)', () => {
+  // O Lavis vai do número da unidade direto para o box, e declara "03
+  // Dormitórios ( 03 Suítes)" uma vez só, no rodapé.
+  const LAVIS = `Previsão de entrega: 31/12/2030 Vigência desta tabela: Julho/2026
+CUB06 - Julho - R$ 3.121,62 ENTRADA 1 X REFORÇO ANUAL 6 X PARCELA MENSAL 72 X
+501 63D - T 125,98 25,90 219,88 340.256,58 1.701.282,90 66.718,64 1.701.282,90 13.343,26 545 1.701.282,90 545 545 701 13 e 14S - 2ºSS 125,98 24,00 217,50 357.737,65 1.788.688,26 70.146,39 1.788.688,26 14.028,78 573 1.788.688,26 573 573 Observações:
+Nº DORMITÓRIOS UNIDADES 03 Dormitórios ( 03 Suítes)`
+
+  it('reconhece as linhas sem o dígito de dormitórios', () => {
+    const r = parsearTabelaFontana(LAVIS, CUB_JULHO)
+    expect(r.unidades.map(u => u.unidade)).toEqual(['501', '701'])
+    expect(r.rejeitadas).toEqual([])
+    expect(r.conferenciaLinhas.confere).toBe(true)
+  })
+
+  it('o box não é confundido com dormitórios', () => {
+    const r = parsearTabelaFontana(LAVIS, CUB_JULHO)
+    // "501 63D": o 6 NÃO é dormitório — vem colado no 3.
+    expect(r.unidades[0].box_codigo).toBe('63D')
+    expect(r.unidades[1].box_codigo).toBe('13 e 14S')
+  })
+
+  it('dormitórios e suítes vêm do rodapé', () => {
+    const r = parsearTabelaFontana(LAVIS, CUB_JULHO)
+    expect(r.unidades.every(u => u.dormitorios === 3 && u.suites === 3)).toBe(true)
+    expect(paraUnidadeDoBanco(r.unidades[0], 'emp-1').suites).toBe(3)
+  })
+
+  it('tabela COM a coluna não muda de caminho', () => {
+    // A detecção tenta primeiro a forma com dormitórios; só cai na outra
+    // quando nenhuma linha é reconhecida.
+    const r = parsearTabelaFontana(TABELA, CUB_JULHO)
+    expect(r.unidades.every(u => u.dormitorios === 2)).toBe(true)
+    expect(r.unidades[0].box_codigo).toBe('91S')
+  })
+})
+
+describe('suítes saem do rodapé, não de valor fixo', () => {
+  it('rodapé uniforme define as suítes do prédio', () => {
+    expect(lerDormitoriosDoRodape('Nº DORMITÓRIOS UNIDADES 03 Dormitórios ( 03 Suítes)'))
+      .toEqual({ dormitorios: 3, suites: 3 })
+    expect(lerDormitoriosDoRodape('Apto Tipo - 03 Dormitórios (01 Suíte)'))
+      .toEqual({ dormitorios: 3, suites: 1 })
+    expect(lerDormitoriosDoRodape('04 Dormitórios (Sendo 03 Suítes)'))
+      .toEqual({ dormitorios: 4, suites: 3 })
+  })
+
+  it('rodapé que varia por final devolve null em vez de chutar', () => {
+    // Monte Leone: "Finais 01 e 02 - 04 Dormitórios (Sendo 03 Suítes) Final 03
+    // - 04 Dormitórios (Sendo 04 Suítes)". Escolher um dos dois colocaria
+    // número errado em parte do prédio.
+    const r = lerDormitoriosDoRodape(
+      'Finais 01 e 02 - 04 Dormitórios (Sendo 03 Suítes) Final 03 - 04 Dormitórios (Sendo 04 Suítes)',
+    )
+    expect(r.dormitorios).toBe(4) // uniforme
+    expect(r.suites).toBeNull()   // varia
+  })
+
+  it('sem rodapé legível, mantém 1 e não quebra', () => {
+    expect(lerDormitoriosDoRodape('sem nada disso')).toEqual({ dormitorios: null, suites: null })
+    const r = parsearTabelaFontana(TABELA.replace(/02 Dormitórios \(01 Suíte\)/, ''), CUB_JULHO)
+    expect(paraUnidadeDoBanco(r.unidades[0], 'e').suites).toBe(1)
   })
 })
