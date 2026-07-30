@@ -129,6 +129,10 @@ export function EspelhoPublico({ slug }: { slug: string }) {
 
       {escolhida && (
         <ModalUnidade
+          // Uma instância por unidade. Sem isto, trocar de unidade sem fechar o
+          // modal reaproveitaria o estado da anterior — valor revelado, reserva
+          // e entrada do slider apareceriam sob o título da unidade nova.
+          key={escolhida.id}
           unidade={escolhida}
           empreendimento={dados.empreendimento?.nome ?? ''}
           onFechar={() => setEscolhida(null)}
