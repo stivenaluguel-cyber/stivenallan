@@ -143,16 +143,16 @@ describe('notificarLeadNovo — janela anti-repetição', () => {
         if (tabela === 'crm_push_subscriptions') {
           return { select: async () => ({ data: [] }) }
         }
+        // Encadeável: a consulta usa .eq() mais de uma vez (tipo e título).
+        const q = { eqs: {} as Record<string, string>, filtro: {}, desde: '' }
+        const chain: Record<string, unknown> = {
+          eq: (coluna: string, v: string) => { q.eqs[coluna] = v; return chain },
+          contains: (_c: string, filtro: Record<string, unknown>) => { q.filtro = filtro; return chain },
+          gte: (_c: string, desde: string) => { q.desde = desde; return chain },
+          limit: async () => { consultas.push({ ...q.eqs, filtro: q.filtro, desde: q.desde }); return { data: recentes } },
+        }
         return {
-          select: () => ({
-            eq: (_c: string, v: string) => ({
-              contains: (_c2: string, filtro: Record<string, unknown>) => ({
-                gte: (_c3: string, desde: string) => ({
-                  limit: async () => { consultas.push({ tipo: v, filtro, desde }); return { data: recentes } },
-                }),
-              }),
-            }),
-          }),
+          select: () => chain,
           insert: async (linha: unknown) => { inseridas.push(linha); return { error: null } },
         }
       },
@@ -186,6 +186,27 @@ describe('notificarLeadNovo — janela anti-repetição', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await notificarLeadNovo(client as any, { id: 'lead-xyz', nome: 'Ana', origem: 'espelho' }, { naoRepetirPorMinutos: 15 })
     expect(consultas[0].filtro).toEqual({ leadId: 'lead-xyz' })
+  })
+
+  it('a janela também considera o título, não só o lead', async () => {
+    const { client, consultas } = clienteFake([])
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await notificarLeadNovo(client as any, { id: 'l1', nome: 'Ana', origem: 'espelho' },
+      { naoRepetirPorMinutos: 15, tituloCustom: 'Quer a unidade 1505: Ana' })
+    expect(consultas[0].titulo).toBe('Quer a unidade 1505: Ana')
+  })
+
+  it('duas unidades diferentes na mesma janela: as duas avisam', async () => {
+    // Cenário real depois de lembrar o visitante entre unidades: a mesma
+    // pessoa reserva a 1204 e, um minuto depois, a 1505. Um "Novo lead"
+    // repetido é ruído; duas unidades distintas são dois fatos.
+    const { client, inseridas } = clienteFake([])
+    for (const u of ['1204', '1505']) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await notificarLeadNovo(client as any, { id: 'l1', nome: 'Ana', origem: 'espelho' },
+        { naoRepetirPorMinutos: 15, tituloCustom: `Quer a unidade ${u}: Ana` })
+    }
+    expect(inseridas).toHaveLength(2)
   })
 
   it('título e corpo customizados vencem o padrão "Novo lead"', async () => {

@@ -52,6 +52,11 @@ export async function notificarLeadNovo(
   try {
     const { data: admin } = await supabase.from('admin_users').select('id').limit(1).maybeSingle()
 
+    const nome = lead.nome?.trim() || 'Lead sem nome'
+    const origemLabel = (lead.origem && ORIGEM_LABEL[lead.origem]) || lead.origem || 'origem desconhecida'
+    const titulo = opcoes?.tituloCustom ?? `Novo lead: ${nome}`
+    const corpo = opcoes?.corpoCustom ?? `Chegou pelo ${origemLabel}.`
+
     const janela = opcoes?.naoRepetirPorMinutos
     if (janela && janela > 0) {
       const desde = new Date(Date.now() - janela * 60_000).toISOString()
@@ -59,15 +64,16 @@ export async function notificarLeadNovo(
         .from('crm_notificacoes')
         .select('id')
         .eq('tipo', 'lead_novo')
+        // O título entra na chave, não só o lead. Repetir "Novo lead: teste" é
+        // ruído; "Quer a unidade 1204" e "Quer a unidade 1505" são dois fatos
+        // diferentes — e agora que o visitante é lembrado entre unidades, a
+        // mesma pessoa percorre várias na mesma sessão.
+        .eq('titulo', titulo)
         .contains('metadata', { leadId: lead.id })
         .gte('created_at', desde)
         .limit(1)
       if (recente && recente.length > 0) return
     }
-    const nome = lead.nome?.trim() || 'Lead sem nome'
-    const origemLabel = (lead.origem && ORIGEM_LABEL[lead.origem]) || lead.origem || 'origem desconhecida'
-    const titulo = opcoes?.tituloCustom ?? `Novo lead: ${nome}`
-    const corpo = opcoes?.corpoCustom ?? `Chegou pelo ${origemLabel}.`
     const link = `/dashboard/crm?lead=${lead.id}`
 
     await supabase.from('crm_notificacoes').insert({
