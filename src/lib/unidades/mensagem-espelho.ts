@@ -60,8 +60,12 @@ export function montarMensagemSimulacao(d: DadosMensagem): string {
       '',
       '*Como fica o pagamento*',
       `Entrada: ${brlExato(s.entrada)} (${s.entradaPercentual}%)`,
-      `${s.parcelasQtd}x de ${brlExato(s.parcelaValor)}`,
     )
+    // Plano sem parcelamento (entrada + financiamento): anunciar "0x de R$ 0,00"
+    // seria pior que não dizer nada.
+    if (s.parcelasQtd > 0) {
+      linhas.push(`${s.parcelasQtd}x de ${brlExato(s.parcelaValor)}`)
+    }
     if (s.reforcosQtd > 0) {
       linhas.push(`${s.reforcosQtd} reforços anuais de ${brlExato(s.reforcoValor)}`)
     }
@@ -111,7 +115,8 @@ export function montarAvisoCorretor(d: DadosMensagem & { whatsappCliente: string
   ]
   if (s) {
     linhas.push(
-      `${brl(s.valorTotal)} · entrada ${brl(s.entrada)} (${s.entradaPercentual}%) · ${s.parcelasQtd}x ${brl(s.parcelaValor)}`,
+      `${brl(s.valorTotal)} · entrada ${brl(s.entrada)} (${s.entradaPercentual}%)`
+        + (s.parcelasQtd > 0 ? ` · ${s.parcelasQtd}x ${brl(s.parcelaValor)}` : ' · sem parcelamento'),
     )
     if (!s.padraoDaTabela) linhas.push('_Entrada escolhida pelo cliente, acima da tabela._')
   }

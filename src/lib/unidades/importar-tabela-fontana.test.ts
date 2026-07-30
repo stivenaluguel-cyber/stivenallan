@@ -260,3 +260,85 @@ describe('paraUnidadeDoBanco — plano de pagamento estruturado', () => {
     expect(soma + p.saldo_financiamento).toBeCloseTo(699242.88, 0)
   })
 })
+
+// ─────────────────────────────────────────────────────────────────────
+// Segundo formato: entrada única + financiamento.
+//
+// Texto real da tabela do Avezzano (julho/2026), como o conector do Drive
+// devolve. Nem toda tabela da Fontana é como a do Pineto: aqui não há parcela
+// nem reforço, só entrada de 15% e 85% financiados na entrega.
+// ─────────────────────────────────────────────────────────────────────
+const AVEZZANO = `Vigência desta tabela: Julho/2026
+Empresa: CONSTRUTORA FONTANA LTDA.
+CUB06 - Julho - R$ 3.121,62 UNIDADE
+101 3 23D - T 127,22 24,00 199,90 156.393,16 1.042.621,08 886.227,92 1.042.621,08 334 334 102 3 25D - T 127,22 24,00 199,90 154.051,95 1.027.012,98 872.961,03 1.027.012,98 329 329 103 3 30D - T 127,22 24,00 199,90 156.393,16 1.042.621,08 886.227,92 1.042.621,08 334 334 Observações:`
+
+describe('tabela no formato entrada + financiamento', () => {
+  it('lê as unidades em vez de recusar por não ter parcela', () => {
+    const r = parsearTabelaFontana(AVEZZANO)
+    expect(r.unidades).toHaveLength(3)
+    expect(r.rejeitadas).toHaveLength(0)
+  })
+
+  it('marca o formato, e zera parcela e reforço em vez de inventar', () => {
+    const u = parsearTabelaFontana(AVEZZANO).unidades[0]
+    expect(u.formato).toBe('entrada_financiamento')
+    expect(u.parcela_mensal).toBe(0)
+    expect(u.reforco_anual).toBe(0)
+  })
+
+  it('a unidade 101 bate com o PDF, no centavo', () => {
+    const u = parsearTabelaFontana(AVEZZANO).unidades[0]
+    expect(u.unidade).toBe('101')
+    expect(u.dormitorios).toBe(3)
+    expect(u.metragem).toBe(127.22)
+    expect(u.valor_tabela).toBe(1042621.08)
+    expect(u.valor_entrada_min).toBe(156393.16)
+    expect(u.saldo_financiamento).toBe(886227.92)
+    expect(u.cub_fator).toBe(334)
+  })
+
+  it('entrada + financiamento fecham o total em todas', () => {
+    for (const u of parsearTabelaFontana(AVEZZANO).unidades) {
+      expect(u.valor_entrada_min + u.saldo_financiamento).toBeCloseTo(u.valor_tabela, 2)
+    }
+  })
+
+  it('o total continua sendo a quantidade de CUBs vezes o CUB do mês', () => {
+    for (const u of parsearTabelaFontana(AVEZZANO).unidades) {
+      expect(u.cub_fator! * 3121.62).toBeCloseTo(u.valor_tabela, 2)
+    }
+  })
+
+  it('linha que não fecha em nenhum dos dois formatos é recusada', () => {
+    const adulterada = AVEZZANO.replace('886.227,92', '999.999,99')
+    const r = parsearTabelaFontana(adulterada)
+    expect(r.unidades).toHaveLength(2)
+    expect(r.rejeitadas[0].unidade).toBe('101')
+  })
+
+  it('não confunde o formato do Pineto com o simples', () => {
+    // Blindagem contra a heurística escolher errado e zerar parcela/reforço de
+    // uma tabela que os tem.
+    const r = parsearTabelaFontana(TABELA)
+    expect(r.unidades.length).toBeGreaterThan(0)
+    for (const u of r.unidades) {
+      expect(u.formato).toBe('parcelado')
+      expect(u.parcela_mensal).toBeGreaterThan(0)
+    }
+  })
+})
+
+describe('guarda contra coluna faltando', () => {
+  it('linha truncada é recusada, não aceita em silêncio', () => {
+    // Toda comparação com NaN é falsa: `Math.abs(NaN - x) > tolerancia` dá
+    // false. Sem a guarda explícita, a linha atravessava as invariantes sem
+    // disparar nenhuma e entrava como se tivesse sido conferida.
+    const truncada = `Vigência desta tabela: Julho/2026
+CUB06 - Julho - R$ 3.121,62 UNIDADE
+101 3 23D - T 127,22 24,00 199,90 156.393,16 334 334 Observações:`
+    const r = parsearTabelaFontana(truncada)
+    expect(r.unidades).toHaveLength(0)
+    expect(r.rejeitadas).toHaveLength(1)
+  })
+})

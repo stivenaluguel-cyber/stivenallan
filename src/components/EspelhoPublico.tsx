@@ -380,8 +380,10 @@ function ModalUnidade({ unidade, empreendimento, onFechar, onConcluido }: {
                     {brl(sim.entrada)} <span style={{ color: P.suave, fontWeight: 400 }}>({sim.entradaPercentual}%)</span>
                   </dd>
 
-                  <dt style={{ color: P.suave }}>{sim.parcelasQtd} parcelas de</dt>
-                  <dd style={{ margin: 0, fontWeight: 700, textAlign: 'right' }}>{brl(sim.parcelaValor)}</dd>
+                  {sim.parcelasQtd > 0 && (<>
+                    <dt style={{ color: P.suave }}>{sim.parcelasQtd} parcelas de</dt>
+                    <dd style={{ margin: 0, fontWeight: 700, textAlign: 'right' }}>{brl(sim.parcelaValor)}</dd>
+                  </>)}
 
                   {sim.reforcosQtd > 0 && (<>
                     <dt style={{ color: P.suave }}>

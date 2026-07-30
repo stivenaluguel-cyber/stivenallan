@@ -21,7 +21,21 @@
 // 30% até a entrega é entrada + parcelas + reforços. Por isso a validação usa o
 // TOTAL de 30%, não a entrada isolada.
 
+/**
+ * Como o pagamento está estruturado na tabela.
+ *
+ * `parcelado` é o do Pineto: entrada + 40 parcelas + 4 reforços somam 30% até
+ * as chaves, e 70% financiam na entrega.
+ *
+ * `entrada_financiamento` é o do Avezzano: entrada única de 15% e 85%
+ * financiados, sem parcela nem reforço. Descoberto em 30/07/2026 — até então o
+ * importador assumia que toda tabela Fontana era como a do Pineto, e recusava
+ * as outras dizendo que as contas não fechavam. Fechavam; era outra conta.
+ */
+export type FormatoTabela = 'parcelado' | 'entrada_financiamento'
+
 export type UnidadeImportada = {
+  formato: FormatoTabela
   unidade: string
   dormitorios: number
   andar: number | null
@@ -99,10 +113,18 @@ function parseCabecalho(texto: string): CabecalhoTabela {
  * número da unidade (3–4 dígitos), dormitórios (1 dígito) e o código do box
  * ("91S", "89E").
  */
+// Código do box: número seguido de UMA letra. No Pineto é S (Simples) ou E;
+// no Avezzano é D (Duplo), com sufixo de pavimento — "23D - T", "05D - SS".
+// Restringir a [SE], como era antes, fazia o fatiador não encontrar nenhuma
+// linha da tabela do Avezzano e devolver zero unidades sem nem rejeitar: a
+// tabela parecia vazia em vez de incompatível.
+const INICIO_DE_UNIDADE = /\b\d{3,4}\s+\d\s+\d{1,3}[A-Z]\b/
+
 function fatiarUnidades(texto: string): string[] {
   const corpo = texto.split(/Observa[çc][õo]es\s*:/i)[0]
-  const partes = corpo.split(/(?=\b\d{3,4}\s+\d\s+\d{1,3}[SE]\b)/)
-  return partes.filter((p) => /^\d{3,4}\s+\d\s+\d{1,3}[SE]\b/.test(p.trim()))
+  const partes = corpo.split(new RegExp(`(?=${INICIO_DE_UNIDADE.source})`))
+  const comeca = new RegExp(`^${INICIO_DE_UNIDADE.source.replace(/^\\b/, '')}`)
+  return partes.filter((p) => comeca.test(p.trim()))
 }
 
 /** Andar pela convenção predial: 102 → 1º, 1505 → 15º. */
@@ -125,7 +147,7 @@ export function parsearTabelaFontana(
     const chunk = bruto.trim()
     const unidade = chunk.match(/^(\d{3,4})/)?.[1] ?? '?'
     const dormitorios = Number(chunk.match(/^\d{3,4}\s+(\d)/)?.[1] ?? 0)
-    const boxCodigo = chunk.match(/^\d{3,4}\s+\d\s+(\d{1,3}[SE])/)?.[1] ?? null
+    const boxCodigo = chunk.match(/^\d{3,4}\s+\d\s+(\d{1,3}[A-Z](?:\s*-\s*[A-Z]{1,2})?)/)?.[1] ?? null
 
     // Tokeniza a PARTIR do primeiro decimal. Antes dele só há ruído numérico
     // ("91S", "3º Pav") que confundiria a contagem de colunas.
@@ -143,17 +165,41 @@ export function parsearTabelaFontana(
 
     // Ordem das colunas no PDF: área, box, total m², entrada, total venda,
     // reforço, (total repetido), parcela, (total), financiamento, (total).
-    if (decimais.length < 10 || cubFator === null) {
+    // 7 colunas basta para o formato simples (área, box, total m², entrada,
+    // total, financiamento e o total repetido); o parcelado precisa de 10.
+    if (decimais.length < 7 || cubFator === null) {
       rejeitadas.push({ unidade, motivo: `colunas insuficientes (${decimais.length} valores, fator ${cubFator})` })
       continue
     }
 
-    const [metragem, boxM2, totalM2, entrada, total, reforco] = decimais
-    const parcela = decimais[7]
-    const financiamento = decimais[9]
+    const [metragem, boxM2, totalM2, entrada, total] = decimais
 
-    // ── As três invariantes ───────────────────────────────────────────
+    // Qual formato é esta linha? A pergunta se responde pela aritmética, não
+    // por um rótulo no PDF: no formato simples, entrada + o valor seguinte
+    // fecham o total exato.
+    // Colunas do formato simples: área, box, total m², entrada, total,
+    // FINANCIAMENTO, total repetido. O financiamento é o índice 5.
+    const ehSimples =
+      decimais.length < 10 &&
+      decimais[5] !== undefined &&
+      Math.abs(entrada + decimais[5] - total) <= TOLERANCIA_REAIS
+
+    const formato: FormatoTabela = ehSimples ? 'entrada_financiamento' : 'parcelado'
+    const reforco = ehSimples ? 0 : decimais[5]
+    const parcela = ehSimples ? 0 : decimais[7]
+    const financiamento = ehSimples ? decimais[5] : decimais[9]
+
+    // ── As invariantes ────────────────────────────────────────────────
     const problemas: string[] = []
+
+    // Antes de qualquer comparação: número que faltou vira NaN, e TODA
+    // comparação com NaN é falsa — `Math.abs(NaN - x) > tolerancia` dá false.
+    // Sem esta guarda, uma linha com coluna faltando passava por todas as
+    // invariantes sem disparar nenhuma e entrava como válida.
+    const numeros = { entrada, total, financiamento, parcela, reforco }
+    for (const [nome, v] of Object.entries(numeros)) {
+      if (!Number.isFinite(v)) problemas.push(`${nome} ausente ou ilegível`)
+    }
 
     if (cabecalho.cub_valor) {
       const esperado = cubFator * cabecalho.cub_valor
@@ -162,13 +208,23 @@ export function parsearTabelaFontana(
       }
     }
 
-    const soma30 = entrada + 40 * parcela + 4 * reforco
-    if (Math.abs(soma30 - total * 0.3) > TOLERANCIA_REAIS) {
-      problemas.push(`entrada+40p+4r = ${soma30.toFixed(2)} ≠ 30% de ${total.toFixed(2)}`)
-    }
-
-    if (Math.abs(financiamento - total * 0.7) > TOLERANCIA_REAIS) {
-      problemas.push(`financiamento ${financiamento.toFixed(2)} ≠ 70% de ${total.toFixed(2)}`)
+    if (formato === 'parcelado') {
+      const soma30 = entrada + 40 * parcela + 4 * reforco
+      if (Math.abs(soma30 - total * 0.3) > TOLERANCIA_REAIS) {
+        problemas.push(`entrada+40p+4r = ${soma30.toFixed(2)} ≠ 30% de ${total.toFixed(2)}`)
+      }
+      if (Math.abs(financiamento - total * 0.7) > TOLERANCIA_REAIS) {
+        problemas.push(`financiamento ${financiamento.toFixed(2)} ≠ 70% de ${total.toFixed(2)}`)
+      }
+    } else {
+      // Aqui a conta é uma só, e tem que fechar no centavo: quem entra na
+      // entrada mais quem financia é o imóvel inteiro.
+      if (Math.abs(entrada + financiamento - total) > TOLERANCIA_REAIS) {
+        problemas.push(`entrada ${entrada.toFixed(2)} + financiamento ${financiamento.toFixed(2)} ≠ total ${total.toFixed(2)}`)
+      }
+      if (!(entrada > 0) || !(financiamento > 0)) {
+        problemas.push('entrada ou financiamento zerado')
+      }
     }
 
     if (problemas.length > 0) {
@@ -177,6 +233,7 @@ export function parsearTabelaFontana(
     }
 
     unidades.push({
+      formato,
       unidade,
       dormitorios,
       andar: andarDe(unidade),

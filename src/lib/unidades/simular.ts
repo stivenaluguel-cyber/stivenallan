@@ -74,7 +74,12 @@ export function simular(
 ): Simulacao | null {
   if (!(valorTotal > 0) || !plano) return null
 
-  const parcelasQtd = Math.max(1, Math.floor(plano.parcelas_qtd || 0))
+  // Zero parcelas é um plano legítimo, não um dado faltando: no formato
+  // "entrada + financiamento" (Avezzano) o comprador paga a entrada e financia
+  // o resto na entrega, sem parcelar nada com a construtora. Forçar mínimo de
+  // 1 aqui, como antes, imprimiria "1x R$ 0,00" na página pública.
+  const semParcelamento = !(plano.parcelas_qtd > 0)
+  const parcelasQtd = semParcelamento ? 0 : Math.floor(plano.parcelas_qtd)
   const reforcosQtd = Math.max(0, Math.floor(plano.reforcos_qtd || 0))
 
   // Montante até as chaves, tirado do próprio plano da tabela — não de um
@@ -83,6 +88,9 @@ export function simular(
     plano.entrada + parcelasQtd * plano.parcela_valor + reforcosQtd * plano.reforco_valor
 
   const usaPadrao =
+    // Sem parcelas não há o que redistribuir: mexer na entrada mudaria o
+    // saldo financiado, que é decisão do banco, não da construtora.
+    semParcelamento ||
     entradaDesejada === null ||
     entradaDesejada === undefined ||
     !Number.isFinite(entradaDesejada) ||
