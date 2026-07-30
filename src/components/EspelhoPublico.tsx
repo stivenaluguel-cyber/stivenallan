@@ -1,8 +1,11 @@
 'use client'
 import { useCallback, useEffect, useState } from 'react'
 import type { StatusUnidade, UnidadePublica } from '@/lib/unidades/espelho'
-import { faixaDeEntrada, simular, type PlanoPagamento, type Simulacao } from '@/lib/unidades/simular'
-import { parcelaDiretaComReforcos, prazosSugeridos, reforcoMaximo } from '@/lib/unidades/financiamento-direto'
+import {
+  faixaDeEntrada, REFORCO_MAXIMO_EM_PARCELAS, simular,
+  type PlanoPagamento, type Simulacao,
+} from '@/lib/unidades/simular'
+import { parcelaDiretaComReforcos, prazosSugeridos, reforcoMaximoContratual } from '@/lib/unidades/financiamento-direto'
 
 type Resposta = {
   temEspelho: boolean
@@ -423,7 +426,9 @@ function ModalUnidade({ unidade, empreendimento, onFechar, onConcluido }: {
                   const prazo = prazoDireto ?? prazos[prazos.length - 1]
                   const p = parcelaDiretaComReforcos(saldo, prazo, pol.jurosAoMes, reforcoDireto)
                   if (!p) return null
-                  const tetoReforco = reforcoMaximo(saldo, prazo, pol.jurosAoMes)
+                  // Teto pela regra de contrato (até 5x a parcela), não pelo
+                  // limite matemático — que aceitaria 12x e mais.
+                  const tetoReforco = reforcoMaximoContratual(saldo, prazo, pol.jurosAoMes, REFORCO_MAXIMO_EM_PARCELAS)
 
                   return (
                     <div style={{ marginTop: 16, border: '1px solid ' + P.ouro + '55', borderRadius: 11, padding: '13px 15px', background: P.creme }}>
@@ -453,14 +458,18 @@ function ModalUnidade({ unidade, empreendimento, onFechar, onConcluido }: {
                         <div style={{ marginTop: 11 }}>
                           <label htmlFor="reforco-direto" style={{ display: 'block', fontSize: 12.5, color: P.suave, marginBottom: 6, lineHeight: 1.45 }}>
                             Recebe 13º, bônus ou safra? Some um reforço por ano e a mensal cai.
+                            O contrato aceita reforço de até {REFORCO_MAXIMO_EM_PARCELAS}x a parcela.
                           </label>
-                          <input id="reforco-direto" type="range" min={0} max={Math.min(tetoReforco, 100000)} step={1000}
+                          <input id="reforco-direto" type="range" min={0} max={tetoReforco} step={1000}
                             value={reforcoDireto} onChange={(ev) => setReforcoDireto(Number(ev.target.value))}
                             style={{ width: '100%', accentColor: P.ouro, minHeight: 34 }} />
                           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: P.suave }}>
                             <span>sem reforço</span>
                             {p.reforcoValor > 0 && (
-                              <span>{p.reforcosQtd} reforços de <strong style={{ color: P.tinta }}>{brl(p.reforcoValor)}</strong></span>
+                              <span>
+                                {p.reforcosQtd} reforços de <strong style={{ color: P.tinta }}>{brl(p.reforcoValor)}</strong>
+                                {' '}· {p.reforcoEmParcelas.toLocaleString('pt-BR')}x a parcela
+                              </span>
                             )}
                           </div>
                           {p.reforcoValor > 0 && (
