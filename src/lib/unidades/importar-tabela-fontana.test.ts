@@ -410,3 +410,68 @@ describe('cub_fator não recebe a quantidade de CUBs', () => {
     expect((l.plano_pagamento as Record<string, unknown>).cub_quantidade).toBeGreaterThan(99)
   })
 })
+
+// ─────────────────────────────────────────────────────────────────────
+// Terceiro formato: 100% até as chaves, sem financiamento.
+//
+// Tremezzo, julho/2026. Entrada + 72 parcelas + 6 reforços fecham o valor
+// inteiro do imóvel — a tabela não tem coluna de financiamento, porque não
+// sobra saldo para o banco. Assumir 40 parcelas, 4 reforços e 30/70 recusava
+// esta tabela inteira.
+// ─────────────────────────────────────────────────────────────────────
+const TREMEZZO = `Vigência desta tabela: Julho/2026
+CUB06 - Julho - R$ 3.121,62 UNIDADE
+BOX (m²) TOTAL (m²) ENTRADA
+1 X
+REFORÇO
+PARCELA R$ ANUAL 100%
+MENSAL R$ CUB06 100% 6 X
+72 X
+R$ CUB06 100% CUB06 102 3 105SE - 1º Pav 125,35 26,05 217,55 265.962,02 1.329.810,12 52.150,72 1.329.810,12 10.429,77 426 1.329.810,12 426 426 104 3 42S - 1º SS 125,35 13,50 201,96 244.110,68 1.220.553,42 47.866,04 1.220.553,42 9.572,87 391 1.220.553,42 391 391 Observações:
+6) POLITICA COMERCIAL: OPÇÃO 1: SERÁ CONCEDIDO DESCONTO DE 15% PARA PAGAMENTO À VISTA, SEM PERMUTA.
+OPÇÃO 2: O SALDO DEVEDOR DEVERÁ SER QUITADO VIA FINANCIAMENTO BANCÁRIO OU DIRETO COM A CONSTRUTORA EM ATÉ 180 MESES, SENDO CORRIGIDO PELO IGPM E ACRESCIDO DE JUROS COMPENSATÓRIOS DE 0,75% a.m.`
+
+describe('tabela com 100% até as chaves', () => {
+  it('lê as quantidades do cabeçalho, não do código', () => {
+    const r = parsearTabelaFontana(TREMEZZO)
+    expect(r.cabecalho.parcelas_qtd).toBe(72)
+    expect(r.cabecalho.reforcos_qtd).toBe(6)
+  })
+
+  it('aceita a tabela em vez de recusar por não ter financiamento', () => {
+    const r = parsearTabelaFontana(TREMEZZO)
+    expect(r.unidades).toHaveLength(2)
+    expect(r.rejeitadas).toHaveLength(0)
+  })
+
+  it('a conta fecha no valor inteiro do imóvel', () => {
+    const u = parsearTabelaFontana(TREMEZZO).unidades[0]
+    const soma = u.valor_entrada_min + 72 * u.parcela_mensal + 6 * u.reforco_anual
+    expect(soma).toBeCloseTo(u.valor_tabela, 0)
+    expect(u.saldo_financiamento).toBe(0)
+  })
+
+  it('o plano gravado registra 72/6 e 100% até as chaves', () => {
+    const r = parsearTabelaFontana(TREMEZZO)
+    const plano = paraUnidadeDoBanco(r.unidades[0], 'e').plano_pagamento as Record<string, unknown>
+    expect(plano.parcelas_qtd).toBe(72)
+    expect(plano.reforcos_qtd).toBe(6)
+    expect(plano.percentual_ate_chaves).toBe(100)
+  })
+
+  it('o desconto à vista do rodapé vira opção', () => {
+    const ops = parsearTabelaFontana(TREMEZZO).cabecalho.opcoes_pagamento
+    expect(ops.find(o => o.tipo === 'a_vista')?.descontoPct).toBe(15)
+    expect(ops.find(o => o.tipo === 'direto')?.meses).toBe(180)
+  })
+
+  it('o Pineto continua com 40/4 e o saldo IMPRESSO, não o derivado', () => {
+    // Multiplicar 40 parcelas arredondadas dá 489.470,09; o PDF imprime
+    // 489.470,02. Sete centavos que iriam para o contrato do cliente.
+    const r = parsearTabelaFontana(TABELA)
+    expect(r.cabecalho.parcelas_qtd).toBe(40)
+    expect(r.cabecalho.reforcos_qtd).toBe(4)
+    const u = r.unidades.find(x => x.unidade === '102')!
+    expect(u.saldo_financiamento).toBe(489470.02)
+  })
+})

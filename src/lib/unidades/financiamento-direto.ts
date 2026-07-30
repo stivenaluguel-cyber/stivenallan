@@ -266,6 +266,11 @@ function classificar(desc: string): OpcaoPagamento {
     return { tipo: 'direto', descricao: desc, ...politica }
   }
   if (/BANC[ÁA]RI|CAIXA|BANCO/i.test(desc)) return { tipo: 'bancario', descricao: desc }
-  if (/[ÀA]\s*VISTA/i.test(desc)) return { tipo: 'a_vista', descricao: desc }
+  if (/[ÀA]\s*VISTA/i.test(desc)) {
+    // O percentual precisa sair daqui também: quando o desconto vem DENTRO de
+    // uma OPÇÃO (Tremezzo), a extração avulsa do rodapé nem chega a rodar.
+    const pct = desc.match(/DESCONTO DE\s*(\d{1,2})\s*%/i)
+    return { tipo: 'a_vista', descricao: desc, ...(pct ? { descontoPct: Number(pct[1]) } : {}) }
+  }
   return { tipo: 'outro', descricao: desc }
 }
