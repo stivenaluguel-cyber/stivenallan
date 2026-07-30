@@ -695,3 +695,49 @@ describe('previsão de entrega vai para o plano', () => {
     expect(linha.plano_pagamento.previsao_entrega).toBeNull()
   })
 })
+
+describe('quantidade de CUB acima de mil', () => {
+  // Monte Leone (julho/2026): apartamentos de 4 dormitórios entre R$ 3,33M e
+  // R$ 4,60M — os primeiros do portfólio a passar de 1.000 CUBs. Acima de mil
+  // o PDF escreve "1.192" com separador de milhar, e o extrator de inteiros
+  // capturava só "192". A invariante `total = quantidade × CUB` então
+  // derrubava a linha: 26 de 26 rejeitadas, com zero unidades importadas.
+  const MONTE_LEONE = `Previsão de entrega: 30/08/2030 Vigência desta tabela: Julho/2026
+CUB06 - Julho - R$ 3.121,62 ENTRADA 1 X REFORÇO ANUAL 6 X PARCELA MENSAL 72 X
+301 4 03D e 10S - 2ºSS 253,80 37,50 430,61 744.194,21 3.720.971,04 145.924,08 3.720.971,04 29.183,78 1.192 3.720.971,04 1.192 1.192 303 4 01D e 08S - 2ºSS 232,70 40,50 403,67 666.778,03 3.333.890,16 130.744,06 3.333.890,16 26.147,89 1.068 3.333.890,16 1.068 1.068 1301 4 42E - T, 43 e 44S - T 03 253,80 45,00 446,32 919.629,25 4.598.146,26 180.323,97 4.598.146,26 36.063,52 1.473 4.598.146,26 1.473 1.473 Observações:`
+
+  it('lê 1.192 como 1192, não como 192', () => {
+    const r = parsearTabelaFontana(MONTE_LEONE, CUB_JULHO)
+    expect(r.rejeitadas).toEqual([])
+    expect(r.unidades.map(u => u.cub_fator)).toEqual([1192, 1068, 1473])
+  })
+
+  it('a invariante do CUB volta a fechar', () => {
+    const r = parsearTabelaFontana(MONTE_LEONE, CUB_JULHO)
+    expect(r.unidades).toHaveLength(3)
+    for (const u of r.unidades) {
+      expect(u.cub_fator * CUB_JULHO).toBeCloseTo(u.valor_tabela, 1)
+    }
+  })
+
+  it('a quantidade grande vai para o jsonb, nunca para cub_fator', () => {
+    // `cub_fator` é numeric(6,4): 1192 estouraria a coluna.
+    const r = parsearTabelaFontana(MONTE_LEONE, CUB_JULHO)
+    const linha = paraUnidadeDoBanco(r.unidades[0], 'emp-1')
+    expect(linha.cub_fator).toBeNull()
+    expect(linha.plano_pagamento.cub_quantidade).toBe(1192)
+  })
+
+  it('tabela sem separador de milhar continua igual', () => {
+    // Pineto opera entre 210 e 264 CUBs, escritos sem ponto.
+    const r = parsearTabelaFontana(TABELA, CUB_JULHO)
+    expect(r.unidades.map(u => u.cub_fator)).toEqual([224, 210, 257, 264, 260])
+    expect(r.rejeitadas).toEqual([])
+  })
+
+  it('quatro dígitos corridos, sem ponto, também são lidos inteiros', () => {
+    const semPonto = MONTE_LEONE.replace(/1\.192/g, '1192')
+    const r = parsearTabelaFontana(semPonto, CUB_JULHO)
+    expect(r.unidades.find(u => u.unidade === '301')!.cub_fator).toBe(1192)
+  })
+})

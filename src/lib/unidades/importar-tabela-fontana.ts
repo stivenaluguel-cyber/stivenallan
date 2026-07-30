@@ -251,8 +251,17 @@ export function parsearTabelaFontana(
 
     const decimais = [...cauda.matchAll(/\d[\d.]*,\d{2}/g)].map((m) => moeda(m[0]))
     // O fator CUB é o primeiro inteiro solto depois dos decimais começarem.
-    const inteiro = cauda.replace(/\d[\d.]*,\d{2}/g, ' ').match(/\b(\d{2,4})\b/)
-    const cubFator = inteiro ? Number(inteiro[1]) : null
+    //
+    // Acima de mil o PDF escreve a quantidade com separador de milhar —
+    // "1.192", não "1192". Casar só 2–4 dígitos seguidos capturava o pedaço
+    // DEPOIS do ponto: 1.192 virava 192, 1.068 virava 68. A invariante
+    // `total = quantidade × CUB` derrubava a linha, e o Monte Leone (todas as
+    // 26 unidades passam de 1.000 CUBs) voltava 26 de 26 rejeitadas.
+    //
+    // A forma com separador vem primeiro: 4 dígitos corridos ainda casam pela
+    // segunda alternativa, então tabela sem separador continua igual.
+    const inteiro = cauda.replace(/\d[\d.]*,\d{2}/g, ' ').match(/\b(\d{1,3}(?:\.\d{3})+|\d{2,4})\b/)
+    const cubFator = inteiro ? Number(inteiro[1].replace(/\./g, '')) : null
 
     // Ordem das colunas no PDF: área, box, total m², entrada, total venda,
     // reforço, (total repetido), parcela, (total), financiamento, (total).
