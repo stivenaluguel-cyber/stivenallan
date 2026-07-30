@@ -214,3 +214,48 @@ describe('simular — teto contratual do reforço', () => {
     expect(s.entrada + s.parcelasQtd * s.parcelaValor).toBeCloseTo(s.ateAsChaves, 0)
   })
 })
+
+// ─────────────────────────────────────────────────────────────────────
+// Plano sem parcelamento — formato "entrada + financiamento" (Avezzano).
+//
+// Unidade 101 real: R$ 1.042.621,08, entrada de R$ 156.393,16 (15%) e
+// R$ 886.227,92 financiados na entrega. Sem parcela, sem reforço.
+// ─────────────────────────────────────────────────────────────────────
+const PLANO_SEM_PARCELA = {
+  entrada: 156393.16,
+  parcelas_qtd: 0,
+  parcela_valor: 0,
+  reforcos_qtd: 0,
+  reforco_valor: 0,
+  saldo_financiamento: 886227.92,
+}
+
+describe('plano sem parcelamento', () => {
+  it('não inventa uma parcela de R$ 0,00 para preencher a tela', () => {
+    const s = simular(1042621.08, PLANO_SEM_PARCELA)!
+    expect(s.parcelasQtd).toBe(0)
+    expect(s.parcelaValor).toBe(0)
+    expect(s.reforcosQtd).toBe(0)
+  })
+
+  it('até as chaves é a entrada, e o saldo é o financiamento', () => {
+    const s = simular(1042621.08, PLANO_SEM_PARCELA)!
+    expect(s.ateAsChaves).toBe(156393.16)
+    expect(s.entradaPercentual).toBe(15)
+    expect(s.saldoFinanciamento).toBe(886227.92)
+    expect(s.entrada + s.saldoFinanciamento).toBeCloseTo(s.valorTotal, 2)
+  })
+
+  it('ignora entrada ajustada: sem parcela não há o que redistribuir', () => {
+    // Mexer na entrada mudaria o saldo financiado, que é decisão do banco.
+    const s = simular(1042621.08, PLANO_SEM_PARCELA, 300000)!
+    expect(s.entrada).toBe(156393.16)
+    expect(s.padraoDaTabela).toBe(true)
+  })
+
+  it('o formato com parcelas segue intacto', () => {
+    const s = simular(752310.42, PLANO_102, 120000)!
+    expect(s.parcelasQtd).toBeGreaterThan(0)
+    expect(s.parcelaValor).toBeGreaterThan(0)
+  })
+})

@@ -193,7 +193,8 @@ describe('parsearTabelaFontana — conferência do CUB', () => {
 
 describe('paraUnidadeDoBanco', () => {
   const r = parsearTabelaFontana(TABELA, CUB_JULHO)
-  const linha = paraUnidadeDoBanco(r.unidades.find((u) => u.unidade === '102')!, 'emp-pineto')
+  const POLITICA = { meses: 240, jurosAoMes: 0.0075, indice: 'IGPM' }
+  const linha = paraUnidadeDoBanco(r.unidades.find((u) => u.unidade === '102')!, 'emp-pineto', POLITICA)
 
   it('mapeia para as colunas reais de empreendimentos_unidades', () => {
     expect(linha).toMatchObject({
@@ -215,6 +216,7 @@ describe('paraUnidadeDoBanco', () => {
     expect(linha.condicoes_negociacao).toContain('4 reforços')
     expect(linha.condicoes_negociacao).toContain('30% até as chaves')
     expect(linha.condicoes_negociacao).toContain('240x')
+    expect(linha.condicoes_negociacao).toContain('IGPM')
     expect(linha.condicoes_negociacao).toContain('224 CUB')
   })
 
@@ -258,5 +260,125 @@ describe('paraUnidadeDoBanco — plano de pagamento estruturado', () => {
     const p = l.plano_pagamento
     const soma = p.entrada + p.parcelas_qtd * p.parcela_valor + p.reforcos_qtd * p.reforco_valor
     expect(soma + p.saldo_financiamento).toBeCloseTo(699242.88, 0)
+  })
+})
+
+// ─────────────────────────────────────────────────────────────────────
+// Segundo formato: entrada única + financiamento.
+//
+// Texto real da tabela do Avezzano (julho/2026), como o conector do Drive
+// devolve. Nem toda tabela da Fontana é como a do Pineto: aqui não há parcela
+// nem reforço, só entrada de 15% e 85% financiados na entrega.
+// ─────────────────────────────────────────────────────────────────────
+const AVEZZANO = `Vigência desta tabela: Julho/2026
+Empresa: CONSTRUTORA FONTANA LTDA.
+CUB06 - Julho - R$ 3.121,62 UNIDADE
+101 3 23D - T 127,22 24,00 199,90 156.393,16 1.042.621,08 886.227,92 1.042.621,08 334 334 102 3 25D - T 127,22 24,00 199,90 154.051,95 1.027.012,98 872.961,03 1.027.012,98 329 329 103 3 30D - T 127,22 24,00 199,90 156.393,16 1.042.621,08 886.227,92 1.042.621,08 334 334 Observações:`
+
+describe('tabela no formato entrada + financiamento', () => {
+  it('lê as unidades em vez de recusar por não ter parcela', () => {
+    const r = parsearTabelaFontana(AVEZZANO)
+    expect(r.unidades).toHaveLength(3)
+    expect(r.rejeitadas).toHaveLength(0)
+  })
+
+  it('marca o formato, e zera parcela e reforço em vez de inventar', () => {
+    const u = parsearTabelaFontana(AVEZZANO).unidades[0]
+    expect(u.formato).toBe('entrada_financiamento')
+    expect(u.parcela_mensal).toBe(0)
+    expect(u.reforco_anual).toBe(0)
+  })
+
+  it('a unidade 101 bate com o PDF, no centavo', () => {
+    const u = parsearTabelaFontana(AVEZZANO).unidades[0]
+    expect(u.unidade).toBe('101')
+    expect(u.dormitorios).toBe(3)
+    expect(u.metragem).toBe(127.22)
+    expect(u.valor_tabela).toBe(1042621.08)
+    expect(u.valor_entrada_min).toBe(156393.16)
+    expect(u.saldo_financiamento).toBe(886227.92)
+    expect(u.cub_fator).toBe(334)
+  })
+
+  it('entrada + financiamento fecham o total em todas', () => {
+    for (const u of parsearTabelaFontana(AVEZZANO).unidades) {
+      expect(u.valor_entrada_min + u.saldo_financiamento).toBeCloseTo(u.valor_tabela, 2)
+    }
+  })
+
+  it('o total continua sendo a quantidade de CUBs vezes o CUB do mês', () => {
+    for (const u of parsearTabelaFontana(AVEZZANO).unidades) {
+      expect(u.cub_fator! * 3121.62).toBeCloseTo(u.valor_tabela, 2)
+    }
+  })
+
+  it('linha que não fecha em nenhum dos dois formatos é recusada', () => {
+    const adulterada = AVEZZANO.replace('886.227,92', '999.999,99')
+    const r = parsearTabelaFontana(adulterada)
+    expect(r.unidades).toHaveLength(2)
+    expect(r.rejeitadas[0].unidade).toBe('101')
+  })
+
+  it('não confunde o formato do Pineto com o simples', () => {
+    // Blindagem contra a heurística escolher errado e zerar parcela/reforço de
+    // uma tabela que os tem.
+    const r = parsearTabelaFontana(TABELA)
+    expect(r.unidades.length).toBeGreaterThan(0)
+    for (const u of r.unidades) {
+      expect(u.formato).toBe('parcelado')
+      expect(u.parcela_mensal).toBeGreaterThan(0)
+    }
+  })
+})
+
+describe('guarda contra coluna faltando', () => {
+  it('linha truncada é recusada, não aceita em silêncio', () => {
+    // Toda comparação com NaN é falsa: `Math.abs(NaN - x) > tolerancia` dá
+    // false. Sem a guarda explícita, a linha atravessava as invariantes sem
+    // disparar nenhuma e entrava como se tivesse sido conferida.
+    const truncada = `Vigência desta tabela: Julho/2026
+CUB06 - Julho - R$ 3.121,62 UNIDADE
+101 3 23D - T 127,22 24,00 199,90 156.393,16 334 334 Observações:`
+    const r = parsearTabelaFontana(truncada)
+    expect(r.unidades).toHaveLength(0)
+    expect(r.rejeitadas).toHaveLength(1)
+  })
+})
+
+
+describe('paraUnidadeDoBanco e o formato da tabela', () => {
+  it('não promete parcelamento direto que a tabela não menciona', () => {
+    // Sem política lida, o texto some. Antes o "240x" era fixo no código e
+    // aparecia para qualquer empreendimento, tivesse ou não a condição.
+    const r = parsearTabelaFontana(TABELA)
+    const l = paraUnidadeDoBanco(r.unidades[0], 'emp')
+    expect(l.condicoes_negociacao).not.toContain('240x')
+    expect(l.condicoes_negociacao).toContain('financiado')
+  })
+
+  it('tabela de entrada única não grava 40 parcelas inventadas', () => {
+    const r = parsearTabelaFontana(AVEZZANO)
+    const l = paraUnidadeDoBanco(r.unidades[0], 'emp-avezzano', { meses: 240, jurosAoMes: 0.0075, indice: 'IGPM' })
+    const plano = l.plano_pagamento as Record<string, unknown>
+    expect(plano.parcelas_qtd).toBe(0)
+    expect(plano.reforcos_qtd).toBe(0)
+    expect(plano.entrada).toBe(156393.16)
+    expect(l.condicoes_negociacao).toContain('Entrada única')
+    expect(l.condicoes_negociacao).toContain('240x')
+  })
+
+  it('a política lida do rodapé viaja até o plano gravado', () => {
+    // Rodapé real da tabela do Avezzano. Sem ele o parser não tem de onde tirar
+    // a condição — e o teste precisa provar o caminho inteiro, do PDF ao jsonb.
+    const comRodape = AVEZZANO.replace(
+      'Observações:',
+      'Observações: 1) POLITICA COMERCIAL: OPÇÃO 02: O SALDO DEVEDOR PODERÁ SER PARCELADO DIRETO COM A CONSTRUTORA EM ATÉ 240 MESES, SENDO CORRIGIDO PELO IGPM E ACRESCIDO DE JUROS COMPENSATÓRIOS DE 0,75% A.M;',
+    )
+    const r = parsearTabelaFontana(comRodape)
+    expect(r.cabecalho.financiamento_direto).toEqual({ meses: 240, jurosAoMes: 0.0075, indice: 'IGPM' })
+
+    const l = paraUnidadeDoBanco(r.unidades[0], 'emp', r.cabecalho.financiamento_direto)
+    const plano = l.plano_pagamento as Record<string, unknown>
+    expect(plano.financiamento_direto).toEqual({ meses: 240, jurosAoMes: 0.0075, indice: 'IGPM' })
   })
 })

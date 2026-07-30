@@ -1,3 +1,4 @@
+import type { OpcaoPagamento } from './financiamento-direto'
 // Simulação de pagamento de uma unidade.
 //
 // É o degrau que faltava no espelho. O único botão era "Reservar 48h" — pedido
@@ -21,6 +22,10 @@ export type PlanoPagamento = {
   reforco_valor: number
   saldo_financiamento: number
   cub_quantidade?: number | null
+  /** Parcelamento direto do saldo, quando a tabela oferece. */
+  financiamento_direto?: { meses: number; jurosAoMes: number; indice: string | null } | null
+  /** Formas de pagamento da tabela daquele empreendimento. */
+  opcoes_pagamento?: OpcaoPagamento[] | null
   percentual_ate_chaves?: number | null
 }
 
@@ -74,7 +79,12 @@ export function simular(
 ): Simulacao | null {
   if (!(valorTotal > 0) || !plano) return null
 
-  const parcelasQtd = Math.max(1, Math.floor(plano.parcelas_qtd || 0))
+  // Zero parcelas é um plano legítimo, não um dado faltando: no formato
+  // "entrada + financiamento" (Avezzano) o comprador paga a entrada e financia
+  // o resto na entrega, sem parcelar nada com a construtora. Forçar mínimo de
+  // 1 aqui, como antes, imprimiria "1x R$ 0,00" na página pública.
+  const semParcelamento = !(plano.parcelas_qtd > 0)
+  const parcelasQtd = semParcelamento ? 0 : Math.floor(plano.parcelas_qtd)
   const reforcosQtd = Math.max(0, Math.floor(plano.reforcos_qtd || 0))
 
   // Montante até as chaves, tirado do próprio plano da tabela — não de um
@@ -83,6 +93,9 @@ export function simular(
     plano.entrada + parcelasQtd * plano.parcela_valor + reforcosQtd * plano.reforco_valor
 
   const usaPadrao =
+    // Sem parcelas não há o que redistribuir: mexer na entrada mudaria o
+    // saldo financiado, que é decisão do banco, não da construtora.
+    semParcelamento ||
     entradaDesejada === null ||
     entradaDesejada === undefined ||
     !Number.isFinite(entradaDesejada) ||
@@ -183,6 +196,8 @@ export function planoDoJson(v: unknown): PlanoPagamento | null {
     reforco_valor: n('reforco_valor'),
     saldo_financiamento: n('saldo_financiamento'),
     cub_quantidade: o.cub_quantidade === undefined || o.cub_quantidade === null ? null : n('cub_quantidade'),
+    financiamento_direto: politicaDoJson(o.financiamento_direto),
+    opcoes_pagamento: Array.isArray(o.opcoes_pagamento) ? (o.opcoes_pagamento as OpcaoPagamento[]) : null,
     percentual_ate_chaves:
       o.percentual_ate_chaves === undefined || o.percentual_ate_chaves === null ? null : n('percentual_ate_chaves'),
   }
@@ -190,4 +205,15 @@ export function planoDoJson(v: unknown): PlanoPagamento | null {
   // interface não mostrar nada do que mostrar zeros.
   if (plano.entrada <= 0 && plano.parcela_valor <= 0) return null
   return plano
+}
+
+/** Lê a política de parcelamento direto gravada no jsonb, se estiver íntegra. */
+function politicaDoJson(v: unknown): PlanoPagamento['financiamento_direto'] {
+  if (!v || typeof v !== 'object') return null
+  const o = v as Record<string, unknown>
+  const meses = Number(o.meses)
+  const jurosAoMes = Number(o.jurosAoMes)
+  if (!Number.isFinite(meses) || meses < 1) return null
+  if (!Number.isFinite(jurosAoMes) || jurosAoMes < 0) return null
+  return { meses: Math.floor(meses), jurosAoMes, indice: typeof o.indice === 'string' ? o.indice : null }
 }

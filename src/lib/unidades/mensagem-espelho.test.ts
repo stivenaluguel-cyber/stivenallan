@@ -118,3 +118,25 @@ describe('montarAvisoCorretor', () => {
     expect(montarAvisoCorretor({ ...comZap, simulacao: PADRAO })).toContain('https://wa.me/48999998888')
   })
 })
+
+describe('plano sem parcelamento na mensagem', () => {
+  const SEM_PARCELA: Simulacao = {
+    valorTotal: 1042621.08, entrada: 156393.16, entradaPercentual: 15,
+    parcelasQtd: 0, parcelaValor: 0, reforcosQtd: 0, reforcoValor: 0,
+    ateAsChaves: 156393.16, ateAsChavesPercentual: 15,
+    saldoFinanciamento: 886227.92, padraoDaTabela: true, reforcoEmParcelas: 0,
+  }
+
+  it('não anuncia "0x de R$ 0,00" ao cliente', () => {
+    const m = montarMensagemSimulacao({ ...BASE, simulacao: SEM_PARCELA })
+    expect(m).not.toContain('0x')
+    expect(m).toContain('Entrada:')
+    expect(m).toContain('Saldo na entrega')
+  })
+
+  it('o aviso ao corretor diz que não há parcelamento', () => {
+    const m = montarAvisoCorretor({ ...BASE, whatsappCliente: '48999998888', simulacao: SEM_PARCELA })
+    expect(m).toContain('sem parcelamento')
+    expect(m).not.toContain('0x')
+  })
+})

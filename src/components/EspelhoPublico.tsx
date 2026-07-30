@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { StatusUnidade, UnidadePublica } from '@/lib/unidades/espelho'
 import { faixaDeEntrada, simular, type PlanoPagamento, type Simulacao } from '@/lib/unidades/simular'
+import { parcelaDiretaComReforcos, prazosSugeridos, reforcoMaximo } from '@/lib/unidades/financiamento-direto'
 
 type Resposta = {
   temEspelho: boolean
@@ -207,6 +208,9 @@ function ModalUnidade({ unidade, empreendimento, onFechar, onConcluido }: {
   const [revelado, setRevelado] = useState<Revelado | null>(null)
   const [reservado, setReservado] = useState(false)
   const [entrada, setEntrada] = useState<number | null>(null)
+  // Prazo e reforço do parcelamento direto do SALDO — separado da entrada.
+  const [prazoDireto, setPrazoDireto] = useState<number | null>(null)
+  const [reforcoDireto, setReforcoDireto] = useState(0)
   const [reenviando, setReenviando] = useState(false)
   const [reenviado, setReenviado] = useState(false)
 
@@ -380,8 +384,10 @@ function ModalUnidade({ unidade, empreendimento, onFechar, onConcluido }: {
                     {brl(sim.entrada)} <span style={{ color: P.suave, fontWeight: 400 }}>({sim.entradaPercentual}%)</span>
                   </dd>
 
-                  <dt style={{ color: P.suave }}>{sim.parcelasQtd} parcelas de</dt>
-                  <dd style={{ margin: 0, fontWeight: 700, textAlign: 'right' }}>{brl(sim.parcelaValor)}</dd>
+                  {sim.parcelasQtd > 0 && (<>
+                    <dt style={{ color: P.suave }}>{sim.parcelasQtd} parcelas de</dt>
+                    <dd style={{ margin: 0, fontWeight: 700, textAlign: 'right' }}>{brl(sim.parcelaValor)}</dd>
+                  </>)}
 
                   {sim.reforcosQtd > 0 && (<>
                     <dt style={{ color: P.suave }}>
@@ -401,6 +407,86 @@ function ModalUnidade({ unidade, empreendimento, onFechar, onConcluido }: {
                   <dt style={{ color: P.suave }}>Saldo na entrega</dt>
                   <dd style={{ margin: 0, fontWeight: 700, textAlign: 'right' }}>{brl(sim.saldoFinanciamento)}</dd>
                 </dl>
+
+                {/* O saldo não é só problema do banco: a construtora parcela
+                    direto. É o que o site anuncia — precisa estar na tela da
+                    unidade, com o número que o cliente vai perguntar. */}
+                {(() => {
+                  const plano = revelado?.plano
+                  const pol = plano?.financiamento_direto
+                  const outras = (plano?.opcoes_pagamento ?? []).filter((o) => o.tipo !== 'direto')
+                  const saldo = sim.saldoFinanciamento
+                  if (!pol || !(saldo > 0)) return null
+
+                  const prazos = prazosSugeridos(pol.meses)
+                  if (prazos.length === 0) return null
+                  const prazo = prazoDireto ?? prazos[prazos.length - 1]
+                  const p = parcelaDiretaComReforcos(saldo, prazo, pol.jurosAoMes, reforcoDireto)
+                  if (!p) return null
+                  const tetoReforco = reforcoMaximo(saldo, prazo, pol.jurosAoMes)
+
+                  return (
+                    <div style={{ marginTop: 16, border: '1px solid ' + P.ouro + '55', borderRadius: 11, padding: '13px 15px', background: P.creme }}>
+                      <p style={{ margin: 0, fontSize: 13.5, fontWeight: 700, color: P.tinta }}>
+                        Parcele o saldo direto com a construtora
+                      </p>
+                      <p style={{ margin: '3px 0 11px', fontSize: 12.5, color: P.suave, lineHeight: 1.5 }}>
+                        Sem banco e sem análise de crédito bancária. Até {pol.meses}x, juros de{' '}
+                        {(pol.jurosAoMes * 100).toLocaleString('pt-BR')}% ao mês.
+                      </p>
+
+                      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 11 }}>
+                        {prazos.map((n) => (
+                          <button key={n} type="button" onClick={() => setPrazoDireto(n)}
+                            style={{ padding: '6px 13px', borderRadius: 20, border: '1px solid ' + (n === prazo ? P.ouro : P.linha), background: n === prazo ? P.ouro : '#fff', color: n === prazo ? '#fff' : P.tinta, fontSize: 12.5, fontWeight: 600, cursor: 'pointer', minHeight: 34 }}>
+                            {n}x
+                          </button>
+                        ))}
+                      </div>
+
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 10 }}>
+                        <span style={{ fontSize: 13, color: P.suave }}>{prazo} parcelas de</span>
+                        <strong style={{ fontSize: 20, color: P.tinta }}>{brl(p.valor)}</strong>
+                      </div>
+
+                      {p.reforcosQtd > 0 && tetoReforco > 0 && (
+                        <div style={{ marginTop: 11 }}>
+                          <label htmlFor="reforco-direto" style={{ display: 'block', fontSize: 12.5, color: P.suave, marginBottom: 6, lineHeight: 1.45 }}>
+                            Recebe 13º, bônus ou safra? Some um reforço por ano e a mensal cai.
+                          </label>
+                          <input id="reforco-direto" type="range" min={0} max={Math.min(tetoReforco, 100000)} step={1000}
+                            value={reforcoDireto} onChange={(ev) => setReforcoDireto(Number(ev.target.value))}
+                            style={{ width: '100%', accentColor: P.ouro, minHeight: 34 }} />
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: P.suave }}>
+                            <span>sem reforço</span>
+                            {p.reforcoValor > 0 && (
+                              <span>{p.reforcosQtd} reforços de <strong style={{ color: P.tinta }}>{brl(p.reforcoValor)}</strong></span>
+                            )}
+                          </div>
+                          {p.reforcoValor > 0 && (
+                            // O reforço alivia o mês, mas concentra dinheiro uma vez por
+                            // ano: o total nominal sobe. Esconder isso seria vender alívio
+                            // como economia.
+                            <p style={{ margin: '7px 0 0', fontSize: 11.5, color: P.suave, lineHeight: 1.45 }}>
+                              O reforço alivia a mensal, mas paga mais tarde no ano — o total sai{' '}
+                              {brl(p.totalPago)}, contra {brl(parcelaDiretaComReforcos(saldo, prazo, pol.jurosAoMes, 0)!.totalPago)} sem reforço.
+                            </p>
+                          )}
+                        </div>
+                      )}
+
+                      <p style={{ margin: '11px 0 0', fontSize: 11.5, color: P.suave, lineHeight: 1.45 }}>
+                        Parcela e reforço em valor de hoje, ambos com juros de {(pol.jurosAoMes * 100).toLocaleString('pt-BR')}% ao mês.{pol.indice ? ` Os dois são corrigidos pelo ${pol.indice} ao longo do contrato.` : ''}
+                      </p>
+
+                      {outras.length > 0 && (
+                        <p style={{ margin: '9px 0 0', paddingTop: 9, borderTop: '1px solid ' + P.linha, fontSize: 12, color: P.suave, lineHeight: 1.5 }}>
+                          Também aceita: {outras.map((o) => o.descricao.toLowerCase()).join(' · ')}.
+                        </p>
+                      )}
+                    </div>
+                  )
+                })()}
 
                 {faixa && faixa.max > faixa.min && (
                   <div style={{ marginTop: 16 }}>

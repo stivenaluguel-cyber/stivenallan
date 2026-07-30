@@ -342,9 +342,9 @@ function SimuladorFluxo({ cub, emps }: { cub: Cub | null; emps: Emp[] }) {
             </p>
           ) : (
             <>
-              <div style={{ fontSize: 11, color: D.onDarkMuted, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Parcela mensal</div>
+              <div style={{ fontSize: 11, color: D.onDarkMuted, textTransform: 'uppercase', letterSpacing: '0.08em' }}>{sim.parcelasQtd > 0 ? 'Parcela mensal' : 'Entrada única'}</div>
               <div style={{ fontFamily: "'Bricolage Grotesque',system-ui", fontSize: 'clamp(1.8rem,4vw,2.6rem)', fontWeight: 800, color: D.orange, margin: '6px 0 4px', letterSpacing: '-0.025em' }}>
-                {sim.parcelasQtd}x {fmt(sim.parcelaValor)}
+                {sim.parcelasQtd > 0 ? `${sim.parcelasQtd}x ${fmt(sim.parcelaValor)}` : fmt(sim.entrada)}
               </div>
               <div style={{ fontSize: 12, color: D.onDarkMuted, marginBottom: 16 }}>
                 sobre {fmt(sim.valorTotal)}{rotuloUnidade ? ` · unidade ${rotuloUnidade}` : ''}
