@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { normalizeEmail, normalizePhone, normalizeString, temWhatsappReal } from './normalize'
+import { normalizarCelularBR, normalizeEmail, normalizePhone, normalizeString, temWhatsappReal } from './normalize'
 
 describe('normalizeString', () => {
   it('trims surrounding whitespace', () => {
@@ -83,5 +83,43 @@ describe('temWhatsappReal', () => {
     expect(temWhatsappReal(null)).toBe(false)
     expect(temWhatsappReal(undefined)).toBe(false)
     expect(temWhatsappReal('')).toBe(false)
+  })
+})
+
+// ─────────────────────────────────────────────────────────────────────
+// normalizarCelularBR
+//
+// `normalizePhone` só tira o que não é dígito. No espelho de vendas isso
+// deixou entrar um "48999924724234" de 14 dígitos vindo do formulário — um
+// lead que nunca poderia ser contatado, ocupando o índice único de
+// leads.whatsapp.
+// ─────────────────────────────────────────────────────────────────────
+describe('normalizarCelularBR', () => {
+  it('aceita celular de 11 dígitos, com ou sem formatação', () => {
+    expect(normalizarCelularBR('(48) 99999-8888')).toBe('48999998888')
+    expect(normalizarCelularBR('48999998888')).toBe('48999998888')
+  })
+
+  it('aceita fixo de 10 dígitos', () => {
+    expect(normalizarCelularBR('4834334455')).toBe('4834334455')
+  })
+
+  it('remove o 55 do país', () => {
+    expect(normalizarCelularBR('5548999998888')).toBe('48999998888')
+  })
+
+  it('RECUSA o número de 14 dígitos que passou em produção', () => {
+    expect(normalizarCelularBR('48999924724234')).toBeNull()
+  })
+
+  it('recusa número curto demais para ter DDD', () => {
+    expect(normalizarCelularBR('99998888')).toBeNull()
+    expect(normalizarCelularBR('123')).toBeNull()
+  })
+
+  it('recusa texto sem dígito e valores vazios', () => {
+    expect(normalizarCelularBR('meu zap')).toBeNull()
+    expect(normalizarCelularBR('')).toBeNull()
+    expect(normalizarCelularBR(null)).toBeNull()
   })
 })

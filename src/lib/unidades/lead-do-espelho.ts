@@ -40,7 +40,7 @@ export async function resolverLeadDoEspelho(
   const { data: lead, error } = await client
     .from('leads')
     .upsert({ whatsapp: dados.whatsapp }, { onConflict: 'whatsapp' })
-    .select('id, nome, origem, created_at, empreendimento_interesse, property_name, estagio_funil, entrada_disponivel')
+    .select('id, nome, email, origem, created_at, empreendimento_interesse, property_name, estagio_funil, entrada_disponivel')
     .single()
 
   if (error || !lead) {
@@ -52,7 +52,10 @@ export async function resolverLeadDoEspelho(
   const completar: Record<string, unknown> = {}
 
   if (!lead.nome && dados.nome) completar.nome = dados.nome
-  if (dados.email) completar.email = dados.email
+  // Só preenche o que está vazio, igual ao nome: o e-mail que o corretor
+  // corrigiu na conversa vale mais que o digitado às pressas no site — e agora
+  // a mesma pessoa reenvia o formulário a cada unidade que abre.
+  if (!lead.email && dados.email) completar.email = dados.email
 
   // `whatsapp` é o default do sistema e não diz nada sobre intenção — pode
   // ser sobrescrito pela origem real. Qualquer outra origem já apurada fica.

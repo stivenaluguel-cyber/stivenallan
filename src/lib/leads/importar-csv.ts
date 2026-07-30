@@ -14,7 +14,7 @@
 //    quem decide inserir ou pular é a rota, depois de conferir o que já
 //    existe no banco.
 
-import { normalizeEmail, normalizePhone, normalizeString } from './normalize'
+import { normalizarCelularBR, normalizeEmail, normalizeString } from './normalize'
 
 export type LinhaImportada = {
   linha: number
@@ -123,11 +123,8 @@ function moeda(v: string | null): number | null {
  * nunca poderá ser contatado.
  */
 export function normalizarTelefoneImportado(valor: string | null): string | null {
-  const digitos = normalizePhone(valor)
-  if (!digitos) return null
-  const semPais = digitos.length > 11 && digitos.startsWith('55') ? digitos.slice(2) : digitos
-  if (semPais.length < 10 || semPais.length > 11) return null
-  return semPais
+  // Mesma regra do formulário público — uma só, em normalize.ts.
+  return normalizarCelularBR(valor)
 }
 
 export function parsearCsvLeads(conteudo: string): ResultadoParse {

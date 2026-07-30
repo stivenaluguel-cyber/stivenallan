@@ -129,6 +129,10 @@ export function EspelhoPublico({ slug }: { slug: string }) {
 
       {escolhida && (
         <ModalUnidade
+          // Uma instância por unidade. Sem isto, trocar de unidade sem fechar o
+          // modal reaproveitaria o estado da anterior — valor revelado, reserva
+          // e entrada do slider apareceriam sob o título da unidade nova.
+          key={escolhida.id}
           unidade={escolhida}
           empreendimento={dados.empreendimento?.nome ?? ''}
           onFechar={() => setEscolhida(null)}
@@ -137,6 +141,44 @@ export function EspelhoPublico({ slug }: { slug: string }) {
       )}
     </section>
   )
+}
+
+
+/**
+ * Quem você é, lembrado no navegador.
+ *
+ * Sem isso, ver a segunda unidade exigia redigitar nome e telefone. No teste
+ * de 29/07 a mesma pessoa virou TRÊS leads separados olhando três
+ * apartamentos do mesmo prédio — e escreveu a reclamação no campo nome.
+ *
+ * Fica no localStorage porque é o dado da própria pessoa, no aparelho dela, e
+ * porque precisa sobreviver a fechar a aba: comparar unidade é coisa de quem
+ * volta no dia seguinte.
+ */
+const CHAVE_IDENTIDADE = 'sa-espelho-contato'
+
+type Identidade = { nome: string; telefone: string; email?: string }
+
+function lerIdentidade(): Identidade | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const cru = window.localStorage.getItem(CHAVE_IDENTIDADE)
+    if (!cru) return null
+    const v = JSON.parse(cru) as Identidade
+    return v?.nome && v?.telefone ? v : null
+  } catch {
+    // localStorage bloqueado (aba anônima, cookies desligados): o formulário
+    // aparece de novo. Degrada para o comportamento antigo, não quebra.
+    return null
+  }
+}
+
+function gravarIdentidade(v: Identidade): void {
+  try { window.localStorage.setItem(CHAVE_IDENTIDADE, JSON.stringify(v)) } catch { /* idem */ }
+}
+
+function esquecerIdentidade(): void {
+  try { window.localStorage.removeItem(CHAVE_IDENTIDADE) } catch { /* idem */ }
 }
 
 type Revelado = {
@@ -152,8 +194,11 @@ function ModalUnidade({ unidade, empreendimento, onFechar, onConcluido }: {
   onConcluido: () => void
 }) {
   const [intencao, setIntencao] = useState<'simular' | 'quero'>('simular')
+  // Preenchido de saída quando a pessoa já se identificou em outra unidade.
+  const [lembrado, setLembrado] = useState<Identidade | null>(null)
   const [nome, setNome] = useState('')
   const [telefone, setTelefone] = useState('')
+  const [email, setEmail] = useState('')
   const [enviando, setEnviando] = useState(false)
   const [erro, setErro] = useState('')
 
@@ -164,6 +209,11 @@ function ModalUnidade({ unidade, empreendimento, onFechar, onConcluido }: {
   const [entrada, setEntrada] = useState<number | null>(null)
   const [reenviando, setReenviando] = useState(false)
   const [reenviado, setReenviado] = useState(false)
+
+  useEffect(() => {
+    const id = lerIdentidade()
+    if (id) { setLembrado(id); setNome(id.nome); setTelefone(id.telefone); setEmail(id.email ?? '') }
+  }, [])
 
   const rotulo = [unidade.bloco, unidade.unidade].filter(Boolean).join(' ')
 
@@ -182,10 +232,14 @@ function ModalUnidade({ unidade, empreendimento, onFechar, onConcluido }: {
       // unidade" faz a reserva por cima, depois de identificar.
       const res = await fetch('/api/espelho/simular', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ unidade_id: unidade.id, nome, telefone }),
+        body: JSON.stringify({ unidade_id: unidade.id, nome, telefone, email: email || undefined }),
       })
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || 'Não foi possível concluir')
+
+      // Só grava depois que o servidor aceitou: telefone recusado não vira
+      // identidade lembrada.
+      gravarIdentidade({ nome, telefone, email: email || undefined })
       setRevelado({ valor: json.valor ?? null, plano: json.plano ?? null, simulacao: json.simulacao ?? null })
 
       if (intencao === 'quero' && unidade.status === 'disponivel') {
@@ -210,7 +264,7 @@ function ModalUnidade({ unidade, empreendimento, onFechar, onConcluido }: {
     try {
       await fetch('/api/espelho/simular', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ unidade_id: unidade.id, nome, telefone, entrada: sim.entrada }),
+        body: JSON.stringify({ unidade_id: unidade.id, nome, telefone, email: email || undefined, entrada: sim.entrada }),
       })
       setReenviado(true)
     } finally { setReenviando(false) }
@@ -245,15 +299,39 @@ function ModalUnidade({ unidade, empreendimento, onFechar, onConcluido }: {
               </p>
             </div>
 
-            <label style={{ ...rot, marginTop: 16 }}>
-              Seu nome
-              <input value={nome} onChange={(e) => setNome(e.target.value)} required autoComplete="name" style={inp} />
-            </label>
-            <label style={{ ...rot, marginTop: 12 }}>
-              WhatsApp com DDD
-              <input value={telefone} onChange={(e) => setTelefone(e.target.value)} required
-                inputMode="tel" autoComplete="tel" placeholder="(48) 99999-8888" style={inp} />
-            </label>
+            {lembrado ? (
+              // Já se identificou em outra unidade: um clique, não um cadastro.
+              <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, border: '1px solid ' + P.linha, borderRadius: 11, padding: '12px 14px' }}>
+                <div style={{ minWidth: 0 }}>
+                  <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: P.tinta, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {lembrado.nome}
+                  </p>
+                  <p style={{ margin: '2px 0 0', fontSize: 12.5, color: P.suave }}>{lembrado.telefone}</p>
+                </div>
+                <button type="button"
+                  onClick={() => { esquecerIdentidade(); setLembrado(null); setNome(''); setTelefone(''); setEmail('') }}
+                  style={{ background: 'none', border: 'none', padding: 0, color: P.suave, fontSize: 12.5, textDecoration: 'underline', cursor: 'pointer', flexShrink: 0 }}>
+                  não é você?
+                </button>
+              </div>
+            ) : (
+              <>
+                <label style={{ ...rot, marginTop: 16 }}>
+                  Seu nome
+                  <input value={nome} onChange={(e) => setNome(e.target.value)} required autoComplete="name" style={inp} />
+                </label>
+                <label style={{ ...rot, marginTop: 12 }}>
+                  WhatsApp com DDD
+                  <input value={telefone} onChange={(e) => setTelefone(e.target.value)} required
+                    inputMode="tel" autoComplete="tel" placeholder="(48) 99999-8888" style={inp} />
+                </label>
+                <label style={{ ...rot, marginTop: 12 }}>
+                  E-mail <span style={{ fontWeight: 400, color: P.suave }}>(opcional)</span>
+                  <input value={email} onChange={(e) => setEmail(e.target.value)} type="email"
+                    autoComplete="email" placeholder="voce@email.com" style={inp} />
+                </label>
+              </>
+            )}
 
             {/* Honeypot: invisível ao humano, irresistível ao bot. */}
             <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true"
@@ -281,7 +359,7 @@ function ModalUnidade({ unidade, empreendimento, onFechar, onConcluido }: {
 
             <button type="submit" disabled={enviando}
               style={{ marginTop: 16, width: '100%', minHeight: 50, background: P.ouro, color: '#fff', border: 'none', borderRadius: 10, fontSize: 15.5, fontWeight: 700, cursor: enviando ? 'wait' : 'pointer', opacity: enviando ? 0.7 : 1 }}>
-              {enviando ? 'Enviando…' : 'Ver valor e condições'}
+              {enviando ? 'Enviando…' : lembrado ? 'Ver valor desta unidade' : 'Ver valor e condições'}
             </button>
           </form>
         ) : (
@@ -348,7 +426,7 @@ function ModalUnidade({ unidade, empreendimento, onFechar, onConcluido }: {
                     {!sim.padraoDaTabela && (
                       <button type="button" onClick={enviarAjuste} disabled={reenviando || reenviado}
                         style={{ marginTop: 10, width: '100%', minHeight: 42, background: reenviado ? P.verdeBg : '#fff', color: reenviado ? P.verde : P.tinta, border: '1.5px solid ' + (reenviado ? 'transparent' : P.linha), borderRadius: 9, fontSize: 13.5, fontWeight: 600, cursor: reenviado ? 'default' : 'pointer' }}>
-                        {reenviado ? '✓ Simulação enviada' : reenviando ? 'Enviando…' : 'Me mande esta simulação'}
+                        {reenviado ? '✓ Anotado — te mando esta' : reenviando ? 'Enviando…' : 'Quero receber esta simulação'}
                       </button>
                     )}
                   </div>
@@ -369,9 +447,11 @@ function ModalUnidade({ unidade, empreendimento, onFechar, onConcluido }: {
                 e a exclusividade não é nossa para prometer. */}
             <div style={{ marginTop: 14, background: reservado ? P.verdeBg : P.creme, border: '1px solid ' + (reservado ? 'rgba(21,128,61,0.35)' : P.linha), borderRadius: 10, padding: '11px 13px' }}>
               <p style={{ fontSize: 13.5, color: P.tinta, margin: 0, lineHeight: 1.5 }}>
+                {/* Quem manda a mensagem é o corretor, na mão. A tela não pode
+                    dizer "já mandei" — ele é quem chama. */}
                 {reservado
-                  ? `Anotei seu interesse na ${rotulo}. Vou confirmar a disponibilidade com a construtora e te retorno hoje pelo WhatsApp.`
-                  : 'Te chamo no WhatsApp com as condições completas desta unidade.'}
+                  ? `Anotei seu interesse na ${rotulo}. Vou confirmar a disponibilidade com a construtora e te chamo no WhatsApp ainda hoje.`
+                  : 'Recebi seu contato — te chamo no WhatsApp com estas condições.'}
               </p>
             </div>
 

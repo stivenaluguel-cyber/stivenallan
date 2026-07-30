@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { extractIp, isBotSubmission } from '@/lib/leads/anti-spam'
 import { checkRateLimit } from '@/lib/leads/rate-limit'
-import { normalizeEmail, normalizePhone, normalizeString } from '@/lib/leads/normalize'
+import { normalizarCelularBR, normalizeEmail, normalizeString } from '@/lib/leads/normalize'
 import { notificarLeadNovo } from '@/lib/leads/notificar-lead-novo'
 import { recalcularScoreLead } from '@/lib/leads/score-server'
 import { expiraEm, RESERVA_DURACAO_HORAS } from '@/lib/unidades/espelho'
@@ -63,13 +63,13 @@ export async function POST(req: NextRequest) {
 
     const unidadeId = normalizeString(body.unidade_id)
     const nome = normalizeString(body.nome)
-    const whatsapp = normalizePhone(body.telefone)
+    const whatsapp = normalizarCelularBR(body.telefone)
     const email = normalizeEmail(body.email)
 
     if (!unidadeId) return NextResponse.json({ error: 'Unidade não informada' }, { status: 400 })
     if (!nome) return NextResponse.json({ error: 'Informe seu nome' }, { status: 400 })
-    if (!whatsapp || whatsapp.length < 10) {
-      return NextResponse.json({ error: 'Informe um WhatsApp com DDD' }, { status: 400 })
+    if (!whatsapp) {
+      return NextResponse.json({ error: 'Informe um WhatsApp válido com DDD' }, { status: 400 })
     }
 
     const client = sb()
@@ -163,10 +163,17 @@ export async function POST(req: NextRequest) {
     // Notificação e score são best-effort: a reserva já está gravada e não
     // pode ser desfeita por falha em avisar.
     const nascidoAgora = rLead.nasceuAgora
+    // Nada é enviado automaticamente: o follow-up com o cliente é manual, por
+    // opção do corretor. O painel entrega a mensagem pronta num link wa.me
+    // para ele revisar e disparar com um clique.
     notificarLeadNovo(client, {
       id: lead.id,
       nome,
       origem: nascidoAgora ? 'espelho' : 'espelho (lead existente)',
+    }, {
+      naoRepetirPorMinutos: 15,
+      tituloCustom: `Quer a unidade ${rotulo}: ${nome}`,
+      corpoCustom: `${empNome}. Confirme a disponibilidade com a construtora.`,
     }).catch((e) => logError(SOURCE, 'notificacao falhou', e))
 
     recalcularScoreLead(client, lead.id).catch((e) => logError(SOURCE, 'score falhou', e))

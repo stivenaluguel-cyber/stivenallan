@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { extractIp, isBotSubmission } from '@/lib/leads/anti-spam'
 import { checkRateLimit } from '@/lib/leads/rate-limit'
-import { normalizeEmail, normalizePhone, normalizeString } from '@/lib/leads/normalize'
+import { normalizarCelularBR, normalizeEmail, normalizeString } from '@/lib/leads/normalize'
 import { notificarLeadNovo } from '@/lib/leads/notificar-lead-novo'
 import { recalcularScoreLead } from '@/lib/leads/score-server'
 import { resolverLeadDoEspelho } from '@/lib/unidades/lead-do-espelho'
@@ -46,21 +46,21 @@ export async function POST(req: NextRequest) {
 
     const unidadeId = normalizeString(body.unidade_id)
     const nome = normalizeString(body.nome)
-    const whatsapp = normalizePhone(body.telefone)
+    const whatsapp = normalizarCelularBR(body.telefone)
     const email = normalizeEmail(body.email)
     const entradaDesejada = Number.isFinite(Number(body.entrada)) ? Number(body.entrada) : null
 
     if (!unidadeId) return NextResponse.json({ error: 'Unidade não informada' }, { status: 400 })
     if (!nome) return NextResponse.json({ error: 'Informe seu nome' }, { status: 400 })
-    if (!whatsapp || whatsapp.length < 10) {
-      return NextResponse.json({ error: 'Informe um WhatsApp com DDD' }, { status: 400 })
+    if (!whatsapp) {
+      return NextResponse.json({ error: 'Informe um WhatsApp válido com DDD' }, { status: 400 })
     }
 
     const client = sb()
 
     const { data: unidade } = await client
       .from('empreendimentos_unidades')
-      .select('id, unidade, bloco, valor_tabela, valor_promocional, plano_pagamento, empreendimento_id, empreendimentos(nome)')
+      .select('id, unidade, bloco, andar, metragem, dormitorios, valor_tabela, valor_promocional, plano_pagamento, empreendimento_id, empreendimentos(nome)')
       .eq('id', unidadeId)
       .maybeSingle()
 
@@ -121,11 +121,14 @@ export async function POST(req: NextRequest) {
       })
     }
 
+    // Janela de 15 min: pedir simulação, marcar "já quero" e reenviar com a
+    // entrada ajustada são três requisições em segundos. Sem isso vira três
+    // notificações iguais — foi o que aconteceu no teste de 29/07.
     notificarLeadNovo(client, {
       id: r.leadId,
       nome,
       origem: r.nasceuAgora ? 'espelho (simulação)' : 'espelho (simulação, lead existente)',
-    }).catch((e) => logError(SOURCE, 'notificacao falhou', e))
+    }, { naoRepetirPorMinutos: 15 }).catch((e) => logError(SOURCE, 'notificacao falhou', e))
 
     recalcularScoreLead(client, r.leadId).catch((e) => logError(SOURCE, 'score falhou', e))
 
