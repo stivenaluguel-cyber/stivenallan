@@ -33,12 +33,14 @@ export async function resolverLeadDoEspelho(
     empreendimentoNome: string
     unidadeRotulo: string
     origem: OrigemEspelho
+    /** Entrada que o cliente escolheu no simulador, quando ajustou. */
+    entradaDeclarada?: number | null
   },
 ): Promise<ResultadoLead> {
   const { data: lead, error } = await client
     .from('leads')
     .upsert({ whatsapp: dados.whatsapp }, { onConflict: 'whatsapp' })
-    .select('id, nome, origem, created_at, empreendimento_interesse, property_name, estagio_funil')
+    .select('id, nome, origem, created_at, empreendimento_interesse, property_name, estagio_funil, entrada_disponivel')
     .single()
 
   if (error || !lead) {
@@ -62,6 +64,16 @@ export async function resolverLeadDoEspelho(
   }
   if (!lead.property_name) {
     completar.property_name = `${dados.empreendimentoNome} · unidade ${dados.unidadeRotulo}`
+  }
+
+  // Entrada que a própria pessoa escolheu arrastando o slider. É o campo de
+  // MAIOR peso no score de financiamento direto, e aqui ele chega
+  // auto-declarado, sem o corretor precisar perguntar. Só grava se estiver
+  // vazio: o que o corretor apurou na conversa vale mais que um slider.
+  if (!lead.entrada_disponivel && dados.entradaDeclarada && dados.entradaDeclarada > 0) {
+    completar.entrada_disponivel = dados.entradaDeclarada.toLocaleString('pt-BR', {
+      style: 'currency', currency: 'BRL', maximumFractionDigits: 0,
+    })
   }
 
   // Quem simula ou reserva demonstrou interesse concreto — mais que

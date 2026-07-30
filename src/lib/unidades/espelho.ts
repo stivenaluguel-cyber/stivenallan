@@ -17,8 +17,6 @@
 // 3. O que o público vê é um SUBCONJUNTO explícito (pickPublico): anotações
 //    de negociação, lead da reserva e fator CUB são informação interna.
 
-import { planoDoJson, type PlanoPagamento } from './simular'
-
 export type UnidadeEspelho = {
   id: string
   bloco: string | null
@@ -227,21 +225,24 @@ export type UnidadePublica = {
   suites: number | null
   orientacao: string | null
   status: StatusUnidade
-  preco: PrecoUnidade | null
-  entrada_min: number | null
-  // O plano de pagamento É informação pública: está impresso na tabela que a
-  // construtora entrega ao cliente no plantão. Diferente de
-  // `condicoes_negociacao`, que é texto livre e pode conter recado interno
-  // ("aceita carro na entrada") — esse continua fora.
-  plano: PlanoPagamento | null
 }
 
+// O que NÃO está aqui é o ponto: preço por unidade e plano de pagamento saíram
+// do payload anônimo.
+//
+// A tabela da Fontana formatada e sempre atualizada era a melhor moeda de
+// troca da página — e estava de graça para qualquer concorrente que abrisse o
+// site. Agora ela vem por `/api/espelho/simular`, depois que a pessoa se
+// identifica. O que continua público é o que gera escassez sem entregar a
+// tabela: disponibilidade, metragem, andar e um "a partir de" no topo.
+//
+// O gate é de SERVIDOR: o preço não sai no JSON. Esconder no CSS seria teatro.
+
 /**
- * O que sai para o site. `exibirPreco` vem do cadastro do empreendimento
- * (mesma chave que já controla o preço na página) — com ele desligado, a
- * grade mostra status e metragem, e o preço fica "sob consulta".
+ * O que sai para o site anônimo: identidade da unidade e status. Nada de
+ * dinheiro.
  */
-export function pickPublico(u: UnidadeEspelho, exibirPreco: boolean, agora: Date): UnidadePublica {
+export function pickPublico(u: UnidadeEspelho, agora: Date): UnidadePublica {
   return {
     id: u.id,
     bloco: u.bloco,
@@ -252,10 +253,20 @@ export function pickPublico(u: UnidadeEspelho, exibirPreco: boolean, agora: Date
     suites: u.suites,
     orientacao: u.orientacao,
     status: statusDaUnidade(u, agora),
-    preco: exibirPreco ? precoDaUnidade(u) : null,
-    entrada_min: exibirPreco ? numeroOuNull(u.valor_entrada_min) : null,
-    // Sem preço exibido não faz sentido mostrar plano de pagamento: seria
-    // dizer a parcela sem dizer o valor.
-    plano: exibirPreco ? planoDoJson(u.plano_pagamento) : null,
   }
+}
+
+/**
+ * O "a partir de" da seção — âncora de preço sem entregar a tabela.
+ *
+ * Calculado só sobre as unidades DISPONÍVEIS: anunciar o menor preço do
+ * empreendimento quando essa unidade já foi vendida é anunciar o que não se
+ * pode vender.
+ */
+export function precoMinimoDisponivel(unidades: UnidadeEspelho[], agora: Date): number | null {
+  const valores = unidades
+    .filter((u) => statusDaUnidade(u, agora) === 'disponivel')
+    .map((u) => precoDaUnidade(u).valor)
+    .filter((v): v is number => v !== null)
+  return valores.length ? Math.min(...valores) : null
 }
