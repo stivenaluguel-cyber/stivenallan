@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   lerPoliticaFinanciamento, parcelaDireta, parcelaDiretaComReforcos,
   prazosSugeridos, reforcoMaximo, reforcoMaximoContratual, lerOpcoesDePagamento,
+  planoDaOpcao,
 } from './financiamento-direto'
 
 // Rodapé real da tabela do Avezzano, julho/2026.
@@ -292,5 +293,65 @@ describe('reforcoMaximoContratual', () => {
   it('prazo sem reforço nenhum devolve zero', () => {
     expect(reforcoMaximoContratual(SALDO, 6, I, 5)).toBe(0)
     expect(reforcoMaximoContratual(0, 240, I, 5)).toBe(0)
+  })
+})
+
+// ─────────────────────────────────────────────────────────────────────
+// Opção comercial completa — texto real da opção 2 do Tremezzo.
+//
+// Não é "financiamento direto do saldo": é outro negócio. Desconto de 10%,
+// 40% até as chaves em vez dos 100% da tabela, ato mínimo de 10% e o saldo em
+// 180 meses. Sem modelar isso, a página mostraria só o plano da tabela e
+// esconderia num parágrafo a condição que costuma ser a melhor do PDF.
+// ─────────────────────────────────────────────────────────────────────
+const TREMEZZO_POLITICA = `6) POLITICA COMERCIAL:
+OPÇÃO 1: SERÁ CONCEDIDO DESCONTO DE 15% PARA PAGAMENTO À VISTA, SEM PERMUTA.
+OPÇÃO 2: SERÁ CONCEDIDO DESCONTO DE 10% SOBRE O VALOR TOTAL, PAGANDO 40% ATÉ AS CHAVES, COM ATO MÍNIMO DE 10% DO VALOR DA VENDA. APÓS A CONCLUSÃO DO EMPREENDIMENTO, O SALDO DEVEDOR DEVERÁ SER QUITADO VIA FINANCIAMENTO BANCÁRIO OU DIRETO COM A CONSTRUTORA EM ATÉ 180 MESES, SENDO CORRIGIDO PELO IGPM E ACRESCIDO DE JUROS COMPENSATÓRIOS DE 0,75% a.m. ( NESSA OPÇÃO NÃO SERÁ ACEITO PERMUTA).`
+
+describe('opção comercial com desconto e percentual até as chaves', () => {
+  const ops = lerOpcoesDePagamento(TREMEZZO_POLITICA)
+  const direto = ops.find(o => o.tipo === 'direto')!
+  const aVista = ops.find(o => o.tipo === 'a_vista')!
+
+  it('lê os quatro números da opção 2', () => {
+    expect(direto.descontoPct).toBe(10)
+    expect(direto.ateAsChavesPct).toBe(40)
+    expect(direto.atoMinimoPct).toBe(10)
+    expect(direto.meses).toBe(180)
+  })
+
+  it('registra que a opção não aceita permuta', () => {
+    expect(direto.aceitaPermuta).toBe(false)
+  })
+
+  it('a opção 1 é o desconto à vista de 15%', () => {
+    expect(aVista.descontoPct).toBe(15)
+  })
+
+  it('traduz a opção em dinheiro para a unidade', () => {
+    // Unidade 102 do Tremezzo: R$ 1.329.810,12.
+    const p = planoDaOpcao(1329810.12, direto)!
+    expect(p.valorComDesconto).toBeCloseTo(1196829.11, 2)
+    expect(p.descontoEmReais).toBeCloseTo(132981.01, 2)
+    expect(p.ateAsChaves).toBeCloseTo(478731.64, 2)
+    expect(p.ato).toBeCloseTo(119682.91, 2)
+    expect(p.saldo).toBeCloseTo(718097.47, 2)
+  })
+
+  it('as partes somam o valor com desconto', () => {
+    const p = planoDaOpcao(1329810.12, direto)!
+    expect(p.ateAsChaves + p.saldo).toBeCloseTo(p.valorComDesconto, 2)
+  })
+
+  it('opção sem números não vira plano inventado', () => {
+    expect(planoDaOpcao(1000000, { tipo: 'bancario', descricao: 'FINANCIAMENTO BANCÁRIO' })).toBeNull()
+    expect(planoDaOpcao(0, direto)).toBeNull()
+  })
+
+  it('opção só com desconto trata 100% até as chaves', () => {
+    const p = planoDaOpcao(1000000, aVista)!
+    expect(p.valorComDesconto).toBe(850000)
+    expect(p.ateAsChaves).toBe(850000)
+    expect(p.saldo).toBe(0)
   })
 })

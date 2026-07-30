@@ -41,6 +41,9 @@ export type FormatoTabela = 'parcelado' | 'entrada_financiamento'
 
 export type UnidadeImportada = {
   formato: FormatoTabela
+  /** Quantidades da tabela deste empreendimento, não assumidas. */
+  parcelas_qtd: number
+  reforcos_qtd: number
   unidade: string
   dormitorios: number
   andar: number | null
@@ -59,6 +62,16 @@ export type UnidadeImportada = {
 export type LinhaRejeitadaTabela = { unidade: string; motivo: string }
 
 export type CabecalhoTabela = {
+  /**
+   * Quantas parcelas e reforços a tabela oferece, lidos do cabeçalho.
+   *
+   * O PDF escreve os multiplicadores como "1 X", "6 X", "72 X" — entrada,
+   * reforços, parcelas. Cada empreendimento tem os seus: o Pineto opera em
+   * 40 parcelas e 4 reforços; o Tremezzo, em 72 e 6. Assumir 40/4 fazia a
+   * validação recusar toda tabela que não fosse a do Pineto.
+   */
+  parcelas_qtd: number | null
+  reforcos_qtd: number | null
   /** Parcelamento direto com a construtora, lido do rodapé. */
   financiamento_direto: PoliticaFinanciamento | null
   /** Todas as formas de pagamento que a tabela oferece, direto na frente. */
@@ -101,7 +114,11 @@ function parseCabecalho(texto: string): CabecalhoTabela {
   const end = texto.match(/^\s*Data\s+(.+?)\s+emiss[ãa]o:/i)
   const desc = texto.match(/DESCONTO DE\s*(\d+)%\s*PARA PAGAMENTO [ÀA] VISTA/i)
 
+  const q = lerQuantidades(texto)
+
   return {
+    parcelas_qtd: q.parcelas,
+    reforcos_qtd: q.reforcos,
     financiamento_direto: lerPoliticaFinanciamento(texto),
     opcoes_pagamento: lerOpcoesDePagamento(texto),
     cub_valor: cub ? moeda(cub[2]) : null,
@@ -124,12 +141,40 @@ function parseCabecalho(texto: string): CabecalhoTabela {
  * número da unidade (3–4 dígitos), dormitórios (1 dígito) e o código do box
  * ("91S", "89E").
  */
-// Código do box: número seguido de UMA letra. No Pineto é S (Simples) ou E;
-// no Avezzano é D (Duplo), com sufixo de pavimento — "23D - T", "05D - SS".
-// Restringir a [SE], como era antes, fazia o fatiador não encontrar nenhuma
-// linha da tabela do Avezzano e devolver zero unidades sem nem rejeitar: a
-// tabela parecia vazia em vez de incompatível.
-const INICIO_DE_UNIDADE = /\b\d{3,4}\s+\d\s+\d{1,3}[A-Z]\b/
+// Código do box: número seguido de UMA ou DUAS letras.
+//
+// A legenda das tabelas: S (Simples), D (Duplo), SE (Simples Estendido), DE
+// (Duplo Estendido), com sufixo de pavimento — "23D - T", "105SE - 1º Pav".
+//
+// Duas armadilhas já pagas aqui: restringir a [SE] fazia o fatiador ignorar a
+// tabela inteira do Avezzano (código "23D"); exigir UMA letra ignorava a
+// unidade 102 do Tremezzo ("105SE"), porque o \b não fecha entre S e E. Nos
+// dois casos a tabela voltava vazia em vez de incompatível.
+const INICIO_DE_UNIDADE = /\b\d{3,4}\s+\d\s+\d{1,3}[A-Z]{1,2}\b/
+
+/**
+ * Multiplicadores do cabeçalho: "1 X" (entrada), "6 X" (reforços), "72 X"
+ * (parcelas).
+ *
+ * Só olha o trecho ANTES da primeira linha de unidade — depois dela, "X" não
+ * aparece, mas números soltos sim, e um falso positivo aqui inventaria uma
+ * condição comercial.
+ *
+ * A ordem é sempre crescente no PDF; o maior é o número de parcelas mensais e
+ * o do meio, o de reforços anuais. O 1 da entrada é ignorado.
+ */
+function lerQuantidades(texto: string): { parcelas: number | null; reforcos: number | null } {
+  const corte = texto.search(INICIO_DE_UNIDADE)
+  const cabeca = corte > 0 ? texto.slice(0, corte) : texto
+  const nums = [...cabeca.matchAll(/\b(\d{1,3})\s*X\b/gi)]
+    .map((m) => Number(m[1]))
+    .filter((n) => n > 1 && n <= 360)
+  if (nums.length === 0) return { parcelas: null, reforcos: null }
+  const ordenado = [...new Set(nums)].sort((a, b) => a - b)
+  const parcelas = ordenado[ordenado.length - 1]
+  const reforcos = ordenado.length > 1 ? ordenado[0] : null
+  return { parcelas, reforcos }
+}
 
 function fatiarUnidades(texto: string): string[] {
   const corpo = texto.split(/Observa[çc][õo]es\s*:/i)[0]
@@ -158,7 +203,9 @@ export function parsearTabelaFontana(
     const chunk = bruto.trim()
     const unidade = chunk.match(/^(\d{3,4})/)?.[1] ?? '?'
     const dormitorios = Number(chunk.match(/^\d{3,4}\s+(\d)/)?.[1] ?? 0)
-    const boxCodigo = chunk.match(/^\d{3,4}\s+\d\s+(\d{1,3}[A-Z](?:\s*-\s*[A-Z]{1,2})?)/)?.[1] ?? null
+    // Só o código, sem o sufixo de pavimento ("89E", não "89E - 3º"): o andar
+    // já sai do número da unidade.
+    const boxCodigo = chunk.match(/^\d{3,4}\s+\d\s+(\d{1,3}[A-Z]{1,2})/)?.[1] ?? null
 
     // Tokeniza a PARTIR do primeiro decimal. Antes dele só há ruído numérico
     // ("91S", "3º Pav") que confundiria a contagem de colunas.
@@ -198,7 +245,28 @@ export function parsearTabelaFontana(
     const formato: FormatoTabela = ehSimples ? 'entrada_financiamento' : 'parcelado'
     const reforco = ehSimples ? 0 : decimais[5]
     const parcela = ehSimples ? 0 : decimais[7]
-    const financiamento = ehSimples ? decimais[5] : decimais[9]
+
+    // O financiamento é DERIVADO, não lido por posição.
+    //
+    // Antes vinha de `decimais[9]`, e o Tremezzo quebrou isso: a tabela dele
+    // não tem coluna de financiamento, porque são 100% até as chaves em 72
+    // parcelas — o índice 9 nem existe. Derivar do que sobra e depois conferir
+    // contra as colunas do PDF vale para os dois casos e não depende da ordem.
+    const npCab = cabecalho.parcelas_qtd ?? 40
+    const nrCab = cabecalho.reforcos_qtd ?? 4
+    const ateChavesCalc = entrada + npCab * parcela + nrCab * reforco
+    const restante = Math.round((total - ateChavesCalc) * 100) / 100
+
+    // O valor DERIVADO diz o que procurar; o IMPRESSO é o que vale. Multiplicar
+    // 40 parcelas arredondadas em centavos não reconstrói o total exato: no
+    // Pineto a derivação dá 489.470,09 e o PDF imprime 489.470,02. Sete
+    // centavos que iriam para o contrato do cliente.
+    const impressoProximo = decimais.find((d) => Math.abs(d - restante) <= TOLERANCIA_REAIS)
+    const financiamento = ehSimples
+      ? decimais[5]
+      : Math.abs(restante) <= TOLERANCIA_REAIS
+        ? 0
+        : (impressoProximo ?? restante)
 
     // ── As invariantes ────────────────────────────────────────────────
     const problemas: string[] = []
@@ -220,12 +288,21 @@ export function parsearTabelaFontana(
     }
 
     if (formato === 'parcelado') {
-      const soma30 = entrada + 40 * parcela + 4 * reforco
-      if (Math.abs(soma30 - total * 0.3) > TOLERANCIA_REAIS) {
-        problemas.push(`entrada+40p+4r = ${soma30.toFixed(2)} ≠ 30% de ${total.toFixed(2)}`)
+      // Quantidades da PRÓPRIA tabela. O Pineto é 40 parcelas + 4 reforços
+      // fechando 30% até as chaves, com 70% financiados; o Tremezzo é 72 + 6
+      // fechando 100%, sem financiamento nenhum. Fixar 40/4 e 30/70 recusava
+      // tudo que não fosse o Pineto.
+      if (!(parcela > 0) || !(reforco > 0)) {
+        problemas.push('parcela ou reforço zerado numa tabela parcelada')
       }
-      if (Math.abs(financiamento - total * 0.7) > TOLERANCIA_REAIS) {
-        problemas.push(`financiamento ${financiamento.toFixed(2)} ≠ 70% de ${total.toFixed(2)}`)
+
+      // Quando há saldo a financiar, o valor derivado tem que APARECER entre
+      // as colunas do PDF. É o que impede a conta de fechar por construção:
+      // se o número não está impresso na tabela, alguma coluna foi lida errado.
+      if (financiamento > 0 && impressoProximo === undefined) {
+        problemas.push(
+          `saldo de ${restante.toFixed(2)} não aparece na linha — entrada+${npCab}p+${nrCab}r não bate com as colunas`,
+        )
       }
     } else {
       // Aqui a conta é uma só, e tem que fechar no centavo: quem entra na
@@ -245,6 +322,8 @@ export function parsearTabelaFontana(
 
     unidades.push({
       formato,
+      parcelas_qtd: formato === 'parcelado' ? (cabecalho.parcelas_qtd ?? 40) : 0,
+      reforcos_qtd: formato === 'parcelado' ? (cabecalho.reforcos_qtd ?? 4) : 0,
       unidade,
       dormitorios,
       andar: andarDe(unidade),
@@ -292,8 +371,8 @@ export function paraUnidadeDoBanco(
   // Quantidades vêm do FORMATO da linha, não fixas. Gravar 40 parcelas para
   // uma tabela de entrada única inventaria um plano que a construtora não
   // ofereceu — e a página pública o repetiria ao cliente.
-  const parcelasQtd = u.formato === 'parcelado' ? 40 : 0
-  const reforcosQtd = u.formato === 'parcelado' ? 4 : 0
+  const parcelasQtd = u.formato === 'parcelado' ? u.parcelas_qtd : 0
+  const reforcosQtd = u.formato === 'parcelado' ? u.reforcos_qtd : 0
   const ateAsChaves =
     u.valor_entrada_min + parcelasQtd * u.parcela_mensal + reforcosQtd * u.reforco_anual
 

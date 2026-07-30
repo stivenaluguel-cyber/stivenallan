@@ -5,7 +5,9 @@ import {
   faixaDeEntrada, REFORCO_MAXIMO_EM_PARCELAS, simular,
   type PlanoPagamento, type Simulacao,
 } from '@/lib/unidades/simular'
-import { parcelaDiretaComReforcos, prazosSugeridos, reforcoMaximoContratual } from '@/lib/unidades/financiamento-direto'
+import {
+  parcelaDiretaComReforcos, planoDaOpcao, prazosSugeridos, reforcoMaximoContratual,
+} from '@/lib/unidades/financiamento-direto'
 
 type Resposta = {
   temEspelho: boolean
@@ -490,12 +492,68 @@ function ModalUnidade({ unidade, empreendimento, onFechar, onConcluido }: {
 
                       {outras.length > 0 && (
                         <p style={{ margin: '9px 0 0', paddingTop: 9, borderTop: '1px solid ' + P.linha, fontSize: 12, color: P.suave, lineHeight: 1.5 }}>
-                          Também aceita: {outras.map((o) => o.descricao.toLowerCase()).join(' · ')}.
+                          Também aceita: {outras.map((o) => o.tipo === 'bancario' ? 'financiamento bancário' : o.descricao.toLowerCase()).join(' · ')}.
                         </p>
                       )}
                     </div>
                   )
                 })()}
+
+                {/* Opções que REFAZEM o negócio, não só parcelam o saldo.
+                    A opção 2 do Tremezzo dá 10% de desconto e muda o "até as
+                    chaves" de 100% para 40% — costuma ser a melhor condição do
+                    PDF, e estava escondida num parágrafo de rodapé. */}
+                {(revelado?.plano?.opcoes_pagamento ?? [])
+                  .filter((o) => o.descontoPct || o.ateAsChavesPct)
+                  .map((o, i) => {
+                    const p = planoDaOpcao(sim.valorTotal, o)
+                    if (!p) return null
+                    const parcelaSaldo = o.meses && o.jurosAoMes !== undefined && p.saldo > 0
+                      ? parcelaDiretaComReforcos(p.saldo, o.meses, o.jurosAoMes, 0)
+                      : null
+                    return (
+                      <div key={i} style={{ marginTop: 12, border: '1px solid ' + P.linha, borderRadius: 11, padding: '13px 15px' }}>
+                        <p style={{ margin: 0, fontSize: 13.5, fontWeight: 700, color: P.tinta }}>
+                          {o.descontoPct ? `Outra condição: ${o.descontoPct}% de desconto` : 'Outra condição'}
+                        </p>
+                        <div style={{ display: 'grid', gap: 6, marginTop: 9, fontSize: 13 }}>
+                          {o.descontoPct ? (
+                            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10 }}>
+                              <span style={{ color: P.suave }}>Valor com desconto</span>
+                              <strong>{brl(p.valorComDesconto)}</strong>
+                            </div>
+                          ) : null}
+                          {p.ato !== null && (
+                            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10 }}>
+                              <span style={{ color: P.suave }}>Ato mínimo</span>
+                              <strong>{brl(p.ato)}</strong>
+                            </div>
+                          )}
+                          {o.ateAsChavesPct ? (
+                            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10 }}>
+                              <span style={{ color: P.suave }}>Até as chaves ({o.ateAsChavesPct}%)</span>
+                              <strong>{brl(p.ateAsChaves)}</strong>
+                            </div>
+                          ) : null}
+                          {p.saldo > 0 && (
+                            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10 }}>
+                              <span style={{ color: P.suave }}>Saldo depois da entrega</span>
+                              <strong>{brl(p.saldo)}</strong>
+                            </div>
+                          )}
+                          {parcelaSaldo && (
+                            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10 }}>
+                              <span style={{ color: P.suave }}>{o.meses}x de</span>
+                              <strong style={{ color: P.ouro }}>{brl(parcelaSaldo.valor)}</strong>
+                            </div>
+                          )}
+                        </div>
+                        {o.aceitaPermuta === false && (
+                          <p style={{ margin: '9px 0 0', fontSize: 11.5, color: P.suave }}>Nesta condição não há permuta.</p>
+                        )}
+                      </div>
+                    )
+                  })}
 
                 {faixa && faixa.max > faixa.min && (
                   <div style={{ marginTop: 16 }}>

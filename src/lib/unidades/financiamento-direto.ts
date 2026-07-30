@@ -225,8 +225,22 @@ export type OpcaoPagamento = {
   meses?: number
   jurosAoMes?: number
   indice?: string | null
-  /** Desconto percentual, quando é pagamento à vista. */
+  /** Desconto sobre o valor total, à vista ou como condição da opção. */
   descontoPct?: number
+  /**
+   * Quanto precisa estar quitado até a entrega das chaves, nesta opção.
+   *
+   * O Tremezzo tem tabela de 100% até as chaves, mas a opção 2 refaz o
+   * negócio inteiro: 10% de desconto, 40% até as chaves e 60% parcelados em
+   * 180 meses. Sem este campo a página mostraria só o plano da tabela e
+   * esconderia, num parágrafo de rodapé, a condição que costuma ser a melhor
+   * para o comprador.
+   */
+  ateAsChavesPct?: number
+  /** Entrada mínima no ato, em % do valor da venda. */
+  atoMinimoPct?: number
+  /** `false` quando a opção diz explicitamente que não aceita permuta. */
+  aceitaPermuta?: boolean
 }
 
 const PESO: Record<TipoOpcao, number> = { direto: 0, a_vista: 1, bancario: 2, outro: 3 }
@@ -263,9 +277,80 @@ export function lerOpcoesDePagamento(texto: string): OpcaoPagamento[] {
 function classificar(desc: string): OpcaoPagamento {
   const politica = lerPoliticaFinanciamento(desc)
   if (politica && /DIRETO|CONSTRUTORA|INCORPORADORA/i.test(desc)) {
-    return { tipo: 'direto', descricao: desc, ...politica }
+    return { tipo: 'direto', descricao: desc, ...politica, ...numerosDaOpcao(desc) }
   }
   if (/BANC[ÁA]RI|CAIXA|BANCO/i.test(desc)) return { tipo: 'bancario', descricao: desc }
-  if (/[ÀA]\s*VISTA/i.test(desc)) return { tipo: 'a_vista', descricao: desc }
+  if (/[ÀA]\s*VISTA/i.test(desc)) {
+    // O percentual precisa sair daqui também: quando o desconto vem DENTRO de
+    // uma OPÇÃO (Tremezzo), a extração avulsa do rodapé nem chega a rodar.
+    return { tipo: 'a_vista', descricao: desc, ...numerosDaOpcao(desc) }
+  }
   return { tipo: 'outro', descricao: desc }
+}
+
+/**
+ * Números que uma opção comercial pode carregar além do prazo.
+ *
+ * Exemplo real, opção 2 do Tremezzo: "DESCONTO DE 10% SOBRE O VALOR TOTAL,
+ * PAGANDO 40% ATÉ AS CHAVES, COM ATO MÍNIMO DE 10% DO VALOR DA VENDA".
+ */
+function numerosDaOpcao(desc: string): Partial<OpcaoPagamento> {
+  const out: Partial<OpcaoPagamento> = {}
+  const desconto = desc.match(/DESCONTO DE\s*(\d{1,2})\s*%/i)
+  if (desconto) out.descontoPct = Number(desconto[1])
+
+  const chaves = desc.match(/(\d{1,3})\s*%\s*AT[ÉE]\s*AS?\s*CHAVES/i)
+  if (chaves) {
+    const v = Number(chaves[1])
+    if (v > 0 && v <= 100) out.ateAsChavesPct = v
+  }
+
+  const ato = desc.match(/ATO\s*M[ÍI]NIMO\s*DE\s*(\d{1,2})\s*%/i)
+  if (ato) out.atoMinimoPct = Number(ato[1])
+
+  if (/N[ÃA]O\s+(SER[ÁA]\s+)?ACEIT[OA]?\s+PERMUTA/i.test(desc)) out.aceitaPermuta = false
+
+  return out
+}
+
+export type PlanoDaOpcao = {
+  /** Valor já com o desconto da opção aplicado. */
+  valorComDesconto: number
+  descontoEmReais: number
+  /** Entrada mínima no ato, quando a opção exige. */
+  ato: number | null
+  /** Quanto precisa estar quitado até as chaves. */
+  ateAsChaves: number
+  /** O que sobra para financiar ou parcelar depois da entrega. */
+  saldo: number
+}
+
+/**
+ * Traduz uma opção comercial em dinheiro, para a unidade escolhida.
+ *
+ * A opção 2 do Tremezzo, num apartamento de R$ 1.329.810,12: 10% de desconto
+ * levam a R$ 1.196.829,11; 40% até as chaves são R$ 478.731,64, com ato mínimo
+ * de R$ 119.682,91; sobram R$ 718.097,47 para 180 meses.
+ *
+ * Os percentuais incidem sobre o valor JÁ DESCONTADO — é o que a frase diz
+ * ("desconto de 10% SOBRE O VALOR TOTAL, pagando 40% até as chaves"): o
+ * negócio passa a ser pelo valor novo.
+ */
+export function planoDaOpcao(valorTotal: number, opcao: OpcaoPagamento): PlanoDaOpcao | null {
+  if (!(valorTotal > 0)) return null
+  if (opcao.ateAsChavesPct === undefined && opcao.descontoPct === undefined) return null
+
+  const cent = (n: number) => Math.round(n * 100) / 100
+  const desconto = opcao.descontoPct ?? 0
+  const valorComDesconto = cent(valorTotal * (1 - desconto / 100))
+  const pctChaves = opcao.ateAsChavesPct ?? 100
+  const ateAsChaves = cent(valorComDesconto * (pctChaves / 100))
+
+  return {
+    valorComDesconto,
+    descontoEmReais: cent(valorTotal - valorComDesconto),
+    ato: opcao.atoMinimoPct ? cent(valorComDesconto * (opcao.atoMinimoPct / 100)) : null,
+    ateAsChaves,
+    saldo: cent(valorComDesconto - ateAsChaves),
+  }
 }
