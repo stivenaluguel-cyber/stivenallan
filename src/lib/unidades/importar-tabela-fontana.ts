@@ -410,6 +410,7 @@ export function paraUnidadeDoBanco(
   empreendimentoId: string,
   politica?: PoliticaFinanciamento | null,
   opcoes?: OpcaoPagamento[],
+  previsaoEntrega?: string | null,
 ) {
   const brl = (n: number) => n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
@@ -445,6 +446,12 @@ export function paraUnidadeDoBanco(
       // bancário, que nunca deve sumir.
       opcoes_pagamento: opcoes ?? [],
       saldo_financiamento: u.saldo_financiamento,
+      // A entrega já vinha lida no cabeçalho e parava ali. A tela precisa dela
+      // para responder a pergunta que a tabela não responde: a opção diz
+      // "40% até as chaves, ato mínimo de 10%" e cala sobre em quantas vezes
+      // se paga o resto. Sem a data não há quantos meses faltam, e o bloco
+      // vira número solto.
+      previsao_entrega: previsaoEntrega ?? null,
       // A quantidade de CUBs vive aqui: `cub_fator` é numeric(6,4) e não
       // comporta 210–264.
       cub_quantidade: u.cub_fator,

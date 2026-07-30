@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   lerPoliticaFinanciamento, parcelaDireta, parcelaDiretaComReforcos,
   prazosSugeridos, reforcoMaximo, reforcoMaximoContratual, lerOpcoesDePagamento,
-  planoDaOpcao,
+  planoDaOpcao, mesesAteAEntrega, distribuirAteAsChaves,
 } from './financiamento-direto'
 
 // Rodapé real da tabela do Avezzano, julho/2026.
@@ -382,5 +382,115 @@ describe('juros escritos por extenso — "ao mês"', () => {
 
   it('tabela que não fala de parcelamento direto continua devolvendo null', () => {
     expect(lerPoliticaFinanciamento('OPÇÃO 01: FINANCIAMENTO BANCÁRIO')).toBeNull()
+  })
+})
+
+describe('a descrição da opção termina onde a condição termina', () => {
+  // Rodapé REAL do Tremezzo (julho/2026). A opção 2 é a última da lista e não
+  // termina em ";" — o bloco corria até o fim do texto e a `descricao` gravada
+  // no plano_pagamento levava junto legendas, "Nº DORMITÓRIOS" e a hora da
+  // emissão do PDF. É o texto que o corretor lê para repetir a condição.
+  const RODAPE_TREMEZZO = `6) POLÍTICA COMERCIAL: OPÇÃO 1: SERÁ CONCEDIDO DESCONTO DE 15% PARA PAGAMENTO À VISTA, SEM PERMUTA; OPÇÃO 2: SERÁ CONCEDIDO DESCONTO DE 10% SOBRE O VALOR TOTAL, PAGANDO 40% ATÉ AS CHAVES, COM ATO MÍNIMO DE 10% DO VALOR DA VENDA. APÓS A CONCLUSÃO DO EMPREENDIMENTO, O SALDO DEVEDOR DEVERÁ SER QUITADO VIA FINANCIAMENTO BANCÁRIO OU DIRETO COM A CONSTRUTORA EM ATÉ 180 MESES, SENDO CORRIGIDO PELO IGPM E ACRESCIDO DE JUROS COMPENSATÓRIOS DE 0,75% a.m. ( NESSA OPÇÃO NÃO SERÁ ACEITO PERMUTA). LEGENDAS: 1º Pav - 1º Pavimento T - Térreo SS - Subsolo S - Simples SE - Simples Estendido D - Duplo DE - Duplo Estendido Nº DORMITÓRIOS UNIDADES 03 Dormitórios ( 1 Suíte) Data emissão: 01/07/2026 16:36:28`
+
+  const opcoes = lerOpcoesDePagamento(RODAPE_TREMEZZO)
+  const direto = opcoes.find(o => o.tipo === 'direto')!
+
+  it('corta em LEGENDAS e não leva o rodapé gráfico junto', () => {
+    expect(direto.descricao).not.toMatch(/LEGENDAS/i)
+    expect(direto.descricao).not.toMatch(/DORMIT[ÓO]RIOS/i)
+    expect(direto.descricao).not.toMatch(/Data emiss/i)
+    expect(direto.descricao).not.toMatch(/1º Pavimento/i)
+  })
+
+  it('mantém a condição inteira, até a ressalva da permuta', () => {
+    expect(direto.descricao).toMatch(/^SERÁ CONCEDIDO DESCONTO DE 10%/)
+    expect(direto.descricao).toMatch(/NÃO SERÁ ACEITO PERMUTA\)$/)
+  })
+
+  it('os números da opção continuam saindo certos', () => {
+    expect(direto).toMatchObject({
+      meses: 180, jurosAoMes: 0.0075, indice: 'IGPM',
+      descontoPct: 10, ateAsChavesPct: 40, atoMinimoPct: 10, aceitaPermuta: false,
+    })
+    expect(opcoes.find(o => o.tipo === 'a_vista')?.descontoPct).toBe(15)
+  })
+
+  it('corta também quando o rodapé começa por VISITE NOSSO SITE', () => {
+    const t = 'OPÇÃO 02: O SALDO DEVEDOR PODERÁ SER PARCELADO DIRETO COM A CONSTRUTORA EM ATÉ 180 MESES, SENDO CORRIGIDO PELO IGPM E ACRESCIDO DE JUROS COMPENSATÓRIOS DE 0,75% A.M VISITE NOSSO SITE www.estilofontana.com.br'
+    expect(lerOpcoesDePagamento(t)[0].descricao).not.toMatch(/VISITE|estilofontana/i)
+  })
+})
+
+describe('como pagar o "até as chaves"', () => {
+  const HOJE = new Date(2026, 6, 30) // 30/07/2026
+
+  it('conta os meses cheios até a entrega', () => {
+    expect(mesesAteAEntrega('31/03/2027', HOJE)).toBe(8)
+    expect(mesesAteAEntrega('30/09/2026', HOJE)).toBe(2)
+  })
+
+  it('entrega no passado ou data ausente não vira parcelamento', () => {
+    expect(mesesAteAEntrega('31/03/2026', HOJE)).toBeNull()
+    expect(mesesAteAEntrega(null, HOJE)).toBeNull()
+    expect(mesesAteAEntrega('', HOJE)).toBeNull()
+    expect(mesesAteAEntrega('marco/2027', HOJE)).toBeNull()
+  })
+
+  it('divide o que sobra depois do ato pelos meses que faltam', () => {
+    // Tremezzo 102, opção 2: total 1.329.810,12 → −10% = 1.196.829,11.
+    // 40% até as chaves = 478.731,64, ato mínimo 10% = 119.682,91.
+    const r = distribuirAteAsChaves(478731.64, 119682.91, 8)!
+    expect(r.ato).toBe(119682.91)
+    expect(r.restante).toBe(359048.73)
+    expect(r.meses).toBe(8)
+    expect(r.parcela).toBeCloseTo(44881.09, 2)
+    // A conta tem que fechar: ato + as mensais devolvem o até-as-chaves.
+    expect(r.ato + r.parcela * r.meses).toBeCloseTo(478731.64, 1)
+  })
+
+  it('sem meses restantes não inventa parcela', () => {
+    expect(distribuirAteAsChaves(478731.64, 119682.91, null)).toBeNull()
+    expect(distribuirAteAsChaves(478731.64, 119682.91, 0)).toBeNull()
+  })
+
+  it('ato que já cobre tudo não vira parcela de zero', () => {
+    expect(distribuirAteAsChaves(100000, 100000, 8)).toBeNull()
+    expect(distribuirAteAsChaves(100000, 150000, 8)).toBeNull()
+  })
+
+  it('sem ato mínimo, distribui o valor inteiro', () => {
+    const r = distribuirAteAsChaves(80000, null, 8)!
+    expect(r.ato).toBe(0)
+    expect(r.parcela).toBe(10000)
+  })
+})
+
+describe('opção à vista não vira parcelamento', () => {
+  // `planoDaOpcao` assume 100% até as chaves quando a opção não diz outra
+  // coisa — o que é certo para o cálculo, e armadilha para quem consome.
+  // A opção à vista do Tremezzo (15% de desconto, sem ateAsChavesPct) chegava
+  // na tela com "No ato R$ 0 + 8x até a entrega R$ 141.292": um parcelamento
+  // oferecido em cima de uma condição que existe justamente para ser à vista.
+  // Quem desenha a tela tem que checar `ateAsChavesPct` antes de distribuir.
+  const A_VISTA = { tipo: 'a_vista' as const, descricao: 'À VISTA', descontoPct: 15 }
+
+  it('o plano da opção à vista cobre o valor inteiro até as chaves', () => {
+    const p = planoDaOpcao(1329810.12, A_VISTA)!
+    expect(p.valorComDesconto).toBeCloseTo(1130338.6, 2)
+    expect(p.ateAsChaves).toBeCloseTo(p.valorComDesconto, 2)
+    expect(p.saldo).toBe(0)
+    // Sem ato mínimo declarado: não há o que dar de entrada.
+    expect(p.ato).toBeNull()
+  })
+
+  it('a opção escalonada continua declarando o que distribuir', () => {
+    const escalonada = {
+      tipo: 'direto' as const, descricao: 'OPÇÃO 2', descontoPct: 10,
+      ateAsChavesPct: 40, atoMinimoPct: 10, meses: 180, jurosAoMes: 0.0075,
+    }
+    const p = planoDaOpcao(1329810.12, escalonada)!
+    expect(escalonada.ateAsChavesPct).toBeTruthy()
+    expect(p.ato).toBeCloseTo(119682.91, 1)
+    expect(p.saldo).toBeCloseTo(718097.47, 1)
   })
 })

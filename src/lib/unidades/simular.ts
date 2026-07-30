@@ -27,6 +27,8 @@ export type PlanoPagamento = {
   /** Formas de pagamento da tabela daquele empreendimento. */
   opcoes_pagamento?: OpcaoPagamento[] | null
   percentual_ate_chaves?: number | null
+  /** Entrega no formato do PDF ("31/03/2027"). Base para os meses que faltam. */
+  previsao_entrega?: string | null
 }
 
 export type Simulacao = {
@@ -200,6 +202,7 @@ export function planoDoJson(v: unknown): PlanoPagamento | null {
     opcoes_pagamento: Array.isArray(o.opcoes_pagamento) ? (o.opcoes_pagamento as OpcaoPagamento[]) : null,
     percentual_ate_chaves:
       o.percentual_ate_chaves === undefined || o.percentual_ate_chaves === null ? null : n('percentual_ate_chaves'),
+    previsao_entrega: typeof o.previsao_entrega === 'string' ? o.previsao_entrega : null,
   }
   // Plano sem entrada nem parcela não é plano — é jsonb sujo. Melhor a
   // interface não mostrar nada do que mostrar zeros.

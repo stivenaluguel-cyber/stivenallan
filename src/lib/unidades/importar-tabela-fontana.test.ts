@@ -553,3 +553,145 @@ CUB06 - Julho - R$ 3.121,62 ENTRADA 1 X R$ CUB06 100% CUB06 904 B 2 44S - 2ºSS 
     expect(r.rejeitadas.map(x => x.unidade)).toContain('1004')
   })
 })
+
+describe('tabelas reais de julho/2026 — regressão do fatiador com bloco opcional', () => {
+  // Trechos FIÉIS das tabelas já importadas e conferidas contra produção.
+  // Existem porque o grupo opcional do bloco (`(?:[A-Z]\s+)?`) afrouxa o
+  // reconhecimento do início de unidade, e esse mesmo padrão decide ONDE o
+  // cabeçalho termina — se ele casar cedo demais, os multiplicadores "6 X" e
+  // "72 X" ficam de fora e a tabela inteira volta com o plano do Pineto (40/4).
+  //
+  // Cada fixture guarda o cabeçalho inteiro, duas unidades e o rodapé.
+
+  const THIENE = `Data RUA MONTEIRO LOBATO, 105, ESQ. RUA SANTO ANTONIO - CENTRO - CRICIÚMA/SC
+emissão: 01/07/2026 17:05:43
+Previsão de entrega: 30/09/2026 Vigência desta tabela: Julho/2026
+CUB06 - Julho - R$ 3.121,62 UNIDADE
+UNIDADE (m²) PRIVATIVA BOX (m²) TOTAL (m²) ENTRADA
+1 X
+REFORÇO
+PARCELA R$ ANUAL 100%
+MENSAL R$ CUB06 100% 6 X
+72 X
+R$ CUB06 100% CUB06 102 3 16S - T 101,88 13,50 174,03 214.767,46 1.073.837,28 42.112,32 1.073.837,28 8.422,17 344 1.073.837,28 344 344 301 3 06S - SS 101,88 14,57 175,41 245.983,66 1.229.918,28 48.233,30 1.229.918,28 9.646,32 394 1.229.918,28 394 394 Observações:
+6) POLÍTICA COMERCIAL: OPÇÃO 1: SERÁ CONCEDIDO DESCONTO DE 15% PARA PAGAMENTO À VISTA;
+OPÇÃO 2: SERÁ CONCEDIDO DESCONTO DE 10% SOBRE O VALOR TOTAL, PAGANDO 40% ATÉ AS CHAVES , COM ATO MÍNIMO DE 10%. APÓS A CONCLUSÃO DO EMPREENDIMENTO, O SALDO DEVEDOR DEVERÁ SER QUITADO VIA FINANCIAMENTO BANCÁRIO OU DIRETO COM A CONSTRUTORA EM ATÉ 180 MESES, SENDO CORRIGIDO PELO IGPM E ACRESCIDO DE JUROS COMPENSATÓRIOS DE 0,75% a.m (NESSA OPÇÃO NÃO SERÁ ACEITO PERMUTA).`
+
+  const BELLANTE = `RUA TREZE DE MAIO - COMERCIARIO - Criciúma/SC
+Previsão de entrega: 30/11/2026 Vigência desta tabela: Julho/2026
+CUB06 - Julho - R$ 3.121,62 UNIDADE
+UNIDADE (m²) PRIVATIVA BOX (m²) TOTAL (m²) ENTRADA
+1 X
+REFORÇO
+PARCELA R$ ANUAL 100%
+MENSAL R$ CUB06 100% 2 X
+4 X
+R$ CUB06 100%
+R$ CUB06 100% CUB06 103 2 34S - SS 67,41 12,50 115,81 51.943,76 649.296,96 14.284,53 649.296,96 28.569,07 208 649.296,96 454.507,87 208 649.296,96 208 208 104 2 04S - SS 64,85 12,00 111,42 49.945,92 624.324,00 13.735,13 624.324,00 27.470,26 200 624.324,00 437.026,80 200 624.324,00 200 200 Observações:
+1) Os valores contidos na presente tabela sofrerão correção monetária mensal com base na variação do CUB/SINDUSCON/SC até a data de conclusão do empreendimento, sendo que após a conclusão, os valores remanescentes serão corrigidos pelo IGPM e acrescidos de juros compensatórios de 0,75% ao mês. 2) Até a entrega de conclusão do empreendimento, 30% do valor do mesmo deverá estar quitado, sendo que o restante deverá ser liquidado mediante financiamento bancário ou em até 240 meses, diretamente com a construtora, observando-se o disposto no ítem 1. 6) Este empreendimento não aceita permuta; 8) POLÍTICA COMERCIAL: NESTE EMPREENDIMENTO SERÁ CONCEDIDO DESCONTO DE 5% PARA PAGAMENTO À VISTA`
+
+  const CALLIANO = `Data Rua São José - Centro - CRICIÚMA/SC
+Vigência desta tabela: Julho/2026
+CUB06 - Julho - R$ 3.121,62 UNIDADE
+UNIDADE (m²) PRIVATIVA BOX (m²) TOTAL (m²) ENTRADA
+1 X
+FINANCIAMENTO R$ 100% 1 X
+R$ CUB06 100% CUB06 305 3 31 e 42S - SS 92,47 24,00 155,69 135.790,47 905.269,80 769.479,33 905.269,80 290 290 Observações:
+1) POLITICA COMERCIAL:
+OPÇÃO 01: FINANCIAMENTO BANCÁRIO
+OPÇÃO 02: O SALDO DEVEDOR PODERÁ SER PARCELADO DIRETO COM A CONSTRUTORA EM ATÉ 180 MESES, SENDO CORRIGIDO PELO IGPM E ACRESCIDO DE JUROS COMPENSATÓRIOS DE 0,75% A.M;`
+
+  it('Thiene: cabeçalho preserva 72 parcelas e 6 reforços', () => {
+    const r = parsearTabelaFontana(THIENE, CUB_JULHO)
+    expect(r.cabecalho.parcelas_qtd).toBe(72)
+    expect(r.cabecalho.reforcos_qtd).toBe(6)
+    expect(r.unidades).toHaveLength(2)
+    expect(r.rejeitadas).toEqual([])
+    const u = r.unidades[0]
+    expect(u.bloco).toBeNull()
+    expect(u.box_codigo).toBe('16S')
+    expect(u.valor_tabela).toBe(1073837.28)
+    expect(u.valor_entrada_min).toBe(214767.46)
+    expect(u.parcela_mensal).toBe(8422.17)
+    expect(u.reforco_anual).toBe(42112.32)
+    expect(u.saldo_financiamento).toBe(0)
+    expect(u.cub_fator).toBe(344)
+  })
+
+  it('Thiene: a opção 2 chega inteira, com desconto, chaves, ato e permuta', () => {
+    const { opcoes_pagamento } = parsearTabelaFontana(THIENE, CUB_JULHO).cabecalho
+    const direto = opcoes_pagamento.find(o => o.tipo === 'direto')
+    expect(direto).toMatchObject({
+      meses: 180, jurosAoMes: 0.0075, indice: 'IGPM',
+      descontoPct: 10, ateAsChavesPct: 40, atoMinimoPct: 10, aceitaPermuta: false,
+    })
+    expect(opcoes_pagamento.find(o => o.tipo === 'a_vista')?.descontoPct).toBe(15)
+  })
+
+  it('Bellante: 4 parcelas e 2 reforços, e o direto de 240x volta a aparecer', () => {
+    const r = parsearTabelaFontana(BELLANTE, CUB_JULHO)
+    expect(r.cabecalho.parcelas_qtd).toBe(4)
+    expect(r.cabecalho.reforcos_qtd).toBe(2)
+    // A regressão que motivou o fix: "0,75% ao mês" devolvia null.
+    expect(r.cabecalho.financiamento_direto).toEqual({
+      meses: 240, jurosAoMes: 0.0075, indice: 'IGPM',
+    })
+    expect(r.cabecalho.desconto_a_vista_pct).toBe(5)
+    expect(r.cabecalho.aceita_permuta).toBe(false)
+    expect(r.unidades).toHaveLength(2)
+    expect(r.rejeitadas).toEqual([])
+
+    const u = r.unidades[0]
+    expect(u.bloco).toBeNull()
+    expect(u.valor_entrada_min).toBe(51943.76)
+    expect(u.parcela_mensal).toBe(28569.07)
+    expect(u.reforco_anual).toBe(14284.53)
+    expect(u.saldo_financiamento).toBe(454507.87)
+    // 30% até as chaves com as quantidades DESTA tabela — não as do Pineto.
+    const ateChaves = u.valor_entrada_min + 4 * u.parcela_mensal + 2 * u.reforco_anual
+    expect(ateChaves / u.valor_tabela).toBeCloseTo(0.3, 4)
+  })
+
+  it('Calliano: box composto e formato entrada+financiamento intactos', () => {
+    const r = parsearTabelaFontana(CALLIANO, CUB_JULHO)
+    expect(r.unidades).toHaveLength(1)
+    expect(r.rejeitadas).toEqual([])
+    const u = r.unidades[0]
+    expect(u.bloco).toBeNull()
+    expect(u.box_codigo).toBe('31 e 42S')
+    expect(u.formato).toBe('entrada_financiamento')
+    expect(u.valor_entrada_min + u.saldo_financiamento).toBeCloseTo(u.valor_tabela, 2)
+    expect(u.cub_fator).toBe(290)
+  })
+
+  it('a letra do bloco não inventa unidade onde não há', () => {
+    // Nenhuma das tabelas de bloco único pode ganhar unidade a mais por causa
+    // do grupo opcional.
+    for (const [nome, texto, esperado] of [
+      ['Thiene', THIENE, 2], ['Bellante', BELLANTE, 2], ['Calliano', CALLIANO, 1],
+    ] as const) {
+      const r = parsearTabelaFontana(texto, CUB_JULHO)
+      expect(`${nome}:${r.unidades.length + r.rejeitadas.length}`).toBe(`${nome}:${esperado}`)
+    }
+  })
+})
+
+describe('previsão de entrega vai para o plano', () => {
+  // A data já era lida no cabeçalho e parava ali. A tela precisa dela para
+  // dividir o "até as chaves" da opção comercial pelos meses que faltam.
+  it('grava a entrega do cabeçalho no plano_pagamento', () => {
+    const r = parsearTabelaFontana(TABELA, CUB_JULHO)
+    expect(r.cabecalho.previsao_entrega).toBe('30/11/2029')
+    const linha = paraUnidadeDoBanco(
+      r.unidades[0], 'emp-1', r.cabecalho.financiamento_direto,
+      r.cabecalho.opcoes_pagamento, r.cabecalho.previsao_entrega,
+    )
+    expect(linha.plano_pagamento.previsao_entrega).toBe('30/11/2029')
+  })
+
+  it('tabela sem data de entrega grava null, não string vazia', () => {
+    const r = parsearTabelaFontana(TABELA, CUB_JULHO)
+    const linha = paraUnidadeDoBanco(r.unidades[0], 'emp-1', null, [], null)
+    expect(linha.plano_pagamento.previsao_entrega).toBeNull()
+  })
+})

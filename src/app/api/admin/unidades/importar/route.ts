@@ -118,7 +118,9 @@ export async function POST(req: NextRequest) {
   }
 
   const linhas = r.unidades.map((u) => {
-    const linha = paraUnidadeDoBanco(u, empId, r.cabecalho.financiamento_direto, r.cabecalho.opcoes_pagamento)
+    const linha = paraUnidadeDoBanco(
+      u, empId, r.cabecalho.financiamento_direto, r.cabecalho.opcoes_pagamento, r.cabecalho.previsao_entrega,
+    )
     // Preserva o que a tabela da construtora não sabe.
     if (porUnidade.get(u.unidade)?.disponivel === false) linha.disponivel = false
     return linha

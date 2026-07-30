@@ -1,11 +1,12 @@
 'use client'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { StatusUnidade, UnidadePublica } from '@/lib/unidades/espelho'
 import {
   faixaDeEntrada, REFORCO_MAXIMO_EM_PARCELAS, simular,
   type PlanoPagamento, type Simulacao,
 } from '@/lib/unidades/simular'
 import {
+  distribuirAteAsChaves, mesesAteAEntrega,
   parcelaDiretaComReforcos, planoDaOpcao, prazosSugeridos, reforcoMaximoContratual,
 } from '@/lib/unidades/financiamento-direto'
 
@@ -216,6 +217,13 @@ function ModalUnidade({ unidade, empreendimento, onFechar, onConcluido }: {
   // Prazo e reforço do parcelamento direto do SALDO — separado da entrada.
   const [prazoDireto, setPrazoDireto] = useState<number | null>(null)
   const [reforcoDireto, setReforcoDireto] = useState(0)
+  // Uma opção comercial pode ser simulada como o saldo já é. Guardado por
+  // índice porque nada impede a tabela de trazer duas.
+  const [prazoOpcao, setPrazoOpcao] = useState<Record<number, number>>({})
+  const [reforcoOpcao, setReforcoOpcao] = useState<Record<number, number>>({})
+  // Uma data só para a vida do modal: recalcular a cada render faria os meses
+  // até a entrega mudarem no meio da simulação.
+  const hoje = useMemo(() => new Date(), [])
   const [reenviando, setReenviando] = useState(false)
   const [reenviado, setReenviado] = useState(false)
 
@@ -508,9 +516,35 @@ function ModalUnidade({ unidade, empreendimento, onFechar, onConcluido }: {
                   .map((o, i) => {
                     const p = planoDaOpcao(sim.valorTotal, o)
                     if (!p) return null
-                    const parcelaSaldo = o.meses && o.jurosAoMes !== undefined && p.saldo > 0
-                      ? parcelaDiretaComReforcos(p.saldo, o.meses, o.jurosAoMes, 0)
+
+                    // O saldo desta opção se simula como o outro: prazo à
+                    // escolha (nunca além do que a opção escreve) e reforço
+                    // anual com o mesmo teto contratual de 5x a parcela.
+                    const prazos = o.meses ? prazosSugeridos(o.meses) : []
+                    const prazo = prazoOpcao[i] ?? (prazos.length > 0 ? prazos[prazos.length - 1] : 0)
+                    const reforco = reforcoOpcao[i] ?? 0
+                    const podeParcelar = prazo > 0 && o.jurosAoMes !== undefined && p.saldo > 0
+                    const parcelaSaldo = podeParcelar
+                      ? parcelaDiretaComReforcos(p.saldo, prazo, o.jurosAoMes!, reforco)
                       : null
+                    const tetoReforcoOpcao = podeParcelar
+                      ? reforcoMaximoContratual(p.saldo, prazo, o.jurosAoMes!, REFORCO_MAXIMO_EM_PARCELAS)
+                      : 0
+
+                    // O pedaço que a tabela NÃO escreve: em quantas vezes se
+                    // paga o "até as chaves" depois do ato. Só dá para
+                    // responder com os meses que faltam para a entrega.
+                    //
+                    // Só faz sentido para a opção que ESCALONA o pagamento. A
+                    // opção à vista não declara `ateAsChavesPct`, e o padrão de
+                    // 100% do `planoDaOpcao` fazia o bloco aparecer nela também
+                    // — oferecendo "pagamento à vista em 8x", que é o oposto do
+                    // que a condição diz.
+                    const mesesEntrega = mesesAteAEntrega(revelado?.plano?.previsao_entrega, hoje)
+                    const ateChaves = o.ateAsChavesPct
+                      ? distribuirAteAsChaves(p.ateAsChaves, p.ato, mesesEntrega)
+                      : null
+
                     return (
                       <div key={i} style={{ marginTop: 12, border: '1px solid ' + P.linha, borderRadius: 11, padding: '13px 15px' }}>
                         <p style={{ margin: 0, fontSize: 13.5, fontWeight: 700, color: P.tinta }}>
@@ -541,13 +575,86 @@ function ModalUnidade({ unidade, empreendimento, onFechar, onConcluido }: {
                               <strong>{brl(p.saldo)}</strong>
                             </div>
                           )}
-                          {parcelaSaldo && (
-                            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10 }}>
-                              <span style={{ color: P.suave }}>{o.meses}x de</span>
-                              <strong style={{ color: P.ouro }}>{brl(parcelaSaldo.valor)}</strong>
-                            </div>
-                          )}
                         </div>
+
+                        {/* Como se paga o "até as chaves". A tabela diz quanto
+                            e quanto no ato, e cala sobre o resto — então isto
+                            vai rotulado como conta, não como condição. */}
+                        {ateChaves && (
+                          <div style={{ marginTop: 11, paddingTop: 10, borderTop: '1px dashed ' + P.linha }}>
+                            <p style={{ margin: '0 0 7px', fontSize: 12.5, fontWeight: 700, color: P.tinta }}>
+                              Como pagar os {o.ateAsChavesPct}% até as chaves
+                            </p>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, fontSize: 13 }}>
+                              <span style={{ color: P.suave }}>No ato</span>
+                              <strong>{brl(ateChaves.ato)}</strong>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, fontSize: 13, marginTop: 5 }}>
+                              <span style={{ color: P.suave }}>+ {ateChaves.meses}x até a entrega</span>
+                              <strong style={{ color: P.ouro }}>{brl(ateChaves.parcela)}</strong>
+                            </div>
+                            <p style={{ margin: '7px 0 0', fontSize: 11.5, color: P.suave, lineHeight: 1.45 }}>
+                              A tabela fixa o ato mínimo, mas não escreve em quantas vezes o
+                              restante se paga. Aqui ele está dividido pelos {ateChaves.meses} meses
+                              que faltam até a entrega — é sugestão nossa, sem juros, para dar ordem
+                              de grandeza. O parcelamento real se negocia na proposta.
+                            </p>
+                          </div>
+                        )}
+
+                        {/* O saldo desta opção também se simula. */}
+                        {parcelaSaldo && (
+                          <div style={{ marginTop: 11, paddingTop: 10, borderTop: '1px dashed ' + P.linha }}>
+                            <p style={{ margin: '0 0 7px', fontSize: 12.5, fontWeight: 700, color: P.tinta }}>
+                              Saldo depois da entrega, direto com a construtora
+                            </p>
+
+                            {prazos.length > 1 && (
+                              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 9 }}>
+                                {prazos.map((n) => (
+                                  <button key={n} type="button"
+                                    onClick={() => setPrazoOpcao((v) => ({ ...v, [i]: n }))}
+                                    style={{ padding: '5px 12px', borderRadius: 20, border: '1px solid ' + (n === prazo ? P.ouro : P.linha), background: n === prazo ? P.ouro : '#fff', color: n === prazo ? '#fff' : P.tinta, fontSize: 12, fontWeight: 600, cursor: 'pointer', minHeight: 32 }}>
+                                    {n}x
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 10 }}>
+                              <span style={{ fontSize: 13, color: P.suave }}>{prazo} parcelas de</span>
+                              <strong style={{ fontSize: 19, color: P.tinta }}>{brl(parcelaSaldo.valor)}</strong>
+                            </div>
+
+                            {parcelaSaldo.reforcosQtd > 0 && tetoReforcoOpcao > 0 && (
+                              <div style={{ marginTop: 10 }}>
+                                <label htmlFor={`reforco-opcao-${i}`} style={{ display: 'block', fontSize: 12, color: P.suave, marginBottom: 5, lineHeight: 1.45 }}>
+                                  Reforço anual derruba a mensal. O contrato aceita até {REFORCO_MAXIMO_EM_PARCELAS}x a parcela.
+                                </label>
+                                <input id={`reforco-opcao-${i}`} type="range" min={0} max={tetoReforcoOpcao} step={1000}
+                                  value={reforco}
+                                  onChange={(ev) => setReforcoOpcao((v) => ({ ...v, [i]: Number(ev.target.value) }))}
+                                  style={{ width: '100%', accentColor: P.ouro, minHeight: 34 }} />
+                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11.5, color: P.suave }}>
+                                  <span>sem reforço</span>
+                                  {parcelaSaldo.reforcoValor > 0 && (
+                                    <span>
+                                      {parcelaSaldo.reforcosQtd} de <strong style={{ color: P.tinta }}>{brl(parcelaSaldo.reforcoValor)}</strong>
+                                      {' '}· {parcelaSaldo.reforcoEmParcelas.toLocaleString('pt-BR')}x a parcela
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+
+                            <p style={{ margin: '9px 0 0', fontSize: 11.5, color: P.suave, lineHeight: 1.45 }}>
+                              Em valor de hoje, juros de {((o.jurosAoMes ?? 0) * 100).toLocaleString('pt-BR')}% ao mês.
+                              {o.indice ? ` Corrigido pelo ${o.indice}.` : ''} O financiamento bancário
+                              continua valendo para este saldo.
+                            </p>
+                          </div>
+                        )}
+
                         {o.aceitaPermuta === false && (
                           <p style={{ margin: '9px 0 0', fontSize: 11.5, color: P.suave }}>Nesta condição não há permuta.</p>
                         )}

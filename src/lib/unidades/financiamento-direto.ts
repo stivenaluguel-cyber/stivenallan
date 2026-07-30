@@ -252,6 +252,20 @@ export type OpcaoPagamento = {
 
 const PESO: Record<TipoOpcao, number> = { direto: 0, a_vista: 1, bancario: 2, outro: 3 }
 
+/**
+ * Onde o rodapé do PDF deixa de ser condição comercial.
+ *
+ * A última opção da lista não termina em `;` nem é seguida de outro item
+ * numerado — então o bloco corria até o fim do texto e engolia o rodapé
+ * inteiro. A `descricao` da opção 2 do Tremezzo terminava em "LEGENDAS: 1º Pav
+ * - 1º Pavimento … Nº DORMITÓRIOS UNIDADES 03 Dormitórios (1 Suíte) Data
+ * emissão: 01/07/2026 16:36:28" — tudo isso na tela, no bloco que o corretor
+ * lê para repetir a condição ao cliente.
+ *
+ * Estes marcadores são gráficos do PDF, nunca parte da condição.
+ */
+const FIM_DO_RODAPE = /(?:LEGENDAS?\s*:|VISITE\s+NOSSO\s+SITE|N[ºO°]?\s*DORMIT[ÓO]RIOS?\b|N[ÚU]MERO\s+DORMIT[ÓO]RIOS?\b|Data\s+emiss[ãa]o\s*:|Observa[çc][õo]es\s*:)/i
+
 export function lerOpcoesDePagamento(texto: string): OpcaoPagamento[] {
   const t = (texto || '').replace(/\s+/g, ' ')
   const opcoes: OpcaoPagamento[] = []
@@ -260,7 +274,9 @@ export function lerOpcoesDePagamento(texto: string): OpcaoPagamento[] {
   // o próximo item numerado das observações.
   // O `;` fecha o bloco: `[^;]` já para nele, então ele precisa estar entre os
   // terminadores aceitos — senão a última opção da lista nunca casa.
-  const blocos = [...t.matchAll(/OP[ÇC][ÃA]O\s*\d+\s*:\s*([^;]+?)\s*(?=OP[ÇC][ÃA]O\s*\d+\s*:|\s\d\)|;|$)/gi)]
+  const blocos = [...t.matchAll(
+    new RegExp(`OP[ÇC][ÃA]O\\s*\\d+\\s*:\\s*([^;]+?)\\s*(?=OP[ÇC][ÃA]O\\s*\\d+\\s*:|\\s\\d\\)|;|${FIM_DO_RODAPE.source}|$)`, 'gi'),
+  )]
 
   for (const b of blocos) {
     const desc = b[1].trim().replace(/[;.\s]+$/, '')
@@ -318,6 +334,71 @@ function numerosDaOpcao(desc: string): Partial<OpcaoPagamento> {
   if (/N[ÃA]O\s+(SER[ÁA]\s+)?ACEIT[OA]?\s+PERMUTA/i.test(desc)) out.aceitaPermuta = false
 
   return out
+}
+
+/**
+ * Meses cheios entre hoje e a entrega ("31/03/2027" do cabeçalho do PDF).
+ *
+ * `null` quando a data não veio na tabela ou já passou — nesse caso não há o
+ * que distribuir, e a tela precisa calar em vez de dividir por zero.
+ */
+export function mesesAteAEntrega(previsaoEntrega: string | null | undefined, hoje: Date): number | null {
+  const m = (previsaoEntrega || '').match(/^(\d{2})\/(\d{2})\/(\d{4})$/)
+  if (!m) return null
+  const [, d, mes, ano] = m
+  const entrega = new Date(Number(ano), Number(mes) - 1, Number(d))
+  if (!Number.isFinite(entrega.getTime())) return null
+
+  const meses =
+    (entrega.getFullYear() - hoje.getFullYear()) * 12 +
+    (entrega.getMonth() - hoje.getMonth()) -
+    (entrega.getDate() < hoje.getDate() ? 1 : 0)
+
+  return meses >= 1 ? meses : null
+}
+
+export type AteAsChavesParcelado = {
+  ato: number
+  /** Quantas mensais cabem entre hoje e a entrega. */
+  meses: number
+  /** O que sobra depois do ato, dividido pelos meses restantes. */
+  parcela: number
+  restante: number
+}
+
+/**
+ * Como pagar o "até as chaves" de uma opção comercial.
+ *
+ * A opção 2 do Tremezzo diz quanto (40%) e quanto no ato (10%), mas NÃO diz em
+ * quantas vezes o resto se paga. A tabela é omissa de propósito: isso se
+ * negocia. O que dá para responder com honestidade é a aritmética — sobra
+ * tanto, faltam tantos meses até a entrega, então dá tanto por mês.
+ *
+ * Sem juros: até as chaves a correção é pelo CUB, e a tabela não escreve juros
+ * nesse trecho. Inventar uma taxa aqui seria pior que não dividir.
+ *
+ * Quem chama TEM que rotular o resultado como sugestão — é conta nossa, não
+ * condição assinada pela construtora.
+ */
+export function distribuirAteAsChaves(
+  ateAsChaves: number,
+  ato: number | null,
+  mesesRestantes: number | null,
+): AteAsChavesParcelado | null {
+  if (!(ateAsChaves > 0) || !mesesRestantes || mesesRestantes < 1) return null
+  const entrada = ato ?? 0
+  if (entrada < 0 || entrada > ateAsChaves) return null
+
+  const cent = (n: number) => Math.round(n * 100) / 100
+  const restante = cent(ateAsChaves - entrada)
+  if (restante <= 0) return null
+
+  return {
+    ato: cent(entrada),
+    meses: mesesRestantes,
+    parcela: cent(restante / mesesRestantes),
+    restante,
+  }
 }
 
 export type PlanoDaOpcao = {
