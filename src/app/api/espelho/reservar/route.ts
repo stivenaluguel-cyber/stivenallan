@@ -7,13 +7,10 @@ import { notificarLeadNovo } from '@/lib/leads/notificar-lead-novo'
 import { recalcularScoreLead } from '@/lib/leads/score-server'
 import { expiraEm, RESERVA_DURACAO_HORAS } from '@/lib/unidades/espelho'
 import { resolverLeadDoEspelho } from '@/lib/unidades/lead-do-espelho'
-import { enviarMensagem } from '@/lib/evolution'
 import { logError } from '@/lib/log'
 
 export const dynamic = 'force-dynamic'
 const SOURCE = 'api/espelho/reservar'
-// Mesmo número que src/lib/evolution.ts já usa no alerta de escalada.
-const CORRETOR_WHATSAPP = '5548991642332'
 
 function sb() {
   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
@@ -166,19 +163,9 @@ export async function POST(req: NextRequest) {
     // Notificação e score são best-effort: a reserva já está gravada e não
     // pode ser desfeita por falha em avisar.
     const nascidoAgora = rLead.nasceuAgora
-    // A mensagem para o CLIENTE sai pela rota de simulação, que roda antes
-    // desta no mesmo fluxo e já carrega o valor e o plano. Duplicar aqui faria
-    // a pessoa receber duas mensagens em sequência dizendo quase a mesma coisa.
-    //
-    // O que muda para o corretor é o peso: "quer a unidade" não é o mesmo que
-    // "pediu simulação", e por isso este aviso vale mesmo dentro da janela.
-    enviarMensagem(
-      CORRETOR_WHATSAPP,
-      `*Quer esta unidade — pelo site*\n\n${nome} · +${whatsapp}\n${empNome} · unidade ${rotulo}\n` +
-      `Sinalizada por ${RESERVA_DURACAO_HORAS}h no sistema. Confirme a disponibilidade com a construtora.\n\n` +
-      `https://wa.me/${whatsapp}`,
-    ).catch((e) => logError(SOURCE, 'falha ao avisar o corretor', e))
-
+    // Nada é enviado automaticamente: o follow-up com o cliente é manual, por
+    // opção do corretor. O painel entrega a mensagem pronta num link wa.me
+    // para ele revisar e disparar com um clique.
     notificarLeadNovo(client, {
       id: lead.id,
       nome,

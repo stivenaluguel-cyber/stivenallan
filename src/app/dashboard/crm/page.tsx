@@ -404,6 +404,42 @@ function Kanban({ leads, dragId, onDragStart, onDrop, onSelect, onMover }: { lea
   )
 }
 
+
+/**
+ * Abre a conversa do WhatsApp com a simulação do espelho já digitada.
+ *
+ * Só aparece quando o lead TEM simulação registrada — a maioria não tem, e um
+ * botão morto em todo card seria ruído. O disparo continua manual: quem
+ * confere e aperta enviar é o corretor.
+ */
+function BotaoSimulacaoPronta({ leadId }: { leadId: string }) {
+  const [estado, setEstado] = useState<'carregando' | 'tem' | 'nao'>('carregando')
+  const [url, setUrl] = useState('')
+  const [unidade, setUnidade] = useState('')
+
+  useEffect(() => {
+    let vivo = true
+    fetch('/api/admin/leads/' + leadId + '/whatsapp-simulacao')
+      .then(async (r) => (r.ok ? r.json() : null))
+      .then((j) => {
+        if (!vivo) return
+        if (j?.url) { setUrl(j.url); setUnidade(j.unidade ?? ''); setEstado('tem') }
+        else setEstado('nao')
+      })
+      .catch(() => { if (vivo) setEstado('nao') })
+    return () => { vivo = false }
+  }, [leadId])
+
+  if (estado !== 'tem') return null
+
+  return (
+    <a href={url} target="_blank" rel="noopener noreferrer"
+      style={{ display: 'block', marginTop: 18, background: D.bronze, color: '#fff', borderRadius: 10, padding: 12, fontSize: 14, fontWeight: 700, textAlign: 'center', textDecoration: 'none' }}>
+      Enviar a simulação {unidade ? 'da unidade ' + unidade : ''} — texto pronto
+    </a>
+  )
+}
+
 function LeadModal({ lead, onClose, onUpdated, onDeleted }: { lead: Lead; onClose: () => void; onUpdated: (l: Lead) => void; onDeleted: (id: string) => void }) {
   const [editing, setEditing] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
@@ -623,9 +659,16 @@ function LeadModal({ lead, onClose, onUpdated, onDeleted }: { lead: Lead; onClos
           <ConversaPanel leadId={lead.id} />
 
           {temWhatsappReal(lead.whatsapp) ? (
-            <a href={'https://wa.me/55' + (lead.whatsapp || '').replace(/\D/g, '')} target="_blank" rel="noopener noreferrer" style={{ display: 'block', marginTop: 18, background: '#25D366', color: '#fff', borderRadius: 10, padding: 12, fontSize: 14, fontWeight: 700, textAlign: 'center', textDecoration: 'none' }}>
-              Abrir no WhatsApp (app)
-            </a>
+            <>
+              {/* Lead que simulou no espelho: abre a conversa com a simulação
+                  já digitada. O envio segue sendo manual — o que sai daqui é
+                  conversa comercial dele, não notificação de sistema —, mas
+                  sem redigitar entrada, parcela e reforço a cada lead. */}
+              <BotaoSimulacaoPronta leadId={lead.id} />
+              <a href={'https://wa.me/55' + (lead.whatsapp || '').replace(/\D/g, '')} target="_blank" rel="noopener noreferrer" style={{ display: 'block', marginTop: 10, background: '#25D366', color: '#fff', borderRadius: 10, padding: 12, fontSize: 14, fontWeight: 700, textAlign: 'center', textDecoration: 'none' }}>
+                Abrir no WhatsApp (app)
+              </a>
+            </>
           ) : (
             <div style={{ display: 'block', marginTop: 18, background: '#F3F2EE', color: '#8a8a85', borderRadius: 10, padding: 12, fontSize: 13, textAlign: 'center' }}>
               📷 Lead veio do Instagram — edite acima quando conseguir o telefone

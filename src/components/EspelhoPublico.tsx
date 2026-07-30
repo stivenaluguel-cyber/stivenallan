@@ -143,8 +143,6 @@ type Revelado = {
   valor: number | null
   plano: PlanoPagamento | null
   simulacao: Simulacao | null
-  /** A tela só afirma que mandou quando o servidor confirma que saiu. */
-  whatsappEnviado: boolean
 }
 
 function ModalUnidade({ unidade, empreendimento, onFechar, onConcluido }: {
@@ -188,7 +186,7 @@ function ModalUnidade({ unidade, empreendimento, onFechar, onConcluido }: {
       })
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || 'Não foi possível concluir')
-      setRevelado({ valor: json.valor ?? null, plano: json.plano ?? null, simulacao: json.simulacao ?? null, whatsappEnviado: !!json.whatsappEnviado })
+      setRevelado({ valor: json.valor ?? null, plano: json.plano ?? null, simulacao: json.simulacao ?? null })
 
       if (intencao === 'quero' && unidade.status === 'disponivel') {
         const r2 = await fetch('/api/espelho/reservar', {
@@ -350,7 +348,7 @@ function ModalUnidade({ unidade, empreendimento, onFechar, onConcluido }: {
                     {!sim.padraoDaTabela && (
                       <button type="button" onClick={enviarAjuste} disabled={reenviando || reenviado}
                         style={{ marginTop: 10, width: '100%', minHeight: 42, background: reenviado ? P.verdeBg : '#fff', color: reenviado ? P.verde : P.tinta, border: '1.5px solid ' + (reenviado ? 'transparent' : P.linha), borderRadius: 9, fontSize: 13.5, fontWeight: 600, cursor: reenviado ? 'default' : 'pointer' }}>
-                        {reenviado ? '✓ Enviei no seu WhatsApp' : reenviando ? 'Enviando…' : 'Me mande esta simulação'}
+                        {reenviado ? '✓ Anotado — te mando esta' : reenviando ? 'Enviando…' : 'Quero receber esta simulação'}
                       </button>
                     )}
                   </div>
@@ -371,13 +369,11 @@ function ModalUnidade({ unidade, empreendimento, onFechar, onConcluido }: {
                 e a exclusividade não é nossa para prometer. */}
             <div style={{ marginTop: 14, background: reservado ? P.verdeBg : P.creme, border: '1px solid ' + (reservado ? 'rgba(21,128,61,0.35)' : P.linha), borderRadius: 10, padding: '11px 13px' }}>
               <p style={{ fontSize: 13.5, color: P.tinta, margin: 0, lineHeight: 1.5 }}>
-                {revelado.whatsappEnviado
-                  ? (reservado
-                      ? `Já mandei as condições no seu WhatsApp. Anotei seu interesse na ${rotulo} e vou confirmar a disponibilidade com a construtora — te retorno hoje.`
-                      : 'Já mandei estas condições no seu WhatsApp, para você consultar quando quiser.')
-                  : (reservado
-                      ? `Anotei seu interesse na ${rotulo}. Vou confirmar a disponibilidade com a construtora e te chamo no WhatsApp ainda hoje.`
-                      : 'Recebi seu contato — te chamo no WhatsApp com estas condições.')}
+                {/* Quem manda a mensagem é o corretor, na mão. A tela não pode
+                    dizer "já mandei" — ele é quem chama. */}
+                {reservado
+                  ? `Anotei seu interesse na ${rotulo}. Vou confirmar a disponibilidade com a construtora e te chamo no WhatsApp ainda hoje.`
+                  : 'Recebi seu contato — te chamo no WhatsApp com estas condições.'}
               </p>
             </div>
 
