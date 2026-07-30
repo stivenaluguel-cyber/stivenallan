@@ -6,6 +6,7 @@ import {
   pickPublico,
   precoDaUnidade,
   resolverEmpreendimentoPorNome,
+  precoMinimoDisponivel,
   resumoEspelho,
   statusDaUnidade,
   type UnidadeEspelho,
@@ -192,60 +193,83 @@ describe('resolverEmpreendimentoPorNome — contra os nomes REAIS de produção'
   })
 })
 
-describe('pickPublico — o que vaza e o que não vaza', () => {
+
+describe('pickPublico — o gate de preço é de servidor', () => {
   const interna = unidade({
     condicoes_negociacao: 'aceita carro na entrada',
     lead_id_reserva: 'lead-secreto',
     cub_fator: 2.27,
     valor_entrada_min: 45000,
+    valor_tabela: 699242.88,
+    plano_pagamento: { entrada: 55939.43, parcela_valor: 2796.97 },
   })
 
-  it('nunca expõe condições de negociação, lead da reserva nem cub_fator', () => {
-    const pub = pickPublico(interna, true, AGORA) as unknown as Record<string, unknown>
+  it('o payload anônimo NÃO carrega preço nem plano', () => {
+    // A tabela da Fontana formatada era a melhor moeda de troca da página, e
+    // saía de graça para qualquer concorrente. Agora ela vem por
+    // /api/espelho/simular, depois que a pessoa se identifica.
+    const pub = pickPublico(interna, AGORA) as unknown as Record<string, unknown>
+    expect(pub.preco).toBeUndefined()
+    expect(pub.plano).toBeUndefined()
+    expect(pub.entrada_min).toBeUndefined()
+    expect(pub.valor_tabela).toBeUndefined()
+  })
+
+  it('segue sem vazar condição de negociação, lead da reserva e cub_fator', () => {
+    const pub = pickPublico(interna, AGORA) as unknown as Record<string, unknown>
     expect(pub.condicoes_negociacao).toBeUndefined()
     expect(pub.lead_id_reserva).toBeUndefined()
     expect(pub.cub_fator).toBeUndefined()
+    expect(pub.plano_pagamento).toBeUndefined()
   })
 
-  it('com exibir_preco desligado, preço e entrada saem null', () => {
-    const pub = pickPublico(interna, false, AGORA)
-    expect(pub.preco).toBeNull()
-    expect(pub.entrada_min).toBeNull()
-    expect(pub.status).toBe('disponivel')
+  it('entrega o que gera escassez: identidade, metragem, andar e status', () => {
+    const pub = pickPublico(unidade({ unidade: '1505', metragem: 75.72, dormitorios: 2 }), AGORA)
+    expect(pub).toMatchObject({ unidade: '1505', metragem: 75.72, dormitorios: 2, status: 'disponivel' })
+    expect(pub.andar).toBe(15)
   })
 
-  it('com exibir_preco ligado, preço e entrada mínima aparecem', () => {
-    const pub = pickPublico(interna, true, AGORA)
-    expect(pub.preco?.valor).toBe(450000)
-    expect(pub.entrada_min).toBe(45000)
+  it('nenhuma chave do recorte público contém valor monetário', () => {
+    const pub = pickPublico(interna, AGORA) as unknown as Record<string, unknown>
+    for (const [k, v] of Object.entries(pub)) {
+      if (typeof v === 'number' && k !== 'metragem' && k !== 'andar') {
+        expect(v, `chave suspeita: ${k}`).toBeLessThan(1000)
+      }
+    }
   })
 })
 
-describe('pickPublico — plano de pagamento', () => {
-  const PLANO = {
-    entrada: 55939.43, parcelas_qtd: 40, parcela_valor: 2796.97,
-    reforcos_qtd: 4, reforco_valor: 10488.64, saldo_financiamento: 489470.02,
-    cub_quantidade: 224, percentual_ate_chaves: 30,
-  }
-
-  it('o plano sai no recorte público — está impresso na tabela do plantão', () => {
-    const pub = pickPublico(unidade({ plano_pagamento: PLANO }), true, AGORA)
-    expect(pub.plano).toMatchObject({ entrada: 55939.43, parcelas_qtd: 40, cub_quantidade: 224 })
+describe('precoMinimoDisponivel — a âncora "a partir de"', () => {
+  it('devolve o menor preço entre as DISPONÍVEIS', () => {
+    const lista = [
+      unidade({ unidade: '101', valor_tabela: 700000 }),
+      unidade({ unidade: '102', valor_tabela: 655540 }),
+      unidade({ unidade: '103', valor_tabela: 824107 }),
+    ]
+    expect(precoMinimoDisponivel(lista, AGORA)).toBe(655540)
   })
 
-  it('com exibir_preco desligado o plano some — parcela sem preço não diz nada', () => {
-    expect(pickPublico(unidade({ plano_pagamento: PLANO }), false, AGORA).plano).toBeNull()
+  it('ignora vendida — anunciar preço de unidade vendida é anunciar o que não se pode vender', () => {
+    const lista = [
+      unidade({ unidade: '101', valor_tabela: 655540, disponivel: false }),
+      unidade({ unidade: '102', valor_tabela: 700000 }),
+    ]
+    expect(precoMinimoDisponivel(lista, AGORA)).toBe(700000)
   })
 
-  it('unidade sem plano cadastrado devolve null, não objeto zerado', () => {
-    expect(pickPublico(unidade({}), true, AGORA).plano).toBeNull()
+  it('ignora reserva vigente, mas considera reserva vencida', () => {
+    const reservada = unidade({ unidade: '101', valor_tabela: 600000, reservado_ate: '2026-07-30T00:00:00Z' })
+    const vencida = unidade({ unidade: '102', valor_tabela: 650000, reservado_ate: '2026-07-01T00:00:00Z' })
+    expect(precoMinimoDisponivel([reservada, vencida], AGORA)).toBe(650000)
   })
 
-  it('condicoes_negociacao continua FORA do público mesmo com plano presente', () => {
-    const pub = pickPublico(
-      unidade({ plano_pagamento: PLANO, condicoes_negociacao: 'aceita carro na entrada' }),
-      true, AGORA,
-    ) as unknown as Record<string, unknown>
-    expect(pub.condicoes_negociacao).toBeUndefined()
+  it('espelho sem nenhuma disponível devolve null em vez de zero', () => {
+    expect(precoMinimoDisponivel([unidade({ disponivel: false })], AGORA)).toBeNull()
+    expect(precoMinimoDisponivel([], AGORA)).toBeNull()
+  })
+
+  it('unidade sem preço cadastrado não entra na conta', () => {
+    const lista = [unidade({ unidade: '101', valor_tabela: null }), unidade({ unidade: '102', valor_tabela: 700000 })]
+    expect(precoMinimoDisponivel(lista, AGORA)).toBe(700000)
   })
 })

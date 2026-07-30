@@ -81,6 +81,9 @@ export async function POST(req: NextRequest) {
       empreendimentoNome: empNome,
       unidadeRotulo: rotulo,
       origem: 'simulacao',
+      // Só conta como declaração quando a pessoa MEXEU no slider — a entrada
+      // padrão da tabela é escolha da construtora, não dela.
+      entradaDeclarada: sim && !sim.padraoDaTabela ? sim.entrada : null,
     })
     if (!r.ok) return NextResponse.json({ error: r.erro }, { status: 500 })
 
@@ -126,7 +129,16 @@ export async function POST(req: NextRequest) {
 
     recalcularScoreLead(client, r.leadId).catch((e) => logError(SOURCE, 'score falhou', e))
 
-    return NextResponse.json({ ok: true, unidade: rotulo, empreendimento: empNome, simulacao: sim }, { status: 201 })
+    // O preço e o plano saem AQUI, não no payload anônimo: é o que a pessoa
+    // ganha por se identificar.
+    return NextResponse.json({
+      ok: true,
+      unidade: rotulo,
+      empreendimento: empNome,
+      valor,
+      plano,
+      simulacao: sim,
+    }, { status: 201 })
   } catch (e) {
     logError(SOURCE, 'erro inesperado', e)
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 })

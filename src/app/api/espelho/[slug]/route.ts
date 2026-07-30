@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import {
   pickPublico,
+  precoMinimoDisponivel,
   resolverEmpreendimentoPorNome,
   resumoEspelho,
   type UnidadeEspelho,
@@ -76,6 +77,10 @@ export async function GET(_req: NextRequest, { params }: Params) {
     empreendimento: { nome: prop.nome, slug: prop.slug },
     exibirPreco,
     resumo: resumoEspelho(lista, agora),
-    unidades: lista.map((u) => pickPublico(u, exibirPreco, agora)),
+    // Âncora de preço, não a tabela: o menor valor entre as DISPONÍVEIS.
+    // Preço por unidade e plano de pagamento só saem por /api/espelho/simular,
+    // depois que a pessoa se identifica.
+    precoMinimo: exibirPreco ? precoMinimoDisponivel(lista, agora) : null,
+    unidades: lista.map((u) => pickPublico(u, agora)),
   })
 }
