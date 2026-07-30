@@ -330,7 +330,14 @@ export function paraUnidadeDoBanco(
     suites: 1,
     valor_tabela: u.valor_tabela,
     valor_entrada_min: u.valor_entrada_min,
-    cub_fator: u.cub_fator,
+    // NUNCA a quantidade de CUBs aqui. A coluna é numeric(6,4) — teto 99,9999
+    // — e as quantidades reais vão de 210 (Pineto) a 372 (Avezzano). Gravar
+    // aqui derruba a importação inteira com "numeric field overflow", que foi
+    // o que aconteceu na primeira tentativa de importar o Avezzano.
+    //
+    // A quantidade vive em `plano_pagamento.cub_quantidade`, logo acima. As 54
+    // unidades do Pineto já estão assim: cub_fator nulo, quantidade no jsonb.
+    cub_fator: null,
     disponivel: true,
     condicoes_negociacao: [
       u.formato === 'parcelado'

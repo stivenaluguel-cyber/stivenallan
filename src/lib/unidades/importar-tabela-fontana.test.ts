@@ -206,9 +206,12 @@ describe('paraUnidadeDoBanco', () => {
       suites: 1,
       valor_tabela: 699242.88,
       valor_entrada_min: 55939.43,
-      cub_fator: 224,
+      // A quantidade de CUBs NÃO cabe aqui: a coluna é numeric(6,4), teto
+      // 99,9999. Ela vive em plano_pagamento.cub_quantidade.
+      cub_fator: null,
       disponivel: true,
     })
+    expect((linha.plano_pagamento as Record<string, unknown>).cub_quantidade).toBe(224)
   })
 
   it('escreve o plano de pagamento legível em condicoes_negociacao', () => {
@@ -380,5 +383,30 @@ describe('paraUnidadeDoBanco e o formato da tabela', () => {
     const l = paraUnidadeDoBanco(r.unidades[0], 'emp', r.cabecalho.financiamento_direto)
     const plano = l.plano_pagamento as Record<string, unknown>
     expect(plano.financiamento_direto).toEqual({ meses: 240, jurosAoMes: 0.0075, indice: 'IGPM' })
+  })
+})
+
+describe('cub_fator não recebe a quantidade de CUBs', () => {
+  // `cub_fator` é numeric(6,4): teto 99,9999. As quantidades reais vão de 210
+  // (Pineto) a 372 (Avezzano). Gravar ali derruba a importação inteira com
+  // "numeric field overflow" — foi o que aconteceu ao importar o Avezzano.
+  it('a coluna vai nula, mesmo com quantidade alta na tabela', () => {
+    const r = parsearTabelaFontana(AVEZZANO)
+    const l = paraUnidadeDoBanco(r.unidades[0], 'emp')
+    expect(l.cub_fator).toBeNull()
+    expect(r.unidades[0].cub_fator).toBe(334)
+  })
+
+  it('a quantidade continua guardada, no plano', () => {
+    const r = parsearTabelaFontana(AVEZZANO)
+    const l = paraUnidadeDoBanco(r.unidades[0], 'emp')
+    expect((l.plano_pagamento as Record<string, unknown>).cub_quantidade).toBe(334)
+  })
+
+  it('vale também para o formato parcelado', () => {
+    const r = parsearTabelaFontana(TABELA)
+    const l = paraUnidadeDoBanco(r.unidades[0], 'emp')
+    expect(l.cub_fator).toBeNull()
+    expect((l.plano_pagamento as Record<string, unknown>).cub_quantidade).toBeGreaterThan(99)
   })
 })
