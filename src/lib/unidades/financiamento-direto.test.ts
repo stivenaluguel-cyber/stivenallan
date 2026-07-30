@@ -169,3 +169,76 @@ describe('lerOpcoesDePagamento', () => {
     expect(lerOpcoesDePagamento(t)[0].tipo).toBe('bancario')
   })
 })
+
+// ─────────────────────────────────────────────────────────────────────
+// Prova de que o reforço também paga juros.
+//
+// O extrato mês a mês é a verificação que não deixa dúvida: se o reforço
+// entrasse "por fora", sem incidência de juros, o saldo não zeraria no último
+// mês — sobraria ou faltaria dinheiro.
+// ─────────────────────────────────────────────────────────────────────
+describe('extrato de amortização', () => {
+  const SALDO = 886227.92
+  const I = 0.0075
+
+  function simularExtrato(n: number, reforcoAnual: number) {
+    const p = parcelaDiretaComReforcos(SALDO, n, I, reforcoAnual)!
+    let saldo = SALDO
+    let jurosAcumulado = 0
+    for (let m = 1; m <= n; m++) {
+      const juros = saldo * I          // juros do mês sobre o saldo devedor
+      jurosAcumulado += juros
+      saldo = saldo + juros - p.valor  // a parcela abate depois dos juros
+      if (m % 12 === 0) saldo -= p.reforcoValor // e o reforço, no aniversário
+    }
+    return { saldoFinal: saldo, jurosAcumulado, p }
+  }
+
+  // A parcela é arredondada em centavos, e 240 pagamentos acumulam essa
+  // sobra: até 1 centavo por parcela. Exigir zero absoluto seria exigir que a
+  // construtora cobrasse fração de centavo.
+  const residuoAceitavel = (n: number) => n * 0.01
+
+  it('240x sem reforço: o saldo zera no último mês', () => {
+    const { saldoFinal } = simularExtrato(240, 0)
+    expect(Math.abs(saldoFinal)).toBeLessThan(residuoAceitavel(240))
+  })
+
+  it('240x com reforço de 20 mil: o saldo também zera', () => {
+    // Se o reforço entrasse "por fora", sem juros, sobraria saldo aqui — muito
+    // acima do resíduo de centavos.
+    const { saldoFinal } = simularExtrato(240, 20000)
+    expect(Math.abs(saldoFinal)).toBeLessThan(residuoAceitavel(240))
+  })
+
+  it('reforço sem juros deixaria saldo — é o que este modelo evita', () => {
+    // Controle: se o plano fosse montado ignorando que o reforço rende juros,
+    // o erro seria de dezenas de milhares, não de centavos.
+    const p = parcelaDiretaComReforcos(SALDO, 240, I, 20000)!
+    const ingenuo = (SALDO - 20 * p.reforcoValor) * I / (1 - Math.pow(1 + I, -240))
+    expect(Math.abs(ingenuo - p.valor)).toBeGreaterThan(500)
+  })
+
+  it('o reforço derruba a mensal, mas o total nominal sobe — não é almoço grátis', () => {
+    // Contraintuitivo e importante: os dois planos têm o MESMO valor presente
+    // (ambos quitam o saldo a 0,75%), mas o do reforço concentra dinheiro uma
+    // vez por ano em vez de espalhar pelos 12 meses. Dinheiro que entra mais
+    // tarde soma mais em valor nominal.
+    //
+    // A tela precisa dizer isso: quem escolhe reforço para aliviar o mês não
+    // pode ser levado a acreditar que está pagando menos no fim.
+    const sem = simularExtrato(240, 0)
+    const com = simularExtrato(240, 20000)
+    expect(com.p.valor).toBeLessThan(sem.p.valor)
+    expect(com.p.totalPago).toBeGreaterThan(sem.p.totalPago)
+    expect(com.jurosAcumulado).toBeGreaterThan(sem.jurosAcumulado)
+  })
+
+  it('vale para outros prazos e valores de reforço', () => {
+    for (const n of [60, 120, 180]) {
+      for (const r of [0, 5000, 30000]) {
+        expect(Math.abs(simularExtrato(n, r).saldoFinal)).toBeLessThan(residuoAceitavel(n))
+      }
+    }
+  })
+})

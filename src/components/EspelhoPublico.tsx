@@ -463,11 +463,20 @@ function ModalUnidade({ unidade, empreendimento, onFechar, onConcluido }: {
                               <span>{p.reforcosQtd} reforços de <strong style={{ color: P.tinta }}>{brl(p.reforcoValor)}</strong></span>
                             )}
                           </div>
+                          {p.reforcoValor > 0 && (
+                            // O reforço alivia o mês, mas concentra dinheiro uma vez por
+                            // ano: o total nominal sobe. Esconder isso seria vender alívio
+                            // como economia.
+                            <p style={{ margin: '7px 0 0', fontSize: 11.5, color: P.suave, lineHeight: 1.45 }}>
+                              O reforço alivia a mensal, mas paga mais tarde no ano — o total sai{' '}
+                              {brl(p.totalPago)}, contra {brl(parcelaDiretaComReforcos(saldo, prazo, pol.jurosAoMes, 0)!.totalPago)} sem reforço.
+                            </p>
+                          )}
                         </div>
                       )}
 
                       <p style={{ margin: '11px 0 0', fontSize: 11.5, color: P.suave, lineHeight: 1.45 }}>
-                        Parcela em valor de hoje.{pol.indice ? ` Corrigida pelo ${pol.indice} ao longo do contrato — o valor de cada mês acompanha o índice.` : ''}
+                        Parcela e reforço em valor de hoje, ambos com juros de {(pol.jurosAoMes * 100).toLocaleString('pt-BR')}% ao mês.{pol.indice ? ` Os dois são corrigidos pelo ${pol.indice} ao longo do contrato.` : ''}
                       </p>
 
                       {outras.length > 0 && (
