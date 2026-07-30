@@ -193,7 +193,8 @@ describe('parsearTabelaFontana — conferência do CUB', () => {
 
 describe('paraUnidadeDoBanco', () => {
   const r = parsearTabelaFontana(TABELA, CUB_JULHO)
-  const linha = paraUnidadeDoBanco(r.unidades.find((u) => u.unidade === '102')!, 'emp-pineto')
+  const POLITICA = { meses: 240, jurosAoMes: 0.0075, indice: 'IGPM' }
+  const linha = paraUnidadeDoBanco(r.unidades.find((u) => u.unidade === '102')!, 'emp-pineto', POLITICA)
 
   it('mapeia para as colunas reais de empreendimentos_unidades', () => {
     expect(linha).toMatchObject({
@@ -215,6 +216,7 @@ describe('paraUnidadeDoBanco', () => {
     expect(linha.condicoes_negociacao).toContain('4 reforços')
     expect(linha.condicoes_negociacao).toContain('30% até as chaves')
     expect(linha.condicoes_negociacao).toContain('240x')
+    expect(linha.condicoes_negociacao).toContain('IGPM')
     expect(linha.condicoes_negociacao).toContain('224 CUB')
   })
 
@@ -340,5 +342,43 @@ CUB06 - Julho - R$ 3.121,62 UNIDADE
     const r = parsearTabelaFontana(truncada)
     expect(r.unidades).toHaveLength(0)
     expect(r.rejeitadas).toHaveLength(1)
+  })
+})
+
+
+describe('paraUnidadeDoBanco e o formato da tabela', () => {
+  it('não promete parcelamento direto que a tabela não menciona', () => {
+    // Sem política lida, o texto some. Antes o "240x" era fixo no código e
+    // aparecia para qualquer empreendimento, tivesse ou não a condição.
+    const r = parsearTabelaFontana(TABELA)
+    const l = paraUnidadeDoBanco(r.unidades[0], 'emp')
+    expect(l.condicoes_negociacao).not.toContain('240x')
+    expect(l.condicoes_negociacao).toContain('financiado')
+  })
+
+  it('tabela de entrada única não grava 40 parcelas inventadas', () => {
+    const r = parsearTabelaFontana(AVEZZANO)
+    const l = paraUnidadeDoBanco(r.unidades[0], 'emp-avezzano', { meses: 240, jurosAoMes: 0.0075, indice: 'IGPM' })
+    const plano = l.plano_pagamento as Record<string, unknown>
+    expect(plano.parcelas_qtd).toBe(0)
+    expect(plano.reforcos_qtd).toBe(0)
+    expect(plano.entrada).toBe(156393.16)
+    expect(l.condicoes_negociacao).toContain('Entrada única')
+    expect(l.condicoes_negociacao).toContain('240x')
+  })
+
+  it('a política lida do rodapé viaja até o plano gravado', () => {
+    // Rodapé real da tabela do Avezzano. Sem ele o parser não tem de onde tirar
+    // a condição — e o teste precisa provar o caminho inteiro, do PDF ao jsonb.
+    const comRodape = AVEZZANO.replace(
+      'Observações:',
+      'Observações: 1) POLITICA COMERCIAL: OPÇÃO 02: O SALDO DEVEDOR PODERÁ SER PARCELADO DIRETO COM A CONSTRUTORA EM ATÉ 240 MESES, SENDO CORRIGIDO PELO IGPM E ACRESCIDO DE JUROS COMPENSATÓRIOS DE 0,75% A.M;',
+    )
+    const r = parsearTabelaFontana(comRodape)
+    expect(r.cabecalho.financiamento_direto).toEqual({ meses: 240, jurosAoMes: 0.0075, indice: 'IGPM' })
+
+    const l = paraUnidadeDoBanco(r.unidades[0], 'emp', r.cabecalho.financiamento_direto)
+    const plano = l.plano_pagamento as Record<string, unknown>
+    expect(plano.financiamento_direto).toEqual({ meses: 240, jurosAoMes: 0.0075, indice: 'IGPM' })
   })
 })

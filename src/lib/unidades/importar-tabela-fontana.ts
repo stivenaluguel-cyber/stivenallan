@@ -32,6 +32,8 @@
  * importador assumia que toda tabela Fontana era como a do Pineto, e recusava
  * as outras dizendo que as contas não fechavam. Fechavam; era outra conta.
  */
+import { lerPoliticaFinanciamento, type PoliticaFinanciamento } from './financiamento-direto'
+
 export type FormatoTabela = 'parcelado' | 'entrada_financiamento'
 
 export type UnidadeImportada = {
@@ -54,6 +56,8 @@ export type UnidadeImportada = {
 export type LinhaRejeitadaTabela = { unidade: string; motivo: string }
 
 export type CabecalhoTabela = {
+  /** Parcelamento direto com a construtora, lido do rodapé. */
+  financiamento_direto: PoliticaFinanciamento | null
   cub_valor: number | null
   cub_label: string | null
   vigencia: string | null
@@ -93,6 +97,7 @@ function parseCabecalho(texto: string): CabecalhoTabela {
   const desc = texto.match(/DESCONTO DE\s*(\d+)%\s*PARA PAGAMENTO [ÀA] VISTA/i)
 
   return {
+    financiamento_direto: lerPoliticaFinanciamento(texto),
     cub_valor: cub ? moeda(cub[2]) : null,
     cub_label: cub ? cub[1] : null,
     vigencia: vig ? vig[1] : null,
@@ -270,9 +275,20 @@ export function parsearTabelaFontana(
  * `condicoes_negociacao` recebe o plano de pagamento em texto legível: é o que
  * o corretor lê na tela ao abrir a unidade, e o que ele repete no WhatsApp.
  */
-export function paraUnidadeDoBanco(u: UnidadeImportada, empreendimentoId: string) {
+export function paraUnidadeDoBanco(
+  u: UnidadeImportada,
+  empreendimentoId: string,
+  politica?: PoliticaFinanciamento | null,
+) {
   const brl = (n: number) => n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-  const ateAsChaves = u.valor_entrada_min + 40 * u.parcela_mensal + 4 * u.reforco_anual
+
+  // Quantidades vêm do FORMATO da linha, não fixas. Gravar 40 parcelas para
+  // uma tabela de entrada única inventaria um plano que a construtora não
+  // ofereceu — e a página pública o repetiria ao cliente.
+  const parcelasQtd = u.formato === 'parcelado' ? 40 : 0
+  const reforcosQtd = u.formato === 'parcelado' ? 4 : 0
+  const ateAsChaves =
+    u.valor_entrada_min + parcelasQtd * u.parcela_mensal + reforcosQtd * u.reforco_anual
 
   return {
     empreendimento_id: empreendimentoId,
@@ -285,10 +301,13 @@ export function paraUnidadeDoBanco(u: UnidadeImportada, empreendimentoId: string
     // condição especial, Aura 40/60) — coluna fixa só caberia no plano de hoje.
     plano_pagamento: {
       entrada: u.valor_entrada_min,
-      parcelas_qtd: 40,
+      parcelas_qtd: parcelasQtd,
       parcela_valor: u.parcela_mensal,
-      reforcos_qtd: 4,
+      reforcos_qtd: reforcosQtd,
       reforco_valor: u.reforco_anual,
+      // O saldo não é só "problema do banco": a construtora parcela direto.
+      // É o produto que o site anuncia — precisa chegar estruturado na tela.
+      financiamento_direto: politica ?? null,
       saldo_financiamento: u.saldo_financiamento,
       // A quantidade de CUBs vive aqui: `cub_fator` é numeric(6,4) e não
       // comporta 210–264.
@@ -302,9 +321,14 @@ export function paraUnidadeDoBanco(u: UnidadeImportada, empreendimentoId: string
     valor_entrada_min: u.valor_entrada_min,
     cub_fator: u.cub_fator,
     disponivel: true,
-    condicoes_negociacao:
-      `Entrada ${brl(u.valor_entrada_min)} + 40x ${brl(u.parcela_mensal)} + 4 reforços anuais de ` +
-      `${brl(u.reforco_anual)} (30% até as chaves). Saldo de ${brl(u.saldo_financiamento)} ` +
-      `financiado ou em até 240x direto com a construtora. Valor equivale a ${u.cub_fator} CUB.`,
+    condicoes_negociacao: [
+      u.formato === 'parcelado'
+        ? `Entrada ${brl(u.valor_entrada_min)} + ${parcelasQtd}x ${brl(u.parcela_mensal)} + ${reforcosQtd} reforços anuais de ${brl(u.reforco_anual)} (${Math.round((ateAsChaves / u.valor_tabela) * 100)}% até as chaves).`
+        : `Entrada única de ${brl(u.valor_entrada_min)} (${Math.round((u.valor_entrada_min / u.valor_tabela) * 100)}%).`,
+      politica
+        ? `Saldo de ${brl(u.saldo_financiamento)} financiado ou parcelado em até ${politica.meses}x direto com a construtora${politica.indice ? `, corrigido pelo ${politica.indice}` : ''} + ${(politica.jurosAoMes * 100).toLocaleString('pt-BR')}% a.m.`
+        : `Saldo de ${brl(u.saldo_financiamento)} financiado.`,
+      `Valor equivale a ${u.cub_fator} CUB.`,
+    ].filter(Boolean).join(' '),
   }
 }

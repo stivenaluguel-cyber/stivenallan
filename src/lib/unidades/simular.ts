@@ -21,6 +21,8 @@ export type PlanoPagamento = {
   reforco_valor: number
   saldo_financiamento: number
   cub_quantidade?: number | null
+  /** Parcelamento direto do saldo, quando a tabela oferece. */
+  financiamento_direto?: { meses: number; jurosAoMes: number; indice: string | null } | null
   percentual_ate_chaves?: number | null
 }
 
@@ -191,6 +193,7 @@ export function planoDoJson(v: unknown): PlanoPagamento | null {
     reforco_valor: n('reforco_valor'),
     saldo_financiamento: n('saldo_financiamento'),
     cub_quantidade: o.cub_quantidade === undefined || o.cub_quantidade === null ? null : n('cub_quantidade'),
+    financiamento_direto: politicaDoJson(o.financiamento_direto),
     percentual_ate_chaves:
       o.percentual_ate_chaves === undefined || o.percentual_ate_chaves === null ? null : n('percentual_ate_chaves'),
   }
@@ -198,4 +201,15 @@ export function planoDoJson(v: unknown): PlanoPagamento | null {
   // interface não mostrar nada do que mostrar zeros.
   if (plano.entrada <= 0 && plano.parcela_valor <= 0) return null
   return plano
+}
+
+/** Lê a política de parcelamento direto gravada no jsonb, se estiver íntegra. */
+function politicaDoJson(v: unknown): PlanoPagamento['financiamento_direto'] {
+  if (!v || typeof v !== 'object') return null
+  const o = v as Record<string, unknown>
+  const meses = Number(o.meses)
+  const jurosAoMes = Number(o.jurosAoMes)
+  if (!Number.isFinite(meses) || meses < 1) return null
+  if (!Number.isFinite(jurosAoMes) || jurosAoMes < 0) return null
+  return { meses: Math.floor(meses), jurosAoMes, indice: typeof o.indice === 'string' ? o.indice : null }
 }

@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { StatusUnidade, UnidadePublica } from '@/lib/unidades/espelho'
 import { faixaDeEntrada, simular, type PlanoPagamento, type Simulacao } from '@/lib/unidades/simular'
+import { parcelaDireta, prazosSugeridos } from '@/lib/unidades/financiamento-direto'
 
 type Resposta = {
   temEspelho: boolean
@@ -403,6 +404,42 @@ function ModalUnidade({ unidade, empreendimento, onFechar, onConcluido }: {
                   <dt style={{ color: P.suave }}>Saldo na entrega</dt>
                   <dd style={{ margin: 0, fontWeight: 700, textAlign: 'right' }}>{brl(sim.saldoFinanciamento)}</dd>
                 </dl>
+
+                {/* O saldo não é só problema do banco: a construtora parcela
+                    direto. É o que o site anuncia — precisa estar na tela da
+                    unidade, com o número que o cliente vai perguntar. */}
+                {(() => {
+                  const pol = revelado?.plano?.financiamento_direto
+                  if (!pol || !(sim.saldoFinanciamento > 0)) return null
+                  const prazos = prazosSugeridos(pol.meses)
+                  if (prazos.length === 0) return null
+                  return (
+                    <div style={{ marginTop: 16, border: '1px solid ' + P.linha, borderRadius: 11, padding: '13px 15px', background: P.creme }}>
+                      <p style={{ margin: 0, fontSize: 13.5, fontWeight: 700, color: P.tinta }}>
+                        Ou parcele o saldo direto com a construtora
+                      </p>
+                      <p style={{ margin: '3px 0 10px', fontSize: 12.5, color: P.suave, lineHeight: 1.5 }}>
+                        Sem banco, sem análise de crédito bancária. Em até {pol.meses}x, juros de{' '}
+                        {(pol.jurosAoMes * 100).toLocaleString('pt-BR')}% ao mês.
+                      </p>
+                      <div style={{ display: 'grid', gap: 6 }}>
+                        {prazos.map((n) => {
+                          const p = parcelaDireta(sim.saldoFinanciamento, n, pol.jurosAoMes)
+                          if (!p) return null
+                          return (
+                            <div key={n} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13.5 }}>
+                              <span style={{ color: P.suave }}>{n}x de</span>
+                              <strong style={{ color: P.tinta }}>{brl(p.valor)}</strong>
+                            </div>
+                          )
+                        })}
+                      </div>
+                      <p style={{ margin: '10px 0 0', fontSize: 11.5, color: P.suave, lineHeight: 1.45 }}>
+                        Parcela em valor de hoje.{pol.indice ? ` Corrigida pelo ${pol.indice} ao longo do contrato — por isso o valor final de cada mês muda.` : ''}
+                      </p>
+                    </div>
+                  )
+                })()}
 
                 {faixa && faixa.max > faixa.min && (
                   <div style={{ marginTop: 16 }}>
