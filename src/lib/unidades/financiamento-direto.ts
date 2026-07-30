@@ -122,9 +122,42 @@ export function reforcoMaximo(saldo: number, meses: number, jurosAoMes: number):
   return Math.floor(saldo / fr)
 }
 
+/**
+ * Teto do reforço pela regra de contrato: até `multiplo` vezes a parcela.
+ *
+ * É a mesma regra que já limita o simulador de entrada — "cada reforço
+ * equivale a até 5 vezes o valor da parcela mensal". Faltava aqui: o slider do
+ * saldo ia até o limite matemático (o que zera a mensal), e um reforço de
+ * R$ 50 mil com parcela de R$ 3.976 dá 12,6× — plano que a construtora não
+ * assina.
+ *
+ * A conta se resolve de uma vez porque a parcela DEPENDE do reforço:
+ *
+ *   R = m × PMT(R) = m × (PV − R×fr) / fp
+ *   R × fp = m×PV − m×R×fr
+ *   R = m×PV / (fp + m×fr)
+ */
+export function reforcoMaximoContratual(
+  saldo: number,
+  meses: number,
+  jurosAoMes: number,
+  multiplo: number,
+): number {
+  if (!(saldo > 0) || !(meses >= 12) || !(multiplo > 0)) return 0
+  const fr = fatorReforcos(meses, jurosAoMes)
+  const fp = fatorPrice(meses, jurosAoMes)
+  if (fr <= 0 || fp <= 0) return 0
+  const teto = (multiplo * saldo) / (fp + multiplo * fr)
+  if (!Number.isFinite(teto) || teto <= 0) return 0
+  // Piso em mil reais para o slider parar num número que se fala em voz alta.
+  return Math.floor(Math.min(teto, reforcoMaximo(saldo, meses, jurosAoMes)) / 1000) * 1000
+}
+
 export type ParcelaComReforco = ParcelaDireta & {
   reforcosQtd: number
   reforcoValor: number
+  /** Reforço em múltiplos da parcela. Teto contratual: 5. */
+  reforcoEmParcelas: number
 }
 
 /**
@@ -166,6 +199,7 @@ export function parcelaDiretaComReforcos(
     juros: cent(totalPago - saldo),
     reforcosQtd: K,
     reforcoValor: cent(reforco),
+    reforcoEmParcelas: valor > 0 ? Math.round((reforco / valor) * 100) / 100 : 0,
   }
 }
 

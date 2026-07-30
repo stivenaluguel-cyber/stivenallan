@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   lerPoliticaFinanciamento, parcelaDireta, parcelaDiretaComReforcos,
-  prazosSugeridos, reforcoMaximo, lerOpcoesDePagamento,
+  prazosSugeridos, reforcoMaximo, reforcoMaximoContratual, lerOpcoesDePagamento,
 } from './financiamento-direto'
 
 // Rodapé real da tabela do Avezzano, julho/2026.
@@ -240,5 +240,57 @@ describe('extrato de amortização', () => {
         expect(Math.abs(simularExtrato(n, r).saldoFinal)).toBeLessThan(residuoAceitavel(n))
       }
     }
+  })
+})
+
+// ─────────────────────────────────────────────────────────────────────
+// Teto contratual do reforço no saldo parcelado.
+//
+// Mesma regra que já limita o simulador de entrada: o reforço vai até 5x a
+// parcela mensal. Sem isso, o slider oferecia R$ 50 mil com parcela de
+// R$ 3.976 — 12,6x, um plano que a construtora não assina.
+// ─────────────────────────────────────────────────────────────────────
+describe('reforcoMaximoContratual', () => {
+  const SALDO = 886227.92
+  const I = 0.0075
+
+  it('o teto respeita exatamente o múltiplo pedido', () => {
+    const teto = reforcoMaximoContratual(SALDO, 240, I, 5)
+    const p = parcelaDiretaComReforcos(SALDO, 240, I, teto)!
+    expect(p.reforcoEmParcelas).toBeLessThanOrEqual(5)
+    expect(p.reforcoEmParcelas).toBeGreaterThan(4.5)
+  })
+
+  it('um passo além do teto já estoura a regra', () => {
+    const teto = reforcoMaximoContratual(SALDO, 240, I, 5)
+    const p = parcelaDiretaComReforcos(SALDO, 240, I, teto + 5000)!
+    expect(p.reforcoEmParcelas).toBeGreaterThan(5)
+  })
+
+  it('é bem menor que o limite matemático', () => {
+    // O limite matemático é o que zera a mensal; o contratual para muito antes.
+    expect(reforcoMaximoContratual(SALDO, 240, I, 5))
+      .toBeLessThan(reforcoMaximo(SALDO, 240, I))
+  })
+
+  it('múltiplo menor aperta mais', () => {
+    const a = reforcoMaximoContratual(SALDO, 240, I, 3.75)
+    const b = reforcoMaximoContratual(SALDO, 240, I, 5)
+    expect(a).toBeLessThan(b)
+    const p = parcelaDiretaComReforcos(SALDO, 240, I, a)!
+    expect(p.reforcoEmParcelas).toBeLessThanOrEqual(3.75)
+  })
+
+  it('vale para qualquer prazo com pelo menos um reforço', () => {
+    for (const n of [60, 120, 180, 240]) {
+      const teto = reforcoMaximoContratual(SALDO, n, I, 5)
+      const p = parcelaDiretaComReforcos(SALDO, n, I, teto)!
+      expect(p.reforcoEmParcelas).toBeLessThanOrEqual(5)
+    }
+  })
+
+  it('prazo sem reforço nenhum devolve zero', () => {
+    expect(reforcoMaximoContratual(SALDO, 6, I, 5)).toBe(0)
+    expect(reforcoMaximoContratual(0, 240, I, 5)).toBe(0)
   })
 })
