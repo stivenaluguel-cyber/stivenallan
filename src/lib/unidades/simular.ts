@@ -1,3 +1,4 @@
+import type { OpcaoPagamento } from './financiamento-direto'
 // Simulação de pagamento de uma unidade.
 //
 // É o degrau que faltava no espelho. O único botão era "Reservar 48h" — pedido
@@ -23,6 +24,8 @@ export type PlanoPagamento = {
   cub_quantidade?: number | null
   /** Parcelamento direto do saldo, quando a tabela oferece. */
   financiamento_direto?: { meses: number; jurosAoMes: number; indice: string | null } | null
+  /** Formas de pagamento da tabela daquele empreendimento. */
+  opcoes_pagamento?: OpcaoPagamento[] | null
   percentual_ate_chaves?: number | null
 }
 
@@ -194,6 +197,7 @@ export function planoDoJson(v: unknown): PlanoPagamento | null {
     saldo_financiamento: n('saldo_financiamento'),
     cub_quantidade: o.cub_quantidade === undefined || o.cub_quantidade === null ? null : n('cub_quantidade'),
     financiamento_direto: politicaDoJson(o.financiamento_direto),
+    opcoes_pagamento: Array.isArray(o.opcoes_pagamento) ? (o.opcoes_pagamento as OpcaoPagamento[]) : null,
     percentual_ate_chaves:
       o.percentual_ate_chaves === undefined || o.percentual_ate_chaves === null ? null : n('percentual_ate_chaves'),
   }

@@ -32,7 +32,10 @@
  * importador assumia que toda tabela Fontana era como a do Pineto, e recusava
  * as outras dizendo que as contas não fechavam. Fechavam; era outra conta.
  */
-import { lerPoliticaFinanciamento, type PoliticaFinanciamento } from './financiamento-direto'
+import {
+  lerOpcoesDePagamento, lerPoliticaFinanciamento,
+  type OpcaoPagamento, type PoliticaFinanciamento,
+} from './financiamento-direto'
 
 export type FormatoTabela = 'parcelado' | 'entrada_financiamento'
 
@@ -58,6 +61,8 @@ export type LinhaRejeitadaTabela = { unidade: string; motivo: string }
 export type CabecalhoTabela = {
   /** Parcelamento direto com a construtora, lido do rodapé. */
   financiamento_direto: PoliticaFinanciamento | null
+  /** Todas as formas de pagamento que a tabela oferece, direto na frente. */
+  opcoes_pagamento: OpcaoPagamento[]
   cub_valor: number | null
   cub_label: string | null
   vigencia: string | null
@@ -98,6 +103,7 @@ function parseCabecalho(texto: string): CabecalhoTabela {
 
   return {
     financiamento_direto: lerPoliticaFinanciamento(texto),
+    opcoes_pagamento: lerOpcoesDePagamento(texto),
     cub_valor: cub ? moeda(cub[2]) : null,
     cub_label: cub ? cub[1] : null,
     vigencia: vig ? vig[1] : null,
@@ -279,6 +285,7 @@ export function paraUnidadeDoBanco(
   u: UnidadeImportada,
   empreendimentoId: string,
   politica?: PoliticaFinanciamento | null,
+  opcoes?: OpcaoPagamento[],
 ) {
   const brl = (n: number) => n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
@@ -308,6 +315,10 @@ export function paraUnidadeDoBanco(
       // O saldo não é só "problema do banco": a construtora parcela direto.
       // É o produto que o site anuncia — precisa chegar estruturado na tela.
       financiamento_direto: politica ?? null,
+      // Cada empreendimento tem a sua política. Guardar a lista inteira deixa
+      // a tela mostrar o que aquela tabela realmente oferece — inclusive o
+      // bancário, que nunca deve sumir.
+      opcoes_pagamento: opcoes ?? [],
       saldo_financiamento: u.saldo_financiamento,
       // A quantidade de CUBs vive aqui: `cub_fator` é numeric(6,4) e não
       // comporta 210–264.

@@ -93,3 +93,145 @@ export function parcelaDireta(
 export function prazosSugeridos(maximo: number): number[] {
   return [60, 120, 180, 240, 300, 360].filter((m) => m <= maximo)
 }
+
+/**
+ * Fator de valor presente de n parcelas mensais: a(n,i) = (1 − (1+i)^−n) / i.
+ */
+function fatorPrice(meses: number, i: number): number {
+  return i === 0 ? meses : (1 - Math.pow(1 + i, -meses)) / i
+}
+
+/**
+ * Fator de valor presente dos reforços anuais dentro do prazo.
+ *
+ * Um reforço a cada 12 meses, K = floor(n/12) deles. Cada um descontado a
+ * (1+i)^(−12k) — soma geométrica de razão v = (1+i)^(−12).
+ */
+function fatorReforcos(meses: number, i: number): number {
+  const K = Math.floor(meses / 12)
+  if (K < 1) return 0
+  if (i === 0) return K
+  const v = Math.pow(1 + i, -12)
+  return (v * (1 - Math.pow(v, K))) / (1 - v)
+}
+
+/** Quanto de reforço anual o saldo comporta antes de zerar a mensal. */
+export function reforcoMaximo(saldo: number, meses: number, jurosAoMes: number): number {
+  const fr = fatorReforcos(meses, jurosAoMes)
+  if (!(saldo > 0) || fr <= 0) return 0
+  return Math.floor(saldo / fr)
+}
+
+export type ParcelaComReforco = ParcelaDireta & {
+  reforcosQtd: number
+  reforcoValor: number
+}
+
+/**
+ * Parcela mensal quando o cliente também paga reforços anuais.
+ *
+ * PV = PMT × a(n,i) + R × Σ  →  PMT = (PV − R × Σ) / a(n,i)
+ *
+ * Serve para o comprador que recebe 13º, bônus ou safra: joga um valor por ano
+ * e derruba a mensal. É a mesma lógica dos reforços da tabela do Pineto, só que
+ * aplicada ao saldo parcelado direto.
+ */
+export function parcelaDiretaComReforcos(
+  saldo: number,
+  meses: number,
+  jurosAoMes: number,
+  reforcoAnual: number,
+): ParcelaComReforco | null {
+  if (!(saldo > 0) || !(meses >= 1) || !Number.isFinite(jurosAoMes) || jurosAoMes < 0) return null
+  if (!Number.isFinite(reforcoAnual) || reforcoAnual < 0) return null
+
+  const n = Math.floor(meses)
+  const K = Math.floor(n / 12)
+  const fr = fatorReforcos(n, jurosAoMes)
+  const fp = fatorPrice(n, jurosAoMes)
+  if (fp <= 0) return null
+
+  // Reforço que sozinho quitaria o saldo deixaria a mensal negativa — o que
+  // apareceria na tela como desconto, não como plano impossível.
+  const reforco = K > 0 ? Math.min(reforcoAnual, saldo / fr) : 0
+  const valor = (saldo - reforco * fr) / fp
+  if (!Number.isFinite(valor) || valor < 0) return null
+
+  const cent = (x: number) => Math.round(x * 100) / 100
+  const totalPago = cent(valor * n + reforco * K)
+  return {
+    meses: n,
+    valor: cent(valor),
+    totalPago,
+    juros: cent(totalPago - saldo),
+    reforcosQtd: K,
+    reforcoValor: cent(reforco),
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// Opções de pagamento, uma lista por empreendimento.
+//
+// Cada tabela escreve a sua política. O Avezzano oferece banco OU 240x direto;
+// o Pineto tem o 30/70 com 40 parcelas e reforços. Fixar um modelo no código
+// obrigaria a mentir em todos os outros — por isso a lista sai do PDF.
+//
+// A ordem de exibição privilegia o financiamento direto (é o diferencial da
+// casa), mas o bancário NUNCA some: quem já tem crédito aprovado precisa ver
+// que é aceito.
+// ─────────────────────────────────────────────────────────────────────
+
+export type TipoOpcao = 'direto' | 'bancario' | 'a_vista' | 'outro'
+
+export type OpcaoPagamento = {
+  tipo: TipoOpcao
+  /** Texto como a construtora escreveu, para o corretor conferir. */
+  descricao: string
+  /** Preenchido quando é parcelamento direto. */
+  meses?: number
+  jurosAoMes?: number
+  indice?: string | null
+  /** Desconto percentual, quando é pagamento à vista. */
+  descontoPct?: number
+}
+
+const PESO: Record<TipoOpcao, number> = { direto: 0, a_vista: 1, bancario: 2, outro: 3 }
+
+export function lerOpcoesDePagamento(texto: string): OpcaoPagamento[] {
+  const t = (texto || '').replace(/\s+/g, ' ')
+  const opcoes: OpcaoPagamento[] = []
+
+  // "OPÇÃO 01: ... OPÇÃO 02: ..." — cada bloco vai até a próxima opção ou até
+  // o próximo item numerado das observações.
+  // O `;` fecha o bloco: `[^;]` já para nele, então ele precisa estar entre os
+  // terminadores aceitos — senão a última opção da lista nunca casa.
+  const blocos = [...t.matchAll(/OP[ÇC][ÃA]O\s*\d+\s*:\s*([^;]+?)\s*(?=OP[ÇC][ÃA]O\s*\d+\s*:|\s\d\)|;|$)/gi)]
+
+  for (const b of blocos) {
+    const desc = b[1].trim().replace(/[;.\s]+$/, '')
+    if (!desc) continue
+    opcoes.push(classificar(desc))
+  }
+
+  // Desconto à vista costuma vir fora da lista de opções.
+  const aVista = t.match(/DESCONTO DE\s*(\d{1,2})\s*%\s*PARA PAGAMENTO [ÀA] VISTA/i)
+  if (aVista && !opcoes.some((o) => o.tipo === 'a_vista')) {
+    opcoes.push({
+      tipo: 'a_vista',
+      descricao: `Pagamento à vista com ${aVista[1]}% de desconto`,
+      descontoPct: Number(aVista[1]),
+    })
+  }
+
+  return opcoes.sort((a, b) => PESO[a.tipo] - PESO[b.tipo])
+}
+
+function classificar(desc: string): OpcaoPagamento {
+  const politica = lerPoliticaFinanciamento(desc)
+  if (politica && /DIRETO|CONSTRUTORA|INCORPORADORA/i.test(desc)) {
+    return { tipo: 'direto', descricao: desc, ...politica }
+  }
+  if (/BANC[ÁA]RI|CAIXA|BANCO/i.test(desc)) return { tipo: 'bancario', descricao: desc }
+  if (/[ÀA]\s*VISTA/i.test(desc)) return { tipo: 'a_vista', descricao: desc }
+  return { tipo: 'outro', descricao: desc }
+}
