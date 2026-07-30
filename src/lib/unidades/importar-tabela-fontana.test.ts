@@ -475,3 +475,31 @@ describe('tabela com 100% até as chaves', () => {
     expect(u.saldo_financiamento).toBe(489470.02)
   })
 })
+
+describe('nenhuma unidade some em silêncio', () => {
+  // A unidade 1702 do Tremezzo tem DOIS boxes: "09 e 16S - 2º SS". A prévia
+  // mostrava 13 de 14 unidades com ZERO rejeitadas — a linha desaparecia sem
+  // deixar rastro. Perder em silêncio é pior que rejeitar.
+  const COM_BOX_COMPOSTO = `Vigência desta tabela: Julho/2026
+CUB06 - Julho - R$ 3.121,62 ENTRADA 1 X REFORÇO ANUAL 6 X PARCELA MENSAL 72 X
+102 3 105SE - 1º Pav 125,35 26,05 217,55 265.962,02 1.329.810,12 52.150,72 1.329.810,12 10.429,77 426 1.329.810,12 426 426 1702 3 09 e 16S - 2º SS 125,35 27,00 218,71 314.034,97 1.570.174,86 61.577,02 1.570.174,86 12.314,97 503 1.570.174,86 503 503 Observações:`
+
+  it('lê a unidade com dois boxes em vez de descartá-la', () => {
+    const r = parsearTabelaFontana(COM_BOX_COMPOSTO)
+    expect(r.unidades.map(u => u.unidade)).toContain('1702')
+    expect(r.unidades).toHaveLength(2)
+  })
+
+  it('linha que o fatiador não pega vira rejeição visível', () => {
+    // Código impossível de prever: a varredura tem que apontar o sumiço.
+    const estranho = COM_BOX_COMPOSTO.replace('09 e 16S - 2º SS', '@@@')
+    const r = parsearTabelaFontana(estranho)
+    expect(r.unidades).toHaveLength(1)
+    expect(r.rejeitadas.map(x => x.unidade)).toContain('1702')
+  })
+
+  it('a soma sempre fecha: lidas + rejeitadas = o que está no PDF', () => {
+    const r = parsearTabelaFontana(COM_BOX_COMPOSTO)
+    expect(r.unidades.length + r.rejeitadas.length).toBe(2)
+  })
+})

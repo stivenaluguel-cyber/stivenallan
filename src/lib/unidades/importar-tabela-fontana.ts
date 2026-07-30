@@ -150,7 +150,7 @@ function parseCabecalho(texto: string): CabecalhoTabela {
 // tabela inteira do Avezzano (código "23D"); exigir UMA letra ignorava a
 // unidade 102 do Tremezzo ("105SE"), porque o \b não fecha entre S e E. Nos
 // dois casos a tabela voltava vazia em vez de incompatível.
-const INICIO_DE_UNIDADE = /\b\d{3,4}\s+\d\s+\d{1,3}[A-Z]{1,2}\b/
+const INICIO_DE_UNIDADE = /\b\d{3,4}\s+\d\s+\d{1,3}(?:\s*e\s*\d{1,3})?\s*[A-Z]{1,2}\b/
 
 /**
  * Multiplicadores do cabeçalho: "1 X" (entrada), "6 X" (reforços), "72 X"
@@ -183,6 +183,29 @@ function fatiarUnidades(texto: string): string[] {
   return partes.filter((p) => comeca.test(p.trim()))
 }
 
+/**
+ * Números de unidade que o fatiador NÃO capturou.
+ *
+ * Existe porque a falha mais perigosa deste importador não é rejeitar uma
+ * linha — é perder uma sem avisar. Já aconteceu três vezes, sempre pelo mesmo
+ * motivo: um código de box fora do padrão esperado ("23D", "105SE",
+ * "09 e 16S"). A prévia mostrava 13 de 14 unidades, com zero rejeitadas, e
+ * parecia correta.
+ *
+ * A varredura procura qualquer "NNN D " seguido de valores monetários — o
+ * formato de uma linha de unidade — e reporta o que ficou de fora, para virar
+ * rejeição visível em vez de sumiço.
+ */
+function unidadesPerdidas(texto: string, capturadas: Set<string>): string[] {
+  const corpo = texto.split(/Observa[çc][õo]es\s*:/i)[0]
+  const perdidas: string[] = []
+  for (const m of corpo.matchAll(/\b(\d{3,4})\s+\d\s+\S[^\n]{0,40}?\d[\d.]*,\d{2}/g)) {
+    const n = m[1]
+    if (!capturadas.has(n) && !perdidas.includes(n)) perdidas.push(n)
+  }
+  return perdidas
+}
+
 /** Andar pela convenção predial: 102 → 1º, 1505 → 15º. */
 function andarDe(unidade: string): number | null {
   const d = unidade.replace(/\D/g, '')
@@ -205,7 +228,7 @@ export function parsearTabelaFontana(
     const dormitorios = Number(chunk.match(/^\d{3,4}\s+(\d)/)?.[1] ?? 0)
     // Só o código, sem o sufixo de pavimento ("89E", não "89E - 3º"): o andar
     // já sai do número da unidade.
-    const boxCodigo = chunk.match(/^\d{3,4}\s+\d\s+(\d{1,3}[A-Z]{1,2})/)?.[1] ?? null
+    const boxCodigo = chunk.match(/^\d{3,4}\s+\d\s+(\d{1,3}(?:\s*e\s*\d{1,3})?\s*[A-Z]{1,2})/)?.[1] ?? null
 
     // Tokeniza a PARTIR do primeiro decimal. Antes dele só há ruído numérico
     // ("91S", "3º Pav") que confundiria a contagem de colunas.
@@ -337,6 +360,17 @@ export function parsearTabelaFontana(
       reforco_anual: reforco,
       saldo_financiamento: financiamento,
       cub_fator: cubFator,
+    })
+  }
+
+  // Nada pode sumir em silêncio: o que a varredura encontrou e o fatiador não
+  // capturou vira rejeição explícita, com o motivo.
+  const capturadas = new Set(unidades.map((u) => u.unidade))
+  for (const r of rejeitadas) capturadas.add(r.unidade)
+  for (const n of unidadesPerdidas(texto, capturadas)) {
+    rejeitadas.push({
+      unidade: n,
+      motivo: 'linha não reconhecida — código de box fora do padrão (ex.: "09 e 16S")',
     })
   }
 
