@@ -947,3 +947,29 @@ describe('ordem das colunas parcela/reforço varia por tabela', () => {
 
 const TABELA_BELLANTE = `CUB06 - Julho - R$ 3.121,62 ENTRADA 1 X REFORÇO PARCELA R$ ANUAL 100% MENSAL R$ CUB06 100% 2 X 4 X
 103 2 34S - SS 67,41 12,50 115,81 51.943,76 649.296,96 14.284,53 649.296,96 28.569,07 208 649.296,96 454.507,87 208 649.296,96 208 208 Observações:`
+
+describe('código de box com três letras', () => {
+  // Villammare 802: "15DLL - T", box de 29,25 m² contra 24,00 das outras nove.
+  // O "LL" não está na legenda daquela tabela; o corretor decidiu seguir sem
+  // consultar a construtora. A rede continua sendo a aritmética: 942 CUB ×
+  // 3.121,62 = 2.940.566,04, o total impresso — se o código fosse lixo de
+  // extração, a linha cairia nas contas.
+  const VILLAMMARE = `CUB06 - Julho - R$ 3.121,62 ENTRADA 1 X PARCELA MENSAL R$ 100% REFORÇO ANUAL 1 X 60 X 5 X
+802 4 15DLL - T 172,21 29,25 258,07 588.113,21 2.940.566,04 27.675,63 2.940.566,04 138.383,04 942 2.940.566,04 942 942 Observações:`
+
+  it('lê o box de três letras e a linha fecha nas invariantes', () => {
+    const r = parsearTabelaFontana(VILLAMMARE, CUB_JULHO)
+    expect(r.rejeitadas).toEqual([])
+    const u = r.unidades[0]
+    expect(u.box_codigo).toBe('15DLL')
+    expect(u.cub_fator).toBe(942)
+    expect(u.cub_fator * CUB_JULHO).toBeCloseTo(u.valor_tabela, 1)
+    expect(u.parcela_mensal).toBe(27675.63)
+    expect(u.reforco_anual).toBe(138383.04)
+  })
+
+  it('uma e duas letras continuam funcionando', () => {
+    const r = parsearTabelaFontana(TABELA, CUB_JULHO)
+    expect(r.unidades.map(u => u.box_codigo)).toEqual(['91S', '04S', '02S', '89E', '96E'])
+  })
+})

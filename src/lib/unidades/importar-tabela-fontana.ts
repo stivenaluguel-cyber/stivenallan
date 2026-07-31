@@ -163,6 +163,12 @@ function parseCabecalho(texto: string): CabecalhoTabela {
 // A legenda das tabelas: S (Simples), D (Duplo), SE (Simples Estendido), DE
 // (Duplo Estendido), com sufixo de pavimento — "23D - T", "105SE - 1º Pav".
 //
+// Aceita TRÊS letras por causa do Villammare 802: "15DLL - T", box de 29,25 m²
+// contra 24,00 das outras nove unidades. O "LL" não está na legenda daquela
+// tabela e a construtora não foi consultada — o corretor decidiu seguir assim,
+// e as invariantes aritméticas mais a conferência de linhas continuam sendo a
+// rede. Se o código for lixo de extração, a linha cai nas contas.
+//
 // Três armadilhas já pagas aqui: restringir a [SE] fazia o fatiador ignorar a
 // tabela inteira do Avezzano (código "23D"); exigir UMA letra ignorava a
 // unidade 102 do Tremezzo ("105SE"), porque o \b não fecha entre S e E. Nos
@@ -172,7 +178,7 @@ function parseCabecalho(texto: string): CabecalhoTabela {
 // número e os dormitórios — "904 B 2 44S - 2ºSS". Sem o grupo opcional, o
 // fatiador não reconhecia nenhuma linha e a tabela do Bosco del Montello
 // (Torre B) voltava com zero unidades das três.
-const INICIO_DE_UNIDADE = /\b\d{3,4}\s+(?:[A-Z]\s+)?\d\s+\d{1,3}(?:\s*e\s*\d{1,3})?\s*[A-Z]{1,2}\b/
+const INICIO_DE_UNIDADE = /\b\d{3,4}\s+(?:[A-Z]\s+)?\d\s+\d{1,3}(?:\s*e\s*\d{1,3})?\s*[A-Z]{1,3}\b/
 
 // A quarta: nem toda tabela traz a coluna de dormitórios. O Lavis vai do
 // número da unidade direto para o box — "501 63D - T" — e informa "03
@@ -183,7 +189,7 @@ const INICIO_DE_UNIDADE = /\b\d{3,4}\s+(?:[A-Z]\s+)?\d\s+\d{1,3}(?:\s*e\s*\d{1,3
 // "545 1.701.282,90" (quantidade de CUB seguida do total) passa a parecer
 // início de unidade. O formato se decide UMA VEZ por tabela, e cada um usa o
 // seu par de expressões.
-const INICIO_SEM_DORMITORIOS = /\b\d{3,4}\s+\d{1,3}(?:\s*e\s*\d{1,3})?\s*[A-Z]{1,2}\b/
+const INICIO_SEM_DORMITORIOS = /\b\d{3,4}\s+\d{1,3}(?:\s*e\s*\d{1,3})?\s*[A-Z]{1,3}\b/
 
 export type FormatoLinha = 'com_dormitorios' | 'sem_dormitorios'
 
@@ -209,7 +215,7 @@ const PADROES: Record<FormatoLinha, {
     inicio: INICIO_DE_UNIDADE,
     perdidas: /\b(\d{3,4})\s+(?:[A-Z]\s+)?\d\s+\S[^\n]{0,40}?\d[\d.]*,\d{2}/g,
     dormitorios: /^\d{3,4}\s+(?:[A-Z]\s+)?(\d)\s/,
-    box: /^\d{3,4}\s+(?:[A-Z]\s+)?\d\s+(\d{1,3}(?:\s*e\s*\d{1,3})?\s*[A-Z]{1,2})/,
+    box: /^\d{3,4}\s+(?:[A-Z]\s+)?\d\s+(\d{1,3}(?:\s*e\s*\d{1,3})?\s*[A-Z]{1,3})/,
   },
   sem_dormitorios: {
     inicio: INICIO_SEM_DORMITORIOS,
@@ -229,10 +235,10 @@ const PADROES: Record<FormatoLinha, {
     // que as outras. A redundância que dá para explorar nestas tabelas é
     // outra: cada linha termina com a quantidade de CUB repetida duas vezes
     // depois do total.
-    perdidas: /\b(\d{3,4})\s+\d{1,3}(?:\s*e\s*\d{1,3})?\s*[A-Z]{1,2}\b/g,
+    perdidas: /\b(\d{3,4})\s+\d{1,3}(?:\s*e\s*\d{1,3})?\s*[A-Z]{1,3}\b/g,
     // A coluna não existe: o número vem do rodapé.
     dormitorios: null,
-    box: /^\d{3,4}\s+(\d{1,3}(?:\s*e\s*\d{1,3})?\s*[A-Z]{1,2})/,
+    box: /^\d{3,4}\s+(\d{1,3}(?:\s*e\s*\d{1,3})?\s*[A-Z]{1,3})/,
   },
 }
 
