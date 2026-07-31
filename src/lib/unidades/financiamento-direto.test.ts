@@ -494,3 +494,45 @@ describe('opção à vista não vira parcelamento', () => {
     expect(p.saldo).toBeCloseTo(718097.47, 1)
   })
 })
+
+describe('percentual até as chaves com texto no meio (Lavis)', () => {
+  // Rodapé REAL do Lavis. As 55 unidades entraram em produção em 30/07 sem
+  // exibir esta condição: o `40%` não era capturado, e a tela só mostra o
+  // bloco da opção quando há desconto OU percentual até as chaves.
+  const LAVIS = '7) POLITICA COMERCIAL: OPÇÃO 1: PAGAMENTO DE 40% DO VALOR TOTAL ATÉ AS CHAVES, COM ATO MÍNIMO DE 10% DO VALOR DA VENDA. APÓS A CONCLUSÃO DO EMPREENDIMENTO, O SALDO DEVEDOR DEVERÁ SER QUITADO VIA FINANCIAMENTO BANCÁRIO OU DIRETO COM A CONSTRUTORA EM ATÉ 240 MESES, SENDO CORRIGIDO PELO IGPM E ACRESCIDO DE JUROS COMPENSATÓRIOS DE 0,75% a.m. ( NESSA OPÇÃO NÃO SERÁ ACEITO PERMUTA). SS - Subsolo T - Térreo Pav Gar - Pavimento Garagem S - Simples E - Estendido D - Duplo'
+
+  const opcao = lerOpcoesDePagamento(LAVIS)[0]
+
+  it('captura os 40% mesmo com "DO VALOR TOTAL" no meio', () => {
+    expect(opcao).toMatchObject({
+      tipo: 'direto', ateAsChavesPct: 40, atoMinimoPct: 10,
+      meses: 240, jurosAoMes: 0.0075, indice: 'IGPM', aceitaPermuta: false,
+    })
+  })
+
+  it('a lista de abreviações não entra na descrição, mesmo sem "LEGENDAS:"', () => {
+    expect(opcao.descricao).not.toMatch(/Subsolo|Térreo|Pavimento Garagem/i)
+    expect(opcao.descricao).toMatch(/NÃO SERÁ ACEITO PERMUTA\)$/)
+  })
+
+  it('o plano em dinheiro passa a existir para o Lavis', () => {
+    // Antes, sem ateAsChavesPct, `planoDaOpcao` não tinha o que calcular.
+    const p = planoDaOpcao(1701282.90, opcao)!
+    expect(p.ateAsChaves).toBeCloseTo(680513.16, 2)  // 40%
+    expect(p.ato).toBeCloseTo(170128.29, 2)          // 10%
+    expect(p.saldo).toBeCloseTo(1020769.74, 2)       // 60% → 240x
+  })
+
+  it('não confunde o desconto com o percentual até as chaves', () => {
+    // Tremezzo: "DESCONTO DE 10% SOBRE O VALOR TOTAL, PAGANDO 40% ATÉ AS
+    // CHAVES". O `[^%]` impede atravessar outro percentual — se atravessasse,
+    // o 10 do desconto viraria o valor até as chaves.
+    const t = 'OPÇÃO 2: SERÁ CONCEDIDO DESCONTO DE 10% SOBRE O VALOR TOTAL, PAGANDO 40% ATÉ AS CHAVES, COM ATO MÍNIMO DE 10% DO VALOR DA VENDA;'
+    expect(lerOpcoesDePagamento(t)[0]).toMatchObject({ descontoPct: 10, ateAsChavesPct: 40, atoMinimoPct: 10 })
+  })
+
+  it('opção sem percentual até as chaves continua sem inventar um', () => {
+    const t = 'OPÇÃO 01: FINANCIAMENTO BANCÁRIO; OPÇÃO 02: SERÁ CONCEDIDO DESCONTO DE 15% PARA PAGAMENTO À VISTA;'
+    for (const o of lerOpcoesDePagamento(t)) expect(o.ateAsChavesPct).toBeUndefined()
+  })
+})

@@ -1,12 +1,11 @@
 'use client'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import type { StatusUnidade, UnidadePublica } from '@/lib/unidades/espelho'
 import {
   faixaDeEntrada, REFORCO_MAXIMO_EM_PARCELAS, simular,
   type PlanoPagamento, type Simulacao,
 } from '@/lib/unidades/simular'
 import {
-  distribuirAteAsChaves, mesesAteAEntrega,
   parcelaDiretaComReforcos, planoDaOpcao, prazosSugeridos, reforcoMaximoContratual,
 } from '@/lib/unidades/financiamento-direto'
 
@@ -221,9 +220,6 @@ function ModalUnidade({ unidade, empreendimento, onFechar, onConcluido }: {
   // índice porque nada impede a tabela de trazer duas.
   const [prazoOpcao, setPrazoOpcao] = useState<Record<number, number>>({})
   const [reforcoOpcao, setReforcoOpcao] = useState<Record<number, number>>({})
-  // Uma data só para a vida do modal: recalcular a cada render faria os meses
-  // até a entrega mudarem no meio da simulação.
-  const hoje = useMemo(() => new Date(), [])
   const [reenviando, setReenviando] = useState(false)
   const [reenviado, setReenviado] = useState(false)
 
@@ -531,19 +527,6 @@ function ModalUnidade({ unidade, empreendimento, onFechar, onConcluido }: {
                       ? reforcoMaximoContratual(p.saldo, prazo, o.jurosAoMes!, REFORCO_MAXIMO_EM_PARCELAS)
                       : 0
 
-                    // O pedaço que a tabela NÃO escreve: em quantas vezes se
-                    // paga o "até as chaves" depois do ato. Só dá para
-                    // responder com os meses que faltam para a entrega.
-                    //
-                    // Só faz sentido para a opção que ESCALONA o pagamento. A
-                    // opção à vista não declara `ateAsChavesPct`, e o padrão de
-                    // 100% do `planoDaOpcao` fazia o bloco aparecer nela também
-                    // — oferecendo "pagamento à vista em 8x", que é o oposto do
-                    // que a condição diz.
-                    const mesesEntrega = mesesAteAEntrega(revelado?.plano?.previsao_entrega, hoje)
-                    const ateChaves = o.ateAsChavesPct
-                      ? distribuirAteAsChaves(p.ateAsChaves, p.ato, mesesEntrega)
-                      : null
 
                     return (
                       <div key={i} style={{ marginTop: 12, border: '1px solid ' + P.linha, borderRadius: 11, padding: '13px 15px' }}>
@@ -576,31 +559,6 @@ function ModalUnidade({ unidade, empreendimento, onFechar, onConcluido }: {
                             </div>
                           )}
                         </div>
-
-                        {/* Como se paga o "até as chaves". A tabela diz quanto
-                            e quanto no ato, e cala sobre o resto — então isto
-                            vai rotulado como conta, não como condição. */}
-                        {ateChaves && (
-                          <div style={{ marginTop: 11, paddingTop: 10, borderTop: '1px dashed ' + P.linha }}>
-                            <p style={{ margin: '0 0 7px', fontSize: 12.5, fontWeight: 700, color: P.tinta }}>
-                              Como pagar os {o.ateAsChavesPct}% até as chaves
-                            </p>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, fontSize: 13 }}>
-                              <span style={{ color: P.suave }}>No ato</span>
-                              <strong>{brl(ateChaves.ato)}</strong>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, fontSize: 13, marginTop: 5 }}>
-                              <span style={{ color: P.suave }}>+ {ateChaves.meses}x até a entrega</span>
-                              <strong style={{ color: P.ouro }}>{brl(ateChaves.parcela)}</strong>
-                            </div>
-                            <p style={{ margin: '7px 0 0', fontSize: 11.5, color: P.suave, lineHeight: 1.45 }}>
-                              A tabela fixa o ato mínimo, mas não escreve em quantas vezes o
-                              restante se paga. Aqui ele está dividido pelos {ateChaves.meses} meses
-                              que faltam até a entrega — é sugestão nossa, sem juros, para dar ordem
-                              de grandeza. O parcelamento real se negocia na proposta.
-                            </p>
-                          </div>
-                        )}
 
                         {/* O saldo desta opção também se simula. */}
                         {parcelaSaldo && (

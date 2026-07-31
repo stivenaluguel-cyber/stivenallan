@@ -264,7 +264,10 @@ const PESO: Record<TipoOpcao, number> = { direto: 0, a_vista: 1, bancario: 2, ou
  *
  * Estes marcadores são gráficos do PDF, nunca parte da condição.
  */
-const FIM_DO_RODAPE = /(?:LEGENDAS?\s*:|VISITE\s+NOSSO\s+SITE|N[ºO°]?\s*DORMIT[ÓO]RIOS?\b|N[ÚU]MERO\s+DORMIT[ÓO]RIOS?\b|Data\s+emiss[ãa]o\s*:|Observa[çc][õo]es\s*:)/i
+// A lista de abreviações nem sempre vem anunciada por "LEGENDAS:". O rodapé do
+// Lavis emenda "SS - Subsolo T - Térreo Pav Gar - …" logo depois da condição, e
+// isso entrava na `descricao` que o corretor lê na tela.
+const FIM_DO_RODAPE = /(?:LEGENDAS?\s*:|VISITE\s+NOSSO\s+SITE|N[ºO°]?\s*DORMIT[ÓO]RIOS?\b|N[ÚU]MERO\s+DORMIT[ÓO]RIOS?\b|Data\s+emiss[ãa]o\s*:|Observa[çc][õo]es\s*:|SS\s*-\s*Subsolo|T\s*-\s*T[ée]rreo|S\s*-\s*Simples)/i
 
 export function lerOpcoesDePagamento(texto: string): OpcaoPagamento[] {
   const t = (texto || '').replace(/\s+/g, ' ')
@@ -298,17 +301,19 @@ export function lerOpcoesDePagamento(texto: string): OpcaoPagamento[] {
 }
 
 function classificar(desc: string): OpcaoPagamento {
+  // Os números saem da opção INDEPENDENTE do tipo. Antes só `direto` e
+  // `a_vista` os liam, e uma opção que declarasse desconto e percentual até as
+  // chaves sem mencionar banco nem construtora caía em `outro` e perdia tudo —
+  // some da tela, porque o bloco só renderiza quando há desconto ou percentual.
+  // Nenhuma tabela de julho cai nesse caso, mas a perda seria silenciosa.
+  const numeros = numerosDaOpcao(desc)
   const politica = lerPoliticaFinanciamento(desc)
   if (politica && /DIRETO|CONSTRUTORA|INCORPORADORA/i.test(desc)) {
-    return { tipo: 'direto', descricao: desc, ...politica, ...numerosDaOpcao(desc) }
+    return { tipo: 'direto', descricao: desc, ...politica, ...numeros }
   }
-  if (/BANC[ÁA]RI|CAIXA|BANCO/i.test(desc)) return { tipo: 'bancario', descricao: desc }
-  if (/[ÀA]\s*VISTA/i.test(desc)) {
-    // O percentual precisa sair daqui também: quando o desconto vem DENTRO de
-    // uma OPÇÃO (Tremezzo), a extração avulsa do rodapé nem chega a rodar.
-    return { tipo: 'a_vista', descricao: desc, ...numerosDaOpcao(desc) }
-  }
-  return { tipo: 'outro', descricao: desc }
+  if (/BANC[ÁA]RI|CAIXA|BANCO/i.test(desc)) return { tipo: 'bancario', descricao: desc, ...numeros }
+  if (/[ÀA]\s*VISTA/i.test(desc)) return { tipo: 'a_vista', descricao: desc, ...numeros }
+  return { tipo: 'outro', descricao: desc, ...numeros }
 }
 
 /**
@@ -322,7 +327,17 @@ function numerosDaOpcao(desc: string): Partial<OpcaoPagamento> {
   const desconto = desc.match(/DESCONTO DE\s*(\d{1,2})\s*%/i)
   if (desconto) out.descontoPct = Number(desconto[1])
 
-  const chaves = desc.match(/(\d{1,3})\s*%\s*AT[ÉE]\s*AS?\s*CHAVES/i)
+  // O percentual e "até as chaves" nem sempre são vizinhos. Tremezzo e Parco
+  // Savello escrevem "PAGANDO 40% ATÉ AS CHAVES"; o Lavis escreve "PAGAMENTO
+  // DE 40% DO VALOR TOTAL ATÉ AS CHAVES". Exigir adjacência deixava o Lavis
+  // sem `ateAsChavesPct` — e como a tela só mostra o bloco da opção quando há
+  // desconto OU percentual até as chaves, as 55 unidades ficaram no ar sem
+  // exibir a condição comercial que é o produto.
+  //
+  // O `[^%]` é o que segura o alcance: impede atravessar OUTRO percentual, de
+  // modo que em "DESCONTO DE 10% SOBRE O VALOR TOTAL, PAGANDO 40% ATÉ AS
+  // CHAVES" o 40 vence e o 10 não é confundido com o valor até as chaves.
+  const chaves = desc.match(/(\d{1,3})\s*%[^%]{0,30}?AT[ÉE]\s*AS?\s*CHAVES/i)
   if (chaves) {
     const v = Number(chaves[1])
     if (v > 0 && v <= 100) out.ateAsChavesPct = v
