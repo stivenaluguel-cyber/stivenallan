@@ -201,7 +201,7 @@ export type FormatoLinha = 'com_dormitorios' | 'sem_dormitorios'
  * já funciona muda de caminho.
  */
 function detectarFormatoLinha(texto: string): FormatoLinha {
-  const corpo = texto.split(/Observa[çc][õo]es\s*:/i)[0]
+  const corpo = corpoSemRodapes(texto)
   return INICIO_DE_UNIDADE.test(corpo) ? 'com_dormitorios' : 'sem_dormitorios'
 }
 
@@ -361,8 +361,31 @@ function parcelaVemAntesDoReforco(texto: string): boolean {
   return mensal < anual
 }
 
+/**
+ * Remove os blocos de rodapé, preservando as unidades entre eles.
+ *
+ * Antes era `texto.split(/Observações:/)[0]` — truncar no primeiro. Funciona
+ * quando há um rodapé só, que é o caso de 12 das 13 tabelas.
+ *
+ * O Pavia junta T1, T2 e T3 num arquivo e repete "Observações:" uma vez por
+ * torre. Truncar no primeiro fazia T2 e T3 desaparecerem — e o pior: a
+ * conferência de linhas usava o mesmo corte, então contava 6, achava 6 e
+ * APROVAVA. Unidade sumindo com todas as redes dizendo que está bem.
+ *
+ * Aqui cada rodapé é removido de "Observações:" até a próxima linha de
+ * unidade (ou até o fim). Em tabela de rodapé único não há unidade depois
+ * dele, então a remoção vai até o fim — o mesmo que o corte antigo fazia.
+ */
+function corpoSemRodapes(texto: string): string {
+  const re = new RegExp(
+    `Observa[çc][õo]es\\s*:[\\s\\S]*?(?=${INICIO_DE_UNIDADE.source}|$)`,
+    'gi',
+  )
+  return texto.replace(re, ' ')
+}
+
 function fatiarUnidades(texto: string, forma: FormatoLinha): string[] {
-  const corpo = texto.split(/Observa[çc][õo]es\s*:/i)[0]
+  const corpo = corpoSemRodapes(texto)
   const inicio = PADROES[forma].inicio
   const partes = corpo.split(new RegExp(`(?=${inicio.source})`))
   const comeca = new RegExp(`^${inicio.source.replace(/^\\b/, '')}`)
@@ -383,7 +406,7 @@ function fatiarUnidades(texto: string, forma: FormatoLinha): string[] {
  * rejeição visível em vez de sumiço.
  */
 function unidadesPerdidas(texto: string, capturadas: Set<string>, forma: FormatoLinha): string[] {
-  const corpo = texto.split(/Observa[çc][õo]es\s*:/i)[0]
+  const corpo = corpoSemRodapes(texto)
   const perdidas: string[] = []
   for (const m of corpo.matchAll(PADROES[forma].perdidas)) {
     const n = m[1]
@@ -411,7 +434,7 @@ function unidadesPerdidas(texto: string, capturadas: Set<string>, forma: Formato
  * coluna de dormitórios, onde aquela heurística não tem âncora e fica inerte.
  */
 export function contarLinhasPelaRepeticaoDoCub(texto: string): number | null {
-  const corpo = texto.split(/Observa[çc][õo]es\s*:/i)[0]
+  const corpo = corpoSemRodapes(texto)
   // Os `(?<![\d.,])` e `(?![\d.,])` não são zelo: sem eles, os CENTAVOS de um
   // valor colam no começo do próximo e inventam um par. No Lavis,
   // "1.863.607,14 14.616,37" virava "14 14" — duas vezes —, e a conferência
