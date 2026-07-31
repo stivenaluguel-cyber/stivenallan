@@ -41,3 +41,38 @@ export async function resolveOrCreateInstagramLead(
 
   return { status: 'skipped', motivo: error.message }
 }
+
+// Idempotência do webhook: a Meta reenvia a mesma entrega em timeout/resposta
+// não-2xx. `mid` (message id) é único por mensagem — se já existe uma linha
+// em `interacoes` com esse `mid`, essa chamada é uma redelivery e não deve
+// gerar card nem histórico duplicado. Checar ANTES de resolveOrCreateInstagramLead
+// evita também uma chamada desnecessária à Graph API (buscarNomeInstagram)
+// a cada reenvio.
+export async function mensagemInstagramJaProcessada(supabase: SupabaseClient, mid: string): Promise<boolean> {
+  const { data } = await supabase.from('interacoes').select('id').eq('mid', mid).maybeSingle()
+  return !!data
+}
+
+export type RegistroInteracaoResultado = 'inserida' | 'duplicada'
+
+// Grava a mensagem no histórico de conversa (exibido no Kanban via
+// /api/admin/leads/[id]/timeline). O índice único parcial em `interacoes.mid`
+// (migração 20260731090000) é quem garante a idempotência de fato — o
+// check-then-insert acima só evita trabalho redundante no caminho feliz;
+// numa corrida entre duas invocações concorrentes da mesma redelivery, é o
+// 23505 aqui que realmente impede a duplicata.
+export async function registrarInteracaoInstagram(
+  supabase: SupabaseClient,
+  params: { leadId: string; mid: string | null; texto: string },
+): Promise<RegistroInteracaoResultado> {
+  const { error } = await supabase.from('interacoes').insert({
+    lead_id: params.leadId,
+    canal: 'instagram',
+    direcao: 'entrada',
+    mensagem: params.texto,
+    mid: params.mid,
+  })
+  if (!error) return 'inserida'
+  if (error.code === '23505') return 'duplicada'
+  throw error
+}

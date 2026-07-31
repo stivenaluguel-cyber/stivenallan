@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { verificarAssinaturaMeta, resolverDesafioVerificacaoMeta } from '@/lib/leads/meta-leadgen-webhook'
 import { extrairMensagensInstagram } from '@/lib/leads/instagram-dm-webhook'
-import { resolveOrCreateInstagramLead } from '@/lib/leads/upsert-instagram-lead'
+import { resolveOrCreateInstagramLead, mensagemInstagramJaProcessada, registrarInteracaoInstagram } from '@/lib/leads/upsert-instagram-lead'
 import { notificarLeadNovo } from '@/lib/leads/notificar-lead-novo'
 import { logError, logInfo, logWarn } from '@/lib/log'
 
@@ -71,6 +71,13 @@ export async function POST(req: NextRequest) {
 
   for (const msg of mensagens) {
     try {
+      // Idempotência: a Meta reenvia a mesma entrega em timeout/resposta
+      // não-2xx. Ver mensagemInstagramJaProcessada em upsert-instagram-lead.ts.
+      if (msg.mid && (await mensagemInstagramJaProcessada(supabase, msg.mid))) {
+        logInfo(SOURCE, 'mensagem ja processada, ignorando redelivery', { senderId: msg.senderId, mid: msg.mid })
+        continue
+      }
+
       const nomeSugerido = await buscarNomeInstagram(msg.senderId, pageAccessToken)
       const resultado = await resolveOrCreateInstagramLead(supabase, { igsid: msg.senderId, nomeSugerido })
 
@@ -79,14 +86,9 @@ export async function POST(req: NextRequest) {
         continue
       }
 
-      await supabase.from('interacoes').insert({
-        lead_id: resultado.id,
-        canal: 'instagram',
-        direcao: 'entrada',
-        mensagem: msg.texto,
-      })
+      const registro = await registrarInteracaoInstagram(supabase, { leadId: resultado.id, mid: msg.mid, texto: msg.texto })
 
-      logInfo(SOURCE, 'mensagem do instagram processada', { senderId: msg.senderId, leadStatus: resultado.status })
+      logInfo(SOURCE, 'mensagem do instagram processada', { senderId: msg.senderId, leadStatus: resultado.status, registro })
       if (resultado.status === 'created') {
         notificarLeadNovo(supabase, { id: resultado.id, nome: nomeSugerido, origem: 'Instagram DM' }).catch((err) =>
           logError(SOURCE, 'falha ao notificar lead novo (push)', err),

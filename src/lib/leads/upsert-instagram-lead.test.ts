@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { resolveOrCreateInstagramLead } from './upsert-instagram-lead'
+import { resolveOrCreateInstagramLead, mensagemInstagramJaProcessada, registrarInteracaoInstagram } from './upsert-instagram-lead'
 
 type Call = { table: string; op: string; payload?: unknown }
 
@@ -61,5 +61,63 @@ describe('resolveOrCreateInstagramLead', () => {
     await resolveOrCreateInstagramLead(client, { igsid: '17841400000000000' })
     const payload = calls.find((c) => c.op === 'insert')!.payload as Record<string, unknown>
     expect(payload.nome).toBeNull()
+  })
+})
+
+function makeSupabaseInteracoes({
+  existente = null,
+  insertError = null,
+}: {
+  existente?: { id: string } | null
+  insertError?: { code?: string; message?: string } | null
+} = {}) {
+  const calls: Call[] = []
+  const client = {
+    from(table: string) {
+      return {
+        select() {
+          calls.push({ table, op: 'select' })
+          return { eq: (_f: string, _v: unknown) => ({ maybeSingle: async () => ({ data: existente, error: null }) }) }
+        },
+        insert(payload: unknown) {
+          calls.push({ table, op: 'insert', payload })
+          return Promise.resolve({ error: insertError })
+        },
+      }
+    },
+  }
+  return { client: client as unknown as SupabaseClient, calls }
+}
+
+describe('mensagemInstagramJaProcessada', () => {
+  it('retorna false quando o mid ainda nao foi visto', async () => {
+    const { client } = makeSupabaseInteracoes({ existente: null })
+    expect(await mensagemInstagramJaProcessada(client, 'mid-novo')).toBe(false)
+  })
+
+  it('retorna true quando o mid ja existe (redelivery da Meta)', async () => {
+    const { client } = makeSupabaseInteracoes({ existente: { id: 'interacao-1' } })
+    expect(await mensagemInstagramJaProcessada(client, 'mid-repetido')).toBe(true)
+  })
+})
+
+describe('registrarInteracaoInstagram', () => {
+  it('grava a interacao com o mid quando ainda nao existe', async () => {
+    const { client, calls } = makeSupabaseInteracoes()
+    const resultado = await registrarInteracaoInstagram(client, { leadId: 'lead-1', mid: 'mid-abc', texto: 'oi' })
+    expect(resultado).toBe('inserida')
+    const payload = calls.find((c) => c.op === 'insert')!.payload as Record<string, unknown>
+    expect(payload).toMatchObject({ lead_id: 'lead-1', canal: 'instagram', direcao: 'entrada', mensagem: 'oi', mid: 'mid-abc' })
+  })
+
+  it('trata violacao de indice unico (corrida entre redeliveries concorrentes) como duplicada, sem lancar excecao', async () => {
+    const { client } = makeSupabaseInteracoes({ insertError: { code: '23505', message: 'duplicate key' } })
+    const resultado = await registrarInteracaoInstagram(client, { leadId: 'lead-1', mid: 'mid-abc', texto: 'oi' })
+    expect(resultado).toBe('duplicada')
+  })
+
+  it('propaga outros erros de insercao', async () => {
+    const { client } = makeSupabaseInteracoes({ insertError: { code: '500', message: 'db indisponivel' } })
+    await expect(registrarInteracaoInstagram(client, { leadId: 'lead-1', mid: null, texto: 'oi' })).rejects.toMatchObject({ code: '500' })
   })
 })

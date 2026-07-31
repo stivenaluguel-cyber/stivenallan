@@ -23,7 +23,11 @@ import fitz
 # para não juntar linhas vizinhas da tabela.
 TOLERANCIA_Y = 3.0
 # Quão perto um fragmento precisa estar da linha de dados para pertencer a ela.
-LIMITE_Y = 14.0
+# 6 pontos, e o valor importa: a 14 o cabeçalho das tabelas Mar di era sugado
+# para dentro da primeira unidade e as quatro voltavam com 100% rejeitadas. O
+# fragmento de uma célula fica a menos de 4 pontos da linha; o cabeçalho, a
+# ~11. A janela útil vai de 4 a 10 — em 12 já quebra.
+LIMITE_Y = float(__import__('os').environ.get('LIMITE_Y', '6.0'))
 
 
 def linhas_da_pagina(pagina):
