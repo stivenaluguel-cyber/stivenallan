@@ -82,6 +82,6 @@ const linhas = r.unidades.map((u) => {
 })
 
 const { data, error } = await sb.from('empreendimentos_unidades')
-  .upsert(linhas, { onConflict: 'empreendimento_id,unidade' }).select('id')
+  .upsert(linhas, { onConflict: 'empreendimento_id,bloco,unidade' }).select('id')
 if (error) { console.error(`\nERRO ao gravar: ${error.message}`); process.exit(1) }
 console.log(`\nGRAVADAS: ${data?.length} unidades${vendidas.size ? ` (${vendidas.size} vendidas preservadas)` : ''}`)

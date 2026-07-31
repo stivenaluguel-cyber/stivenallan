@@ -178,7 +178,7 @@ function parseCabecalho(texto: string): CabecalhoTabela {
 // número e os dormitórios — "904 B 2 44S - 2ºSS". Sem o grupo opcional, o
 // fatiador não reconhecia nenhuma linha e a tabela do Bosco del Montello
 // (Torre B) voltava com zero unidades das três.
-const INICIO_DE_UNIDADE = /\b\d{3,4}\s+(?:[A-Z]\s+)?\d\s+\d{1,3}(?:\s*e\s*\d{1,3})?\s*[A-Z]{1,3}\b/
+const INICIO_DE_UNIDADE = /\b\d{3,4}\s+(?:[A-Z]\d?\s+)?\d\s+\d{1,3}(?:\s*e\s*\d{1,3})?\s*[A-Z]{1,3}\b/
 
 // A quarta: nem toda tabela traz a coluna de dormitórios. O Lavis vai do
 // número da unidade direto para o box — "501 63D - T" — e informa "03
@@ -213,9 +213,9 @@ const PADROES: Record<FormatoLinha, {
 }> = {
   com_dormitorios: {
     inicio: INICIO_DE_UNIDADE,
-    perdidas: /\b(\d{3,4})\s+(?:[A-Z]\s+)?\d\s+\S[^\n]{0,40}?\d[\d.]*,\d{2}/g,
-    dormitorios: /^\d{3,4}\s+(?:[A-Z]\s+)?(\d)\s/,
-    box: /^\d{3,4}\s+(?:[A-Z]\s+)?\d\s+(\d{1,3}(?:\s*e\s*\d{1,3})?\s*[A-Z]{1,3})/,
+    perdidas: /\b(\d{3,4})\s+(?:[A-Z]\d?\s+)?\d\s+\S[^\n]{0,40}?\d[\d.]*,\d{2}/g,
+    dormitorios: /^\d{3,4}\s+(?:[A-Z]\d?\s+)?(\d)\s/,
+    box: /^\d{3,4}\s+(?:[A-Z]\d?\s+)?\d\s+(\d{1,3}(?:\s*e\s*\d{1,3})?\s*[A-Z]{1,3})/,
   },
   sem_dormitorios: {
     inicio: INICIO_SEM_DORMITORIOS,
@@ -446,7 +446,10 @@ export function parsearTabelaFontana(
     const unidade = chunk.match(/^(\d{3,4})/)?.[1] ?? '?'
     // Letra da torre, quando o prédio tem mais de uma ("904 B 2 44S" → "B").
     // Vai para a coluna `bloco`, que é como o espelho agrupa a grade.
-    const bloco = chunk.match(/^\d{3,4}\s+([A-Z])\s+\d\s/)?.[1] ?? null
+    // Uma ou duas posições: o Bosco escreve "904 B 2 44S" e o Pavia,
+    // "101 T1 3 166D". Prédio de várias torres repete o número do apartamento,
+    // e é o bloco que os distingue na chave.
+    const bloco = chunk.match(/^\d{3,4}\s+([A-Z]\d?)\s+\d\s/)?.[1] ?? null
     // Sem coluna de dormitórios, o número vem do rodapé — é o que a
     // construtora declara para o prédio inteiro.
     const padrao = PADROES[forma]

@@ -164,12 +164,19 @@ export async function POST(req: NextRequest) {
     return linha
   })
 
-  // Upsert pela chave natural que já existe no schema
-  // (empreendimentos_unidades_empreendimento_id_unidade_key): reimportar a
-  // tabela do mês seguinte ATUALIZA preço em vez de duplicar unidade.
+  // Upsert pela chave natural (empreendimentos_unidades_emp_bloco_unidade_key):
+  // reimportar a tabela do mês seguinte ATUALIZA preço em vez de duplicar.
+  //
+  // O BLOCO entra na chave porque prédio de várias torres repete o número do
+  // apartamento: o Pavia tem um 704 na T1 e outro na T2. Sem a torre, um
+  // sobrescreveria o outro e sobrariam 9 unidades onde há 10, sem erro nenhum.
+  //
+  // O índice é NULLS NOT DISTINCT — sem isso as 398 unidades de bloco nulo
+  // deixariam de ser protegidas, porque o Postgres trata cada NULL como
+  // distinto e a reimportação passaria a INSERIR em vez de atualizar.
   const { data, error } = await client
     .from('empreendimentos_unidades')
-    .upsert(linhas, { onConflict: 'empreendimento_id,unidade' })
+    .upsert(linhas, { onConflict: 'empreendimento_id,bloco,unidade' })
     .select('id')
 
   if (error) {
