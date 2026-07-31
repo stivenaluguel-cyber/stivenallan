@@ -323,6 +323,38 @@ function lerQuantidades(texto: string): { parcelas: number | null; reforcos: num
   return { parcelas, reforcos }
 }
 
+/**
+ * A tabela imprime a PARCELA MENSAL antes do REFORÇO ANUAL?
+ *
+ * A maioria escreve o reforço primeiro ("REFORÇO ... ANUAL ... MENSAL", com os
+ * multiplicadores "6 X 72 X"), e o parser sempre assumiu essa ordem. Mar di
+ * Atrani e Villammare invertem — "MENSAL ... ANUAL", "60 X 5 X" — e as duas
+ * entravam com parcela e reforço TROCADOS em todas as unidades.
+ *
+ * O Villammare denunciou porque com 60 parcelas e 5 reforços a soma não
+ * tolerou a troca e uma linha foi rejeitada. O Mar di Atrani, com 72 e 6,
+ * passou inteiro: 9 unidades, zero rejeitadas, conferência de linhas 9/9. A
+ * troca some dentro da própria equação quando as quantidades se combinam — as
+ * invariantes NÃO pegam. Na tela viraria "72 parcelas de R$ 132 mil" no lugar
+ * de "72 de R$ 26 mil".
+ *
+ * Detecta por `MENSAL` vs `ANUAL`, que são os rótulos que sempre aparecem —
+ * as palavras "PARCELA" e "REFORÇO" nem sempre sobrevivem à extração.
+ *
+ * Não confundir com o Bellante: lá o reforço (R$ 14.284,53) é MENOR que a
+ * parcela (R$ 28.569,07) e está correto — entrega em 4 meses, 4 parcelas e 2
+ * reforços. Por isso a detecção é pela ordem no cabeçalho, e não por comparar
+ * os valores: "reforço ≥ parcela" recusaria o Bellante.
+ */
+function parcelaVemAntesDoReforco(texto: string): boolean {
+  const corte = texto.search(INICIO_DE_UNIDADE)
+  const cabeca = corte > 0 ? texto.slice(0, corte) : texto
+  const mensal = cabeca.search(/\bMENSAL\b/i)
+  const anual = cabeca.search(/\bANUAL\b/i)
+  if (mensal < 0 || anual < 0) return false
+  return mensal < anual
+}
+
 function fatiarUnidades(texto: string, forma: FormatoLinha): string[] {
   const corpo = texto.split(/Observa[çc][õo]es\s*:/i)[0]
   const inicio = PADROES[forma].inicio
@@ -399,6 +431,7 @@ export function parsearTabelaFontana(
   const forma = detectarFormatoLinha(texto)
   const doRodape = lerDormitoriosDoRodape(texto)
   const regrasPorFinal = lerRegrasPorFinal(texto)
+  const colunasTrocadas = parcelaVemAntesDoReforco(texto)
   const unidades: UnidadeImportada[] = []
   const rejeitadas: LinhaRejeitadaTabela[] = []
 
@@ -463,8 +496,9 @@ export function parsearTabelaFontana(
       Math.abs(entrada + decimais[5] - total) <= TOLERANCIA_REAIS
 
     const formato: FormatoTabela = ehSimples ? 'entrada_financiamento' : 'parcelado'
-    const reforco = ehSimples ? 0 : decimais[5]
-    const parcela = ehSimples ? 0 : decimais[7]
+    // Qual das duas colunas é qual depende do cabeçalho desta tabela.
+    const reforco = ehSimples ? 0 : (colunasTrocadas ? decimais[7] : decimais[5])
+    const parcela = ehSimples ? 0 : (colunasTrocadas ? decimais[5] : decimais[7])
 
     // O financiamento é DERIVADO, não lido por posição.
     //

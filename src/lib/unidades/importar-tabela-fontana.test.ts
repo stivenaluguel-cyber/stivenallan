@@ -907,3 +907,43 @@ ${MONTE_LEONE}`
     expect(r.unidades.every(u => u.dormitorios === 4)).toBe(true)
   })
 })
+
+describe('ordem das colunas parcela/reforço varia por tabela', () => {
+  const VALORES = '101 4 03D - T 189,51 24,00 272,15 561.267,28 2.806.336,38 26.412,30 2.806.336,38 132.066,19 899 2.806.336,38 899 899 Observações:'
+
+  // Villammare: MENSAL antes de ANUAL, multiplicadores "60 X 5 X".
+  const INVERTIDA = `CUB06 - Julho - R$ 3.121,62 ENTRADA 1 X PARCELA MENSAL R$ 100% REFORÇO ANUAL 1 X 60 X 5 X ${VALORES}`
+  // A mesma linha, com o cabeçalho na ordem da maioria.
+  const PADRAO = `CUB06 - Julho - R$ 3.121,62 ENTRADA 1 X REFORÇO ANUAL 100% PARCELA MENSAL 1 X 5 X 60 X ${VALORES}`
+
+  it('lê parcela e reforço pela ordem do cabeçalho, não por posição fixa', () => {
+    const inv = parsearTabelaFontana(INVERTIDA, CUB_JULHO).unidades[0]
+    // Confirmado pelo corretor: 60x de R$ 26.412,30 com 5 reforços de R$ 132.066,19.
+    expect(inv.parcela_mensal).toBe(26412.30)
+    expect(inv.reforco_anual).toBe(132066.19)
+  })
+
+  it('a troca fecha a soma e por isso as invariantes NÃO a pegam', () => {
+    // É o ponto do fix. O Mar di Atrani passava com 9 unidades e ZERO
+    // rejeitadas, com parcela e reforço trocados em todas — a soma
+    // `entrada + Np + Mr` fecha igual quando as quantidades se combinam.
+    // Na tela viraria "72 parcelas de R$ 132 mil" em vez de "72 de R$ 26 mil".
+    const r = parsearTabelaFontana(PADRAO, CUB_JULHO)
+    expect(r.unidades[0].parcela_mensal).toBe(132066.19) // lido ao contrário
+    expect(r.rejeitadas).toEqual([])                      // e ainda assim aceito
+  })
+
+  it('reforço MENOR que a parcela é legítimo — não serve de detector', () => {
+    // Bellante entrega em 4 meses: 4 parcelas de R$ 28.569,07 e 2 reforços de
+    // R$ 14.284,53. Uma trava "reforço >= parcela" recusaria uma tabela certa.
+    const r = parsearTabelaFontana(TABELA_BELLANTE, CUB_JULHO)
+    const u = r.unidades[0]
+    expect(u.parcela_mensal).toBe(28569.07)
+    expect(u.reforco_anual).toBe(14284.53)
+    expect(u.reforco_anual).toBeLessThan(u.parcela_mensal)
+    expect(r.rejeitadas).toEqual([])
+  })
+})
+
+const TABELA_BELLANTE = `CUB06 - Julho - R$ 3.121,62 ENTRADA 1 X REFORÇO PARCELA R$ ANUAL 100% MENSAL R$ CUB06 100% 2 X 4 X
+103 2 34S - SS 67,41 12,50 115,81 51.943,76 649.296,96 14.284,53 649.296,96 28.569,07 208 649.296,96 454.507,87 208 649.296,96 208 208 Observações:`
