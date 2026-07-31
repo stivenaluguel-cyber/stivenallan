@@ -88,6 +88,7 @@ export async function POST(req: NextRequest) {
     cabecalho: r.cabecalho,
     conferenciaCub: r.conferenciaCub,
     conferenciaLinhas: r.conferenciaLinhas,
+    conferenciaRodape: r.conferenciaRodape,
     total: r.unidades.length,
     novas: novas.length,
     alteradas: alteradas.length,
@@ -119,6 +120,23 @@ export async function POST(req: NextRequest) {
           'gravaria um espelho incompleto sem avisar.',
         conferenciaLinhas: r.conferenciaLinhas,
         rejeitadas: r.rejeitadas,
+      },
+      { status: 409 },
+    )
+  }
+
+  // O rodapé escreve um número e o parser não guardou: é condição comercial
+  // que some da tela. Foi assim que o Lavis ficou 2h no ar sem os 40% até as
+  // chaves — leu a opção, perdeu o número dentro dela, e nenhuma trava viu.
+  const perdidos = r.conferenciaRodape.filter((x) => !x.confere)
+  if (perdidos.length > 0) {
+    return NextResponse.json(
+      {
+        error:
+          'Rodapé com condição que o parser não leu: ' +
+          perdidos.map((x) => `${x.sinal} = ${x.noTexto}`).join('; ') +
+          '. Importar agora gravaria o empreendimento sem essa condição na tela.',
+        conferenciaRodape: r.conferenciaRodape,
       },
       { status: 409 },
     )

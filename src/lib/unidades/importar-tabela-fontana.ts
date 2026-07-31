@@ -33,8 +33,8 @@
  * as outras dizendo que as contas não fechavam. Fechavam; era outra conta.
  */
 import {
-  lerOpcoesDePagamento, lerPoliticaFinanciamento,
-  type OpcaoPagamento, type PoliticaFinanciamento,
+  conferirRodape, lerOpcoesDePagamento, lerPoliticaFinanciamento,
+  type OpcaoPagamento, type PoliticaFinanciamento, type SinalDoRodape,
 } from './financiamento-direto'
 
 export type FormatoTabela = 'parcelado' | 'entrada_financiamento'
@@ -105,6 +105,11 @@ export type ResultadoTabela = {
    * linha: é bloqueio de importação, não aviso.
    */
   conferenciaLinhas: { esperado: number | null; lidas: number; confere: boolean | null }
+  /**
+   * Cada número que o rodapé escreve, e se ele chegou em alguma opção.
+   * Sinal com `confere: false` = condição comercial que some da tela.
+   */
+  conferenciaRodape: SinalDoRodape[]
 }
 
 // Uma tabela é feita com o CUB de UM mês; a diferença aceitável entre o valor
@@ -590,6 +595,7 @@ export function parsearTabelaFontana(
       sistema,
       confere: impresso === null || sistema === null ? null : Math.abs(impresso - sistema) <= TOLERANCIA_CUB,
     },
+    conferenciaRodape: conferirRodape(texto, cabecalho.opcoes_pagamento, cabecalho.financiamento_direto),
     conferenciaLinhas: {
       esperado: esperadoPelaRepeticao,
       lidas,

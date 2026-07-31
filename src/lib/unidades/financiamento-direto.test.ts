@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   lerPoliticaFinanciamento, parcelaDireta, parcelaDiretaComReforcos,
   prazosSugeridos, reforcoMaximo, reforcoMaximoContratual, lerOpcoesDePagamento,
-  planoDaOpcao, mesesAteAEntrega, distribuirAteAsChaves,
+  planoDaOpcao, mesesAteAEntrega, distribuirAteAsChaves, conferirRodape,
 } from './financiamento-direto'
 
 // Rodapé real da tabela do Avezzano, julho/2026.
@@ -534,5 +534,43 @@ describe('percentual até as chaves com texto no meio (Lavis)', () => {
   it('opção sem percentual até as chaves continua sem inventar um', () => {
     const t = 'OPÇÃO 01: FINANCIAMENTO BANCÁRIO; OPÇÃO 02: SERÁ CONCEDIDO DESCONTO DE 15% PARA PAGAMENTO À VISTA;'
     for (const o of lerOpcoesDePagamento(t)) expect(o.ateAsChavesPct).toBeUndefined()
+  })
+})
+
+describe('alarme de rodapé — o texto não tem invariante, então tem que ter alarme', () => {
+  const LAVIS = 'POLITICA COMERCIAL: OPÇÃO 1: PAGAMENTO DE 40% DO VALOR TOTAL ATÉ AS CHAVES, COM ATO MÍNIMO DE 10% DO VALOR DA VENDA. APÓS A CONCLUSÃO, O SALDO DEVEDOR DEVERÁ SER QUITADO VIA FINANCIAMENTO BANCÁRIO OU DIRETO COM A CONSTRUTORA EM ATÉ 240 MESES, SENDO CORRIGIDO PELO IGPM E ACRESCIDO DE JUROS COMPENSATÓRIOS DE 0,75% a.m.'
+
+  it('acusa o percentual perdido — o defeito real do Lavis', () => {
+    // Simula o parser ANTES do fix: leu a opção, mas sem os 40%.
+    const opcaoQuebrada = [{ tipo: 'direto' as const, descricao: 'x', meses: 240, atoMinimoPct: 10 }]
+    const sinais = conferirRodape(LAVIS, opcaoQuebrada, { meses: 240, jurosAoMes: 0.0075, indice: 'IGPM' })
+    const chaves = sinais.find(s => s.sinal === 'percentual até as chaves')!
+    expect(chaves).toMatchObject({ noTexto: 40, lido: null, confere: false })
+  })
+
+  it('com o parser corrigido, todos os sinais fecham', () => {
+    const sinais = conferirRodape(LAVIS, lerOpcoesDePagamento(LAVIS), lerPoliticaFinanciamento(LAVIS))
+    expect(sinais.every(s => s.confere)).toBe(true)
+    expect(sinais.map(s => `${s.sinal}=${s.noTexto}`).sort()).toEqual(
+      ['ato mínimo=10', 'percentual até as chaves=40', 'prazo do parcelamento direto=240'],
+    )
+  })
+
+  it('NÃO dispara em tabela que não tem condição comercial', () => {
+    // Monte Leone e Fidenza: só correção monetária, sem política comercial.
+    // Falso positivo aqui bloquearia importação correta e ensinaria a ignorar.
+    const semPolitica = '1) Da atualização monetária: b.1) Primeira Opção - Corrigidos pelo IGPM, acrescidos de juros compensatórios de 0,75% a.m. b.2) Segunda Opção - Corrigidos tão somente pelo CUB/Sinduscon/SC 2) Os vencimentos das parcelas e reforços ocorrerão nos dias 10, 15, 20, 25 e 27. 5) Incorporação Imobiliária Averbada.'
+    expect(conferirRodape(semPolitica, [], null)).toEqual([])
+  })
+
+  it('acusa desconto à vista que não chegou em nenhuma opção', () => {
+    const t = 'POLÍTICA COMERCIAL: SERÁ CONCEDIDO DESCONTO DE 5% PARA PAGAMENTO À VISTA'
+    expect(conferirRodape(t, [], null)).toMatchObject([{ sinal: 'desconto', noTexto: 5, confere: false }])
+    expect(conferirRodape(t, lerOpcoesDePagamento(t), null).every(s => s.confere)).toBe(true)
+  })
+
+  it('acusa prazo do direto que não virou política', () => {
+    const t = 'O SALDO PODERÁ SER PARCELADO DIRETO COM A CONSTRUTORA EM ATÉ 180 MESES'
+    expect(conferirRodape(t, [], null)).toMatchObject([{ sinal: 'prazo do parcelamento direto', noTexto: 180, confere: false }])
   })
 })

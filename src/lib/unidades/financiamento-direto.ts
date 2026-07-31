@@ -457,3 +457,70 @@ export function planoDaOpcao(valorTotal: number, opcao: OpcaoPagamento): PlanoDa
     saldo: cent(valorComDesconto - ateAsChaves),
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────
+// Alarme de rodapé.
+//
+// Os números têm três invariantes aritméticas que os provam. O TEXTO não tem
+// nenhuma: condição comercial é frase, não conta, e nada no sistema sabe dizer
+// se "40% até as chaves" foi lido ou perdido.
+//
+// Foi por aí que o Lavis passou. Ele LEU a opção — só não capturou os 40%
+// dentro dela —, então "zero opções extraídas" não teria acusado nada. As 55
+// unidades ficaram no ar sem a condição, e quem achou foi o corretor
+// perguntando, não o sistema.
+//
+// Este alarme confere SINAL A SINAL: para cada número que o rodapé escreve,
+// pergunta se ele chegou em alguma opção. É o espelho da conferência de
+// linhas, aplicado ao texto.
+// ─────────────────────────────────────────────────────────────────────
+
+export type SinalDoRodape = {
+  /** O que o rodapé escreve. */
+  sinal: string
+  /** O valor que está no PDF. */
+  noTexto: number
+  /** O que o parser guardou, ou null se não guardou. */
+  lido: number | null
+  confere: boolean
+}
+
+export function conferirRodape(
+  texto: string,
+  opcoes: OpcaoPagamento[],
+  politica: PoliticaFinanciamento | null,
+): SinalDoRodape[] {
+  const t = (texto || '').replace(/\s+/g, ' ')
+  const out: SinalDoRodape[] = []
+  const achou = (v: number, vals: (number | undefined)[]) => (vals.includes(v) ? v : null)
+
+  const chaves = t.match(/(\d{1,3})\s*%[^%]{0,30}?AT[ÉE]\s*AS?\s*CHAVES/i)
+  if (chaves) {
+    const v = Number(chaves[1])
+    const lido = achou(v, opcoes.map((o) => o.ateAsChavesPct))
+    out.push({ sinal: 'percentual até as chaves', noTexto: v, lido, confere: lido !== null })
+  }
+
+  const aVista = t.match(/DESCONTO DE\s*(\d{1,2})\s*%/i)
+  if (aVista) {
+    const v = Number(aVista[1])
+    const lido = achou(v, opcoes.map((o) => o.descontoPct))
+    out.push({ sinal: 'desconto', noTexto: v, lido, confere: lido !== null })
+  }
+
+  const ato = t.match(/ATO\s*M[ÍI]NIMO\s*DE\s*(\d{1,2})\s*%/i)
+  if (ato) {
+    const v = Number(ato[1])
+    const lido = achou(v, opcoes.map((o) => o.atoMinimoPct))
+    out.push({ sinal: 'ato mínimo', noTexto: v, lido, confere: lido !== null })
+  }
+
+  const meses = t.match(/EM\s+AT[ÉE]\s+(\d{1,3})\s*MESES/i)
+  if (meses) {
+    const v = Number(meses[1])
+    const lido = achou(v, [politica?.meses, ...opcoes.map((o) => o.meses)])
+    out.push({ sinal: 'prazo do parcelamento direto', noTexto: v, lido, confere: lido !== null })
+  }
+
+  return out
+}
