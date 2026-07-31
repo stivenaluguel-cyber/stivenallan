@@ -64,14 +64,30 @@ const moeda = (s: string) => Number(s.replace(/\./g, '').replace(',', '.'))
 
 function parseCabecalho(texto: string): CabecalhoEraldo {
   const cub = texto.match(/CUB\s*\([^)]*\)\s*\D{0,4}\s*R\$\s*([\d.]+,\d{2})/i)
-  const pcts = [...texto.matchAll(/\b(\d{1,2})%/g)].map((m) => Number(m[1]) / 100)
-  // Os quatro primeiros percentuais do cabeçalho são a estrutura de pagamento.
-  const quatro = pcts.slice(0, 4)
+  // Percentual de JURO não é estrutura de pagamento. O Horizon escreve
+  // "CUB (0,75% + IGPM)" e o "75" era lido como se fosse uma fatia do preço.
+  // Descartar o que vem precedido de vírgula elimina isso sem heurística.
+  const pcts = [...texto.matchAll(/(?<![,.])\b(\d{1,2})%/g)].map((m) => Number(m[1]) / 100)
+
+  // A estrutura é a primeira JANELA de percentuais que soma 100%. Fixar "os
+  // quatro primeiros" não serve: o Árbor repete 20% antes da linha da
+  // estrutura, e o Play tem só DOIS (30/70). Procurar a janela que fecha
+  // encontra a estrutura real de cada tabela, seja ela de 2, 3 ou 4 colunas.
+  const janela = (() => {
+    for (let n = 4; n >= 2; n--) {
+      for (let i = 0; i + n <= pcts.length; i++) {
+        const w = pcts.slice(i, i + n)
+        if (Math.abs(w.reduce((a, b) => a + b, 0) - 1) < 0.001) return w
+      }
+    }
+    return null
+  })()
+  const quatro = janela ?? []
   const meses = texto.match(/AT[ÉE]\s*(\d{1,3})\s*X/i)
   const end = texto.match(/(?:LAN[ÇC]AMENTO|OBRA)\s*-\s*(.+?)(?:\n|$)/i)
   return {
     cub_valor: cub ? moeda(cub[1]) : null,
-    percentuais: quatro.length === 4 && Math.abs(quatro.reduce((a, b) => a + b, 0) - 1) < 0.001 ? quatro : null,
+    percentuais: quatro.length >= 2 ? quatro : null,
     pos_chaves_meses: meses ? Number(meses[1]) : null,
     endereco: end ? end[1].trim() : null,
   }
