@@ -45,6 +45,8 @@ export function buildSitemap(ativos: ImovelVitrine[]): MetadataRoute.Sitemap {
     { url: SITE_URL + '/imprensa', changeFrequency: 'monthly', priority: 0.5 },
     { url: SITE_URL + '/contato', changeFrequency: 'monthly', priority: 0.5 },
     { url: SITE_URL + '/politica-de-privacidade', changeFrequency: 'yearly', priority: 0.3 },
+    { url: SITE_URL + '/termos-de-uso', changeFrequency: 'yearly', priority: 0.3 },
+    { url: SITE_URL + '/exclusao-de-dados', changeFrequency: 'yearly', priority: 0.3 },
   ]
 
   // Páginas de cidade (/lancamentos/[cidade]) — união de cidades com empreendimentos
