@@ -1,13 +1,22 @@
 import Link from 'next/link'
 import { imoveis } from '@/data/imoveis'
 import FormContato from '@/app/empreendimento/[construtora]/[slug]/FormContato'
-import MobileInterestBar from '@/components/MobileInterestBar'
+import CtaFixoEmpreendimento from '@/components/CtaFixoEmpreendimento'
 
-type Props = { atualSlug: string; cidade: string; nomeAtual?: string; propertyIdAtual?: string | null }
+type Props = {
+  atualSlug: string
+  cidade: string
+  nomeAtual?: string
+  propertyIdAtual?: string | null
+  // Quem já tem o próprio formulário na página passa `true` — sem isso a
+  // página fica com dois FormContato idênticos a uma dobra de distância.
+  semFormulario?: boolean
+}
 
-export function RelatedProperties({ atualSlug, cidade, nomeAtual, propertyIdAtual }: Props) {
+export function RelatedProperties({ atualSlug, cidade, nomeAtual, propertyIdAtual, semFormulario }: Props) {
   const atual = imoveis.find((i) => i.slug === atualSlug)
-  const nome = atual?.nome ?? nomeAtual
+  const nomeEncontrado = atual?.nome ?? nomeAtual
+  const nome = semFormulario ? undefined : nomeEncontrado
 
   const ativos = imoveis.filter((i) => i.ativo === true && i.slug !== atualSlug)
   const mesmaCidade = ativos.filter((i) => i.cidade === cidade)
@@ -18,9 +27,13 @@ export function RelatedProperties({ atualSlug, cidade, nomeAtual, propertyIdAtua
 
   return (
     <>
-      {nome && <MobileInterestBar />}
+      {/* Este componente é o único ponto por onde os 36 hotsites de
+          empreendimento renderizam formulário — trocar a barra aqui alcança
+          todos eles sem editar 36 arquivos. A antiga MobileInterestBar era
+          mobile-only e cobria o botão flutuante de WhatsApp. */}
+      {nome && <CtaFixoEmpreendimento nome={nome} slug={atualSlug} />}
       {nome && (
-        <section id="interesse" style={{ maxWidth: '560px', margin: '0 auto', padding: '48px 20px 16px', scrollMarginTop: '24px' }}>
+        <section id="contato" style={{ maxWidth: '560px', margin: '0 auto', padding: '48px 20px 16px', scrollMarginTop: '24px' }}>
           <h2 style={{ fontSize: '24px', fontWeight: 700, textAlign: 'center', marginBottom: '8px', color: '#18181b' }}>
             Tenho interesse
           </h2>

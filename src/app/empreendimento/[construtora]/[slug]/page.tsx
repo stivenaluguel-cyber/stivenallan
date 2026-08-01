@@ -12,6 +12,7 @@ import { createClient } from '@/lib/supabase/server';
 import { PropertyCardImage } from '@/components/PropertyCardImage';
 import { LeadCaptureModal } from '@/components/LeadCaptureModal';
 import FormContato from './FormContato';
+import CtaFixoEmpreendimento from '@/components/CtaFixoEmpreendimento';
 import { EspelhoPublico } from '@/components/EspelhoPublico';
 import Image from 'next/image';
 import PropertyPageTemplate, { type PropertyData } from '@/components/PropertyPageTemplate';
@@ -408,10 +409,15 @@ export default async function EmpreendimentoPage({ params }: PageProps) {
               />
             </div>
           )}
-          <p style={{ fontSize: 13, color: '#8a6d3b', textAlign: 'center', margin: '16px 0 8px' }}>
-            ou deixe seu contato
-          </p>
-          <FormContato empreendimento={emp.nome} propertyId={supabaseId} propertySlug={slug} />
+          {/* Âncora do CTA fixo. scrollMarginTop cobre o `top: 24` do aside
+              sticky — sem ela a rolagem para com a primeira linha do bloco
+              colada no topo da viewport. Esta rota não tem header fixo. */}
+          <div id="contato" style={{ scrollMarginTop: 32 }}>
+            <p style={{ fontSize: 13, color: '#8a6d3b', textAlign: 'center', margin: '16px 0 8px' }}>
+              ou deixe seu contato
+            </p>
+            <FormContato empreendimento={emp.nome} propertyId={supabaseId} propertySlug={slug} />
+          </div>
         </aside>
       </section>
 
@@ -424,6 +430,8 @@ export default async function EmpreendimentoPage({ params }: PageProps) {
           ← Voltar para lançamentos em {emp.cidade}
         </Link>
       </div>
+
+      <CtaFixoEmpreendimento nome={emp.nome} slug={slug} />
     </main>
   );
 }
