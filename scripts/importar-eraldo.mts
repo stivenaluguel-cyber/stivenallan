@@ -98,10 +98,20 @@ const parar = (m: string) => { console.error(`\nBLOQUEADO: ${m}`); process.exit(
 if (r.unidades.length === 0) parar('nenhuma unidade válida na tabela')
 if (r.rejeitadas.length > 0) parar(`${r.rejeitadas.length} linha(s) rejeitada(s) — confira antes de importar`)
 if (!c.percentuais) parar('percentuais do cabeçalho não lidos; sem eles as invariantes não valem')
-if (r.conferencia.linhas_de_valor_orfas.length > 0) {
+// `--somente-aptos` é o reconhecimento EXPLÍCITO de que a tabela tem linhas
+// que não são apartamento e ficam de fora — decisão do corretor para as sete
+// salas comerciais do Symphony. Continua imprimindo cada linha descartada:
+// aceitar em silêncio é o que fez o Pavia entrar com 6 de 14.
+const somenteAptos = process.argv.includes('--somente-aptos')
+if (r.conferencia.linhas_de_valor_orfas.length > 0 && !somenteAptos) {
   parar(`${r.conferencia.linhas_de_valor_orfas.length} linha(s) de valores ficaram fora da leitura — há unidade na tabela que o parser não enxerga`)
 }
-if (!r.conferencia.confere) parar(`o texto anuncia ${r.conferencia.aptos_no_texto} apartamentos e o parser fechou ${r.unidades.length + r.rejeitadas.length}`)
+if (somenteAptos && r.conferencia.linhas_de_valor_orfas.length > 0) {
+  console.log(`\n*** ${r.conferencia.linhas_de_valor_orfas.length} linha(s) DELIBERADAMENTE fora (--somente-aptos) — as listadas acima. ***`)
+}
+if (r.conferencia.aptos_no_texto !== r.unidades.length + r.rejeitadas.length) {
+  parar(`o texto anuncia ${r.conferencia.aptos_no_texto} apartamentos e o parser fechou ${r.unidades.length + r.rejeitadas.length}`)
+}
 
 let unidades = r.unidades
 if (lista) {

@@ -351,8 +351,13 @@ export function parsearTabelaEraldo(texto: string): ResultadoEraldo {
 
     const dep = volta.map((v) => v.replace(/\s+/g, ' ').trim()).filter((v) => /Dep\.|Subsolo|\(G\d/i.test(v)).join(' ')
     // Só o Play tem as colunas "Nº DORM." e "Nº VAGAS CARROS", e as escreve
-    // como inteiros soltos logo após o número da unidade ("Apto 301 2 1 -").
-    const contagens = temDormitorios ? antes.match(/\bApto\s+\d{3,4}\s+(\d)\s+(\d)\b/i) : null
+    // como inteiros soltos antes das áreas ("Apto 301 2 1 - 61,18 …").
+    //
+    // Ancorar no número da unidade não serve: nas unidades 1004 e 1101 o
+    // identificador ficou numa linha e a vaga entrou no meio ("Apto 1004 V332
+    // 2 1 - 61,60"), e as duas entravam sem dormitório. Ancorar na primeira
+    // área pega os dois casos.
+    const contagens = temDormitorios ? antes.match(/(\d)\s+(\d)\s*-?\s*(?=[\d.]+,\d{2})/) : null
     const dorm = contagens ? Number(contagens[1]) : NaN
     const vagasNum = contagens ? Number(contagens[2]) : NaN
 

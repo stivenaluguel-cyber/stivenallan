@@ -117,6 +117,19 @@ describe('estrutura de pagamento — cada tabela tem a sua', () => {
     expect(r.unidades[0].colunas.map((c) => c.papel)).toEqual(['entrada', 'saldo'])
   })
 
+  it('acha os dormitórios mesmo com a vaga entre o número e as contagens', () => {
+    // Play 1004: o identificador ficou numa linha e a vaga entrou no meio.
+    const separado = PLAY.replace(
+      'Apto 301 2 1 - 61,18 115,76 191,00 R$ 596.239,95 R$ 178.871,98 R$ 417.367,96',
+      'Apto 1004 V332\n2 1 - 61,60 118,59 264,47 R$ 825.561,60 R$ 247.668,48 R$ 577.893,12',
+    )
+    const r = parsearTabelaEraldo(separado)
+
+    expect(r.rejeitadas).toEqual([])
+    expect(r.unidades[0].unidade).toBe('1004')
+    expect(r.unidades[0].dormitorios).toBe(2)
+  })
+
   it('a data do apartamento decorado não é a entrega do prédio', () => {
     expect(parsearTabelaEraldo(PLAY).cabecalho.previsao_entrega).toBeNull()
   })
