@@ -259,3 +259,48 @@ describe('plano sem parcelamento', () => {
     expect(s.parcelaValor).toBeGreaterThan(0)
   })
 })
+
+describe('pagamento na entrega das chaves', () => {
+  // Horizon 201 (Eraldo, julho/2026): 20% de entrada, 15% nas chaves, 5% em
+  // 4 mensais e 60% financiado em 60x. O pagamento das chaves é valor e data
+  // de contrato — não é reforço e não se dilui.
+  const HORIZON_201: PlanoPagamento = {
+    entrada: 386581.47,
+    parcelas_qtd: 4,
+    parcela_valor: 24161.34,
+    reforcos_qtd: 0,
+    reforco_valor: 0,
+    pagamento_nas_chaves: 289936.1,
+    saldo_financiamento: 1159744.2,
+  }
+
+  it('entra no total até as chaves', () => {
+    const s = simular(1932907.35, HORIZON_201)!
+
+    expect(s.pagamentoNasChaves).toBe(289936.1)
+    expect(s.ateAsChaves).toBe(773162.93)
+    expect(s.ateAsChavesPercentual).toBe(40)
+  })
+
+  it('não é diluído quando o cliente aumenta a entrada', () => {
+    const s = simular(1932907.35, HORIZON_201, 450000)!
+
+    expect(s.pagamentoNasChaves).toBe(289936.1)
+    expect(s.entrada).toBe(450000)
+    // Só as quatro mensais absorvem a diferença: 773.162,93 − 450.000 −
+    // 289.936,10 = 33.226,83, divididos por 4.
+    expect(s.parcelaValor).toBe(8306.71)
+    expect(s.ateAsChaves).toBe(773162.93)
+  })
+
+  it('a entrada não avança sobre o que é devido na entrega', () => {
+    const s = simular(1932907.35, HORIZON_201, 900000)!
+
+    expect(s.entrada).toBe(483226.83)
+    expect(s.parcelaValor).toBe(0)
+  })
+
+  it('plano sem essa coluna continua com zero', () => {
+    expect(simular(861000, PLANO_102)!.pagamentoNasChaves).toBe(0)
+  })
+})

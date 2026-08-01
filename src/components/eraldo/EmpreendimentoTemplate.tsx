@@ -6,6 +6,7 @@ import { LeadCaptureButton } from '@/components/LeadCaptureButton'
 import { PropertySchema } from '@/components/PropertySchema'
 import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
+import { EspelhoPublico } from '@/components/EspelhoPublico'
 import type { Empreendimento, StatusEmpreendimento } from '@/data/eraldo/types'
 
 const WPP_NUMERO = '5548991642332'
@@ -424,6 +425,11 @@ export default function EmpreendimentoTemplate({ data }: { data: Empreendimento 
       </a>
 
       <PropertyFAQ items={data.faq} accent="#9C5F2E" />
+
+      {/* Espelho de vendas — some sozinho quando o empreendimento ainda não
+          tem unidade cadastrada. Oito das nove páginas da Eraldo passam por
+          este template; só a do Aura monta o espelho por conta própria. */}
+      <EspelhoPublico slug={data.slug} />
 
       <RelatedProperties atualSlug={data.slug} cidade={data.cidade} nomeAtual={data.nome} propertyIdAtual={null} />
     </>

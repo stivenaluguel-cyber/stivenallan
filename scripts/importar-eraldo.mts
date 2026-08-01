@@ -125,11 +125,12 @@ const linhas = unidades.map((u) => {
   const mensais = coluna(u, 'mensais')
   const chaves = coluna(u, 'chaves')
   const saldo = coluna(u, 'saldo')
-  // O pagamento nas chaves do Horizon é uma parcela única até a entrega — a
-  // mesma natureza do reforço, e é assim que o simulador o trata. Fica
-  // registrado à parte para a página poder chamá-lo pelo nome certo.
-  const reforcosQtd = (reforcos?.quantidade ?? 0) + (chaves ? 1 : 0)
-  const reforcoValor = reforcos?.valor ?? chaves?.valor ?? 0
+  // O pagamento nas chaves do Horizon NÃO é reforço: é valor e data de
+  // contrato. Dobrá-lo em reforço faria o simulador diluí-lo quando o cliente
+  // mexesse na entrada — 15% do preço virando parcela que a Eraldo não
+  // ofereceu. Vai no campo próprio, que o simulador mantém fixo.
+  const reforcosQtd = reforcos?.quantidade ?? 0
+  const reforcoValor = reforcos?.valor ?? 0
   const pctAteChaves = Math.round((1 - (saldo?.percentual ?? 0)) * 100)
   const mesesDoSaldo = c.pos_chaves_meses ?? saldo?.quantidade ?? 0
 

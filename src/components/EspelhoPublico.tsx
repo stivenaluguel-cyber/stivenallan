@@ -408,6 +408,11 @@ function ModalUnidade({ unidade, empreendimento, onFechar, onConcluido }: {
                     <dd style={{ margin: 0, fontWeight: 700, textAlign: 'right' }}>{brl(sim.reforcoValor)}</dd>
                   </>)}
 
+                  {sim.pagamentoNasChaves > 0 && (<>
+                    <dt style={{ color: P.suave }}>Na entrega das chaves</dt>
+                    <dd style={{ margin: 0, fontWeight: 700, textAlign: 'right' }}>{brl(sim.pagamentoNasChaves)}</dd>
+                  </>)}
+
                   <dt style={{ color: P.suave, borderTop: '1px solid ' + P.linha, paddingTop: 9 }}>Até as chaves</dt>
                   <dd style={{ margin: 0, fontWeight: 700, textAlign: 'right', borderTop: '1px solid ' + P.linha, paddingTop: 9 }}>
                     {brl(sim.ateAsChaves)} <span style={{ color: P.suave, fontWeight: 400 }}>({sim.ateAsChavesPercentual}%)</span>
