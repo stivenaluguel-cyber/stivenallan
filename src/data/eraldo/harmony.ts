@@ -122,7 +122,7 @@ export const harmony: Empreendimento = {
   ],
 
   tipologias: [
-    { nome: 'Apartamento tipo — Final 03', areaPrivativa: 74.43, dormitorios: 2, suites: 2 },
+    { nome: 'Apartamento tipo — Final 03', areaPrivativa: 74.43, dormitorios: 2, suites: 1 },
     { nome: 'Apartamento tipo — Final 04', areaPrivativa: 100.88, dormitorios: 3, suites: 1 },
     { nome: 'Apartamento tipo — Final 01', areaPrivativa: 122.82, dormitorios: 3, suites: 3 },
     { nome: 'Apartamento tipo — Final 02', areaPrivativa: 125.03, dormitorios: 3, suites: 3 },
@@ -133,7 +133,7 @@ export const harmony: Empreendimento = {
   plantas: [
     { categoria: 'tipo', src: `${SITE}/2026/03/TIPO-FINAL-01-scaled.png`, alt: 'Harmony Residence — planta apartamento final 01', label: 'Apartamento final 01', area: 122.82, quartos: 3, suites: 3 },
     { categoria: 'tipo', src: `${SITE}/2026/03/TIPO-FINAL-02-scaled.png`, alt: 'Harmony Residence — planta apartamento final 02', label: 'Apartamento final 02', area: 125.03, quartos: 3, suites: 3 },
-    { categoria: 'tipo', src: `${SITE}/2026/03/TIPO-FINAL-03-scaled.png`, alt: 'Harmony Residence — planta apartamento final 03', label: 'Apartamento final 03', area: 74.43, quartos: 2, suites: 2 },
+    { categoria: 'tipo', src: `${SITE}/2026/03/TIPO-FINAL-03-scaled.png`, alt: 'Harmony Residence — planta apartamento final 03', label: 'Apartamento final 03', area: 74.43, quartos: 2, suites: 1 },
     { categoria: 'tipo', src: `${SITE}/2026/03/TIPO-FINAL-04-scaled.png`, alt: 'Harmony Residence — planta apartamento final 04', label: 'Apartamento final 04', area: 100.88, quartos: 3, suites: 1 },
     { categoria: 'cobertura', src: `${SITE}/2026/03/cobertura1-scaled.png`, alt: 'Harmony Residence — planta cobertura final 01', label: 'Cobertura final 01' },
     { categoria: 'cobertura', src: `${SITE}/2026/03/cobertura2-scaled.png`, alt: 'Harmony Residence — planta cobertura final 02', label: 'Cobertura final 02' },

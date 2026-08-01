@@ -40,25 +40,30 @@ const opt = (nome: string) => {
 const lista = opt('unidades')?.split(',').map((u) => u.trim()) ?? null
 
 /**
- * Regra de quartos/suítes por metragem, no formato "85:3/2" — a partir de
- * 85 m² são 3, abaixo são 2. Aceita também um número só, quando vale para o
- * prédio inteiro.
+ * Quartos e suítes POR METRAGEM, no formato "192.95=3/3,373.16=3/3" — a
+ * metragem privativa, o número de dormitórios e, depois da barra, o de suítes.
+ * A parte das suítes é opcional.
  *
- * Existe porque a tabela do Eraldo não traz a coluna (só o Play traz) e o
- * corretor confirmou a leitura por metragem para o GRAN MICHEL — 93 m² = 3
- * quartos, 70 m² = 2. Estender esse corte aos outros oito prédios seria
- * decisão minha, não dele: o Árbor tem apartamento de 192 m² e duplex de 373.
- * Sem a regra declarada na linha de comando, a coluna fica nula.
+ * É mapa, não regra de corte. A tabela do Eraldo não traz a coluna (só o Play
+ * traz) e a metragem sozinha não decide: no Gran Palazzo, 126,71 m² e
+ * 129,43 m² são os dois "3 quartos sendo 1 suíte", enquanto no Symphony
+ * 155,24 m² é "2 suítes e 2 demi-suítes" e 178,86 m² é "3 suítes". Os pares
+ * saem das plantas do catálogo da construtora, uma a uma.
+ *
+ * Metragem que aparecer na tabela e não estiver no mapa BLOQUEIA a
+ * importação: é planta que ninguém conferiu, não caso para chutar.
  */
-const regra = (s: string | null) => {
+const mapaQuartos = (() => {
+  const s = opt('quartos')
   if (!s) return null
-  if (/^\d+$/.test(s)) return () => Number(s)
-  const m = s.match(/^([\d.]+):(\d+)\/(\d+)$/)
-  if (!m) { console.error(`regra inválida: ${s} (use "85:3/2" ou "3")`); process.exit(1) }
-  return (metragem: number) => (metragem >= Number(m[1]) ? Number(m[2]) : Number(m[3]))
-}
-const regraDorm = regra(opt('dormitorios'))
-const regraSuites = regra(opt('suites'))
+  const m = new Map<string, { dorm: number; suites: number | null }>()
+  for (const par of s.split(',')) {
+    const x = par.trim().match(/^([\d.]+)=(\d+)(?:\/(\d+))?$/)
+    if (!x) { console.error(`par inválido em --quartos: "${par}" (use "192.95=3/3")`); process.exit(1) }
+    m.set(Number(x[1]).toFixed(2), { dorm: Number(x[2]), suites: x[3] ? Number(x[3]) : null })
+  }
+  return m
+})()
 if (!slug || !arquivo) { console.error('uso: npx tsx scripts/importar-eraldo.mts <slug> <arquivo.txt> [--confirmar] [--unidades ...]'); process.exit(1) }
 
 const sb = createClient(env.NEXT_PUBLIC_SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY)
@@ -124,6 +129,11 @@ if (lista) {
   unidades = unidades.filter((u) => lista.includes(u.unidade))
 }
 
+if (mapaQuartos) {
+  const semPlanta = [...new Set(unidades.filter((u) => !mapaQuartos.has(u.metragem.toFixed(2))).map((u) => u.metragem.toFixed(2)))]
+  if (semPlanta.length > 0) parar(`metragens fora do mapa de plantas: ${semPlanta.join(', ')} m²`)
+}
+
 if (!confirmar) { console.log('\n(prévia — nada gravado. Use --confirmar para gravar.)'); process.exit(0) }
 
 const { data: existentes } = await sb.from('empreendimentos_unidades').select('unidade, disponivel').eq('empreendimento_id', emp.id)
@@ -149,10 +159,10 @@ const linhas = unidades.map((u) => {
     unidade: u.unidade,
     bloco: null,
     andar: u.unidade.length >= 3 ? Math.floor(Number(u.unidade) / 100) : null,
-    // A tabela vem primeiro; depois a regra que o corretor declarar. Sem as
-    // duas, nulo — melhor a página não dizer nada do que dizer o número errado.
-    dormitorios: u.dormitorios ?? regraDorm?.(u.metragem) ?? null,
-    suites: regraSuites?.(u.metragem) ?? null,
+    // A tabela vem primeiro; depois o mapa das plantas. Sem os dois, nulo —
+    // melhor a página não dizer nada do que dizer o número errado.
+    dormitorios: u.dormitorios ?? mapaQuartos?.get(u.metragem.toFixed(2))?.dorm ?? null,
+    suites: mapaQuartos?.get(u.metragem.toFixed(2))?.suites ?? null,
     metragem: u.metragem,
     valor_tabela: u.preco,
     valor_entrada_min: entrada.valor,
@@ -182,7 +192,7 @@ const linhas = unidades.map((u) => {
       vagas: u.vagas,
       deposito: u.deposito,
       metragem_global: u.metragem_global,
-      dormitorios_por_metragem: u.dormitorios === null && regraDorm !== null,
+      dormitorios_da_planta: u.dormitorios === null && mapaQuartos !== null,
       pagamento_nas_chaves: chaves ? chaves.valor : null,
       colunas: u.colunas,
     },
