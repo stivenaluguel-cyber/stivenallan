@@ -4,6 +4,11 @@ import PropertyFAQ from '@/components/PropertyFAQ'
 import { EspelhoPublico } from '@/components/EspelhoPublico';
 import RelatedProperties from '@/components/RelatedProperties'
 import { LeadCaptureModal } from '@/components/LeadCaptureModal'
+// FormContato é 'use client' e vive na rota estática; importar daqui (server
+// component) é a mesma fronteira que o RelatedProperties já atravessa — o Next
+// resolve como client boundary normal, sem precisar mover o arquivo.
+import FormContato from '@/app/empreendimento/[construtora]/[slug]/FormContato'
+import CtaFixoEmpreendimento from '@/components/CtaFixoEmpreendimento'
 
 const WPP = 'https://wa.me/5548991642332'
 
@@ -243,17 +248,28 @@ export default function PropertyPageTemplate({ data, relacionados }: { data: Pro
       {relacionados !== false && data.cidade && (
         <section style={{ padding: '0 clamp(20px,5vw,48px) clamp(72px,12vh,120px)' }}>
           <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-            <RelatedProperties atualSlug={data.slug} cidade={data.cidade} nomeAtual={data.nome} propertyIdAtual={data.id} />
+            <RelatedProperties atualSlug={data.slug} cidade={data.cidade} nomeAtual={data.nome} propertyIdAtual={data.id} semFormulario />
           </div>
         </section>
       )}
 
-      {/* CTA FINAL */}
-      <section style={{ background: t.dark, color: t.onDark, padding: 'clamp(80px,14vh,140px) clamp(20px,5vw,48px)', textAlign: 'center' }}>
+      {/* CTA FINAL
+          O WhatsApp continua aqui, mas é canal manual: o clique não vira lead
+          no CRM. O formulário é o único caminho medível — por isso empreendimento
+          cadastrado só pelo painel, que nasce neste template, precisa dele. */}
+      <section id="contato" style={{ background: t.dark, color: t.onDark, padding: 'clamp(80px,14vh,140px) clamp(20px,5vw,48px)', textAlign: 'center', scrollMarginTop: 24 }}>
         <h2 style={{ fontFamily: t.serif, fontStyle: 'italic', fontSize: 'clamp(28px,4.5vw,52px)', color: '#FFFFFF', margin: 0, maxWidth: '16ch', marginLeft: 'auto', marginRight: 'auto' }}>Vamos realizar o seu próximo endereço?</h2>
         <a href={wppNome} target="_blank" rel="noopener" style={{ display: 'inline-block', marginTop: 32, padding: '16px 40px', background: acento, color: t.dark, fontFamily: t.body, fontSize: 13, letterSpacing: '0.16em', textTransform: 'uppercase', textDecoration: 'none' }}>Falar no WhatsApp</a>
+        <div style={{ maxWidth: 460, margin: '48px auto 0', textAlign: 'left' }}>
+          <p style={{ fontFamily: t.body, fontSize: 13, letterSpacing: '0.14em', textTransform: 'uppercase', color: acento, textAlign: 'center', marginBottom: 20 }}>
+            ou receba plantas e condições
+          </p>
+          <FormContato empreendimento={data.nome} propertyId={data.id ?? null} propertySlug={data.slug} />
+        </div>
         <p style={{ fontFamily: t.body, fontSize: 12, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(245,241,234,0.6)', marginTop: 40 }}>Atendimento exclusivo com Stiven Allan · CRECI 60.275</p>
       </section>
+
+      <CtaFixoEmpreendimento nome={data.nome} slug={data.slug} />
     </main>
   )
 }
