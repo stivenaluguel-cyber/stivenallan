@@ -1,0 +1,199 @@
+import { describe, expect, it } from 'vitest'
+import { coluna, parsearTabelaEraldo } from './importar-tabela-eraldo'
+
+// Os números destes trechos são das tabelas de julho/2026, copiados do texto
+// extraído dos PDFs. Inventar valor aqui não testaria nada: o que o parser faz
+// é justamente conferir que eles fecham entre si.
+
+const GRAN_MICHEL = `CUB (JULHO/2026)  R$ 3.121,62 LANÇAMENTO - RUA SENADOR PAULO SARASATE, BAIRRO MICHEL, CRICIÚMA/SC
+ÁREAS PARCELAS
+UNIDADES REFORCOS x PÓS CHAVES
+APTO TOTAL PREÇO ENTRADA MENSAIS x
+GLOBAL OU FIN. ATÉ 180X *
+VAGAS (m²) CUB (R$) 3 22
+APTO DEP. VAGAS GARAGEM (m²)
+GARAGEM PRIVAT. 10% 5% 15% 70%
+Dep. 31 V80 A/B
+Apto 304 2 Vagas - 93,20 160,97 314,38 R$ 981.383,66 R$ 98.138,37 R$ 16.356,39 R$ 6.691,25 R$ 686.968,56
+(Subsolo) (G1)
+Dep. 1 V69
+Apto 405 1 Vaga - 71,47 116,47 212,78 R$ 664.227,72 R$ 66.422,77 R$ 11.070,46 R$ 4.528,83 R$ 464.959,40
+(Subsolo) (G1)
+- Parcela B - 70% em até 180 parcelas mensais corrigidas pelo IGPM + 075% ao mês, direto com a construtora.
+4 - Prazo de entrega Junho de 2028.
+`
+
+// Três colunas e nenhum saldo: tudo se paga até as chaves.
+const ARBOR = `CUB (JULHO/2026)  R$ 3.121,62 LANÇAMENTO
+ÁREAS REFORÇOS PARCELAS
+UNIDADES Entrada
+APTO PREÇO ANUAIS x MENSAIS x
+GLOBAL TOTAL CUB (20%)
+(m²) (R$) 6 65
+APTO DEP. VAGAS GARAGEM (m²)
+PRIVAT. 20% 20% 60%
+Dep. 6 V 05 V 27A/B
+Apto 301 192,95 332,55 855,48 R$ 2.670.476,21 R$ 534.095,24 R$ 89.015,87 R$ 24.650,55
+(Subsolo) (Subsolo) (Subsolo)
+Dep. 5 V 59 V 26A/B
+Apto 302 192,95 332,46 855,25 R$ 2.669.776,77 R$ 533.955,35 R$ 88.992,56 R$ 24.644,09
+(Subsolo) (G1) (Subsolo)
+3 - Conclusão da obra: OUT/28.
+`
+
+const HORIZON = `CUB (JULHO/2026)  R$ 3.121,62 LANÇAMENTO - AV. DOS ESPORTES, BALNEÁRIO RINCÃO/SC
+ÁREAS FIN. BANCÁRIO OU
+PARCELAS
+UNIDADES PARCELAS MENSAIS
+PREÇO ENTRADA CHAVES MENSAIS x
+APTO TOTAL CUB (0,75% + IGPM) x
+GLOBAL (R$)
+(m²)
+(m²) 4 60
+APTO DEP. VAGAS GARAGEM
+PRIVAT. 20% 15% 5% 60%
+Apto 201 Dep. 16 V03 A/B
+- - 125,45 220,36 619,20 R$ 1.932.907,35 R$ 386.581,47 R$ 289.936,10 R$ 24.161,34 R$ 19.329,07
+(decorado) (G1) (Térreo)
+4 - Prazo de entrega: 30 de Novembro de 2026.
+`
+
+const PLAY = `CUB - JULHO - 2026 R$ 3.121,62
+ÁREAS UN.
+UNIDADES ÁREA FINANC.
+(m²) TOTAL PREÇO ENTRADA
+GLOBAL BANCÁRIO
+Nº Nº VAGAS CUB (R$)
+UN. PRIVAT. (m²)
+DORM. CARROS GARAGEM 30% 70%
+V415
+Apto 301 2 1 - 61,18 115,76 191,00 R$ 596.239,95 R$ 178.871,98 R$ 417.367,96
+(G4)
+6- Prazo de entrega dos aptos decorados:OUTUBRO/2025
+`
+
+describe('estrutura de pagamento — cada tabela tem a sua', () => {
+  it('lê as quatro colunas do Gran Michel e deriva as quantidades', () => {
+    const r = parsearTabelaEraldo(GRAN_MICHEL)
+
+    expect(r.rejeitadas).toEqual([])
+    expect(r.unidades).toHaveLength(2)
+    expect(r.quantidades).toEqual([1, 3, 22, 1])
+    expect(r.unidades[0].colunas.map((c) => c.papel)).toEqual(['entrada', 'reforcos', 'mensais', 'saldo'])
+    expect(r.cabecalho.pos_chaves_meses).toBe(180)
+    expect(r.cabecalho.previsao_entrega).toBe('Junho de 2028')
+  })
+
+  it('não inventa saldo onde a tabela não tem: o Árbor fecha 100% até as chaves', () => {
+    const r = parsearTabelaEraldo(ARBOR)
+
+    expect(r.rejeitadas).toEqual([])
+    expect(r.cabecalho.percentuais).toEqual([0.2, 0.2, 0.6])
+    expect(r.cabecalho.tem_financiamento).toBe(false)
+    expect(r.unidades[0].colunas.map((c) => c.papel)).toEqual(['entrada', 'reforcos', 'mensais'])
+    expect(coluna(r.unidades[0], 'saldo')).toBeNull()
+    expect(r.quantidades).toEqual([1, 6, 65])
+    expect(r.cabecalho.previsao_entrega).toBe('OUT/28')
+  })
+
+  it('separa o pagamento nas chaves do Horizon das parcelas mensais', () => {
+    const r = parsearTabelaEraldo(HORIZON)
+
+    expect(r.rejeitadas).toEqual([])
+    expect(r.unidades[0].colunas.map((c) => c.papel)).toEqual(['entrada', 'chaves', 'mensais', 'saldo'])
+    expect(coluna(r.unidades[0], 'chaves')?.valor).toBe(289936.1)
+    expect(coluna(r.unidades[0], 'mensais')?.quantidade).toBe(4)
+    // O saldo do Horizon é parcelado em 60x, não pago de uma vez.
+    expect(coluna(r.unidades[0], 'saldo')?.quantidade).toBe(60)
+    expect(r.cabecalho.juros_ao_mes).toBe(0.75)
+  })
+
+  it('usa a coluna de dormitórios quando a tabela traz (só o Play traz)', () => {
+    const r = parsearTabelaEraldo(PLAY)
+
+    expect(r.rejeitadas).toEqual([])
+    expect(r.unidades[0].dormitorios).toBe(2)
+    expect(r.unidades[0].vagas).toBe('1 Vaga')
+    expect(r.unidades[0].colunas.map((c) => c.papel)).toEqual(['entrada', 'saldo'])
+  })
+
+  it('a data do apartamento decorado não é a entrega do prédio', () => {
+    expect(parsearTabelaEraldo(PLAY).cabecalho.previsao_entrega).toBeNull()
+  })
+})
+
+describe('o juro do rodapé', () => {
+  it('lê "IGPM + 075% ao mês" como 0,75% — não como 75%', () => {
+    expect(parsearTabelaEraldo(GRAN_MICHEL).cabecalho.juros_ao_mes).toBe(0.75)
+  })
+})
+
+describe('a rede de conferência', () => {
+  it('rejeita a unidade cujo preço não é a quantidade de CUB impressa', () => {
+    // R$ 1.000.000,00 no lugar de R$ 981.383,66, com as demais colunas
+    // recalculadas para 10/5/15/70 — todas as invariantes de percentual
+    // continuam fechando, e só o CUB denuncia.
+    const adulterado = GRAN_MICHEL.replace(
+      'R$ 981.383,66 R$ 98.138,37 R$ 16.356,39 R$ 6.691,25 R$ 686.968,56',
+      'R$ 1.000.000,00 R$ 100.000,00 R$ 16.666,67 R$ 6.818,18 R$ 700.000,00',
+    )
+    const r = parsearTabelaEraldo(adulterado)
+
+    expect(r.unidades.map((u) => u.unidade)).toEqual(['405'])
+    expect(r.rejeitadas[0].unidade).toBe('304')
+    expect(r.rejeitadas[0].motivo).toContain('CUB não fecha')
+  })
+
+  it('rejeita a linha em que uma coluna não dá número inteiro de pagamentos', () => {
+    const r = parsearTabelaEraldo(GRAN_MICHEL.replace('R$ 16.356,39', 'R$ 15.000,00'))
+
+    expect(r.rejeitadas[0].unidade).toBe('304')
+    expect(r.rejeitadas[0].motivo).toContain('não dá inteiro')
+  })
+
+  it('recusa a tabela inteira quando as quantidades divergem entre unidades', () => {
+    // Metade do reforço na 405: cada linha passa sozinha, mas uma diz 3
+    // reforços e a outra 6. Não é a tabela de dois apartamentos diferentes.
+    const r = parsearTabelaEraldo(GRAN_MICHEL.replace('R$ 11.070,46', 'R$ 5.535,23'))
+
+    expect(r.unidades).toEqual([])
+    expect(r.quantidades).toBeNull()
+    expect(r.rejeitadas).toHaveLength(2)
+    expect(r.rejeitadas[0].motivo).toContain('quantidades divergem')
+  })
+
+  it('acusa a linha de valores que ficou fora da leitura', () => {
+    // As sete salas comerciais do Symphony vêm depois do rodapé dos
+    // apartamentos, com estrutura própria. Não são "Apto": a contagem por
+    // identificador fechava 2 de 2 e não via nada.
+    const comSalas = `${ARBOR}Sala C. 02 117,34 159,00 159,00 318,00 R$ 992.678,89 R$ 198.535,78 R$ 198.535,78 R$ 16.544,65\n`
+    const r = parsearTabelaEraldo(comSalas)
+
+    expect(r.unidades).toHaveLength(2)
+    expect(r.conferencia.aptos_no_texto).toBe(2)
+    expect(r.conferencia.linhas_de_valor_orfas).toHaveLength(1)
+    expect(r.conferencia.confere).toBe(false)
+  })
+
+  it('fecha quando tudo que parece unidade virou unidade', () => {
+    const r = parsearTabelaEraldo(GRAN_MICHEL)
+
+    expect(r.conferencia.confere).toBe(true)
+    expect(r.conferencia.linhas_de_valor_orfas).toEqual([])
+  })
+})
+
+describe('percentuais do cabeçalho', () => {
+  it('ignora a condição comercial do rodapé que também fecha em 100%', () => {
+    // A condição 4 do Aura é "10% de entrada, 10% em 3 reforços anuais, 20% em
+    // parcelas mensais e 60% após a entrega das chaves". Procurando no
+    // documento inteiro, essa janela de quatro vencia a estrutura de três da
+    // tabela e as 29 unidades voltavam rejeitadas por número de colunas.
+    const comRodape = `${ARBOR}-> 10% de entrada, 10% em 3 reforços anuais, 20% em parcelas mensais até o fim da obra e 60% após a entrega das chaves em até 180 parcelas.\n`
+    const r = parsearTabelaEraldo(comRodape)
+
+    expect(r.cabecalho.percentuais).toEqual([0.2, 0.2, 0.6])
+    expect(r.rejeitadas).toEqual([])
+    expect(r.unidades).toHaveLength(2)
+  })
+})
