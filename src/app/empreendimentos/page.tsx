@@ -230,7 +230,12 @@ export default async function EmpreendimentosPage() {
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
             <p style={{ fontFamily: t.body, fontSize: 12, color: 'rgba(245,241,234,0.5)', margin: 0 }}>© {new Date().getFullYear()} Stiven Allan. Todos os direitos reservados.</p>
-            <p style={{ fontFamily: t.body, fontSize: 12, color: 'rgba(245,241,234,0.5)', margin: 0 }}>Sul de Santa Catarina · CRECI 60.275</p>
+            <p style={{ fontFamily: t.body, fontSize: 12, color: 'rgba(245,241,234,0.5)', margin: 0, display: 'flex', flexWrap: 'wrap', gap: 14, alignItems: 'center' }}>
+              <Link href="/politica-de-privacidade" style={{ color: 'rgba(245,241,234,0.5)', textDecoration: 'underline' }}>Política de Privacidade</Link>
+              <Link href="/termos-de-uso" style={{ color: 'rgba(245,241,234,0.5)', textDecoration: 'underline' }}>Termos de Uso</Link>
+              <Link href="/exclusao-de-dados" style={{ color: 'rgba(245,241,234,0.5)', textDecoration: 'underline' }}>Exclusão de Dados</Link>
+              <span>Sul de Santa Catarina · CRECI 60.275</span>
+            </p>
           </div>
         </div>
       </footer>
