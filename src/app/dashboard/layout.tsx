@@ -42,6 +42,7 @@ const GRUPOS: { titulo: string; itens: NavItem[] }[] = [
     titulo: 'GROWTH',
     itens: [
       { href: '/dashboard/instagram', label: 'Instagram', icon: '📸' },
+      { href: '/dashboard/ativacao', label: 'Ativação IG', icon: '📩' },
     ],
   },
 ];
@@ -57,6 +58,7 @@ const PAGE_LABELS: Record<string, string> = {
   '/dashboard/campanhas': 'Campanhas',
   '/dashboard/cron': 'Cron', '/dashboard/instagram': 'Instagram',
   '/dashboard/instagram/calendario': 'Calendário Instagram',
+  '/dashboard/ativacao': 'Ativação IG',
 };
 
 function getLabel(pathname: string) {
