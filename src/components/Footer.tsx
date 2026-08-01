@@ -129,6 +129,12 @@ export default function Footer() {
             <Link href="/politica-de-privacidade" style={{ color: C.muted, textDecoration: 'underline' }}>
               Política de Privacidade
             </Link>
+            <Link href="/termos-de-uso" style={{ color: C.muted, textDecoration: 'underline' }}>
+              Termos de Uso
+            </Link>
+            <Link href="/exclusao-de-dados" style={{ color: C.muted, textDecoration: 'underline' }}>
+              Exclusão de Dados
+            </Link>
             <Link href="/indicadores" style={{ color: C.muted, textDecoration: 'underline' }}>
               Indicadores
             </Link>

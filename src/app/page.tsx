@@ -351,6 +351,8 @@ export default async function HomePage() {
             <p style={{ fontFamily: t.body, fontSize: 12, color: 'rgba(245,241,234,0.5)', margin: 0 }}>© {new Date().getFullYear()} Stiven Allan. Todos os direitos reservados.</p>
             <p style={{ fontFamily: t.body, fontSize: 12, color: 'rgba(245,241,234,0.5)', margin: 0, display: 'flex', flexWrap: 'wrap', gap: 14, alignItems: 'center' }}>
               <Link href="/politica-de-privacidade" style={{ color: 'rgba(245,241,234,0.5)', textDecoration: 'underline' }}>Política de Privacidade</Link>
+              <Link href="/termos-de-uso" style={{ color: 'rgba(245,241,234,0.5)', textDecoration: 'underline' }}>Termos de Uso</Link>
+              <Link href="/exclusao-de-dados" style={{ color: 'rgba(245,241,234,0.5)', textDecoration: 'underline' }}>Exclusão de Dados</Link>
               <CookiePreferencesLink style={{ color: 'rgba(245,241,234,0.5)', fontSize: 12 }} />
               <span>Sul de Santa Catarina · CRECI 60.275</span>
             </p>

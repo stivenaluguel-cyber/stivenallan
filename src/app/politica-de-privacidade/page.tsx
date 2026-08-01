@@ -27,15 +27,16 @@ const C = {
 const secoes = [
   { id: 'controlador', titulo: '1. Quem somos' },
   { id: 'dados-coletados', titulo: '2. Quais dados coletamos' },
-  { id: 'finalidade', titulo: '3. Para que usamos seus dados' },
-  { id: 'base-legal', titulo: '4. Base legal do tratamento' },
-  { id: 'compartilhamento', titulo: '5. Com quem compartilhamos' },
-  { id: 'cookies', titulo: '6. Cookies e atribuição de campanhas' },
-  { id: 'retencao', titulo: '7. Por quanto tempo guardamos os dados' },
-  { id: 'direitos', titulo: '8. Seus direitos como titular' },
-  { id: 'seguranca', titulo: '9. Segurança da informação' },
-  { id: 'alteracoes', titulo: '10. Alterações desta política' },
-  { id: 'contato', titulo: '11. Fale com a gente' },
+  { id: 'instagram', titulo: '3. Mensagens recebidas pelo Instagram' },
+  { id: 'finalidade', titulo: '4. Para que usamos seus dados' },
+  { id: 'base-legal', titulo: '5. Base legal do tratamento' },
+  { id: 'compartilhamento', titulo: '6. Com quem compartilhamos' },
+  { id: 'cookies', titulo: '7. Cookies e atribuição de campanhas' },
+  { id: 'retencao', titulo: '8. Por quanto tempo guardamos os dados' },
+  { id: 'direitos', titulo: '9. Seus direitos como titular' },
+  { id: 'seguranca', titulo: '10. Segurança da informação' },
+  { id: 'alteracoes', titulo: '11. Alterações desta política' },
+  { id: 'contato', titulo: '12. Fale com a gente' },
 ]
 
 function Secao({ id, titulo, children }: { id: string; titulo: string; children: React.ReactNode }) {
@@ -113,17 +114,43 @@ export default function PoliticaDePrivacidadePage() {
           <p>Não coletamos dados sensíveis (saúde, origem racial, opinião política, religião, etc.) nem dados de menores de idade.</p>
         </Secao>
 
-        <Secao id="finalidade" titulo="3. Para que usamos seus dados">
+        <Secao id="instagram" titulo="3. Mensagens recebidas pelo Instagram">
+          <p>
+            Quando você envia uma mensagem direta (Direct) ao nosso perfil comercial{' '}
+            <strong>@stivenallan.ofc</strong> no Instagram, essa mensagem é recebida no nosso sistema de
+            atendimento para que possamos responder você a partir de um único lugar, sem perder contatos na
+            caixa de entrada. Nesse fluxo tratamos:
+          </p>
+          <ul style={{ margin: 0, paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <li>O identificador da sua conta no Instagram, atribuído pela Meta</li>
+            <li>Seu nome ou nome de usuário público no Instagram</li>
+            <li>O conteúdo em texto da mensagem enviada e a data/hora de recebimento</li>
+          </ul>
+          <p>
+            Esses dados são usados <strong>exclusivamente</strong> para responder ao seu contato e organizar o
+            atendimento comercial. Não enviamos mensagens automáticas, não fazemos disparos em massa, não
+            usamos o conteúdo das conversas para publicidade e não compartilhamos essas mensagens com
+            terceiros.
+          </p>
+          <p>
+            A base legal é a mesma dos demais contatos: execução de procedimentos preliminares a pedido do
+            titular (art. 7º, V, da LGPD) — foi você quem iniciou a conversa. Você pode pedir a exclusão
+            desse histórico a qualquer momento na página de{' '}
+            <Link href="/exclusao-de-dados" style={{ color: C.accent }}>Exclusão de Dados</Link>.
+          </p>
+        </Secao>
+
+        <Secao id="finalidade" titulo="4. Para que usamos seus dados">
           <p>Usamos os dados que você envia exclusivamente para:</p>
           <ul style={{ margin: 0, paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <li>Retornar seu contato sobre o empreendimento ou imóvel de interesse, por WhatsApp, telefone ou e-mail</li>
+            <li>Retornar seu contato sobre o empreendimento ou imóvel de interesse, por WhatsApp, telefone, e-mail ou Instagram</li>
             <li>Enviar o material solicitado (catálogo, plantas, condições de pagamento)</li>
             <li>Entender qual campanha ou canal de divulgação gerou o contato, para investir melhor nosso orçamento de anúncios</li>
           </ul>
           <p>Não vendemos seus dados, e não os usamos para nenhuma finalidade além do atendimento comercial descrito acima.</p>
         </Secao>
 
-        <Secao id="base-legal" titulo="4. Base legal do tratamento">
+        <Secao id="base-legal" titulo="5. Base legal do tratamento">
           <p>
             Quando você preenche um formulário pedindo para ser contatado, o tratamento dos seus dados se
             baseia na <strong>execução de procedimentos preliminares a pedido do titular</strong> (art. 7º,
@@ -133,7 +160,7 @@ export default function PoliticaDePrivacidadePage() {
             Para o envio de mensagens de acompanhamento comercial sobre o imóvel de interesse, o tratamento se
             apoia no <strong>legítimo interesse</strong> do controlador (art. 7º, IX), sempre limitado à
             finalidade comercial já descrita, e você pode se opor a esse contato a qualquer momento — veja a
-            seção 8.
+            seção 9.
           </p>
           <p>
             Não tratamos o envio do formulário como um consentimento amplo ou obrigatório para outras
@@ -141,7 +168,7 @@ export default function PoliticaDePrivacidadePage() {
           </p>
         </Secao>
 
-        <Secao id="compartilhamento" titulo="5. Com quem compartilhamos">
+        <Secao id="compartilhamento" titulo="6. Com quem compartilhamos">
           <p>Seus dados podem ser compartilhados com prestadores de serviço que dão suporte à operação do site e ao atendimento comercial, sempre limitados ao necessário para cada finalidade:</p>
           <ul style={{ margin: 0, paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 6 }}>
             <li><strong>Meta (Facebook/Instagram Ads)</strong> — para medir a eficácia de campanhas. Quando aplicável, e-mail e telefone são enviados de forma criptografada (hash), nunca em texto simples.</li>
@@ -152,7 +179,7 @@ export default function PoliticaDePrivacidadePage() {
           <p>Não compartilhamos seus dados com terceiros para fins de revenda de listas de contato.</p>
         </Secao>
 
-        <Secao id="cookies" titulo="6. Cookies e atribuição de campanhas">
+        <Secao id="cookies" titulo="7. Cookies e atribuição de campanhas">
           <p>
             Cookies de medição (Google Analytics) e de marketing (Meta e Google Ads) <strong>só são ativados
             depois do seu aceite</strong> no aviso de cookies, por categoria. Você pode aceitar tudo, rejeitar
@@ -175,7 +202,7 @@ export default function PoliticaDePrivacidadePage() {
           </p>
         </Secao>
 
-        <Secao id="retencao" titulo="7. Por quanto tempo guardamos os dados">
+        <Secao id="retencao" titulo="8. Por quanto tempo guardamos os dados">
           <p>
             Mantemos seus dados enquanto durar a relação comercial (do primeiro contato até a eventual compra
             e pós-venda) ou até que você solicite a exclusão, o que ocorrer primeiro. Após esse período, os
@@ -183,7 +210,7 @@ export default function PoliticaDePrivacidadePage() {
           </p>
         </Secao>
 
-        <Secao id="direitos" titulo="8. Seus direitos como titular">
+        <Secao id="direitos" titulo="9. Seus direitos como titular">
           <p>Conforme o art. 18 da LGPD, você pode a qualquer momento solicitar:</p>
           <ul style={{ margin: 0, paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 6 }}>
             <li>Confirmação de que tratamos seus dados, e acesso a eles</li>
@@ -194,10 +221,10 @@ export default function PoliticaDePrivacidadePage() {
             <li>Informação sobre com quem compartilhamos seus dados</li>
             <li>Revogação do consentimento (quando o tratamento depender dele) e oposição ao tratamento baseado em legítimo interesse</li>
           </ul>
-          <p>Para exercer qualquer um desses direitos, use os canais de contato da seção 11.</p>
+          <p>Para exercer qualquer um desses direitos, use os canais de contato da seção 12.</p>
         </Secao>
 
-        <Secao id="seguranca" titulo="9. Segurança da informação">
+        <Secao id="seguranca" titulo="10. Segurança da informação">
           <p>
             Adotamos medidas técnicas e administrativas razoáveis para proteger seus dados contra acesso não
             autorizado, perda, alteração ou vazamento — incluindo conexão criptografada (HTTPS), controle de
@@ -206,14 +233,14 @@ export default function PoliticaDePrivacidadePage() {
           </p>
         </Secao>
 
-        <Secao id="alteracoes" titulo="10. Alterações desta política">
+        <Secao id="alteracoes" titulo="11. Alterações desta política">
           <p>
             Esta política pode ser atualizada para refletir mudanças no site ou na legislação. A data no topo
             desta página indica a versão vigente. Recomendamos revisitá-la periodicamente.
           </p>
         </Secao>
 
-        <Secao id="contato" titulo="11. Fale com a gente">
+        <Secao id="contato" titulo="12. Fale com a gente">
           <p>Para dúvidas sobre esta política ou para exercer seus direitos como titular de dados, fale diretamente com Stiven Allan:</p>
           <ul style={{ margin: 0, paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 6 }}>
             <li>WhatsApp: <a href="https://wa.me/5548991642332" target="_blank" rel="noopener noreferrer" style={{ color: C.accent }}>(48) 99164-2332</a></li>

@@ -407,6 +407,8 @@ export default function EmpreendimentoTemplate({ data }: { data: Empreendimento 
             <Link href="/" style={{ fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 12, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(245,238,230,0.65)', textDecoration: 'none' }}>Início</Link>
             <Link href="/empreendimentos" style={{ fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 12, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(245,238,230,0.65)', textDecoration: 'none' }}>Empreendimentos</Link>
             <Link href="/politica-de-privacidade" style={{ fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 12, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(245,238,230,0.65)', textDecoration: 'none' }}>Privacidade</Link>
+            <Link href="/termos-de-uso" style={{ fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 12, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(245,238,230,0.65)', textDecoration: 'none' }}>Termos</Link>
+            <Link href="/exclusao-de-dados" style={{ fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 12, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(245,238,230,0.65)', textDecoration: 'none' }}>Exclusão de Dados</Link>
             <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 12, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#D9A066', textDecoration: 'none' }}>WhatsApp</a>
           </div>
         </div>
