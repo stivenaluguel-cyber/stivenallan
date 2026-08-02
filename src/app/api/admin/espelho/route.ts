@@ -16,8 +16,46 @@ const sb = () => createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env
 export async function GET(req: NextRequest) {
   if (!(await requireAdmin())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const empId = new URL(req.url).searchParams.get('empreendimento_id')
+  const url = new URL(req.url)
+  const empId = url.searchParams.get('empreendimento_id')
   const client = sb()
+
+  // ?vendidas=1 — RELATÓRIO consolidado, todas as unidades vendidas de todos
+  // os empreendimentos, da mais recente para a mais antiga.
+  //
+  // Existe porque a página pública deixou de mostrar a vendida (o cliente não
+  // precisa saber qual foi) mas o corretor precisa: é como ele acompanha o
+  // giro do estoque mês a mês.
+  if (url.searchParams.get('vendidas') === '1') {
+    const [{ data: vendidas, error: erroV }, { data: emps }] = await Promise.all([
+      client.from('empreendimentos_unidades')
+        .select('id, empreendimento_id, bloco, unidade, metragem, dormitorios, valor_tabela, vendida_em')
+        .eq('disponivel', false)
+        .order('vendida_em', { ascending: false, nullsFirst: false }),
+      client.from('empreendimentos').select('id, nome'),
+    ])
+    if (erroV) {
+      logError(SOURCE, 'falha ao listar vendidas', erroV)
+      return NextResponse.json({ error: erroV.message }, { status: 500 })
+    }
+    const nome = new Map((emps ?? []).map((e) => [e.id as string, e.nome as string]))
+    const lista = (vendidas ?? []).map((u) => ({
+      id: u.id as string,
+      empreendimento: nome.get(u.empreendimento_id as string) ?? '—',
+      bloco: u.bloco as string | null,
+      unidade: u.unidade as string,
+      metragem: Number(u.metragem),
+      dormitorios: u.dormitorios as number | null,
+      valor_tabela: u.valor_tabela === null ? null : Number(u.valor_tabela),
+      // Nulo nas que foram baixadas antes desta coluna existir.
+      vendida_em: (u.vendida_em as string | null) ?? null,
+    }))
+    return NextResponse.json({
+      vendidas: lista,
+      total: lista.length,
+      valorTotal: lista.reduce((s, u) => s + (u.valor_tabela ?? 0), 0),
+    })
+  }
 
   if (!empId) {
     const [{ data: emps }, { data: contagem }] = await Promise.all([
@@ -109,12 +147,19 @@ export async function PATCH(req: NextRequest) {
       break
     case 'vender':
       update.disponivel = false
+      // A DATA da venda, não só o fato: é o que sustenta o relatório de giro
+      // do estoque. `updated_at` não serviria — muda em toda reimportação de
+      // tabela, que acontece todo mês em todas as unidades.
+      update.vendida_em = agora.toISOString()
       // A reserva cumpriu o papel; manter o carimbo faria a unidade aparecer
       // como "vendida e reservada" ao mesmo tempo.
       update.reservado_ate = null
       break
     case 'disponibilizar':
       update.disponivel = true
+      // Baixa feita por engano: a data sai junto, senão a unidade voltaria
+      // disponível e continuaria no relatório de vendas.
+      update.vendida_em = null
       update.reservado_ate = null
       update.lead_id_reserva = null
       break

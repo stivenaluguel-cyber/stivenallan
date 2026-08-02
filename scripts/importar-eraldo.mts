@@ -257,7 +257,7 @@ console.log(`\nGRAVADAS: ${data?.length} unidades${vendidas.size ? ` (${vendidas
 // histórico de preço da unidade.
 if (marcarVendidas && sumiram.length > 0) {
   const { error: e2 } = await sb.from('empreendimentos_unidades')
-    .update({ disponivel: false })
+    .update({ disponivel: false, vendida_em: new Date().toISOString() })
     .eq('empreendimento_id', emp.id)
     .in('unidade', sumiram.map((u) => u.unidade as string))
   if (e2) { console.error(`ERRO ao marcar vendidas: ${e2.message}`); process.exit(1) }
