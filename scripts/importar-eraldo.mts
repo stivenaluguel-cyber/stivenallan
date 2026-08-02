@@ -83,7 +83,20 @@ console.log(`CUB ${c.cub_valor ?? '—'} · percentuais ${c.percentuais ? c.perc
 if (r.quantidades && r.unidades[0]) {
   console.log(`colunas: ${r.unidades[0].colunas.map((x) => `${x.papel} ${x.quantidade}x (${(x.percentual * 100).toFixed(0)}%)`).join(' · ')}`)
 }
-console.log(`saldo financiado: ${c.tem_financiamento ? `sim, até ${c.pos_chaves_meses ?? r.unidades[0]?.colunas.at(-1)?.quantidade ?? '—'}x` : 'não'} · juros ${c.juros_ao_mes ?? '—'}% a.m. ${c.indice ?? ''} · entrega ${c.previsao_entrega ?? '—'}`)
+console.log(`saldo financiado: ${c.tem_financiamento ? `sim, até ${c.pos_chaves_meses ?? r.unidades[0]?.colunas.at(-1)?.quantidade ?? '—'}x` : 'não'} · juros ${c.juros_ao_mes ?? '—'}% a.m. ${c.indice ?? ''} · entrega ${c.previsao_entrega ?? '—'}${c.pe_direito ? ` · pé-direito ${c.pe_direito}` : ''}`)
+
+console.log(`\npolítica comercial do rodapé: ${c.opcoes_pagamento.length} condição(ões)`)
+for (const o of c.opcoes_pagamento) {
+  const n = [
+    o.descontoPct != null ? `${o.descontoPct}% desc.` : null,
+    o.ateAsChavesPct != null ? `${o.ateAsChavesPct}% até as chaves` : null,
+    o.atoMinimoPct != null ? `entrada ${o.atoMinimoPct}%` : null,
+    o.meses ? `${o.meses}x` : null,
+    o.jurosAoMes ? `${String(o.jurosAoMes).replace('.', ',')}% a.m.` : null,
+    o.indice ?? null,
+  ].filter(Boolean).join(' · ')
+  console.log(`  [${o.tipo}] ${n || '—'}\n      ${o.descricao.slice(0, 190)}`)
+}
 
 const cel = (u: (typeof r.unidades)[number], papel: Parameters<typeof coluna>[1]) => {
   const x = coluna(u, papel)
@@ -183,7 +196,8 @@ const linhas = unidades.map((u) => {
       financiamento_direto: saldo && mesesDoSaldo > 1
         ? { meses: mesesDoSaldo, jurosAoMes: c.juros_ao_mes ?? 0, indice: c.indice }
         : null,
-      opcoes_pagamento: [],
+      opcoes_pagamento: c.opcoes_pagamento,
+      pe_direito: c.pe_direito,
       percentual_ate_chaves: pctAteChaves,
       previsao_entrega: c.previsao_entrega,
       cub_quantidade: u.cub_quantidade,

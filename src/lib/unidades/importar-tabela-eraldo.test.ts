@@ -196,6 +196,71 @@ describe('a rede de conferência', () => {
   })
 })
 
+describe('política comercial do rodapé', () => {
+  const RODAPE = `${GRAN_MICHEL}Condição 2 - 5% de desconto
+- Parcela A (70% até as chaves) - 10% de entrada, 20% em reforços até as chaves e 40% divididos em 22 parcelas mensais corrigidas pelo CUB.
+- Parcela B - 30% em até 180 parcelas mensais corrigidas pelo IGPM + 075% ao mês, direto com a construtora ou financiamento bancário.
+Condição 3 -7% de desconto para pagamento até as chaves
+- Parcela A - 20% de entrada 20% em reforços até as chaves 60% em 22 parcelas mensais corrigidas pelo CUB
+Condição 4 - 10% de desconto
+- Pagamento à vista.
+ATENÇÃO: O período máximo de intervalo entre os reforços será de 12 meses.
+1 - Os valores expressos na presente tabela serão corrigidos mensalmente conforme variaçao do CUB.
+5 - Os apartamentos "Diferenciados"possuem pé direito 4,70m.
+`
+
+  it('lê as condições numeradas com desconto, prazo e juros', () => {
+    const o = parsearTabelaEraldo(RODAPE).cabecalho.opcoes_pagamento
+
+    expect(o.map((x) => x.tipo)).toEqual(['direto', 'outro', 'a_vista'])
+    expect(o[0]).toMatchObject({ descontoPct: 5, ateAsChavesPct: 70, atoMinimoPct: 10 })
+    expect(o[1]).toMatchObject({ descontoPct: 7, ateAsChavesPct: 100 })
+    expect(o[2]).toMatchObject({ descontoPct: 10 })
+  })
+
+  it('não confunde a fatia do reforço com o total até as chaves', () => {
+    // A condição 3 diz "20% em reforços até as chaves" e quita 100% antes da
+    // entrega. Ler o 20 como total é afirmar uma condição que não existe.
+    const c3 = parsearTabelaEraldo(RODAPE).cabecalho.opcoes_pagamento[1]
+    expect(c3.ateAsChavesPct).toBe(100)
+  })
+
+  it('para nas observações de obra, que não são condição de pagamento', () => {
+    for (const o of parsearTabelaEraldo(RODAPE).cabecalho.opcoes_pagamento) {
+      expect(o.descricao).not.toMatch(/ATEN[ÇC][ÃA]O|corrigidos mensalmente|pé direito/i)
+    }
+  })
+
+  it('guarda o pé-direito dos "Diferenciados", que o corretor quer em destaque', () => {
+    expect(parsearTabelaEraldo(RODAPE).cabecalho.pe_direito).toBe('4,70m')
+  })
+
+  it('pega o desconto à vista solto na lista de observações', () => {
+    // Gran Palazzo, Horizon e L'Essence não têm lista de condições.
+    const semLista = `${ARBOR}5- 10% de desconto para pagamento á vista;\n`
+    const o = parsearTabelaEraldo(semLista).cabecalho.opcoes_pagamento
+
+    expect(o).toHaveLength(1)
+    expect(o[0]).toMatchObject({ tipo: 'a_vista', descontoPct: 10 })
+  })
+
+  it('não oferece a condição das salas comerciais como se fosse dos apartamentos', () => {
+    // O rodapé dos apartamentos do Symphony é seguido da tabela das salas,
+    // com estrutura e condição próprias (20/40/40 em 24x).
+    const comSalas = `${ARBOR}Condição 3 - 10% de desconto
+- Pagamento à vista.
+PRIVAT. TOTAL 20% 40% 40%
+Sala C. 02 117,34 159,00 159,00 318,00 R$ 992.678,89 R$ 198.535,78 R$ 198.535,78 R$ 16.544,65
+Condição 1 - 20% entrada, 40% em reforços anuais e 40% em 24 parcelas mensais.
+`
+    const o = parsearTabelaEraldo(comSalas).cabecalho.opcoes_pagamento
+
+    expect(o).toHaveLength(1)
+    expect(o[0].descricao).toContain('Condição 3')
+    expect(o.some((x) => /24 parcelas/.test(x.descricao))).toBe(false)
+  })
+})
+
 describe('percentuais do cabeçalho', () => {
   it('ignora a condição comercial do rodapé que também fecha em 100%', () => {
     // A condição 4 do Aura é "10% de entrada, 10% em 3 reforços anuais, 20% em
