@@ -1,5 +1,10 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import {
+  Archive, ArrowUpDown, Blinds, BrickWall, Building, Building2, CalendarDays, Car,
+  DoorOpen, Droplets, Flame, Grid2x2, HardHat, House, Lock, PanelTop, ScanFace,
+  Sun, Umbrella, Video, VolumeX, Waves, type LucideIcon,
+} from 'lucide-react'
 import { HeroImage } from '@/components/HeroImage'
 import Link from 'next/link'
 import GalleryWithLightbox from './gallery-lightbox'
@@ -44,43 +49,47 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 }
 
-const DIFERENCIAIS_GRUPOS = [
+// Ícones do lucide em vez de emoji: emoji cai no glifo do sistema operacional e
+// renderiza colorido e diferente em cada aparelho, o que destoa da paleta sóbria.
+type Diferencial = { Icon: LucideIcon; title: string; desc: string }
+
+const DIFERENCIAIS_GRUPOS: { titulo: string; itens: Diferencial[] }[] = [
   {
     titulo: 'Segurança & Acesso',
     itens: [
-      { ico: '🔐', title: 'Fechadura digital com biometria', desc: 'Segurança e praticidade na porta do apartamento.' },
-      { ico: '🪪', title: 'Acesso facial e QR Code', desc: 'Reconhecimento facial e QR Code no hall de entrada.' },
-      { ico: '🛗', title: '3 elevadores', desc: 'Circulação ágil, mesmo nos horários de pico.' },
-      { ico: '🚗', title: 'Garage hall', desc: 'Recepção coberta para embarque e desembarque com conforto.' },
-      { ico: '📹', title: 'Monitoramento eletrônico', desc: 'Áreas comuns com vigilância contínua.' },
+      { Icon: Lock, title: 'Fechadura digital com biometria', desc: 'Segurança e praticidade na porta do apartamento.' },
+      { Icon: ScanFace, title: 'Acesso facial e QR Code', desc: 'Reconhecimento facial e QR Code no hall de entrada.' },
+      { Icon: ArrowUpDown, title: '3 elevadores', desc: 'Circulação ágil, mesmo nos horários de pico.' },
+      { Icon: Car, title: 'Garage hall', desc: 'Recepção coberta para embarque e desembarque com conforto.' },
+      { Icon: Video, title: 'Monitoramento eletrônico', desc: 'Áreas comuns com vigilância contínua.' },
     ],
   },
   {
     titulo: 'Conforto acústico & Tecnologia',
     itens: [
-      { ico: '🪟', title: 'Persianas automatizadas', desc: 'Controle de luz e privacidade com um toque, direto na esquadria.' },
-      { ico: '🧱', title: 'Paredes mais espessas entre apartamentos', desc: 'Mais privacidade acústica entre unidades vizinhas.' },
-      { ico: '🔇', title: 'Contrapiso com atenuante de ruído', desc: 'Conforto sonoro no impacto entre andares.' },
-      { ico: '🏊', title: 'Piscina com trocador de calor', desc: 'Pré-instalação pronta para climatização futura.' },
-      { ico: '🍖', title: 'Churrasqueira a carvão com exaustor', desc: 'Sabor de verdade, sem fumaça dentro de casa.' },
+      { Icon: Blinds, title: 'Persianas automatizadas', desc: 'Controle de luz e privacidade com um toque, direto na esquadria.' },
+      { Icon: BrickWall, title: 'Paredes mais espessas entre apartamentos', desc: 'Mais privacidade acústica entre unidades vizinhas.' },
+      { Icon: VolumeX, title: 'Contrapiso com atenuante de ruído', desc: 'Conforto sonoro no impacto entre andares.' },
+      { Icon: Waves, title: 'Piscina com trocador de calor', desc: 'Pré-instalação pronta para climatização futura.' },
+      { Icon: Flame, title: 'Churrasqueira a carvão com exaustor', desc: 'Sabor de verdade, sem fumaça dentro de casa.' },
     ],
   },
   {
     titulo: 'Sustentabilidade',
     itens: [
-      { ico: '☀️', title: 'Energia fotovoltaica', desc: 'Geração própria de energia solar nas áreas comuns.' },
-      { ico: '💧', title: 'Reúso de água da chuva', desc: 'Aproveitamento na limpeza das áreas comuns.' },
+      { Icon: Sun, title: 'Energia fotovoltaica', desc: 'Geração própria de energia solar nas áreas comuns.' },
+      { Icon: Droplets, title: 'Reúso de água da chuva', desc: 'Aproveitamento na limpeza das áreas comuns.' },
     ],
   },
   {
     titulo: 'Design & Acabamento',
     itens: [
-      { ico: '🚪', title: 'Porta pivotante', desc: 'Entrada do apartamento com acabamento diferenciado.' },
-      { ico: '🧱', title: 'Forro de gesso com bordas negativas', desc: 'Detalhe de acabamento premium no teto.' },
-      { ico: '🏛', title: 'Fachada 100% pastilhada', desc: 'Acabamento nobre e durável em toda a fachada.' },
-      { ico: '🏺', title: 'Porcelanato 80×80 nas áreas comuns', desc: 'Acabamento em grandes formatos.' },
-      { ico: '🌂', title: 'Deck coberto', desc: 'Área externa protegida em qualquer estação do ano.' },
-      { ico: '🗄', title: 'Depósito individual', desc: 'Espaço extra de armazenamento por apartamento.' },
+      { Icon: DoorOpen, title: 'Porta pivotante', desc: 'Entrada do apartamento com acabamento diferenciado.' },
+      { Icon: PanelTop, title: 'Forro de gesso com bordas negativas', desc: 'Detalhe de acabamento premium no teto.' },
+      { Icon: Building, title: 'Fachada 100% pastilhada', desc: 'Acabamento nobre e durável em toda a fachada.' },
+      { Icon: Grid2x2, title: 'Porcelanato 80×80 nas áreas comuns', desc: 'Acabamento em grandes formatos.' },
+      { Icon: Umbrella, title: 'Deck coberto', desc: 'Área externa protegida em qualquer estação do ano.' },
+      { Icon: Archive, title: 'Depósito individual', desc: 'Espaço extra de armazenamento por apartamento.' },
     ],
   },
 ]
@@ -176,7 +185,7 @@ export default function AuraResidencePage() {
     .ar-h2 { font-family: var(--font-bricolage), system-ui, sans-serif; font-weight: 300; text-transform: uppercase; letter-spacing: 0.14em; line-height: 1.1; }
     .ar-serif { font-family: var(--font-cormorant), Georgia, serif; font-style: italic; font-weight: 300; }
     .ar-diff-item { display: flex; align-items: flex-start; gap: 16px; padding: 18px 0; border-bottom: 1px solid rgba(26,24,20,0.10); }
-    .ar-diff-icon { width: 36px; height: 36px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: rgba(156,95,46,0.08); border-radius: 50%; font-size: 16px; }
+    .ar-diff-icon { width: 36px; height: 36px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: rgba(156,95,46,0.08); border-radius: 50%; color: #9C5F2E; }
     .ar-wa-float { position: fixed; bottom: 28px; right: 28px; z-index: 999; width: 56px; height: 56px; border-radius: 50%; background: #25D366; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(37,211,102,0.35); transition: transform .2s ease; }
     .ar-wa-float:hover { transform: scale(1.08); }
     @media (max-width: 768px) {
@@ -253,8 +262,8 @@ export default function AuraResidencePage() {
               17 pavimentos na Av. Getúlio Vargas, com 40 apartamentos tipo e 4 coberturas duplex — apenas 4 unidades por andar, um pavimento inteiro de área de lazer e 4 pavimentos de garagem.
             </p>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-              {[{ ico: '🏗', label: 'Lançamento' }, { ico: '🏢', label: '17 pavimentos' }, { ico: '🏠', label: '44 unidades' }, { ico: '📅', label: 'Entrega abr/2029' }].map(({ ico, label }) => (
-                <span key={label} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(156,95,46,0.08)', color: '#9C5F2E', borderRadius: 2, padding: '7px 14px', fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 12, letterSpacing: '0.1em' }}>{ico} {label}</span>
+              {[{ Icon: HardHat, label: 'Lançamento' }, { Icon: Building2, label: '17 pavimentos' }, { Icon: House, label: '44 unidades' }, { Icon: CalendarDays, label: 'Entrega abr/2029' }].map(({ Icon, label }) => (
+                <span key={label} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(156,95,46,0.08)', color: '#9C5F2E', borderRadius: 2, padding: '7px 14px', fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 12, letterSpacing: '0.1em' }}><Icon size={14} strokeWidth={1.5} aria-hidden="true" />{label}</span>
               ))}
             </div>
           </div>
@@ -308,9 +317,9 @@ export default function AuraResidencePage() {
               <div key={titulo}>
                 <p style={{ fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#9C5F2E', marginBottom: 8 }}>{titulo}</p>
                 <div className="ar-diff-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '0 48px' }}>
-                  {itens.map(({ ico, title, desc }) => (
+                  {itens.map(({ Icon, title, desc }) => (
                     <div key={title} className="ar-diff-item">
-                      <div className="ar-diff-icon">{ico}</div>
+                      <div className="ar-diff-icon"><Icon size={20} strokeWidth={1.5} aria-hidden="true" /></div>
                       <div>
                         <p style={{ fontFamily: 'var(--font-bricolage), system-ui, sans-serif', fontWeight: 400, fontSize: 14, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#1A1814', marginBottom: 4 }}>{title}</p>
                         <p style={{ fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 14, color: '#6B655B', lineHeight: 1.6 }}>{desc}</p>

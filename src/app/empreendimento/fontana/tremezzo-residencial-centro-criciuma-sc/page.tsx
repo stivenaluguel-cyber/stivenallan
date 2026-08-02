@@ -1,5 +1,9 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import {
+  Blinds, Building2, Flame, Gem, Grid2x2, HardHat, Lock, PlugZap, Ruler,
+  VolumeX, WashingMachine,
+} from 'lucide-react'
 import { HeroImage } from '@/components/HeroImage'
 import Link from 'next/link'
 import GalleryWithLightbox from './gallery-lightbox'
@@ -125,7 +129,7 @@ const CSS = `
   .tz-h2 { font-family: 'Jost', system-ui, sans-serif; font-weight: 300; text-transform: uppercase; letter-spacing: 0.14em; line-height: 1.1; }
   .tz-serif { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-weight: 300; }
   .tz-diff-item { display: flex; align-items: flex-start; gap: 16px; padding: 18px 0; border-bottom: 1px solid rgba(26,24,20,0.10); }
-  .tz-diff-icon { width: 36px; height: 36px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: rgba(107,45,62,0.08); border-radius: 50%; font-size: 16px; }
+  .tz-diff-icon { width: 36px; height: 36px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: rgba(107,45,62,0.08); border-radius: 50%; color: #6B2D3E; }
   .tz-lcard { position: relative; overflow: hidden; border-radius: 6px; aspect-ratio: 4/3; }
   .tz-lcard img { transition: transform .8s ease; }
   .tz-lcard:hover img { transform: scale(1.06); }
@@ -205,8 +209,8 @@ const CSS = `
               Com 3 dormitórios (1 suíte master), 125 m² privativos e 200 m² de área total, cada unidade foi concebida para oferecer privacidade, conforto e funcionalidade. São apenas 4 apartamentos por andar.
             </p>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-              {[{ ico: '🏗', label: 'Em obras · 03/2027' }, { ico: '📐', label: '125 m² privativos' }, { ico: '🏢', label: '18 andares' }].map(({ ico, label }) => (
-                <span key={label} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(107,45,62,0.07)', color: '#6B2D3E', borderRadius: 2, padding: '7px 14px', fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 12, letterSpacing: '0.1em' }}>{ico} {label}</span>
+              {[{ Icon: HardHat, label: 'Em obras · 03/2027' }, { Icon: Ruler, label: '125 m² privativos' }, { Icon: Building2, label: '18 andares' }].map(({ Icon, label }) => (
+                <span key={label} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(107,45,62,0.07)', color: '#6B2D3E', borderRadius: 2, padding: '7px 14px', fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 12, letterSpacing: '0.1em' }}><Icon size={14} strokeWidth={1.5} aria-hidden="true" />{label}</span>
               ))}
             </div>
           </div>
@@ -296,17 +300,17 @@ const CSS = `
           </div>
           <div className="tz-diff-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '0 48px', maxWidth: 840, margin: '0 auto' }}>
             {[
-              { ico: '🔐', title: 'Fechadura digital', desc: 'Tecnologia e segurança na entrada do seu lar.' },
-              { ico: '🪟', title: 'Persianas automatizadas', desc: 'Controle de luz e privacidade com praticidade.' },
-              { ico: '🏺', title: 'Porcelanato retificado 80×80 cm', desc: 'Acabamento impecável em grandes formatos.' },
-              { ico: '🪨', title: 'Quartzito Gabbana Polido', desc: 'Bancada de cozinha com padrão premium.' },
-              { ico: '🔇', title: 'Manta acústica', desc: 'Conforto sonoro para o seu descanso.' },
-              { ico: '🧺', title: 'Lavanderia independente', desc: 'Com acesso externo — praticidade no dia a dia.' },
-              { ico: '🍖', title: 'Sacada gourmet + churrasqueira', desc: 'Integrada ao living, com churrasqueira a carvão.' },
-              { ico: '🔌', title: 'Espera para carregador elétrico', desc: 'Disponível na garagem, pronto para o seu veículo elétrico.' },
-            ].map(({ ico, title, desc }) => (
+              { Icon: Lock, title: 'Fechadura digital', desc: 'Tecnologia e segurança na entrada do seu lar.' },
+              { Icon: Blinds, title: 'Persianas automatizadas', desc: 'Controle de luz e privacidade com praticidade.' },
+              { Icon: Grid2x2, title: 'Porcelanato retificado 80×80 cm', desc: 'Acabamento impecável em grandes formatos.' },
+              { Icon: Gem, title: 'Quartzito Gabbana Polido', desc: 'Bancada de cozinha com padrão premium.' },
+              { Icon: VolumeX, title: 'Manta acústica', desc: 'Conforto sonoro para o seu descanso.' },
+              { Icon: WashingMachine, title: 'Lavanderia independente', desc: 'Com acesso externo — praticidade no dia a dia.' },
+              { Icon: Flame, title: 'Sacada gourmet + churrasqueira', desc: 'Integrada ao living, com churrasqueira a carvão.' },
+              { Icon: PlugZap, title: 'Espera para carregador elétrico', desc: 'Disponível na garagem, pronto para o seu veículo elétrico.' },
+            ].map(({ Icon, title, desc }) => (
               <div key={title} className="tz-diff-item">
-                <div className="tz-diff-icon">{ico}</div>
+                <div className="tz-diff-icon"><Icon size={20} strokeWidth={1.5} aria-hidden="true" /></div>
                 <div>
                   <p style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 400, fontSize: 14, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#1A1814', marginBottom: 4 }}>{title}</p>
                   <p style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 14, color: '#6B655B', lineHeight: 1.6 }}>{desc}</p>
