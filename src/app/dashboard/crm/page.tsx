@@ -9,6 +9,7 @@ import { isEligibleForFocusQueue } from '@/lib/dashboard/focus-queue'
 import { temWhatsappReal } from '@/lib/leads/normalize'
 import { PainelScore, type DetalheScore } from '@/components/dashboard/PainelScore'
 import { AnexosLead } from '@/components/dashboard/AnexosLead'
+import { EnvolvidosLead } from '@/components/dashboard/EnvolvidosLead'
 import { CORES_SLA, statusSla } from '@/lib/leads/sla'
 import type { TimelineItem, TimelineKind } from '@/lib/dashboard/lead-timeline'
 import {
@@ -857,6 +858,9 @@ function LeadModal({ lead, onClose, onUpdated, onDeleted }: { lead: Lead; onClos
 
           <label style={labelCss}>Documentos</label>
           <AnexosLead leadId={lead.id} onMudou={carregarTimeline} />
+
+          <label style={labelCss}>Envolvidos no negócio</label>
+          <EnvolvidosLead leadId={lead.id} />
 
           <label style={labelCss}>Linha do tempo</label>
           <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
