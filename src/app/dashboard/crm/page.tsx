@@ -57,6 +57,7 @@ type Lead = {
   id: string; nome?: string; whatsapp: string; estagio_funil: string
   lead_score?: number; requer_atencao?: boolean; origem?: string
   orcamento_max?: number | null; perfil?: string; email?: string | null
+  permuta_descricao?: string | null; permuta_valor?: number | null
   temperatura?: number; anotacoes?: string | null; created_at?: string
   empreendimentos?: { nome?: string; cidade?: string } | null
   property_name?: string | null; visitas?: number; downloads?: number
@@ -682,6 +683,10 @@ function LeadModal({ lead, onClose, onUpdated, onDeleted }: { lead: Lead; onClos
     entrada_disponivel: lead.entrada_disponivel ?? '',
     prazo_compra: lead.prazo_compra ?? '',
     cidade_interesse: lead.cidade_interesse ?? '',
+    // O imóvel dado na troca. Alimenta o cruzamento em /dashboard/permutas —
+    // sem valor, o lead não entra no cruzamento.
+    permuta_descricao: lead.permuta_descricao ?? '',
+    permuta_valor: lead.permuta_valor != null ? String(lead.permuta_valor) : '',
   })
 
   const [timelineUnificada, setTimelineUnificada] = useState<TimelineItem[]>([])
@@ -738,6 +743,8 @@ function LeadModal({ lead, onClose, onUpdated, onDeleted }: { lead: Lead; onClos
       entrada_disponivel: form.entrada_disponivel || null,
       prazo_compra: form.prazo_compra || null,
       cidade_interesse: form.cidade_interesse || null,
+      permuta_descricao: form.permuta_descricao || null,
+      permuta_valor: form.permuta_valor ? Number(form.permuta_valor) : null,
     }
     const res = await fetch('/api/admin/leads/' + lead.id, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
     setSaving(false)
@@ -821,6 +828,12 @@ function LeadModal({ lead, onClose, onUpdated, onDeleted }: { lead: Lead; onClos
               </select>
               <label style={labelCss}>Cidade de interesse</label>
               <input style={inputCss} value={form.cidade_interesse} onChange={e => setForm(p => ({ ...p, cidade_interesse: e.target.value }))} />
+              <label style={labelCss}>Imóvel na troca (permuta)</label>
+              <input style={inputCss} placeholder="Ex.: apto 2 dorm. no Michel, quitado"
+                value={form.permuta_descricao} onChange={e => setForm(p => ({ ...p, permuta_descricao: e.target.value }))} />
+              <label style={labelCss}>Valor estimado da permuta (R$)</label>
+              <input type="number" style={inputCss} placeholder="280000"
+                value={form.permuta_valor} onChange={e => setForm(p => ({ ...p, permuta_valor: e.target.value }))} />
               <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
                 <button onClick={salvarEdicao} disabled={saving} style={{ flex: 1, background: D.bronze, color: '#fff', border: 'none', borderRadius: 10, padding: 12, fontSize: 14, fontWeight: 700, cursor: 'pointer', opacity: saving ? 0.6 : 1 }}>{saving ? 'Salvando...' : 'Salvar alterações'}</button>
                 <button onClick={() => setEditing(false)} style={{ flex: 1, background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: 10, padding: 12, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Cancelar</button>
