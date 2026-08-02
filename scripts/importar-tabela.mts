@@ -35,6 +35,7 @@ const env = Object.fromEntries(
 
 const [slug, arquivo] = process.argv.slice(2)
 const confirmar = process.argv.includes('--confirmar')
+const marcarVendidas = process.argv.includes('--marcar-vendidas')
 const iLista = process.argv.indexOf('--unidades')
 // Aceita "T1:704" e "302". O bloco é obrigatório onde o número se repete
 // entre torres — o Pavia tem um 704 na T1 e outro na T2, e uma lista de
@@ -105,11 +106,36 @@ const perdidos = r.conferenciaRodape.filter((x) => !x.confere)
 if (perdidos.length > 0) parar('rodapé com condição não lida: ' + perdidos.map((x) => `${x.sinal}=${x.noTexto}`).join('; '))
 if (r.conferenciaCub.confere === false) parar(`CUB divergente: tabela ${r.conferenciaCub.impresso}, sistema ${r.conferenciaCub.sistema}`)
 
-if (!confirmar) { console.log('\n(prévia — nada gravado. Use --confirmar para gravar.)'); process.exit(0) }
-
 const { data: existentes } = await sb.from('empreendimentos_unidades')
-  .select('unidade, disponivel').eq('empreendimento_id', emp.id)
+  .select('unidade, disponivel, bloco, metragem, valor_tabela').eq('empreendimento_id', emp.id)
 const vendidas = new Set((existentes ?? []).filter((u) => u.disponivel === false).map((u) => u.unidade as string))
+
+// QUEM SUMIU DA TABELA DO MÊS.
+//
+// A Fontana publica tabela nova todo mês e a unidade vendida deixa de constar.
+// O upsert só sabe de quem veio: sem esta conferência a vendida ficaria
+// "disponível" no site para sempre. Sair da tabela não é prova de venda —
+// pode ser permuta ou bloqueio —, então o padrão é ACUSAR e só baixar com
+// `--marcar-vendidas`.
+const chave = (bloco: unknown, unidade: unknown) => `${(bloco as string) ?? ''}|${unidade as string}`
+const naTabela = new Set(r.unidades.map((u) => chave(u.bloco, u.unidade)))
+const sumiram = (existentes ?? []).filter(
+  (u) => u.disponivel !== false && !naTabela.has(chave(u.bloco, u.unidade)),
+)
+if (sumiram.length > 0) {
+  const brl = (n: number) => n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  console.log(`\n*** ${sumiram.length} unidade(s) SUMIRAM da tabela deste mês — provável venda ***`)
+  console.log('| Bloco | Un. | m² | último preço em tabela |')
+  console.log('|---|---|---|---|')
+  for (const u of sumiram) {
+    console.log(`| ${u.bloco ?? '—'} | ${u.unidade} | ${brl(Number(u.metragem))} | ${u.valor_tabela ? brl(Number(u.valor_tabela)) : '—'} |`)
+  }
+  console.log(marcarVendidas
+    ? '    → serão marcadas como VENDIDAS (--marcar-vendidas).'
+    : '    → continuam disponíveis no site. Use --marcar-vendidas para baixá-las.')
+}
+
+if (!confirmar) { console.log('\n(prévia — nada gravado. Use --confirmar para gravar.)'); process.exit(0) }
 
 const linhas = r.unidades.map((u) => {
   const linha = paraUnidadeDoBanco(u, emp.id, c.financiamento_direto, c.opcoes_pagamento, c.previsao_entrega)
@@ -121,3 +147,16 @@ const { data, error } = await sb.from('empreendimentos_unidades')
   .upsert(linhas, { onConflict: 'empreendimento_id,bloco,unidade' }).select('id')
 if (error) { console.error(`\nERRO ao gravar: ${error.message}`); process.exit(1) }
 console.log(`\nGRAVADAS: ${data?.length} unidades${vendidas.size ? ` (${vendidas.size} vendidas preservadas)` : ''}`)
+
+// A unidade some da tabela; ela NÃO sai do espelho. Vendida continua na grade,
+// marcada — "12 de 54 vendidas" é argumento de venda, e apagar perderia o
+// histórico de preço.
+if (marcarVendidas && sumiram.length > 0) {
+  for (const u of sumiram) {
+    const q = sb.from('empreendimentos_unidades').update({ disponivel: false })
+      .eq('empreendimento_id', emp.id).eq('unidade', u.unidade as string)
+    const { error: e2 } = await (u.bloco === null ? q.is('bloco', null) : q.eq('bloco', u.bloco as string))
+    if (e2) { console.error(`ERRO ao marcar ${u.unidade} como vendida: ${e2.message}`); process.exit(1) }
+  }
+  console.log(`MARCADAS COMO VENDIDAS: ${sumiram.length} (${sumiram.map((u) => u.unidade).join(', ')})`)
+}
