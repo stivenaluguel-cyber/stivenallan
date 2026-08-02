@@ -14,6 +14,13 @@ import {
 
 type Emp = { id: string; nome: string; slug: string; unidades: number }
 
+type Vendida = {
+  id: string; empreendimento: string; bloco: string | null; unidade: string
+  metragem: number; dormitorios: number | null
+  valor_tabela: number | null; vendida_em: string | null
+}
+type Relatorio = { vendidas: Vendida[]; total: number; valorTotal: number }
+
 type Resposta = {
   grade: BlocoAgrupado[]
   resumo: ResumoEspelho
@@ -48,6 +55,20 @@ function EspelhoConteudo() {
   const [carregando, setCarregando] = useState(true)
   const [erro, setErro] = useState('')
   const [aberta, setAberta] = useState<UnidadeEspelho | null>(null)
+  // Relatório de vendas: consolidado de TODOS os empreendimentos, não só do
+  // selecionado. A página pública deixou de mostrar a unidade vendida — este é
+  // o lugar onde o corretor acompanha o giro do estoque.
+  const [relatorio, setRelatorio] = useState<Relatorio | null>(null)
+  const [verVendidas, setVerVendidas] = useState(false)
+
+  const carregarRelatorio = useCallback(() => {
+    fetch('/api/admin/espelho?vendidas=1')
+      .then((r) => r.json())
+      .then((j) => setRelatorio(j?.vendidas ? j : { vendidas: [], total: 0, valorTotal: 0 }))
+      .catch(() => setRelatorio({ vendidas: [], total: 0, valorTotal: 0 }))
+  }, [])
+
+  useEffect(() => { carregarRelatorio() }, [carregarRelatorio])
 
   useEffect(() => {
     fetch('/api/admin/espelho')
@@ -196,13 +217,68 @@ function EspelhoConteudo() {
         </>
       )}
 
+      {/* RELATÓRIO DE VENDAS — todos os empreendimentos, não só o aberto. */}
+      {relatorio && relatorio.total > 0 && (
+        <section style={{ marginTop: 26, background: D.surface, border: '1px solid ' + D.line, borderRadius: 12, padding: 16 }}>
+          <button
+            onClick={() => setVerVendidas((v) => !v)}
+            aria-expanded={verVendidas}
+            style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', background: 'none', border: 0, padding: 0, cursor: 'pointer', font: 'inherit', textAlign: 'left' }}>
+            <CircleDollarSign size={16} color="#b91c1c" aria-hidden />
+            <span style={{ fontSize: 14, fontWeight: 700, color: D.ink }}>
+              Relatório de vendas — {relatorio.total} {relatorio.total === 1 ? 'unidade' : 'unidades'}
+            </span>
+            <span style={{ fontSize: 12.5, color: D.muted }}>
+              {fmt(relatorio.valorTotal)} em tabela · {verVendidas ? 'ocultar' : 'ver'}
+            </span>
+          </button>
+
+          {verVendidas && (
+            <div style={{ overflowX: 'auto', marginTop: 12 }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5 }}>
+                <thead>
+                  <tr style={{ textAlign: 'left', color: D.muted }}>
+                    <th style={{ padding: '6px 8px', fontWeight: 600 }}>Empreendimento</th>
+                    <th style={{ padding: '6px 8px', fontWeight: 600 }}>Unidade</th>
+                    <th style={{ padding: '6px 8px', fontWeight: 600 }}>m²</th>
+                    <th style={{ padding: '6px 8px', fontWeight: 600, textAlign: 'right' }}>Preço em tabela</th>
+                    <th style={{ padding: '6px 8px', fontWeight: 600 }}>Baixada em</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {relatorio.vendidas.map((v) => (
+                    <tr key={v.id} style={{ borderTop: '1px solid ' + D.line }}>
+                      <td style={{ padding: '7px 8px', color: D.ink }}>{v.empreendimento}</td>
+                      <td style={{ padding: '7px 8px', color: D.ink, fontWeight: 700 }}>
+                        {v.bloco ? `${v.bloco} · ` : ''}{v.unidade}
+                      </td>
+                      <td style={{ padding: '7px 8px', color: D.muted }}>
+                        {v.metragem}{v.dormitorios ? ` · ${v.dormitorios} qtos` : ''}
+                      </td>
+                      <td style={{ padding: '7px 8px', color: D.ink, textAlign: 'right' }}>
+                        {v.valor_tabela === null ? '—' : fmt(v.valor_tabela)}
+                      </td>
+                      <td style={{ padding: '7px 8px', color: D.muted }}>
+                        {/* Nulo nas baixadas antes desta coluna existir — dizer
+                            "sem data" é mais honesto que inventar uma. */}
+                        {v.vendida_em ? new Date(v.vendida_em).toLocaleDateString('pt-BR') : 'sem data'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+      )}
+
       {aberta && (
         <PainelUnidade
           unidade={aberta}
           nomeReserva={aberta.lead_id_reserva ? dados?.nomesReserva[aberta.lead_id_reserva] : undefined}
           agora={agora}
           onFechar={() => setAberta(null)}
-          onAgir={agir}
+          onAgir={(u, acao, extra) => { agir(u, acao, extra); carregarRelatorio() }}
         />
       )}
     </div>

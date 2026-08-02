@@ -154,7 +154,7 @@ console.log(`\nGRAVADAS: ${data?.length} unidades${vendidas.size ? ` (${vendidas
 // histórico de preço da unidade.
 if (marcarVendidas && sumiram.length > 0) {
   for (const u of sumiram) {
-    const q = sb.from('empreendimentos_unidades').update({ disponivel: false })
+    const q = sb.from('empreendimentos_unidades').update({ disponivel: false, vendida_em: new Date().toISOString() })
       .eq('empreendimento_id', emp.id).eq('unidade', u.unidade as string)
     const { error: e2 } = await (u.bloco === null ? q.is('bloco', null) : q.eq('bloco', u.bloco as string))
     if (e2) { console.error(`ERRO ao marcar ${u.unidade} como vendida: ${e2.message}`); process.exit(1) }
