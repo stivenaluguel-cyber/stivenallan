@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { SocioResposta } from './SocioResposta'
 
 type Mensagem = {
   id: string
@@ -22,6 +23,7 @@ export function ConversaPanel({ leadId }: { leadId: string }) {
   const [enviando, setEnviando] = useState(false)
   const [erro, setErro] = useState('')
   const fimRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   const carregar = useCallback(async () => {
     try {
@@ -103,10 +105,16 @@ export function ConversaPanel({ leadId }: { leadId: string }) {
         <div ref={fimRef} />
       </div>
 
+      <SocioResposta
+        leadId={leadId}
+        onUsar={(sugestao) => { setTexto(sugestao); inputRef.current?.focus() }}
+      />
+
       {erro && <p style={{ fontSize: 12, color: '#dc2626', margin: '0 0 8px' }}>{erro}</p>}
 
       <div style={{ display: 'flex', gap: 8 }}>
         <input
+          ref={inputRef}
           value={texto}
           onChange={(e) => setTexto(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter') enviar() }}
