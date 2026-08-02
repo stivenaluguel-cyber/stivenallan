@@ -44,7 +44,14 @@ export async function GET(_req: NextRequest, { params }: Params) {
   if (!prop) return NextResponse.json({ error: 'Empreendimento não encontrado' }, { status: 404 })
 
   const { data: emps } = await client.from('empreendimentos').select('id, nome')
-  const empId = resolverEmpreendimentoPorNome(prop.nome as string, (emps ?? []) as { id: string; nome: string }[])
+  // Quem tem estoque desempata os nomes repetidos — ver
+  // resolverEmpreendimentoPorNome.
+  const { data: comUn } = await client.from('empreendimentos_unidades').select('empreendimento_id')
+  const empId = resolverEmpreendimentoPorNome(
+    prop.nome as string,
+    (emps ?? []) as { id: string; nome: string }[],
+    new Set((comUn ?? []).map((u) => u.empreendimento_id as string)),
+  )
 
   // Sem espelho cadastrado não é erro: a maioria dos 36 imóveis não tem
   // unidade nenhuma. `temEspelho: false` faz a seção sumir da página.

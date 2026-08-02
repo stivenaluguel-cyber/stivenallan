@@ -191,16 +191,37 @@ function chaveNome(s: string): string {
     .replace(/[^a-z0-9]/g, '')
 }
 
+/**
+ * `empreendimentos` tem linhas DUPLICADAS com o nome idêntico.
+ *
+ * "Lavis Residencial" e "Monte Leone Residencial" existem duas vezes cada: uma
+ * com as unidades importadas e outra vazia, sobra de cadastro. Exigir match
+ * único fazia os dois caírem em `null` — e o Lavis (55 unidades) e o Monte
+ * Leone (26, de R$ 3,3 a 4,6 milhões) ficaram no ar com a seção de
+ * disponibilidade escondida, sem erro em lugar nenhum.
+ *
+ * O desempate é ter unidade. Duas linhas com o mesmo nome e só uma com estoque
+ * não é ambiguidade: é a linha certa e a sobra. Continua devolvendo `null`
+ * quando o empate é real — mostrar as unidades do prédio errado seria pior que
+ * não mostrar nada.
+ */
 export function resolverEmpreendimentoPorNome(
   nomeProperty: string,
   empreendimentos: { id: string; nome: string }[],
+  comUnidades?: ReadonlySet<string>,
 ): string | null {
   const alvo = chaveNome(nomeProperty)
   if (!alvo) return null
 
+  const desempatar = (cands: { id: string; nome: string }[]): string | null => {
+    if (cands.length === 1) return cands[0].id
+    if (cands.length === 0 || !comUnidades) return null
+    const comEstoque = cands.filter((e) => comUnidades.has(e.id))
+    return comEstoque.length === 1 ? comEstoque[0].id : null
+  }
+
   const exatos = empreendimentos.filter((e) => chaveNome(e.nome) === alvo)
-  if (exatos.length === 1) return exatos[0].id
-  if (exatos.length > 1) return null
+  if (exatos.length > 0) return desempatar(exatos)
 
   // Fallback por continência (um nome contém o outro), ainda exigindo
   // unicidade. Pega "Lavis" ↔ "Lavis Residencial Centro".
@@ -208,7 +229,7 @@ export function resolverEmpreendimentoPorNome(
     const k = chaveNome(e.nome)
     return k.length >= 4 && alvo.length >= 4 && (k.includes(alvo) || alvo.includes(k))
   })
-  return parciais.length === 1 ? parciais[0].id : null
+  return desempatar(parciais)
 }
 
 // ─────────────────────────────────────────────────────────────────────

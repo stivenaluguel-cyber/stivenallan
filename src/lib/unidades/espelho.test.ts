@@ -273,3 +273,31 @@ describe('precoMinimoDisponivel — a âncora "a partir de"', () => {
     expect(precoMinimoDisponivel(lista, AGORA)).toBe(700000)
   })
 })
+
+describe('nome duplicado em empreendimentos', () => {
+  // Caso real: "Lavis Residencial" existe duas vezes em `empreendimentos` —
+  // a linha com as 55 unidades e uma sobra de cadastro, vazia.
+  const DUPLICADO = [
+    { id: 'vazia', nome: 'Lavis Residencial' },
+    { id: 'com-estoque', nome: 'Lavis Residencial' },
+  ]
+
+  it('desempata pela linha que tem unidades', () => {
+    expect(resolverEmpreendimentoPorNome('Lavis Residencial', DUPLICADO, new Set(['com-estoque'])))
+      .toBe('com-estoque')
+  })
+
+  it('sem saber quem tem estoque, prefere não responder', () => {
+    expect(resolverEmpreendimentoPorNome('Lavis Residencial', DUPLICADO)).toBeNull()
+  })
+
+  it('empate real continua sem resposta — nunca o prédio errado', () => {
+    const ambos = new Set(['vazia', 'com-estoque'])
+    expect(resolverEmpreendimentoPorNome('Lavis Residencial', DUPLICADO, ambos)).toBeNull()
+  })
+
+  it('nome único não muda de comportamento', () => {
+    const unico = [{ id: 'a', nome: 'Pineto' }, { id: 'b', nome: 'Thiene' }]
+    expect(resolverEmpreendimentoPorNome('Pineto', unico, new Set())).toBe('a')
+  })
+})
