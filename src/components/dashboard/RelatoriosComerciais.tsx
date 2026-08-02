@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { AlertTriangle, Clock, TrendingUp, Wallet } from 'lucide-react'
 import { D, fmt } from '@/components/dashboard/focus/tokens'
+import { BotaoImprimir } from '@/components/dashboard/BotaoImprimir'
 
 type PorOrigem = { origem: string; leads: number; vendas: number; vgv: number; conversao: number }
 
@@ -64,16 +65,25 @@ export function RelatoriosComerciais() {
   const v = dados?.vendas
 
   return (
-    <section style={{ marginTop: 28 }}>
+    <section id="desempenho-comercial" style={{ marginTop: 28 }}>
       <header style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'flex-end', marginBottom: 14 }}>
         <div style={{ marginRight: 'auto' }}>
           <h2 style={{ fontSize: 16, fontWeight: 800, color: D.ink, margin: 0 }}>Desempenho comercial</h2>
           <p style={{ fontSize: 12, color: D.muted, margin: '3px 0 0' }}>
             VGV, conversão por origem e o que está parado.
           </p>
+          {/* O período fica no papel: um PDF de relatório sem dizer de quando
+              ele é vira número solto na mesa de quem recebe. */}
+          {dados && (
+            <p style={{ fontSize: 12, color: D.muted, margin: '3px 0 0' }}>
+              Período: {new Date(dados.periodo.de + 'T12:00:00').toLocaleDateString('pt-BR')} a{' '}
+              {new Date(dados.periodo.ate + 'T12:00:00').toLocaleDateString('pt-BR')}
+            </p>
+          )}
         </div>
-        <label style={rotulo}>De<input type="date" value={de} max={ate} onChange={(e) => setDe(e.target.value)} style={campo} /></label>
-        <label style={rotulo}>Até<input type="date" value={ate} min={de} max={hoje()} onChange={(e) => setAte(e.target.value)} style={campo} /></label>
+        <label className="sem-impressao" style={rotulo}>De<input type="date" value={de} max={ate} onChange={(e) => setDe(e.target.value)} style={campo} /></label>
+        <label className="sem-impressao" style={rotulo}>Até<input type="date" value={ate} min={de} max={hoje()} onChange={(e) => setAte(e.target.value)} style={campo} /></label>
+        <span className="sem-impressao"><BotaoImprimir alvo="desempenho-comercial" /></span>
       </header>
 
       {erro && <p role="alert" style={alerta}>{erro}</p>}

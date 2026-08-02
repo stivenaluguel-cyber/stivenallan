@@ -4,6 +4,7 @@ import { Plus, Users, X } from 'lucide-react'
 import { STATUS_COMISSAO, calcularDivisao, type StatusComissao } from '@/lib/comissoes/calcular'
 import { normalizarParticipantes, ROTULO_PAPEL } from '@/lib/comissoes/participantes'
 import { ParcelasComissao } from '@/components/dashboard/ParcelasComissao'
+import { ExtratoAnual } from '@/components/dashboard/ExtratoAnual'
 import { DivisaoEnvolvidos, linhasParaPayload, type LinhaEnvolvido } from '@/components/dashboard/DivisaoEnvolvidos'
 
 const D = {
@@ -190,6 +191,8 @@ export default function ComissoesPage() {
             })}
           </div>
         )}
+
+        <ExtratoAnual />
       </div>
 
       {modalAberto && <ModalVenda corretores={corretores} onFechar={() => setModalAberto(false)} onSalvo={() => { setModalAberto(false); carregar() }} />}
