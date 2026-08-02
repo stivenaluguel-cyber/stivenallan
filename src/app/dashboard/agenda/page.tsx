@@ -1,5 +1,9 @@
 'use client'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
+import {
+  agruparPorDia, deslocar, intervaloDaVista, linksDeNavegacao, rotuloDoPeriodo,
+  VISTAS, type Vista,
+} from '@/lib/dashboard/agenda-periodo'
 
 interface Evento {
   id: string
@@ -25,21 +29,24 @@ export default function AgendaPage() {
   const [eventos, setEventos] = useState<Evento[]>([])
   const [loading, setLoading] = useState(true)
   const [dataSel, setDataSel] = useState(new Date().toISOString().slice(0,10))
+  const [vista, setVista] = useState<Vista>('dia')
   const [modalAberto, setModalAberto] = useState(false)
   const [eventoSel, setEventoSel] = useState<Evento | null>(null)
   const [form, setForm] = useState({ titulo: '', data_hora: '', tipo: 'reuniao', local: '', descricao: '', lembrete_min: 30 })
   const [salvando, setSalvando] = useState(false)
   const [erro, setErro] = useState('')
 
+  const periodo = useMemo(() => intervaloDaVista(vista, dataSel), [vista, dataSel])
+
   const buscarEventos = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await fetch('/api/admin/agenda?data_ini=' + dataSel + '&data_fim=' + dataSel)
+      const res = await fetch('/api/admin/agenda?data_ini=' + periodo.ini + '&data_fim=' + periodo.fim)
       const json = await res.json()
       setEventos(json.data || [])
     } catch { setErro('Erro ao carregar') }
     setLoading(false)
-  }, [dataSel])
+  }, [periodo])
 
   useEffect(() => { buscarEventos() }, [buscarEventos])
 
@@ -84,24 +91,17 @@ export default function AgendaPage() {
     buscarEventos()
   }
 
-  function navDia(d: number) {
-    const dt = new Date(dataSel + 'T12:00:00')
-    dt.setDate(dt.getDate() + d)
-    setDataSel(dt.toISOString().slice(0,10))
-  }
+  // Anterior/próximo anda na unidade da vista: um dia, uma semana ou um mês.
+  function navegar(passo: number) { setDataSel(deslocar(vista, dataSel, passo)) }
 
   function getTipo(t: string) { return TIPOS.find(x => x.value === t) || TIPOS[4] }
   function formatHora(s: string) { return new Date(s).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) }
-  function formatDataLabel(s: string) {
-    const d = new Date(s + 'T12:00:00')
-    const hoje = new Date(); hoje.setHours(0,0,0,0)
-    const sel = new Date(d); sel.setHours(0,0,0,0)
-    const diff = (sel.getTime() - hoje.getTime()) / 86400000
-    if (diff === 0) return 'Hoje'
-    if (diff === 1) return 'Amanhã'
-    if (diff === -1) return 'Ontem'
-    return d.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })
-  }
+
+  const hojeTexto = new Date().toISOString().slice(0, 10)
+  const rotuloPeriodo = rotuloDoPeriodo(vista, dataSel, hojeTexto)
+  // Em dia, um bloco só. Em semana e mês, um bloco por dia — é assim que os
+  // buracos da agenda ficam visíveis, que é o motivo de existir a vista.
+  const porDia = agruparPorDia(eventos)
 
   return (
     <div style={{ padding: '1.5rem', maxWidth: '900px', margin: '0 auto' }}>
@@ -109,14 +109,22 @@ export default function AgendaPage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#111', margin: 0 }}>Agenda</h1>
-          <p style={{ color: '#666', margin: '0.25rem 0 0', fontSize: '0.875rem' }}>{eventos.length} evento{eventos.length !== 1 ? 's' : ''} para {formatDataLabel(dataSel)}</p>
+          <p style={{ color: '#666', margin: '0.25rem 0 0', fontSize: '0.875rem' }}>{eventos.length} evento{eventos.length !== 1 ? 's' : ''} — {rotuloPeriodo}</p>
         </div>
-        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-          <button onClick={() => navDia(-1)} style={{ padding: '0.5rem 0.75rem', border: '1px solid #e5e7eb', borderRadius: '6px', background: '#fff', cursor: 'pointer', fontSize: '1rem' }}>←</button>
-          <input type="date" value={dataSel} onChange={e => setDataSel(e.target.value)} style={{ padding: '0.5rem', border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: '0.875rem' }} />
-          <button onClick={() => navDia(1)} style={{ padding: '0.5rem 0.75rem', border: '1px solid #e5e7eb', borderRadius: '6px', background: '#fff', cursor: 'pointer', fontSize: '1rem' }}>→</button>
-          <button onClick={() => { setDataSel(new Date().toISOString().slice(0,10)) }} style={{ padding: '0.5rem 0.75rem', border: '1px solid #e5e7eb', borderRadius: '6px', background: '#fff', cursor: 'pointer', fontSize: '0.8rem' }}>Hoje</button>
-          <button onClick={() => abrirModal()} style={{ background: '#111', color: '#fff', border: 'none', borderRadius: '8px', padding: '0.5rem 1rem', fontWeight: 600, cursor: 'pointer', fontSize: '0.875rem' }}>+ Evento</button>
+        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          <div role="group" aria-label="Vista da agenda" style={{ display: 'flex', border: '1px solid #e5e7eb', borderRadius: '8px', overflow: 'hidden' }}>
+            {VISTAS.map(v => (
+              <button key={v.value} onClick={() => setVista(v.value)} aria-pressed={vista === v.value}
+                style={{ padding: '0.5rem 0.85rem', border: 'none', background: vista === v.value ? '#111' : '#fff', color: vista === v.value ? '#fff' : '#374151', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600, minHeight: 40 }}>
+                {v.label}
+              </button>
+            ))}
+          </div>
+          <button onClick={() => navegar(-1)} aria-label="Período anterior" style={{ padding: '0.5rem 0.75rem', border: '1px solid #e5e7eb', borderRadius: '6px', background: '#fff', cursor: 'pointer', fontSize: '1rem', minHeight: 40 }}>←</button>
+          <input type="date" value={dataSel} onChange={e => setDataSel(e.target.value)} style={{ padding: '0.5rem', border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: '0.875rem', minHeight: 40 }} />
+          <button onClick={() => navegar(1)} aria-label="Próximo período" style={{ padding: '0.5rem 0.75rem', border: '1px solid #e5e7eb', borderRadius: '6px', background: '#fff', cursor: 'pointer', fontSize: '1rem', minHeight: 40 }}>→</button>
+          <button onClick={() => { setDataSel(new Date().toISOString().slice(0,10)) }} style={{ padding: '0.5rem 0.75rem', border: '1px solid #e5e7eb', borderRadius: '6px', background: '#fff', cursor: 'pointer', fontSize: '0.8rem', minHeight: 40 }}>Hoje</button>
+          <button onClick={() => abrirModal()} style={{ background: '#111', color: '#fff', border: 'none', borderRadius: '8px', padding: '0.5rem 1rem', fontWeight: 600, cursor: 'pointer', fontSize: '0.875rem', minHeight: 40 }}>+ Evento</button>
         </div>
       </div>
 
@@ -127,10 +135,23 @@ export default function AgendaPage() {
         ) : eventos.length === 0 ? (
           <div style={{ background: '#fff', borderRadius: '12px', border: '1px solid #e5e7eb', padding: '3rem', textAlign: 'center' }}>
             <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📅</div>
-            <div style={{ color: '#666', fontSize: '0.875rem' }}>Nenhum evento para este dia</div>
+            <div style={{ color: '#666', fontSize: '0.875rem' }}>
+              Nenhum evento {vista === 'dia' ? 'para este dia' : vista === 'semana' ? 'nesta semana' : 'neste mês'}
+            </div>
             <button onClick={() => abrirModal()} style={{ marginTop: '1rem', background: '#111', color: '#fff', border: 'none', borderRadius: '8px', padding: '0.5rem 1rem', cursor: 'pointer', fontSize: '0.875rem' }}>+ Adicionar evento</button>
           </div>
-        ) : eventos.map(ev => {
+        ) : porDia.map(grupo => (
+          <div key={grupo.data}>
+            {/* Cabeçalho de dia só aparece quando o período tem mais de um —
+                no modo "dia" ele repetiria o título da tela. */}
+            {vista !== 'dia' && (
+              <h2 style={{ fontSize: '0.8rem', fontWeight: 700, color: '#374151', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0.75rem 0 0.5rem' }}>
+                {new Date(grupo.data + 'T12:00:00').toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}
+                <span style={{ color: '#9ca3af', fontWeight: 600 }}> · {grupo.eventos.length}</span>
+              </h2>
+            )}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+        {grupo.eventos.map(ev => {
           const tipo = getTipo(ev.tipo)
           const concluido = ev.status === 'concluido'
           return (
@@ -145,7 +166,29 @@ export default function AgendaPage() {
                   <span style={{ padding: '0.15rem 0.5rem', borderRadius: '999px', background: tipo.cor + '20', color: tipo.cor, fontSize: '0.7rem', fontWeight: 700 }}>{tipo.label}</span>
                   {concluido && <span style={{ padding: '0.15rem 0.5rem', borderRadius: '999px', background: '#dcfce7', color: '#16a34a', fontSize: '0.7rem', fontWeight: 700 }}>Concluído</span>}
                 </div>
-                {ev.local && <div style={{ color: '#666', fontSize: '0.8rem', marginBottom: '0.2rem' }}>📍 {ev.local}</div>}
+                {ev.local && (
+                  <div style={{ color: '#666', fontSize: '0.8rem', marginBottom: '0.35rem' }}>
+                    <div>📍 {ev.local}</div>
+                    {/* O endereço era texto morto: para sair para a visita o
+                        corretor copiava e colava no app de navegação. */}
+                    {(() => {
+                      const nav = linksDeNavegacao(ev.local)
+                      if (!nav) return null
+                      return (
+                        <div style={{ display: 'flex', gap: '0.4rem', marginTop: '0.35rem', flexWrap: 'wrap' }}>
+                          <a href={nav.maps} target="_blank" rel="noopener noreferrer"
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', padding: '0.35rem 0.6rem', borderRadius: '6px', border: '1px solid #e5e7eb', background: '#fff', color: '#374151', fontSize: '0.75rem', fontWeight: 600, textDecoration: 'none', minHeight: 32 }}>
+                            🗺️ Maps
+                          </a>
+                          <a href={nav.waze} target="_blank" rel="noopener noreferrer"
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', padding: '0.35rem 0.6rem', borderRadius: '6px', border: '1px solid #e5e7eb', background: '#fff', color: '#374151', fontSize: '0.75rem', fontWeight: 600, textDecoration: 'none', minHeight: 32 }}>
+                            🚗 Waze
+                          </a>
+                        </div>
+                      )
+                    })()}
+                  </div>
+                )}
                 {ev.descricao && <div style={{ color: '#666', fontSize: '0.8rem', marginBottom: '0.2rem' }}>{ev.descricao}</div>}
                 {ev.leads && (
                   <a href={'https://wa.me/55' + ev.leads.whatsapp?.replace(/\D/g,'')} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', color: '#16a34a', fontSize: '0.8rem', textDecoration: 'none', fontWeight: 500 }}>
@@ -163,6 +206,9 @@ export default function AgendaPage() {
             </div>
           )
         })}
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Modal */}
