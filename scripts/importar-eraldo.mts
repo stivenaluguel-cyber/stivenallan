@@ -3,6 +3,15 @@
  *
  *   npx tsx scripts/importar-eraldo.mts <slug> <arquivo.txt> [--confirmar]
  *                                       [--unidades 304,405,606]
+ *                                       [--quartos "93.20=3/1"]
+ *                                       [--somente-aptos] [--marcar-vendidas]
+ *
+ * VIRADA DE MÊS: a construtora publica tabela nova e a unidade vendida deixa
+ * de constar. A prévia lista quem SUMIU desde a última importação — é a leitura
+ * de vendas do mês. Sem isso a unidade ficaria "disponível" no site para
+ * sempre, porque o upsert só sabe de quem veio. `--marcar-vendidas` baixa as
+ * sumidas; sem o flag, só acusa (sair da tabela pode ser permuta ou bloqueio,
+ * não só venda).
  *
  * As nove tabelas do Eraldo não compartilham a estrutura de pagamento — o Gran
  * Michel é 10/5/15/70 em cinco colunas, o Play é 30/70 em três. O parser lê a
@@ -38,6 +47,7 @@ const opt = (nome: string) => {
   return i >= 0 ? process.argv[i + 1] : null
 }
 const lista = opt('unidades')?.split(',').map((u) => u.trim()) ?? null
+const marcarVendidas = process.argv.includes('--marcar-vendidas')
 
 /**
  * Quartos e suítes POR METRAGEM, no formato "192.95=3/3,373.16=3/3" — a
@@ -83,20 +93,7 @@ console.log(`CUB ${c.cub_valor ?? '—'} · percentuais ${c.percentuais ? c.perc
 if (r.quantidades && r.unidades[0]) {
   console.log(`colunas: ${r.unidades[0].colunas.map((x) => `${x.papel} ${x.quantidade}x (${(x.percentual * 100).toFixed(0)}%)`).join(' · ')}`)
 }
-console.log(`saldo financiado: ${c.tem_financiamento ? `sim, até ${c.pos_chaves_meses ?? r.unidades[0]?.colunas.at(-1)?.quantidade ?? '—'}x` : 'não'} · juros ${c.juros_ao_mes ?? '—'}% a.m. ${c.indice ?? ''} · entrega ${c.previsao_entrega ?? '—'}${c.pe_direito ? ` · pé-direito ${c.pe_direito}` : ''}`)
-
-console.log(`\npolítica comercial do rodapé: ${c.opcoes_pagamento.length} condição(ões)`)
-for (const o of c.opcoes_pagamento) {
-  const n = [
-    o.descontoPct != null ? `${o.descontoPct}% desc.` : null,
-    o.ateAsChavesPct != null ? `${o.ateAsChavesPct}% até as chaves` : null,
-    o.atoMinimoPct != null ? `entrada ${o.atoMinimoPct}%` : null,
-    o.meses ? `${o.meses}x` : null,
-    o.jurosAoMes ? `${String(o.jurosAoMes).replace('.', ',')}% a.m.` : null,
-    o.indice ?? null,
-  ].filter(Boolean).join(' · ')
-  console.log(`  [${o.tipo}] ${n || '—'}\n      ${o.descricao.slice(0, 190)}`)
-}
+console.log(`saldo financiado: ${c.tem_financiamento ? `sim, até ${c.pos_chaves_meses ?? r.unidades[0]?.colunas.at(-1)?.quantidade ?? '—'}x` : 'não'} · juros ${c.juros_ao_mes ?? '—'}% a.m. ${c.indice ?? ''} · entrega ${c.previsao_entrega ?? '—'}`)
 
 const cel = (u: (typeof r.unidades)[number], papel: Parameters<typeof coluna>[1]) => {
   const x = coluna(u, papel)
@@ -147,11 +144,36 @@ if (mapaQuartos) {
   if (semPlanta.length > 0) parar(`metragens fora do mapa de plantas: ${semPlanta.join(', ')} m²`)
 }
 
-if (!confirmar) { console.log('\n(prévia — nada gravado. Use --confirmar para gravar.)'); process.exit(0) }
 
-const { data: existentes } = await sb.from('empreendimentos_unidades').select('unidade, disponivel').eq('empreendimento_id', emp.id)
+const { data: existentes } = await sb.from('empreendimentos_unidades')
+  .select('unidade, disponivel, metragem, valor_tabela').eq('empreendimento_id', emp.id)
 const vendidas = new Set((existentes ?? []).filter((u) => u.disponivel === false).map((u) => u.unidade as string))
 
+// QUEM SUMIU DA TABELA DO MÊS.
+//
+// A construtora publica tabela nova todo mês e a unidade vendida simplesmente
+// deixa de constar. Sem esta conferência ela ficaria no site como
+// "disponível" para sempre — o upsert atualiza quem veio e não sabe nada de
+// quem faltou. É a diferença entre um espelho e uma foto velha.
+//
+// Sair da tabela não é prova de venda: pode ser permuta, bloqueio ou unidade
+// que a construtora recolheu. Por isso o padrão é ACUSAR, e marcar como
+// vendida só com `--marcar-vendidas`.
+const naTabela = new Set(unidades.map((u) => u.unidade))
+const sumiram = (existentes ?? []).filter((u) => u.disponivel !== false && !naTabela.has(u.unidade as string))
+if (sumiram.length > 0) {
+  console.log(`\n*** ${sumiram.length} unidade(s) SUMIRAM da tabela deste mês — provável venda ***`)
+  console.log('| Un. | m² | último preço em tabela |')
+  console.log('|---|---|---|')
+  for (const u of sumiram) {
+    console.log(`| ${u.unidade} | ${brl(Number(u.metragem))} | ${u.valor_tabela ? brl(Number(u.valor_tabela)) : '—'} |`)
+  }
+  console.log(marcarVendidas
+    ? '    → serão marcadas como VENDIDAS (--marcar-vendidas).'
+    : '    → continuam disponíveis no site. Use --marcar-vendidas para baixá-las.')
+}
+
+if (!confirmar) { console.log('\n(prévia — nada gravado. Use --confirmar para gravar.)'); process.exit(0) }
 const linhas = unidades.map((u) => {
   const entrada = coluna(u, 'entrada')!
   const reforcos = coluna(u, 'reforcos')
@@ -196,8 +218,7 @@ const linhas = unidades.map((u) => {
       financiamento_direto: saldo && mesesDoSaldo > 1
         ? { meses: mesesDoSaldo, jurosAoMes: c.juros_ao_mes ?? 0, indice: c.indice }
         : null,
-      opcoes_pagamento: c.opcoes_pagamento,
-      pe_direito: c.pe_direito,
+      opcoes_pagamento: [],
       percentual_ate_chaves: pctAteChaves,
       previsao_entrega: c.previsao_entrega,
       cub_quantidade: u.cub_quantidade,
@@ -229,3 +250,15 @@ const { data, error } = await sb.from('empreendimentos_unidades')
   .upsert(linhas, { onConflict: 'empreendimento_id,bloco,unidade' }).select('id')
 if (error) { console.error(`\nERRO ao gravar: ${error.message}`); process.exit(1) }
 console.log(`\nGRAVADAS: ${data?.length} unidades${vendidas.size ? ` (${vendidas.size} vendidas preservadas)` : ''}`)
+
+// A unidade some da tabela; ela NÃO é apagada do espelho. Vendida continua na
+// grade, marcada, porque "12 de 54 vendidas" é argumento de venda — e apagar
+// perderia o histórico de preço da unidade.
+if (marcarVendidas && sumiram.length > 0) {
+  const { error: e2 } = await sb.from('empreendimentos_unidades')
+    .update({ disponivel: false })
+    .eq('empreendimento_id', emp.id)
+    .in('unidade', sumiram.map((u) => u.unidade as string))
+  if (e2) { console.error(`ERRO ao marcar vendidas: ${e2.message}`); process.exit(1) }
+  console.log(`MARCADAS COMO VENDIDAS: ${sumiram.length} (${sumiram.map((u) => u.unidade).join(', ')})`)
+}
