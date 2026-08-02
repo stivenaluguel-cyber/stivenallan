@@ -84,8 +84,11 @@ export function EspelhoPublico({ slug }: { slug: string }) {
           {' '}Escolha a unidade e eu te mando o valor e as condições de pagamento pelo WhatsApp.
         </p>
 
+        {/* Vendida não tem chip na legenda porque não tem célula na grade: a
+            API pública filtra as vendidas (decisão do corretor, 02/08/2026).
+            A escassez fica na frase acima — "42 de 54 disponíveis". */}
         <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', margin: '18px 0 22px' }}>
-          {(['disponivel', 'reservada', 'vendida'] as StatusUnidade[]).map((k) => (
+          {(['disponivel', 'reservada'] as StatusUnidade[]).map((k) => (
             <span key={k} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: 13, color: P.suave }}>
               <span aria-hidden style={{ width: 12, height: 12, borderRadius: 3, background: ESTILO[k].bg, border: '1px solid ' + ESTILO[k].borda }} />
               {ESTILO[k].label}

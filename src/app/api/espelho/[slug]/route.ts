@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import {
-  pickPublico,
   precoMinimoDisponivel,
   resolverEmpreendimentoPorNome,
   resumoEspelho,
+  unidadesPublicas,
   type UnidadeEspelho,
 } from '@/lib/unidades/espelho'
 import { logError } from '@/lib/log'
@@ -88,6 +88,8 @@ export async function GET(_req: NextRequest, { params }: Params) {
     // Preço por unidade e plano de pagamento só saem por /api/espelho/simular,
     // depois que a pessoa se identifica.
     precoMinimo: exibirPreco ? precoMinimoDisponivel(lista, agora) : null,
-    unidades: lista.map((u) => pickPublico(u, agora)),
+    // Vendida SAI da página pública — decisão do corretor (02/08/2026). O
+    // resumo acima segue contando todas, então a escassez continua visível.
+    unidades: unidadesPublicas(lista, agora),
   })
 }

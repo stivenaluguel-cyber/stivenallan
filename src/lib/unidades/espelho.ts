@@ -278,6 +278,23 @@ export function pickPublico(u: UnidadeEspelho, agora: Date): UnidadePublica {
 }
 
 /**
+ * As unidades que a página PÚBLICA mostra: vendida fica de fora.
+ *
+ * Decisão do corretor (02/08/2026): unidade vendida sai do site. Ela continua
+ * no banco e no espelho interno do dashboard — apagar perderia o histórico de
+ * preço e o controle de liberar/vender — e continua contada no resumo, que é
+ * calculado sobre TODAS: "42 de 54 disponíveis" comunica a escassez sem expor
+ * qual unidade foi.
+ *
+ * Reservada continua visível: a reserva expira em 48h e a unidade volta.
+ */
+export function unidadesPublicas(unidades: UnidadeEspelho[], agora: Date): UnidadePublica[] {
+  return unidades
+    .filter((u) => statusDaUnidade(u, agora) !== 'vendida')
+    .map((u) => pickPublico(u, agora))
+}
+
+/**
  * O "a partir de" da seção — âncora de preço sem entregar a tabela.
  *
  * Calculado só sobre as unidades DISPONÍVEIS: anunciar o menor preço do
