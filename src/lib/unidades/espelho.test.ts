@@ -9,6 +9,7 @@ import {
   precoMinimoDisponivel,
   resumoEspelho,
   statusDaUnidade,
+  unidadesPublicas,
   type UnidadeEspelho,
 } from './espelho'
 
@@ -299,5 +300,46 @@ describe('nome duplicado em empreendimentos', () => {
   it('nome único não muda de comportamento', () => {
     const unico = [{ id: 'a', nome: 'Pineto' }, { id: 'b', nome: 'Thiene' }]
     expect(resolverEmpreendimentoPorNome('Pineto', unico, new Set())).toBe('a')
+  })
+})
+
+describe('unidadesPublicas — vendida sai da página pública', () => {
+  const base: UnidadeEspelho = {
+    id: 'u1', bloco: null, unidade: '101', andar: 1, metragem: 70,
+    dormitorios: 2, suites: 1, orientacao: null,
+    valor_tabela: 500000, valor_promocional: null, valor_entrada_min: 50000,
+    disponivel: true, reservado_ate: null, lead_id_reserva: null,
+    condicoes_negociacao: null, cub_fator: null, plano_pagamento: null,
+  }
+  const agora = new Date('2026-08-02T12:00:00Z')
+
+  it('filtra a vendida e mantém disponível e reservada', () => {
+    const lista: UnidadeEspelho[] = [
+      base,
+      { ...base, id: 'u2', unidade: '102', disponivel: false },
+      { ...base, id: 'u3', unidade: '103', reservado_ate: '2026-08-03T12:00:00Z' },
+    ]
+    const pub = unidadesPublicas(lista, agora)
+
+    expect(pub.map((u) => u.unidade)).toEqual(['101', '103'])
+    expect(pub.find((u) => u.unidade === '103')?.status).toBe('reservada')
+  })
+
+  it('reserva vencida volta como disponível — não some', () => {
+    const lista = [{ ...base, reservado_ate: '2026-08-01T12:00:00Z' }]
+    expect(unidadesPublicas(lista, agora)[0].status).toBe('disponivel')
+  })
+
+  it('o resumo continua contando TODAS — a escassez fica visível', () => {
+    const lista: UnidadeEspelho[] = [
+      base,
+      { ...base, id: 'u2', unidade: '102', disponivel: false },
+    ]
+    const resumo = resumoEspelho(lista, agora)
+
+    expect(unidadesPublicas(lista, agora)).toHaveLength(1)
+    expect(resumo.total).toBe(2)
+    expect(resumo.vendidas).toBe(1)
+    expect(resumo.percentualVendido).toBe(50)
   })
 })

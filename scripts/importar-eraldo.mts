@@ -251,9 +251,10 @@ const { data, error } = await sb.from('empreendimentos_unidades')
 if (error) { console.error(`\nERRO ao gravar: ${error.message}`); process.exit(1) }
 console.log(`\nGRAVADAS: ${data?.length} unidades${vendidas.size ? ` (${vendidas.size} vendidas preservadas)` : ''}`)
 
-// A unidade some da tabela; ela NÃO é apagada do espelho. Vendida continua na
-// grade, marcada, porque "12 de 54 vendidas" é argumento de venda — e apagar
-// perderia o histórico de preço da unidade.
+// A unidade some da tabela; ela NÃO é apagada do banco. Vendida sai da página
+// PÚBLICA (decisão do corretor, 02/08) mas continua no espelho interno e no
+// resumo — "42 de 54 disponíveis" comunica a escassez — e apagar perderia o
+// histórico de preço da unidade.
 if (marcarVendidas && sumiram.length > 0) {
   const { error: e2 } = await sb.from('empreendimentos_unidades')
     .update({ disponivel: false })
