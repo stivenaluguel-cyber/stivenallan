@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { MessageCircle } from 'lucide-react';
 import GalleryWithLightbox from './gallery-lightbox';
 import PlantasLightbox from './plantas-lightbox';
 import { LeadCaptureButton } from '@/components/LeadCaptureButton'
@@ -295,7 +296,7 @@ export default function BellantePage() {
       {/* WHATSAPP FLUTUANTE */}
       <a href={WA} target="_blank" rel="noopener" aria-label="WhatsApp"
         style={{ position: 'fixed', bottom: '1.5rem', right: '1.5rem', zIndex: 100, background: '#25D366', color: '#fff', width: '56px', height: '56px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(0,0,0,0.25)', textDecoration: 'none', fontSize: '1.6rem' }}>
-        💬
+        <MessageCircle size={26} strokeWidth={2} aria-hidden="true" />
       </a>
 
     </main>

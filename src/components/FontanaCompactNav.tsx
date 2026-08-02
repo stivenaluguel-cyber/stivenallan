@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { Menu, X } from 'lucide-react'
 
 // Nav compartilhado pelo template compacto Fontana (Avezzano, Bellante).
 // Links e âncoras são fixos porque as duas páginas usam exatamente as mesmas seções.
@@ -57,7 +58,7 @@ export function FontanaCompactNav({ title, accent, wa }: { title: string; accent
           aria-expanded={open}
           onClick={() => setOpen(o => !o)}
         >
-          {open ? '✕' : '☰'}
+          {open ? <X size={24} aria-hidden="true" /> : <Menu size={24} aria-hidden="true" />}
         </button>
       </div>
       <div className={`fcn-mobile-menu${open ? ' fcn-open' : ''}`} style={{ flexDirection: 'column', padding: '0.5rem 1.1rem 1.25rem', gap: 2, background: 'rgba(0,0,0,0.92)', backdropFilter: 'blur(8px)' }}>

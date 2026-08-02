@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
+import { Building2, House } from 'lucide-react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import WppFloat from '@/components/WppFloat'
@@ -162,7 +163,7 @@ export default function BlogPage() {
               <div className="relative h-64 md:h-auto bg-[#2c3035] overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-[#c9a24b]/20 to-transparent" />
                 <div className="flex items-center justify-center h-full">
-                  <span className="text-6xl">🏙️</span>
+                  <Building2 size={60} strokeWidth={1} aria-hidden="true" className="text-[#c9a24b]/60" />
                 </div>
                 <span className="absolute top-4 left-4 px-3 py-1 bg-[#c9a24b] text-[#121315] rounded-full text-xs font-bold">
                   Destaque
@@ -201,7 +202,7 @@ export default function BlogPage() {
                   <div className="relative h-44 bg-[#2c3035] overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-br from-[#c9a24b]/10 to-transparent" />
                     <div className="flex items-center justify-center h-full">
-                      <span className="text-4xl opacity-50">🏠</span>
+                      <House size={36} strokeWidth={1} aria-hidden="true" className="text-[#c9a24b] opacity-50" />
                     </div>
                   </div>
                   <div className="p-5">

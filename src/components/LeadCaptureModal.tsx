@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { Hand } from 'lucide-react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { getAnonId, getVisitas } from '@/components/VisitTracker'
@@ -151,7 +152,7 @@ export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName
             <div style={{ padding: '24px', backgroundColor: '#ffffff' }}>
               {returningLead && status === 'idle' ? (
                 <div style={{ textAlign: 'center', padding: '12px 0' }}>
-                  <div style={{ fontSize: '32px', marginBottom: '10px' }}>👋</div>
+                  <div style={{ marginBottom: '10px', color: '#18181b', display: 'flex', justifyContent: 'center' }}><Hand size={32} strokeWidth={1.5} aria-hidden="true" /></div>
                   <p style={{ fontWeight: '700', color: '#18181b', fontSize: '17px', margin: '0 0 6px', fontFamily: 'inherit' }}>
                     Olá, {returningLead.nome.split(' ')[0]}!
                   </p>
