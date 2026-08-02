@@ -45,6 +45,8 @@
 //   - e é a MESMA em todas as unidades — é a tabela do empreendimento, não do
 //     apartamento.
 
+import type { OpcaoPagamento } from './financiamento-direto'
+
 export type PapelColuna = 'entrada' | 'reforcos' | 'mensais' | 'chaves' | 'saldo'
 
 export type ColunaPagamento = {
@@ -89,6 +91,10 @@ export type CabecalhoEraldo = {
   tem_financiamento: boolean
   /** Do rodapé: "Prazo de entrega Junho de 2028". */
   previsao_entrega: string | null
+  /** Condições comerciais do rodapé — os descontos de 5%, 7% e 10%. */
+  opcoes_pagamento: OpcaoPagamento[]
+  /** Observação que o corretor pediu em destaque, quando a tabela traz. */
+  pe_direito: string | null
 }
 
 export type ResultadoEraldo = {
@@ -192,6 +198,12 @@ function parseCabecalho(texto: string): CabecalhoEraldo {
     endereco: end ? end[1].trim() : null,
     tem_financiamento,
     previsao_entrega: entrega ? entrega[1].trim() : null,
+    // Preenchidos depois, quando se sabe onde termina a última unidade.
+    opcoes_pagamento: [],
+    // O corretor pediu destaque para isto: está escrito na tabela do Gran
+    // Michel ("Os apartamentos 'Diferenciados' possuem pé direito 4,70m"),
+    // não é suposição nossa.
+    pe_direito: texto.match(/p[ée]\s*direito\s*(?:de\s*)?([\d,]+\s*m)/i)?.[1].replace(/\s+/g, '') ?? null,
   }
 }
 
@@ -429,6 +441,10 @@ export function parsearTabelaEraldo(texto: string): ResultadoEraldo {
     .filter(({ l, i }) => !consumidas.has(i) && [...l.matchAll(/R\$\s*[\d.]+,\d{2}/g)].length >= minValores)
     .map(({ l }) => l)
 
+  // O rodapé começa depois da última linha de unidade consumida.
+  const ultimaUnidade = fatias.length > 0 ? Math.max(...fatias.map((f) => f.valoresEm)) : -1
+  cabecalho.opcoes_pagamento = ultimaUnidade >= 0 ? lerOpcoesEraldo(linhas, ultimaUnidade) : []
+
   return {
     cabecalho,
     unidades,
@@ -440,6 +456,151 @@ export function parsearTabelaEraldo(texto: string): ResultadoEraldo {
       confere: aptosNoTexto === unidades.length + rejeitadas.length && linhasOrfas.length === 0,
     },
   }
+}
+
+/**
+ * Onde o rodapé deixa de ser condição comercial e vira observação de obra.
+ *
+ * "ATENÇÃO: O período máximo de intervalo entre os reforços será de 12 meses"
+ * e a lista numerada ("1 - Os valores expressos…", "3 - Obra iniciada…") não
+ * são condição de pagamento e não devem entrar na descrição que o corretor lê
+ * na tela para repetir ao cliente.
+ */
+const FIM_DAS_CONDICOES =
+  /ATEN[ÇC][ÃA]O\s*:|^\s*\d{1,2}\s*-\s*(?:Os\s+valores|Esta\s+tabela|Obra|In[íi]cio|Previs[ãa]o|Prazo|Incorpora|R\.\d)|Incorpora[çc][ãa]o\s+Imobili[áa]ria/im
+
+/**
+ * Lê a política comercial do rodapé das tabelas da Eraldo.
+ *
+ * O leitor da Fontana não serve: lá o rodapé escreve "OPÇÃO 01: DESCONTO DE
+ * 10% SOBRE O VALOR TOTAL, PAGANDO 40% ATÉ AS CHAVES"; aqui é
+ *
+ *     Condição 2 - 5% de desconto
+ *     - Parcela A (70% até as chaves) - 10% de entrada, 20% em reforços…
+ *     - Parcela B - 30% em até 180 parcelas mensais corrigidas pelo IGPM…
+ *
+ * — título numerado, detalhe em linhas de "Parcela A/B", e o percentual do
+ * desconto ANTES da palavra "desconto", não depois. Nenhum dos dois padrões
+ * casa com o outro, e o resultado era `opcoes_pagamento` vazio nas nove
+ * tabelas: os descontos de 5%, 7% e 10% existiam no PDF e não chegavam na
+ * tela. É a mesma classe de defeito do Lavis.
+ *
+ * Três tabelas (Gran Palazzo, Horizon, L'Essence) não têm lista de condições —
+ * o desconto à vista aparece solto na lista numerada de observações, e é lido
+ * de lá.
+ *
+ * `ate` é o índice da última linha de unidade: o rodapé começa depois dela. No
+ * Symphony isso é o que impede a condição das SALAS comerciais (20/40/40 em
+ * 24x, outro negócio) de ser oferecida como se fosse dos apartamentos.
+ */
+export function lerOpcoesEraldo(linhas: string[], ate: number): OpcaoPagamento[] {
+  // Um segundo bloco de tabela começa com a sua própria linha de estrutura
+  // ("PRIVAT. TOTAL 20% 40% 40%"). Somar 100% não basta para reconhecê-la: a
+  // condição 3 do Gran Michel é "20% de entrada 20% em reforços até as chaves
+  // 60% em 22 parcelas mensais", que também fecha em 100 e cortava o rodapé
+  // ali — as condições 3 e 4, entre elas o desconto de 10% à vista, sumiam.
+  // A linha de estrutura é um RÓTULO: fora os percentuais, quase não tem letra.
+  const ehLinhaDeEstrutura = (l: string) => {
+    const p = [...l.matchAll(/(?<![,.])\b(\d{1,2})%/g)].map((m) => Number(m[1]))
+    if (p.length < 2 || Math.abs(p.reduce((a, b) => a + b, 0) - 100) > 0.5) return false
+    return l.replace(/(?<![,.])\b\d{1,2}%/g, '').replace(/[^A-Za-zÀ-ÿ]/g, '').length <= 20
+  }
+  const fim = (() => {
+    for (let i = ate + 1; i < linhas.length; i++) if (ehLinhaDeEstrutura(linhas[i])) return i
+    return linhas.length
+  })()
+  // O PDF do Aura repete a linha da condição 2 com as letras comidas —
+  // "C di ã 2 P é h (5% d d )" — e ela entrava na descrição que o corretor lê
+  // na tela. Linha em que a maioria das palavras tem uma letra só é sujeira de
+  // extração, não texto.
+  const ehLixo = (l: string) => {
+    const w = l.trim().split(/\s+/)
+    return w.length >= 5 && w.filter((x) => x.replace(/[^A-Za-zÀ-ÿ]/g, '').length <= 1).length / w.length > 0.6
+  }
+  const rodape = linhas.slice(ate + 1, fim).filter((l) => !ehLixo(l)).join('\n')
+
+  const opcoes: OpcaoPagamento[] = []
+  const blocos = [...rodape.matchAll(/Condi[çc][ãa]o\s*(\d+)\s*[-–]\s*([\s\S]*?)(?=Condi[çc][ãa]o\s*\d+\s*[-–]|$)/gi)]
+
+  for (const b of blocos) {
+    // Cada bloco vai até onde as observações de obra começam.
+    const corte = b[2].search(FIM_DAS_CONDICOES)
+    const bruto = (corte >= 0 ? b[2].slice(0, corte) : b[2])
+      .replace(/^\s*-+>?\s*/gm, '')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .replace(/[;.\s]+$/, '')
+    if (!bruto) continue
+
+    const desc = `Condição ${b[1]} — ${bruto}`
+    const opcao: OpcaoPagamento = { tipo: classificarEraldo(bruto), descricao: desc, ...numerosEraldo(bruto) }
+    // Duas linhas idênticas por engano de digitação: a condição 3 do Gran
+    // Michel repete a "Parcela A" no lugar da "Parcela B".
+    if (!opcoes.some((o) => o.descricao === opcao.descricao)) opcoes.push(opcao)
+  }
+
+  // Desconto à vista solto na lista numerada de observações.
+  const aVista = rodape.match(/(\d{1,2})\s*%\s*de\s*desconto\s*(?:para\s*)?(?:pagamento\s*)?[àáa]\s*vista/i)
+  if (aVista && !opcoes.some((o) => o.tipo === 'a_vista')) {
+    opcoes.push({
+      tipo: 'a_vista',
+      descricao: `Pagamento à vista com ${aVista[1]}% de desconto`,
+      descontoPct: Number(aVista[1]),
+    })
+  }
+
+  return opcoes
+}
+
+function classificarEraldo(desc: string): OpcaoPagamento['tipo'] {
+  if (/[àáa]\s*vista/i.test(desc)) return 'a_vista'
+  if (/construtora|direto/i.test(desc)) return 'direto'
+  if (/banc[áa]ri/i.test(desc)) return 'bancario'
+  return 'outro'
+}
+
+function numerosEraldo(desc: string): Partial<OpcaoPagamento> {
+  const out: Partial<OpcaoPagamento> = {}
+
+  // "5% de desconto" — o percentual vem ANTES da palavra, ao contrário da
+  // Fontana ("DESCONTO DE 10%").
+  const desconto = desc.match(/(\d{1,2})\s*%\s*de\s*desconto/i)
+  if (desconto) out.descontoPct = Number(desconto[1])
+
+  // Quanto precisa estar quitado até a entrega. Três formas, nesta ordem — e
+  // NENHUMA delas é "o primeiro percentual perto da palavra chaves".
+  //
+  // Essa forma solta parecia funcionar e mentia: a condição 1 do Gran Michel
+  // diz "5% em reforços até as chaves" (a fatia do reforço, não o total, que é
+  // 30%) e a condição 3 diz "20% em reforços até as chaves" quando o negócio
+  // inteiro é quitado antes da entrega. Melhor não afirmar do que afirmar 5%.
+  const entreParenteses = desc.match(/\((\d{1,3})\s*%\s*at[ée]\s*as?\s*chaves\)/i)
+  const aposEntrega = desc.match(/(\d{1,3})\s*%\s*ap[óo]s\s*a\s*entrega/i)
+  if (entreParenteses) {
+    out.ateAsChavesPct = Number(entreParenteses[1])
+  } else if (aposEntrega) {
+    // "60% após a entrega das chaves" (condição 40/60 do Aura) — o resto é o
+    // que se paga antes.
+    out.ateAsChavesPct = 100 - Number(aposEntrega[1])
+  } else if (/pagamento\s+at[ée]\s+as?\s+chaves|at[ée]\s+as?\s+chaves\s*\(/i.test(desc)) {
+    out.ateAsChavesPct = 100
+  }
+
+  const entrada = desc.match(/(\d{1,2})\s*%\s*de\s*entrada/i)
+  if (entrada) out.atoMinimoPct = Number(entrada[1])
+
+  // "em até 180 parcelas mensais corrigidas pelo IGPM + 075% ao mês"
+  const meses = desc.match(/at[ée]\s*(\d{1,3})\s*parcelas/i)
+  if (meses) out.meses = Number(meses[1])
+  const juros = desc.match(/IGPM\s*\+\s*0?(\d{1,3}(?:,\d{1,2})?)\s*%|(\d{1,3}(?:,\d{1,2})?)\s*%\s*ao\s*m[êe]s/i)
+  if (juros) {
+    const bruto = Number((juros[1] ?? juros[2]).replace(',', '.'))
+    out.jurosAoMes = bruto >= 10 ? bruto / 100 : bruto
+  }
+  if (/IGPM/i.test(desc)) out.indice = 'IGPM'
+  else if (/CUB/i.test(desc)) out.indice = 'CUB'
+
+  return out
 }
 
 /** Atalho de leitura: a coluna daquele papel, quando a tabela tem. */
