@@ -69,6 +69,11 @@ export function montarMensagemSimulacao(d: DadosMensagem): string {
     if (s.reforcosQtd > 0) {
       linhas.push(`${s.reforcosQtd} reforços anuais de ${brlExato(s.reforcoValor)}`)
     }
+    // Parcela única na entrega (Horizon): omiti-la faria a soma da mensagem
+    // não fechar com o "Até as chaves" logo abaixo.
+    if (s.pagamentoNasChaves > 0) {
+      linhas.push(`Na entrega das chaves: ${brlExato(s.pagamentoNasChaves)}`)
+    }
     linhas.push(
       `Até as chaves: ${brlExato(s.ateAsChaves)} (${s.ateAsChavesPercentual}%)`,
       `Saldo na entrega: ${brlExato(s.saldoFinanciamento)}`,

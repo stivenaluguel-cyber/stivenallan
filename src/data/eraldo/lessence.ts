@@ -117,8 +117,8 @@ export const lessence: Empreendimento = {
   tipologias: [
     { nome: 'Apartamento — Tipo 3/4', areaPrivativa: 80.36, dormitorios: 2, suites: 2 },
     { nome: 'Apartamento — Tipo 5/6', areaPrivativa: 98.43, dormitorios: 3, suites: 1 },
-    { nome: 'Apartamento — Tipo 2', areaPrivativa: 119.47, dormitorios: 3, suites: 3 },
-    { nome: 'Apartamento — Tipo 1', areaPrivativa: 120.03, dormitorios: 3, suites: 3 },
+    { nome: 'Apartamento — Tipo 2', areaPrivativa: 119.47, dormitorios: 3, suites: 1 },
+    { nome: 'Apartamento — Tipo 1', areaPrivativa: 120.03, dormitorios: 3, suites: 1 },
     { nome: 'Cobertura 1', areaPrivativa: 383.87, suites: 3, observacao: 'Piscina privativa e deck no terraço.' },
   ],
   plantasTitulo: 'Escolha o seu layout',
@@ -128,8 +128,8 @@ export const lessence: Empreendimento = {
     { categoria: 'tipo', src: `${SITE}/2024/11/3-Planta-LEssence-Apto-Tipo-4.jpg`, alt: "L'Essence — planta apartamento tipo 4", label: 'Apto Tipo 4', area: 80.36, quartos: 2, suites: 2 },
     { categoria: 'tipo', src: `${SITE}/2024/11/4-Planta-LEssence-Apto-Tipo-5-1.jpg`, alt: "L'Essence — planta apartamento tipo 5", label: 'Apto Tipo 5', area: 98.43, quartos: 3, suites: 1 },
     { categoria: 'tipo', src: `${SITE}/2024/11/4-Planta-LEssence-Apto-Tipo-6.jpg`, alt: "L'Essence — planta apartamento tipo 6", label: 'Apto Tipo 6', area: 98.43, quartos: 3, suites: 1 },
-    { categoria: 'tipo', src: `${SITE}/2024/11/2-Planta-LEssence-Apto-Tipo-2.jpg`, alt: "L'Essence — planta apartamento tipo 2", label: 'Apto Tipo 2', area: 119.47, quartos: 3, suites: 3 },
-    { categoria: 'tipo', src: `${SITE}/2024/11/2-Planta-LEssence-Apto-Tipo-1-1.jpg`, alt: "L'Essence — planta apartamento tipo 1", label: 'Apto Tipo 1', area: 120.03, quartos: 3, suites: 3 },
+    { categoria: 'tipo', src: `${SITE}/2024/11/2-Planta-LEssence-Apto-Tipo-2.jpg`, alt: "L'Essence — planta apartamento tipo 2", label: 'Apto Tipo 2', area: 119.47, quartos: 3, suites: 1 },
+    { categoria: 'tipo', src: `${SITE}/2024/11/2-Planta-LEssence-Apto-Tipo-1-1.jpg`, alt: "L'Essence — planta apartamento tipo 1", label: 'Apto Tipo 1', area: 120.03, quartos: 3, suites: 1 },
     { categoria: 'cobertura', src: `${SITE}/2024/11/1-Planta-LEssence-Cobertura-1-1.jpg`, alt: "L'Essence — planta da cobertura 1", label: 'Cobertura 1', area: 383.87, suites: 3 },
   ],
   plantasGrupos: [

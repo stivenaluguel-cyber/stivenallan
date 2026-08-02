@@ -60,7 +60,9 @@ export const granPalazzo: Empreendimento = {
     { val: '12/2026', label: 'Entrega prevista' },
   ],
   metricasExtras: [
-    { n: '2', label: 'Suítes por apartamento tipo' },
+    // A planta do catálogo é explícita: "3 quartos sendo 1 suíte", nos dois
+    // layouts. Aqui dizia 2 suítes.
+    { n: '3', label: 'Quartos por apartamento tipo' },
     { n: '4', label: 'Coberturas duplex' },
   ],
 
@@ -117,16 +119,16 @@ export const granPalazzo: Empreendimento = {
   ],
 
   tipologias: [
-    { nome: 'Apartamento — Layout 01', areaPrivativa: 126.71, dormitorios: 3, suites: 2 },
-    { nome: 'Apartamento — Layout 02', areaPrivativa: 129.43, dormitorios: 3, suites: 2 },
+    { nome: 'Apartamento — Layout 01', areaPrivativa: 126.71, dormitorios: 3, suites: 1 },
+    { nome: 'Apartamento — Layout 02', areaPrivativa: 129.43, dormitorios: 3, suites: 1 },
     { nome: 'Garden 201/202', observacao: 'Área privativa não confirmada com segurança na fonte disponível.' },
     { nome: 'Cobertura duplex (1801 a 1804)', observacao: '2 pavimentos internos, com piscina privativa. Área exata não confirmada com segurança na fonte disponível.' },
   ],
   plantasTitulo: 'Escolha o seu layout',
   plantasTexto: 'Apartamentos, unidades garden e coberturas duplex — plantas por tipo de unidade.',
   plantas: [
-    { categoria: 'tipo', src: `${SITE}/2024/11/Planta-Humanizada-Tipo-01-alterada.png`, alt: 'Gran Palazzo — planta apartamento layout 01', label: 'Layout 01', area: 126.71, quartos: 3, suites: 2 },
-    { categoria: 'tipo', src: `${SITE}/2024/11/Planta-Humanizada-Tipo-03-alterada.png`, alt: 'Gran Palazzo — planta apartamento layout 02', label: 'Layout 02', area: 129.43, quartos: 3, suites: 2 },
+    { categoria: 'tipo', src: `${SITE}/2024/11/Planta-Humanizada-Tipo-01-alterada.png`, alt: 'Gran Palazzo — planta apartamento layout 01', label: 'Layout 01', area: 126.71, quartos: 3, suites: 1 },
+    { categoria: 'tipo', src: `${SITE}/2024/11/Planta-Humanizada-Tipo-03-alterada.png`, alt: 'Gran Palazzo — planta apartamento layout 02', label: 'Layout 02', area: 129.43, quartos: 3, suites: 1 },
     { categoria: 'garden', src: `${SITE}/2024/11/1-Planta-Gran-P-Garden-201-1.jpg`, alt: 'Gran Palazzo — planta garden 201', label: 'Garden 201' },
     { categoria: 'garden', src: `${SITE}/2024/11/2-Planta-Gran-P-Garden-202-1.jpg`, alt: 'Gran Palazzo — planta garden 202', label: 'Garden 202' },
     { categoria: 'duplex', src: `${SITE}/2024/11/4-Planta-Gran-P-Duplex-1801-1.jpg`, alt: 'Gran Palazzo — planta cobertura duplex 1801', label: 'Duplex 1801' },

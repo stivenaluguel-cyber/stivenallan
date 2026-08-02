@@ -355,6 +355,9 @@ function SimuladorFluxo({ cub, emps }: { cub: Cub | null; emps: Emp[] }) {
                 {sim.reforcosQtd > 0 && (
                   <Linha l={`${sim.reforcosQtd} reforços anuais`} v={`${fmt(sim.reforcoValor)} · ${sim.reforcoEmParcelas.toFixed(2)}× a parcela`} />
                 )}
+                {sim.pagamentoNasChaves > 0 && (
+                  <Linha l="Na entrega das chaves" v={fmt(sim.pagamentoNasChaves)} />
+                )}
                 <Linha l={`Até as chaves (${sim.ateAsChavesPercentual}%)`} v={fmt(sim.ateAsChaves)} />
                 <Linha l="Saldo financiado na entrega" v={fmt(sim.saldoFinanciamento)} />
               </div>

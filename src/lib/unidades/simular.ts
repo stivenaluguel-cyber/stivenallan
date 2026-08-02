@@ -21,6 +21,14 @@ export type PlanoPagamento = {
   reforcos_qtd: number
   reforco_valor: number
   saldo_financiamento: number
+  /**
+   * Parcela única paga na entrega das chaves, quando a tabela tem essa coluna.
+   *
+   * É do Horizon (Eraldo): 20% de entrada, 15% nas chaves, 5% em 4 mensais e
+   * 60% financiado. Fica fora da redistribuição da entrada de propósito — é
+   * data e valor de contrato, não uma parcela que se pode diluir.
+   */
+  pagamento_nas_chaves?: number | null
   cub_quantidade?: number | null
   /** Parcelamento direto do saldo, quando a tabela oferece. */
   financiamento_direto?: { meses: number; jurosAoMes: number; indice: string | null } | null
@@ -39,6 +47,8 @@ export type Simulacao = {
   parcelaValor: number
   reforcosQtd: number
   reforcoValor: number
+  /** Parcela única na entrega das chaves; 0 quando a tabela não tem. */
+  pagamentoNasChaves: number
   /** Total quitado até a entrega das chaves (entrada + parcelas + reforços). */
   ateAsChaves: number
   ateAsChavesPercentual: number
@@ -89,10 +99,14 @@ export function simular(
   const parcelasQtd = semParcelamento ? 0 : Math.floor(plano.parcelas_qtd)
   const reforcosQtd = Math.max(0, Math.floor(plano.reforcos_qtd || 0))
 
+  // Pagamento na entrega, quando existe. Entra no total até as chaves e fica
+  // FORA do que a entrada redistribui.
+  const naChaves = Math.max(0, plano.pagamento_nas_chaves ?? 0)
+
   // Montante até as chaves, tirado do próprio plano da tabela — não de um
   // percentual chutado.
   const ateAsChavesPadrao =
-    plano.entrada + parcelasQtd * plano.parcela_valor + reforcosQtd * plano.reforco_valor
+    plano.entrada + parcelasQtd * plano.parcela_valor + reforcosQtd * plano.reforco_valor + naChaves
 
   const usaPadrao =
     // Sem parcelas não há o que redistribuir: mexer na entrada mudaria o
@@ -112,6 +126,7 @@ export function simular(
       parcelaValor: cent(plano.parcela_valor),
       reforcosQtd,
       reforcoValor: cent(plano.reforco_valor),
+      pagamentoNasChaves: cent(naChaves),
       ateAsChaves: cent(ateAsChavesPadrao),
       ateAsChavesPercentual: pct(ateAsChavesPadrao, valorTotal),
       saldoFinanciamento: cent(plano.saldo_financiamento),
@@ -124,7 +139,9 @@ export function simular(
   // Entrada dentro de limites que fazem sentido: nunca negativa, nunca maior
   // que o que precisa estar quitado até as chaves (acima disso já não é
   // entrada, é quitação — outra conversa, com desconto à vista).
-  const entrada = Math.min(Math.max(entradaDesejada, 0), ateAsChavesPadrao)
+  // O que a entrada pode ocupar vai só até o que é redistribuível: o
+  // pagamento na entrega das chaves continua devido de qualquer jeito.
+  const entrada = Math.min(Math.max(entradaDesejada, 0), ateAsChavesPadrao - naChaves)
 
   // Parcela e reforço caem JUNTOS, preservando a proporção da tabela.
   //
@@ -139,7 +156,7 @@ export function simular(
     plano.parcela_valor > 0 ? plano.reforco_valor / plano.parcela_valor : 0
   const razao = Math.min(razaoTabela, REFORCO_MAXIMO_EM_PARCELAS)
 
-  const restante = ateAsChavesPadrao - entrada
+  const restante = ateAsChavesPadrao - entrada - naChaves
   const divisor = parcelasQtd + reforcosQtd * razao
   const parcelaValor = restante > 0 && divisor > 0 ? restante / divisor : 0
   const reforcoValor = parcelaValor * razao
@@ -152,6 +169,7 @@ export function simular(
     parcelaValor: cent(parcelaValor),
     reforcosQtd,
     reforcoValor: cent(reforcoValor),
+    pagamentoNasChaves: cent(naChaves),
     ateAsChaves: cent(ateAsChavesPadrao),
     ateAsChavesPercentual: pct(ateAsChavesPadrao, valorTotal),
     // O saldo financiado não muda: é o que sobra depois das chaves, e a
@@ -194,6 +212,7 @@ export function planoDoJson(v: unknown): PlanoPagamento | null {
     entrada: n('entrada'),
     parcelas_qtd: n('parcelas_qtd'),
     parcela_valor: n('parcela_valor'),
+    pagamento_nas_chaves: n('pagamento_nas_chaves'),
     reforcos_qtd: n('reforcos_qtd'),
     reforco_valor: n('reforco_valor'),
     saldo_financiamento: n('saldo_financiamento'),

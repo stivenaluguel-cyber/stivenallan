@@ -10,6 +10,7 @@ const PADRAO: Simulacao = {
   reforcosQtd: 4, reforcoValor: 11284.66,
   ateAsChaves: 225693.13, ateAsChavesPercentual: 30,
   saldoFinanciamento: 526617.29,
+  pagamentoNasChaves: 0,
   padraoDaTabela: true, reforcoEmParcelas: 3.75,
 }
 
@@ -124,6 +125,7 @@ describe('plano sem parcelamento na mensagem', () => {
     valorTotal: 1042621.08, entrada: 156393.16, entradaPercentual: 15,
     parcelasQtd: 0, parcelaValor: 0, reforcosQtd: 0, reforcoValor: 0,
     ateAsChaves: 156393.16, ateAsChavesPercentual: 15,
+    pagamentoNasChaves: 0,
     saldoFinanciamento: 886227.92, padraoDaTabela: true, reforcoEmParcelas: 0,
   }
 
