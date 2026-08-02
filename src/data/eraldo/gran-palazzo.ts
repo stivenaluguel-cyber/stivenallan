@@ -60,7 +60,9 @@ export const granPalazzo: Empreendimento = {
     { val: '12/2026', label: 'Entrega prevista' },
   ],
   metricasExtras: [
-    { n: '2', label: 'Suítes por apartamento tipo' },
+    // A planta do catálogo é explícita: "3 quartos sendo 1 suíte", nos dois
+    // layouts. Aqui dizia 2 suítes.
+    { n: '3', label: 'Quartos por apartamento tipo' },
     { n: '4', label: 'Coberturas duplex' },
   ],
 
