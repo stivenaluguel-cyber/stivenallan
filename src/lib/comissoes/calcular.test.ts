@@ -143,6 +143,15 @@ describe('normalizarComissao', () => {
     if (!r.ok) expect(r.erro).toContain('corretor')
   })
 
+  it('divisão detalhada dispensa corretor cadastrado', () => {
+    // A venda 100% dividida entre nomes livres (vendedor, imobiliária) já diz
+    // quem recebe. Exigir também um corretor_captador_id/vendedor_id
+    // bloquearia exatamente o caso que a divisão detalhada existe para
+    // cobrir — foi o que aconteceu em produção com crm_corretores vazio.
+    const r = normalizarComissao({ valor_venda: 500000 }, { temParticipantesValidos: true })
+    expect(r.ok).toBe(true)
+  })
+
   it('percentuais sempre somam 100 (respeita o CHECK do banco)', () => {
     const r = normalizarComissao({ ...base, corretor_vendedor_id: 'c2', percentual_captador: 40 })
     if (!r.ok) throw new Error(r.erro)
