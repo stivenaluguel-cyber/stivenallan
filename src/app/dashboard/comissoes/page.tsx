@@ -2,7 +2,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Plus, Users, X } from 'lucide-react'
 import { STATUS_COMISSAO, calcularDivisao, type StatusComissao } from '@/lib/comissoes/calcular'
+import { normalizarParticipantes, ROTULO_PAPEL } from '@/lib/comissoes/participantes'
 import { ParcelasComissao } from '@/components/dashboard/ParcelasComissao'
+import { ExtratoAnual } from '@/components/dashboard/ExtratoAnual'
+import { DivisaoEnvolvidos, linhasParaPayload, type LinhaEnvolvido } from '@/components/dashboard/DivisaoEnvolvidos'
 
 const D = {
   bg: '#F3F2EE', surface: '#FAFAF7', sidebar: '#131211', ink: '#161512',
@@ -28,6 +31,11 @@ type Comissao = {
   empreendimentos?: { nome: string } | null
   captador?: { id: string; nome: string } | null
   vendedor?: { id: string; nome: string } | null
+  participantes?: {
+    id: string; corretor_id: string | null; nome: string | null
+    papel: string; percentual: number
+    corretor?: { id: string; nome: string } | null
+  }[] | null
 }
 type Resumo = { previsto: number; confirmado: number; recebido: number; totalVendas: number; quantidade: number }
 
@@ -74,7 +82,7 @@ export default function ComissoesPage() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap', marginBottom: 24 }}>
           <div>
             <h1 style={{ fontFamily: "'Bricolage Grotesque',system-ui", fontSize: 'clamp(1.5rem,3vw,2rem)', fontWeight: 800, margin: 0 }}>Comissões</h1>
-            <p style={{ margin: '6px 0 0', fontSize: 14, color: D.muted }}>Vendas da rede e divisão entre captador e vendedor.</p>
+            <p style={{ margin: '6px 0 0', fontSize: 14, color: D.muted }}>Vendas da rede e a divisão da comissão entre os envolvidos.</p>
           </div>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             <button onClick={() => setModalCorretor(true)} style={btnSec}><Users size={15} /> Corretores</button>
@@ -123,6 +131,7 @@ export default function ComissoesPage() {
             {comissoes.map((c) => {
               const info = STATUS_INFO[c.status]
               const valorCap = c.valor_comissao * (c.percentual_captador / 100)
+              const temDivisao = (c.participantes?.length ?? 0) > 0
               return (
                 <div key={c.id} style={{ background: '#fff', border: '1px solid ' + D.line, borderRadius: 12, padding: '14px 18px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', marginBottom: 10 }}>
@@ -139,8 +148,17 @@ export default function ComissoesPage() {
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(130px,1fr))', gap: 10, fontSize: 13 }}>
                     <div><span style={lbl}>Venda</span>{fmt(Number(c.valor_venda))}</div>
                     <div><span style={lbl}>Comissão ({c.percentual_total}%)</span><strong>{fmt(Number(c.valor_comissao))}</strong></div>
-                    {c.captador && <div><span style={lbl}>Captador · {c.percentual_captador}%</span>{c.captador.nome} — {fmt(valorCap)}</div>}
-                    {c.vendedor && <div><span style={lbl}>Vendedor · {100 - c.percentual_captador}%</span>{c.vendedor.nome} — {fmt(Number(c.valor_comissao) - valorCap)}</div>}
+                    {/* Com divisão detalhada, mostrar também o par
+                        captador/vendedor diria duas verdades diferentes sobre
+                        o mesmo dinheiro. A detalhada ganha. */}
+                    {!temDivisao && c.captador && <div><span style={lbl}>Captador · {c.percentual_captador}%</span>{c.captador.nome} — {fmt(valorCap)}</div>}
+                    {!temDivisao && c.vendedor && <div><span style={lbl}>Vendedor · {100 - c.percentual_captador}%</span>{c.vendedor.nome} — {fmt(Number(c.valor_comissao) - valorCap)}</div>}
+                    {temDivisao && c.participantes!.map((p) => (
+                      <div key={p.id}>
+                        <span style={lbl}>{ROTULO_PAPEL[p.papel] ?? p.papel} · {Number(p.percentual)}%</span>
+                        {p.corretor?.nome ?? p.nome ?? '—'} — {fmt(Number(c.valor_comissao) * (Number(p.percentual) / 100))}
+                      </div>
+                    ))}
                   </div>
 
                   {c.status !== 'cancelada' && c.status !== 'recebida' && (
@@ -173,6 +191,8 @@ export default function ComissoesPage() {
             })}
           </div>
         )}
+
+        <ExtratoAnual />
       </div>
 
       {modalAberto && <ModalVenda corretores={corretores} onFechar={() => setModalAberto(false)} onSalvo={() => { setModalAberto(false); carregar() }} />}
@@ -209,6 +229,7 @@ function ModalVenda({ corretores, onFechar, onSalvo }: { corretores: Corretor[];
   const [vendedor, setVendedor] = useState('')
   const [percCaptador, setPercCaptador] = useState('50')
   const [dataVenda, setDataVenda] = useState(new Date().toISOString().slice(0, 10))
+  const [envolvidos, setEnvolvidos] = useState<LinhaEnvolvido[]>([])
   const [salvando, setSalvando] = useState(false)
   const [erro, setErro] = useState('')
 
@@ -223,6 +244,17 @@ function ModalVenda({ corretores, onFechar, onSalvo }: { corretores: Corretor[];
     })
   }, [valorVenda, percentualTotal, percCaptador, captador, vendedor])
 
+  // Divisão inválida trava o salvar: a API recusa de qualquer forma, e deixar
+  // o botão ativo só entregaria o erro depois de esperar o round-trip.
+  //
+  // Guarda a MENSAGEM, não um booleano: com booleano, digitar "abc" na fatia
+  // apagava o botão sem dizer por quê — a soma acima de 100% avisa sozinha na
+  // caixa de divisão, mas percentual ilegível não tinha aviso nenhum.
+  const erroDivisao = useMemo(() => {
+    const r = normalizarParticipantes(linhasParaPayload(envolvidos))
+    return r.ok ? '' : r.erro
+  }, [envolvidos])
+
   async function salvar() {
     setSalvando(true); setErro('')
     try {
@@ -235,6 +267,7 @@ function ModalVenda({ corretores, onFechar, onSalvo }: { corretores: Corretor[];
           corretor_vendedor_id: vendedor || null,
           percentual_captador: Number(percCaptador),
           data_venda: dataVenda,
+          participantes: linhasParaPayload(envolvidos),
         }),
       })
       if (!res.ok) throw new Error((await res.json()).error)
@@ -278,8 +311,15 @@ function ModalVenda({ corretores, onFechar, onSalvo }: { corretores: Corretor[];
           </div>
         )}
 
-        {erro && <p style={{ color: '#DC2626', fontSize: 13, margin: 0 }}>{erro}</p>}
-        <button onClick={salvar} disabled={salvando || !previa} style={{ ...btnPri, justifyContent: 'center', opacity: salvando || !previa ? 0.6 : 1 }}>
+        <DivisaoEnvolvidos
+          linhas={envolvidos}
+          onChange={setEnvolvidos}
+          valorComissao={previa?.valorComissao ?? 0}
+          corretores={corretores}
+        />
+
+        {(erro || erroDivisao) && <p style={{ color: '#DC2626', fontSize: 13, margin: 0 }}>{erro || erroDivisao}</p>}
+        <button onClick={salvar} disabled={salvando || !previa || !!erroDivisao} style={{ ...btnPri, justifyContent: 'center', opacity: salvando || !previa || erroDivisao ? 0.6 : 1 }}>
           {salvando ? 'Salvando...' : 'Registrar venda'}
         </button>
       </div>

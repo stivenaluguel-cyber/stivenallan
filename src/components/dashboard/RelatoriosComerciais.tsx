@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { AlertTriangle, Clock, TrendingUp, Wallet } from 'lucide-react'
 import { D, fmt } from '@/components/dashboard/focus/tokens'
+import { BotaoImprimir } from '@/components/dashboard/BotaoImprimir'
 
 type PorOrigem = { origem: string; leads: number; vendas: number; vgv: number; conversao: number }
 
@@ -28,6 +29,11 @@ type Resposta = {
   comissoes: {
     total: number; recebido: number; aReceber: number; vencido: number
     proximos90Dias: number; quantidadeVencidas: number; percentualRecebido: number
+  }
+  motivosPerda: {
+    total: number
+    perdidosNoFunil: number
+    porMotivo: { motivo: string; label: string; total: number; pct: number; detalhes: string[] }[]
   }
 }
 
@@ -59,16 +65,25 @@ export function RelatoriosComerciais() {
   const v = dados?.vendas
 
   return (
-    <section style={{ marginTop: 28 }}>
+    <section id="desempenho-comercial" style={{ marginTop: 28 }}>
       <header style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'flex-end', marginBottom: 14 }}>
         <div style={{ marginRight: 'auto' }}>
           <h2 style={{ fontSize: 16, fontWeight: 800, color: D.ink, margin: 0 }}>Desempenho comercial</h2>
           <p style={{ fontSize: 12, color: D.muted, margin: '3px 0 0' }}>
             VGV, conversão por origem e o que está parado.
           </p>
+          {/* O período fica no papel: um PDF de relatório sem dizer de quando
+              ele é vira número solto na mesa de quem recebe. */}
+          {dados && (
+            <p style={{ fontSize: 12, color: D.muted, margin: '3px 0 0' }}>
+              Período: {new Date(dados.periodo.de + 'T12:00:00').toLocaleDateString('pt-BR')} a{' '}
+              {new Date(dados.periodo.ate + 'T12:00:00').toLocaleDateString('pt-BR')}
+            </p>
+          )}
         </div>
-        <label style={rotulo}>De<input type="date" value={de} max={ate} onChange={(e) => setDe(e.target.value)} style={campo} /></label>
-        <label style={rotulo}>Até<input type="date" value={ate} min={de} max={hoje()} onChange={(e) => setAte(e.target.value)} style={campo} /></label>
+        <label className="sem-impressao" style={rotulo}>De<input type="date" value={de} max={ate} onChange={(e) => setDe(e.target.value)} style={campo} /></label>
+        <label className="sem-impressao" style={rotulo}>Até<input type="date" value={ate} min={de} max={hoje()} onChange={(e) => setAte(e.target.value)} style={campo} /></label>
+        <span className="sem-impressao"><BotaoImprimir alvo="desempenho-comercial" /></span>
       </header>
 
       {erro && <p role="alert" style={alerta}>{erro}</p>}
@@ -146,6 +161,60 @@ export function RelatoriosComerciais() {
                 </li>
               ))}
             </ul>
+          )}
+        </Bloco>
+
+        <Bloco
+          titulo="Motivos de perda"
+          subtitulo={
+            (dados?.motivosPerda?.total ?? 0) === 0
+              ? 'Nenhuma perda registrada no período'
+              : `${dados!.motivosPerda.total} perda(s) no período — por que o negócio não fechou`
+          }
+        >
+          {(dados?.motivosPerda?.porMotivo?.length ?? 0) === 0 ? (
+            <p style={vazio}>
+              Sem perdas registradas no período. O motivo é gravado quando um lead é marcado
+              como perdido pelo Modo Foco.
+            </p>
+          ) : (
+            <>
+              <ul style={lista}>
+                {dados!.motivosPerda.porMotivo.map((m) => (
+                  <li key={m.motivo} style={{ ...item, display: 'block' }}>
+                    <span style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                      <span style={{ flex: 1, minWidth: 0, fontSize: 12.5, fontWeight: 600, color: D.ink }}>
+                        {m.label}
+                      </span>
+                      <span style={{ fontSize: 12.5, fontWeight: 700, color: D.ink, whiteSpace: 'nowrap' }}>
+                        {m.total}
+                      </span>
+                      <span style={{ fontSize: 11, color: D.muted, whiteSpace: 'nowrap', minWidth: 42, textAlign: 'right' }}>
+                        {m.pct}%
+                      </span>
+                    </span>
+                    {/* Barra proporcional: a lista ordenada já diz quem é o
+                        maior, a barra diz por quanto. */}
+                    <span style={{ display: 'block', height: 4, borderRadius: 999, background: D.line, overflow: 'hidden', marginTop: 5 }}>
+                      <span style={{ display: 'block', height: '100%', width: Math.max(2, m.pct) + '%', background: D.bronze, borderRadius: 999 }} />
+                    </span>
+                    {m.detalhes.length > 0 && (
+                      <span style={{ display: 'block', fontSize: 10.5, color: D.muted, marginTop: 5, lineHeight: 1.5 }}>
+                        {m.detalhes.join(' · ')}
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+              {/* Quantas perdas existem no funil sem motivo nenhum. Sem este
+                  aviso o relatório passaria a impressão de cobrir tudo, quando
+                  cobre só o que passou pelo Modo Foco. */}
+              <p style={{ fontSize: 10.5, color: D.muted, margin: '10px 0 0', lineHeight: 1.5 }}>
+                {dados!.motivosPerda.perdidosNoFunil} lead(s) estão hoje na etapa "perdido" no total.
+                Quem foi marcado como perdido direto no CRM, fora do Modo Foco, entra nessa conta
+                mas não tem motivo registrado aqui.
+              </p>
+            </>
           )}
         </Bloco>
 

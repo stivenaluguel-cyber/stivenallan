@@ -3,14 +3,10 @@ import { useState } from 'react'
 import { D } from './tokens'
 import { FocusModalShell, inputCss, labelCss } from './FocusModalShell'
 
-export const MOTIVOS_PERDA = [
-  { value: 'sem_interesse', label: 'Sem interesse' },
-  { value: 'sem_retorno', label: 'Sem retorno' },
-  { value: 'orcamento_incompativel', label: 'Orçamento incompatível' },
-  { value: 'comprou_com_outro', label: 'Comprou com outro corretor' },
-  { value: 'cadastro_invalido', label: 'Cadastro inválido' },
-  { value: 'outro', label: 'Outro' },
-] as const
+// A lista mora em lib/dashboard/motivos-perda para o relatório poder traduzir
+// os códigos gravados sem importar este componente (e o React junto).
+export { MOTIVOS_PERDA } from '@/lib/dashboard/motivos-perda'
+import { MOTIVOS_PERDA } from '@/lib/dashboard/motivos-perda'
 
 export type LostReasonPayload = { motivo: string; detalhe: string }
 

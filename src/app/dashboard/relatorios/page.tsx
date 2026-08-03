@@ -7,6 +7,7 @@ import {
 } from '@/lib/dashboard/funil-stats'
 import { FunilChart } from '@/lib/dashboard/funil-chart'
 import { RelatoriosComerciais } from '@/components/dashboard/RelatoriosComerciais'
+import { BotaoImprimir } from '@/components/dashboard/BotaoImprimir'
 
 export const dynamic = 'force-dynamic'
 
@@ -53,17 +54,22 @@ export default async function RelatoriosPage() {
 
   return (
     <div style={{ padding: '32px clamp(16px,4vw,40px)', background: '#fff', minHeight: '100vh' }}>
-      <header style={{ maxWidth: 1200, margin: '0 auto 28px' }}>
-        <h1 style={{ fontSize: 24, fontWeight: 700, color: T.ink, margin: 0 }}>Relatório de conversão por etapa</h1>
-        <p style={{ fontSize: 14, color: T.mutedInk, margin: '6px 0 0' }}>
-          Distribuição atual do funil + tempo médio por etapa (histórico de transição só existe a partir de {' '}
-          <a href="#nota-historico" style={{ color: T.bronze }}>agora — veja a nota abaixo</a>).
-        </p>
-      </header>
-
       <main style={{ maxWidth: 1200, margin: '0 auto' }}>
-        {result.kind === 'error' && <ErrorState message={result.message} />}
-        {result.kind === 'ok' && <Populated leads={result.leads} transicoes={result.transicoes} />}
+        <section id="funil-por-etapa">
+          <header style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', marginBottom: 28 }}>
+            <div>
+              <h1 style={{ fontSize: 24, fontWeight: 700, color: T.ink, margin: 0 }}>Relatório de conversão por etapa</h1>
+              <p style={{ fontSize: 14, color: T.mutedInk, margin: '6px 0 0' }}>
+                Distribuição atual do funil + tempo médio por etapa (histórico de transição só existe a partir de {' '}
+                <a href="#nota-historico" style={{ color: T.bronze }}>agora — veja a nota abaixo</a>).
+              </p>
+            </div>
+            <span className="sem-impressao"><BotaoImprimir alvo="funil-por-etapa" /></span>
+          </header>
+
+          {result.kind === 'error' && <ErrorState message={result.message} />}
+          {result.kind === 'ok' && <Populated leads={result.leads} transicoes={result.transicoes} />}
+        </section>
 
         {/* Bloco novo, client-side: VGV, conversão por origem, leads parados e
             tempo entre movimentações. Fica separado do funil acima porque

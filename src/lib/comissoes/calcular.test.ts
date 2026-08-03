@@ -77,6 +77,35 @@ describe('resumirComissoes', () => {
     expect(b?.valor).toBe(15000)
   })
 
+  it('divisão detalhada manda no "por corretor"', () => {
+    // Sem isto, uma venda 60/20/20 (vendedor, captador, imobiliária) seria
+    // lida pelo par captador/vendedor e daria metade da comissão a cada um —
+    // inflando o que os dois corretores realmente receberam.
+    const r = resumirComissoes([
+      {
+        status: 'recebida', valor_comissao: 45000, valor_venda: 750000,
+        corretor_captador_id: 'a', corretor_vendedor_id: 'b', percentual_captador: 50,
+        participantes: [
+          { corretor_id: 'b', percentual: 60 },
+          { corretor_id: 'a', percentual: 20 },
+          { corretor_id: null, percentual: 20 }, // imobiliária, sem cadastro
+        ],
+      },
+    ])
+    expect(r.porCorretor.find((c) => c.corretorId === 'b')?.valor).toBe(27000)
+    expect(r.porCorretor.find((c) => c.corretorId === 'a')?.valor).toBe(9000)
+    // A fatia da imobiliária não some do total — só não tem corretor a quem somar.
+    expect(r.recebido).toBe(45000)
+    expect(r.porCorretor).toHaveLength(2)
+  })
+
+  it('lista de participantes vazia cai no par captador/vendedor', () => {
+    const r = resumirComissoes([
+      { ...registros[0], participantes: [] },
+    ])
+    expect(r.porCorretor.find((c) => c.corretorId === 'a')?.valor).toBe(15000)
+  })
+
   it('ordena por valor, do maior para o menor', () => {
     expect(resumirComissoes(registros).porCorretor[0].corretorId).toBe('a')
   })

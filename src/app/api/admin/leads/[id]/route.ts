@@ -44,7 +44,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   // Os campos comerciais (entrada, prazo, perfil, faixa) entraram porque
   // passaram a ser editáveis no card — e são o que mais pesa no score de
   // financiamento direto.
-  const allowed = ['estagio_funil','requer_atencao','notas','temperatura','kanban_ordem','anotacoes','nome','whatsapp','email','origem','orcamento_min','orcamento_max','atendimento_humano_ativo','proximo_followup','ultimo_contato','entrada_disponivel','faixa_investimento','prazo_compra','perfil','cidade_interesse','motivacao','primeiro_atendimento_em']
+  const allowed = ['estagio_funil','requer_atencao','notas','temperatura','kanban_ordem','anotacoes','nome','whatsapp','email','origem','orcamento_min','orcamento_max','atendimento_humano_ativo','proximo_followup','ultimo_contato','entrada_disponivel','faixa_investimento','prazo_compra','perfil','cidade_interesse','motivacao','primeiro_atendimento_em','permuta_descricao','permuta_valor']
   // Loga a transição de estágio (mesma lógica do PUT acima) — o Kanban
   // arrasta-e-solta usa PATCH, então sem isso o relatório de funil nunca
   // teria histórico de mudança de estágio.

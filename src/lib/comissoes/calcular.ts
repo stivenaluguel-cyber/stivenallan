@@ -73,6 +73,10 @@ export type ComissaoRegistro = {
   corretor_captador_id?: string | null
   corretor_vendedor_id?: string | null
   percentual_captador?: number | string | null
+  // Divisão detalhada, quando o negócio tem mais de dois envolvidos. Quando
+  // existe, ela manda: o par captador/vendedor descreveria 60/20/20 como se
+  // fossem só duas partes e inflaria o quanto cada um recebeu.
+  participantes?: { corretor_id?: string | null; percentual: number | string }[] | null
 }
 
 export type ResumoComissoes = {
@@ -104,13 +108,24 @@ export function resumirComissoes(registros: ComissaoRegistro[]): ResumoComissoes
     else if (r.status === 'confirmada') confirmado += comissao
     else if (r.status === 'recebida') recebido += comissao
 
-    const pctCap = r.percentual_captador === null || r.percentual_captador === undefined ? 50 : numero(r.percentual_captador)
-    const valorCap = comissao * (pctCap / 100)
-    if (r.corretor_captador_id) {
-      porCorretor.set(r.corretor_captador_id, (porCorretor.get(r.corretor_captador_id) ?? 0) + valorCap)
-    }
-    if (r.corretor_vendedor_id) {
-      porCorretor.set(r.corretor_vendedor_id, (porCorretor.get(r.corretor_vendedor_id) ?? 0) + (comissao - valorCap))
+    if (r.participantes && r.participantes.length > 0) {
+      // Envolvido sem corretor cadastrado (imobiliária, parceiro de uma venda
+      // só) não entra no "por corretor" — não há a quem somar. O dinheiro
+      // dele continua contado no total, que sai de valor_comissao.
+      for (const p of r.participantes) {
+        if (!p.corretor_id) continue
+        const valor = comissao * (numero(p.percentual) / 100)
+        porCorretor.set(p.corretor_id, (porCorretor.get(p.corretor_id) ?? 0) + valor)
+      }
+    } else {
+      const pctCap = r.percentual_captador === null || r.percentual_captador === undefined ? 50 : numero(r.percentual_captador)
+      const valorCap = comissao * (pctCap / 100)
+      if (r.corretor_captador_id) {
+        porCorretor.set(r.corretor_captador_id, (porCorretor.get(r.corretor_captador_id) ?? 0) + valorCap)
+      }
+      if (r.corretor_vendedor_id) {
+        porCorretor.set(r.corretor_vendedor_id, (porCorretor.get(r.corretor_vendedor_id) ?? 0) + (comissao - valorCap))
+      }
     }
   }
 

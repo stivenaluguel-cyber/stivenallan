@@ -1,13 +1,15 @@
 'use client'
-import { useState, useEffect, useCallback, Suspense } from 'react'
+import { useState, useEffect, useCallback, useRef, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Crosshair } from 'lucide-react'
 import { ConversaPanel } from '@/components/dashboard/ConversaPanel'
 import { ESTAGIOS_FUNIL as ESTAGIOS } from '@/lib/dashboard/estagios'
+import { useKanbanTouchDrag } from '@/lib/dashboard/use-kanban-touch-drag'
 import { isEligibleForFocusQueue } from '@/lib/dashboard/focus-queue'
 import { temWhatsappReal } from '@/lib/leads/normalize'
 import { PainelScore, type DetalheScore } from '@/components/dashboard/PainelScore'
 import { AnexosLead } from '@/components/dashboard/AnexosLead'
+import { EnvolvidosLead } from '@/components/dashboard/EnvolvidosLead'
 import { CORES_SLA, statusSla } from '@/lib/leads/sla'
 import type { TimelineItem, TimelineKind } from '@/lib/dashboard/lead-timeline'
 import {
@@ -55,6 +57,7 @@ type Lead = {
   id: string; nome?: string; whatsapp: string; estagio_funil: string
   lead_score?: number; requer_atencao?: boolean; origem?: string
   orcamento_max?: number | null; perfil?: string; email?: string | null
+  permuta_descricao?: string | null; permuta_valor?: number | null
   temperatura?: number; anotacoes?: string | null; created_at?: string
   empreendimentos?: { nome?: string; cidade?: string } | null
   property_name?: string | null; visitas?: number; downloads?: number
@@ -453,7 +456,7 @@ function TabelaUnidades({ emp, cub }: { emp: Emp; cub: Cub | null }) {
   )
 }
 
-function LeadCard({ lead, onDragStart, onSelect, onMover }: { lead: Lead; onDragStart: (id: string) => void; onSelect: (lead: Lead) => void; onMover: (id: string, estagio: string) => void }) {
+function LeadCard({ lead, onDragStart, onSelect, onMover, onToqueInicio, ignorarClique }: { lead: Lead; onDragStart: (id: string) => void; onSelect: (lead: Lead) => void; onMover: (id: string, estagio: string) => void; onToqueInicio: (id: string, e: React.PointerEvent) => void; ignorarClique: () => boolean }) {
   const t = tempInfo(lead.temperatura)
   const score = lead.lead_score ?? 0
   const diasDesde = lead.created_at ? Math.floor((Date.now() - new Date(lead.created_at).getTime()) / 86400000) : 0
@@ -468,7 +471,12 @@ function LeadCard({ lead, onDragStart, onSelect, onMover }: { lead: Lead; onDrag
   const mostrarSla = sla.estado !== 'atendido' && sla.texto !== ''
 
   return (
-    <div draggable onDragStart={(e) => { e.stopPropagation(); onDragStart(lead.id) }} onClick={() => onSelect(lead)}
+    <div draggable
+      onDragStart={(e) => { e.stopPropagation(); onDragStart(lead.id) }}
+      // Segurar em cima de um botão do card (WhatsApp, Abrir, Mover etapa)
+      // não pode virar arraste — o toque longo ali é só demora em apertar.
+      onPointerDown={(e) => { if ((e.target as HTMLElement).closest('button,a')) return; onToqueInicio(lead.id, e) }}
+      onClick={() => { if (ignorarClique()) return; onSelect(lead) }}
       style={{ background: '#fff', borderRadius: 8, padding: '10px 11px', marginBottom: 8, border: '1px solid ' + D.line, borderLeft: '4px solid ' + t.cor, cursor: 'grab', boxShadow: '0 1px 2px rgba(0,0,0,0.04)', position: 'relative' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 6 }}>
         <span style={{ fontWeight: 700, fontSize: 13, color: D.ink, lineHeight: 1.25 }}>{lead.nome || '+' + lead.whatsapp}</span>
@@ -547,17 +555,29 @@ function LeadCard({ lead, onDragStart, onSelect, onMover }: { lead: Lead; onDrag
 
 function Kanban({ leads, dragId, onDragStart, onDrop, onSelect, onMover }: { leads: Lead[]; dragId: string | null; onDragStart: (id: string) => void; onDrop: (estagio: string) => void; onSelect: (lead: Lead) => void; onMover: (id: string, estagio: string) => void }) {
   const [hoverCol, setHoverCol] = useState<string | null>(null)
+  const scrollerRef = useRef<HTMLDivElement | null>(null)
+  const toque = useKanbanTouchDrag({ onSoltar: onMover, scrollerRef })
+  // A coluna acesa vem do mouse (HTML5) ou do dedo (toque) — quem estiver
+  // ativo. Os dois gestos nunca acontecem ao mesmo tempo.
+  const colunaAcesa = toque.colunaAlvo ?? hoverCol
+  const leadFantasma = toque.leadArrastado ? leads.find(l => l.id === toque.leadArrastado) ?? null : null
+  const etapaAlvo = toque.colunaAlvo ? ESTAGIOS.find(e => e.key === toque.colunaAlvo) : null
+
   return (
-    <div style={{ overflowX: 'auto', paddingBottom: 12 }}>
+    <>
+    <div ref={scrollerRef} style={{ overflowX: 'auto', paddingBottom: 12 }}>
       <div style={{ display: 'flex', gap: 12, minWidth: 'max-content', alignItems: 'flex-start' }}>
         {ESTAGIOS.map(col => {
           const colLeads = leads.filter(l => l.estagio_funil === col.key)
           // VGV da etapa: a contagem sozinha não diz se o funil está gordo ou
           // magro — dez leads de R$ 200 mil valem menos que dois de R$ 1,5 mi.
           const vgvCol = colLeads.reduce((s, l) => s + (l.orcamento_max ?? 0), 0)
-          const isHover = hoverCol === col.key
+          const isHover = colunaAcesa === col.key
           return (
-            <div key={col.key} onDragOver={(e) => { e.preventDefault(); setHoverCol(col.key) }} onDragLeave={() => setHoverCol(h => h === col.key ? null : h)} onDrop={() => { onDrop(col.key); setHoverCol(null) }}
+            // data-coluna é como o arraste por toque descobre onde o dedo
+            // está: elementFromPoint devolve o elemento embaixo e ele sobe
+            // até achar a coluna.
+            <div key={col.key} data-coluna={col.key} onDragOver={(e) => { e.preventDefault(); setHoverCol(col.key) }} onDragLeave={() => setHoverCol(h => h === col.key ? null : h)} onDrop={() => { onDrop(col.key); setHoverCol(null) }}
               style={{ width: 250, flexShrink: 0, background: D.surface, border: '1px solid ' + (isHover ? col.cor : D.line), borderRadius: 12, padding: 10, boxShadow: isHover ? '0 0 0 2px ' + col.cor + '55' : 'none', transition: 'box-shadow .12s, border-color .12s' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, paddingBottom: 8, borderBottom: '2px solid ' + col.cor }}>
                 <span style={{ width: 9, height: 9, borderRadius: 999, background: col.cor }} />
@@ -577,8 +597,9 @@ function Kanban({ leads, dragId, onDragStart, onDrop, onSelect, onMover }: { lea
                   // de seguir no celular, onde arrastar não funciona.
                   <div style={{ color: D.muted, fontSize: 12, textAlign: 'center', padding: '20px 0' }}>{isHover ? 'Solte aqui' : 'Nenhum lead nesta etapa'}</div>
                 ) : colLeads.map(lead => (
-                  <div key={lead.id} style={{ opacity: dragId === lead.id ? 0.4 : 1 }}>
-                    <LeadCard lead={lead} onDragStart={onDragStart} onSelect={onSelect} onMover={onMover} />
+                  <div key={lead.id} style={{ opacity: dragId === lead.id || toque.leadArrastado === lead.id ? 0.4 : 1 }}>
+                    <LeadCard lead={lead} onDragStart={onDragStart} onSelect={onSelect} onMover={onMover}
+                      onToqueInicio={toque.iniciarToque} ignorarClique={toque.deveIgnorarClique} />
                   </div>
                 ))}
               </div>
@@ -587,6 +608,27 @@ function Kanban({ leads, dragId, onDragStart, onDrop, onSelect, onMover }: { lea
         })}
       </div>
     </div>
+
+    {/* O card que segue o dedo. `pointerEvents: none` é obrigatório: sem
+        isso elementFromPoint devolveria sempre o fantasma e nunca a coluna
+        embaixo dele, e nenhum destino seria detectado. */}
+    {leadFantasma && toque.ponto && (
+      <div aria-hidden style={{
+        position: 'fixed', left: toque.ponto.x, top: toque.ponto.y,
+        transform: 'translate(-50%,-50%) rotate(-2deg)', pointerEvents: 'none', zIndex: 80,
+        background: '#fff', border: '1px solid ' + D.line,
+        borderLeft: '4px solid ' + (etapaAlvo?.cor ?? D.bronze), borderRadius: 8,
+        padding: '10px 12px', boxShadow: '0 12px 28px rgba(0,0,0,0.20)', maxWidth: 220,
+      }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: D.ink, lineHeight: 1.25 }}>
+          {leadFantasma.nome || '+' + leadFantasma.whatsapp}
+        </div>
+        <div style={{ fontSize: 11, fontWeight: 700, color: etapaAlvo ? etapaAlvo.cor : D.muted, marginTop: 3 }}>
+          {etapaAlvo ? '→ ' + etapaAlvo.label : 'Arraste até uma coluna'}
+        </div>
+      </div>
+    )}
+    </>
   )
 }
 
@@ -641,6 +683,10 @@ function LeadModal({ lead, onClose, onUpdated, onDeleted }: { lead: Lead; onClos
     entrada_disponivel: lead.entrada_disponivel ?? '',
     prazo_compra: lead.prazo_compra ?? '',
     cidade_interesse: lead.cidade_interesse ?? '',
+    // O imóvel dado na troca. Alimenta o cruzamento em /dashboard/permutas —
+    // sem valor, o lead não entra no cruzamento.
+    permuta_descricao: lead.permuta_descricao ?? '',
+    permuta_valor: lead.permuta_valor != null ? String(lead.permuta_valor) : '',
   })
 
   const [timelineUnificada, setTimelineUnificada] = useState<TimelineItem[]>([])
@@ -697,6 +743,8 @@ function LeadModal({ lead, onClose, onUpdated, onDeleted }: { lead: Lead; onClos
       entrada_disponivel: form.entrada_disponivel || null,
       prazo_compra: form.prazo_compra || null,
       cidade_interesse: form.cidade_interesse || null,
+      permuta_descricao: form.permuta_descricao || null,
+      permuta_valor: form.permuta_valor ? Number(form.permuta_valor) : null,
     }
     const res = await fetch('/api/admin/leads/' + lead.id, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
     setSaving(false)
@@ -780,6 +828,12 @@ function LeadModal({ lead, onClose, onUpdated, onDeleted }: { lead: Lead; onClos
               </select>
               <label style={labelCss}>Cidade de interesse</label>
               <input style={inputCss} value={form.cidade_interesse} onChange={e => setForm(p => ({ ...p, cidade_interesse: e.target.value }))} />
+              <label style={labelCss}>Imóvel na troca (permuta)</label>
+              <input style={inputCss} placeholder="Ex.: apto 2 dorm. no Michel, quitado"
+                value={form.permuta_descricao} onChange={e => setForm(p => ({ ...p, permuta_descricao: e.target.value }))} />
+              <label style={labelCss}>Valor estimado da permuta (R$)</label>
+              <input type="number" style={inputCss} placeholder="280000"
+                value={form.permuta_valor} onChange={e => setForm(p => ({ ...p, permuta_valor: e.target.value }))} />
               <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
                 <button onClick={salvarEdicao} disabled={saving} style={{ flex: 1, background: D.bronze, color: '#fff', border: 'none', borderRadius: 10, padding: 12, fontSize: 14, fontWeight: 700, cursor: 'pointer', opacity: saving ? 0.6 : 1 }}>{saving ? 'Salvando...' : 'Salvar alterações'}</button>
                 <button onClick={() => setEditing(false)} style={{ flex: 1, background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: 10, padding: 12, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Cancelar</button>
@@ -817,6 +871,9 @@ function LeadModal({ lead, onClose, onUpdated, onDeleted }: { lead: Lead; onClos
 
           <label style={labelCss}>Documentos</label>
           <AnexosLead leadId={lead.id} onMudou={carregarTimeline} />
+
+          <label style={labelCss}>Envolvidos no negócio</label>
+          <EnvolvidosLead leadId={lead.id} />
 
           <label style={labelCss}>Linha do tempo</label>
           <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
