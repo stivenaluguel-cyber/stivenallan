@@ -167,12 +167,12 @@ export function RelatoriosComerciais() {
         <Bloco
           titulo="Motivos de perda"
           subtitulo={
-            (dados?.motivosPerda.total ?? 0) === 0
+            (dados?.motivosPerda?.total ?? 0) === 0
               ? 'Nenhuma perda registrada no período'
               : `${dados!.motivosPerda.total} perda(s) no período — por que o negócio não fechou`
           }
         >
-          {(dados?.motivosPerda.porMotivo.length ?? 0) === 0 ? (
+          {(dados?.motivosPerda?.porMotivo?.length ?? 0) === 0 ? (
             <p style={vazio}>
               Sem perdas registradas no período. O motivo é gravado quando um lead é marcado
               como perdido pelo Modo Foco.

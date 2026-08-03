@@ -244,12 +244,16 @@ function ModalVenda({ corretores, onFechar, onSalvo }: { corretores: Corretor[];
     })
   }, [valorVenda, percentualTotal, percCaptador, captador, vendedor])
 
-  // Passar de 100% trava o salvar: a API recusa de qualquer forma, e deixar o
-  // botão ativo só entregaria o erro depois de esperar o round-trip.
-  const divisaoExcedida = useMemo(
-    () => !normalizarParticipantes(linhasParaPayload(envolvidos)).ok,
-    [envolvidos],
-  )
+  // Divisão inválida trava o salvar: a API recusa de qualquer forma, e deixar
+  // o botão ativo só entregaria o erro depois de esperar o round-trip.
+  //
+  // Guarda a MENSAGEM, não um booleano: com booleano, digitar "abc" na fatia
+  // apagava o botão sem dizer por quê — a soma acima de 100% avisa sozinha na
+  // caixa de divisão, mas percentual ilegível não tinha aviso nenhum.
+  const erroDivisao = useMemo(() => {
+    const r = normalizarParticipantes(linhasParaPayload(envolvidos))
+    return r.ok ? '' : r.erro
+  }, [envolvidos])
 
   async function salvar() {
     setSalvando(true); setErro('')
@@ -314,8 +318,8 @@ function ModalVenda({ corretores, onFechar, onSalvo }: { corretores: Corretor[];
           corretores={corretores}
         />
 
-        {erro && <p style={{ color: '#DC2626', fontSize: 13, margin: 0 }}>{erro}</p>}
-        <button onClick={salvar} disabled={salvando || !previa || divisaoExcedida} style={{ ...btnPri, justifyContent: 'center', opacity: salvando || !previa || divisaoExcedida ? 0.6 : 1 }}>
+        {(erro || erroDivisao) && <p style={{ color: '#DC2626', fontSize: 13, margin: 0 }}>{erro || erroDivisao}</p>}
+        <button onClick={salvar} disabled={salvando || !previa || !!erroDivisao} style={{ ...btnPri, justifyContent: 'center', opacity: salvando || !previa || erroDivisao ? 0.6 : 1 }}>
           {salvando ? 'Salvando...' : 'Registrar venda'}
         </button>
       </div>
