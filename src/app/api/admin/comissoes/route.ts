@@ -61,13 +61,15 @@ export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null)
   if (!body) return NextResponse.json({ error: 'JSON invalido' }, { status: 400 })
 
-  const normalizado = normalizarComissao(body)
-  if (!normalizado.ok) return NextResponse.json({ error: normalizado.erro }, { status: 400 })
-
-  // A divisão é validada ANTES de inserir a comissão: recusar depois deixaria
-  // uma comissão órfã no banco só porque a soma dos percentuais passou de 100.
+  // A divisão é validada ANTES da comissão, e não depois: recusar depois
+  // deixaria uma comissão órfã no banco só porque a soma passou de 100 — e o
+  // resultado aqui também diz se a divisão já identifica quem recebe, o que
+  // libera normalizarComissao de exigir um corretor cadastrado.
   const divisaoInvalida = normalizarParticipantes(body.participantes)
   if (!divisaoInvalida.ok) return NextResponse.json({ error: divisaoInvalida.erro }, { status: 400 })
+
+  const normalizado = normalizarComissao(body, { temParticipantesValidos: divisaoInvalida.participantes.length > 0 })
+  if (!normalizado.ok) return NextResponse.json({ error: normalizado.erro }, { status: 400 })
 
   const client = sb()
   const { data, error } = await client.from('crm_comissoes').insert(normalizado.insert).select(SELECT_COMISSAO).single()

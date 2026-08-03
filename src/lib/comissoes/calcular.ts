@@ -164,7 +164,10 @@ export type ResultadoNormalizacao =
 const texto = (v: unknown, max = 200): string | null =>
   typeof v === 'string' && v.trim() ? v.trim().slice(0, max) : null
 
-export function normalizarComissao(body: Record<string, unknown>): ResultadoNormalizacao {
+export function normalizarComissao(
+  body: Record<string, unknown>,
+  opts: { temParticipantesValidos?: boolean } = {},
+): ResultadoNormalizacao {
   const valorVenda = numero(body.valor_venda)
   if (!(valorVenda > 0)) return { ok: false, erro: 'valor_venda deve ser maior que zero' }
 
@@ -177,8 +180,12 @@ export function normalizarComissao(body: Record<string, unknown>): ResultadoNorm
 
   const captadorId = texto(body.corretor_captador_id, 64)
   const vendedorId = texto(body.corretor_vendedor_id, 64)
-  if (!captadorId && !vendedorId) {
-    return { ok: false, erro: 'informe ao menos um corretor (captador ou vendedor)' }
+  // Sem captador/vendedor cadastrado, a divisão detalhada ainda diz quem
+  // recebe — vendedor, captador e imobiliária podem ser todos nome livre,
+  // sem nenhum corretor cadastrado envolvido. Exigir um dos dois aqui
+  // bloquearia exatamente o caso que a divisão detalhada existe para cobrir.
+  if (!captadorId && !vendedorId && !opts.temParticipantesValidos) {
+    return { ok: false, erro: 'informe ao menos um corretor (captador ou vendedor), ou uma divisão entre envolvidos' }
   }
 
   const divisao = calcularDivisao({
