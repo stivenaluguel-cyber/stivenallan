@@ -48,6 +48,10 @@ export default function ComissoesPage() {
   const [erro, setErro] = useState('')
   const [modalAberto, setModalAberto] = useState(false)
   const [modalCorretor, setModalCorretor] = useState(false)
+  // O extrato é um componente à parte, com o próprio fetch — sem isto, marcar
+  // uma comissão como recebida atualizava os cartões do topo mas o extrato
+  // ficava mostrando o mês antigo até o próximo F5.
+  const [versaoExtrato, setVersaoExtrato] = useState(0)
 
   const carregar = useCallback(async () => {
     setCarregando(true); setErro('')
@@ -59,6 +63,7 @@ export default function ComissoesPage() {
       ])
       if (c.error) throw new Error(c.error)
       setComissoes(c.data ?? []); setResumo(c.resumo ?? null); setCorretores(k.data ?? [])
+      setVersaoExtrato((v) => v + 1)
     } catch (e) {
       setErro(e instanceof Error ? e.message : 'Falha ao carregar comissões')
     } finally { setCarregando(false) }
@@ -192,7 +197,7 @@ export default function ComissoesPage() {
           </div>
         )}
 
-        <ExtratoAnual />
+        <ExtratoAnual recarregarQuando={versaoExtrato} />
       </div>
 
       {modalAberto && <ModalVenda corretores={corretores} onFechar={() => setModalAberto(false)} onSalvo={() => { setModalAberto(false); carregar() }} />}

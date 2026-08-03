@@ -34,7 +34,7 @@ type Extrato = {
   identificouCorretor: boolean
 }
 
-export function ExtratoAnual() {
+export function ExtratoAnual({ recarregarQuando }: { recarregarQuando?: number } = {}) {
   const [ano, setAno] = useState(() => new Date().getFullYear())
   const [dados, setDados] = useState<Extrato | null>(null)
   const [erro, setErro] = useState('')
@@ -52,7 +52,10 @@ export function ExtratoAnual() {
     } finally { setCarregando(false) }
   }, [ano])
 
-  useEffect(() => { carregar() }, [carregar])
+  // recarregarQuando muda toda vez que a tela de comissões grava algo (nova
+  // venda, status alterado) — sem isto, o extrato ficava mostrando o mês
+  // antigo até o próximo F5, mesmo com o resto da tela já atualizado.
+  useEffect(() => { carregar() }, [carregar, recarregarQuando])
 
   // Mostrar a coluna "sua parte" sem saber quem é o corretor repetiria o
   // bruto duas vezes e faria o repasse parecer receita própria.
