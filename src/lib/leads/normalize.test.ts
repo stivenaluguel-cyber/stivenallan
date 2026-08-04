@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { normalizarCelularBR, normalizeEmail, normalizePhone, normalizeString, temWhatsappReal } from './normalize'
+import { normalizarCelularBR, normalizeEmail, normalizePhone, normalizeString, pareceCelularBR, temWhatsappReal } from './normalize'
 
 describe('normalizeString', () => {
   it('trims surrounding whitespace', () => {
@@ -83,6 +83,29 @@ describe('temWhatsappReal', () => {
     expect(temWhatsappReal(null)).toBe(false)
     expect(temWhatsappReal(undefined)).toBe(false)
     expect(temWhatsappReal('')).toBe(false)
+  })
+
+  it('rejeita o placeholder de lead promovido da Prospecção sem celular confirmado', () => {
+    expect(temWhatsappReal('pj:ChIJabc123')).toBe(false)
+  })
+})
+
+describe('pareceCelularBR', () => {
+  it('aceita 11 dígitos com o 9 na terceira posição (celular)', () => {
+    expect(pareceCelularBR('48999998888')).toBe(true)
+  })
+
+  it('recusa 10 dígitos (fixo)', () => {
+    expect(pareceCelularBR('4834334455')).toBe(false)
+  })
+
+  it('recusa 11 dígitos sem o 9 na posição certa', () => {
+    expect(pareceCelularBR('48899998888')).toBe(false)
+  })
+
+  it('recusa comprimento errado', () => {
+    expect(pareceCelularBR('489999988')).toBe(false)
+    expect(pareceCelularBR('')).toBe(false)
   })
 })
 

@@ -29,8 +29,27 @@ export function normalizeEmail(value: unknown): string | null {
 // placeholder.
 export const IG_WHATSAPP_PLACEHOLDER_PREFIX = 'ig:'
 
+// Mesmo problema, origem diferente: lead promovido da Prospecção (empresa
+// achada via Google Places) às vezes só tem telefone fixo — que não recebe
+// WhatsApp. Em vez de gravar um fixo em `leads.whatsapp` fingindo ser
+// utilizável, grava esse placeholder (`pj:<place_id>`) até o corretor
+// confirmar um número de verdade.
+export const PJ_WHATSAPP_PLACEHOLDER_PREFIX = 'pj:'
+
+const PLACEHOLDER_PREFIXES = [IG_WHATSAPP_PLACEHOLDER_PREFIX, PJ_WHATSAPP_PLACEHOLDER_PREFIX]
+
 export function temWhatsappReal(whatsapp: string | null | undefined): whatsapp is string {
-  return !!whatsapp && !whatsapp.startsWith(IG_WHATSAPP_PLACEHOLDER_PREFIX)
+  return !!whatsapp && !PLACEHOLDER_PREFIXES.some((prefixo) => whatsapp.startsWith(prefixo))
+}
+
+// Celular brasileiro tem 11 dígitos (DDD + 9 + 8 dígitos); fixo tem 10 (DDD +
+// 8 dígitos, sem o 9). `normalizarCelularBR` aceita as duas formas — correto
+// pro formulário público, que pede "WhatsApp" e confia no usuário — mas a
+// Prospecção lê telefone de cadastro empresarial (Google Places), onde é
+// comum vir só o fixo da recepção. Sem essa checagem, um fixo de 10 dígitos
+// passava batido e virava um link wa.me morto.
+export function pareceCelularBR(digitosComDdd: string): boolean {
+  return digitosComDdd.length === 11 && digitosComDdd[2] === '9'
 }
 
 /**
