@@ -34,6 +34,8 @@ type Campanha = {
   leads_solicitados: number; leads_entregues: number
 }
 
+type Socio = { nome: string; cargo: string | null }
+
 type ProspeccaoLead = {
   id: string; place_id: string; nome: string; endereco: string | null
   telefone: string | null; site: string | null; rating: number | null; rating_count: number | null
@@ -41,6 +43,7 @@ type ProspeccaoLead = {
   score: number | null; score_fit: number | null; score_potencial: number | null; score_acessibilidade: number | null
   classificacao: string | null; contexto_ia: string | null
   status: string; lead_id: string | null
+  cnpj: string | null; razao_social: string | null; situacao_cnpj: string | null; socios: Socio[] | null
 }
 
 const QUANTIDADES = [10, 20, 30, 50]
@@ -358,8 +361,28 @@ function LeadDetalheModal({
   onAbrirNoCrm: () => void
 }) {
   const [confirmando, setConfirmando] = useState(false)
+  const [cnpjInfo, setCnpjInfo] = useState<{ cnpj: string; razaoSocial: string; situacao: string | null; socios: Socio[] } | null>(
+    lead.cnpj ? { cnpj: lead.cnpj, razaoSocial: lead.razao_social ?? lead.nome, situacao: lead.situacao_cnpj, socios: lead.socios ?? [] } : null,
+  )
+  const [buscandoCnpj, setBuscandoCnpj] = useState(false)
+  const [erroCnpj, setErroCnpj] = useState('')
   const cor = CLASSIFICACAO_COR[lead.classificacao ?? ''] ?? D.muted
   const wa = linkWhatsappProspeccao(lead.telefone, lead.nome, produto)
+
+  async function buscarCnpjAutomatico() {
+    if (buscandoCnpj) return
+    setBuscandoCnpj(true); setErroCnpj('')
+    try {
+      const res = await fetch('/api/admin/prospeccao/leads/' + lead.id + '/cnpj', { method: 'POST' })
+      const data = await res.json()
+      if (!res.ok) { setErroCnpj(data.error || 'Falha ao buscar CNPJ.'); return }
+      setCnpjInfo({ cnpj: data.cnpj, razaoSocial: data.razaoSocial, situacao: data.situacao, socios: data.socios ?? [] })
+    } catch {
+      setErroCnpj('Falha ao conectar.')
+    } finally {
+      setBuscandoCnpj(false)
+    }
+  }
 
   return (
     <div
@@ -426,9 +449,43 @@ function LeadDetalheModal({
             </div>
           </div>
 
-          <p style={{ fontSize: 11.5, color: D.muted, background: D.bg, borderRadius: 8, padding: '8px 10px', marginBottom: 18 }}>
-            CNPJ, sócios e e-mail não têm fonte gratuita por nome de empresa — use &quot;Buscar CNPJ&quot; abaixo pra confirmar na Receita em 1 clique.
-          </p>
+          <div style={{ marginBottom: 18 }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: D.muted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>CNPJ & sócios</span>
+            {cnpjInfo ? (
+              <div style={{ marginTop: 8, background: D.bg, borderRadius: 8, padding: '10px 12px' }}>
+                <div style={{ fontSize: 13.5, fontWeight: 700, color: D.ink }}>{cnpjInfo.cnpj}</div>
+                <div style={{ fontSize: 12.5, color: D.muted, marginTop: 2 }}>
+                  {cnpjInfo.razaoSocial}{cnpjInfo.situacao ? ' · ' + cnpjInfo.situacao : ''}
+                </div>
+                {cnpjInfo.socios.length > 0 ? (
+                  <ul style={{ margin: '8px 0 0', paddingLeft: 18, fontSize: 12.5, color: D.ink, lineHeight: 1.6 }}>
+                    {cnpjInfo.socios.map((s, i) => (
+                      <li key={i}>{s.nome}{s.cargo ? ' — ' + s.cargo : ''}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p style={{ fontSize: 12, color: D.muted, margin: '8px 0 0' }}>Nenhum sócio retornado nessa consulta.</p>
+                )}
+                <p style={{ fontSize: 10.5, color: D.muted, margin: '8px 0 0' }}>
+                  CPF do sócio não vem completo — a Receita Federal mascara por lei (LGPD) em qualquer fonte, mesmo paga.
+                </p>
+              </div>
+            ) : (
+              <div style={{ marginTop: 8 }}>
+                <button
+                  onClick={buscarCnpjAutomatico}
+                  disabled={buscandoCnpj}
+                  style={{ background: D.ink, color: '#fff', border: 'none', borderRadius: 8, padding: '9px 12px', fontSize: 12.5, fontWeight: 700, cursor: buscandoCnpj ? 'default' : 'pointer', opacity: buscandoCnpj ? 0.6 : 1 }}
+                >
+                  {buscandoCnpj ? 'Buscando...' : 'Buscar CNPJ automático'}
+                </button>
+                {erroCnpj && <p role="alert" style={{ fontSize: 11.5, color: '#dc2626', margin: '8px 0 0' }}>{erroCnpj}</p>}
+                <p style={{ fontSize: 10.5, color: D.muted, margin: '8px 0 0' }}>
+                  Puxa CNPJ, razão social e sócios pelo nome da empresa (cnpja.com). CPF nunca vem completo — protegido por lei em qualquer fonte.
+                </p>
+              </div>
+            )}
+          </div>
 
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {wa && (
