@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { normalizarCelularBR, normalizeEmail, normalizePhone, normalizeString, pareceCelularBR, temWhatsappReal } from './normalize'
+import { motivoSemWhatsappReal, normalizarCelularBR, normalizeEmail, normalizePhone, normalizeString, pareceCelularBR, temWhatsappReal } from './normalize'
 
 describe('normalizeString', () => {
   it('trims surrounding whitespace', () => {
@@ -87,6 +87,25 @@ describe('temWhatsappReal', () => {
 
   it('rejeita o placeholder de lead promovido da Prospecção sem celular confirmado', () => {
     expect(temWhatsappReal('pj:ChIJabc123')).toBe(false)
+  })
+})
+
+describe('motivoSemWhatsappReal', () => {
+  it('devolve null quando o WhatsApp é real — nada a explicar', () => {
+    expect(motivoSemWhatsappReal('5548991642332')).toBeNull()
+  })
+
+  it('identifica o placeholder do Instagram', () => {
+    expect(motivoSemWhatsappReal('ig:17841400000000000')).toEqual({ emoji: '📷', label: 'Instagram' })
+  })
+
+  it('identifica o placeholder da Prospecção — não pode continuar dizendo "Instagram" pra isso', () => {
+    expect(motivoSemWhatsappReal('pj:ChIJabc123')).toEqual({ emoji: '🏢', label: 'Prospecção' })
+  })
+
+  it('ausência de valor cai no motivo genérico (Instagram), não quebra', () => {
+    expect(motivoSemWhatsappReal(null)).toEqual({ emoji: '📷', label: 'Instagram' })
+    expect(motivoSemWhatsappReal(undefined)).toEqual({ emoji: '📷', label: 'Instagram' })
   })
 })
 
