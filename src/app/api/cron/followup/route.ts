@@ -3,6 +3,7 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { enviarFollowUp, enviarAlertaEscalada, verificarInstancia } from '@/lib/evolution'
 import { logError, logInfo, logWarn } from '@/lib/log'
 import { finishCronRun, startCronRun, type CronRunFinal } from '@/lib/cron/tracker'
+import { recalcularBaseAtiva } from '@/lib/leads/score-server'
 
 export const dynamic = 'force-dynamic'
 
@@ -188,6 +189,18 @@ export async function GET(req: NextRequest) {
   let result: CronRunFinal | undefined
 
   try {
+    // Recálculo diário do lead score, ANTES dos guards do Evolution.
+    //
+    // A dimensão "timing" decai com o tempo, e nada mais acontece com um lead
+    // esquecido para disparar um recálculo — sem esta passagem, um lead
+    // contatado em março continuaria marcado como quente para sempre.
+    //
+    // Fica antes dos guards de propósito: WhatsApp fora do ar não tem relação
+    // nenhuma com score, e colocar depois faria o recálculo ser pulado
+    // justamente nos dias de instabilidade.
+    const scores = await recalcularBaseAtiva(supabase)
+    logInfo(SOURCE, 'scores recalculados', { processados: scores.processados })
+
     // Guards Evolution — dias pulados por env ausente aparecem no histórico
     if (!process.env.EVOLUTION_API_URL || !process.env.EVOLUTION_API_KEY || !process.env.EVOLUTION_INSTANCE) {
       logWarn(SOURCE, 'skipped: envs Evolution ausentes')
