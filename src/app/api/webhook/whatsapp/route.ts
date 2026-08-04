@@ -77,30 +77,16 @@ async function processarEResponder(whatsapp: string, texto: string, mid: string)
   )
 
   try {
-    // Idempotência: a Evolution reentrega o mesmo evento em timeout/resposta
-    // não-2xx (WEBHOOK_RETRY_MAX_ATTEMPTS=10 por padrão) — sem isso, uma
-    // reentrega processaria a mensagem de novo: nova chamada de IA, nova
-    // resposta enviada, novo consumo do teto diário. Mesmo mecanismo já
-    // usado pro Instagram (upsert-instagram-lead.ts, migração
-    // 20260731090000): reaproveita interacoes.mid, que já é único
-    // globalmente (não por canal) — o formato do id do WhatsApp (Baileys,
-    // hex maiúsculo) e do Instagram (mid da Meta) não colidem na prática,
-    // então não precisou de migração nova só pra isso. Este check-then-insert
-    // evita trabalho redundante no caminho feliz; o 23505 no insert abaixo é
-    // quem realmente impede duplicata numa corrida entre reentregas
-    // concorrentes.
-    const { data: jaProcessado } = await supabase.from('interacoes').select('id').eq('mid', mid).maybeSingle()
-    if (jaProcessado) {
-      console.log('[processarEResponder] evento duplicado (mid ja processado), ignorando')
-      return
-    }
-
     // Resolve-ou-cria o lead atomicamente (unique index em leads.whatsapp,
     // migração 0010). Antes só nascia lead quando a IA decidia chamar
     // atualizar_lead() — agora toda mensagem recebida garante um lead_id,
     // mesmo que seja só um "oi" de numero desconhecido, pra nada se perder
     // da caixa de entrada. O upsert só grava a coluna whatsapp; nenhum outro
-    // campo do lead é tocado quando ele já existe.
+    // campo do lead é tocado quando ele já existe. É o único passo que
+    // acontece ANTES da reserva do mid logo abaixo — necessário só porque
+    // interacoes.lead_id precisa de um valor, e é seguro porque é puramente
+    // idempotente (onConflict), não manda mensagem, não chama IA, não muda
+    // estágio: não é um "efeito" de negócio, é resolver quem é o remetente.
     const { data: lead, error: upsertErr } = await supabase
       .from('leads')
       .upsert({ whatsapp }, { onConflict: 'whatsapp' })
@@ -111,6 +97,47 @@ async function processarEResponder(whatsapp: string, texto: string, mid: string)
       console.error('[processarEResponder] falha ao resolver lead', whatsapp, upsertErr)
       return
     }
+
+    // RESERVA do mid — o único portão que decide quem processa este evento.
+    // Nenhum efeito (notificar lead novo, chamar IA, enviar WhatsApp, mudar
+    // estágio, consumir teto diário, rodar automação) roda antes desta
+    // linha. De propósito NÃO existe um SELECT antes desta tentativa:
+    // "consultar → agir → inserir" tem uma janela de corrida real — duas
+    // reentregas concorrentes podem passar no SELECT antes de qualquer uma
+    // inserir. "Tentar inserir e ver o que volta" não tem essa janela: o
+    // unique index (interacoes_mid_key, migração 20260731090000, mesmo
+    // mecanismo do Instagram) é quem decide atomicamente, no banco, sem
+    // depender de timing da aplicação.
+    const { data: interacaoEntrada, error: reservaErr } = await supabase
+      .from('interacoes')
+      .insert({
+        lead_id: lead.id,
+        canal: 'whatsapp',
+        direcao: 'entrada',
+        mensagem: texto,
+        mid,
+      })
+      .select('id')
+      .single()
+
+    if (reservaErr) {
+      if (reservaErr.code === '23505') {
+        // Perdeu a corrida pra outra invocação concorrente da mesma
+        // reentrega (ou é uma reentrega horas depois de outra já
+        // processada) — a linha do vencedor nunca é apagada nem sobrescrita
+        // por este caminho, então o mid não volta a ficar disponível pra
+        // reprocessamento acidental.
+        console.log('[processarEResponder] evento duplicado (mid ja reservado), ignorando')
+        return
+      }
+      // Falha não relacionada a duplicata (erro transitório de rede/DB) —
+      // sem conseguir reservar o mid não dá pra garantir que não vai
+      // duplicar em cima de um retry, então não segue pros efeitos.
+      console.error('[processarEResponder] falha ao reservar mid', whatsapp, reservaErr)
+      return
+    }
+
+    // A partir daqui, SOMENTE quem venceu a corrida pela reserva continua.
 
     // Lead que acabou de nascer neste upsert dispara a notificação — era a
     // única porta de entrada que não avisava ninguém: quem mandava mensagem
@@ -126,7 +153,9 @@ async function processarEResponder(whatsapp: string, texto: string, mid: string)
     }
 
     // Histórico ANTES de logar a mensagem atual (evita ter que filtrar a
-    // própria mensagem de volta do resultado da query).
+    // própria mensagem de volta do resultado da query). A mensagem atual já
+    // foi gravada acima (reserva do mid) — esta query só busca o que veio
+    // antes dela.
     const { data: historicoRows } = await supabase
       .from('interacoes')
       .select('direcao, mensagem, created_at')
@@ -139,31 +168,6 @@ async function processarEResponder(whatsapp: string, texto: string, mid: string)
       .slice()
       .reverse()
       .map((m) => ({ role: m.direcao === 'entrada' ? ('user' as const) : ('assistant' as const), content: m.mensagem }))
-
-    // Loga a mensagem recebida sempre — mesmo se o bot estiver pausado, o
-    // corretor precisa ver isso na caixa de entrada do painel. Guarda o id
-    // pra poder gravar o sentimento nessa mesma linha logo abaixo. Grava o
-    // mid pra valer como registro de deduplicação (ver check no início desta
-    // função) — é o INSERT em si, não o SELECT de lá em cima, que fecha a
-    // corrida entre duas reentregas concorrentes via o unique index.
-    const { data: interacaoEntrada, error: interacaoEntradaErr } = await supabase
-      .from('interacoes')
-      .insert({
-        lead_id: lead.id,
-        canal: 'whatsapp',
-        direcao: 'entrada',
-        mensagem: texto,
-        mid,
-      })
-      .select('id')
-      .single()
-
-    if (interacaoEntradaErr?.code === '23505') {
-      // Perdeu a corrida pra outra invocação concorrente da mesma reentrega
-      // — ela já está processando (ou já processou) este mid.
-      console.log('[processarEResponder] evento duplicado (corrida detectada no insert), ignorando')
-      return
-    }
 
     // Opt-out por palavra-chave (PARAR/STOP/SAIR/...) — verificado antes de
     // qualquer resposta automática. Uma única confirmação FIXA (não gerada

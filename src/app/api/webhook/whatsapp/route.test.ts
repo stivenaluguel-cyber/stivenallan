@@ -47,8 +47,9 @@ import { POST } from './route'
 type MockConfig = {
   lead?: Record<string, unknown>
   leadFreshAtendimentoHumano?: boolean
-  midJaExiste?: boolean
-  midConflitoNoInsert?: string
+  // Mids tratados como já reservados ANTES do teste começar — simula uma
+  // reentrega horas depois de outra já ter sido processada com sucesso.
+  midsJaReservados?: string[]
 }
 
 function makeSupabase(cfg: MockConfig = {}) {
@@ -56,6 +57,14 @@ function makeSupabase(cfg: MockConfig = {}) {
   const interacoesInserts: Record<string, unknown>[] = []
   const interacoesUpdates: Record<string, unknown>[] = []
   let leadReadCount = 0
+  // Estado real de "quem já reservou esse mid" — compartilhado entre
+  // chamadas concorrentes de insert() porque é o MESMO objeto `mock`
+  // (supabaseHolder.current) usado por todas as invocações de
+  // processarEResponder no teste. O check-e-marca é síncrono (nenhum
+  // await entre ler e escrever no Set), igual ao unique index do Postgres
+  // resolveria a corrida de verdade — sem isso o mock não provaria nada
+  // sobre concorrência real.
+  const midsReservados = new Set<string>(cfg.midsJaReservados ?? [])
 
   const leadPadrao = {
     id: 'lead-1', nome: 'Ana', requer_atencao: false, lead_score: 10,
@@ -90,32 +99,37 @@ function makeSupabase(cfg: MockConfig = {}) {
       }
       if (table === 'interacoes') {
         return {
-          // Serve duas consultas bem diferentes: o histórico (.eq().eq().order().limit())
-          // e o check de idempotência por mid (.eq('mid', mid).maybeSingle()). Como
-          // .eq() sempre devolve a própria chain, os dois caminhos convivem no mesmo objeto.
+          // Só serve mais o histórico (.eq().eq().order().limit()) — não existe
+          // mais um SELECT prévio de idempotência; a reserva é o próprio insert().
           select: () => {
             const chain = {
               eq: () => chain,
               order: () => ({ limit: async () => ({ data: [], error: null }) }),
-              maybeSingle: async () => ({ data: cfg.midJaExiste ? { id: 'interacao-existente' } : null, error: null }),
             }
             return chain
           },
+          // Síncrono de propósito (não `async (row) => {...}`): o check-e-marca
+          // do mid precisa acontecer no exato instante em que insert() é
+          // chamado, sem nenhum await no meio — é isso que faz duas chamadas
+          // concorrentes reais (Promise.all) resolverem a corrida de forma
+          // determinística no teste, do mesmo jeito que o unique index faz de
+          // verdade no Postgres no instante do INSERT.
           insert: (row: Record<string, unknown>) => {
+            const mid = typeof row.mid === 'string' ? row.mid : null
+            const duplicado = mid !== null && midsReservados.has(mid)
+            if (mid !== null && !duplicado) midsReservados.add(mid)
             interacoesInserts.push(row)
-            if (cfg.midConflitoNoInsert && row.mid === cfg.midConflitoNoInsert) {
-              return {
-                select: () => ({
-                  single: async () => ({
-                    data: null,
-                    error: { code: '23505', message: 'duplicate key value violates unique constraint "interacoes_mid_key"' },
-                  }),
-                }),
-              }
-            }
             return {
               select: () => ({
-                single: async () => ({ data: { id: 'interacao-' + interacoesInserts.length }, error: null }),
+                single: async () => {
+                  if (duplicado) {
+                    return {
+                      data: null,
+                      error: { code: '23505', message: 'duplicate key value violates unique constraint "interacoes_mid_key"' },
+                    }
+                  }
+                  return { data: { id: 'interacao-' + interacoesInserts.length }, error: null }
+                },
               }),
             }
           },
@@ -347,8 +361,8 @@ describe('POST /api/webhook/whatsapp — idempotência', () => {
     expect(agentHolder.processarMensagem).not.toHaveBeenCalled()
   })
 
-  it('reentrega (mid já existe em interacoes): responde 200 sem duplicar mensagem, chamar IA ou enviar de novo', async () => {
-    const mock = makeSupabase({ midJaExiste: true })
+  it('reentrega horas depois (mid já reservado de um processamento anterior): responde 200 sem reprocessar', async () => {
+    const mock = makeSupabase({ midsJaReservados: ['MID-PADRAO-TESTE'] })
     supabaseHolder.current = mock
 
     const res = await POST(makeReq(EVENTO_MENSAGEM('oi')))
@@ -357,19 +371,38 @@ describe('POST /api/webhook/whatsapp — idempotência', () => {
     expect(res.status).toBe(200)
     expect(agentHolder.processarMensagem).not.toHaveBeenCalled()
     expect(evolutionHolder.enviarMensagem).not.toHaveBeenCalled()
-    expect(mock.interacoesInserts).toHaveLength(0)
+    // A tentativa de reserva acontece de qualquer forma (não existe mais um
+    // SELECT prévio pra "adivinhar" — é o insert() que descobre o 23505),
+    // mas não vira uma segunda linha de verdade nem dispara nenhum efeito.
+    const tentativas = mock.interacoesInserts.filter((i) => i.mid === 'MID-PADRAO-TESTE')
+    expect(tentativas).toHaveLength(1)
   })
 
-  it('concorrência: duas reentregas simultâneas — a que perde a corrida no INSERT (23505) não duplica a resposta', async () => {
-    const mock = makeSupabase({ midConflitoNoInsert: 'MID-PADRAO-TESTE' })
+  it('concorrência REAL: duas requisições em paralelo pro mesmo mid — só a vencedora executa os efeitos, as duas terminam 200', async () => {
+    const mock = makeSupabase()
     supabaseHolder.current = mock
 
-    const res = await POST(makeReq(EVENTO_MENSAGEM('oi')))
+    const evento = EVENTO_MENSAGEM('oi', 'MID-CONCORRENTE')
+    // Promise.all dispara as duas POST() de verdade em paralelo — não é uma
+    // chamada configurada pra simular derrota, é a mesma corrida que duas
+    // reentregas simultâneas da Evolution fariam contra o servidor real.
+    const [res1, res2] = await Promise.all([
+      POST(makeReq(evento)),
+      POST(makeReq(evento)),
+    ])
     await aguardarProcessamentoAssincrono()
 
-    expect(res.status).toBe(200)
-    expect(agentHolder.processarMensagem).not.toHaveBeenCalled()
-    expect(evolutionHolder.enviarMensagem).not.toHaveBeenCalled()
+    expect(res1.status).toBe(200)
+    expect(res2.status).toBe(200)
+    expect(agentHolder.processarMensagem).toHaveBeenCalledTimes(1)
+    expect(evolutionHolder.enviarMensagem).toHaveBeenCalledTimes(1)
+    // Só uma reserva desse mid existe — a segunda tentativa de insert
+    // aconteceu (perdeu a corrida), mas nenhuma "atividade" nova foi criada
+    // além da reserva vencedora + a resposta de saída dela.
+    const reservasDoMid = mock.interacoesInserts.filter((i) => i.mid === 'MID-CONCORRENTE')
+    expect(reservasDoMid).toHaveLength(1)
+    const totalInteracoesCriadas = mock.interacoesInserts.filter((i) => i.direcao === 'entrada' || i.direcao === 'saida')
+    expect(totalInteracoesCriadas).toHaveLength(2) // 1 entrada (a reserva) + 1 saída (a resposta da IA)
   })
 
   it('mids diferentes não são tratados como duplicata um do outro', async () => {
