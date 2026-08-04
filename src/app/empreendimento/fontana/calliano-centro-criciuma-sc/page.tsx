@@ -16,9 +16,8 @@ const t = {
   bg:'#FAFAF8', ink:'#1A1612', terra:'#7A4028', terraDark:'#4E2818',
   muted:'#6B5A50', line:'rgba(26,22,18,0.12)', dark:'#110B07',
   onDark:'#F6EDE8', onDarkMuted:'rgba(246,237,232,0.66)',
-  display:"'Jost',system-ui,sans-serif",
-  serif:"'Cormorant Garamond',Georgia,serif",
-  body:"'Hanken Grotesk',system-ui,sans-serif",
+  display: 'var(--font-piazzolla), Georgia, serif',
+  body: 'var(--font-public-sans), system-ui, sans-serif',
 }
 
 const IMG = {
@@ -97,16 +96,16 @@ export default function CallianoPage() {
 
       <style>{`
         html { scroll-behavior: smooth; }
-        .ca-eyebrow { font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: ${t.terra}; font-family: ${t.display}; }
-        .ca-h1 { font-family: ${t.display}; font-weight: 300; text-transform: uppercase; letter-spacing: .06em; line-height: 1.08; }
-        .ca-h2 { font-family: ${t.display}; font-weight: 300; text-transform: uppercase; letter-spacing: .07em; }
-        .ca-serif { font-family: ${t.serif}; font-style: italic; }
+        .ca-eyebrow { font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase; color: ${t.terra}; font-family: ${t.body}; font-weight: 600; }
+        .ca-h1 { font-family: ${t.display}; font-weight: 600; line-height: 1.08; }
+        .ca-h2 { font-family: ${t.display}; font-weight: 600; }
+        .ca-serif { font-family: ${t.display}; font-style: italic; font-weight: 400; }
         .ca-rule { width: 56px; height: 1px; background: ${t.terra}; margin: 20px 0; }
-        .ca-cta { display: inline-flex; align-items: center; gap: 10px; padding: 13px 30px; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; font-family: ${t.display}; border: 1px solid ${t.terra}; color: ${t.terra}; background: transparent; cursor: pointer; text-decoration: none; transition: background .25s, color .25s; }
+        .ca-cta { display: inline-flex; align-items: center; gap: 10px; padding: 13px 30px; font-size: 15px; font-family: ${t.body}; font-weight: 600; border: 1px solid ${t.terra}; color: ${t.terra}; background: transparent; cursor: pointer; text-decoration: none; transition: background .25s, color .25s; }
         .ca-cta:hover { background: ${t.terra}; color: #fff; }
-        .ca-cta-light { display: inline-flex; align-items: center; gap: 10px; padding: 13px 30px; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; font-family: ${t.display}; border: 1px solid rgba(246,237,232,0.55); color: ${t.onDark}; background: transparent; cursor: pointer; text-decoration: none; transition: background .25s, color .25s; }
+        .ca-cta-light { display: inline-flex; align-items: center; gap: 10px; padding: 13px 30px; font-size: 15px; font-family: ${t.body}; font-weight: 600; border: 1px solid rgba(246,237,232,0.55); color: ${t.onDark}; background: transparent; cursor: pointer; text-decoration: none; transition: background .25s, color .25s; }
         .ca-cta-light:hover { background: rgba(246,237,232,0.12); }
-        .ca-navlink { font-family: ${t.display}; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: #fff; text-decoration: none; opacity: .82; transition: opacity .2s; }
+        .ca-navlink { font-family: ${t.body}; font-size: 15px; font-weight: 500; color: #fff; text-decoration: none; opacity: .82; transition: opacity .2s; }
         .ca-navlink:hover { opacity: 1; }
         .ca-fade { animation: cafade .9s ease forwards; }
         @keyframes cafade { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
@@ -125,14 +124,14 @@ export default function CallianoPage() {
       {/* HEADER */}
       <header style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 100, padding: '28px 48px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <a href="/" style={{ textDecoration: 'none' }}>
-          <span style={{ fontFamily: t.display, fontWeight: 300, fontSize: 18, letterSpacing: '.18em', textTransform: 'uppercase', color: '#fff' }}>Stiven Allan</span>
+          <span style={{ fontFamily: t.display, fontWeight: 600, fontSize: 18, color: '#fff' }}>Stiven Allan</span>
         </a>
         <nav className="ca-nav-links" style={{ display: 'flex', alignItems: 'center', gap: 36 }}>
           <a href="#residencial" className="ca-navlink">O Residencial</a>
           <a href="#galeria" className="ca-navlink">Galeria</a>
           <a href="#plantas" className="ca-navlink">Plantas</a>
           <a href="#localizacao" className="ca-navlink">Localização</a>
-          <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ fontFamily: t.display, fontSize: 12, letterSpacing: '.16em', textTransform: 'uppercase', color: '#fff', background: t.terra, padding: '10px 22px', textDecoration: 'none' }}>Quero saber mais</a>
+          <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ fontFamily: t.body, fontSize: 15, fontWeight: 600, color: '#fff', background: t.terra, padding: '10px 22px', textDecoration: 'none' }}>Quero saber mais</a>
         </nav>
       </header>
 
@@ -152,7 +151,7 @@ export default function CallianoPage() {
       <section id="residencial" style={{ padding: 'clamp(72px,10vw,120px) 6vw', maxWidth: 900, margin: '0 auto' }}>
         <p className="ca-eyebrow" style={{ marginBottom: 12 }}>O Residencial</p>
         <div className="ca-rule" />
-        <p className="ca-serif" style={{ fontSize: 'clamp(24px,3.5vw,46px)', lineHeight: 1.28, color: t.ink, margin: '0 0 32px' }}>
+        <p style={{ fontFamily: t.body, fontWeight: 500, fontSize: 'clamp(24px,3.5vw,46px)', lineHeight: 1.28, color: t.ink, margin: '0 0 32px' }}>
           Inspirado em uma vila italiana onde a vida corre serena entre rotas de caminhada, cafés da tarde e boa culinária.
         </p>
         <p style={{ fontSize: 15, lineHeight: 1.8, color: t.muted, maxWidth: 680 }}>
@@ -184,8 +183,8 @@ export default function CallianoPage() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginBottom: 40 }}>
               {[['2–3','Dormitórios'],['1','Suíte'],['92 m²','Área privativa'],['Sob consulta','Valor']].map(([val,lbl]) => (
                 <div key={lbl}>
-                  <div style={{ fontFamily: t.display, fontSize: 32, fontWeight: 200, color: t.onDark, letterSpacing: '.04em' }}>{val}</div>
-                  <div style={{ fontFamily: t.display, fontSize: 11, letterSpacing: '.2em', textTransform: 'uppercase', color: t.onDarkMuted }}>{lbl}</div>
+                  <div style={{ fontFamily: t.display, fontSize: 32, fontWeight: 600, color: t.onDark }}>{val}</div>
+                  <div style={{ fontFamily: t.body, fontSize: 11, color: t.onDarkMuted }}>{lbl}</div>
                 </div>
               ))}
             </div>
@@ -193,15 +192,15 @@ export default function CallianoPage() {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div style={{ padding: '28px 32px', border: `1px solid rgba(246,237,232,0.12)`, borderRadius: 2 }}>
-              <p style={{ fontFamily: t.display, fontSize: 11, letterSpacing: '.2em', textTransform: 'uppercase', color: t.onDarkMuted, margin: '0 0 8px' }}>Endereço</p>
+              <p style={{ fontFamily: t.body, fontSize: 11, color: t.onDarkMuted, margin: '0 0 8px' }}>Endereço</p>
               <p style={{ fontSize: 15, color: t.onDark, margin: 0 }}>Rua São José — Centro, Criciúma/SC</p>
             </div>
             <div style={{ padding: '28px 32px', border: `1px solid rgba(246,237,232,0.12)`, borderRadius: 2 }}>
-              <p style={{ fontFamily: t.display, fontSize: 11, letterSpacing: '.2em', textTransform: 'uppercase', color: t.onDarkMuted, margin: '0 0 8px' }}>Status</p>
+              <p style={{ fontFamily: t.body, fontSize: 11, color: t.onDarkMuted, margin: '0 0 8px' }}>Status</p>
               <p style={{ fontSize: 15, color: t.onDark, margin: 0 }}>Entregue</p>
             </div>
             <div style={{ padding: '28px 32px', border: `1px solid rgba(246,237,232,0.12)`, borderRadius: 2 }}>
-              <p style={{ fontFamily: t.display, fontSize: 11, letterSpacing: '.2em', textTransform: 'uppercase', color: t.onDarkMuted, margin: '0 0 8px' }}>Preço</p>
+              <p style={{ fontFamily: t.body, fontSize: 11, color: t.onDarkMuted, margin: '0 0 8px' }}>Preço</p>
               <p style={{ fontSize: 15, color: t.onDark, margin: 0 }}>Sob consulta</p>
             </div>
           </div>
@@ -229,7 +228,7 @@ export default function CallianoPage() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(240px,1fr))', gap: 0 }}>
           {DIFERENCIAIS.map((d, i) => (
             <div key={d} style={{ padding: '32px 28px', borderRight: i % 2 === 0 ? `1px solid ${t.line}` : 'none', borderBottom: `1px solid ${t.line}` }}>
-              <div style={{ fontFamily: t.display, fontSize: 28, fontWeight: 200, color: t.terra, marginBottom: 12, letterSpacing: '.04em' }}>0{i+1}</div>
+              <div style={{ fontFamily: t.display, fontSize: 28, fontWeight: 600, color: t.terra, marginBottom: 12 }}>0{i+1}</div>
               <p style={{ fontSize: 14, lineHeight: 1.65, color: t.muted, margin: 0 }}>{d}</p>
             </div>
           ))}
@@ -293,8 +292,8 @@ export default function CallianoPage() {
               ['03','Realize seu sonho','Condições personalizadas para o seu perfil.'],
             ].map(([n,t1,t2]) => (
               <div key={n}>
-                <div style={{ fontFamily: t.display, fontSize: 36, fontWeight: 200, color: 'rgba(246,237,232,0.5)', marginBottom: 12 }}>{n}</div>
-                <p style={{ fontFamily: t.display, fontSize: 14, letterSpacing: '.12em', textTransform: 'uppercase', color: t.onDark, margin: '0 0 8px' }}>{t1}</p>
+                <div style={{ fontFamily: t.display, fontSize: 36, fontWeight: 600, color: 'rgba(246,237,232,0.5)', marginBottom: 12 }}>{n}</div>
+                <p style={{ fontFamily: t.body, fontSize: 14, fontWeight: 600, color: t.onDark, margin: '0 0 8px' }}>{t1}</p>
                 <p style={{ fontSize: 14, lineHeight: 1.7, color: t.onDarkMuted, margin: 0 }}>{t2}</p>
               </div>
             ))}
@@ -303,7 +302,7 @@ export default function CallianoPage() {
             <a href={CATALOGO_PDF} target="_blank" rel="noopener noreferrer" className="ca-cta-light">Baixar catálogo</a>
             <a href={WPP} target="_blank" rel="noopener noreferrer" className="ca-cta-light">Falar com Stiven</a>
           </div>
-          <p style={{ marginTop: 40, fontSize: 11, letterSpacing: '.2em', textTransform: 'uppercase', color: 'rgba(246,237,232,0.7)' }}>Condições conforme a tabela vigente, sujeitas à atualização. Consulte a tabela vigente para valores e disponibilidade por unidade.</p>
+          <p style={{ marginTop: 40, fontSize: 11, color: 'rgba(246,237,232,0.7)' }}>Condições conforme a tabela vigente, sujeitas à atualização. Consulte a tabela vigente para valores e disponibilidade por unidade.</p>
         </div>
       </section>
 
@@ -331,16 +330,16 @@ export default function CallianoPage() {
       <footer style={{ background: t.terraDark, padding: 'clamp(48px,8vw,80px) 6vw' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 48 }}>
           <div>
-            <span style={{ fontFamily: t.display, fontWeight: 300, fontSize: 16, letterSpacing: '.18em', textTransform: 'uppercase', color: t.onDark }}>Stiven Allan</span>
+            <span style={{ fontFamily: t.display, fontWeight: 600, fontSize: 16, color: t.onDark }}>Stiven Allan</span>
             <p style={{ fontSize: 13, lineHeight: 1.75, color: t.onDarkMuted, marginTop: 16 }}>Especialista em imóveis de alto padrão da Construtora Fontana em Santa Catarina.</p>
           </div>
           <div>
-            <p style={{ fontFamily: t.display, fontSize: 11, letterSpacing: '.2em', textTransform: 'uppercase', color: t.onDarkMuted, marginBottom: 16 }}>Contato</p>
+            <p style={{ fontFamily: t.body, fontSize: 11, color: t.onDarkMuted, marginBottom: 16 }}>Contato</p>
             <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ display: 'block', fontSize: 13, color: t.onDark, textDecoration: 'none', marginBottom: 8 }}>WhatsApp: (48) 99164-2332</a>
             <a href="mailto:stivenallan@gmail.com" style={{ display: 'block', fontSize: 13, color: t.onDark, textDecoration: 'none' }}>stivenallan@gmail.com</a>
           </div>
           <div>
-            <p style={{ fontFamily: t.display, fontSize: 11, letterSpacing: '.2em', textTransform: 'uppercase', color: t.onDarkMuted, marginBottom: 16 }}>Empreendimento</p>
+            <p style={{ fontFamily: t.body, fontSize: 11, color: t.onDarkMuted, marginBottom: 16 }}>Empreendimento</p>
             <p style={{ fontSize: 13, color: t.onDark, margin: '0 0 6px' }}>Calliano Residencial</p>
             <p style={{ fontSize: 13, color: t.onDarkMuted, margin: 0 }}>Centro · Criciúma/SC</p>
           </div>

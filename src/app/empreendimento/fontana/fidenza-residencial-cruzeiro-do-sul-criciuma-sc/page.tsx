@@ -26,9 +26,8 @@ const t = {
   dark: '#14130F',
   onDark: '#F4F1EA',
   onDarkMuted: 'rgba(244,241,234,0.66)',
-  display: "'Bricolage Grotesque', system-ui, sans-serif",
-  serif: "'Cormorant Garamond', Georgia, serif",
-  body: "'Hanken Grotesk', system-ui, sans-serif",
+  display: 'var(--font-piazzolla), Georgia, serif',
+  body: 'var(--font-public-sans), system-ui, sans-serif',
 }
 
 const IMG = {
@@ -140,17 +139,17 @@ export default function FidenzaPage() {
         /* Mondrian grid — linhas horizontais e verticais inspiradas em Piet Mondrian */
         .fz-mondrian { position: absolute; inset: 0; pointer-events: none; overflow: hidden; opacity: 0.035; z-index: 1; }
         .fz-mondrian line { stroke: ${t.blue}; stroke-width: 1; }
-        .fz-eyebrow { font-size: 11px; letter-spacing: 0.42em; text-transform: uppercase; color: ${t.graphite}; font-family: ${t.body}; font-weight: 500; }
-        .fz-h1 { font-family: ${t.display}; font-weight: 300; text-transform: uppercase; letter-spacing: 0.14em; line-height: 1.04; text-shadow: 0 2px 24px rgba(0,0,0,0.55), 0 1px 4px rgba(0,0,0,0.4); font-size: clamp(40px,8vw,104px); margin: 0; }
+        .fz-eyebrow { font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase; color: ${t.graphite}; font-family: ${t.body}; font-weight: 600; }
+        .fz-h1 { font-family: ${t.display}; font-weight: 600; line-height: 1.04; text-shadow: 0 2px 24px rgba(0,0,0,0.55), 0 1px 4px rgba(0,0,0,0.4); font-size: clamp(40px,8vw,104px); margin: 0; }
         .fz-onimg { text-shadow: 0 1px 16px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.5); }
-        .fz-h2 { font-family: ${t.display}; font-weight: 300; text-transform: uppercase; letter-spacing: 0.16em; line-height: 1.1; font-size: clamp(26px,4vw,46px); margin: 0; }
-        .fz-serif { font-family: ${t.serif}; font-style: italic; font-weight: 400; }
+        .fz-h2 { font-family: ${t.display}; font-weight: 600; line-height: 1.1; font-size: clamp(26px,4vw,46px); margin: 0; }
+        .fz-serif { font-family: ${t.display}; font-style: italic; font-weight: 400; }
         .fz-rule { width: 56px; height: 1px; background: ${t.graphite}; border: 0; }
-        .fz-cta { display: inline-block; font-family: ${t.body}; font-size: 12px; letter-spacing: 0.3em; text-transform: uppercase; color: ${t.ink}; border: 1px solid ${t.graphite}; padding: 16px 34px; text-decoration: none; transition: background .35s ease, color .35s ease; cursor: pointer; }
+        .fz-cta { display: inline-block; font-family: ${t.body}; font-size: 15px; font-weight: 600; color: ${t.ink}; border: 1px solid ${t.graphite}; padding: 16px 34px; text-decoration: none; transition: background .35s ease, color .35s ease; cursor: pointer; }
         .fz-cta:hover { background: ${t.graphite}; color: #fff; }
         .fz-cta-light { color: ${t.onDark}; border-color: rgba(244,241,234,0.55); }
         .fz-cta-light:hover { background: ${t.onDark}; color: ${t.graphiteDark}; }
-        .fz-navlink { font-family: ${t.body}; font-size: 11px; letter-spacing: 0.28em; text-transform: uppercase; color: rgba(255,255,255,0.85); text-decoration: none; transition: color .3s ease; }
+        .fz-navlink { font-family: ${t.body}; font-size: 15px; font-weight: 500; color: rgba(255,255,255,0.85); text-decoration: none; transition: color .3s ease; }
         .fz-navlink:hover { color: #fff; }
         .fz-fade { opacity: 0; transform: translateY(24px); animation: fzfade .9s ease forwards; }
         @keyframes fzfade { to { opacity: 1; transform: none; } }
@@ -172,7 +171,7 @@ export default function FidenzaPage() {
       {/* NAV */}
       <header style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 50 }}>
         <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '22px clamp(18px,5vw,56px)' }}>
-          <a href="#top" style={{ fontFamily: t.display, fontWeight: 400, letterSpacing: '0.26em', fontSize: 16, color: '#fff', textDecoration: 'none', textTransform: 'uppercase' }}>Fidenza</a>
+          <a href="#top" style={{ fontFamily: t.display, fontWeight: 400, fontSize: 16, color: '#fff', textDecoration: 'none' }}>Fidenza</a>
           <div className="fz-nav-links" style={{ display: 'flex', alignItems: 'center', gap: 30 }}>
             <a href="#residencial" className="fz-navlink">O Residencial</a>
             <a href="#galeria" className="fz-navlink">Galeria</a>
@@ -228,21 +227,21 @@ export default function FidenzaPage() {
           <p className="fz-eyebrow" style={{ marginBottom: 26 }}>O Residencial</p>
           <h2 className="fz-h2">Uma obra de arte<br />para chamar de lar</h2>
           <hr className="fz-rule" style={{ margin: '34px auto' }} />
-          <p className="fz-serif" style={{ fontSize: 'clamp(24px,3.4vw,40px)', lineHeight: 1.35, color: t.ink, margin: 0 }}>
+          <p style={{ fontFamily: t.body, fontWeight: 500, fontSize: 'clamp(24px,3.4vw,40px)', lineHeight: 1.35, color: t.ink, margin: 0 }}>
             Nasce em Criciúma um lugar que acompanha seu momento de vida. Um encontro de linhas horizontais e verticais, que se tornam uma obra de arte.
           </p>
           <p style={{ fontSize: 18, lineHeight: 1.8, color: t.muted, marginTop: 26, maxWidth: 620, marginLeft: 'auto', marginRight: 'auto' }}>
             Onde o seu estilo de vida autêntico se transforma em seu novo lar.
           </p>
-          <p className="fz-serif" style={{ fontSize: 'clamp(17px,2.1vw,24px)', color: t.graphite, marginTop: 28 }}>
+          <p style={{ fontFamily: t.body, fontWeight: 500, fontSize: 'clamp(17px,2.1vw,24px)', color: t.graphite, marginTop: 28 }}>
             A originalidade de viver em um lugar que se encaixa no que você é.
           </p>
           <div style={{ marginTop: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: t.muted }}>Apenas 2 apartamentos por andar</span>
+            <span style={{ fontSize: 11, color: t.muted }}>Apenas 2 apartamentos por andar</span>
             <span style={{ width: 1, height: 28, background: t.line, display: 'inline-block' }} />
-            <span style={{ fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: t.muted }}>22 unidades · 11 pavimentos</span>
+            <span style={{ fontSize: 11, color: t.muted }}>22 unidades · 11 pavimentos</span>
             <span style={{ width: 1, height: 28, background: t.line, display: 'inline-block' }} />
-            <span style={{ fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: t.muted }}>Entrega prevista dez/2027</span>
+            <span style={{ fontSize: 11, color: t.muted }}>Entrega prevista dez/2027</span>
           </div>
         </div>
       </section>
@@ -278,7 +277,7 @@ export default function FidenzaPage() {
         <div style={{ maxWidth: 1080, margin: '0 auto', textAlign: 'center' }}>
           <p className="fz-eyebrow" style={{ color: t.onDark, marginBottom: 18 }}>As Residências</p>
           <h2 className="fz-h2" style={{ color: t.onDark }}>Espaço para o<br />seu estilo autêntico</h2>
-          <p className="fz-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 56 }}>Apenas 2 apartamentos por andar. 22 unidades em 11 pavimentos.</p>
+          <p style={{ fontFamily: t.body, fontWeight: 500, color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 56 }}>Apenas 2 apartamentos por andar. 22 unidades em 11 pavimentos.</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 'clamp(24px,4vw,48px)', marginBottom: 40 }}>
             {[
               { n: '3', l: 'Dormitórios (3 suítes)' },
@@ -289,16 +288,16 @@ export default function FidenzaPage() {
               { n: '11', l: 'Pavimentos' },
             ].map((it, i) => (
               <div key={i}>
-                <div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 'clamp(28px,4vw,52px)', letterSpacing: '0.04em', lineHeight: 1 }}>{it.n}</div>
-                <div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDarkMuted, marginTop: 12 }}>{it.l}</div>
+                <div style={{ fontFamily: t.display, fontWeight: 600, fontSize: 'clamp(28px,4vw,52px)', lineHeight: 1 }}>{it.n}</div>
+                <div style={{ fontSize: 11, color: t.onDarkMuted, marginTop: 12 }}>{it.l}</div>
               </div>
             ))}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 48, opacity: 0.7 }}>
             <span style={{ width: 32, height: 1, background: t.onDark, display: 'inline-block' }} />
-            <span style={{ fontFamily: t.display, fontWeight: 300, fontSize: 'clamp(22px,3vw,38px)', letterSpacing: '0.06em' }}>Dez/2027</span>
+            <span style={{ fontFamily: t.display, fontWeight: 600, fontSize: 'clamp(22px,3vw,38px)' }}>Dez/2027</span>
             <span style={{ width: 32, height: 1, background: t.onDark, display: 'inline-block' }} />
-            <span style={{ fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: t.onDarkMuted }}>Entrega prevista</span>
+            <span style={{ fontSize: 11, color: t.onDarkMuted }}>Entrega prevista</span>
           </div>
           <LeadCaptureButton slug="fidenza-residencial-cruzeiro-do-sul-criciuma-sc" construtora_slug="fontana" className="fz-cta fz-cta-light"  propertyDisplayName="Fidenza Residencial" />
         </div>
@@ -334,7 +333,7 @@ export default function FidenzaPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 1, background: t.line }}>
             {DIFERENCIAIS.map((d, i) => (
               <div key={i} style={{ background: t.bg, padding: 'clamp(28px,4vw,44px)' }}>
-                <div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 22, color: t.blue, marginBottom: 14, opacity: 0.7 }}>{String(i + 1).padStart(2, '0')}</div>
+                <div style={{ fontFamily: t.display, fontWeight: 600, fontSize: 22, color: t.blue, marginBottom: 14, opacity: 0.7 }}>{String(i + 1).padStart(2, '0')}</div>
                 <p style={{ margin: 0, fontSize: 16, lineHeight: 1.5, color: t.ink }}>{d}</p>
               </div>
             ))}
@@ -383,7 +382,7 @@ export default function FidenzaPage() {
         <div style={{ maxWidth: 1080, margin: '0 auto', textAlign: 'center' }}>
           <p className="fz-eyebrow" style={{ color: t.onDark, marginBottom: 18 }}>Financiamento Direto</p>
           <h2 className="fz-h2" style={{ color: t.onDark }}>O privilégio de comprar sem banco</h2>
-          <p className="fz-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 40 }}>Condições de pagamento definidas pela Construtora Fontana, conforme a tabela vigente.</p>
+          <p style={{ fontFamily: t.body, fontWeight: 500, color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 40 }}>Condições de pagamento definidas pela Construtora Fontana, conforme a tabela vigente.</p>
           <p style={{ color: t.onDarkMuted, fontSize: 17, lineHeight: 1.7, maxWidth: 720, margin: '0 auto 20px' }}>{COMERCIAL.texto}</p>
           <p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.7, maxWidth: 720, margin: '0 auto 40px' }}>{COMERCIAL.correcao}</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px,1fr))', gap: 'clamp(28px,4vw,52px)' }}>
@@ -393,13 +392,13 @@ export default function FidenzaPage() {
               { n: '03', ti: 'Negocie direto com a Fontana', d: 'Condições negociadas direto com a construtora, sem depender de banco.' },
             ].map((s, i) => (
               <div key={i} style={{ textAlign: 'left' }}>
-                <div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 40, opacity: 0.55, marginBottom: 14 }}>{s.n}</div>
-                <h3 style={{ fontFamily: t.display, fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: 17, margin: '0 0 12px', color: t.onDark }}>{s.ti}</h3>
+                <div style={{ fontFamily: t.display, fontWeight: 600, fontSize: 40, opacity: 0.55, marginBottom: 14 }}>{s.n}</div>
+                <h3 style={{ fontFamily: t.body, fontWeight: 600, fontSize: 17, margin: '0 0 12px', color: t.onDark }}>{s.ti}</h3>
                 <p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.6, margin: 0 }}>{s.d}</p>
               </div>
             ))}
           </div>
-          <p style={{ marginTop: 56, fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: t.onDark }}>{COMERCIAL.vigencia}</p>
+          <p style={{ marginTop: 56, fontSize: 11, color: t.onDark }}>{COMERCIAL.vigencia}</p>
         </div>
       </section>
 
@@ -430,19 +429,19 @@ export default function FidenzaPage() {
       <footer style={{ background: t.graphiteDark, color: t.onDarkMuted, padding: 'clamp(56px,9vh,96px) clamp(18px,5vw,56px)' }}>
         <div style={{ maxWidth: 1180, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px,1fr))', gap: 'clamp(28px,5vw,56px)' }}>
           <div>
-            <div style={{ fontFamily: t.display, fontWeight: 400, letterSpacing: '0.22em', fontSize: 18, color: t.onDark, textTransform: 'uppercase' }}>Stiven Allan</div>
+            <div style={{ fontFamily: t.display, fontWeight: 400, fontSize: 18, color: t.onDark }}>Stiven Allan</div>
             <p style={{ marginTop: 14, fontSize: 14, lineHeight: 1.6 }}>Imóveis de alto padrão em Santa Catarina.<br />CRECI 60.275</p>
           </div>
           <div>
-            <div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDark, marginBottom: 14 }}>Contato</div>
+            <div style={{ fontSize: 11, color: t.onDark, marginBottom: 14 }}>Contato</div>
             <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ color: t.onDarkMuted, textDecoration: 'none', fontSize: 14 }}>WhatsApp &middot; (48) 99164-2332</a>
           </div>
           <div>
-            <div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDark, marginBottom: 14 }}>Empreendimento</div>
+            <div style={{ fontSize: 11, color: t.onDark, marginBottom: 14 }}>Empreendimento</div>
             <p style={{ fontSize: 14, lineHeight: 1.6, margin: 0 }}>Fidenza Residencial<br />Construtora Fontana<br />Cruzeiro do Sul, Criciúma/SC<br />Rua São José, 1000</p>
           </div>
           <div>
-            <div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDark, marginBottom: 14 }}>Outros Empreendimentos</div>
+            <div style={{ fontSize: 11, color: t.onDark, marginBottom: 14 }}>Outros Empreendimentos</div>
             <Link href="/empreendimento/fontana/monte-leone-centro-criciuma-sc" style={{ display: 'block', fontSize: 14, color: t.onDarkMuted, textDecoration: 'none', marginBottom: 8 }}>Monte Leone Residencial</Link>
             <Link href="/empreendimento/fontana/lavis-residencial-centro-criciuma-sc" style={{ display: 'block', fontSize: 14, color: t.onDarkMuted, textDecoration: 'none', marginBottom: 8 }}>Lavis Residencial</Link>
             <Link href="/empreendimento/fontana/aguas-de-marano-frente-mar-balneario-picarras-sc" style={{ display: 'block', fontSize: 14, color: t.onDarkMuted, textDecoration: 'none' }}>Águas de Marano</Link>

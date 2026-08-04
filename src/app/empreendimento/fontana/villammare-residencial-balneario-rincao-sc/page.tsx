@@ -16,9 +16,8 @@ const t = {
   bg: '#F4F6F8', ink: '#1A1A1A', navy: '#1A3A5C', navyDark: '#0D2039',
   muted: '#6B6B6B', dark: '#091828',
   onDark: '#F4F6F8', onDarkMuted: 'rgba(244,246,248,0.65)',
-  display: "'Playfair Display', Georgia, serif",
-  serif: "Georgia, serif",
-  body: "'Inter', system-ui, sans-serif"
+  display: 'var(--font-piazzolla), Georgia, serif',
+  body: 'var(--font-public-sans), system-ui, sans-serif'
 }
 
 const CDN = '/images/empreendimentos/villammare-residencial-balneario-rincao-sc/'
@@ -105,20 +104,20 @@ export default function Page() {
       />
       <style>{`
         html { scroll-behavior: smooth; }
-        .vm-eyebrow { font-size:11px; letter-spacing:0.42em; text-transform:uppercase; }
-        .vm-h1 { font-family:${t.display}; font-weight:300; text-transform:uppercase; letter-spacing:0.14em; }
-        .vm-h2 { font-family:${t.display}; font-weight:300; text-transform:uppercase; font-size:clamp(26px,4vw,46px); }
-        .vm-cta { display:inline-block; letter-spacing:0.3em; border:1px solid; padding:16px 34px; text-decoration:none; text-transform:uppercase; font-size:11px; }
+        .vm-eyebrow { font-size:11px; letter-spacing:0.07em; text-transform:uppercase; font-family:${t.body}; }
+        .vm-h1 { font-family:${t.display}; font-weight:600; }
+        .vm-h2 { font-family:${t.display}; font-weight:600; font-size:clamp(26px,4vw,46px); }
+        .vm-cta { display:inline-block; font-family:${t.body}; font-weight:600; border:1px solid; padding:16px 34px; text-decoration:none; font-size:15px; }
         .vm-amen { display:flex; align-items:center; gap:12px; padding:14px 0; border-bottom:1px solid rgba(0,0,0,0.08); }
         .vm-amen::before { content:''; width:6px; height:6px; background:${t.navy}; border-radius:50%; flex-shrink:0; }
         .vm-wa { position:fixed; right:20px; bottom:20px; width:56px; height:56px; border-radius:50%; background:#25D366; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 16px rgba(0,0,0,0.25); z-index:200; }
       `}</style>
 
       <header style={{ position:'absolute', top:0, left:0, right:0, zIndex:50, padding:'24px 32px', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-        <Link href="/" style={{ color:'#fff', textDecoration:'none', fontFamily:t.display, fontWeight:300, fontSize:18, letterSpacing:'0.12em' }}>STIVEN ALLAN</Link>
+        <Link href="/" style={{ color:'#fff', textDecoration:'none', fontFamily:t.display, fontWeight:600, fontSize:18 }}>Stiven Allan</Link>
         <nav style={{ display:'flex', gap:32 }}>
-          <Link href="/#empreendimentos" style={{ color:'rgba(255,255,255,0.85)', textDecoration:'none', fontSize:12, letterSpacing:'0.24em', textTransform:'uppercase' }}>Empreendimentos</Link>
-          <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ color:'rgba(255,255,255,0.85)', textDecoration:'none', fontSize:12, letterSpacing:'0.24em', textTransform:'uppercase' }}>Contato</a>
+          <Link href="/#empreendimentos" style={{ color:'rgba(255,255,255,0.85)', textDecoration:'none', fontSize:15, fontWeight:500 }}>Empreendimentos</Link>
+          <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ color:'rgba(255,255,255,0.85)', textDecoration:'none', fontSize:15, fontWeight:500 }}>Contato</a>
         </nav>
       </header>
 
@@ -128,7 +127,7 @@ export default function Page() {
         <div style={{ position:'relative', padding:'0 32px 64px', maxWidth:800 }}>
           <p className="vm-eyebrow" style={{ color:'rgba(255,255,255,0.7)', marginBottom:16 }}>Balneário Rincão / SC</p>
           <h1 className="vm-h1" style={{ color:'#fff', fontSize:'clamp(28px,4.5vw,60px)', lineHeight:1.1, margin:'0 0 16px' }}>Villammare<br/>Residencial</h1>
-          <p style={{ color:'rgba(255,255,255,0.8)', fontSize:'clamp(15px,2vw,18px)', fontFamily:t.serif, fontStyle:'italic', marginBottom:36 }}>
+          <p style={{ color:'rgba(255,255,255,0.8)', fontSize:'clamp(15px,2vw,18px)', fontFamily:t.display, fontStyle:'italic', fontWeight:400, marginBottom:36 }}>
             Onde o mar habita, estar perto e o melhor destino.
           </p>
           <a href={WPP} target="_blank" rel="noopener noreferrer" className="vm-cta" style={{ color:'#fff', borderColor:'rgba(255,255,255,0.6)' }}>
@@ -184,8 +183,8 @@ export default function Page() {
               <div style={{ display:'flex', gap:40, marginBottom:40 }}>
                 {[['4','Dorm.'],['2','Suítes'],['275','m2 max']].map(([n,l]) => (
                   <div key={l}>
-                    <p style={{ fontFamily:t.display, fontSize:40, fontWeight:300, color:t.onDark, margin:0, lineHeight:1 }}>{n}</p>
-                    <p style={{ fontSize:11, letterSpacing:'0.3em', textTransform:'uppercase', color:t.onDarkMuted, margin:'6px 0 0' }}>{l}</p>
+                    <p style={{ fontFamily:t.display, fontSize:40, fontWeight:600, color:t.onDark, margin:0, lineHeight:1 }}>{n}</p>
+                    <p style={{ fontFamily:t.body, fontSize:11, letterSpacing:'0.07em', textTransform:'uppercase', color:t.onDarkMuted, margin:'6px 0 0' }}>{l}</p>
                   </div>
                 ))}
               </div>
@@ -206,7 +205,7 @@ export default function Page() {
         <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:'28px 64px' }}>
           {DIFERENCIAIS.map((d,i) => (
             <div key={i} style={{ display:'flex', gap:24, alignItems:'flex-start' }}>
-              <span style={{ fontFamily:t.display, fontSize:32, fontWeight:300, color:t.navy, lineHeight:1, flexShrink:0 }}>{String(i+1).padStart(2,'0')}</span>
+              <span style={{ fontFamily:t.display, fontSize:32, fontWeight:600, color:t.navy, lineHeight:1, flexShrink:0 }}>{String(i+1).padStart(2,'0')}</span>
               <p style={{ margin:0, fontSize:15, lineHeight:1.7, color:t.ink }}>{d}</p>
             </div>
           ))}
@@ -263,7 +262,7 @@ export default function Page() {
         <div style={{ position:'absolute', inset:0, background:'rgba(9,24,40,0.72)' }} />
         <div style={{ position:'relative', textAlign:'center', padding:'0 32px' }}>
           <h2 className="vm-h2" style={{ color:'#fff', margin:'0 0 16px' }}>Villammare Residencial</h2>
-          <p style={{ color:'rgba(255,255,255,0.75)', marginBottom:40, fontFamily:t.serif, fontStyle:'italic', fontSize:18 }}>Preço sob consulta - Balneário Rincão / SC</p>
+          <p style={{ color:'rgba(255,255,255,0.75)', marginBottom:40, fontFamily:t.body, fontSize:18 }}>Preço sob consulta - Balneário Rincão / SC</p>
           <a href={WPP} target="_blank" rel="noopener noreferrer" className="vm-cta" style={{ color:'#fff', borderColor:'rgba(255,255,255,0.6)' }}>
             Falar com Stiven Allan
           </a>
@@ -271,11 +270,11 @@ export default function Page() {
       </section>
 
       <footer style={{ background:t.navyDark, padding:'48px 32px', textAlign:'center' }}>
-        <p style={{ color:t.onDarkMuted, fontSize:12, letterSpacing:'0.2em', textTransform:'uppercase', margin:'0 0 8px' }}>Stiven Allan</p>
+        <p style={{ color:t.onDarkMuted, fontSize:12, letterSpacing:'0.07em', textTransform:'uppercase', margin:'0 0 8px' }}>Stiven Allan</p>
         <p style={{ color:t.onDarkMuted, fontSize:11, margin:'0 0 4px' }}>CRECI 60.275</p>
         <p style={{ color:t.onDarkMuted, fontSize:11, margin:0 }}>Balneário Rincão - SC</p>
         <div style={{ marginTop:24 }}>
-          <Link href="/" style={{ color:t.onDarkMuted, fontSize:11, letterSpacing:'0.2em', textTransform:'uppercase', textDecoration:'none' }}>Todos os Empreendimentos</Link>
+          <Link href="/" style={{ color:t.onDarkMuted, fontSize:13, textDecoration:'none' }}>Todos os Empreendimentos</Link>
         </div>
       </footer>
 

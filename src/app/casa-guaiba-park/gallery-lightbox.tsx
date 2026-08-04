@@ -38,7 +38,7 @@ style={{ position: 'relative', zIndex: 2, maxWidth: '90vw', maxHeight: '80vh', c
 >
 <img src={img.src} alt={img.alt} style={{ maxWidth: '90vw', maxHeight: '80vh', display: 'block', userSelect: 'none', pointerEvents: 'none', objectFit: 'contain' }} />
 </div>
-<div style={{ position: 'absolute', bottom: 18, left: 0, right: 0, textAlign: 'center', zIndex: 3, color: 'rgba(255,255,255,0.85)', fontSize: 12, letterSpacing: '0.26em', textTransform: 'uppercase' }}>
+<div style={{ position: 'absolute', bottom: 18, left: 0, right: 0, textAlign: 'center', zIndex: 3, color: 'rgba(255,255,255,0.85)', fontSize: 12, letterSpacing: '0.07em', textTransform: 'uppercase' }}>
 {img.label}{images.length > 1 && <span style={{ marginLeft: 14, opacity: 0.55 }}>{idx + 1} / {images.length}</span>}
 </div>
 </div>
@@ -59,7 +59,7 @@ return (
 <figure key={i} className={`${prefix}-gcard`} style={{ margin: 0, aspectRatio: '4 / 3', position: 'relative', overflow: 'hidden', cursor: 'zoom-in' }} role="button" tabIndex={0} aria-label={`Ampliar: ${g.label}`} onClick={() => openLb(i)} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && openLb(i)}>
 <Image unoptimized src={g.src} alt={g.alt} fill sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw" style={{ objectFit: 'cover', transition: 'transform .8s ease' }} />
 <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(to top, ${gradient}, rgba(0,0,0,0) 45%)` }} />
-<figcaption className={`${prefix}-onimg`} style={{ position: 'absolute', left: 18, bottom: 16, color: '#fff', fontSize: 12, letterSpacing: '0.24em', textTransform: 'uppercase' }}>{g.label}</figcaption>
+<figcaption className={`${prefix}-onimg`} style={{ position: 'absolute', left: 18, bottom: 16, color: '#fff', fontSize: 12, letterSpacing: '0.07em', textTransform: 'uppercase' }}>{g.label}</figcaption>
 </figure>
 ))}
 {lb.open && <Lightbox images={galeria} startIndex={lb.index} onClose={closeLb} />}

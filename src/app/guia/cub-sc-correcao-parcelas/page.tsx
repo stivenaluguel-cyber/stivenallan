@@ -82,31 +82,31 @@ const FAQ_SCHEMA = {
 
 export default function GuiaCubScPage() {
   return (
-    <main style={{ background: '#FAFAF8', color: '#1A1A1A', fontFamily: "'Hanken Grotesk', system-ui, sans-serif" }}>
+    <main style={{ background: '#FAFAF8', color: '#1A1A1A', fontFamily: 'var(--font-public-sans), system-ui, sans-serif' }}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHEMA) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_SCHEMA) }} />
 
       {/* HEADER */}
       <header style={{ background: '#fff', borderBottom: '1px solid rgba(0,0,0,0.08)', padding: '16px clamp(18px,5vw,64px)' }}>
         <nav style={{ maxWidth: 1080, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Link href="/" style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 400, letterSpacing: '0.22em', fontSize: 15, color: '#1A1A1A', textDecoration: 'none', textTransform: 'uppercase' }}>Stiven Allan</Link>
-          <Link href="/empreendimentos" style={{ fontSize: 12, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#1B5E8B', textDecoration: 'none' }}>Ver Empreendimentos</Link>
+          <Link href="/" style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 400, fontSize: 15, color: '#1A1A1A', textDecoration: 'none' }}>Stiven Allan</Link>
+          <Link href="/empreendimentos" style={{ fontSize: 15, color: '#1B5E8B', textDecoration: 'none' }}>Ver Empreendimentos</Link>
         </nav>
       </header>
 
       {/* HERO */}
       <section style={{ background: '#0F1C22', color: '#E4EEF6', padding: 'clamp(64px,12vh,120px) clamp(18px,5vw,64px)' }}>
         <div style={{ maxWidth: 800, margin: '0 auto' }}>
-          <p style={{ fontSize: 11, letterSpacing: '0.42em', textTransform: 'uppercase', color: 'rgba(228,238,246,0.55)', marginBottom: 20 }}>Guia - CUB/SC</p>
-          <h1 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.12em', fontSize: 'clamp(28px,5vw,52px)', lineHeight: 1.1, margin: 0 }}>
+          <p style={{ fontSize: 11, letterSpacing: '0.07em', textTransform: 'uppercase', color: 'rgba(228,238,246,0.55)', marginBottom: 20 }}>Guia - CUB/SC</p>
+          <h1 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(28px,5vw,52px)', lineHeight: 1.1, margin: 0 }}>
             CUB/SC e Correção de Parcelas
           </h1>
           <p style={{ fontSize: 'clamp(16px,2vw,20px)', color: 'rgba(228,238,246,0.75)', marginTop: 24, lineHeight: 1.6 }}>
             Entenda o que é o CUB/SC, como ele corrige suas parcelas e o que esperar durante a obra.
           </p>
           <div style={{ marginTop: 32, background: 'rgba(228,238,246,0.08)', border: '1px solid rgba(228,238,246,0.15)', borderRadius: 2, padding: '20px 24px', display: 'inline-block' }}>
-            <p style={{ margin: 0, fontSize: 12, letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(228,238,246,0.55)' }}>CUB/SC - Referência jun/2026</p>
-            <p style={{ margin: '8px 0 0', fontSize: 'clamp(24px,4vw,40px)', fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, letterSpacing: '0.04em' }}>R$ {CUB_JUNHO_2026.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}/m2</p>
+            <p style={{ margin: 0, fontSize: 12, letterSpacing: '0.07em', textTransform: 'uppercase', color: 'rgba(228,238,246,0.55)' }}>CUB/SC - Referência jun/2026</p>
+            <p style={{ margin: '8px 0 0', fontSize: 'clamp(24px,4vw,40px)', fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600 }}>R$ {CUB_JUNHO_2026.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}/m2</p>
           </div>
         </div>
       </section>
@@ -127,7 +127,7 @@ export default function GuiaCubScPage() {
 
       <p style={{ background: '#FFF4CC', border: '1px solid #E0C04C', borderRadius: 2, padding: '16px 20px', margin: '0 0 32px', fontSize: 15, lineHeight: 1.6, color: '#333', fontWeight: 600 }}>{`CUB/SC residencial: maio/2026 R$ ${CUB_MAIO_2026.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}/m² → junho/2026 R$ ${CUB_JUNHO_2026.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}/m² (variação de ${CUB_VARIACAO_MAIO_JUNHO}). Fonte: série histórica compilada pelo SENGE-SC — não é a fonte oficial primária. Não há valor de julho/2026 confirmado ainda; consulte sempre o índice do mês vigente.`}</p>
 
-        <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>O que é o CUB/SC?</h2>
+        <h2 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>O que é o CUB/SC?</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
           O <strong>CUB (Custo Unitário Básico)</strong> e um índice publicado mensalmente pelo <strong>Sinduscon-SC</strong> (Sindicato da Indústria da Construção Civil de Santa Catarina). Ele mede o custo médio de construção residencial no estado e serve como base de correção monetaria nos contratos de compra de imoveis na planta com a Construtora Fontana.
         </p>
@@ -135,20 +135,20 @@ export default function GuiaCubScPage() {
           Em maio de 2026, o CUB/SC estava em R$ {CUB_MAIO_2026.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}/m2; em junho de 2026, subiu para <strong>R$ {CUB_JUNHO_2026.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}/m2</strong> (variação de {CUB_VARIACAO_MAIO_JUNHO}). Este valor e atualizado todo mês e publicado pelo Sinduscon-SC. A Construtora Fontana usa o CUB/SC como indexador das parcelas mensais durante a obra, diferentemente de muitas construtoras do Sudeste que usam o INCC nacional.
         </p>
 
-        <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Como o CUB/SC corrige as parcelas?</h2>
+        <h2 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Como o CUB/SC corrige as parcelas?</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
           No financiamento direto da Construtora Fontana, cada parcela mensal e corrigida todo mês pela variação do CUB/SC. O cálculo é simples:
         </p>
         <div style={{ background: '#F0F5FF', border: '1px solid rgba(27,94,139,0.15)', borderRadius: 2, padding: '24px 28px', margin: '24px 0', fontFamily: 'monospace', fontSize: 14, lineHeight: 2 }}>
           <p style={{ margin: 0 }}><strong>Parcela nova = Parcela anterior x (CUB do mês / CUB do mês anterior)</strong></p>
-          <p style={{ margin: '12px 0 0', color: '#555', fontFamily: "'Hanken Grotesk', system-ui, sans-serif" }}>
+          <p style={{ margin: '12px 0 0', color: '#555', fontFamily: 'var(--font-public-sans), system-ui, sans-serif' }}>
             Exemplo: parcela de R$ 1.000 + CUB subiu 0,6% = nova parcela de R$ 1.006
           </p>
         </div>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
           O impacto acumulado do CUB ao longo de uma obra de 72 meses pode ser relevante: como a correção incide mês a mês sobre a parcela já corrigida, o efeito é composto (cada aumento soma sobre o valor já reajustado, não sobre o valor original). O total acumulado real depende da variação de cada mês — não existe uma média fixa —, então o jeito correto de dimensionar o impacto é consultar a série histórica completa do CUB/SC, não estimar com uma taxa hipotética única.
         </p>
-        <h3 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: 'clamp(16px,2vw,20px)', marginTop: 32, marginBottom: 12 }}>Como acompanhar o CUB mês a mês</h3>
+        <h3 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 400, fontSize: 'clamp(16px,2vw,20px)', marginTop: 32, marginBottom: 12 }}>Como acompanhar o CUB mês a mês</h3>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
           Acompanhar a correção evita surpresas no boleto e ajuda a conferir se o valor cobrado esta correto. Como o CUB/SC (Custo Unitário Básico do Sinduscon-SC) e divulgado mensalmente, da para prever a proxima parcela com boa precisao. O processo e simples e pode ser feito todo mês:
         </p>
@@ -159,7 +159,7 @@ export default function GuiaCubScPage() {
           <li>Compare o resultado com o valor do boleto para confirmar que a correção foi aplicada corretamente e registrar qualquer divergencia.</li>
         </ol>
 
-        <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Cenário hipotético: impacto do CUB em 36 meses</h2>
+        <h2 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Cenário hipotético: impacto do CUB em 36 meses</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
           O exemplo abaixo é inteiramente hipotético — usa uma variação fixa de 0,5% ao mês só para ilustrar como a fórmula de correção funciona na prática. Não é uma previsão nem uma média histórica real do CUB/SC; a variação de cada mês está na série histórica compilada citada acima. Para um financiamento de 36 meses de obra com parcela inicial de R$ 2.000, num cenário hipotético de +0,5% a.m. constante:
         </p>
@@ -184,7 +184,7 @@ export default function GuiaCubScPage() {
           </table>
         </div>
         <p style={{ fontSize: 13, color: '#666', marginTop: 8 }}>Cenário 100% hipotético com variação mensal fixa de 0,5%, só para fins didáticos. A variação real do CUB/SC muda mês a mês — não é constante — e pode ser maior ou menor. Consulte a série histórica compilada citada acima para os valores reais.</p>
-        <h3 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: 'clamp(16px,2vw,20px)', marginTop: 32, marginBottom: 12 }}>Passo a passo do cenário hipotético</h3>
+        <h3 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 400, fontSize: 'clamp(16px,2vw,20px)', marginTop: 32, marginBottom: 12 }}>Passo a passo do cenário hipotético</h3>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
           Veja como a formula acima gera os valores da tabela, partindo de uma parcela inicial de R$ 2.000 com variação de 0,5% ao mês. No mês 1, a parcela e de R$ 2.000. No mês 2, multiplicamos R$ 2.000 por 1,005 (o equivalente a +0,5%), chegando a cerca de R$ 2.010. No mês 3, aplicamos 0,5% de novo sobre R$ 2.010, alcancando aproximadamente R$ 2.020. Repetindo esse calculo mês a mês, a correção se acumula: por volta do mês 12 a parcela chega perto de R$ 2.124, no mês 24 fica proxima de R$ 2.254 e no mês 36 alcanca cerca de R$ 2.393, exatamente como mostra a tabela. Note que cada aumento incide sobre a parcela ja corrigida, por isso o efeito e composto ao longo da obra.
         </p>
@@ -192,7 +192,7 @@ export default function GuiaCubScPage() {
           Esse mesmo mecanismo (juros/correção compostos) explica por que o impacto acumulado importa tanto ao longo de uma obra mais longa. Como a variação real do CUB/SC muda mês a mês, o jeito correto de dimensionar quanto a parcela pode crescer não é assumir uma taxa fixa — é consultar a série histórica compilada citada acima e, idealmente, pedir uma simulação personalizada antes de fechar o contrato.
         </p>
 
-        <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>CUB/SC vs INCC vs IGPM</h2>
+        <h2 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>CUB/SC vs INCC vs IGPM</h2>
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
             <thead>
@@ -219,25 +219,25 @@ export default function GuiaCubScPage() {
           </table>
         </div>
 
-        <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>O que acontece com as parcelas apos as chaves?</h2>
+        <h2 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>O que acontece com as parcelas apos as chaves?</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
           Após a entrega do imovel, o saldo devedor pode ser financiado diretamente com a Fontana, com correção pelo <strong>IGPM + 0,75% a.m.</strong>, em ate 180 ou 240 meses. Alternativamente, você pode usar um financiamento bancario convencional e quitar o saldo com a construtora.
         </p>
-        <h3 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: 'clamp(16px,2vw,20px)', marginTop: 32, marginBottom: 12 }}>Financiamento do saldo apos a entrega</h3>
+        <h3 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 400, fontSize: 'clamp(16px,2vw,20px)', marginTop: 32, marginBottom: 12 }}>Financiamento do saldo apos a entrega</h3>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
           A vantagem do financiamento bancario pos-chaves e a possibilidade de usar o FGTS para amortizar o saldo, o que não é possível durante a fase de obra no financiamento direto. Alem disso, as taxas bancarias para imoveis prontos costumam ser competitivas, especialmente para quem tem bom historico de credito.
         </p>
 
-        <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Como planejar o orcamento com a correção do CUB?</h2>
+        <h2 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Como planejar o orcamento com a correção do CUB?</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
           Para se preparar para a correção pelo CUB/SC, não existe um percentual de margem que sirva para todo mundo — o quanto sua parcela pode subir depende do prazo de obra e da variação real do índice nesse período, que muda mês a mês. Consulte a série histórica compilada citada acima para dimensionar cenários com dados reais, e peça uma simulação personalizada para o prazo do seu empreendimento antes de assinar.
         </p>
-        <h3 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: 'clamp(16px,2vw,20px)', marginTop: 32, marginBottom: 12 }}>Conte com uma simulacao personalizada</h3>
+        <h3 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 400, fontSize: 'clamp(16px,2vw,20px)', marginTop: 32, marginBottom: 12 }}>Conte com uma simulacao personalizada</h3>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
           Stiven Allan monta simulacoes detalhadas com projecoes de correção para cada empreendimento Fontana, ajudando o comprador a entender o fluxo de caixa real ao longo de toda a obra. Este servico e prestado sem custo adicional para quem adquire atraves de Stiven Allan, CRECI 60.275.
         </p>
 
-        <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Perguntas Frequentes</h2>
+        <h2 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Perguntas Frequentes</h2>
 
         {FAQ_SCHEMA.mainEntity.map((item, i) => (
           <details key={i} style={{ borderTop: '1px solid rgba(0,0,0,0.10)', padding: '20px 0' }}>
@@ -252,15 +252,15 @@ export default function GuiaCubScPage() {
 
         {/* CTA */}
         <div style={{ background: '#0F1C22', color: '#E4EEF6', borderRadius: 2, padding: 'clamp(32px,5vw,56px)', marginTop: 64, textAlign: 'center' }}>
-          <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,28px)', margin: 0 }}>Simule seu financiamento</h2>
+          <h2 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(20px,3vw,28px)', margin: 0 }}>Simule seu financiamento</h2>
           <p style={{ color: 'rgba(228,238,246,0.8)', marginTop: 16, marginBottom: 32, fontSize: 15, lineHeight: 1.6 }}>
             Veja os empreendimentos Fontana disponíveis e simule as condicoes de financiamento. Stiven Allan, CRECI 60.275.
           </p>
           <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', fontSize: 12, letterSpacing: '0.3em', textTransform: 'uppercase', color: '#E4EEF6', border: '1px solid rgba(228,238,246,0.55)', padding: '14px 28px', textDecoration: 'none' }}>
+            <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', fontSize: 15, color: '#E4EEF6', border: '1px solid rgba(228,238,246,0.55)', padding: '14px 28px', textDecoration: 'none' }}>
               Falar no WhatsApp
             </a>
-            <Link href="/empreendimentos" style={{ display: 'inline-block', fontSize: 12, letterSpacing: '0.3em', textTransform: 'uppercase', color: '#E4EEF6', border: '1px solid rgba(228,238,246,0.55)', padding: '14px 28px', textDecoration: 'none' }}>
+            <Link href="/empreendimentos" style={{ display: 'inline-block', fontSize: 15, color: '#E4EEF6', border: '1px solid rgba(228,238,246,0.55)', padding: '14px 28px', textDecoration: 'none' }}>
               Ver Empreendimentos
             </Link>
           </div>

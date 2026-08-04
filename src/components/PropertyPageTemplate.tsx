@@ -12,12 +12,15 @@ import CtaFixoEmpreendimento from '@/components/CtaFixoEmpreendimento'
 
 const WPP = 'https://wa.me/5548991642332'
 
+// Tipografia "Clássica Brasileira Sofisticada" (redesenho 08/2026): Piazzolla
+// (display + itálico como acento pontual, não em toda seção) + Public Sans
+// (corpo/nav/controles). accent troca o dourado/champagne pela --bronze
+// (#D24E22) que já existia em globals.css mas nunca virava cor visível.
 const t = {
-  bg: '#FAFAF8', ink: '#1A1814', champagne: '#B89B5E', chamDark: '#8A7240',
+  bg: '#FAFAF8', ink: '#1A1814', accent: '#D24E22',
   muted: '#6B655B', dark: '#141210', onDark: '#F5F1EA',
-  display: "'Bricolage Grotesque', system-ui, sans-serif",
-  serif: "'Instrument Serif', Georgia, serif",
-  body: "'Hanken Grotesk', system-ui, sans-serif",
+  display: 'var(--font-piazzolla), Georgia, serif',
+  body: 'var(--font-public-sans), system-ui, sans-serif',
 }
 
 export type PropertyData = {
@@ -59,7 +62,10 @@ function ytId(url?: string) {
 }
 
 export default function PropertyPageTemplate({ data, relacionados }: { data: PropertyData; relacionados?: boolean }) {
-  const acento = data.cor_acento || t.champagne
+  // cor_acento vem do cadastro do empreendimento (por construtora/coleção) —
+  // mantém a variação de marca entre empreendimentos; só o valor DEFAULT
+  // deixou de ser o dourado genérico.
+  const acento = data.cor_acento || t.accent
   const local = [data.bairro, data.cidade, data.uf].filter(Boolean).join(', ')
   const hero = data.cover_image_url || (data.galeria && data.galeria[0])
   const wppNome = WPP + '?text=' + encodeURIComponent('Olá Stiven! Tenho interesse no ' + data.nome + '.')
@@ -98,10 +104,10 @@ export default function PropertyPageTemplate({ data, relacionados }: { data: Pro
         {hero && <Image unoptimized src={hero} alt={data.nome} fill priority sizes="100vw" style={{ objectFit: 'cover' }} />}
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.30) 45%, rgba(0,0,0,0.15) 100%)' }} />
         <div style={{ position: 'relative', width: '100%', maxWidth: 1200, margin: '0 auto', padding: 'calc(68px + 6vh) clamp(20px,5vw,48px) clamp(48px,8vh,80px)' }}>
-          {data.status && <p style={{ fontFamily: t.body, fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: acento, marginBottom: 16 }}>{data.status}</p>}
-          <h1 style={{ fontFamily: t.display, fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.01em', lineHeight: 1.05, fontSize: 'clamp(34px,5.4vw,76px)', color: '#FFFFFF', margin: 0, maxWidth: '18ch' }}>{data.nome}</h1>
-          {local && <p style={{ fontFamily: t.serif, fontStyle: 'italic', fontSize: 'clamp(16px,2vw,24px)', color: t.onDark, marginTop: 16 }}>{local}</p>}
-          <a href={wppNome} target="_blank" rel="noopener" style={{ display: 'inline-block', marginTop: 28, padding: '14px 34px', background: acento, color: t.dark, fontFamily: t.body, fontSize: 13, letterSpacing: '0.16em', textTransform: 'uppercase', textDecoration: 'none' }}>Falar no WhatsApp</a>
+          {data.status && <p style={{ fontFamily: t.body, fontSize: 12, fontWeight: 600, letterSpacing: '0.07em', textTransform: 'uppercase', color: acento, marginBottom: 16 }}>{data.status}</p>}
+          <h1 style={{ fontFamily: t.display, fontWeight: 600, lineHeight: 1.12, fontSize: 'clamp(34px,5.4vw,68px)', color: '#FFFFFF', margin: 0, maxWidth: '18ch' }}>{data.nome}</h1>
+          {local && <p style={{ fontFamily: t.body, fontSize: 'clamp(15px,1.6vw,18px)', color: t.onDark, marginTop: 16 }}>{local}</p>}
+          <a href={wppNome} target="_blank" rel="noopener" style={{ display: 'inline-block', marginTop: 28, padding: '14px 32px', background: acento, color: '#fff', fontFamily: t.body, fontSize: 15, fontWeight: 600, textDecoration: 'none' }}>Falar no WhatsApp</a>
           <div style={{ marginTop: 12 }}>
             <LeadCaptureModal propertyId={data.id ?? ''} propertyName={data.nome} bookPdfUrl={data.book_pdf_url ?? null} />
           </div>
@@ -112,7 +118,7 @@ export default function PropertyPageTemplate({ data, relacionados }: { data: Pro
       {(data.frase || data.descricao) && (
         <section style={{ padding: 'clamp(72px,12vh,120px) clamp(20px,5vw,48px)' }}>
           <div style={{ maxWidth: 820, margin: '0 auto', textAlign: 'center' }}>
-            {data.frase && <p style={{ fontFamily: t.serif, fontStyle: 'italic', fontSize: 'clamp(24px,3.4vw,42px)', lineHeight: 1.25, color: t.ink, margin: 0 }}>{data.frase}</p>}
+            {data.frase && <p style={{ fontFamily: t.display, fontStyle: 'italic', fontWeight: 400, fontSize: 'clamp(24px,3.4vw,40px)', lineHeight: 1.3, color: t.ink, margin: 0 }}>{data.frase}</p>}
             {data.descricao && <p style={{ fontFamily: t.body, fontSize: 'clamp(15px,1.6vw,18px)', lineHeight: 1.7, color: t.muted, marginTop: 28 }}>{data.descricao}</p>}
           </div>
         </section>
@@ -146,12 +152,12 @@ export default function PropertyPageTemplate({ data, relacionados }: { data: Pro
       {specs.length > 0 && (
         <section style={{ background: t.dark, color: t.onDark, padding: 'clamp(72px,12vh,120px) clamp(20px,5vw,48px)' }}>
           <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-            <p style={{ fontFamily: t.body, fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: acento, textAlign: 'center', marginBottom: 12 }}>As residências</p>
+            <p style={{ fontFamily: t.body, fontSize: 12, fontWeight: 600, letterSpacing: '0.07em', textTransform: 'uppercase', color: acento, textAlign: 'center', marginBottom: 12 }}>As residências</p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 'clamp(20px,3vw,40px)', marginTop: 40 }}>
               {specs.map((s) => (
                 <div key={s.label} style={{ textAlign: 'center' }}>
-                  <p style={{ fontFamily: t.display, fontWeight: 300, fontSize: 'clamp(28px,3.4vw,44px)', color: '#FFFFFF', margin: 0 }}>{s.v}</p>
-                  <p style={{ fontFamily: t.body, fontSize: 12, letterSpacing: '0.18em', textTransform: 'uppercase', color: acento, marginTop: 8 }}>{s.label}</p>
+                  <p style={{ fontFamily: t.display, fontWeight: 600, fontSize: 'clamp(28px,3.4vw,44px)', color: '#FFFFFF', margin: 0 }}>{s.v}</p>
+                  <p style={{ fontFamily: t.body, fontSize: 13, color: acento, marginTop: 8 }}>{s.label}</p>
                 </div>
               ))}
             </div>
@@ -163,7 +169,7 @@ export default function PropertyPageTemplate({ data, relacionados }: { data: Pro
       {data.diferenciais && data.diferenciais.length > 0 && (
         <section style={{ padding: 'clamp(72px,12vh,120px) clamp(20px,5vw,48px)' }}>
           <div style={{ maxWidth: 1000, margin: '0 auto' }}>
-            <h2 style={{ fontFamily: t.display, fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.04em', fontSize: 'clamp(24px,3.4vw,40px)', textAlign: 'center', marginBottom: 48 }}>Diferenciais</h2>
+            <h2 style={{ fontFamily: t.display, fontWeight: 600, fontSize: 'clamp(26px,3.4vw,38px)', textAlign: 'center', marginBottom: 48 }}>Diferenciais</h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))', gap: 'clamp(16px,2.5vw,28px)' }}>
               {data.diferenciais.map((d, i) => (
                 <div key={i} style={{ padding: '20px 0', borderTop: '1px solid rgba(26,24,20,0.12)', fontFamily: t.body, fontSize: 15, color: t.ink }}>{d}</div>
@@ -177,10 +183,10 @@ export default function PropertyPageTemplate({ data, relacionados }: { data: Pro
       {data.lazer && data.lazer.length > 0 && (
         <section style={{ background: t.bg, padding: '0 clamp(20px,5vw,48px) clamp(72px,12vh,120px)' }}>
           <div style={{ maxWidth: 1000, margin: '0 auto' }}>
-            <h2 style={{ fontFamily: t.display, fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.04em', fontSize: 'clamp(24px,3.4vw,40px)', textAlign: 'center', marginBottom: 48 }}>Lazer</h2>
+            <h2 style={{ fontFamily: t.display, fontWeight: 600, fontSize: 'clamp(26px,3.4vw,38px)', textAlign: 'center', marginBottom: 48 }}>Lazer</h2>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center' }}>
               {data.lazer.map((l, i) => (
-                <span key={i} style={{ padding: '10px 20px', border: '1px solid rgba(26,24,20,0.15)', fontFamily: t.body, fontSize: 13, letterSpacing: '0.04em', color: t.muted }}>{l}</span>
+                <span key={i} style={{ padding: '10px 20px', border: '1px solid rgba(26,24,20,0.15)', fontFamily: t.body, fontSize: 14, color: t.muted }}>{l}</span>
               ))}
             </div>
           </div>
@@ -191,7 +197,7 @@ export default function PropertyPageTemplate({ data, relacionados }: { data: Pro
       {(data.endereco || local || data.mapa_embed) && (
         <section style={{ padding: 'clamp(72px,12vh,120px) clamp(20px,5vw,48px)' }}>
           <div style={{ maxWidth: 1000, margin: '0 auto', textAlign: 'center' }}>
-            <h2 style={{ fontFamily: t.display, fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.04em', fontSize: 'clamp(24px,3.4vw,40px)', marginBottom: 16 }}>Localização</h2>
+            <h2 style={{ fontFamily: t.display, fontWeight: 600, fontSize: 'clamp(26px,3.4vw,38px)', marginBottom: 16 }}>Localização</h2>
             {(data.endereco || local) && <p style={{ fontFamily: t.body, fontSize: 16, color: t.muted, marginBottom: 32 }}>{data.endereco || local}</p>}
             {data.mapa_embed && (
               <div style={{ position: 'relative', aspectRatio: '16 / 9', overflow: 'hidden' }}>
@@ -205,7 +211,7 @@ export default function PropertyPageTemplate({ data, relacionados }: { data: Pro
       {/* FINANCIAMENTO 3 PASSOS */}
       <section style={{ background: t.dark, color: t.onDark, padding: 'clamp(72px,12vh,120px) clamp(20px,5vw,48px)' }}>
         <div style={{ maxWidth: 1000, margin: '0 auto' }}>
-          <h2 style={{ fontFamily: t.display, fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.04em', fontSize: 'clamp(24px,3.4vw,40px)', textAlign: 'center', color: '#FFFFFF', marginBottom: 48 }}>Financiamento direto em 3 passos</h2>
+          <h2 style={{ fontFamily: t.display, fontWeight: 600, fontSize: 'clamp(26px,3.4vw,38px)', textAlign: 'center', color: '#FFFFFF', marginBottom: 48 }}>Financiamento direto em 3 passos</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 'clamp(20px,3vw,40px)' }}>
             {[
               { n: '01', tit: 'Entrada de 20%', txt: 'Você garante a unidade com entrada de 20% no ato do contrato, sem depender de financiamento bancário — a construtora poderá realizar análise cadastral e de capacidade de pagamento conforme suas políticas.' },
@@ -213,8 +219,8 @@ export default function PropertyPageTemplate({ data, relacionados }: { data: Pro
               { n: '03', tit: 'Saldo pós-chaves', txt: 'Na entrega, o saldo pode ser financiado direto com a construtora ou por financiamento bancário.' },
             ].map((p) => (
               <div key={p.n}>
-                <p style={{ fontFamily: t.display, fontWeight: 300, fontSize: 40, color: acento, margin: 0 }}>{p.n}</p>
-                <p style={{ fontFamily: t.body, fontSize: 16, color: '#FFFFFF', margin: '12px 0 8px', letterSpacing: '0.04em' }}>{p.tit}</p>
+                <p style={{ fontFamily: t.display, fontWeight: 600, fontSize: 36, color: acento, margin: 0 }}>{p.n}</p>
+                <p style={{ fontFamily: t.body, fontSize: 16, fontWeight: 600, color: '#FFFFFF', margin: '12px 0 8px' }}>{p.tit}</p>
                 <p style={{ fontFamily: t.body, fontSize: 14, lineHeight: 1.6, color: 'rgba(245,241,234,0.75)', margin: 0 }}>{p.txt}</p>
               </div>
             ))}
@@ -258,15 +264,15 @@ export default function PropertyPageTemplate({ data, relacionados }: { data: Pro
           no CRM. O formulário é o único caminho medível — por isso empreendimento
           cadastrado só pelo painel, que nasce neste template, precisa dele. */}
       <section id="contato" style={{ background: t.dark, color: t.onDark, padding: 'clamp(80px,14vh,140px) clamp(20px,5vw,48px)', textAlign: 'center', scrollMarginTop: 24 }}>
-        <h2 style={{ fontFamily: t.serif, fontStyle: 'italic', fontSize: 'clamp(28px,4.5vw,52px)', color: '#FFFFFF', margin: 0, maxWidth: '16ch', marginLeft: 'auto', marginRight: 'auto' }}>Vamos realizar o seu próximo endereço?</h2>
-        <a href={wppNome} target="_blank" rel="noopener" style={{ display: 'inline-block', marginTop: 32, padding: '16px 40px', background: acento, color: t.dark, fontFamily: t.body, fontSize: 13, letterSpacing: '0.16em', textTransform: 'uppercase', textDecoration: 'none' }}>Falar no WhatsApp</a>
+        <h2 style={{ fontFamily: t.display, fontStyle: 'italic', fontWeight: 400, fontSize: 'clamp(28px,4.5vw,48px)', color: '#FFFFFF', margin: 0, maxWidth: '16ch', marginLeft: 'auto', marginRight: 'auto' }}>Vamos realizar o seu próximo endereço?</h2>
+        <a href={wppNome} target="_blank" rel="noopener" style={{ display: 'inline-block', marginTop: 32, padding: '16px 40px', background: acento, color: '#fff', fontFamily: t.body, fontSize: 15, fontWeight: 600, textDecoration: 'none' }}>Falar no WhatsApp</a>
         <div style={{ maxWidth: 460, margin: '48px auto 0', textAlign: 'left' }}>
-          <p style={{ fontFamily: t.body, fontSize: 13, letterSpacing: '0.14em', textTransform: 'uppercase', color: acento, textAlign: 'center', marginBottom: 20 }}>
+          <p style={{ fontFamily: t.body, fontSize: 13, fontWeight: 600, letterSpacing: '0.05em', color: acento, textAlign: 'center', marginBottom: 20 }}>
             ou receba plantas e condições
           </p>
           <FormContato empreendimento={data.nome} propertyId={data.id ?? null} propertySlug={data.slug} />
         </div>
-        <p style={{ fontFamily: t.body, fontSize: 12, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(245,241,234,0.6)', marginTop: 40 }}>Atendimento exclusivo com Stiven Allan · CRECI 60.275</p>
+        <p style={{ fontFamily: t.body, fontSize: 13, color: 'rgba(245,241,234,0.6)', marginTop: 40 }}>Atendimento exclusivo com Stiven Allan · CRECI 60.275</p>
       </section>
 
       <CtaFixoEmpreendimento nome={data.nome} slug={data.slug} />

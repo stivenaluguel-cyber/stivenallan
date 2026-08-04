@@ -31,9 +31,8 @@ const t = {
   bg:'#F8FAFA', ink:'#0F1C22', teal:'#1B7A72', tealDark:'#104E48',
   muted:'#4A6E6A', line:'rgba(15,28,34,0.12)', dark:'#070D0C',
   onDark:'#E2F4F2', onDarkMuted:'rgba(226,244,242,0.66)',
-  display:"'Jost',system-ui,sans-serif",
-  serif:"'Cormorant Garamond',Georgia,serif",
-  body:"'Hanken Grotesk',system-ui,sans-serif",
+  display:'var(--font-piazzolla), Georgia, serif',
+  body:'var(--font-public-sans), system-ui, sans-serif',
 }
 
 const IMG = {
@@ -122,7 +121,7 @@ const jsonLd = {
   url: 'https://stivenallan.com.br/empreendimento/fontana/mar-di-nizza-mar-grosso-laguna-sc',
 }
 
-const CSS = `.mn-hero{position:relative;width:100%;height:100vh;min-height:520px;display:flex;align-items:flex-end}.mn-hero-img{position:absolute;inset:0;z-index:0}.mn-hero-overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(to top,rgba(7,13,12,0.72) 0%,rgba(7,13,12,0.18) 60%,rgba(7,13,12,0.04) 100%)}.mn-hero-content{position:relative;z-index:2;width:100%;max-width:900px;margin:0 auto;padding:0 24px 72px}.mn-tagline{font-size:clamp(2rem,5vw,3.4rem);font-weight:300;color:#E2F4F2;line-height:1.18;letter-spacing:-.01em;margin:0 0 20px}.mn-hero-cta{display:inline-flex;align-items:center;gap:10px;background:#1B7A72;color:#fff;text-decoration:none;padding:14px 28px;font-size:.85rem;letter-spacing:.14em;text-transform:uppercase;font-weight:500;border-radius:2px;transition:background .2s;border:none;cursor:pointer;font-family:'Jost',system-ui,sans-serif}.mn-hero-cta:hover{background:#104E48}.mn-section{padding:80px 24px;max-width:1160px;margin:0 auto}.mn-section-sm{padding:48px 24px;max-width:1160px;margin:0 auto}.mn-label{font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;font-weight:600;margin:0 0 16px;opacity:.55}.mn-h2{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:300;letter-spacing:-.02em;margin:0 0 24px;line-height:1.2}.mn-copy{font-size:1.05rem;line-height:1.75;max-width:680px;opacity:.82}.mn-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:2px;background:rgba(15,28,34,0.08);margin-top:56px}.mn-stat{background:#F8FAFA;padding:28px 20px;text-align:center}.mn-stat-n{font-size:clamp(1.6rem,3.5vw,2.2rem);font-weight:300;color:#1B7A72;letter-spacing:-.02em;display:block;margin-bottom:4px}.mn-stat-l{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;opacity:.55}.mn-divider{width:100%;height:1px;background:rgba(15,28,34,0.12);margin:0}.mn-two-col{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}@media(max-width:768px){.mn-two-col{grid-template-columns:1fr;gap:40px}}.mn-diff-list{list-style:none;padding:0;margin:0;display:grid;gap:16px}.mn-diff-item{display:flex;gap:16px;align-items:flex-start}.mn-diff-num{font-size:.72rem;letter-spacing:.16em;color:#1B7A72;font-weight:600;padding-top:2px;min-width:28px}.mn-diff-text{font-size:.97rem;line-height:1.5;opacity:.82}.mn-lazer-card{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:2px}.mn-gal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}@media(max-width:640px){.mn-gal-grid{grid-template-columns:1fr}}.mn-gcard{border-radius:0}.mn-onimg{font-family:'Hanken Grotesk',system-ui,sans-serif}.mn-amenidades{display:flex;flex-wrap:wrap;gap:10px}.mn-chip{display:inline-flex;align-items:center;padding:8px 16px;border:1px solid rgba(15,28,34,0.16);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;border-radius:2px;opacity:.8}.mn-mapa-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}@media(max-width:768px){.mn-mapa-grid{grid-template-columns:1fr;gap:40px}}.mn-mapa-img{position:relative;width:100%;aspect-ratio:4/3;overflow:hidden;border-radius:2px}.mn-cta-band{background:#104E48;color:#E2F4F2;padding:72px 24px;text-align:center}.mn-cta-band-h{font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:300;margin:0 0 12px;letter-spacing:-.01em}.mn-cta-band-sub{opacity:.66;margin:0 0 36px;font-size:1rem}.mn-cta-btn{display:inline-flex;align-items:center;gap:10px;background:#1B7A72;color:#fff;text-decoration:none;padding:16px 32px;font-size:.85rem;letter-spacing:.14em;text-transform:uppercase;font-weight:500;border-radius:2px;transition:background .2s}.mn-cta-btn:hover{background:#104E48}.mn-fab{position:fixed;bottom:28px;right:28px;z-index:999;display:flex;align-items:center;gap:10px;background:#1B7A72;color:#fff;text-decoration:none;padding:14px 22px;border-radius:100px;font-size:.82rem;font-weight:600;letter-spacing:.06em;box-shadow:0 4px 24px rgba(27,122,114,.38);transition:background .2s}.mn-fab:hover{background:#104E48}.mn-footer{background:#070D0C;color:rgba(226,244,242,0.66);padding:32px 24px;text-align:center;font-size:.82rem}`
+const CSS = `.mn-hero{position:relative;width:100%;height:100vh;min-height:520px;display:flex;align-items:flex-end}.mn-hero-img{position:absolute;inset:0;z-index:0}.mn-hero-overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(to top,rgba(7,13,12,0.72) 0%,rgba(7,13,12,0.18) 60%,rgba(7,13,12,0.04) 100%)}.mn-hero-content{position:relative;z-index:2;width:100%;max-width:900px;margin:0 auto;padding:0 24px 72px}.mn-tagline{font-size:clamp(2rem,5vw,3.4rem);font-weight:400;font-style:italic;color:#E2F4F2;line-height:1.18;margin:0 0 20px}.mn-hero-cta{display:inline-flex;align-items:center;gap:10px;background:#1B7A72;color:#fff;text-decoration:none;padding:14px 28px;font-size:15px;font-weight:500;border-radius:2px;transition:background .2s;border:none;cursor:pointer;font-family:var(--font-piazzolla), Georgia, serif}.mn-hero-cta:hover{background:#104E48}.mn-section{padding:80px 24px;max-width:1160px;margin:0 auto}.mn-section-sm{padding:48px 24px;max-width:1160px;margin:0 auto}.mn-label{font-size:.72rem;letter-spacing:.07em;text-transform:uppercase;font-weight:600;margin:0 0 16px;opacity:.55}.mn-h2{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:600;margin:0 0 24px;line-height:1.2}.mn-copy{font-size:1.05rem;line-height:1.75;max-width:680px;opacity:.82}.mn-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:2px;background:rgba(15,28,34,0.08);margin-top:56px}.mn-stat{background:#F8FAFA;padding:28px 20px;text-align:center}.mn-stat-n{font-size:clamp(1.6rem,3.5vw,2.2rem);font-weight:600;color:#1B7A72;letter-spacing:-.02em;display:block;margin-bottom:4px}.mn-stat-l{font-size:.72rem;opacity:.55}.mn-divider{width:100%;height:1px;background:rgba(15,28,34,0.12);margin:0}.mn-two-col{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}@media(max-width:768px){.mn-two-col{grid-template-columns:1fr;gap:40px}}.mn-diff-list{list-style:none;padding:0;margin:0;display:grid;gap:16px}.mn-diff-item{display:flex;gap:16px;align-items:flex-start}.mn-diff-num{font-size:.72rem;letter-spacing:.16em;color:#1B7A72;font-weight:600;padding-top:2px;min-width:28px}.mn-diff-text{font-size:.97rem;line-height:1.5;opacity:.82}.mn-lazer-card{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:2px}.mn-gal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}@media(max-width:640px){.mn-gal-grid{grid-template-columns:1fr}}.mn-gcard{border-radius:0}.mn-onimg{font-family:var(--font-public-sans), system-ui, sans-serif}.mn-amenidades{display:flex;flex-wrap:wrap;gap:10px}.mn-chip{display:inline-flex;align-items:center;padding:8px 16px;border:1px solid rgba(15,28,34,0.16);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;border-radius:2px;opacity:.8}.mn-mapa-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}@media(max-width:768px){.mn-mapa-grid{grid-template-columns:1fr;gap:40px}}.mn-mapa-img{position:relative;width:100%;aspect-ratio:4/3;overflow:hidden;border-radius:2px}.mn-cta-band{background:#104E48;color:#E2F4F2;padding:72px 24px;text-align:center}.mn-cta-band-h{font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:400;font-style:italic;margin:0 0 12px}.mn-cta-band-sub{opacity:.66;margin:0 0 36px;font-size:1rem}.mn-cta-btn{display:inline-flex;align-items:center;gap:10px;background:#1B7A72;color:#fff;text-decoration:none;padding:16px 32px;font-size:15px;font-weight:500;border-radius:2px;transition:background .2s}.mn-cta-btn:hover{background:#104E48}.mn-fab{position:fixed;bottom:28px;right:28px;z-index:999;display:flex;align-items:center;gap:10px;background:#1B7A72;color:#fff;text-decoration:none;padding:14px 22px;border-radius:100px;font-size:15px;font-weight:600;box-shadow:0 4px 24px rgba(27,122,114,.38);transition:background .2s}.mn-fab:hover{background:#104E48}.mn-footer{background:#070D0C;color:rgba(226,244,242,0.66);padding:32px 24px;text-align:center;font-size:.82rem}`
 
 export default function MarDiNizzaPage() {
   return (
@@ -134,10 +133,10 @@ export default function MarDiNizzaPage() {
 
         {/* NAV */}
         <header style={{ position:'absolute', top:0, left:0, right:0, zIndex:10, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'20px 32px' }}>
-          <a href="/" style={{ color:'#E2F4F2', textDecoration:'none', fontFamily:t.display, fontSize:'1.1rem', fontWeight:600, letterSpacing:'.04em' }}>Stiven Allan</a>
+          <a href="/" style={{ color:'#E2F4F2', textDecoration:'none', fontFamily:t.display, fontSize:'1.1rem', fontWeight:600 }}>Stiven Allan</a>
           <nav style={{ display:'flex', gap:24 }}>
             <LeadCaptureButton slug="mar-di-nizza-mar-grosso-laguna-sc" construtora_slug="fontana" className="mn-cta"  propertyDisplayName="Mar di Nizza Residencial" />
-            <a href={WA} target="_blank" rel="noopener noreferrer" style={{ color:'rgba(226,244,242,0.82)', textDecoration:'none', fontSize:'.8rem', letterSpacing:'.12em', textTransform:'uppercase' }}>Contato</a>
+            <a href={WA} target="_blank" rel="noopener noreferrer" style={{ color:'rgba(226,244,242,0.82)', textDecoration:'none', fontSize:15 }}>Contato</a>
           </nav>
         </header>
 
@@ -149,7 +148,7 @@ export default function MarDiNizzaPage() {
           <div className="mn-hero-overlay" />
           <div className="mn-hero-content">
             <p className="mn-label" style={{ color:'rgba(226,244,242,0.66)' }}>Mar Grosso — Laguna/SC</p>
-            <h1 className="mn-tagline" style={{ fontFamily:t.serif }}>Sinta a leveza do litoral de Laguna no seu dia a dia.</h1>
+            <h1 className="mn-tagline" style={{ fontFamily:t.display }}>Sinta a leveza do litoral de Laguna no seu dia a dia.</h1>
             <div style={{ display:'flex', gap:16, flexWrap:'wrap' }}>
               <a href={WA} target="_blank" rel="noopener noreferrer" className="mn-hero-cta" style={{ fontFamily:t.display }}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
@@ -163,7 +162,7 @@ export default function MarDiNizzaPage() {
         {/* SOBRE */}
         <section className="mn-section">
           <p className="mn-label" style={{ color:t.teal }}>O Empreendimento</p>
-          <h2 className="mn-h2" style={{ fontFamily:t.serif }}>Mar di Nizza Residencial</h2>
+          <h2 className="mn-h2" style={{ fontFamily:t.display }}>Mar di Nizza Residencial</h2>
           <p className="mn-copy">A poucos minutos do mar e tudo que você precisa. O Mar di Nizza foi pensado para acolher bem os seus sonhos — com infraestrutura moderna e apartamentos de 2 e 3 dormitórios, ele é capaz de abrigar tudo que faz parte de você. Venha aproveitar ao máximo o seu jeito leve de viver.</p>
           <div className="mn-stats">
             {STATS.map((s,i) => (
@@ -182,7 +181,7 @@ export default function MarDiNizzaPage() {
           <div className="mn-two-col">
             <div>
               <p className="mn-label" style={{ color:t.teal }}>Diferenciais</p>
-              <h2 className="mn-h2" style={{ fontFamily:t.serif }}>Por que escolher o Mar di Nizza?</h2>
+              <h2 className="mn-h2" style={{ fontFamily:t.display }}>Por que escolher o Mar di Nizza?</h2>
               <ul className="mn-diff-list">
                 {DIFERENCIAIS.map((d,i) => (
                   <li key={i} className="mn-diff-item">
@@ -203,7 +202,7 @@ export default function MarDiNizzaPage() {
         {/* PLANTAS */}
         <section className="mn-section">
           <p className="mn-label" style={{ color:t.teal }}>Plantas</p>
-          <h2 className="mn-h2" style={{ fontFamily:t.serif }}>Escolha o seu layout</h2>
+          <h2 className="mn-h2" style={{ fontFamily:t.display }}>Escolha o seu layout</h2>
           <p className="mn-copy" style={{ marginBottom: 40 }}>Plantas oficiais da Construtora Fontana — 2 e 3 dormitórios (1 suíte), de 65,89 a 92,09 m² privativos, conforme o final do apartamento.</p>
           <div style={{ display:'flex', flexDirection:'column', gap:48 }}>
             {PLANTAS_GRUPOS.map(({ titulo, categoria }) => {
@@ -227,7 +226,7 @@ export default function MarDiNizzaPage() {
         <section style={{ padding:'80px 0' }}>
           <div style={{ maxWidth:1160, margin:'0 auto', padding:'0 24px 32px' }}>
             <p className="mn-label" style={{ color:t.teal }}>Galeria</p>
-            <h2 className="mn-h2" style={{ fontFamily:t.serif }}>Conheça cada detalhe</h2>
+            <h2 className="mn-h2" style={{ fontFamily:t.display }}>Conheça cada detalhe</h2>
           </div>
           <div className="mn-gal-grid">
             <GalleryWithLightbox galeria={GALERIA} prefix="mn" gradient="rgba(7,13,12,0.62)" />
@@ -239,7 +238,7 @@ export default function MarDiNizzaPage() {
         {/* AMENIDADES */}
         <section className="mn-section">
           <p className="mn-label" style={{ color:t.teal }}>Infraestrutura</p>
-          <h2 className="mn-h2" style={{ fontFamily:t.serif }}>Amenidades</h2>
+          <h2 className="mn-h2" style={{ fontFamily:t.display }}>Amenidades</h2>
           <div className="mn-amenidades">
             {AMENIDADES.map((a,i) => (
               <span key={i} className="mn-chip">{a}</span>
@@ -254,7 +253,7 @@ export default function MarDiNizzaPage() {
           <div className="mn-mapa-grid">
             <div>
               <p className="mn-label" style={{ color:t.teal }}>Localização</p>
-              <h2 className="mn-h2" style={{ fontFamily:t.serif }}>Mar Grosso, Laguna/SC</h2>
+              <h2 className="mn-h2" style={{ fontFamily:t.display }}>Mar Grosso, Laguna/SC</h2>
               <p className="mn-copy" style={{ marginBottom:32 }}>Rua Joana Mussi, esq. Rua Moreira Gomes — Laguna/SC</p>
               <a href={WA} target="_blank" rel="noopener noreferrer" className="mn-hero-cta" style={{ fontFamily:t.display }}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
@@ -272,7 +271,7 @@ export default function MarDiNizzaPage() {
         {/* CONDIÇÕES DE PAGAMENTO */}
         <section className="mn-section">
           <p className="mn-label" style={{ color:t.teal }}>Investimento</p>
-          <h2 className="mn-h2" style={{ fontFamily:t.serif }}>Condições de pagamento</h2>
+          <h2 className="mn-h2" style={{ fontFamily:t.display }}>Condições de pagamento</h2>
           <p className="mn-copy">{CONDICOES.texto}</p>
           <p className="mn-copy" style={{ marginTop: 16 }}>{CONDICOES.desconto}</p>
           <p style={{ marginTop: 24, fontSize: '.78rem', letterSpacing: '.04em', opacity: .55 }}>{CONDICOES.vigencia}</p>
@@ -284,7 +283,7 @@ export default function MarDiNizzaPage() {
 
         {/* CTA BAND */}
         <section className="mn-cta-band">
-          <p className="mn-cta-band-h" style={{ fontFamily:t.serif }}>Pronto para morar no litoral?</p>
+          <p className="mn-cta-band-h" style={{ fontFamily:t.display }}>Pronto para morar no litoral?</p>
           <p className="mn-cta-band-sub" style={{ fontFamily:t.body }}>Preço sob consulta — fale com Stiven Allan</p>
           <a href={WA} target="_blank" rel="noopener noreferrer" className="mn-cta-btn" style={{ fontFamily:t.display }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>

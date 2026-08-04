@@ -16,8 +16,8 @@ const CATALOGO_PDF = "https://estilofontana.com.br/upload/empreendimento/catalog
 const t = {
 bg: '#F8FAFB', ink: '#0F1A20', ocean: '#1A4E72', oceanDark: '#0F3149', muted: '#4A6478',
 line: 'rgba(15,26,32,0.12)', dark: '#070D12', onDark: '#E2EEF6', onDarkMuted: 'rgba(226,238,246,0.66)',
-display: "'Jost', system-ui, sans-serif", serif: "'Cormorant Garamond', Georgia, serif",
-body: "'Hanken Grotesk', system-ui, sans-serif",
+display: 'var(--font-piazzolla), Georgia, serif',
+body: 'var(--font-public-sans), system-ui, sans-serif',
 }
 const IMG = {
 hero: '/images/empreendimentos/mar-di-licata-mar-grosso-laguna-sc/mar-di-licata-residencial-655b9b64e5d33.jpg',
@@ -106,17 +106,17 @@ return (
 <PropertySchema nome="Mar di Licata Residencial" slug="mar-di-licata-mar-grosso-laguna-sc" construtora_slug="fontana" cidade="Laguna" uf="SC" bairro="Mar Grosso" descricao="Mar di Licata Residencial — apartamentos 3 dormitórios com suíte, 120 a 122 m² privativos, rooftop com vista para o mar no Mar Grosso, Laguna/SC. Financiamento direto Fontana." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/mar-di-licata-mar-grosso-laguna-sc.jpg" faq={FAQ_ITEMS} />
 
 <style>{`html { scroll-behavior: smooth; }
-.ml-eyebrow { font-size: 11px; letter-spacing: 0.42em; text-transform: uppercase; color: ${t.ocean}; font-family: ${t.body}; font-weight: 500; }
-.ml-h1 { font-family: ${t.display}; font-weight: 300; text-transform: uppercase; letter-spacing: 0.14em; line-height: 1.04; text-shadow: 0 2px 24px rgba(0,0,0,0.55); }
+.ml-eyebrow { font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase; color: ${t.ocean}; font-family: ${t.body}; font-weight: 500; }
+.ml-h1 { font-family: ${t.display}; font-weight: 600; line-height: 1.04; text-shadow: 0 2px 24px rgba(0,0,0,0.55); }
 .ml-onimg { text-shadow: 0 1px 16px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.5); }
-.ml-h2 { font-family: ${t.display}; font-weight: 300; text-transform: uppercase; letter-spacing: 0.16em; line-height: 1.1; font-size: clamp(26px,4vw,46px); margin: 0; }
-.ml-serif { font-family: ${t.serif}; font-style: italic; font-weight: 400; }
+.ml-h2 { font-family: ${t.display}; font-weight: 600; line-height: 1.1; font-size: clamp(26px,4vw,46px); margin: 0; }
+.ml-serif { font-family: ${t.display}; font-style: italic; font-weight: 400; }
 .ml-rule { width: 56px; height: 1px; background: ${t.ocean}; border: 0; }
-.ml-cta { display: inline-block; font-family: ${t.body}; font-size: 12px; letter-spacing: 0.3em; text-transform: uppercase; color: ${t.ink}; border: 1px solid ${t.ocean}; padding: 16px 34px; text-decoration: none; transition: background .35s ease, color .35s ease; cursor: pointer; }
+.ml-cta { display: inline-block; font-family: ${t.body}; font-size: 15px; color: ${t.ink}; border: 1px solid ${t.ocean}; padding: 16px 34px; text-decoration: none; transition: background .35s ease, color .35s ease; cursor: pointer; }
 .ml-cta:hover { background: ${t.ocean}; color: #fff; }
 .ml-cta-light { color: ${t.onDark}; border-color: rgba(226,238,246,0.55); }
 .ml-cta-light:hover { background: ${t.onDark}; color: ${t.oceanDark}; }
-.ml-navlink { font-family: ${t.body}; font-size: 11px; letter-spacing: 0.28em; text-transform: uppercase; color: rgba(255,255,255,0.85); text-decoration: none; transition: color .3s ease; }
+.ml-navlink { font-family: ${t.body}; font-size: 15px; color: rgba(255,255,255,0.85); text-decoration: none; transition: color .3s ease; }
 .ml-navlink:hover { color: #fff; }
 .ml-fade { opacity: 0; transform: translateY(24px); animation: mlfade .9s ease forwards; }
 @keyframes mlfade { to { opacity: 1; transform: none; } }
@@ -137,7 +137,7 @@ details.ml-menu > summary { list-style: none; }
 details.ml-menu > summary::-webkit-details-marker { display: none; }`}</style>
 <header style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 50 }}>
 <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '22px clamp(18px,5vw,56px)' }}>
-<a href="#top" style={{ fontFamily: t.display, fontWeight: 400, letterSpacing: '0.26em', fontSize: 16, color: '#fff', textDecoration: 'none', textTransform: 'uppercase' }}>Mar di Licata</a>
+<a href="#top" style={{ fontFamily: t.display, fontWeight: 600, fontSize: 16, color: '#fff', textDecoration: 'none' }}>Mar di Licata</a>
 <div className="ml-nav-links" style={{ display: 'flex', alignItems: 'center', gap: 30 }}>
 <a href="#residencial" className="ml-navlink">O Residencial</a>
 <a href="#galeria" className="ml-navlink">Galeria</a>
@@ -170,7 +170,7 @@ details.ml-menu > summary::-webkit-details-marker { display: none; }`}</style>
 <section id="residencial" style={{ padding: 'clamp(80px,14vh,160px) clamp(18px,5vw,56px)', textAlign: 'center' }}>
 <div style={{ maxWidth: 820, margin: '0 auto' }}>
 <p className="ml-eyebrow" style={{ marginBottom: 26 }}>O Residencial</p>
-<p className="ml-serif" style={{ fontSize: 'clamp(24px,3.4vw,40px)', lineHeight: 1.35, color: t.ink, margin: 0 }}>Toque no céu no rooftop, contemple a natureza e aprecie a brisa do mar pela sua janela. Um lugar que te faz transitar entre a praticidade e a calmaria. Assim nasce o Mar di Licata &mdash; um paraíso com linhas arquitetônicas elegantes em uma das praias mais procuradas de Santa Catarina: o Mar Grosso, em Laguna.</p>
+<p style={{ fontFamily: t.body, fontWeight: 500, fontSize: 'clamp(24px,3.4vw,40px)', lineHeight: 1.35, color: t.ink, margin: 0 }}>Toque no céu no rooftop, contemple a natureza e aprecie a brisa do mar pela sua janela. Um lugar que te faz transitar entre a praticidade e a calmaria. Assim nasce o Mar di Licata &mdash; um paraíso com linhas arquitetônicas elegantes em uma das praias mais procuradas de Santa Catarina: o Mar Grosso, em Laguna.</p>
 <hr className="ml-rule" style={{ margin: '46px auto 0' }} />
 </div>
 </section>
@@ -187,10 +187,10 @@ details.ml-menu > summary::-webkit-details-marker { display: none; }`}</style>
 <div style={{ maxWidth: 1080, margin: '0 auto', textAlign: 'center' }}>
 <p className="ml-eyebrow" style={{ color: t.onDark, marginBottom: 18 }}>As Residências</p>
 <h2 className="ml-h2" style={{ color: t.onDark }}>Espaço para viver com grandiosidade</h2>
-<p className="ml-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 56 }}>Rooftop exclusivo, no Mar Grosso de Laguna.</p>
+<p style={{ fontFamily: t.body, fontWeight: 500, color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 56 }}>Rooftop exclusivo, no Mar Grosso de Laguna.</p>
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 'clamp(28px,5vw,64px)', marginBottom: 56 }}>
 {[{n:'3',l:'Dormitórios'},{n:'1',l:'Suíte'},{n:'120 a 122',l:'m² privativos'},{n:'Rooftop',l:'exclusivo'}].map((it,i)=>(
-<div key={i}><div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 'clamp(34px,5vw,58px)', letterSpacing: '0.04em', lineHeight: 1 }}>{it.n}</div><div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDarkMuted, marginTop: 12 }}>{it.l}</div></div>
+<div key={i}><div style={{ fontFamily: t.display, fontWeight: 600, fontSize: 'clamp(34px,5vw,58px)', letterSpacing: '0.04em', lineHeight: 1 }}>{it.n}</div><div style={{ fontSize: 11, color: t.onDarkMuted, marginTop: 12 }}>{it.l}</div></div>
 ))}
 </div>
 <LeadCaptureButton slug="mar-di-licata-mar-grosso-laguna-sc" construtora_slug="fontana" className="ml-cta ml-cta-light"  propertyDisplayName="Mar di Licata Residencial" />
@@ -219,7 +219,7 @@ return (
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 1, background: t.line }}>
 {DIFERENCIAIS.map((d,i)=>(
 <div key={i} style={{ background: t.bg, padding: 'clamp(28px,4vw,44px)' }}>
-<div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 22, color: t.ocean, marginBottom: 14 }}>{String(i+1).padStart(2,'0')}</div>
+<div style={{ fontFamily: t.display, fontWeight: 600, fontSize: 22, color: t.ocean, marginBottom: 14 }}>{String(i+1).padStart(2,'0')}</div>
 <p style={{ margin: 0, fontSize: 16, lineHeight: 1.5, color: t.ink }}>{d}</p>
 </div>
 ))}
@@ -260,15 +260,15 @@ return (
 <div style={{ maxWidth: 1080, margin: '0 auto', textAlign: 'center' }}>
 <p className="ml-eyebrow" style={{ color: t.onDark, marginBottom: 18 }}>Financiamento Direto</p>
 <h2 className="ml-h2" style={{ color: t.onDark }}>Condições de pagamento</h2>
-<p className="ml-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 40 }}>Condições de pagamento definidas pela Construtora Fontana, conforme a tabela vigente.</p>
+<p style={{ fontFamily: t.body, fontWeight: 500, color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 40 }}>Condições de pagamento definidas pela Construtora Fontana, conforme a tabela vigente.</p>
 <p style={{ color: t.onDarkMuted, fontSize: 17, lineHeight: 1.7, maxWidth: 720, margin: '0 auto 20px' }}>{CONDICOES.texto}</p>
 <p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.7, maxWidth: 720, margin: '0 auto 40px' }}>{CONDICOES.desconto}</p>
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px,1fr))', gap: 'clamp(28px,4vw,52px)' }}>
 {[{n:'01',t:'Converse com o corretor',d:'Atendimento exclusivo e personalizado para entender o seu momento e as melhores condições.'},{n:'02',t:'Escolha a sua planta',d:'Selecione a unidade ideal e defina uma proposta sob medida, sem amarras bancárias.'},{n:'03',t:'Negocie direto',d:'Condições flexíveis diretamente com a Construtora Fontana, com a liberdade que você merece.'}].map((s,i)=>(
-<div key={i} style={{ textAlign: 'left' }}><div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 40, opacity: 0.55, marginBottom: 14 }}>{s.n}</div><h3 style={{ fontFamily: t.display, fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: 17, margin: '0 0 12px' }}>{s.t}</h3><p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.6, margin: 0 }}>{s.d}</p></div>
+<div key={i} style={{ textAlign: 'left' }}><div style={{ fontFamily: t.display, fontWeight: 600, fontSize: 40, opacity: 0.55, marginBottom: 14 }}>{s.n}</div><h3 style={{ fontFamily: t.display, fontWeight: 400, fontSize: 17 }}>{s.t}</h3><p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.6, margin: 0 }}>{s.d}</p></div>
 ))}
 </div>
-<p style={{ marginTop: 56, fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: t.onDark }}>{CONDICOES.vigencia}</p>
+<p style={{ marginTop: 56, fontSize: 11, letterSpacing: '0.07em', textTransform: 'uppercase', color: t.onDark }}>{CONDICOES.vigencia}</p>
 </div>
 </section>
 <section style={{ position: 'relative', minHeight: '78vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
@@ -276,15 +276,15 @@ return (
 <div style={{ position: 'absolute', inset: 0, background: 'rgba(7,13,18,0.62)' }} />
 <div style={{ position: 'relative', zIndex: 2, padding: '0 clamp(18px,5vw,56px)', maxWidth: 880 }}>
 <p className="ml-eyebrow ml-onimg" style={{ color: '#fff', marginBottom: 22 }}>Atendimento Exclusivo</p>
-<h2 className="ml-h2 ml-onimg" style={{ color: '#fff', fontSize: 'clamp(30px,5vw,56px)' }}>Bem-vindo ao seu novo horizonte particular.</h2>
+<h2 className="ml-serif ml-onimg" style={{ color: '#fff', fontSize: 'clamp(30px,5vw,56px)' }}>Bem-vindo ao seu novo horizonte particular.</h2>
 <div style={{ marginTop: 38 }}><a href={WPP} target="_blank" rel="noopener noreferrer" className="ml-cta ml-cta-light">Atendimento Exclusivo</a></div>
 </div>
 </section>
 <footer style={{ background: t.oceanDark, color: t.onDarkMuted, padding: 'clamp(56px,9vh,96px) clamp(18px,5vw,56px)' }}>
 <div style={{ maxWidth: 1180, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px,1fr))', gap: 'clamp(28px,5vw,56px)' }}>
-<div><div style={{ fontFamily: t.display, fontWeight: 400, letterSpacing: '0.22em', fontSize: 18, color: t.onDark, textTransform: 'uppercase' }}>Stiven Allan</div><p style={{ marginTop: 14, fontSize: 14, lineHeight: 1.6 }}>Imóveis de alto padrão em Santa Catarina.<br />CRECI 60.275</p></div>
-<div><div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDark, marginBottom: 14 }}>Contato</div><a href={WPP} target="_blank" rel="noopener noreferrer" style={{ color: t.onDarkMuted, textDecoration: 'none', fontSize: 14 }}>WhatsApp &middot; (48) 99164-2332</a></div>
-<div><div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDark, marginBottom: 14 }}>Empreendimento</div><p style={{ fontSize: 14, lineHeight: 1.6, margin: 0 }}>Mar di Licata Residencial<br />Construtora Fontana<br />Mar Grosso, Laguna/SC</p></div>
+<div><div style={{ fontFamily: t.display, fontWeight: 600, fontSize: 18, color: t.onDark }}>Stiven Allan</div><p style={{ marginTop: 14, fontSize: 14, lineHeight: 1.6 }}>Imóveis de alto padrão em Santa Catarina.<br />CRECI 60.275</p></div>
+<div><div style={{ fontSize: 11, color: t.onDark, marginBottom: 14 }}>Contato</div><a href={WPP} target="_blank" rel="noopener noreferrer" style={{ color: t.onDarkMuted, textDecoration: 'none', fontSize: 14 }}>WhatsApp &middot; (48) 99164-2332</a></div>
+<div><div style={{ fontSize: 11, color: t.onDark, marginBottom: 14 }}>Empreendimento</div><p style={{ fontSize: 14, lineHeight: 1.6, margin: 0 }}>Mar di Licata Residencial<br />Construtora Fontana<br />Mar Grosso, Laguna/SC</p></div>
 </div>
 <div style={{ maxWidth: 1180, margin: '40px auto 0', paddingTop: 24, borderTop: '1px solid rgba(226,238,246,0.12)', fontSize: 12 }}>
 <p style={{ margin: '0 0 8px', opacity: .8 }}>Mar di Licata Residencial é um empreendimento da Construtora Fontana, incorporado por Domus Aurea Incorporações Ltda. Incorporação imobiliária averbada na Matrícula R-6/42.905, Ofício de Registro de Imóveis da Comarca de Laguna/SC.</p>

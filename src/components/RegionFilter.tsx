@@ -12,7 +12,7 @@ function SelectArrow() {
       fill="none"
       style={{ position: 'absolute', right: 18, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}
     >
-      <path d="M6 9l6 6 6-6" stroke="#B89B5E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M6 9l6 6 6-6" stroke="#D24E22" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
 }

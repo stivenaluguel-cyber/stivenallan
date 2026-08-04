@@ -4,32 +4,28 @@ import { VisitTracker } from '@/components/VisitTracker'
 import { TrackingProvider } from '@/components/TrackingProvider'
 import { AnalyticsScripts } from '@/components/AnalyticsScripts'
 import { CookieConsent } from '@/components/CookieConsent'
-import { Bricolage_Grotesque, Hanken_Grotesk, Cormorant_Garamond } from 'next/font/google'
+import { Piazzolla, Public_Sans } from 'next/font/google'
 import './globals.css'
 
-const bricolage = Bricolage_Grotesque({
+// Identidade tipográfica "Clássica Brasileira Sofisticada" (redesenho de
+// 08/2026 — branch design/tipografia-editorial). Piazzolla como display com
+// raiz latino-americana foge do par Playfair/Cormorant que todo template
+// "luxury" genérico usa; Public Sans cobre corpo, navegação e controles com
+// ótimo suporte a diacríticos do português. Só 2 pesos por família (400/600)
+// + itálico da Piazzolla como acento pontual — nunca decorativo em toda seção.
+const piazzolla = Piazzolla({
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-bricolage',
-  weight: ['400', '500', '600', '700', '800'],
-})
-
-const hanken = Hanken_Grotesk({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-hanken',
-  weight: ['400', '500', '600', '700'],
-})
-
-// Usado nos hotsites premium (ex. Parco Savello, Casa Guaíba Park) para os
-// destaques em itálico serifado — antes só existia como string CSS sem
-// nenhum @font-face carregado, então caía silenciosamente pro Georgia.
-const cormorant = Cormorant_Garamond({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-cormorant',
-  weight: ['400', '500', '600'],
+  variable: '--font-piazzolla',
+  weight: ['400', '600'],
   style: ['normal', 'italic'],
+})
+
+const publicSans = Public_Sans({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-public-sans',
+  weight: ['400', '600'],
 })
 
 export const metadata: Metadata = {
@@ -117,7 +113,7 @@ const schemaAgent = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className={`${bricolage.variable} ${hanken.variable} ${cormorant.variable}`}>
+    <html lang="pt-BR" className={`${piazzolla.variable} ${publicSans.variable}`}>
       <head>
         {/* Google Consent Mode v2 — default DENY antes de qualquer gtag.js (LGPD).
             Restaura sincronicamente a escolha salva (mesma chave/versão de

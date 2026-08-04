@@ -68,18 +68,18 @@ export default function PiazzaCastelloPage() {
         .pc-hero-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.75) 0%,rgba(0,0,0,.15) 60%,transparent 100%)}
         .pc-hero-content{position:relative;z-index:2;padding:3rem 1.5rem 4rem}
         .pc-container{max-width:1100px;margin:0 auto}
-        .pc-badge{display:inline-block;background:${COR};color:#fff;font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:.35rem .8rem;border-radius:2px;margin-bottom:1rem}
-        .pc-hero-title{font-size:clamp(2rem,6vw,3.5rem);font-weight:700;color:#fff;line-height:1.1;margin:0 0 .75rem}
+        .pc-badge{display:inline-block;background:${COR};color:#fff;font-size:.7rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:.35rem .8rem;border-radius:2px;margin-bottom:1rem}
+        .pc-hero-title{font-family:var(--font-piazzolla),Georgia,serif;font-size:clamp(2rem,6vw,3.5rem);font-weight:600;color:#fff;line-height:1.15;margin:0 0 .75rem}
         .pc-hero-sub{font-size:clamp(1rem,2.5vw,1.25rem);color:rgba(255,255,255,.88);margin:0 0 2rem;max-width:600px}
         .pc-hero-btn{display:inline-flex;align-items:center;gap:.5rem;background:${COR};color:#fff;text-decoration:none;padding:.85rem 2rem;border-radius:4px;font-weight:700;font-size:1rem}
         .pc-specs{background:#fff;display:flex;flex-wrap:wrap;border-bottom:1px solid #eee}
         .pc-spec{flex:1 1 150px;padding:1.25rem 1.5rem;text-align:center;border-right:1px solid #eee}
         .pc-spec:last-child{border-right:none}
         .pc-spec-val{font-size:1.5rem;font-weight:700;color:${COR}}
-        .pc-spec-lbl{font-size:.75rem;color:#666;text-transform:uppercase;letter-spacing:.08em;margin-top:.2rem}
+        .pc-spec-lbl{font-size:.75rem;color:#666;margin-top:.2rem}
         .pc-section{padding:5rem 1.5rem}
-        .pc-section-tag{font-size:.7rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:${COR};margin-bottom:.5rem}
-        .pc-section-title{font-size:clamp(1.6rem,4vw,2.4rem);font-weight:700;color:#1a1a1a;line-height:1.2;margin:0 0 1.5rem}
+        .pc-section-tag{font-size:.7rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:${COR};margin-bottom:.5rem}
+        .pc-section-title{font-family:var(--font-piazzolla),Georgia,serif;font-size:clamp(1.6rem,4vw,2.4rem);font-weight:600;color:#1a1a1a;line-height:1.25;margin:0 0 1.5rem}
         .pc-section-text{font-size:1.05rem;color:#555;line-height:1.75;margin:0 0 1.5rem;max-width:680px}
         .pc-features{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;margin-top:2rem}
         .pc-feature{display:flex;align-items:center;gap:.75rem;padding:1rem 1.25rem;border:1px solid #eee;border-radius:6px;font-size:.9rem;color:#333}
@@ -96,7 +96,7 @@ export default function PiazzaCastelloPage() {
         .pc-loc-address{font-size:1.1rem;font-weight:600;color:#1a1a1a;margin:0 0 1rem}
         .pc-loc-text{font-size:.95rem;color:#555;line-height:1.8;margin:0 0 1.5rem}
         .pc-cta-box{text-align:center;padding:5rem 1.5rem;background:${COR}}
-        .pc-cta-title{font-size:clamp(1.5rem,4vw,2rem);font-weight:700;color:#fff;margin:0 0 1rem}
+        .pc-cta-title{font-family:var(--font-piazzolla),Georgia,serif;font-size:clamp(1.5rem,4vw,2rem);font-weight:600;color:#fff;margin:0 0 1rem}
         .pc-cta-sub{font-size:1rem;color:rgba(255,255,255,.85);margin:0 0 2rem}
         .pc-cta-btn{display:inline-flex;align-items:center;gap:.6rem;background:#fff;color:${COR};text-decoration:none;padding:.9rem 2.25rem;border-radius:4px;font-weight:700;font-size:1.05rem}
         .pc-catalogo-btn{display:inline-flex;align-items:center;gap:.6rem;border:2px solid ${COR};color:${COR};text-decoration:none;padding:.85rem 2rem;border-radius:4px;font-weight:600;font-size:.95rem}
@@ -109,7 +109,7 @@ export default function PiazzaCastelloPage() {
       
 <PropertySchema nome="Piazza Castello Residencial" slug="piazza-castello-centro-icara-sc" construtora_slug="fontana" cidade="Içara" uf="SC" bairro="Centro" descricao="Piazza Castello Residencial — 3 dormitórios (3 suítes), até 172 m² privativos, no Centro de Içara/SC." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/piazza-castello-centro-icara-sc.jpg" faq={[{"pergunta":"Como funciona o pagamento do Piazza Castello Residencial?","resposta":"Condições de pagamento sob consulta. Fale com um corretor para receber a composição comercial e a disponibilidade atualizadas."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Fale com um corretor para confirmar as modalidades de pagamento disponíveis, incluindo financiamento bancário e FGTS."},{"pergunta":"Onde fica o Piazza Castello Residencial?","resposta":"O Piazza Castello Residencial está localizado na Praça Presidente João Goulart, frente à Praça Castelo Branco, no Centro de Içara/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"O empreendimento oferece apartamentos com 3 dormitórios (3 suítes) e até 172 m² privativos."}]} />
 <header style={{position:'absolute',top:0,left:0,right:0,zIndex:10,padding:'1.5rem'}}>
-        <a href="/" style={{color:'#fff',fontSize:'1rem',fontWeight:700,textDecoration:'none',letterSpacing:'.04em'}}>
+        <a href="/" style={{color:'#fff',fontSize:'1rem',fontWeight:700,textDecoration:'none'}}>
           Stiven Allan
         </a>
       </header>
@@ -232,7 +232,7 @@ export default function PiazzaCastelloPage() {
         <p className="pc-footer-logo">Stiven Allan · Corretor de Imóveis</p>
         <p>CRECI 60.275 · Empreendimentos Fontana em Criciúma e região</p>
         <p style={{marginTop:'.5rem'}}><a href={WA} target="_blank" rel="noopener noreferrer" style={{color:'#25D366',textDecoration:'none'}}>WhatsApp: (48) 99164-2332</a></p>
-        <p style={{marginTop:'.5rem',fontSize:'.75rem'}}><a href="/" style={{color:'#666',textDecoration:'none'}}>← Ver todos os empreendimentos</a></p>
+        <p style={{marginTop:'.5rem',fontSize:'.95rem'}}><a href="/" style={{color:'#666',textDecoration:'none'}}>← Ver todos os empreendimentos</a></p>
       </footer>
 
       <a href={WA} target="_blank" rel="noopener noreferrer" className="pc-fab" aria-label="WhatsApp">

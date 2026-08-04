@@ -106,10 +106,9 @@ const FAQ_ITEMS = [
 
 export default function TremezzoPage() {
 const CSS = `
-  @import url('https://fonts.googleapis.com/css2?family=Jost:wght@200;300;400&family=Cormorant+Garamond:ital,wght@0,300;1,300;1,400&family=Hanken+Grotesk:wght@300;400;500&display=swap');
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
-  body { background: #FAFAF8; color: #1A1814; font-family: 'Hanken Grotesk', system-ui, sans-serif; }
+  body { background: #FAFAF8; color: #1A1814; font-family: var(--font-public-sans), system-ui, sans-serif; }
   .tz-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; transition: background .35s ease, box-shadow .35s ease; }
   @supports (animation-timeline: scroll()) {
     .tz-nav { animation: tz-nav-fill linear both; animation-timeline: scroll(); animation-range: 0px 80px; }
@@ -121,13 +120,13 @@ const CSS = `
   .tz-gcard { position: relative; overflow: hidden; border-radius: 6px; cursor: zoom-in; }
   .tz-gcard img { transition: transform .8s ease; }
   .tz-gcard:hover img { transform: scale(1.06); }
-  .tz-btn { display: inline-flex; align-items: center; gap: 8px; padding: 14px 32px; font-family: 'Jost', system-ui, sans-serif; font-size: 11px; font-weight: 400; letter-spacing: 0.3em; text-transform: uppercase; text-decoration: none; border: 1px solid #6B2D3E; color: #6B2D3E; background: transparent; cursor: pointer; transition: all .25s ease; border-radius: 2px; }
+  .tz-btn { display: inline-flex; align-items: center; gap: 8px; padding: 14px 32px; font-family: var(--font-public-sans), system-ui, sans-serif; font-size: 15px; font-weight: 600; text-decoration: none; border: 1px solid #6B2D3E; color: #6B2D3E; background: transparent; cursor: pointer; transition: all .25s ease; border-radius: 2px; }
   .tz-btn:hover { background: #6B2D3E; color: #fff; }
   .tz-btn--solid { background: #6B2D3E; color: #fff; }
   .tz-btn--solid:hover { background: #4E1F2C; border-color: #4E1F2C; }
   .tz-rule { width: 40px; height: 1px; background: #6B2D3E; border: none; display: block; }
-  .tz-h2 { font-family: 'Jost', system-ui, sans-serif; font-weight: 300; text-transform: uppercase; letter-spacing: 0.14em; line-height: 1.1; }
-  .tz-serif { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-weight: 300; }
+  .tz-h2 { font-family: var(--font-piazzolla), Georgia, serif; font-weight: 600; line-height: 1.1; }
+  .tz-serif { font-family: var(--font-piazzolla), Georgia, serif; font-style: italic; font-weight: 400; }
   .tz-diff-item { display: flex; align-items: flex-start; gap: 16px; padding: 18px 0; border-bottom: 1px solid rgba(26,24,20,0.10); }
   .tz-diff-icon { width: 36px; height: 36px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: rgba(107,45,62,0.08); border-radius: 50%; color: #6B2D3E; }
   .tz-lcard { position: relative; overflow: hidden; border-radius: 6px; aspect-ratio: 4/3; }
@@ -159,12 +158,12 @@ const CSS = `
       {/* NAV */}
       <nav className="tz-nav">
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 clamp(18px,4vw,48px)', height: 68, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Link href="/" style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.22em', fontSize: 15, textDecoration: 'none', color: '#FFFFFF', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>
+          <Link href="/" style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 18, textDecoration: 'none', color: '#FFFFFF', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>
             Stiven Allan
           </Link>
           <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
-            <Link href="/#empreendimentos" style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.85)', textDecoration: 'none', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>Empreendimentos</Link>
-            <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#6B2D3E', textDecoration: 'none', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>WhatsApp</a>
+            <Link href="/#empreendimentos" style={{ fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: 15, fontWeight: 500, color: 'rgba(255,255,255,0.85)', textDecoration: 'none', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>Empreendimentos</Link>
+            <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: 15, fontWeight: 600, color: '#6B2D3E', textDecoration: 'none', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>WhatsApp</a>
           </div>
         </div>
       </nav>
@@ -173,10 +172,10 @@ const CSS = `
         <HeroImage unoptimized src={RENDERS[0].src} alt="Tremezzo Residencial — fachada, Centro de Criciúma SC" fill priority style={{ objectFit: 'cover', objectPosition: 'center 40%' }} sizes="100vw" />
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.40) 55%, rgba(0,0,0,0.55) 100%)' }} />
         <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 clamp(24px,6vw,80px)', paddingTop: 68 }}>
-          <p className="tz-fade" style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 10, letterSpacing: '0.45em', textTransform: 'uppercase', color: 'rgba(245,238,240,0.80)', marginBottom: 24, textShadow: '0 1px 6px rgba(0,0,0,0.4)' }}>
+          <p className="tz-fade" style={{ fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: 12, letterSpacing: '0.07em', textTransform: 'uppercase', color: 'rgba(245,238,240,0.80)', marginBottom: 24, textShadow: '0 1px 6px rgba(0,0,0,0.4)' }}>
             Construtora Fontana · Centro · Criciúma/SC
           </p>
-          <h1 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 200, textTransform: 'uppercase', letterSpacing: '0.15em', lineHeight: 1.05, fontSize: 'clamp(38px,7vw,92px)', color: '#FFFFFF', textShadow: '0 2px 8px rgba(0,0,0,0.5), 0 2px 32px rgba(0,0,0,0.60)', maxWidth: 800 }} className="tz-fade tz-fade-1">
+          <h1 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, lineHeight: 1.05, fontSize: 'clamp(38px,7vw,92px)', color: '#FFFFFF', textShadow: '0 2px 8px rgba(0,0,0,0.5), 0 2px 32px rgba(0,0,0,0.60)', maxWidth: 800 }} className="tz-fade tz-fade-1">
             Celebre o inesquecível.
           </h1>
           <hr className="tz-rule tz-fade tz-fade-2" style={{ margin: '28px auto' }} />
@@ -188,7 +187,7 @@ const CSS = `
             <LeadCaptureButton slug="tremezzo-residencial-centro-criciuma-sc" construtora_slug="fontana"  propertyDisplayName="Tremezzo Residencial" />
             <a href="#galeria" className="tz-btn" style={{ borderColor: 'rgba(255,255,255,0.55)', color: '#fff', backdropFilter: 'blur(8px)' }}>Ver galeria</a>
           </div>
-          <p className="tz-fade tz-fade-3" style={{ marginTop: 20, fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 12, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.55)', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>
+          <p className="tz-fade tz-fade-3" style={{ marginTop: 20, fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: 14, color: 'rgba(255,255,255,0.55)', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>
             Apartamento decorado aberto para visitação.
           </p>
         </div>
@@ -199,18 +198,18 @@ const CSS = `
       <section id="conceito" style={{ background: '#FAFAF8', padding: 'clamp(64px,8vw,120px) clamp(24px,6vw,80px)' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'clamp(48px,6vw,96px)', alignItems: 'center' }}>
           <div>
-            <p style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 10, letterSpacing: '0.45em', textTransform: 'uppercase', color: '#6B2D3E', display: 'block', marginBottom: 20 }}>O empreendimento</p>
+            <p style={{ fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: 12, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#6B2D3E', display: 'block', marginBottom: 20 }}>O empreendimento</p>
             <h2 className="tz-h2" style={{ fontSize: 'clamp(26px,4vw,44px)', color: '#1A1814', marginBottom: 28 }}>Sofisticação<br />em cada detalhe.</h2>
             <hr className="tz-rule" style={{ marginBottom: 28 }} />
-            <p className="tz-serif" style={{ fontSize: 'clamp(17px,2vw,21px)', color: '#6B655B', lineHeight: 1.7, marginBottom: 24 }}>
+            <p style={{ fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontWeight: 500, fontSize: 'clamp(17px,2vw,21px)', color: '#6B655B', lineHeight: 1.7, marginBottom: 24 }}>
               O Tremezzo Residencial é um projeto de 18 andares no coração de Criciúma, onde cada detalhe foi pensado para quem não abre mão do melhor. Sacada gourmet integrada ao living, churrasqueira a carvão, persianas automatizadas e fechadura digital.
             </p>
-            <p style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 14, color: '#6B655B', lineHeight: 1.8, marginBottom: 32 }}>
+            <p style={{ fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: 14, color: '#6B655B', lineHeight: 1.8, marginBottom: 32 }}>
               Com 3 dormitórios (1 suíte master), 125 m² privativos e 200 m² de área total, cada unidade foi concebida para oferecer privacidade, conforto e funcionalidade. São apenas 4 apartamentos por andar.
             </p>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               {[{ Icon: HardHat, label: 'Em obras · 03/2027' }, { Icon: Ruler, label: '125 m² privativos' }, { Icon: Building2, label: '18 andares' }].map(({ Icon, label }) => (
-                <span key={label} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(107,45,62,0.07)', color: '#6B2D3E', borderRadius: 2, padding: '7px 14px', fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 12, letterSpacing: '0.1em' }}><Icon size={14} strokeWidth={1.5} aria-hidden="true" />{label}</span>
+                <span key={label} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(107,45,62,0.07)', color: '#6B2D3E', borderRadius: 2, padding: '7px 14px', fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: 13 }}><Icon size={14} strokeWidth={1.5} aria-hidden="true" />{label}</span>
               ))}
             </div>
           </div>
@@ -218,8 +217,8 @@ const CSS = `
             <Image unoptimized src={RENDERS[1].src} alt="Tremezzo Residencial — perspectiva" fill style={{ objectFit: 'cover' }} sizes="(min-width:768px) 50vw,100vw" />
             <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(26,12,16,0.55), transparent 60%)' }} />
             <div style={{ position: 'absolute', bottom: 20, left: 20 }}>
-              <p style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: 'rgba(245,238,240,0.70)', marginBottom: 4 }}>Status</p>
-              <p style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, fontSize: 18, color: '#F5EEF0', letterSpacing: '0.08em' }}>Em obras · Entrega 03/2027</p>
+              <p style={{ fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: 11, letterSpacing: '0.07em', textTransform: 'uppercase', color: 'rgba(245,238,240,0.70)', marginBottom: 4 }}>Status</p>
+              <p style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 18, color: '#F5EEF0' }}>Em obras · Entrega 03/2027</p>
             </div>
           </div>
         </div>
@@ -228,7 +227,7 @@ const CSS = `
       <section style={{ background: '#1A0C10', padding: 'clamp(64px,8vw,120px) clamp(24px,6vw,80px)' }}>
         <div style={{ maxWidth: 960, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
-            <p style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 10, letterSpacing: '0.45em', textTransform: 'uppercase', color: 'rgba(107,45,62,0.80)', display: 'block', marginBottom: 16 }}>Vídeo oficial</p>
+            <p style={{ fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: 12, letterSpacing: '0.07em', textTransform: 'uppercase', color: 'rgba(107,45,62,0.80)', display: 'block', marginBottom: 16 }}>Vídeo oficial</p>
             <h2 className="tz-h2" style={{ fontSize: 'clamp(24px,3.5vw,38px)', color: '#F5EEF0' }}>Conheça o Tremezzo</h2>
           </div>
           <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, borderRadius: 6, overflow: 'hidden' }}>
@@ -241,9 +240,9 @@ const CSS = `
       <section id="galeria" style={{ background: '#FAFAF8', padding: 'clamp(64px,8vw,120px) clamp(24px,6vw,80px)' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 56 }}>
-            <p style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 10, letterSpacing: '0.45em', textTransform: 'uppercase', color: '#6B2D3E', display: 'block', marginBottom: 16 }}>Galeria</p>
+            <p style={{ fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: 12, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#6B2D3E', display: 'block', marginBottom: 16 }}>Galeria</p>
             <h2 className="tz-h2" style={{ fontSize: 'clamp(24px,3.5vw,42px)', color: '#1A1814', marginBottom: 16 }}>Apartamento decorado</h2>
-            <p className="tz-serif" style={{ fontSize: 'clamp(15px,1.8vw,19px)', color: '#6B655B', maxWidth: 480, margin: '0 auto' }}>
+            <p style={{ fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontWeight: 500, fontSize: 'clamp(15px,1.8vw,19px)', color: '#6B655B', maxWidth: 480, margin: '0 auto' }}>
               Apartamento decorado aberto para visitação. Conheça pessoalmente cada detalhe.
             </p>
           </div>
@@ -255,23 +254,23 @@ const CSS = `
       <section style={{ background: '#1A0C10', padding: 'clamp(64px,8vw,120px) clamp(24px,6vw,80px)' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 64 }}>
-            <p style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 10, letterSpacing: '0.45em', textTransform: 'uppercase', color: 'rgba(107,45,62,0.80)', display: 'block', marginBottom: 16 }}>As residências</p>
+            <p style={{ fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: 12, letterSpacing: '0.07em', textTransform: 'uppercase', color: 'rgba(107,45,62,0.80)', display: 'block', marginBottom: 16 }}>As residências</p>
             <h2 className="tz-h2" style={{ fontSize: 'clamp(24px,3.5vw,42px)', color: '#F5EEF0', marginBottom: 16 }}>Números que encantam</h2>
             <hr className="tz-rule" style={{ margin: '0 auto 24px' }} />
           </div>
           <div className="tz-metrics-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 'clamp(32px,4vw,56px)' }}>
             {[{ val: '125', label: 'm² privativos' }, { val: '18', label: 'Andares' }, { val: '+1.000', label: 'm² de lazer' }, { val: '03/2027', label: 'Entrega prevista' }].map(({ val, label }) => (
               <div key={label} style={{ textAlign: 'center' }}>
-                <p style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 200, fontSize: 'clamp(40px,6vw,64px)', color: 'rgba(245,238,240,0.90)', letterSpacing: '0.04em', lineHeight: 1 }}>{val}</p>
-                <p style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: 'rgba(245,238,240,0.65)', marginTop: 4 }}>{label}</p>
+                <p style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(40px,6vw,64px)', color: 'rgba(245,238,240,0.90)', letterSpacing: '0.04em', lineHeight: 1 }}>{val}</p>
+                <p style={{ fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: 11, letterSpacing: '0.07em', textTransform: 'uppercase', color: 'rgba(245,238,240,0.65)', marginTop: 4 }}>{label}</p>
               </div>
             ))}
           </div>
           <div style={{ marginTop: 64, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px,1fr))', gap: 24, borderTop: '1px solid rgba(245,238,240,0.10)', paddingTop: 48 }}>
             {[{ n: '3', label: 'Dormitórios (1 suíte)' }, { n: '200', label: 'm² área total' }, { n: '4', label: 'Aptos por andar' }, { n: '2', label: 'Elevadores' }, { n: '14', label: 'Unidades' }].map(({ n, label }) => (
               <div key={label} style={{ textAlign: 'center', padding: '24px 16px' }}>
-                <p style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 200, fontSize: 'clamp(28px,4vw,48px)', color: '#D4869A', letterSpacing: '0.04em', lineHeight: 1 }}>{n}</p>
-                <p style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 12, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(245,238,240,0.65)', marginTop: 8 }}>{label}</p>
+                <p style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(28px,4vw,48px)', color: '#D4869A', letterSpacing: '0.04em', lineHeight: 1 }}>{n}</p>
+                <p style={{ fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: 12, letterSpacing: '0.07em', textTransform: 'uppercase', color: 'rgba(245,238,240,0.65)', marginTop: 8 }}>{label}</p>
               </div>
             ))}
           </div>
@@ -281,7 +280,7 @@ const CSS = `
               if (!itens.length) return null
               return (
                 <div key={categoria} style={{ marginBottom: 40 }}>
-                  <p style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 10, letterSpacing: '0.3em', textTransform: 'uppercase', color: 'rgba(107,45,62,0.80)', textAlign: 'center', marginBottom: 16 }}>{titulo}</p>
+                  <p style={{ fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: 12, letterSpacing: '0.07em', textTransform: 'uppercase', color: 'rgba(107,45,62,0.80)', textAlign: 'center', marginBottom: 16 }}>{titulo}</p>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
                     <GalleryWithLightbox galeria={itens} prefix="tz" gradient="linear-gradient(to top, rgba(26,12,16,0.6), transparent 50%)" badge="Planta oficial" trackPlantas={{ empreendimento: 'tremezzo-residencial-centro-criciuma-sc', content_name: 'Tremezzo Residencial' }} />
                   </div>
@@ -295,7 +294,7 @@ const CSS = `
       <section style={{ background: '#FAFAF8', padding: 'clamp(64px,8vw,120px) clamp(24px,6vw,80px)' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 56 }}>
-            <p style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 10, letterSpacing: '0.45em', textTransform: 'uppercase', color: '#6B2D3E', display: 'block', marginBottom: 16 }}>Diferenciais</p>
+            <p style={{ fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: 12, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#6B2D3E', display: 'block', marginBottom: 16 }}>Diferenciais</p>
             <h2 className="tz-h2" style={{ fontSize: 'clamp(24px,3.5vw,42px)', color: '#1A1814' }}>O padrão que transforma</h2>
           </div>
           <div className="tz-diff-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '0 48px', maxWidth: 840, margin: '0 auto' }}>
@@ -312,8 +311,8 @@ const CSS = `
               <div key={title} className="tz-diff-item">
                 <div className="tz-diff-icon"><Icon size={20} strokeWidth={1.5} aria-hidden="true" /></div>
                 <div>
-                  <p style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 400, fontSize: 14, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#1A1814', marginBottom: 4 }}>{title}</p>
-                  <p style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 14, color: '#6B655B', lineHeight: 1.6 }}>{desc}</p>
+                  <p style={{ fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontWeight: 600, fontSize: 15, color: '#1A1814', marginBottom: 4 }}>{title}</p>
+                  <p style={{ fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: 14, color: '#6B655B', lineHeight: 1.6 }}>{desc}</p>
                 </div>
               </div>
             ))}
@@ -325,9 +324,9 @@ const CSS = `
       <section style={{ background: '#1A0C10', padding: 'clamp(64px,8vw,120px) clamp(24px,6vw,80px)' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 56 }}>
-            <p style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 10, letterSpacing: '0.45em', textTransform: 'uppercase', color: 'rgba(107,45,62,0.80)', display: 'block', marginBottom: 16 }}>Lazer</p>
+            <p style={{ fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: 12, letterSpacing: '0.07em', textTransform: 'uppercase', color: 'rgba(107,45,62,0.80)', display: 'block', marginBottom: 16 }}>Lazer</p>
             <h2 className="tz-h2" style={{ fontSize: 'clamp(24px,3.5vw,42px)', color: '#F5EEF0', marginBottom: 16 }}>+1.000 m² de experiências</h2>
-            <p className="tz-serif" style={{ fontSize: 'clamp(15px,1.8vw,19px)', color: 'rgba(245,238,240,0.65)', maxWidth: 520, margin: '0 auto' }}>
+            <p style={{ fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontWeight: 500, fontSize: 'clamp(15px,1.8vw,19px)', color: 'rgba(245,238,240,0.65)', maxWidth: 520, margin: '0 auto' }}>
               Piscinas, fitness, coworking, salão de festas, brinquedoteca, espaço pet e muito mais.
             </p>
           </div>
@@ -336,13 +335,13 @@ const CSS = `
               <div key={i} className="tz-lcard">
                 <Image unoptimized src={item.src} alt={item.alt} fill style={{ objectFit: 'cover' }} sizes="(min-width:1024px) 33vw,50vw" />
                 <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(26,12,16,0.65), transparent 50%)' }} />
-                <p style={{ position: 'absolute', bottom: 12, left: 14, color: 'rgba(245,238,240,0.90)', fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase' }}>{item.label}</p>
+                <p style={{ position: 'absolute', bottom: 12, left: 14, color: 'rgba(245,238,240,0.90)', fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: 11, letterSpacing: '0.07em', textTransform: 'uppercase' }}>{item.label}</p>
               </div>
             ))}
           </div>
           <div style={{ marginTop: 40, display: 'flex', flexWrap: 'wrap', gap: 10, justifyContent: 'center' }}>
             {['Piscina adulto','Piscina infantil','Fitness','Sala de jogos','Coworking','Brinquedoteca','Playground','Espaço pet','Quiosque BBQ','Jardim','Bicicletário','Terraço','Salão de festas'].map(item => (
-              <span key={item} style={{ padding: '7px 14px', background: 'rgba(107,45,62,0.15)', borderRadius: 2, fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 12, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(107,45,62,0.85)' }}>{item}</span>
+              <span key={item} style={{ padding: '7px 14px', background: 'rgba(107,45,62,0.15)', borderRadius: 2, fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: 13, color: 'rgba(107,45,62,0.85)' }}>{item}</span>
             ))}
           </div>
         </div>
@@ -351,9 +350,9 @@ const CSS = `
       <section style={{ background: '#FAFAF8', padding: 'clamp(64px,8vw,120px) clamp(24px,6vw,80px)' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
-            <p style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 10, letterSpacing: '0.45em', textTransform: 'uppercase', color: '#6B2D3E', display: 'block', marginBottom: 16 }}>Localização</p>
+            <p style={{ fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: 12, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#6B2D3E', display: 'block', marginBottom: 16 }}>Localização</p>
             <h2 className="tz-h2" style={{ fontSize: 'clamp(24px,3.5vw,42px)', color: '#1A1814', marginBottom: 12 }}>Centro de Criciúma</h2>
-            <p style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 15, color: '#6B655B', maxWidth: 420, margin: '0 auto' }}>
+            <p style={{ fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: 15, color: '#6B655B', maxWidth: 420, margin: '0 auto' }}>
               Av. Vítor Meireles c/ Rua Domingos Bristot — tudo que você precisa a poucos minutos.
             </p>
           </div>
@@ -363,8 +362,8 @@ const CSS = `
           <div style={{ marginTop: 24, display: 'flex', justifyContent: 'center', gap: 48, flexWrap: 'wrap' }}>
             {[{ label: 'Endereço', val: 'Av. Vítor Meireles c/ R. Domingos Bristot' }, { label: 'Bairro', val: 'Centro, Criciúma/SC' }, { label: 'Status', val: 'Em obras · Entrega 03/2027' }].map(({ label, val }) => (
               <div key={label} style={{ textAlign: 'center' }}>
-                <p style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 10, letterSpacing: '0.3em', textTransform: 'uppercase', color: '#6B2D3E', marginBottom: 4 }}>{label}</p>
-                <p style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 15, color: '#1A1814' }}>{val}</p>
+                <p style={{ fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: 11, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#6B2D3E', marginBottom: 4 }}>{label}</p>
+                <p style={{ fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: 15, color: '#1A1814' }}>{val}</p>
               </div>
             ))}
           </div>
@@ -375,16 +374,16 @@ const CSS = `
       <section style={{ background: '#FAFAF8', padding: 'clamp(64px,8vw,120px) clamp(24px,6vw,80px)', borderTop: '1px solid rgba(26,24,20,0.10)' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 64 }}>
-            <p style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 10, letterSpacing: '0.45em', textTransform: 'uppercase', color: '#6B2D3E', display: 'block', marginBottom: 16 }}>Como funciona</p>
+            <p style={{ fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: 12, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#6B2D3E', display: 'block', marginBottom: 16 }}>Como funciona</p>
             <h2 className="tz-h2" style={{ fontSize: 'clamp(24px,3.5vw,42px)', color: '#1A1814', marginBottom: 16 }}>Financiamento direto</h2>
-            <p className="tz-serif" style={{ fontSize: 'clamp(15px,1.8vw,19px)', color: '#6B655B', maxWidth: 480, margin: '0 auto', lineHeight: 1.7 }}>
+            <p style={{ fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontWeight: 500, fontSize: 'clamp(15px,1.8vw,19px)', color: '#6B655B', maxWidth: 480, margin: '0 auto', lineHeight: 1.7 }}>
               Negociado diretamente com a Construtora Fontana.
             </p>
           </div>
           <div style={{ maxWidth: 720, margin: '0 auto clamp(40px,6vw,64px)' }}>
-            <p style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 15, lineHeight: 1.8, color: '#6B655B', marginBottom: 16 }}>{COMERCIAL.padrao}</p>
-            <p style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 14, lineHeight: 1.8, color: '#8A8177', marginBottom: 16 }}>{COMERCIAL.correcaoPadrao}</p>
-            <p style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 14, lineHeight: 1.8, color: '#8A8177' }}>{COMERCIAL.alternativas}</p>
+            <p style={{ fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: 15, lineHeight: 1.8, color: '#6B655B', marginBottom: 16 }}>{COMERCIAL.padrao}</p>
+            <p style={{ fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: 14, lineHeight: 1.8, color: '#8A8177', marginBottom: 16 }}>{COMERCIAL.correcaoPadrao}</p>
+            <p style={{ fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: 14, lineHeight: 1.8, color: '#8A8177' }}>{COMERCIAL.alternativas}</p>
           </div>
           <div className="tz-step-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 'clamp(32px,4vw,56px)' }}>
             {[
@@ -393,27 +392,27 @@ const CSS = `
               { n: '03', titulo: 'Contrato com a construtora', desc: 'Revise a documentação e as condições contratuais antes de assinar.' },
             ].map(({ n, titulo, desc }) => (
               <div key={n} style={{ display: 'flex', gap: 24, alignItems: 'flex-start' }}>
-                <span style={{ fontFamily: "'Jost', system-ui, sans-serif", fontSize: 36, fontWeight: 200, color: 'rgba(107,45,62,0.20)', lineHeight: 1, flexShrink: 0, width: 48 }}>{n}</span>
+                <span style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontSize: 36, fontWeight: 600, color: 'rgba(107,45,62,0.20)', lineHeight: 1, flexShrink: 0, width: 48 }}>{n}</span>
                 <div>
-                  <p style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 400, fontSize: 14, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#1A1814', marginBottom: 10 }}>{titulo}</p>
-                  <p style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 14, color: '#6B655B', lineHeight: 1.7 }}>{desc}</p>
+                  <p style={{ fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontWeight: 600, fontSize: 15, color: '#1A1814', marginBottom: 10 }}>{titulo}</p>
+                  <p style={{ fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: 14, color: '#6B655B', lineHeight: 1.7 }}>{desc}</p>
                 </div>
               </div>
             ))}
           </div>
-          <p style={{ marginTop: 48, fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 11, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#8A8177', textAlign: 'center' }}>{COMERCIAL.vigencia}</p>
+          <p style={{ marginTop: 48, fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: 13, color: '#8A8177', textAlign: 'center' }}>{COMERCIAL.vigencia}</p>
         </div>
       </section>
 
       {/* CTA FINAL */}
       <section style={{ background: '#1A0C10', padding: 'clamp(80px,10vw,140px) clamp(24px,6vw,80px)', textAlign: 'center' }}>
         <div style={{ maxWidth: 640, margin: '0 auto' }}>
-          <p style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 10, letterSpacing: '0.45em', textTransform: 'uppercase', color: 'rgba(107,45,62,0.80)', display: 'block', marginBottom: 24 }}>Próximo passo</p>
-          <h2 className="tz-serif" style={{ fontSize: 'clamp(32px,5vw,58px)', color: '#F5EEF0', fontStyle: 'italic', fontWeight: 300, lineHeight: 1.2, marginBottom: 24 }}>
+          <p style={{ fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: 12, letterSpacing: '0.07em', textTransform: 'uppercase', color: 'rgba(107,45,62,0.80)', display: 'block', marginBottom: 24 }}>Próximo passo</p>
+          <h2 className="tz-serif" style={{ fontSize: 'clamp(32px,5vw,58px)', color: '#F5EEF0', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.2, marginBottom: 24 }}>
             Agende sua visita ao decorado.
           </h2>
           <hr className="tz-rule" style={{ margin: '0 auto 32px' }} />
-          <p style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 'clamp(15px,1.8vw,18px)', color: 'rgba(245,238,240,0.65)', lineHeight: 1.7, marginBottom: 40 }}>
+          <p style={{ fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: 'clamp(15px,1.8vw,18px)', color: 'rgba(245,238,240,0.65)', lineHeight: 1.7, marginBottom: 40 }}>
             O decorado do Tremezzo Residencial está aberto para visitação. Conheça o padrão de acabamento e fale com Stiven para descobrir as condições de pagamento direto.
           </p>
           <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -427,17 +426,17 @@ const CSS = `
       <footer style={{ background: '#1A0C10', borderTop: '1px solid rgba(245,238,240,0.08)', padding: 'clamp(32px,4vw,48px) clamp(24px,6vw,80px)' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
           <div>
-            <p style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.22em', fontSize: 14, color: '#F5EEF0' }}>Stiven Allan</p>
-            <p style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 12, color: 'rgba(245,238,240,0.65)', marginTop: 4 }}>CRECI 60.275 · Imóveis no Sul de Santa Catarina</p>
+            <p style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 18, color: '#F5EEF0' }}>Stiven Allan</p>
+            <p style={{ fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: 12, color: 'rgba(245,238,240,0.65)', marginTop: 4 }}>CRECI 60.275 · Imóveis no Sul de Santa Catarina</p>
           </div>
           <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
-            <Link href="/" style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 12, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(245,238,240,0.65)', textDecoration: 'none' }}>Início</Link>
-            <Link href="/#empreendimentos" style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 12, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(245,238,240,0.65)', textDecoration: 'none' }}>Empreendimentos</Link>
-            <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 12, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#6B2D3E', textDecoration: 'none' }}>WhatsApp</a>
+            <Link href="/" style={{ fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: 13, color: 'rgba(245,238,240,0.65)', textDecoration: 'none' }}>Início</Link>
+            <Link href="/#empreendimentos" style={{ fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: 13, color: 'rgba(245,238,240,0.65)', textDecoration: 'none' }}>Empreendimentos</Link>
+            <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: 13, color: '#6B2D3E', textDecoration: 'none' }}>WhatsApp</a>
           </div>
         </div>
         <div style={{ maxWidth: 1200, margin: '16px auto 0', paddingTop: 16, borderTop: '1px solid rgba(245,238,240,0.05)' }}>
-          <p style={{ fontFamily: "'Hanken Grotesk', system-ui, sans-serif", fontSize: 11, color: 'rgba(245,238,240,0.30)', letterSpacing: '0.08em' }}>
+          <p style={{ fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: 12, color: 'rgba(245,238,240,0.30)' }}>
             {new Date().getFullYear()} Stiven Allan · Tremezzo Residencial é um empreendimento da Construtora Fontana. Imagens meramente ilustrativas.
           </p>
         </div>

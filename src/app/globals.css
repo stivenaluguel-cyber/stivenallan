@@ -11,9 +11,10 @@
   --muted: #6B655B;
   --line: rgba(26,24,21,0.08);
   --line-dark: rgba(245,241,234,0.14);
-  /* display font */
-  --font-display: var(--font-bricolage, 'Bricolage Grotesque', system-ui, sans-serif);
-  --font-body: var(--font-hanken, 'Hanken Grotesk', system-ui, sans-serif);
+  /* tipografia — Piazzolla (display, com itálico como acento pontual) +
+     Public Sans (corpo, navegação, controles). Ver src/app/layout.tsx. */
+  --font-display: var(--font-piazzolla, 'Piazzolla', Georgia, serif);
+  --font-body: var(--font-public-sans, 'Public Sans', system-ui, sans-serif);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }

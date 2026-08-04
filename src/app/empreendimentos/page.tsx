@@ -28,25 +28,24 @@ const WPP_MSG = WPP + '?text=Ol%C3%A1+Stiven!+Vi+seu+site+e+quero+conhecer+os+em
 // autocontida (próprio <style>, sem componentes compartilhados entre rotas),
 // então os tokens são replicados aqui para manter a mesma identidade visual.
 const t = {
-  bg: '#FAFAF8', ink: '#1A1814', champagne: '#B89B5E', chamDark: '#8A7240',
+  bg: '#FAFAF8', ink: '#1A1814', accent: '#D24E22',
   muted: '#6B655B', line: 'rgba(26,24,20,0.10)', dark: '#141210',
   onDark: '#F5F1EA', onDarkMuted: 'rgba(245,241,234,0.60)',
-  display: "var(--font-bricolage), system-ui, sans-serif",
-  serif: "var(--font-cormorant), Georgia, serif",
-  body: "var(--font-hanken), system-ui, sans-serif",
+  display: 'var(--font-piazzolla), Georgia, serif',
+  body: 'var(--font-public-sans), system-ui, sans-serif',
 }
 
 function StatusBadge({ status }: { status?: StatusObra }) {
   const colorMap: Record<string, { bg: string; color: string }> = {
-    'na planta': { bg: 'rgba(184,155,94,0.12)', color: '#8A7240' },
-    'em obras':  { bg: 'rgba(184,155,94,0.12)', color: '#8A7240' },
+    'na planta': { bg: 'rgba(210,78,34,0.12)', color: '#B5451F' },
+    'em obras':  { bg: 'rgba(210,78,34,0.12)', color: '#B5451F' },
     'pronto':    { bg: 'rgba(40,120,60,0.10)',  color: '#2a7840' },
     'entregue':  { bg: 'rgba(40,120,60,0.10)',  color: '#2a7840' },
     'loteamento': { bg: 'rgba(0,0,0,0.06)', color: '#5a5a52' },
   }
   const c = colorMap[status || 'na planta'] || colorMap['na planta']
   return (
-    <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.22em', textTransform: 'uppercase', background: c.bg, color: c.color, padding: '4px 10px', fontFamily: t.body }}>
+    <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.07em', textTransform: 'uppercase', background: c.bg, color: c.color, padding: '4px 10px', fontFamily: t.body }}>
       {statusLabel(status)}
     </span>
   )
@@ -64,19 +63,19 @@ function CatalogCard({ emp }: { emp: Empreendimento }) {
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(26,24,20,0.55), transparent 50%)' }} />
           <div style={{ position: 'absolute', top: 16, left: 16, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             <StatusBadge status={emp.statusObra} />
-            <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.22em', textTransform: 'uppercase', background: 'rgba(184,155,94,0.15)', color: '#8A7240', padding: '4px 10px', fontFamily: t.body }}>Financiamento direto</span>
+            <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.07em', textTransform: 'uppercase', background: 'rgba(210,78,34,0.16)', color: '#F0DDD3', padding: '4px 10px', fontFamily: t.body }}>Financiamento direto</span>
           </div>
           <div style={{ position: 'absolute', bottom: 16, left: 16, right: 16 }}>
-            <p style={{ margin: 0, fontFamily: t.body, fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(245,241,234,0.70)', marginBottom: 4 }}>{emp.construtoraNome || 'Construtora Fontana'}</p>
-            <h3 style={{ margin: 0, fontFamily: t.display, fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.10em', fontSize: 'clamp(18px,2.5vw,24px)', color: '#F5F1EA', lineHeight: 1.1 }}>{emp.nome}</h3>
+            <p style={{ margin: 0, fontFamily: t.body, fontSize: 12, color: 'rgba(245,241,234,0.70)', marginBottom: 4 }}>{emp.construtoraNome || 'Construtora Fontana'}</p>
+            <h3 style={{ margin: 0, fontFamily: t.display, fontWeight: 600, fontSize: 'clamp(19px,2.5vw,25px)', color: '#F5F1EA', lineHeight: 1.15 }}>{emp.nome}</h3>
           </div>
         </div>
         <div style={{ padding: '20px 22px 22px', background: t.bg, borderBottom: `1px solid ${t.line}` }}>
-          <p style={{ margin: '0 0 8px', fontFamily: t.body, fontSize: 12, color: '#6B5A3A', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 500 }}>{localizacao}</p>
-          <p style={{ margin: '0 0 16px', fontFamily: t.serif, fontStyle: 'italic', fontSize: 'clamp(15px,1.6vw,17px)', color: t.ink, lineHeight: 1.5, minHeight: '1.5em' }}>{emp.frase}</p>
+          <p style={{ margin: '0 0 8px', fontFamily: t.body, fontSize: 12, color: t.muted, fontWeight: 500 }}>{localizacao}</p>
+          <p style={{ margin: '0 0 16px', fontFamily: t.display, fontStyle: 'italic', fontWeight: 400, fontSize: 'clamp(15px,1.6vw,17px)', color: t.ink, lineHeight: 1.5, minHeight: '1.5em' }}>{emp.frase}</p>
           <p style={{ margin: '0 0 18px', fontFamily: t.body, fontSize: 13, color: t.muted, fontWeight: 500 }}>{precoLabel(emp)}</p>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span className="cat-cta-primary" style={{ fontFamily: t.body, fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.ink, borderBottom: `1px solid ${t.champagne}`, paddingBottom: 2, fontWeight: 500 }}>Ver detalhes →</span>
+            <span className="cat-cta-primary" style={{ fontFamily: t.body, fontSize: 15, color: t.ink, borderBottom: `1px solid ${t.accent}`, paddingBottom: 2, fontWeight: 500 }}>Ver detalhes →</span>
             <span aria-hidden="true" style={{ width: 36, height: 36, flexShrink: 0 }} />
           </div>
         </div>
@@ -106,24 +105,24 @@ export default async function EmpreendimentosPage() {
       <style>{`
         html { scroll-behavior: smooth; }
         *, *::before, *::after { box-sizing: border-box; }
-        body { margin: 0; background: #FAFAF8; color: #1A1814; font-family: var(--font-hanken), system-ui, sans-serif; }
+        body { margin: 0; background: #FAFAF8; color: #1A1814; font-family: var(--font-public-sans), system-ui, sans-serif; }
         .cat-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(20,18,16,0.92); backdrop-filter: blur(20px); box-shadow: 0 1px 0 rgba(245,241,234,0.08); }
-        .cat-eyebrow { font-size: 11px; letter-spacing: 0.42em; text-transform: uppercase; color: #B89B5E; font-family: var(--font-hanken), system-ui, sans-serif; font-weight: 500; }
-        .cat-h2 { font-family: var(--font-bricolage), system-ui, sans-serif; font-weight: 300; text-transform: uppercase; letter-spacing: 0.14em; line-height: 1.1; margin: 0; font-size: clamp(28px,4.5vw,48px); }
-        .cat-serif { font-family: var(--font-cormorant), Georgia, serif; font-style: italic; font-weight: 300; }
-        .cat-rule { width: 48px; height: 1px; background: #B89B5E; border: 0; margin: 0; }
+        .cat-eyebrow { font-size: 12px; letter-spacing: 0.07em; text-transform: uppercase; color: #D24E22; font-family: var(--font-public-sans), system-ui, sans-serif; font-weight: 600; }
+        .cat-h2 { font-family: var(--font-piazzolla), Georgia, serif; font-weight: 600; line-height: 1.1; margin: 0; font-size: clamp(28px,4.5vw,48px); }
+        .cat-serif { font-family: var(--font-piazzolla), Georgia, serif; font-style: italic; font-weight: 400; }
+        .cat-rule { width: 48px; height: 1px; background: #D24E22; border: 0; margin: 0; }
         .cat-card { background: #FAFAF8; overflow: hidden; transition: transform .35s ease, box-shadow .35s ease; }
         .cat-card:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(26,24,20,0.12); }
         .cat-cta-primary { transition: border-color .25s ease, color .25s ease; cursor: pointer; }
-        .cat-cta-primary:hover { color: #B89B5E; }
-        .cat-btn { display: inline-block; font-family: var(--font-hanken), system-ui, sans-serif; font-size: 11px; letter-spacing: 0.32em; text-transform: uppercase; color: #1A1814; border: 1px solid #1A1814; padding: 15px 36px; text-decoration: none; transition: background .3s ease, color .3s ease; }
+        .cat-cta-primary:hover { color: #D24E22; }
+        .cat-btn { display: inline-block; font-family: var(--font-public-sans), system-ui, sans-serif; font-size: 15px; font-weight: 600; color: #1A1814; border: 1px solid #1A1814; padding: 15px 36px; text-decoration: none; transition: background .3s ease, color .3s ease; }
         .cat-btn:hover { background: #1A1814; color: #FAFAF8; }
-        .cat-btn--cham { border-color: #B89B5E; color: #B89B5E; }
-        .cat-btn--cham:hover { background: #B89B5E; color: #FAFAF8; }
+        .cat-btn--cham { border-color: #D24E22; color: #D24E22; }
+        .cat-btn--cham:hover { background: #D24E22; color: #FAFAF8; }
         .cat-wa-float { position: fixed; right: 22px; bottom: 22px; z-index: 60; width: 54px; height: 54px; border-radius: 50%; background: #25D366; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(37,211,102,0.35); transition: transform .2s ease; }
         .cat-wa-float:hover { transform: scale(1.08); }
-        .cat-region-select { font-family: var(--font-hanken), system-ui, sans-serif; font-size: 11px; letter-spacing: 0.20em; text-transform: uppercase; color: #6B655B; border: 1px solid rgba(26,24,20,0.15); padding: 12px 40px 12px 20px; background: transparent; width: 100%; cursor: pointer; appearance: none; -webkit-appearance: none; -moz-appearance: none; transition: border-color .25s, color .25s; }
-        .cat-region-select:hover, .cat-region-select:focus { border-color: #B89B5E; color: #B89B5E; outline: none; }
+        .cat-region-select { font-family: var(--font-public-sans), system-ui, sans-serif; font-size: 15px; color: #6B655B; border: 1px solid rgba(26,24,20,0.15); padding: 12px 40px 12px 20px; background: transparent; width: 100%; cursor: pointer; appearance: none; -webkit-appearance: none; -moz-appearance: none; transition: border-color .25s, color .25s; }
+        .cat-region-select:hover, .cat-region-select:focus { border-color: #D24E22; color: #D24E22; outline: none; }
         .cat-region-select option { color: #1A1814; background: #FAFAF8; }
         @keyframes fadein { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:none; } }
         .fade-in { animation: fadein .7s ease both; }
@@ -135,12 +134,12 @@ export default async function EmpreendimentosPage() {
       {/* NAV */}
       <nav className="cat-nav">
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 clamp(18px,4vw,48px)', height: 68, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Link href="/" style={{ fontFamily: t.display, fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.22em', fontSize: 16, textDecoration: 'none', color: t.onDark }}>
+          <Link href="/" style={{ fontFamily: t.display, fontWeight: 600, fontSize: 18, textDecoration: 'none', color: t.onDark }}>
             Stiven Allan
           </Link>
           <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
-            <Link href="/empreendimentos" style={{ fontFamily: t.body, fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: t.onDark, textDecoration: 'none' }}>Empreendimentos</Link>
-            <a href={WPP_MSG} data-wpp="1" target="_blank" rel="noopener noreferrer" style={{ fontFamily: t.body, fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: t.champagne, textDecoration: 'none' }}>WhatsApp</a>
+            <Link href="/empreendimentos" style={{ fontFamily: t.body, fontSize: 15, fontWeight: 500, color: t.onDark, textDecoration: 'none' }}>Empreendimentos</Link>
+            <a href={WPP_MSG} data-wpp="1" target="_blank" rel="noopener noreferrer" style={{ fontFamily: t.body, fontSize: 15, fontWeight: 600, color: '#E28465', textDecoration: 'none' }}>WhatsApp</a>
           </div>
         </div>
       </nav>
@@ -151,11 +150,11 @@ export default async function EmpreendimentosPage() {
           <nav aria-label="breadcrumb" style={{ marginBottom: 24 }}>
             <ol style={{ display: 'flex', gap: 8, listStyle: 'none', padding: 0, margin: 0, fontSize: 12, fontFamily: t.body, color: t.onDarkMuted }}>
               <li><Link href="/" style={{ color: t.onDarkMuted, textDecoration: 'none' }}>Início</Link></li>
-              <li style={{ color: t.champagne }}>›</li>
+              <li style={{ color: '#E28465' }}>›</li>
               <li style={{ color: t.onDark }}>Empreendimentos</li>
             </ol>
           </nav>
-          <p className="cat-eyebrow fade-in" style={{ marginBottom: 16 }}>Portfólio completo</p>
+          <p className="cat-eyebrow fade-in" style={{ marginBottom: 16, color: '#E28465' }}>Portfólio completo</p>
           <h1 className="cat-h2 fade-in fade-in-1" style={{ color: t.onDark, maxWidth: '20ch' }}>Empreendimentos em Criciúma e região</h1>
           <hr className="cat-rule fade-in fade-in-2" style={{ margin: '24px 0' }} />
           <p className="cat-serif fade-in fade-in-2" style={{ color: t.onDarkMuted, fontSize: 'clamp(15px,1.8vw,19px)', maxWidth: 560, lineHeight: 1.65 }}>
@@ -168,7 +167,7 @@ export default async function EmpreendimentosPage() {
       <section style={{ padding: 'clamp(72px,12vh,120px) clamp(18px,4vw,40px)' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 'clamp(48px,8vh,72px)' }}>
-            <p className="cat-eyebrow" style={{ marginBottom: 16, color: '#6B5A3A' }}>Portfólio</p>
+            <p className="cat-eyebrow" style={{ marginBottom: 16, color: '#B5451F' }}>Portfólio</p>
             <h2 className="cat-h2">Todos os empreendimentos</h2>
             <hr className="cat-rule" style={{ margin: '20px auto 0' }} />
           </div>
@@ -197,12 +196,12 @@ export default async function EmpreendimentosPage() {
       {/* CTA FINAL */}
       <section style={{ background: t.dark, color: t.onDark, padding: 'clamp(72px,12vh,120px) clamp(18px,4vw,40px)', textAlign: 'center' }}>
         <div style={{ maxWidth: 620, margin: '0 auto' }}>
-          <p className="cat-eyebrow" style={{ marginBottom: 24 }}>Não sabe qual escolher?</p>
-          <h2 className="cat-serif" style={{ color: t.onDark, fontSize: 'clamp(28px,4.5vw,48px)', fontStyle: 'italic', fontWeight: 300, letterSpacing: '0.01em', lineHeight: 1.15 }}>Stiven é especialista nos empreendimentos Fontana da região.</h2>
-          <p className="cat-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(15px,1.8vw,19px)', margin: '20px 0 36px', lineHeight: 1.6 }}>
+          <p className="cat-eyebrow" style={{ marginBottom: 24, color: '#E28465' }}>Não sabe qual escolher?</p>
+          <h2 className="cat-serif" style={{ color: t.onDark, fontSize: 'clamp(28px,4.5vw,48px)', lineHeight: 1.15 }}>Stiven é especialista nos empreendimentos Fontana da região.</h2>
+          <p style={{ fontFamily: t.body, color: t.onDarkMuted, fontSize: 'clamp(15px,1.8vw,19px)', margin: '20px 0 36px', lineHeight: 1.6 }}>
             Fale com Stiven e receba uma recomendação sob medida para o seu momento. CRECI 60.275.
           </p>
-          <a href={WPP_MSG} data-wpp="1" target="_blank" rel="noopener noreferrer" className="cat-btn" style={{ background: t.champagne, borderColor: t.champagne, color: t.ink }}>Falar com Stiven — WhatsApp</a>
+          <a href={WPP_MSG} data-wpp="1" target="_blank" rel="noopener noreferrer" className="cat-btn" style={{ background: t.accent, borderColor: t.accent, color: '#fff' }}>Falar com Stiven — WhatsApp</a>
         </div>
       </section>
 
@@ -211,22 +210,22 @@ export default async function EmpreendimentosPage() {
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div className="cat-footer-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 'clamp(32px,4vw,64px)', marginBottom: 40, paddingBottom: 40, borderBottom: '1px solid rgba(245,241,234,0.10)' }}>
             <div>
-              <p style={{ fontFamily: t.display, fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.22em', fontSize: 16, color: t.onDark, margin: '0 0 16px' }}>Stiven Allan</p>
+              <p style={{ fontFamily: t.display, fontWeight: 600, fontSize: 16, color: t.onDark, margin: '0 0 16px' }}>Stiven Allan</p>
               <p style={{ fontFamily: t.body, fontSize: 13, color: t.onDarkMuted, lineHeight: 1.7, margin: '0 0 12px', maxWidth: 280 }}>Corretor de imóveis especializado em empreendimentos Fontana e Eraldo com financiamento direto.</p>
-              <p style={{ fontFamily: t.body, fontSize: 11, letterSpacing: '0.16em', color: 'rgba(245,241,234,0.5)', margin: 0 }}>CRECI 60.275</p>
+              <p style={{ fontFamily: t.body, fontSize: 11, color: 'rgba(245,241,234,0.5)', margin: 0 }}>CRECI 60.275</p>
             </div>
             <div>
-              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.25em', textTransform: 'uppercase', color: t.champagne, marginBottom: 20 }}>Menu</div>
+              <div style={{ fontFamily: t.body, fontSize: 13, fontWeight: 700, color: '#E28465', marginBottom: 20 }}>Menu</div>
               {[['/', 'Início'], ['/empreendimentos', 'Empreendimentos'], ['/#como-funciona', 'Financiamento direto'], ['/guia', 'Guias']].map(([href, label]) => (
                 <div key={href} style={{ marginBottom: 10 }}>
-                  <Link href={href} style={{ fontSize: 13, color: 'rgba(245,241,234,0.55)', textDecoration: 'none', letterSpacing: '0.04em' }}>{label}</Link>
+                  <Link href={href} style={{ fontFamily: t.body, fontSize: 13, color: 'rgba(245,241,234,0.55)', textDecoration: 'none' }}>{label}</Link>
                 </div>
               ))}
             </div>
             <div>
-              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.25em', textTransform: 'uppercase', color: t.champagne, marginBottom: 20 }}>Contato</div>
-              <a href={WPP} data-wpp="1" target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: 'rgba(245,241,234,0.55)', textDecoration: 'none', display: 'block', marginBottom: 10 }}>WhatsApp</a>
-              <p style={{ fontSize: 13, color: 'rgba(245,241,234,0.5)', margin: '16px 0 0', lineHeight: 1.6 }}>Sul de Santa Catarina</p>
+              <div style={{ fontFamily: t.body, fontSize: 13, fontWeight: 700, color: '#E28465', marginBottom: 20 }}>Contato</div>
+              <a href={WPP} data-wpp="1" target="_blank" rel="noopener noreferrer" style={{ fontFamily: t.body, fontSize: 13, color: 'rgba(245,241,234,0.55)', textDecoration: 'none', display: 'block', marginBottom: 10 }}>WhatsApp</a>
+              <p style={{ fontFamily: t.body, fontSize: 13, color: 'rgba(245,241,234,0.5)', margin: '16px 0 0', lineHeight: 1.6 }}>Sul de Santa Catarina</p>
             </div>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>

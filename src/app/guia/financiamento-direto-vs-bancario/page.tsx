@@ -83,7 +83,7 @@ export const metadata: Metadata = {
 
                             export default function GuiaFinanciamentoDiretoVsBancarioPage() {
                             return (
-                            <main style={{ background: '#FAFAF8', color: '#1A1A1A', fontFamily: "'Hanken Grotesk', system-ui, sans-serif" }}>
+                            <main style={{ background: '#FAFAF8', color: '#1A1A1A', fontFamily: 'var(--font-public-sans), system-ui, sans-serif' }}>
                             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHEMA) }} />
                             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_SCHEMA) }} />
                             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB_SCHEMA) }} />
@@ -91,16 +91,16 @@ export const metadata: Metadata = {
                             {/* HEADER */}
                             <header style={{ background: '#fff', borderBottom: '1px solid rgba(0,0,0,0.08)', padding: '16px clamp(18px,5vw,64px)' }}>
                             <nav style={{ maxWidth: 1080, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <Link href="/" style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 400, letterSpacing: '0.22em', fontSize: 15, color: '#1A1A1A', textDecoration: 'none', textTransform: 'uppercase' }}>Stiven Allan</Link>
-                            <Link href="/empreendimentos" style={{ fontSize: 12, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#C1682E', textDecoration: 'none' }}>Ver Empreendimentos</Link>
+                            <Link href="/" style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 400, fontSize: 15, color: '#1A1A1A', textDecoration: 'none' }}>Stiven Allan</Link>
+                            <Link href="/empreendimentos" style={{ fontSize: 15, color: '#C1682E', textDecoration: 'none' }}>Ver Empreendimentos</Link>
                             </nav>
                             </header>
 
                             {/* HERO */}
                             <section style={{ background: '#241611', color: '#F2E9DE', padding: 'clamp(64px,12vh,120px) clamp(18px,5vw,64px)' }}>
                             <div style={{ maxWidth: 800, margin: '0 auto' }}>
-                            <p style={{ fontSize: 11, letterSpacing: '0.42em', textTransform: 'uppercase', color: 'rgba(242,233,222,0.55)', marginBottom: 20 }}>Guia - Financiamento</p>
-                            <h1 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.12em', fontSize: 'clamp(28px,5vw,52px)', lineHeight: 1.1, margin: 0 }}>
+                            <p style={{ fontSize: 11, letterSpacing: '0.07em', textTransform: 'uppercase', color: 'rgba(242,233,222,0.55)', marginBottom: 20 }}>Guia - Financiamento</p>
+                            <h1 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(28px,5vw,52px)', lineHeight: 1.1, margin: 0 }}>
                             Financiamento Direto vs. Financiamento Bancário
                             </h1>
                             <p style={{ fontSize: 'clamp(16px,2vw,20px)', color: 'rgba(242,233,222,0.75)', marginTop: 24, lineHeight: 1.6 }}>
@@ -124,7 +124,7 @@ export const metadata: Metadata = {
                               ]}
                             />
 
-                            <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>O que é o financiamento direto com a construtora?</h2>
+                            <h2 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>O que é o financiamento direto com a construtora?</h2>
                             <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
                             No financiamento direto, a negociação ocorre diretamente com a construtora, sem depender de financiamento bancário. A construtora poderá realizar análise cadastral e de capacidade de pagamento conforme suas políticas. No modelo padrão da Construtora Fontana, a entrada corresponde a 20% do valor do imóvel, paga no ato da assinatura do contrato. O saldo é dividido em até 72 parcelas mensais e até 6 reforços anuais, sendo que cada reforço equivale a 5 vezes o valor da parcela mensal. Condições, aprovação, entrada, parcelas, índices e prazos variam por empreendimento e tabela vigente.
                             </p>
@@ -132,7 +132,7 @@ export const metadata: Metadata = {
                             Durante a obra, as parcelas são corrigidas mensalmente pelo CUB/SC (Custo Unitário Básico do Sinduscon-SC). Após a entrega das chaves, o saldo remanescente pode ser financiado diretamente com a construtora, corrigido por IGPM + 0,75% a.m., em prazos de até 180 ou 240 meses, conforme o empreendimento.
                             </p>
 
-                            <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>O que é o financiamento bancário tradicional?</h2>
+                            <h2 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>O que é o financiamento bancário tradicional?</h2>
                             <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
                             No financiamento bancário, o banco analisa a renda e o historico de crédito do comprador antes de aprovar o contrato. O cálculo das parcelas segue sistemas de juros compostos, geralmente pelas tabelas Price ou SAC. O uso do FGTS para composição da entrada ou amortização do saldo devedor pode ser possível no financiamento bancário, sujeito às regras vigentes, à elegibilidade do comprador, do imóvel e à aprovação da instituição financeira.
                             </p>
@@ -140,7 +140,7 @@ export const metadata: Metadata = {
                             Os custos, seguros e tarifas variam conforme a modalidade, a instituição e o contrato. Compare o Custo Efetivo Total (CET) e confirme cada item na minuta contratual antes de decidir.
                             </p>
 
-                            <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Três sistemas de cálculo: SPC-JS, Price e SAC</h2>
+                            <h2 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Três sistemas de cálculo: SPC-JS, Price e SAC</h2>
                             <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
                             As construtoras da região Sul de Santa Catarina utilizam sistemas diferentes para calcular as parcelas dos seus planos de pagamento. Conhecer a diferença ajuda a comparar propostas de forma justa:
                             </p>
@@ -150,7 +150,7 @@ export const metadata: Metadata = {
                             <li><strong>Price/SAC:</strong> a Perego trabalha com os sistemas tradicionais Price e SAC, ambos baseados em juros compostos, comuns também no financiamento bancário.</li>
                             </ul>
 
-                            <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Comparando os presets das construtoras da região</h2>
+                            <h2 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Comparando os presets das construtoras da região</h2>
                             <div style={{ overflowX: 'auto' }}>
                             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
                             <thead>
@@ -181,10 +181,10 @@ export const metadata: Metadata = {
                             Na Corbetta, o modelo split direciona aproximadamente 71,5% do saldo para as parcelas mensais e o restante para os reforços anuais, cada trilha amortizada pelo seu próprio fator de valor presente. Ja na Fontana e na Locks, o reforço anual equivale sempre a 5 vezes o valor da parcela mensal, calculado sobre o saldo total do plano.
                             </p>
 
-                            <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Vantagens e atenções de cada modelo</h2>
+                            <h2 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Vantagens e atenções de cada modelo</h2>
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px,1fr))', gap: 24, marginTop: 16 }}>
                             <div style={{ background: '#FBEEE2', padding: 24, borderRadius: 2 }}>
-                            <h3 style={{ fontSize: 14, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#C1682E', marginTop: 0 }}>Financiamento Direto</h3>
+                            <h3 style={{ fontSize: 14, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#C1682E', marginTop: 0 }}>Financiamento Direto</h3>
                             <ul style={{ fontSize: 14, lineHeight: 2, color: '#333', paddingLeft: 20, margin: 0 }}>
                             <li>Sem financiamento bancário — a construtora faz sua própria análise cadastral e de capacidade de pagamento</li>
                             <li>Custos e encargos variam por contrato — confirme cada item na minuta antes de assinar</li>
@@ -194,7 +194,7 @@ export const metadata: Metadata = {
                             </ul>
                             </div>
                             <div style={{ background: '#F0F0F0', padding: 24, borderRadius: 2 }}>
-                            <h3 style={{ fontSize: 14, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#555', marginTop: 0 }}>Financiamento Bancário</h3>
+                            <h3 style={{ fontSize: 14, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#555', marginTop: 0 }}>Financiamento Bancário</h3>
                             <ul style={{ fontSize: 14, lineHeight: 2, color: '#333', paddingLeft: 20, margin: 0 }}>
                             <li>Uso do FGTS na entrada ou amortização pode ser possível, sujeito às regras vigentes e à aprovação da instituição financeira</li>
                             <li>Taxas contratuais fixas (Price/SAC), sem correção pelo CUB</li>
@@ -205,7 +205,7 @@ export const metadata: Metadata = {
                             </div>
                             </div>
 
-                            <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Qual modelo escolher?</h2>
+                            <h2 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Qual modelo escolher?</h2>
                             <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
                             A escolha depende do perfil do comprador. Quem busca agilidade ou prefere não depender de um banco tende a considerar o financiamento direto durante a obra, como o modelo praticado pela Fontana, Corbetta e Locks — sempre sujeito à análise cadastral da construtora. Quem ja tem FGTS disponível e prefere uma taxa contratual fixa pode considerar o financiamento bancário, seja no momento da compra ou após a entrega das chaves, quando o saldo remanescente do financiamento direto também pode ser substituido por um financiamento bancário convencional.
                             </p>
@@ -217,7 +217,7 @@ export const metadata: Metadata = {
                             </p>
                             
 
-                            <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Perguntas Frequentes</h2>
+                            <h2 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Perguntas Frequentes</h2>
 
                             {FAQ_SCHEMA.mainEntity.map((item, i) => (
                             <details key={i} style={{ borderTop: '1px solid rgba(0,0,0,0.10)', padding: '20px 0' }}>
@@ -236,15 +236,15 @@ export const metadata: Metadata = {
 
                             {/* CTA */}
                             <div style={{ background: '#241611', color: '#F2E9DE', borderRadius: 2, padding: 'clamp(32px,5vw,56px)', marginTop: 64, textAlign: 'center' }}>
-                            <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,28px)', margin: 0 }}>Simule os dois cenários</h2>
+                            <h2 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(20px,3vw,28px)', margin: 0 }}>Simule os dois cenários</h2>
                             <p style={{ color: 'rgba(242,233,222,0.8)', marginTop: 16, marginBottom: 32, fontSize: 15, lineHeight: 1.6 }}>
                             Compare o financiamento direto e o bancário para o empreendimento da sua escolha. Stiven Allan, CRECI 60.275.
                             </p>
                             <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
-                            <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', fontSize: 12, letterSpacing: '0.3em', textTransform: 'uppercase', color: '#F2E9DE', border: '1px solid rgba(242,233,222,0.55)', padding: '14px 28px', textDecoration: 'none' }}>
+                            <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', fontSize: 15, color: '#F2E9DE', border: '1px solid rgba(242,233,222,0.55)', padding: '14px 28px', textDecoration: 'none' }}>
                             Falar no WhatsApp
                             </a>
-                            <Link href="/empreendimentos" style={{ display: 'inline-block', fontSize: 12, letterSpacing: '0.3em', textTransform: 'uppercase', color: '#F2E9DE', border: '1px solid rgba(242,233,222,0.55)', padding: '14px 28px', textDecoration: 'none' }}>
+                            <Link href="/empreendimentos" style={{ display: 'inline-block', fontSize: 15, color: '#F2E9DE', border: '1px solid rgba(242,233,222,0.55)', padding: '14px 28px', textDecoration: 'none' }}>
                             Ver Empreendimentos
                             </Link>
                             </div>

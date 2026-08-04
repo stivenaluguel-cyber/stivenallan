@@ -74,13 +74,13 @@ const PASSOS = [
 
 export default function LpFinanciamentoDireto() {
   return (
-    <main style={{ fontFamily: 'var(--font-hanken), system-ui, sans-serif', background: '#faf7f1', color: '#1a1a1a', minHeight: '100svh' }}>
+    <main style={{ fontFamily: 'var(--font-public-sans), system-ui, sans-serif', background: '#faf7f1', color: '#1a1a1a', minHeight: '100svh' }}>
       {/* HERO */}
       <section style={{ position: 'relative', minHeight: '52svh', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', background: '#111', overflow: 'hidden' }}>
         <Image unoptimized src={HERO_IMG} alt="" aria-hidden="true" fill priority sizes="100vw" style={{ objectFit: 'cover', opacity: 0.8 }} />
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.35) 65%)' }} />
         <div style={{ position: 'relative', padding: '56px 20px 32px', maxWidth: 680, margin: '0 auto', width: '100%' }}>
-          <p style={{ fontSize: 11, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#e2c275', margin: '0 0 12px' }}>
+          <p style={{ fontSize: 11, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#E28465', margin: '0 0 12px' }}>
             Criciúma e Sul de Santa Catarina
           </p>
           <h1 style={{ fontSize: 'clamp(28px,7vw,46px)', lineHeight: 1.08, color: '#fff', margin: 0, fontWeight: 700 }}>
@@ -97,7 +97,7 @@ export default function LpFinanciamentoDireto() {
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 26 }}>
             <a
               href="#form"
-              style={{ display: 'inline-block', background: '#e2c275', color: '#1a1a1a', fontWeight: 700, fontSize: 15, padding: '15px 30px', borderRadius: 10, textDecoration: 'none' }}
+              style={{ display: 'inline-block', background: '#D24E22', color: '#fff', fontWeight: 700, fontSize: 15, padding: '15px 30px', borderRadius: 10, textDecoration: 'none' }}
             >
               Ver as condições para o meu caso
             </a>
@@ -150,7 +150,7 @@ export default function LpFinanciamentoDireto() {
         <div style={{ display: 'grid', gap: 18 }}>
           {PASSOS.map((p) => (
             <div key={p.n} style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
-              <div style={{ fontSize: 26, fontWeight: 300, color: '#c9a24b', lineHeight: 1, flexShrink: 0, minWidth: 38 }}>{p.n}</div>
+              <div style={{ fontSize: 26, fontWeight: 300, color: '#D24E22', lineHeight: 1, flexShrink: 0, minWidth: 38 }}>{p.n}</div>
               <div>
                 <h3 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 5px' }}>{p.titulo}</h3>
                 <p style={{ fontSize: 14.5, color: '#52525b', lineHeight: 1.6, margin: 0 }}>{p.desc}</p>
