@@ -34,6 +34,24 @@ describe('evolution enviarMensagem', () => {
     expect(body.textMessage).toBeUndefined()
   })
 
+  it('varia o delay de digitação (jitter) em vez de um valor fixo — higiene anti-banimento', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, text: async () => '' })
+    vi.stubGlobal('fetch', fetchMock)
+
+    const { enviarMensagem } = await import('./evolution')
+    const delays = new Set<number>()
+    for (let i = 0; i < 20; i++) {
+      await enviarMensagem('5548999999999', 'oi')
+      const body = JSON.parse(fetchMock.mock.calls[i][1].body as string)
+      expect(body.options.delay).toBeGreaterThanOrEqual(900)
+      expect(body.options.delay).toBeLessThanOrEqual(2600)
+      delays.add(body.options.delay)
+    }
+    // Com 20 amostras num intervalo de 1700ms, praticamente impossível dar
+    // sempre o mesmo valor se o jitter estiver de fato ativo.
+    expect(delays.size).toBeGreaterThan(1)
+  })
+
   it('retorna false e não lança quando a Evolution API responde erro', async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: false,
