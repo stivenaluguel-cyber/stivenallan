@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import { HeroImage } from '@/components/HeroImage'
 import Link from 'next/link'
+import ShareButton from '@/components/ShareButton'
 import GalleryWithLightbox, { LightboxPhoto } from './gallery-lightbox'
 import { LeadCaptureButton } from '@/components/LeadCaptureButton'
 import { PropertySchema } from '@/components/PropertySchema'
@@ -277,7 +278,7 @@ return (
 <div style={{ position: 'relative', zIndex: 2, padding: '0 clamp(18px,5vw,56px)', maxWidth: 880 }}>
 <p className="ml-eyebrow ml-onimg" style={{ color: '#fff', marginBottom: 22 }}>Atendimento Exclusivo</p>
 <h2 className="ml-h2 ml-onimg" style={{ color: '#fff', fontSize: 'clamp(30px,5vw,56px)' }}>Bem-vindo ao seu novo horizonte particular.</h2>
-<div style={{ marginTop: 38 }}><a href={WPP} target="_blank" rel="noopener noreferrer" className="ml-cta ml-cta-light">Atendimento Exclusivo</a></div>
+<div style={{ marginTop: 38, display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}><a href={WPP} target="_blank" rel="noopener noreferrer" className="ml-cta ml-cta-light">Atendimento Exclusivo</a><ShareButton nome="Mar di Licata Residencial" className="ml-cta ml-cta-light" /></div>
 </div>
 </section>
 <footer style={{ background: t.oceanDark, color: t.onDarkMuted, padding: 'clamp(56px,9vh,96px) clamp(18px,5vw,56px)' }}>

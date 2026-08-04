@@ -8,6 +8,7 @@ import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
 import { EspelhoPublico } from '@/components/EspelhoPublico'
+import ShareButton from '@/components/ShareButton'
 
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Castellano%20Residencial.'
 const CATALOGO_PDF = 'https://estilofontana.com.br/upload/empreendimento/catalogo/castellano-residencial-1603391644.pdf'
@@ -256,7 +257,10 @@ export default function CastellanoPage() {
         <div style={{ position: 'relative', zIndex: 1, textAlign: 'center', padding: '0 6vw' }}>
           <p className="cs-eyebrow" style={{ color: 'rgba(239,233,246,0.7)', marginBottom: 16 }}>Castellano Residencial</p>
           <h2 className="cs-serif" style={{ fontSize: 'clamp(28px,5vw,60px)', color: t.onDark, margin: '0 0 32px', lineHeight: 1.2 }}>Para viver momentos únicos.</h2>
-          <a href={WPP} target="_blank" rel="noopener noreferrer" className="cs-cta-light">Quero saber mais</a>
+          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <a href={WPP} target="_blank" rel="noopener noreferrer" className="cs-cta-light">Quero saber mais</a>
+            <ShareButton nome="Castellano Residencial" className="cs-cta-light" />
+          </div>
         </div>
       </section>
 

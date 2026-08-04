@@ -9,6 +9,7 @@ import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
 import { EspelhoPublico } from '@/components/EspelhoPublico'
+import ShareButton from '@/components/ShareButton'
 
 const WPP = "https://wa.me/5548991642332?text=Olá!%20Tenho%20interesse%20no%20Pianezze%20Residencial%20em%20Içara."
 const CATALOGO_PDF = "https://estilofontana.com.br/upload/empreendimento/catalogo/pianezze-residencial-1668427993.pdf"
@@ -286,9 +287,12 @@ export default function Page() {
         <div style={{ position:'relative', textAlign:'center', padding:'0 32px' }}>
           <h2 className="pz-h2" style={{ color:'#fff', margin:'0 0 16px' }}>Pianezze Residencial</h2>
           <p style={{ color:'rgba(255,255,255,0.75)', marginBottom:40, fontFamily:t.serif, fontStyle:'italic', fontSize:18 }}>Preço sob consulta · Centro · Içara / SC</p>
-          <a href={WPP} target="_blank" rel="noopener noreferrer" className="pz-cta" style={{ color:'#fff', borderColor:'rgba(255,255,255,0.6)', fontSize:11, textTransform:'uppercase' }}>
-            Falar com Stiven Allan
-          </a>
+          <div style={{ display:'flex', gap:16, flexWrap:'wrap', justifyContent:'center' }}>
+            <a href={WPP} target="_blank" rel="noopener noreferrer" className="pz-cta" style={{ color:'#fff', borderColor:'rgba(255,255,255,0.6)', fontSize:11, textTransform:'uppercase' }}>
+              Falar com Stiven Allan
+            </a>
+            <ShareButton nome="Pianezze Residencial" className="pz-cta" style={{ color:'#fff', borderColor:'rgba(255,255,255,0.6)', fontSize:11, textTransform:'uppercase' }} />
+          </div>
         </div>
       </section>
 

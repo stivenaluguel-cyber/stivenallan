@@ -8,6 +8,7 @@ import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
 import { EspelhoPublico } from '@/components/EspelhoPublico'
+import ShareButton from '@/components/ShareButton'
 
 const WPP = "https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Calalzo%20Di%20Cadore%20Residencial."
 const CATALOGO_PDF = "https://estilofontana.com.br/upload/empreendimento/catalogo/calalzo-di-cadore-residencial-1603739983.pdf"
@@ -264,7 +265,10 @@ export default function CalalzoDiCadorePage() {
         <div style={{ position: 'relative', zIndex: 2, padding: '0 clamp(18px,5vw,56px)', maxWidth: 880 }}>
           <p className="cc-eyebrow cc-onimg" style={{ color: '#fff', marginBottom: 22 }}>Atendimento Exclusivo</p>
           <h2 className="cc-h2 cc-onimg" style={{ color: '#fff', fontSize: 'clamp(30px,5vw,56px)' }}>Para completar sua vida.</h2>
-          <div style={{ marginTop: 38 }}><a href={WPP} target="_blank" rel="noopener noreferrer" className="cc-cta cc-cta-light">Atendimento Exclusivo</a></div>
+          <div style={{ marginTop: 38, display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
+            <a href={WPP} target="_blank" rel="noopener noreferrer" className="cc-cta cc-cta-light">Atendimento Exclusivo</a>
+            <ShareButton nome="Calalzo Di Cadore Residencial" className="cc-cta cc-cta-light" style={{ borderColor: 'rgba(234,242,232,0.3)' }} />
+          </div>
         </div>
       </section>
       <footer style={{ background: t.greenDark, color: t.onDarkMuted, padding: 'clamp(56px,9vh,96px) clamp(18px,5vw,56px)' }}>

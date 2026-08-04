@@ -13,6 +13,7 @@ import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
 import { EspelhoPublico } from '@/components/EspelhoPublico'
+import ShareButton from '@/components/ShareButton'
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Tremezzo%20Residencial%20em%20Crici%C3%BAma.%20Pode%20me%20passar%20mais%20informa%C3%A7%C3%B5es%3F'
 
 export const metadata: Metadata = {
@@ -419,6 +420,7 @@ const CSS = `
           <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
             <a href={WPP} target="_blank" rel="noopener noreferrer" className="tz-btn tz-btn--solid">Falar com Stiven</a>
             <a href={WPP} target="_blank" rel="noopener noreferrer" className="tz-btn" style={{ borderColor: 'rgba(245,238,240,0.30)', color: '#F5EEF0' }}>Financiamento direto com a construtora</a>
+            <ShareButton nome="Tremezzo Residencial" className="tz-btn" style={{ borderColor: 'rgba(245,238,240,0.30)', color: '#F5EEF0' }} />
           </div>
         </div>
       </section>

@@ -9,6 +9,7 @@ import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
 import { EspelhoPublico } from '@/components/EspelhoPublico'
+import ShareButton from '@/components/ShareButton'
 
 const WPP = "https://wa.me/5548991642332?text=Olá!%20Tenho%20interesse%20no%20Villaggio%20Verde%20Residenziale%20em%20Criciúma."
 
@@ -272,9 +273,12 @@ export default function Page() {
         <div style={{ position:'relative', textAlign:'center', padding:'0 32px' }}>
           <h2 className="vv-h2" style={{ color:'#fff', margin:'0 0 16px' }}>Villaggio Verde Residenziale</h2>
           <p style={{ color:'rgba(255,255,255,0.75)', marginBottom:40, fontFamily:t.serif, fontStyle:'italic', fontSize:18 }}>Preço sob consulta · Grande Próspera · Criciúma / SC</p>
-          <a href={WPP} target="_blank" rel="noopener noreferrer" className="vv-cta" style={{ color:'#fff', borderColor:'rgba(255,255,255,0.6)' }}>
-            Falar com Stiven Allan
-          </a>
+          <div style={{ display:'flex', gap:16, justifyContent:'center', flexWrap:'wrap' }}>
+            <a href={WPP} target="_blank" rel="noopener noreferrer" className="vv-cta" style={{ color:'#fff', borderColor:'rgba(255,255,255,0.6)' }}>
+              Falar com Stiven Allan
+            </a>
+            <ShareButton nome="Villaggio Verde Residenziale" className="vv-cta" style={{ color:'rgba(255,255,255,0.75)', borderColor:'rgba(255,255,255,0.35)', background:'transparent', cursor:'pointer' }} />
+          </div>
         </div>
       </section>
 

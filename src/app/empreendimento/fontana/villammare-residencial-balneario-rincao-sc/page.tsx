@@ -9,6 +9,7 @@ import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
 import { EspelhoPublico } from '@/components/EspelhoPublico'
+import ShareButton from '@/components/ShareButton'
 
 const WPP = "https://wa.me/5548991642332?text=Ol%C3%A1!%20Tenho%20interesse%20no%20Villammare%20Residencial%20em%20Balne%C3%A1rio%20Rinc%C3%A3o."
 
@@ -264,9 +265,12 @@ export default function Page() {
         <div style={{ position:'relative', textAlign:'center', padding:'0 32px' }}>
           <h2 className="vm-h2" style={{ color:'#fff', margin:'0 0 16px' }}>Villammare Residencial</h2>
           <p style={{ color:'rgba(255,255,255,0.75)', marginBottom:40, fontFamily:t.serif, fontStyle:'italic', fontSize:18 }}>Preço sob consulta - Balneário Rincão / SC</p>
-          <a href={WPP} target="_blank" rel="noopener noreferrer" className="vm-cta" style={{ color:'#fff', borderColor:'rgba(255,255,255,0.6)' }}>
-            Falar com Stiven Allan
-          </a>
+          <div style={{ display:'flex', gap:16, justifyContent:'center', flexWrap:'wrap' }}>
+            <a href={WPP} target="_blank" rel="noopener noreferrer" className="vm-cta" style={{ color:'#fff', borderColor:'rgba(255,255,255,0.6)' }}>
+              Falar com Stiven Allan
+            </a>
+            <ShareButton nome="Villammare Residencial" className="vm-cta" style={{ color:'rgba(255,255,255,0.75)', borderColor:'rgba(255,255,255,0.35)', background:'transparent', cursor:'pointer' }} />
+          </div>
         </div>
       </section>
 
