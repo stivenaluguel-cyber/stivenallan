@@ -42,6 +42,7 @@ function StatusBadge({ status }: { status?: StatusObra }) {
     'em obras':  { bg: 'rgba(184,155,94,0.12)', color: '#8A7240' },
     'pronto':    { bg: 'rgba(40,120,60,0.10)',  color: '#2a7840' },
     'entregue':  { bg: 'rgba(40,120,60,0.10)',  color: '#2a7840' },
+    'loteamento': { bg: 'rgba(0,0,0,0.06)', color: '#5a5a52' },
   }
   const c = colorMap[status || 'na planta'] || colorMap['na planta']
   return (

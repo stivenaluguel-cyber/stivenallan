@@ -9,6 +9,7 @@ import {
   type Empreendimento,
 } from '@/lib/empreendimentos';
 import { createClient } from '@/lib/supabase/server';
+import { getDadosVivosPorSlug } from '@/lib/vitrine';
 import { PropertyCardImage } from '@/components/PropertyCardImage';
 import { LeadCaptureModal } from '@/components/LeadCaptureModal';
 import FormContato from './FormContato';
@@ -114,7 +115,7 @@ function waLink(emp: Empreendimento): string {
 
 export default async function EmpreendimentoPage({ params }: PageProps) {
   const { construtora, slug } = await params;
-  const emp = getEmpreendimento(construtora, slug);
+  let emp = getEmpreendimento(construtora, slug);
   if (!emp) {
     // Slug sem página estática: tenta renderizar via PropertyPageTemplate lendo properties.
     try {
@@ -159,6 +160,25 @@ export default async function EmpreendimentoPage({ params }: PageProps) {
     }
   } catch {
     // tabela ainda não existe ou erro de conexão — continua com dados locais
+  }
+
+  // Status (cadastro em properties) e preço (menor valor_tabela disponível no
+  // espelho de unidades) AO VIVO por cima do estático — mesma camada de
+  // src/lib/vitrine.ts usada pelas vitrines. Sem isso, a página do imóvel
+  // mostraria "Sob consulta" com o espelho de unidades logo abaixo cheio de
+  // preço real, ou um status de fase de obra desatualizado.
+  try {
+    const vivos = (await getDadosVivosPorSlug()).get(slug);
+    if (vivos) {
+      emp = {
+        ...emp,
+        statusObra: vivos.status || emp.statusObra,
+        exibirPreco: vivos.exibirPreco || emp.exibirPreco,
+        precoAPartirDe: vivos.exibirPreco ? (vivos.preco ?? undefined) : emp.precoAPartirDe,
+      };
+    }
+  } catch {
+    // segue com os dados estáticos
   }
 
   const cidadeSlug = emp.cidade

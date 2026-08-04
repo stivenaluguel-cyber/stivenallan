@@ -4,7 +4,7 @@ import Image from 'next/image'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import WppFloat from '@/components/WppFloat'
-import { imoveis } from '@/data/imoveis'
+import { getVitrineImoveis } from '@/lib/vitrine'
 
 // Cidades com pelo menos 1 combinação cidade+bairro com 2+ empreendimentos reais
 // (ver BAIRROS_POR_CIDADE) — chaves consistentes com /lancamentos/[cidade].
@@ -67,6 +67,7 @@ const STATUS_LABELS: Record<string, string> = {
   'pronto': 'Pronto para Morar',
   'entregue': 'Entregue',
   'sob consulta': 'Sob Consulta',
+  'loteamento': 'Loteamento',
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -75,10 +76,15 @@ const STATUS_COLORS: Record<string, string> = {
   'pronto': 'bg-green-500/20 text-green-400',
   'entregue': 'bg-white/10 text-white',
   'sob consulta': 'bg-white/10 text-white',
+  'loteamento': 'bg-white/10 text-white',
 }
 
-function getEmpreendimentosPorBairro(nomeCidade: string, nomeBairro: string) {
-  return imoveis.filter((im) => im.cidade === nomeCidade && im.bairro === nomeBairro && im.ativo)
+// Status e preço vêm de getVitrineImoveis() — camada viva por cima do array
+// estático (properties.status + menor valor_tabela do espelho de unidades).
+// Filtrar por cidade/bairro continua igual; o que muda é não hardcodar preço.
+async function getEmpreendimentosPorBairro(nomeCidade: string, nomeBairro: string) {
+  const imoveisVitrine = await getVitrineImoveis()
+  return imoveisVitrine.filter((im) => im.cidade === nomeCidade && im.bairro === nomeBairro && im.ativo)
 }
 
 export default async function BairroPage({ params }: Props) {
@@ -103,7 +109,7 @@ export default async function BairroPage({ params }: Props) {
   }
 
   const nomeCidade = cidadeInfo.nome
-  const empreendimentos = getEmpreendimentosPorBairro(nomeCidade, nomeBairro)
+  const empreendimentos = await getEmpreendimentosPorBairro(nomeCidade, nomeBairro)
 
   const schemaBreadcrumb = {
     '@context': 'https://schema.org',
