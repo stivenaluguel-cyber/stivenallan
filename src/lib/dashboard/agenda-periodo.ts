@@ -11,6 +11,8 @@
  * mesmo dia e a semana volta com seis dias.
  */
 
+import { toSaoPauloDateString } from './timezone-sp'
+
 export const VISTAS = [
   { value: 'dia', label: 'Dia' },
   { value: 'semana', label: 'Semana' },
@@ -95,8 +97,16 @@ export function agruparPorDia<T extends { data_hora: string }>(eventos: T[]): { 
 
   for (const ev of eventos) {
     // Fatiar o ISO pegaria a data em UTC e jogaria evento das 21h de SP para
-    // o dia seguinte. A data tem que sair do horário local.
-    const dia = paraTexto(new Date(ev.data_hora))
+    // o dia seguinte.
+    //
+    // Usar `paraTexto(new Date(...))` também não resolve: ele formata no fuso
+    // do RUNTIME, e a Vercel roda em UTC. Funcionava só na máquina do
+    // desenvolvedor (UTC-3) — em produção o evento das 21h continuava caindo
+    // no dia seguinte, e o CI (UTC) acusava.
+    //
+    // toSaoPauloDateString desloca pelo offset fixo de SP, então dá o mesmo
+    // resultado em qualquer runtime.
+    const dia = toSaoPauloDateString(ev.data_hora)
     const lista = mapa.get(dia) ?? []
     lista.push(ev)
     mapa.set(dia, lista)
