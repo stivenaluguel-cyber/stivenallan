@@ -514,7 +514,7 @@ function LeadCard({ lead, onDragStart, onSelect, onMover, onToqueInicio, ignorar
           <a href={'https://wa.me/55' + (lead.whatsapp || '').replace(/\D/g, '')} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}
             style={{ flex: 1, background: '#25d366', color: '#fff', borderRadius: 6, padding: '5px 0', fontSize: 11, textAlign: 'center', textDecoration: 'none', fontWeight: 700, minHeight: 26, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>WhatsApp</a>
         ) : (
-          <span title={'Lead veio do ' + (motivoSemWhatsappReal(lead.whatsapp)?.label ?? 'Instagram') + ' — ainda sem telefone'} style={{ flex: 1, background: D.line, color: D.muted, borderRadius: 6, padding: '5px 0', fontSize: 11, textAlign: 'center', fontWeight: 700, minHeight: 26, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{motivoSemWhatsappReal(lead.whatsapp)?.emoji} {motivoSemWhatsappReal(lead.whatsapp)?.label}</span>
+          <span title={'Lead veio d' + (motivoSemWhatsappReal(lead.whatsapp)?.artigo ?? 'o') + ' ' + (motivoSemWhatsappReal(lead.whatsapp)?.label ?? 'Instagram') + ' — ainda sem telefone'} style={{ flex: 1, background: D.line, color: D.muted, borderRadius: 6, padding: '5px 0', fontSize: 11, textAlign: 'center', fontWeight: 700, minHeight: 26, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{motivoSemWhatsappReal(lead.whatsapp)?.emoji} {motivoSemWhatsappReal(lead.whatsapp)?.label}</span>
         )}
         <button onClick={(e) => { e.stopPropagation(); onSelect(lead) }} style={{ flex: 1, background: D.bg, color: D.ink, border: '1px solid ' + D.line, borderRadius: 6, padding: '5px 0', fontSize: 11, fontWeight: 700, cursor: 'pointer', minHeight: 26 }}>Abrir</button>
       </div>
@@ -914,7 +914,7 @@ function LeadModal({ lead, onClose, onUpdated, onDeleted }: { lead: Lead; onClos
             </>
           ) : (
             <div style={{ display: 'block', marginTop: 18, background: '#F3F2EE', color: '#8a8a85', borderRadius: 10, padding: 12, fontSize: 13, textAlign: 'center' }}>
-              {motivoSemWhatsappReal(lead.whatsapp)?.emoji} Lead veio do {motivoSemWhatsappReal(lead.whatsapp)?.label} — edite acima quando conseguir o telefone
+              {motivoSemWhatsappReal(lead.whatsapp)?.emoji} Lead veio d{motivoSemWhatsappReal(lead.whatsapp)?.artigo} {motivoSemWhatsappReal(lead.whatsapp)?.label} — edite acima quando conseguir o telefone
             </div>
           )}
         </div>
