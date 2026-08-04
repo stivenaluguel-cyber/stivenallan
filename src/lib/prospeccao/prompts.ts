@@ -147,6 +147,27 @@ Devolva SOMENTE um JSON válido, um array com um objeto por candidato, na mesma 
 [{"id":"...","scoreFit":0,"scorePotencial":0,"scoreAcessibilidade":0,"contexto":"..."}]`
 }
 
+// Quantos candidatos vão em CADA chamada de qualificação. Existe porque uma
+// campanha de 20 leads pedidos já pode gerar 60 candidatos brutos (3 queries
+// x 20 resultados cada, ver MAX_CANDIDATOS_PARA_SCORING na rota) — mandar
+// os 60 numa chamada só de IA estourou o limite de tokens da resposta em
+// produção (JSON de 60 objetos cortado no meio, rejeitado inteiro pelo
+// parser). Em lotes de 20, cada resposta cabe folgada no mesmo max_tokens
+// que antes cobria (mal) os 60 juntos.
+export const TAMANHO_LOTE_SCORING = 20
+
+/**
+ * Divide um array em pedaços de até `tamanho` itens, na ordem original.
+ * Último pedaço pode vir menor. tamanho <= 0 devolve o array inteiro como
+ * pedaço único, em vez de entrar em loop infinito.
+ */
+export function chunk<T>(itens: T[], tamanho: number): T[][] {
+  if (tamanho <= 0) return itens.length ? [itens] : []
+  const out: T[][] = []
+  for (let i = 0; i < itens.length; i += tamanho) out.push(itens.slice(i, i + tamanho))
+  return out
+}
+
 /**
  * Interpreta a saída da IA para o scoring em lote.
  *
