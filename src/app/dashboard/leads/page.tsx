@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { ConversaPanel } from '@/components/dashboard/ConversaPanel'
 import { ESTAGIOS_FUNIL as ESTAGIOS } from '@/lib/dashboard/estagios'
-import { temWhatsappReal } from '@/lib/leads/normalize'
+import { motivoSemWhatsappReal, temWhatsappReal } from '@/lib/leads/normalize'
 import { ImportarLeadsCsv } from '@/components/dashboard/ImportarLeadsCsv'
 
 const D = {
@@ -130,7 +130,7 @@ function LeadCard({ lead, onDragStart, onToggleAtencao, onSelect }: { lead: Lead
         {temWhatsappReal(lead.whatsapp) ? (
           <a href={whatsappLink} target='_blank' rel='noopener noreferrer' onClick={(e) => e.stopPropagation()} style={{ fontSize: 12, fontWeight: 600, color: D.green, textDecoration: 'none' }}>WhatsApp →</a>
         ) : (
-          <span style={{ fontSize: 12, fontWeight: 600, color: D.muted }}>📷 Instagram</span>
+          <span style={{ fontSize: 12, fontWeight: 600, color: D.muted }}>{motivoSemWhatsappReal(lead.whatsapp)?.emoji} {motivoSemWhatsappReal(lead.whatsapp)?.label}</span>
         )}
       </div>
     </div>
@@ -310,7 +310,7 @@ style={{ position: 'absolute', top: '14px', right: '14px', width: '30px', height
 <a href={`https://wa.me/55${selectedLead.whatsapp}`} target="_blank" rel="noopener noreferrer" style={{ color: '#25D366', textDecoration: 'none' }}>
 {selectedLead.whatsapp} ↗
 </a>
-) : <span style={{ color: '#8a8a85' }}>Só Instagram — sem telefone ainda</span>}
+) : <span style={{ color: '#8a8a85' }}>Só {motivoSemWhatsappReal(selectedLead.whatsapp)?.label} — sem telefone ainda</span>}
 </td>
 </tr>
 <tr>
@@ -389,7 +389,7 @@ Chamar no WhatsApp
 </a>
 ) : (
 <div style={{ flex: 1, background: '#F3F2EE', color: '#8a8a85', borderRadius: '10px', padding: '12px', fontSize: '13px', textAlign: 'center' }}>
-📷 Veio do Instagram — edite acima quando tiver o telefone
+{motivoSemWhatsappReal(selectedLead.whatsapp)?.emoji} Veio d{motivoSemWhatsappReal(selectedLead.whatsapp)?.artigo} {motivoSemWhatsappReal(selectedLead.whatsapp)?.label} — edite acima quando tiver o telefone
 </div>
 )}
 </div>

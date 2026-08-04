@@ -4,7 +4,7 @@
 // @/data/imoveis diretamente via getVitrineImoveis.
 import { imoveis } from '@/data/imoveis';
 
-export type StatusObra = 'na planta' | 'em obras' | 'pronto' | 'entregue';
+export type StatusObra = 'na planta' | 'em obras' | 'pronto' | 'entregue' | 'loteamento';
 
 export interface Empreendimento {
   slug: string;
@@ -87,5 +87,6 @@ export function statusLabel(s?: StatusObra): string {
   if (s === 'em obras') return 'Em obras';
   if (s === 'pronto') return 'Pronto para morar';
   if (s === 'entregue') return 'Entregue';
+  if (s === 'loteamento') return 'Loteamento';
   return 'Sob consulta';
 }

@@ -5,7 +5,7 @@ import { ArrowUpRight, Building2, CalendarDays, CircleAlert, Lightbulb, MessageC
 import { D, fmt, tempInfo } from './tokens'
 import { LeadAttentionBadges } from './LeadAttentionBadge'
 import { ESTAGIOS_FUNIL } from '@/lib/dashboard/estagios'
-import { temWhatsappReal } from '@/lib/leads/normalize'
+import { motivoSemWhatsappReal, temWhatsappReal } from '@/lib/leads/normalize'
 import { formatSaoPauloDateTime } from '@/lib/dashboard/timezone-sp'
 import type { FocusQueueItem } from '@/lib/dashboard/use-focus-queue'
 
@@ -206,10 +206,14 @@ export function FocusLeadCard({ item, contatoPendenteConfirmacao, processando, t
             </button>
           ) : (
             <span
-              title="Lead veio de DM do Instagram — ainda sem telefone. Responda por lá e edite o lead quando conseguir o número."
+              title={
+                motivoSemWhatsappReal(lead.whatsapp)?.label === 'Prospecção'
+                  ? 'Lead promovido da Prospecção — telefone encontrado não é celular. Confirme um número de verdade e edite o lead.'
+                  : 'Lead veio de DM do Instagram — ainda sem telefone. Responda por lá e edite o lead quando conseguir o número.'
+              }
               style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: D.bg, color: D.muted, border: '1px solid ' + D.line, borderRadius: 8, padding: '9px 14px', fontSize: 12.5, fontWeight: 700, minHeight: 44 }}
             >
-              <MessageCircle size={14} /> Só Instagram (sem telefone)
+              <MessageCircle size={14} /> Só {motivoSemWhatsappReal(lead.whatsapp)?.label} (sem telefone)
             </span>
           )}
           <button

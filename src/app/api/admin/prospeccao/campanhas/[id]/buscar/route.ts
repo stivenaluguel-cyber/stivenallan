@@ -3,18 +3,22 @@ import { createClient } from '@supabase/supabase-js'
 import OpenAI from 'openai'
 import { requireAdmin } from '@/lib/dashboard/admin-auth'
 import { buscarPlacesMultiplas, type PlaceCandidato } from '@/lib/prospeccao/google-places'
-import { classificacaoPorScore, montarPromptScoring, parseScoring, scoreFinal } from '@/lib/prospeccao/prompts'
+import { chunk, classificacaoPorScore, montarPromptScoring, parseScoring, scoreFinal, TAMANHO_LOTE_SCORING } from '@/lib/prospeccao/prompts'
+import { logInfo } from '@/lib/log'
 
 export const dynamic = 'force-dynamic'
 const sb = () => createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+const SOURCE = 'api/admin/prospeccao/buscar'
 
 type Params = { params: Promise<{ id: string }> }
 
 const QUANTIDADE_PADRAO = 20
 const QUANTIDADE_MIN = 5
 const QUANTIDADE_MAX = 50
-// Groq processa a lista inteira numa chamada só — acima disso o prompt fica
-// grande demais pra confiar na resposta vir completa e bem formada.
+// Teto de candidatos brutos admitidos por busca (antes de qualificar). A
+// qualificação em si roda em lotes de TAMANHO_LOTE_SCORING (ver prompts.ts)
+// — esse teto existe pra limitar quantas chamadas de IA em paralelo uma
+// única busca dispara, não pra caber numa resposta só.
 const MAX_CANDIDATOS_PARA_SCORING = 60
 
 export async function POST(req: NextRequest, { params }: Params) {
@@ -58,20 +62,43 @@ export async function POST(req: NextRequest, { params }: Params) {
   const criterios: string[] = Array.isArray(campanha.criterios) ? campanha.criterios : []
 
   const groq = new OpenAI({ apiKey, baseURL: 'https://api.groq.com/openai/v1' })
-  let bruto = ''
-  try {
-    const resposta = await groq.chat.completions.create({
-      model: 'llama-3.3-70b-versatile',
-      messages: [{ role: 'user', content: montarPromptScoring({ produto: campanha.produto, alvo: campanha.alvo, criterios, candidatos: paraScoring }) }],
-      max_tokens: 4000,
-      temperature: 0.3,
-    })
-    bruto = resposta.choices[0]?.message?.content ?? ''
-  } catch {
-    return NextResponse.json({ error: 'Falha ao falar com a IA na hora de qualificar os candidatos. Tente de novo.' }, { status: 502 })
-  }
 
-  const scores = parseScoring(bruto, paraScoring)
+  // Em lotes: 60 candidatos numa chamada só de IA excedia o limite de
+  // tokens da resposta em produção (JSON de 60 objetos cortado no meio,
+  // rejeitado inteiro pelo parser — bug real encontrado testando com uma
+  // busca de imobiliárias em Criciúma que trouxe 60 candidatos únicos).
+  // Cada lote roda numa chamada independente, em paralelo; um lote falhando
+  // não derruba os outros — mesma filosofia de parseScoring, agora um nível
+  // acima.
+  const lotes = chunk(paraScoring, TAMANHO_LOTE_SCORING)
+  const resultadosPorLote = await Promise.all(
+    lotes.map(async (lote) => {
+      try {
+        const resposta = await groq.chat.completions.create({
+          model: 'llama-3.3-70b-versatile',
+          messages: [{ role: 'user', content: montarPromptScoring({ produto: campanha.produto, alvo: campanha.alvo, criterios, candidatos: lote }) }],
+          max_tokens: 4000,
+          temperature: 0.3,
+        })
+        return { scores: parseScoring(resposta.choices[0]?.message?.content ?? '', lote), tokens: resposta.usage?.total_tokens ?? 0 }
+      } catch {
+        return { scores: [], tokens: 0 }
+      }
+    }),
+  )
+  const scores = resultadosPorLote.flatMap((r) => r.scores)
+  // Mesmo log de campanhas/route.ts — teto diário de tokens no plano
+  // gratuito da Groq é o limite real (ver mensagem ao usuário sobre quantos
+  // ciclos/dia cabem). candidatosPorLote ajuda a explicar o custo variar
+  // entre buscas: campanha nova sempre gera até 3 lotes, "Garimpar mais"
+  // pode gerar menos se já tiver poucos candidatos novos.
+  logInfo(SOURCE, 'scoring concluído', {
+    operacao: 'scoring',
+    lotes: lotes.length,
+    candidatosPorLote: lotes.map((l) => l.length),
+    tokens: resultadosPorLote.reduce((soma, r) => soma + r.tokens, 0),
+  })
+
   if (scores.length === 0) {
     return NextResponse.json({ error: 'A IA respondeu fora do formato esperado ao qualificar os candidatos. Tente de novo.' }, { status: 502 })
   }

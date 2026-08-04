@@ -5,7 +5,7 @@ import { imoveis } from '@/data/imoveis'
 import { granPalazzo } from '@/data/eraldo/gran-palazzo'
 import { play } from '@/data/eraldo/play'
 import type { Empreendimento as EmpreendimentoEraldo } from '@/data/eraldo/types'
-import { getVitrineImoveis } from '@/lib/vitrine'
+import { getVitrineImoveis, getDadosVivosPorSlug, type DadosVivos } from '@/lib/vitrine'
 import { slugificar } from '@/lib/imoveis/normalizar'
 
 // Cidades suportadas
@@ -203,6 +203,7 @@ function statusParaFase(status: string): string {
   if (status === 'entregue') return 'Entregue'
   if (status === 'pronto') return 'Pronto para morar'
   if (status === 'sob consulta') return 'Sob consulta'
+  if (status === 'loteamento') return 'Loteamento'
   return status
 }
 
@@ -247,34 +248,46 @@ async function getEmpreendimentosDoBanco(cityKey: string, jaListados: Set<string
   }
 }
 
-function getEmpreendimentosDaCidade(cityKey: string) {
+// `vivos` é o mesmo mapa status/preço AO VIVO de getVitrineImoveis (properties +
+// menor valor_tabela do espelho de unidades), buscado uma vez pelo caller e
+// reaproveitado aqui — inclusive para a Eraldo, que antes desta função nunca
+// mostrava preço (`exibir_preco: false` fixo) porque src/data/eraldo não tem
+// esse campo. Os 9 slugs da Eraldo têm linha em `properties`, então entram no
+// mesmo mapa sem precisar de tratamento especial.
+function getEmpreendimentosDaCidade(cityKey: string, vivos: Map<string, DadosVivos>) {
   const slugs = SLUGS_POR_CIDADE[cityKey]
   const fontana = !slugs
     ? []
     : slugs
         .map((slug) => imoveis.find((im) => im.slug === slug && im.ativo))
         .filter((im): im is NonNullable<typeof im> => Boolean(im))
-        .map((im) => ({
-          nome: im.nome,
-          fase: statusParaFase(im.status),
-          slug: '/empreendimento/' + im.construtora_slug + '/' + im.slug,
-          construtora: im.construtora.replace(/^Construtora\s+/, ''),
-          dorms: DORMS_POR_SLUG[im.slug] || '',
-          exibir_preco: im.exibir_preco,
-          preco_a_partir_de: im.preco,
-        }))
+        .map((im) => {
+          const v = vivos.get(im.slug)
+          return {
+            nome: im.nome,
+            fase: statusParaFase(v?.status || im.status),
+            slug: '/empreendimento/' + im.construtora_slug + '/' + im.slug,
+            construtora: im.construtora.replace(/^Construtora\s+/, ''),
+            dorms: DORMS_POR_SLUG[im.slug] || '',
+            exibir_preco: v?.exibirPreco || im.exibir_preco,
+            preco_a_partir_de: v?.exibirPreco ? v.preco : im.preco,
+          }
+        })
 
-  const eraldo = (ERALDO_POR_CIDADE[cityKey] || []).map((emp) => ({
-    nome: emp.nome,
-    fase: statusEraldoParaFase(emp.status),
-    slug: '/empreendimento/' + emp.construtoraSlug + '/' + emp.slug,
-    construtora: 'Eraldo Construções',
-    // Sem campo de dormitórios único em src/data/eraldo (fica em tipologias[],
-    // por planta) — omitido aqui em vez de inventar um resumo.
-    dorms: '',
-    exibir_preco: false,
-    preco_a_partir_de: null as number | null,
-  }))
+  const eraldo = (ERALDO_POR_CIDADE[cityKey] || []).map((emp) => {
+    const v = vivos.get(emp.slug)
+    return {
+      nome: emp.nome,
+      fase: v?.status ? statusParaFase(v.status) : statusEraldoParaFase(emp.status),
+      slug: '/empreendimento/' + emp.construtoraSlug + '/' + emp.slug,
+      construtora: 'Eraldo Construções',
+      // Sem campo de dormitórios único em src/data/eraldo (fica em tipologias[],
+      // por planta) — omitido aqui em vez de inventar um resumo.
+      dorms: '',
+      exibir_preco: v?.exibirPreco ?? false,
+      preco_a_partir_de: v?.exibirPreco ? v.preco : null,
+    }
+  })
 
   return [...fontana, ...eraldo]
 }
@@ -357,7 +370,8 @@ export default async function LancamentosCidadePage({ params }: Props) {
 
   // Tira o sufixo de UF (-sc, -rs, ...) pra casar com as chaves de CIDADES.
   const cityKey = cidade.replace(/-[a-z]{2}$/, '')
-  const estaticos = getEmpreendimentosDaCidade(cityKey)
+  const vivos = await getDadosVivosPorSlug()
+  const estaticos = getEmpreendimentosDaCidade(cityKey, vivos)
   const doBanco = await getEmpreendimentosDoBanco(cityKey, new Set(estaticos.map((e) => e.slug.split('/').pop() ?? '')))
   const empreendimentos = [...estaticos, ...doBanco]
   const breadcrumbSchema = {

@@ -8,7 +8,19 @@
 //
 // Função pura, `agora` injetado, para o teste não depender do relógio.
 
-export type EstadoSla = 'atendido' | 'ok' | 'atencao' | 'estourado'
+export type EstadoSla = 'atendido' | 'ok' | 'atencao' | 'estourado' | 'fora_da_janela'
+
+/**
+ * Depois disso o selo some.
+ *
+ * Um lead de três semanas sem marca de atendimento não é uma emergência de
+ * SLA — é dado velho. Sem este teto, a primeira versão mostrava
+ * "SLA vencido há 500h" em vermelho, para sempre, em todo card antigo: um
+ * alarme permanente que ninguém pode resolver e que treina o corretor a
+ * ignorar a cor vermelha. Lead parado há dias é assunto do relatório
+ * "leads parados", não do cronômetro de primeira resposta.
+ */
+export const JANELA_MAXIMA_HORAS = 24
 
 export type LeadParaSla = {
   created_at?: string | null
@@ -68,6 +80,13 @@ export function statusSla(
 
   const restanteMin = (nascimento + limite * 60_000 - agora.getTime()) / 60_000
 
+  // Fora da janela: o cronômetro perdeu a serventia. Não é "atendido" (ninguém
+  // atendeu), é "isso não é mais um caso de SLA".
+  const idadeHoras = (agora.getTime() - nascimento) / 3_600_000
+  if (idadeHoras > JANELA_MAXIMA_HORAS) {
+    return { estado: 'fora_da_janela', restanteMin, texto: '', urgente: false }
+  }
+
   if (restanteMin < 0) {
     return {
       estado: 'estourado',
@@ -86,6 +105,7 @@ export function statusSla(
 /** Cor do selo por estado — os quatro casos, para a tela não decidir sozinha. */
 export const CORES_SLA: Record<EstadoSla, { fundo: string; texto: string }> = {
   atendido: { fundo: 'rgba(34,197,94,0.12)', texto: '#15803d' },
+  fora_da_janela: { fundo: 'transparent', texto: 'transparent' },
   ok: { fundo: 'rgba(59,130,246,0.12)', texto: '#1d4ed8' },
   atencao: { fundo: 'rgba(245,158,11,0.16)', texto: '#b45309' },
   estourado: { fundo: 'rgba(239,68,68,0.14)', texto: '#b91c1c' },

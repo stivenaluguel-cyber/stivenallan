@@ -93,18 +93,36 @@ console.log(`CUB ${c.cub_valor ?? '—'} · percentuais ${c.percentuais ? c.perc
 if (r.quantidades && r.unidades[0]) {
   console.log(`colunas: ${r.unidades[0].colunas.map((x) => `${x.papel} ${x.quantidade}x (${(x.percentual * 100).toFixed(0)}%)`).join(' · ')}`)
 }
-console.log(`saldo financiado: ${c.tem_financiamento ? `sim, até ${c.pos_chaves_meses ?? r.unidades[0]?.colunas.at(-1)?.quantidade ?? '—'}x` : 'não'} · juros ${c.juros_ao_mes ?? '—'}% a.m. ${c.indice ?? ''} · entrega ${c.previsao_entrega ?? '—'}`)
+console.log(`saldo financiado: ${c.tem_financiamento ? `sim, até ${c.pos_chaves_meses ?? r.unidades[0]?.colunas.at(-1)?.quantidade ?? '—'}x` : 'não'} · juros ${c.juros_ao_mes ?? '—'}% a.m. ${c.indice ?? ''} · entrega ${c.previsao_entrega ?? '—'}${c.pe_direito ? ` · pé-direito ${c.pe_direito}` : ''}`)
+
+console.log(`\npolítica comercial do rodapé: ${c.opcoes_pagamento.length} condição(ões)`)
+for (const o of c.opcoes_pagamento) {
+  const n = [
+    o.descontoPct != null ? `${o.descontoPct}% desc.` : null,
+    o.ateAsChavesPct != null ? `${o.ateAsChavesPct}% até as chaves` : null,
+    o.atoMinimoPct != null ? `entrada ${o.atoMinimoPct}%` : null,
+    o.meses ? `${o.meses}x` : null,
+    o.jurosAoMes ? `${String(o.jurosAoMes).replace('.', ',')}% a.m.` : null,
+    o.indice ?? null,
+  ].filter(Boolean).join(' · ')
+  console.log(`  [${o.tipo}] ${n || '—'}\n      ${o.descricao.slice(0, 190)}`)
+}
 
 const cel = (u: (typeof r.unidades)[number], papel: Parameters<typeof coluna>[1]) => {
   const x = coluna(u, papel)
   return x ? (x.quantidade > 1 ? `${x.quantidade}x ${brl(x.valor)}` : brl(x.valor)) : '—'
 }
 
-console.log('\n| Un. | Vagas | Depósito | m² priv. | m² global | CUB | Preço | Entrada | Reforços | Mensais | Chaves | Saldo |')
-console.log('|---|---|---|---|---|---|---|---|---|---|---|---|')
+if (c.tem_preco_campanha) {
+  console.log('\n*** TABELA COM PREÇO DE CAMPANHA — "Preço" abaixo já é o promocional; "Tabela" é o preço cheio. ***')
+}
+const colPreco = c.tem_preco_campanha ? '| Tabela | Preço (campanha) ' : '| Preço '
+console.log(`\n| Un. | Vagas | Depósito | m² priv. | m² global | CUB ${colPreco}| Entrada | Reforços | Mensais | Chaves | Saldo |`)
+console.log(`|---|---|---|---|---|---${c.tem_preco_campanha ? '|---|---' : '|---'}|---|---|---|---|---|`)
 for (const u of r.unidades) {
+  const precoCol = c.tem_preco_campanha ? `${brl(u.preco_tabela ?? u.preco)} | ${brl(u.preco)} ` : `${brl(u.preco)} `
   console.log(
-    `| ${u.unidade} | ${u.vagas ?? '—'} | ${u.deposito ?? '—'} | ${brl(u.metragem)} | ${brl(u.metragem_global)} | ${brl(u.cub_quantidade)} | ${brl(u.preco)} | ` +
+    `| ${u.unidade} | ${u.vagas ?? '—'} | ${u.deposito ?? '—'} | ${brl(u.metragem)} | ${brl(u.metragem_global)} | ${brl(u.cub_quantidade)} | ${precoCol}| ` +
     `${cel(u, 'entrada')} | ${cel(u, 'reforcos')} | ${cel(u, 'mensais')} | ${cel(u, 'chaves')} | ${cel(u, 'saldo')} |`,
   )
 }
@@ -199,7 +217,13 @@ const linhas = unidades.map((u) => {
     dormitorios: u.dormitorios ?? mapaQuartos?.get(u.metragem.toFixed(2))?.dorm ?? null,
     suites: mapaQuartos?.get(u.metragem.toFixed(2))?.suites ?? null,
     metragem: u.metragem,
-    valor_tabela: u.preco,
+    // Em mês de campanha `u.preco` já é o preço promocional (é sobre ele que
+    // entrada/reforço/mensal foram calculados). `valor_tabela` continua
+    // sendo o preço CHEIO — `precoDaUnidade()` só trata como promoção quando
+    // `valor_promocional < valor_tabela`, e é esse contraste que a página
+    // usa pra mostrar "de/por".
+    valor_tabela: u.preco_tabela ?? u.preco,
+    valor_promocional: u.preco_tabela ? u.preco : null,
     valor_entrada_min: entrada.valor,
     // numeric(6,4) não comporta 314 CUBs; a quantidade vive no plano.
     cub_fator: null,
@@ -218,7 +242,8 @@ const linhas = unidades.map((u) => {
       financiamento_direto: saldo && mesesDoSaldo > 1
         ? { meses: mesesDoSaldo, jurosAoMes: c.juros_ao_mes ?? 0, indice: c.indice }
         : null,
-      opcoes_pagamento: [],
+      opcoes_pagamento: c.opcoes_pagamento,
+      pe_direito: c.pe_direito,
       percentual_ate_chaves: pctAteChaves,
       previsao_entrega: c.previsao_entrega,
       cub_quantidade: u.cub_quantidade,

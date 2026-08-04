@@ -92,9 +92,14 @@ export async function recalcularScoreLead(
 }
 
 /**
- * Recálculo da base ativa. Chamado pelo cron diário: sem isso o componente de
- * timing nunca decai — um lead contatado em março continuaria "quente" para
- * sempre, porque nada mais aconteceria com ele para disparar um recálculo.
+ * Recálculo da base ativa.
+ *
+ * Chamado por /api/cron/followup (diário, 9h) e pelo POST manual em
+ * /api/admin/leads/score com { todos: true }.
+ *
+ * Sem essa passagem periódica o componente de timing nunca decai: um lead
+ * contatado em março continuaria "quente" para sempre, porque nada mais
+ * aconteceria com ele para disparar um recálculo.
  */
 export async function recalcularBaseAtiva(
   client: SupabaseClient,

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { classificacaoPorScore, montarPromptIcp, montarPromptScoring, parseIcp, parseScoring, scoreFinal } from './prompts'
+import { chunk, classificacaoPorScore, montarPromptIcp, montarPromptScoring, parseIcp, parseScoring, scoreFinal } from './prompts'
 import type { PlaceCandidato } from './google-places'
 
 const candidato = (over: Partial<PlaceCandidato> = {}): PlaceCandidato => ({
@@ -100,6 +100,32 @@ describe('parseIcp', () => {
     const icp = parseIcp(bruto)
     expect(icp?.criterios).toEqual(['ok'])
     expect(icp?.queries).toEqual(['ok'])
+  })
+})
+
+describe('chunk', () => {
+  it('divide em pedaços do tamanho pedido, preservando a ordem', () => {
+    expect(chunk([1, 2, 3, 4, 5], 2)).toEqual([[1, 2], [3, 4], [5]])
+  })
+
+  it('array menor que o tamanho do lote vira um pedaço só', () => {
+    expect(chunk([1, 2], 20)).toEqual([[1, 2]])
+  })
+
+  it('array vazio devolve lista de pedaços vazia', () => {
+    expect(chunk([], 20)).toEqual([])
+  })
+
+  it('60 candidatos em lotes de 20 viram exatamente 3 pedaços — o caso real que estourava o limite de tokens', () => {
+    const candidatos = Array.from({ length: 60 }, (_, i) => i)
+    const pedacos = chunk(candidatos, 20)
+    expect(pedacos).toHaveLength(3)
+    expect(pedacos.every((p) => p.length === 20)).toBe(true)
+  })
+
+  it('tamanho <= 0 devolve o array inteiro como pedaço único, sem loop infinito', () => {
+    expect(chunk([1, 2, 3], 0)).toEqual([[1, 2, 3]])
+    expect(chunk([1, 2, 3], -5)).toEqual([[1, 2, 3]])
   })
 })
 

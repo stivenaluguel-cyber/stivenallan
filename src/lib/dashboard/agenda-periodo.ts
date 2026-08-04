@@ -96,10 +96,16 @@ export function agruparPorDia<T extends { data_hora: string }>(eventos: T[]): { 
   const mapa = new Map<string, T[]>()
 
   for (const ev of eventos) {
-    // Os getters locais (getFullYear/getMonth/getDate) leem no fuso do
-    // PROCESSO, não de São Paulo — corretos só numa máquina configurada pra
-    // SP; na Vercel e no CI (UTC) jogam evento das 21h de SP pro dia
-    // seguinte. Precisa do conversor explícito de fuso.
+    // Fatiar o ISO pegaria a data em UTC e jogaria evento das 21h de SP para
+    // o dia seguinte.
+    //
+    // Usar `paraTexto(new Date(...))` também não resolve: ele formata no fuso
+    // do RUNTIME, e a Vercel roda em UTC. Funcionava só na máquina do
+    // desenvolvedor (UTC-3) — em produção o evento das 21h continuava caindo
+    // no dia seguinte, e o CI (UTC) acusava.
+    //
+    // toSaoPauloDateString desloca pelo offset fixo de SP, então dá o mesmo
+    // resultado em qualquer runtime.
     const dia = toSaoPauloDateString(ev.data_hora)
     const lista = mapa.get(dia) ?? []
     lista.push(ev)
