@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { FOCUS_PRIMARY_ACTIONS, FOCUS_SKIP_ACTIONS, pointsForAction, targetStatusForAction, type FocusActionType } from './focus-scoring'
+import { marcarPrimeiroAtendimento } from '@/lib/leads/marcar-atendimento'
 
 type RecordFocusEventInput = {
   sessionId: string
@@ -71,6 +72,11 @@ export async function recordFocusEvent(
 
   if (error) throw new Error(error.message)
   if (data?.error) return { alreadyProcessed: false, points: 0, error: data.error }
+
+  // Ação comercial no Modo Foco também é atendimento. Só as PRIMÁRIAS contam:
+  // pular ou adiar um lead não é atender ninguém, e carimbar nesses casos
+  // faria o cronômetro de SLA parar sem que houvesse contato de verdade.
+  if (isPrimary) await marcarPrimeiroAtendimento(client, input.leadId)
 
   // Contadores autoritativos numa leitura só, depois da gravação.
   const { data: sessao } = await client
