@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { enderecoResumido } from '@/lib/prospeccao/formatacao'
-import { pareceCelularBR } from '@/lib/leads/normalize'
+import { linkWhatsappProspeccao } from '@/lib/prospeccao/whatsapp'
 
 const D = {
   bg: '#F3F2EE', surface: '#FAFAF7', ink: '#161512', bronze: '#D24E22',
@@ -13,11 +13,15 @@ const CLASSIFICACAO_COR: Record<string, string> = {
   EXCELENTE: D.green, 'MUITO FORTE': D.green, FORTE: D.blue, BOM: '#f59e0b', FRACO: D.muted,
 }
 
+const STATUS_LABEL: Record<string, string> = {
+  novo: 'Novo', contatado: 'Contatado', ignorado: 'Ignorado', promovido: 'Promovido',
+}
+
 // Colunas do Kanban — mesmo padrão de arrastar-e-soltar de /dashboard/leads,
 // pra Prospecção não parecer um módulo à parte do resto do dashboard.
-// 'promovido' não é um valor aceito por PATCH /leads/[id] (ver STATUS_VALIDOS
-// na rota) — soltar um card ali dispara o POST /promover de verdade, não um
-// PATCH de status.
+// 'promovido' não aceita ARRASTE (ver onDropNaColuna) — só o botão
+// "Promover" cria o lead de verdade, e sempre com confirmação: soltar um
+// card ali sem querer não pode virar cliente no CRM sozinho.
 const COLUNAS = [
   { key: 'novo', label: 'Novo', cor: D.muted },
   { key: 'contatado', label: 'Contatado', cor: D.blue },
@@ -26,28 +30,28 @@ const COLUNAS = [
 ] as const
 
 type Campanha = {
-  id: string; nome: string; alvo: string | null; localizacao: string | null
+  id: string; nome: string; alvo: string | null; localizacao: string | null; produto: string
   leads_solicitados: number; leads_entregues: number
 }
 
 type ProspeccaoLead = {
   id: string; place_id: string; nome: string; endereco: string | null
   telefone: string | null; site: string | null; rating: number | null; rating_count: number | null
-  score: number | null; classificacao: string | null; contexto_ia: string | null
+  tipos: string[]
+  score: number | null; score_fit: number | null; score_potencial: number | null; score_acessibilidade: number | null
+  classificacao: string | null; contexto_ia: string | null
   status: string; lead_id: string | null
 }
 
 const QUANTIDADES = [10, 20, 30, 50]
 
-function linkWhatsapp(telefone: string | null): string | null {
-  const digitos = telefone?.replace(/\D/g, '') ?? ''
-  if (!pareceCelularBR(digitos)) return null
-  return 'https://wa.me/55' + digitos
-}
-
 function linkBuscaCnpj(nome: string, endereco: string | null): string {
   const termo = nome + ' CNPJ' + (endereco ? ' ' + endereco : '')
   return 'https://www.google.com/search?q=' + encodeURIComponent(termo)
+}
+
+function confirmarPromover(nome: string): boolean {
+  return window.confirm('Promover "' + nome + '" para o CRM de clientes? Isso cria um lead de verdade — não dá pra desfazer clicando de novo.')
 }
 
 export default function ProspeccaoDetalhePage() {
@@ -64,6 +68,7 @@ export default function ProspeccaoDetalhePage() {
   const [quantidadeExtra, setQuantidadeExtra] = useState(20)
   const [dragId, setDragId] = useState<string | null>(null)
   const [promovendoId, setPromovendoId] = useState<string | null>(null)
+  const [leadAberto, setLeadAberto] = useState<ProspeccaoLead | null>(null)
 
   const carregar = useCallback(async () => {
     setLoading(true); setErro('')
@@ -120,13 +125,15 @@ export default function ProspeccaoDetalhePage() {
     }
   }
 
-  async function promover(leadProspeccaoId: string) {
-    setPromovendoId(leadProspeccaoId); setErro('')
+  async function promover(lead: ProspeccaoLead) {
+    if (!confirmarPromover(lead.nome)) return
+    setPromovendoId(lead.id); setErro('')
     try {
-      const res = await fetch('/api/admin/prospeccao/leads/' + leadProspeccaoId + '/promover', { method: 'POST' })
+      const res = await fetch('/api/admin/prospeccao/leads/' + lead.id + '/promover', { method: 'POST' })
       const data = await res.json()
       if (!res.ok) { setErro(data.error || 'Falha ao promover.'); return }
-      setLeads((prev) => prev.map((l) => (l.id === leadProspeccaoId ? { ...l, lead_id: data.lead_id, status: 'promovido' } : l)))
+      setLeads((prev) => prev.map((l) => (l.id === lead.id ? { ...l, lead_id: data.lead_id, status: 'promovido' } : l)))
+      setLeadAberto((prev) => (prev?.id === lead.id ? { ...prev, lead_id: data.lead_id, status: 'promovido' } : prev))
     } catch {
       setErro('Falha ao conectar.')
     } finally {
@@ -139,8 +146,14 @@ export default function ProspeccaoDetalhePage() {
     const lead = leads.find((l) => l.id === dragId)
     setDragId(null)
     if (!lead || lead.status === colunaKey) return
-    if (colunaKey === 'promovido') promover(lead.id)
-    else mudarStatus(lead.id, colunaKey)
+    // Arraste nunca promove sozinho — cai de volta na coluna atual até o
+    // corretor confirmar pelo botão "Promover" (no card ou na ficha).
+    if (colunaKey === 'promovido') return
+    mudarStatus(lead.id, colunaKey)
+  }
+
+  function abrirNoCrm(leadId: string) {
+    router.push('/dashboard/crm?lead=' + leadId)
   }
 
   if (loading) return <div style={{ padding: 40, textAlign: 'center', color: D.muted }}>Carregando...</div>
@@ -174,7 +187,7 @@ export default function ProspeccaoDetalhePage() {
       {erro && <p role="alert" style={{ color: '#dc2626', fontSize: 13, marginBottom: 16 }}>{erro}</p>}
 
       <p style={{ fontSize: 12.5, color: D.muted, marginBottom: 12 }}>
-        {leads.length} lead{leads.length === 1 ? '' : 's'} nesta campanha · {campanha.leads_solicitados} solicitados no total
+        {leads.length} lead{leads.length === 1 ? '' : 's'} nesta campanha · {campanha.leads_solicitados} solicitados no total · clique num card pra ver a ficha completa
       </p>
 
       {leads.length === 0 ? (
@@ -198,16 +211,20 @@ export default function ProspeccaoDetalhePage() {
                   <span style={{ marginLeft: 'auto', fontSize: 12, color: D.muted, background: D.bg, borderRadius: 999, padding: '1px 8px' }}>{doColuna.length}</span>
                 </div>
                 {doColuna.length === 0 ? (
-                  <p style={{ fontSize: 12, color: D.muted, textAlign: 'center', padding: '18px 0' }}>Arraste leads para cá</p>
+                  <p style={{ fontSize: 12, color: D.muted, textAlign: 'center', padding: '18px 0' }}>
+                    {coluna.key === 'promovido' ? 'Use o botão Promover no card' : 'Arraste leads para cá'}
+                  </p>
                 ) : (
                   doColuna.map((lead) => (
                     <LeadCard
                       key={lead.id}
                       lead={lead}
+                      produto={campanha.produto}
                       promovendo={promovendoId === lead.id}
                       onDragStart={setDragId}
-                      onPromover={() => promover(lead.id)}
-                      onAbrirNoCrm={() => lead.lead_id && router.push('/dashboard/crm?lead=' + lead.lead_id)}
+                      onAbrir={() => setLeadAberto(lead)}
+                      onPromover={() => promover(lead)}
+                      onAbrirNoCrm={() => lead.lead_id && abrirNoCrm(lead.lead_id)}
                     />
                   ))
                 )}
@@ -216,28 +233,46 @@ export default function ProspeccaoDetalhePage() {
           })}
         </div>
       )}
+
+      {leadAberto && (
+        <LeadDetalheModal
+          lead={leadAberto}
+          produto={campanha.produto}
+          promovendo={promovendoId === leadAberto.id}
+          onClose={() => setLeadAberto(null)}
+          onPromover={() => promover(leadAberto)}
+          onAbrirNoCrm={() => leadAberto.lead_id && abrirNoCrm(leadAberto.lead_id)}
+        />
+      )}
     </div>
   )
 }
 
 function LeadCard({
-  lead, promovendo, onDragStart, onPromover, onAbrirNoCrm,
+  lead, produto, promovendo, onDragStart, onAbrir, onPromover, onAbrirNoCrm,
 }: {
   lead: ProspeccaoLead
+  produto: string
   promovendo: boolean
   onDragStart: (id: string) => void
+  onAbrir: () => void
   onPromover: () => void
   onAbrirNoCrm: () => void
 }) {
   const cor = CLASSIFICACAO_COR[lead.classificacao ?? ''] ?? D.muted
-  const wa = linkWhatsapp(lead.telefone)
+  const wa = linkWhatsappProspeccao(lead.telefone, lead.nome, produto)
   const arrastavel = lead.status !== 'promovido'
+  const parar = (e: React.MouseEvent) => e.stopPropagation()
 
   return (
     <div
       draggable={arrastavel}
       onDragStart={(e) => { if (!arrastavel) { e.preventDefault(); return } e.stopPropagation(); onDragStart(lead.id) }}
-      style={{ background: '#fff', border: '1px solid ' + D.line, borderRadius: 10, padding: '10px 12px', marginBottom: 8, cursor: arrastavel ? 'grab' : 'default' }}
+      onClick={onAbrir}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => { if (e.key === 'Enter') onAbrir() }}
+      style={{ background: '#fff', border: '1px solid ' + D.line, borderRadius: 10, padding: '10px 12px', marginBottom: 8, cursor: arrastavel ? 'grab' : 'pointer' }}
     >
       <div style={{ display: 'flex', gap: 8, alignItems: 'baseline', marginBottom: 4 }}>
         <span style={{ fontSize: 15, fontWeight: 800, color: cor }}>{lead.score ?? '—'}</span>
@@ -250,36 +285,168 @@ function LeadCard({
 
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
         {wa && (
-          <a href={wa} target="_blank" rel="noopener noreferrer" style={{ background: '#25D366', color: '#fff', borderRadius: 6, padding: '5px 8px', fontSize: 11, fontWeight: 700, textDecoration: 'none' }}>
+          <a href={wa} target="_blank" rel="noopener noreferrer" onClick={parar} style={{ background: '#25D366', color: '#fff', borderRadius: 6, padding: '5px 8px', fontSize: 11, fontWeight: 700, textDecoration: 'none' }}>
             WhatsApp
           </a>
         )}
         {lead.telefone && (
-          <a href={'tel:' + lead.telefone.replace(/\D/g, '')} style={{ background: 'none', border: '1px solid ' + D.line, color: D.ink, borderRadius: 6, padding: '5px 8px', fontSize: 11, fontWeight: 700, textDecoration: 'none' }}>
+          <a href={'tel:' + lead.telefone.replace(/\D/g, '')} onClick={parar} style={{ background: 'none', border: '1px solid ' + D.line, color: D.ink, borderRadius: 6, padding: '5px 8px', fontSize: 11, fontWeight: 700, textDecoration: 'none' }}>
             Ligar
           </a>
         )}
         {lead.site && (
-          <a href={lead.site} target="_blank" rel="noopener noreferrer" style={{ background: 'none', border: '1px solid ' + D.line, color: D.ink, borderRadius: 6, padding: '5px 8px', fontSize: 11, fontWeight: 700, textDecoration: 'none' }}>
+          <a href={lead.site} target="_blank" rel="noopener noreferrer" onClick={parar} style={{ background: 'none', border: '1px solid ' + D.line, color: D.ink, borderRadius: 6, padding: '5px 8px', fontSize: 11, fontWeight: 700, textDecoration: 'none' }}>
             Site
           </a>
         )}
-        <a href={linkBuscaCnpj(lead.nome, lead.endereco)} target="_blank" rel="noopener noreferrer" style={{ background: 'none', border: '1px solid ' + D.line, color: D.ink, borderRadius: 6, padding: '5px 8px', fontSize: 11, fontWeight: 700, textDecoration: 'none' }}>
+        <a href={linkBuscaCnpj(lead.nome, lead.endereco)} target="_blank" rel="noopener noreferrer" onClick={parar} style={{ background: 'none', border: '1px solid ' + D.line, color: D.ink, borderRadius: 6, padding: '5px 8px', fontSize: 11, fontWeight: 700, textDecoration: 'none' }}>
           Buscar CNPJ
         </a>
         {lead.lead_id ? (
-          <button onClick={onAbrirNoCrm} style={{ background: D.ink, color: '#fff', border: 'none', borderRadius: 6, padding: '5px 8px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
+          <button onClick={(e) => { parar(e); onAbrirNoCrm() }} style={{ background: D.ink, color: '#fff', border: 'none', borderRadius: 6, padding: '5px 8px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
             Ver no CRM
           </button>
         ) : (
           <button
-            onClick={onPromover}
+            onClick={(e) => { parar(e); onPromover() }}
             disabled={promovendo}
             style={{ background: D.bronze, color: '#fff', border: 'none', borderRadius: 6, padding: '5px 8px', fontSize: 11, fontWeight: 700, cursor: promovendo ? 'default' : 'pointer', opacity: promovendo ? 0.6 : 1 }}
           >
             {promovendo ? 'Promovendo...' : 'Promover'}
           </button>
         )}
+      </div>
+    </div>
+  )
+}
+
+function BarraScore({ label, valor }: { label: string; valor: number | null }) {
+  const v = valor ?? 0
+  const cor = v >= 80 ? D.green : v >= 55 ? '#f59e0b' : D.red
+  return (
+    <div style={{ marginBottom: 10 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11.5, color: D.muted, marginBottom: 3 }}>
+        <span>{label}</span>
+        <span style={{ fontWeight: 700, color: cor }}>{valor ?? '—'}</span>
+      </div>
+      <div style={{ height: 6, borderRadius: 999, background: D.line, overflow: 'hidden' }}>
+        <div style={{ height: '100%', width: Math.min(100, v) + '%', background: cor, borderRadius: 999 }} />
+      </div>
+    </div>
+  )
+}
+
+function LeadDetalheModal({
+  lead, produto, promovendo, onClose, onPromover, onAbrirNoCrm,
+}: {
+  lead: ProspeccaoLead
+  produto: string
+  promovendo: boolean
+  onClose: () => void
+  onPromover: () => void
+  onAbrirNoCrm: () => void
+}) {
+  const cor = CLASSIFICACAO_COR[lead.classificacao ?? ''] ?? D.muted
+  const wa = linkWhatsappProspeccao(lead.telefone, lead.nome, produto)
+
+  return (
+    <div
+      onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
+      style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)', padding: 16 }}
+    >
+      <div style={{ position: 'relative', width: '100%', maxWidth: 520, maxHeight: '85vh', overflowY: 'auto', background: '#fff', borderRadius: 16, boxShadow: '0 20px 60px rgba(0,0,0,0.25)' }}>
+        <div style={{ background: D.bronze, padding: '20px 60px 20px 24px', borderRadius: '16px 16px 0 0' }}>
+          <h2 style={{ color: '#fff', fontSize: 19, fontWeight: 700, margin: 0 }}>{lead.nome}</h2>
+          <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12.5, margin: '4px 0 0' }}>
+            {lead.score ?? '—'} pts · {lead.classificacao ?? 'sem classificação'} · {STATUS_LABEL[lead.status] ?? lead.status}
+          </p>
+        </div>
+        <button onClick={onClose} aria-label="Fechar" style={{ position: 'absolute', top: 14, right: 14, width: 30, height: 30, borderRadius: '50%', background: 'rgba(255,255,255,0.25)', border: 'none', cursor: 'pointer', color: '#fff', fontSize: 18, lineHeight: 1 }}>×</button>
+
+        <div style={{ padding: 24 }}>
+          <div style={{ marginBottom: 18 }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: D.muted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Contato & canais</span>
+            <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 8 }}>
+              <tbody>
+                <tr>
+                  <td style={{ color: D.muted, padding: '6px 0', borderBottom: '1px solid ' + D.line, fontSize: 13, width: '32%' }}>Endereço</td>
+                  <td style={{ padding: '6px 0', borderBottom: '1px solid ' + D.line, fontSize: 13.5, fontWeight: 600 }}>{lead.endereco ?? '—'}</td>
+                </tr>
+                <tr>
+                  <td style={{ color: D.muted, padding: '6px 0', borderBottom: '1px solid ' + D.line, fontSize: 13 }}>Telefone</td>
+                  <td style={{ padding: '6px 0', borderBottom: '1px solid ' + D.line, fontSize: 13.5, fontWeight: 600 }}>{lead.telefone ?? '—'}</td>
+                </tr>
+                <tr>
+                  <td style={{ color: D.muted, padding: '6px 0', borderBottom: '1px solid ' + D.line, fontSize: 13 }}>Site</td>
+                  <td style={{ padding: '6px 0', borderBottom: '1px solid ' + D.line, fontSize: 13.5, fontWeight: 600 }}>
+                    {lead.site ? <a href={lead.site} target="_blank" rel="noopener noreferrer" style={{ color: D.bronze, textDecoration: 'none' }}>{lead.site} ↗</a> : '—'}
+                  </td>
+                </tr>
+                <tr>
+                  <td style={{ color: D.muted, padding: '6px 0', borderBottom: '1px solid ' + D.line, fontSize: 13 }}>Avaliação Google</td>
+                  <td style={{ padding: '6px 0', borderBottom: '1px solid ' + D.line, fontSize: 13.5, fontWeight: 600 }}>
+                    {lead.rating ? '★ ' + lead.rating.toFixed(1) + ' (' + (lead.rating_count ?? 0) + ' avaliações)' : '—'}
+                  </td>
+                </tr>
+                <tr>
+                  <td style={{ color: D.muted, padding: '6px 0', fontSize: 13 }}>Categorias</td>
+                  <td style={{ padding: '6px 0', fontSize: 12.5 }}>
+                    {lead.tipos?.length ? lead.tipos.slice(0, 4).join(', ').replace(/_/g, ' ') : '—'}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          {lead.contexto_ia && (
+            <div style={{ marginBottom: 18 }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: D.muted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Por que a IA achou esse fit</span>
+              <p style={{ fontSize: 13.5, color: D.ink, lineHeight: 1.5, margin: '8px 0 0' }}>{lead.contexto_ia}</p>
+            </div>
+          )}
+
+          <div style={{ marginBottom: 18 }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: D.muted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Qualificação</span>
+            <div style={{ marginTop: 10 }}>
+              <BarraScore label="Fit de nicho" valor={lead.score_fit} />
+              <BarraScore label="Potencial do negócio" valor={lead.score_potencial} />
+              <BarraScore label="Acessibilidade" valor={lead.score_acessibilidade} />
+            </div>
+          </div>
+
+          <p style={{ fontSize: 11.5, color: D.muted, background: D.bg, borderRadius: 8, padding: '8px 10px', marginBottom: 18 }}>
+            CNPJ, sócios e e-mail não têm fonte gratuita por nome de empresa — use &quot;Buscar CNPJ&quot; abaixo pra confirmar na Receita em 1 clique.
+          </p>
+
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {wa && (
+              <a href={wa} target="_blank" rel="noopener noreferrer" style={{ flex: '1 1 120px', background: '#25D366', color: '#fff', borderRadius: 8, padding: '10px 12px', fontSize: 13, fontWeight: 700, textAlign: 'center', textDecoration: 'none' }}>
+                WhatsApp
+              </a>
+            )}
+            {lead.telefone && (
+              <a href={'tel:' + lead.telefone.replace(/\D/g, '')} style={{ flex: '1 1 100px', background: 'none', border: '1px solid ' + D.line, color: D.ink, borderRadius: 8, padding: '10px 12px', fontSize: 13, fontWeight: 700, textAlign: 'center', textDecoration: 'none' }}>
+                Ligar
+              </a>
+            )}
+            <a href={linkBuscaCnpj(lead.nome, lead.endereco)} target="_blank" rel="noopener noreferrer" style={{ flex: '1 1 120px', background: 'none', border: '1px solid ' + D.line, color: D.ink, borderRadius: 8, padding: '10px 12px', fontSize: 13, fontWeight: 700, textAlign: 'center', textDecoration: 'none' }}>
+              Buscar CNPJ
+            </a>
+            {lead.lead_id ? (
+              <button onClick={onAbrirNoCrm} style={{ flex: '1 1 140px', background: D.ink, color: '#fff', border: 'none', borderRadius: 8, padding: '10px 12px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                Ver no CRM
+              </button>
+            ) : (
+              <button
+                onClick={onPromover}
+                disabled={promovendo}
+                style={{ flex: '1 1 140px', background: D.bronze, color: '#fff', border: 'none', borderRadius: 8, padding: '10px 12px', fontSize: 13, fontWeight: 700, cursor: promovendo ? 'default' : 'pointer', opacity: promovendo ? 0.6 : 1 }}
+              >
+                {promovendo ? 'Promovendo...' : 'Promover para o CRM'}
+              </button>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   )

@@ -4,9 +4,11 @@ import OpenAI from 'openai'
 import { requireAdmin } from '@/lib/dashboard/admin-auth'
 import { buscarPlacesMultiplas, type PlaceCandidato } from '@/lib/prospeccao/google-places'
 import { chunk, classificacaoPorScore, montarPromptScoring, parseScoring, scoreFinal, TAMANHO_LOTE_SCORING } from '@/lib/prospeccao/prompts'
+import { logInfo } from '@/lib/log'
 
 export const dynamic = 'force-dynamic'
 const sb = () => createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+const SOURCE = 'api/admin/prospeccao/buscar'
 
 type Params = { params: Promise<{ id: string }> }
 
@@ -69,7 +71,7 @@ export async function POST(req: NextRequest, { params }: Params) {
   // não derruba os outros — mesma filosofia de parseScoring, agora um nível
   // acima.
   const lotes = chunk(paraScoring, TAMANHO_LOTE_SCORING)
-  const scoresPorLote = await Promise.all(
+  const resultadosPorLote = await Promise.all(
     lotes.map(async (lote) => {
       try {
         const resposta = await groq.chat.completions.create({
@@ -78,13 +80,24 @@ export async function POST(req: NextRequest, { params }: Params) {
           max_tokens: 4000,
           temperature: 0.3,
         })
-        return parseScoring(resposta.choices[0]?.message?.content ?? '', lote)
+        return { scores: parseScoring(resposta.choices[0]?.message?.content ?? '', lote), tokens: resposta.usage?.total_tokens ?? 0 }
       } catch {
-        return []
+        return { scores: [], tokens: 0 }
       }
     }),
   )
-  const scores = scoresPorLote.flat()
+  const scores = resultadosPorLote.flatMap((r) => r.scores)
+  // Mesmo log de campanhas/route.ts — teto diário de tokens no plano
+  // gratuito da Groq é o limite real (ver mensagem ao usuário sobre quantos
+  // ciclos/dia cabem). candidatosPorLote ajuda a explicar o custo variar
+  // entre buscas: campanha nova sempre gera até 3 lotes, "Garimpar mais"
+  // pode gerar menos se já tiver poucos candidatos novos.
+  logInfo(SOURCE, 'scoring concluído', {
+    operacao: 'scoring',
+    lotes: lotes.length,
+    candidatosPorLote: lotes.map((l) => l.length),
+    tokens: resultadosPorLote.reduce((soma, r) => soma + r.tokens, 0),
+  })
 
   if (scores.length === 0) {
     return NextResponse.json({ error: 'A IA respondeu fora do formato esperado ao qualificar os candidatos. Tente de novo.' }, { status: 502 })
