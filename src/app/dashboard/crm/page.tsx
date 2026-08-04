@@ -710,9 +710,11 @@ function LeadModal({ lead, onClose, onUpdated, onDeleted }: { lead: Lead; onClos
   // Rastreamento de navegação no site (lead_eventos) segue numa fonte
   // separada — não é histórico de atendimento, é comportamento no site.
   const timeline = [
-    ...timelineUnificada.map(t => ({ kind: t.kind, data: t.data, texto: t.descricao ? t.titulo + ' — ' + t.descricao : t.titulo, origem: t.origem })),
-    ...eventos.map(e => ({ kind: 'evento' as const, data: e.created_at, origem: 'Site', texto: e.descricao || (e.tipo === 'download' ? 'Baixou catálogo' : e.tipo === 'visita' ? 'Visitou página' : (e.slug || e.tipo || '').replace(/-/g, ' ')) })),
+    ...timelineUnificada.map(t => ({ kind: t.kind, data: t.data, texto: t.descricao ? t.titulo + ' — ' + t.descricao : t.titulo, origem: t.origem, autor: t.autor, sentimento: t.sentimento })),
+    ...eventos.map(e => ({ kind: 'evento' as const, data: e.created_at, origem: 'Site', texto: e.descricao || (e.tipo === 'download' ? 'Baixou catálogo' : e.tipo === 'visita' ? 'Visitou página' : (e.slug || e.tipo || '').replace(/-/g, ' ')), autor: undefined, sentimento: undefined })),
   ].sort((a, b) => (b.data || '').localeCompare(a.data || ''))
+
+  const SENTIMENTOS_ALERTA = new Set(['negativo', 'urgente'])
 
   async function salvarTemp(v: number) {
     setTemp(v)
@@ -890,10 +892,18 @@ function LeadModal({ lead, onClose, onUpdated, onDeleted }: { lead: Lead; onClos
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0, maxHeight: 240, overflowY: 'auto', borderLeft: '2px solid ' + D.line, paddingLeft: 14, marginLeft: 4 }}>
               {timeline.map((item, i) => (
                 <div key={i} style={{ position: 'relative', paddingBottom: 14 }}>
-                  <span style={{ position: 'absolute', left: -21, top: 3, width: 10, height: 10, borderRadius: '50%', background: CORES_TIMELINE[item.kind] ?? D.blue, border: '2px solid #fff' }} />
-                  <div style={{ fontSize: 13, color: D.ink, lineHeight: 1.4 }}>{item.texto}</div>
+                  <span style={{ position: 'absolute', left: -21, top: 3, width: 10, height: 10, borderRadius: '50%', background: SENTIMENTOS_ALERTA.has(item.sentimento ?? '') ? D.red : CORES_TIMELINE[item.kind] ?? D.blue, border: '2px solid #fff' }} />
+                  <div style={{ fontSize: 13, color: D.ink, lineHeight: 1.4 }}>
+                    {item.texto}
+                    {item.autor === 'ia' && (
+                      <span style={{ marginLeft: 6, fontSize: 9, fontWeight: 700, padding: '1px 6px', borderRadius: 999, background: D.bronze, color: '#fff', verticalAlign: 'middle' }}>IA</span>
+                    )}
+                  </div>
                   <div style={{ fontSize: 11, color: '#8a8a85', marginTop: 2 }}>
                     {item.origem} · {item.data ? new Date(item.data).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }) : 'sem data'}
+                    {SENTIMENTOS_ALERTA.has(item.sentimento ?? '') && (
+                      <span style={{ marginLeft: 6, color: D.red, fontWeight: 700 }}>· {item.sentimento}</span>
+                    )}
                   </div>
                 </div>
               ))}

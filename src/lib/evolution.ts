@@ -8,10 +8,38 @@ const INSTANCE = process.env.EVOLUTION_INSTANCE!     // ex: 'stiven'
 // Numero do Stiven para alertas de escalada
 const STIVEN_NUMBER = '5548991642332'
 
+// Jitter no delay de "digitando...": um valor fixo (era 1200ms sempre) é um
+// padrao reconhecivel demais quando o volume de envio automatico cresce —
+// parte da higiene anti-banimento e variar o timing, nao só simular digitação.
+const DELAY_MIN_MS = 900
+const DELAY_MAX_MS = 2600
+
+function delayComJitter(): number {
+  return Math.floor(DELAY_MIN_MS + Math.random() * (DELAY_MAX_MS - DELAY_MIN_MS))
+}
+
+// Preview e development NUNCA podem tocar a Evolution real — os mesmos
+// EVOLUTION_API_URL/_KEY/_INSTANCE de produção também estão configurados no
+// escopo Preview na Vercel (verificado em 04/08/2026), então sem este freio
+// todo deploy de PR conseguiria mandar WhatsApp real pra lead real. A
+// Vercel seta VERCEL_ENV pra 'production'/'preview'/'development' em todo
+// deploy; localmente (next dev sem `vercel env pull`) fica ausente —
+// ausência ou qualquer valor diferente de 'production' bloqueia
+// (fail-closed). Único portão pra TODO envio real (enviarMensagem é a
+// função de base de enviarFollowUp, enviarAlertaEscalada e do envio manual
+// do painel) — não dá pra esquecer de aplicar em algum call site novo.
+function ambienteDeProducaoReal(): boolean {
+  return process.env.VERCEL_ENV === 'production'
+}
+
 // ============================================
 // ENVIAR MENSAGEM DE TEXTO
 // ============================================
 export async function enviarMensagem(para: string, texto: string): Promise<boolean> {
+  if (!ambienteDeProducaoReal()) {
+    console.warn(`[evolution] envio bloqueado: VERCEL_ENV="${process.env.VERCEL_ENV ?? ''}" (só 'production' envia de verdade)`)
+    return false
+  }
   try {
     const res = await fetch(`${BASE_URL}/message/sendText/${INSTANCE}`, {
       method: 'POST',
@@ -23,8 +51,8 @@ export async function enviarMensagem(para: string, texto: string): Promise<boole
         number: para,
         text: texto,
         options: {
-          delay: 1200,           // simula digitacao humana (1.2s)
-          presence: 'composing', // mostra 'digitando...'
+          delay: delayComJitter(), // simula digitacao humana, com variacao (anti-padrao)
+          presence: 'composing',   // mostra 'digitando...'
         },
       }),
     })

@@ -3,6 +3,9 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { enviarFollowUp, enviarAlertaEscalada, verificarInstancia } from '@/lib/evolution'
 import { logError, logInfo, logWarn } from '@/lib/log'
 import { finishCronRun, startCronRun, type CronRunFinal } from '@/lib/cron/tracker'
+import { podeEnviarAutomatico, automacaoProativaAtiva } from '@/lib/leads/whatsapp-envio-limite'
+import { leadCasaNaRegra, executarAcao, type RegraAutomacao, type LeadParaRegra } from '@/lib/automacoes/regras'
+import { sugerirConhecimentoDeConversasResolvidas } from '@/lib/leads/base-conhecimento-auto-sugestao'
 import { recalcularBaseAtiva } from '@/lib/leads/score-server'
 
 export const dynamic = 'force-dynamic'
@@ -95,7 +98,9 @@ type LeadRow = {
   lead_score?: number | null
 }
 
-async function processarLeadFollowUp(supabase: SupabaseClient, lead: LeadRow, config: ConfigFollowUp) {
+async function processarLeadFollowUp(supabase: SupabaseClient, lead: LeadRow, config: ConfigFollowUp): Promise<
+  { id: string; acao: 'mensagem_enviada' | 'escalado' | 'erro' | 'limite_atingido' | 'automacao_desativada' }
+> {
   const {
     id,
     nome,
@@ -138,6 +143,19 @@ async function processarLeadFollowUp(supabase: SupabaseClient, lead: LeadRow, co
     return { id, acao: 'escalado' as const }
   }
 
+  // Interruptor mestre da automação proativa — checado ANTES do teto diário
+  // de propósito: se está desligada, não vale a pena gastar uma query só
+  // pra descobrir um limite que nem importa agora.
+  if (!automacaoProativaAtiva()) {
+    logWarn(SOURCE, 'automação proativa desativada (FOLLOWUP_AUTOMATICO_ATIVO), pulando lead', { leadId: id })
+    return { id, acao: 'automacao_desativada' as const }
+  }
+
+  if (!(await podeEnviarAutomatico(supabase, id))) {
+    logWarn(SOURCE, 'limite diário de envio automático atingido, pulando lead', { leadId: id })
+    return { id, acao: 'limite_atingido' as const }
+  }
+
   const enviado = await enviarFollowUp(whatsapp, mensagem)
 
   if (!enviado) {
@@ -166,6 +184,126 @@ async function processarLeadFollowUp(supabase: SupabaseClient, lead: LeadRow, co
   }).eq('id', id)
 
   return { id, acao: 'mensagem_enviada' as const }
+}
+
+// ============================================
+// MOTOR DE REGRAS "SE/ENTÃO" (item 5) — roda dentro deste mesmo cron diário,
+// não depende de haver leads pra follow-up nem é bloqueado por eles: são
+// dois sistemas independentes compartilhando a mesma execução agendada
+// (Vercel Hobby só permite os crons já cadastrados em vercel.json).
+// ============================================
+
+const LIMITE_CANDIDATOS_POR_REGRA = 200
+const JANELA_DEDUP_HORAS = 20 // < 24h de propósito: cobre atraso/retry do cron sem re-executar no mesmo dia
+
+function diasDesde(iso: string): number {
+  return Math.floor((Date.now() - new Date(iso).getTime()) / (24 * 60 * 60 * 1000))
+}
+
+// Dias desde a ÚLTIMA mudança de etapa real (leads_interacoes.tipo=status_change),
+// não leads.updated_at — esse campo é tocado por qualquer update (score, nota,
+// etc), não só mudança de estágio, e daria falso positivo em "estagio_parado_dias".
+async function calcularDiasNoEstagioAtual(supabase: SupabaseClient, leadId: string, updatedAtFallback: string | null): Promise<number | null> {
+  const { data } = await supabase
+    .from('leads_interacoes')
+    .select('created_at')
+    .eq('lead_id', leadId)
+    .eq('tipo', 'status_change')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  const desde = data?.created_at ?? updatedAtFallback
+  return desde ? diasDesde(desde) : null
+}
+
+type LeadCandidatoRegra = {
+  id: string
+  nome: string | null
+  whatsapp: string
+  estagio_funil: string
+  lead_score: number | null
+  updated_at: string | null
+  ultimo_contato: string | null
+}
+
+async function jaExecutouRegraHoje(supabase: SupabaseClient, regraId: string, leadId: string): Promise<boolean> {
+  const desde = new Date(Date.now() - JANELA_DEDUP_HORAS * 60 * 60 * 1000).toISOString()
+  const { count, error } = await supabase
+    .from('automacao_regras_execucoes')
+    .select('id', { count: 'exact', head: true })
+    .eq('regra_id', regraId)
+    .eq('lead_id', leadId)
+    .gte('executado_em', desde)
+  // Falha na checagem de dedup: mais seguro pular (não agir de novo por engano)
+  // do que arriscar reenviar mensagem duplicada.
+  if (error) return true
+  return (count ?? 0) > 0
+}
+
+async function processarRegrasAutomacao(supabase: SupabaseClient): Promise<{ avaliados: number; executados: number }> {
+  const { data: regrasRows, error } = await supabase
+    .from('automacao_regras')
+    .select('id, nome, ativo, gatilho_tipo, gatilho_params, filtro_estagio, acao_tipo, acao_params')
+    .eq('ativo', true)
+
+  if (error) {
+    logWarn(SOURCE, 'automacao_regras indisponível, pulando motor de regras', { db_message: error.message })
+    return { avaliados: 0, executados: 0 }
+  }
+  if (!regrasRows || regrasRows.length === 0) return { avaliados: 0, executados: 0 }
+
+  let avaliados = 0
+  let executados = 0
+
+  for (const regra of regrasRows as RegraAutomacao[]) {
+    const { data: candidatos, error: candErr } = await supabase
+      .from('leads')
+      .select('id, nome, whatsapp, estagio_funil, lead_score, updated_at, ultimo_contato')
+      .not('whatsapp', 'is', null)
+      .is('whatsapp_optout_at', null)
+      .in('status', ['novo', 'ativo', 'qualificado'])
+      .limit(LIMITE_CANDIDATOS_POR_REGRA)
+
+    if (candErr || !candidatos) continue
+
+    for (const lead of candidatos as LeadCandidatoRegra[]) {
+      avaliados++
+
+      if (regra.filtro_estagio && regra.filtro_estagio.length > 0 && !regra.filtro_estagio.includes(lead.estagio_funil)) {
+        continue
+      }
+
+      const leadParaRegra: LeadParaRegra = {
+        id: lead.id,
+        estagio_funil: lead.estagio_funil,
+        lead_score: lead.lead_score,
+        // Só calcula com query extra quando o gatilho realmente precisa —
+        // sem isso seria 1 query a mais por candidato mesmo pras regras que
+        // nunca olham esse campo.
+        diasNoEstagioAtual: regra.gatilho_tipo === 'estagio_parado_dias'
+          ? await calcularDiasNoEstagioAtual(supabase, lead.id, lead.updated_at)
+          : null,
+        diasSemResposta: lead.ultimo_contato ? diasDesde(lead.ultimo_contato) : null,
+      }
+
+      if (!leadCasaNaRegra(leadParaRegra, regra)) continue
+      if (await jaExecutouRegraHoje(supabase, regra.id, lead.id)) continue
+
+      const ok = await executarAcao(
+        supabase,
+        { leadId: lead.id, whatsapp: lead.whatsapp, nome: lead.nome, leadScore: lead.lead_score },
+        regra,
+      )
+      if (ok) {
+        executados++
+        await supabase.from('automacao_regras_execucoes').insert({ regra_id: regra.id, lead_id: lead.id })
+      }
+    }
+  }
+
+  logInfo(SOURCE, 'regras automacao summary', { avaliados, executados })
+  return { avaliados, executados }
 }
 
 export async function GET(req: NextRequest) {
@@ -229,6 +367,7 @@ export async function GET(req: NextRequest) {
       .eq('requer_atencao', false)
       .in('status', ['novo', 'ativo', 'qualificado'])
       .not('whatsapp', 'is', null)
+      .is('whatsapp_optout_at', null)
       .limit(50)
 
     if (error) {
@@ -238,26 +377,36 @@ export async function GET(req: NextRequest) {
     }
 
     if (!leads || leads.length === 0) {
+      const regrasResumo = await processarRegrasAutomacao(supabase)
+      const baseConhecimentoResumo = await sugerirConhecimentoDeConversasResolvidas(supabase)
       const summary = { processados: 0, enviados: 0, escalados: 0, erros_envio: 0 }
       logInfo(SOURCE, 'run summary', summary)
-      result = { status: 'ok', ...summary }
-      return NextResponse.json({ message: 'Nenhum lead para follow-up.', processados: 0 })
+      result = { status: 'ok', ...summary, details: { regras: regrasResumo, baseConhecimento: baseConhecimentoResumo } }
+      return NextResponse.json({ message: 'Nenhum lead para follow-up.', processados: 0, regras: regrasResumo, baseConhecimento: baseConhecimentoResumo })
     }
 
-    const resultados: Array<{ id: string; acao: 'mensagem_enviada' | 'escalado' | 'erro' }> = []
+    const resultados: Array<{ id: string; acao: 'mensagem_enviada' | 'escalado' | 'erro' | 'limite_atingido' | 'automacao_desativada' }> = []
     for (const lead of leads as LeadRow[]) {
       const resultado = await processarLeadFollowUp(supabase, lead, config)
       resultados.push(resultado)
       await new Promise((r) => setTimeout(r, 2000))
     }
 
+    const regrasResumo = await processarRegrasAutomacao(supabase)
+    const baseConhecimentoResumo = await sugerirConhecimentoDeConversasResolvidas(supabase)
+
     const enviados = resultados.filter((r) => r.acao === 'mensagem_enviada').length
     const escalados = resultados.filter((r) => r.acao === 'escalado').length
     const erros_envio = resultados.filter((r) => r.acao === 'erro').length
-    const summary = { processados: leads.length, enviados, escalados, erros_envio }
+    const limite_atingido = resultados.filter((r) => r.acao === 'limite_atingido').length
+    const automacao_desativada = resultados.filter((r) => r.acao === 'automacao_desativada').length
+    const summary = { processados: leads.length, enviados, escalados, erros_envio, limite_atingido, automacao_desativada }
     logInfo(SOURCE, 'run summary', summary)
-    result = { status: 'ok', processados: leads.length, enviados, erros_envio, details: { escalados } }
-    return NextResponse.json({ message: 'Follow-ups processados.', ...summary })
+    result = {
+      status: 'ok', processados: leads.length, enviados, erros_envio,
+      details: { escalados, limite_atingido, automacao_desativada, regras: regrasResumo, baseConhecimento: baseConhecimentoResumo },
+    }
+    return NextResponse.json({ message: 'Follow-ups processados.', ...summary, regras: regrasResumo, baseConhecimento: baseConhecimentoResumo })
   } catch (err: unknown) {
     logError(SOURCE, 'run failed', err)
     result = { status: 'error', motivo: err instanceof Error ? err.message : String(err) }
