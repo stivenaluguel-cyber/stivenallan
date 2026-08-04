@@ -234,4 +234,61 @@ describe('POST /api/admin/prospeccao/campanhas/[id]/buscar', () => {
     const res = await POST(req({}), params)
     expect(res.status).toBe(500)
   })
+
+  // Regressão do bug real: uma busca de imobiliárias em Criciúma trouxe 60
+  // candidatos únicos (3 queries x 20), mandados numa chamada só de IA —
+  // estourou o limite de tokens da resposta, o JSON veio cortado no meio, e
+  // a campanha inteira falhava com 502 mesmo o Places tendo funcionado.
+  describe('qualificação em lotes (60 candidatos)', () => {
+    function groqRespondeConformeOPrompt() {
+      return async (args: { messages: { content: string }[] }) => {
+        const ids = [...args.messages[0].content.matchAll(/id="([^"]+)"/g)].map((m) => m[1])
+        return { choices: [{ message: { content: scoringOk(ids) } }] }
+      }
+    }
+
+    it('divide em 3 chamadas de IA e qualifica os 60 — nenhum se perde', async () => {
+      const placeIds = Array.from({ length: 60 }, (_, i) => 'p' + i)
+      placesHolder.current = async () => ({ ok: true, candidatos: placeIds.map((placeId) => candidato({ placeId })) })
+      const chamadas = vi.fn(groqRespondeConformeOPrompt())
+      groqHolder.current = chamadas as never
+
+      const res = await POST(req({ quantidade: 50 }), params)
+
+      expect(res.status).toBe(200)
+      expect(chamadas).toHaveBeenCalledTimes(3)
+      const body = await res.json()
+      expect(body.analisados).toBe(60)
+      expect(body.entregues).toBe(50)
+    })
+
+    it('um lote falhando não derruba os outros dois — parcial em vez de 502', async () => {
+      const placeIds = Array.from({ length: 60 }, (_, i) => 'p' + i)
+      placesHolder.current = async () => ({ ok: true, candidatos: placeIds.map((placeId) => candidato({ placeId })) })
+      let chamada = 0
+      groqHolder.current = (async (args: { messages: { content: string }[] }) => {
+        chamada++
+        if (chamada === 2) throw new Error('ECONNRESET no segundo lote')
+        const ids = [...args.messages[0].content.matchAll(/id="([^"]+)"/g)].map((m) => m[1])
+        return { choices: [{ message: { content: scoringOk(ids) } }] }
+      }) as never
+
+      const res = await POST(req({ quantidade: 50 }), params)
+
+      expect(res.status).toBe(200)
+      const body = await res.json()
+      // Só 40 dos 60 foram qualificados (2 lotes de 20 que funcionaram); o
+      // pedido de 50 não pode ser satisfeito por completo, mas entrega os 40.
+      expect(body.entregues).toBe(40)
+    })
+
+    it('todos os lotes falhando ainda devolve 502 — o piso de segurança continua de pé', async () => {
+      const placeIds = Array.from({ length: 40 }, (_, i) => 'p' + i)
+      placesHolder.current = async () => ({ ok: true, candidatos: placeIds.map((placeId) => candidato({ placeId })) })
+      groqHolder.current = (async () => { throw new Error('fora do ar') }) as never
+
+      const res = await POST(req({ quantidade: 20 }), params)
+      expect(res.status).toBe(502)
+    })
+  })
 })
