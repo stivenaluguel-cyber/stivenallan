@@ -95,17 +95,17 @@ describe('motivoSemWhatsappReal', () => {
     expect(motivoSemWhatsappReal('5548991642332')).toBeNull()
   })
 
-  it('identifica o placeholder do Instagram', () => {
-    expect(motivoSemWhatsappReal('ig:17841400000000000')).toEqual({ emoji: '📷', label: 'Instagram' })
+  it('identifica o placeholder do Instagram, com artigo masculino pra concordância', () => {
+    expect(motivoSemWhatsappReal('ig:17841400000000000')).toEqual({ emoji: '📷', label: 'Instagram', artigo: 'o' })
   })
 
-  it('identifica o placeholder da Prospecção — não pode continuar dizendo "Instagram" pra isso', () => {
-    expect(motivoSemWhatsappReal('pj:ChIJabc123')).toEqual({ emoji: '🏢', label: 'Prospecção' })
+  it('identifica o placeholder da Prospecção, com artigo feminino — não pode continuar dizendo "Instagram" pra isso', () => {
+    expect(motivoSemWhatsappReal('pj:ChIJabc123')).toEqual({ emoji: '🏢', label: 'Prospecção', artigo: 'a' })
   })
 
   it('ausência de valor cai no motivo genérico (Instagram), não quebra', () => {
-    expect(motivoSemWhatsappReal(null)).toEqual({ emoji: '📷', label: 'Instagram' })
-    expect(motivoSemWhatsappReal(undefined)).toEqual({ emoji: '📷', label: 'Instagram' })
+    expect(motivoSemWhatsappReal(null)).toEqual({ emoji: '📷', label: 'Instagram', artigo: 'o' })
+    expect(motivoSemWhatsappReal(undefined)).toEqual({ emoji: '📷', label: 'Instagram', artigo: 'o' })
   })
 })
 

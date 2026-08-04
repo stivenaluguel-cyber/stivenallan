@@ -389,7 +389,7 @@ Chamar no WhatsApp
 </a>
 ) : (
 <div style={{ flex: 1, background: '#F3F2EE', color: '#8a8a85', borderRadius: '10px', padding: '12px', fontSize: '13px', textAlign: 'center' }}>
-{motivoSemWhatsappReal(selectedLead.whatsapp)?.emoji} Veio do {motivoSemWhatsappReal(selectedLead.whatsapp)?.label} — edite acima quando tiver o telefone
+{motivoSemWhatsappReal(selectedLead.whatsapp)?.emoji} Veio d{motivoSemWhatsappReal(selectedLead.whatsapp)?.artigo} {motivoSemWhatsappReal(selectedLead.whatsapp)?.label} — edite acima quando tiver o telefone
 </div>
 )}
 </div>
