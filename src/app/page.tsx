@@ -26,7 +26,7 @@ export const metadata = {
 
 // Fontes: Piazzolla (display, com itálico só como acento pontual — hero e CTA
 // final, não repetido em todo card) + Public Sans (corpo/nav/controles), via
-// next/font no layout raiz. Cor de destaque é a --bronze (#D24E22) que já
+// next/font no layout raiz. Cor de destaque é a --accent (#D24E22) que já
 // existia em globals.css (seleção de texto, range input) mas nunca tinha
 // virado a cor visível da página — o dourado/champagne que estava aqui antes
 // foi removido (redesenho tipográfico 08/2026, ver /especimes-tipografia).

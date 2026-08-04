@@ -45,7 +45,7 @@ function ctaFinalBotaoSecundario(status: StatusEmpreendimento) {
 // de src/app/layout.tsx usadas em PropertyPageTemplate.tsx e na home.
 const DISPLAY = 'var(--font-piazzolla), Georgia, serif'
 const BODY = 'var(--font-public-sans), system-ui, sans-serif'
-// Accent: mesma família de cor de PropertyPageTemplate.tsx (--bronze), num
+// Accent: mesma família de cor de PropertyPageTemplate.tsx (--accent), num
 // tom levemente diferente pra manter a Eraldo com identidade própria dentro
 // do mesmo sistema — troca o dourado #9C5F2E/#D9A066 de antes.
 const ACCENT = '#C1461F'

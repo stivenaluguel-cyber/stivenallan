@@ -15,7 +15,7 @@ const WPP = 'https://wa.me/5548991642332'
 
 // Tipografia "Clássica Brasileira Sofisticada" (redesenho 08/2026): Piazzolla
 // (display + itálico como acento pontual, não em toda seção) + Public Sans
-// (corpo/nav/controles). accent troca o dourado/champagne pela --bronze
+// (corpo/nav/controles). accent troca o dourado/champagne pela --accent
 // (#D24E22) que já existia em globals.css mas nunca virava cor visível.
 const t = {
   bg: '#FAFAF8', ink: '#1A1814', accent: '#D24E22',

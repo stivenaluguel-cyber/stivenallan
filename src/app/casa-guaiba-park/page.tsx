@@ -9,7 +9,7 @@ import { SITE_URL } from '@/lib/site'
 // Só existe pra tráfego direto/anúncio — sem link em nenhum menu ou listagem, noindex.
 // Tipografia "Clássica Brasileira Sofisticada" (redesenho 08/2026): Piazzolla
 // (display + itálico como acento pontual) + Public Sans (corpo/nav/controles).
-// accent troca o dourado/champagne pela --bronze (#D24E22), mesmo sistema das
+// accent troca o dourado/champagne pela --accent (#D24E22), mesmo sistema das
 // páginas de referência (home, PropertyPageTemplate, EmpreendimentoTemplate).
 
 const OG_IMAGE = '/images/casa-guaiba-park/projeto-noite.jpg'
