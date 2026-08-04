@@ -14,6 +14,7 @@ import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
 import { EspelhoPublico } from '@/components/EspelhoPublico'
+import ShareButton from '@/components/ShareButton'
 
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Aura%20Residence%20em%20Crici%C3%BAma.%20Pode%20me%20passar%20mais%20informa%C3%A7%C3%B5es%3F'
 const SLUG = 'aura-residence-centro-criciuma-sc'
@@ -480,6 +481,7 @@ export default function AuraResidencePage() {
           <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
             <a href={WPP} target="_blank" rel="noopener noreferrer" className="ar-btn ar-btn--solid" data-wpp="cta_final" data-wpp-emp={SLUG} data-wpp-nome={NOME}>Falar com Stiven</a>
             <a href={WPP} target="_blank" rel="noopener noreferrer" className="ar-btn" style={{ borderColor: 'rgba(245,238,230,0.30)', color: '#F5EEE6' }} data-wpp="cta_final" data-wpp-emp={SLUG} data-wpp-nome={NOME}>Sob consulta · Financiamento direto</a>
+            <ShareButton nome={NOME} className="ar-btn" style={{ borderColor: 'rgba(245,238,230,0.30)', color: '#F5EEE6', background: 'transparent', cursor: 'pointer' }} />
           </div>
         </div>
       </section>

@@ -9,6 +9,7 @@ import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
 import { EspelhoPublico } from '@/components/EspelhoPublico'
+import ShareButton from '@/components/ShareButton'
 
 // Hotsite premium Thiene Residencial (Fontana, Centro Criciúma/SC). Padrão EPIC.
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Thiene%20Residencial.'
@@ -350,8 +351,9 @@ Com tudo a poucos passos, o Thiene coloca você no centro da vida urbana de Cric
 <div style={{ position: 'relative', zIndex: 2, padding: '0 clamp(18px,5vw,56px)', maxWidth: 880 }}>
 <p className="th-eyebrow th-onimg" style={{ color: '#fff', marginBottom: 22 }}>Atendimento Exclusivo</p>
 <h2 className="th-h2 th-onimg" style={{ color: '#fff', fontSize: 'clamp(30px,5vw,56px)' }}>Grandioso como a sua história.</h2>
-<div style={{ marginTop: 38 }}>
+<div style={{ marginTop: 38, display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
 <a href={WPP} target="_blank" rel="noopener noreferrer" className="th-cta th-cta-light" data-wpp="1">Atendimento Exclusivo</a>
+<ShareButton nome="Thiene Residencial" className="th-cta th-cta-light" />
 </div>
 </div>
 </section>

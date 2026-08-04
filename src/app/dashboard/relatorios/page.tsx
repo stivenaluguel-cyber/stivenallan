@@ -1,11 +1,13 @@
 import { createClient } from '@supabase/supabase-js'
 import {
   snapshotPorEstagio,
+  vgvPorEstagio,
   tempoMedioPorEstagio,
   type LeadStageRow,
   type StageTransitionRow,
 } from '@/lib/dashboard/funil-stats'
 import { FunilChart } from '@/lib/dashboard/funil-chart'
+import { VgvChart } from '@/lib/dashboard/vgv-chart'
 import { RelatoriosComerciais } from '@/components/dashboard/RelatoriosComerciais'
 import { BotaoImprimir } from '@/components/dashboard/BotaoImprimir'
 
@@ -31,7 +33,7 @@ async function fetchDados(): Promise<
 
   const supabase = createClient(url, key)
   const [{ data: leads, error: leadsErr }, { data: transicoes, error: transErr }] = await Promise.all([
-    supabase.from('leads').select('id, estagio_funil'),
+    supabase.from('leads').select('id, estagio_funil, orcamento_max'),
     supabase
       .from('leads_interacoes')
       .select('lead_id, estagio_de, estagio_para, created_at')
@@ -82,6 +84,7 @@ export default async function RelatoriosPage() {
 
 function Populated({ leads, transicoes }: { leads: LeadStageRow[]; transicoes: StageTransitionRow[] }) {
   const snapshot = snapshotPorEstagio(leads)
+  const vgv = vgvPorEstagio(leads)
   const tempos = tempoMedioPorEstagio(transicoes)
   const total = leads.length
 
@@ -103,17 +106,27 @@ function Populated({ leads, transicoes }: { leads: LeadStageRow[]; transicoes: S
 
       <section
         style={{
-          background: '#fff',
-          border: `1px solid ${T.border}`,
-          borderRadius: 12,
-          padding: '20px 22px',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+          gap: 16,
           marginBottom: 24,
         }}
       >
-        <div style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: T.mutedInk, fontWeight: 600, marginBottom: 12 }}>
-          Distribuição atual por etapa
+        <div style={{ background: '#fff', border: `1px solid ${T.border}`, borderRadius: 12, padding: '20px 22px' }}>
+          <div style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: T.mutedInk, fontWeight: 600, marginBottom: 12 }}>
+            Distribuição atual por etapa
+          </div>
+          <FunilChart data={snapshot} />
         </div>
-        <FunilChart data={snapshot} />
+        <div style={{ background: '#fff', border: `1px solid ${T.border}`, borderRadius: 12, padding: '20px 22px' }}>
+          <div style={{ fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: T.mutedInk, fontWeight: 600, marginBottom: 4 }}>
+            VGV por etapa
+          </div>
+          <p style={{ fontSize: 12, color: T.mutedInk, margin: '0 0 12px' }}>
+            Orçamento declarado pelo lead, somado por estágio — não é valor de contrato confirmado.
+          </p>
+          <VgvChart data={vgv} />
+        </div>
       </section>
 
       <section style={{ background: '#fff', border: `1px solid ${T.border}`, borderRadius: 12, overflow: 'hidden', marginBottom: 24 }}>

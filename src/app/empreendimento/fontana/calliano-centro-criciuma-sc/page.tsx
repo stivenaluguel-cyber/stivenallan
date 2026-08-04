@@ -8,6 +8,7 @@ import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
 import { EspelhoPublico } from '@/components/EspelhoPublico'
+import ShareButton from '@/components/ShareButton'
 
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Calliano%20Residencial.'
 const CATALOGO_PDF = 'https://estilofontana.com.br/upload/empreendimento/catalogo/calliano-residencial-1603223885.pdf'
@@ -323,7 +324,10 @@ export default function CallianoPage() {
         <div style={{ position: 'relative', zIndex: 1, textAlign: 'center', padding: '0 6vw' }}>
           <p className="ca-eyebrow" style={{ color: 'rgba(246,237,232,0.7)', marginBottom: 16 }}>Calliano Residencial</p>
           <h2 className="ca-serif" style={{ fontSize: 'clamp(28px,5vw,60px)', color: t.onDark, margin: '0 0 32px', lineHeight: 1.2 }}>Idealizado para oferecer o melhor.</h2>
-          <a href={WPP} target="_blank" rel="noopener noreferrer" className="ca-cta-light">Quero saber mais</a>
+          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <a href={WPP} target="_blank" rel="noopener noreferrer" className="ca-cta-light">Quero saber mais</a>
+            <ShareButton nome="Calliano Residencial" className="ca-cta-light" />
+          </div>
         </div>
       </section>
 

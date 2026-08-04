@@ -9,6 +9,7 @@ import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
 import { EspelhoPublico } from '@/components/EspelhoPublico'
+import ShareButton from '@/components/ShareButton'
 
 // Hotsite premium Monte Leone Residencial (Fontana, Centro Criciúma/SC). Padrão EPIC — benchmark Aguas de Marano.
 // WhatsApp do corretor Stiven (NAO usar numeros internos da Fontana).
@@ -384,8 +385,9 @@ No coração nobre de Criciúma, a poucos passos de comércio premium, gastronom
 <div style={{ position: 'relative', zIndex: 2, padding: '0 clamp(18px,5vw,56px)', maxWidth: 880 }}>
 <p className="ml-eyebrow ml-onimg" style={{ color: '#fff', marginBottom: 22 }}>Atendimento Exclusivo</p>
 <h2 className="ml-h2 ml-onimg" style={{ color: '#fff', fontSize: 'clamp(30px,5vw,56px)' }}>Magnífico por essência.</h2>
-<div style={{ marginTop: 38 }}>
+<div style={{ marginTop: 38, display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
 <a href={WPP} target="_blank" rel="noopener noreferrer" className="ml-cta ml-cta-light">Atendimento Exclusivo</a>
+<ShareButton nome="Monte Leone Residencial" className="ml-cta ml-cta-light" />
 </div>
 </div>
 </section>

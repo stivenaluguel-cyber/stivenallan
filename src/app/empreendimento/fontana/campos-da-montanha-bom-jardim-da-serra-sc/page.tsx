@@ -9,6 +9,7 @@ import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
 import { EspelhoPublico } from '@/components/EspelhoPublico'
+import ShareButton from '@/components/ShareButton'
 
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Campos%20da%20Montanha%20Residencial.'
 const CATALOGO = 'https://estilofontana.com.br/upload/empreendimento/catalogo/campos-da-montanha-residencial-1668428039.pdf'
@@ -218,6 +219,7 @@ html { scroll-behavior: smooth; }
 <div style={{ display:'flex', gap:16, justifyContent:'center', flexWrap:'wrap' }}>
 <a href={WPP} className="cm-cta cm-cta-light">Falar no WhatsApp</a>
 <Link href="/" className="cm-cta" style={{ color:t.onDark, borderColor:'rgba(232,242,232,0.3)' }}>Ver todos os imóveis</Link>
+<ShareButton nome="Campos da Montanha Residencial" className="cm-cta" style={{ color:t.onDark, borderColor:'rgba(232,242,232,0.3)' }} />
 </div>
 </section>
 <footer style={{ background:t.dark, borderTop:'1px solid rgba(232,242,232,0.06)', padding:'32px', textAlign:'center' }}>

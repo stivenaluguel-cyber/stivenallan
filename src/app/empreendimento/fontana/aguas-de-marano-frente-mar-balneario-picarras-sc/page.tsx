@@ -9,6 +9,7 @@ import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
 import { EspelhoPublico } from '@/components/EspelhoPublico'
+import ShareButton from '@/components/ShareButton'
 
 const WPP = "https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20%C3%81guas%20de%20Marano%20Residencial."
 const t = {
@@ -274,7 +275,10 @@ return (
 <div style={{ position: 'relative', zIndex: 2, padding: '0 clamp(18px,5vw,56px)', maxWidth: 880 }}>
 <p className="am-eyebrow am-onimg" style={{ color: '#fff', marginBottom: 22 }}>Atendimento Exclusivo</p>
 <h2 className="am-h2 am-onimg" style={{ color: '#fff', fontSize: 'clamp(30px,5vw,56px)' }}>Tenha o mar como seu vizinho.</h2>
-<div style={{ marginTop: 38 }}><a href={WPP} target="_blank" rel="noopener noreferrer" className="am-cta am-cta-light">Atendimento Exclusivo</a></div>
+<div style={{ marginTop: 38, display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
+<a href={WPP} target="_blank" rel="noopener noreferrer" className="am-cta am-cta-light">Atendimento Exclusivo</a>
+<ShareButton nome="Águas de Marano Residencial" className="am-cta am-cta-light" style={{ borderColor: 'rgba(234,241,246,0.3)' }} />
+</div>
 </div>
 </section>
       {/* SEO FAQ */}

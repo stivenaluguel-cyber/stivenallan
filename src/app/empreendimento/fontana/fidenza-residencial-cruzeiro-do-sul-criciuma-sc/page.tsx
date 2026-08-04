@@ -9,6 +9,7 @@ import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
 import { EspelhoPublico } from '@/components/EspelhoPublico'
+import ShareButton from '@/components/ShareButton'
 
 // Hotsite premium Fidenza Residencial (Fontana, Cruzeiro do Sul, Criciúma/SC). Padrão EPIC — benchmark Aguas de Marano.
 // Acento: grafite #2B2B2B com detalhe azul #1E3A8A discreto (motivo Mondrian).
@@ -422,6 +423,7 @@ export default function FidenzaPage() {
           <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
             <a href={WPP} target="_blank" rel="noopener noreferrer" className="fz-cta fz-cta-light">Atendimento Exclusivo</a>
             <a href={CATALOGO_PDF} target="_blank" rel="noopener noreferrer" className="fz-cta" style={{ borderColor: 'rgba(244,241,234,0.5)', color: t.onDark }}>Baixar Catálogo</a>
+            <ShareButton nome="Fidenza Residencial" className="fz-cta" style={{ borderColor: 'rgba(244,241,234,0.5)', color: t.onDark }} />
           </div>
         </div>
       </section>

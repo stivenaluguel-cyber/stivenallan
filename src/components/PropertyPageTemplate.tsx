@@ -9,6 +9,7 @@ import { LeadCaptureModal } from '@/components/LeadCaptureModal'
 // resolve como client boundary normal, sem precisar mover o arquivo.
 import FormContato from '@/app/empreendimento/[construtora]/[slug]/FormContato'
 import CtaFixoEmpreendimento from '@/components/CtaFixoEmpreendimento'
+import ShareButton from '@/components/ShareButton'
 
 const WPP = 'https://wa.me/5548991642332'
 
@@ -259,7 +260,13 @@ export default function PropertyPageTemplate({ data, relacionados }: { data: Pro
           cadastrado só pelo painel, que nasce neste template, precisa dele. */}
       <section id="contato" style={{ background: t.dark, color: t.onDark, padding: 'clamp(80px,14vh,140px) clamp(20px,5vw,48px)', textAlign: 'center', scrollMarginTop: 24 }}>
         <h2 style={{ fontFamily: t.serif, fontStyle: 'italic', fontSize: 'clamp(28px,4.5vw,52px)', color: '#FFFFFF', margin: 0, maxWidth: '16ch', marginLeft: 'auto', marginRight: 'auto' }}>Vamos realizar o seu próximo endereço?</h2>
-        <a href={wppNome} target="_blank" rel="noopener" style={{ display: 'inline-block', marginTop: 32, padding: '16px 40px', background: acento, color: t.dark, fontFamily: t.body, fontSize: 13, letterSpacing: '0.16em', textTransform: 'uppercase', textDecoration: 'none' }}>Falar no WhatsApp</a>
+        <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', marginTop: 32 }}>
+          <a href={wppNome} target="_blank" rel="noopener" style={{ display: 'inline-block', padding: '16px 40px', background: acento, color: t.dark, fontFamily: t.body, fontSize: 13, letterSpacing: '0.16em', textTransform: 'uppercase', textDecoration: 'none' }}>Falar no WhatsApp</a>
+          <ShareButton
+            nome={data.nome}
+            style={{ display: 'inline-block', padding: '16px 40px', background: 'transparent', border: '1px solid rgba(245,241,234,0.35)', color: t.onDark, fontFamily: t.body, fontSize: 13, letterSpacing: '0.16em', textTransform: 'uppercase', cursor: 'pointer' }}
+          />
+        </div>
         <div style={{ maxWidth: 460, margin: '48px auto 0', textAlign: 'left' }}>
           <p style={{ fontFamily: t.body, fontSize: 13, letterSpacing: '0.14em', textTransform: 'uppercase', color: acento, textAlign: 'center', marginBottom: 20 }}>
             ou receba plantas e condições

@@ -7,6 +7,7 @@ import { PropertySchema } from '@/components/PropertySchema'
 import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { EspelhoPublico } from '@/components/EspelhoPublico'
+import ShareButton from '@/components/ShareButton'
 import type { Empreendimento, StatusEmpreendimento } from '@/data/eraldo/types'
 
 const WPP_NUMERO = '5548991642332'
@@ -393,6 +394,7 @@ export default function EmpreendimentoTemplate({ data }: { data: Empreendimento 
           <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
             <a href={WPP} target="_blank" rel="noopener noreferrer" className="ec-btn ec-btn--solid" data-wpp="cta_final" data-wpp-emp={data.slug} data-wpp-nome={data.nome}>Falar com Stiven</a>
             <a href={WPP} target="_blank" rel="noopener noreferrer" className="ec-btn" style={{ borderColor: 'rgba(245,238,230,0.30)', color: '#F5EEE6' }} data-wpp="cta_final" data-wpp-emp={data.slug} data-wpp-nome={data.nome}>{ctaFinalBotaoSecundario(data.status)}</a>
+            <ShareButton nome={data.nome} className="ec-btn" style={{ borderColor: 'rgba(245,238,230,0.30)', color: '#F5EEE6' }} />
           </div>
         </div>
       </section>

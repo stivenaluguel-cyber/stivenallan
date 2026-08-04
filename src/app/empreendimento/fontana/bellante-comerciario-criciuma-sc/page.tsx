@@ -9,6 +9,7 @@ import { RelatedProperties } from '@/components/RelatedProperties'
 import { FontanaCompactNav } from '@/components/FontanaCompactNav'
 import { SITE_URL } from '@/lib/site'
 import { EspelhoPublico } from '@/components/EspelhoPublico'
+import ShareButton from '@/components/ShareButton'
 
 export const revalidate = 3600;
 
@@ -278,10 +279,13 @@ export default function BellantePage() {
           <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#c8d8ef', fontSize: 'clamp(1.5rem,3vw,2.5rem)', fontStyle: 'italic', marginBottom: '2rem' }}>
             "Feito para você."
           </p>
-          <a href={WA} target="_blank" rel="noopener"
-            style={{ background: ACCENT, color: '#fff', padding: '1rem 2.5rem', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', borderRadius: '2px' }}>
-            FALAR COM STIVEN
-          </a>
+          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+            <a href={WA} target="_blank" rel="noopener"
+              style={{ background: ACCENT, color: '#fff', padding: '1rem 2.5rem', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', borderRadius: '2px' }}>
+              FALAR COM STIVEN
+            </a>
+            <ShareButton nome="Bellante Residencial" style={{ background: 'transparent', color: '#fff', border: '1px solid rgba(255,255,255,0.6)', padding: '1rem 2.5rem', fontSize: '0.85rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', borderRadius: '2px', cursor: 'pointer' }} />
+          </div>
         </div>
       </section>
 
