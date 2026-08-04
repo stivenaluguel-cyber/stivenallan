@@ -6,16 +6,17 @@ import { HeroImage } from '@/components/HeroImage'
 import CatalogFilters from '@/components/CatalogFilters'
 import { SkipLink } from '@/components/SkipLink'
 import { statusLabel, precoLabel, type Empreendimento, type StatusObra } from '@/lib/empreendimentos'
+import type { PoliticaFinanciamento } from '@/lib/eraldo-politica-financiamento'
 
 export const revalidate = 3600
 
 export const metadata: Metadata = {
   title: 'Empreendimentos em Criciúma SC e região',
-  description: 'Todos os empreendimentos da Fontana Construtora em Criciúma e região SC. Apartamentos e terrenos com financiamento direto. Atendimento exclusivo com Stiven Allan.',
+  description: 'Todos os empreendimentos da Fontana e Eraldo Construções em Criciúma e região SC. Financiamento direto na maioria, com opção bancária em alguns. Atendimento exclusivo com Stiven Allan.',
   alternates: { canonical: 'https://stivenallan.com.br/empreendimentos' },
   openGraph: {
     title: 'Empreendimentos em Criciúma SC e região | Stiven Allan',
-    description: 'Descubra os empreendimentos da Fontana Construtora em Criciúma SC. Financiamento direto, sem banco.',
+    description: 'Descubra os empreendimentos da Fontana e Eraldo Construções em Criciúma SC. Financiamento direto na maioria, com opção bancária em alguns.',
     url: 'https://stivenallan.com.br/empreendimentos',
     type: 'website',
   },
@@ -36,6 +37,19 @@ const t = {
   display: "var(--font-bricolage), system-ui, sans-serif",
   serif: "var(--font-cormorant), Georgia, serif",
   body: "var(--font-hanken), system-ui, sans-serif",
+}
+
+// Rótulo curto pro badge do card (compacto, ao lado do status) — mesma
+// classificação de 4 categorias de @/lib/eraldo-politica-financiamento e
+// @/lib/fontana-politica-financiamento, mas com texto mais curto que o usado
+// nos títulos de seção da página do empreendimento. 'nao_informado' não gera
+// badge: afirmar "Condições sob consulta" ao lado de outros badges chamaria
+// atenção pra ausência de dado sem necessidade — o preço "Sob consulta" já
+// comunica isso mais abaixo no card.
+const BADGE_FINANCIAMENTO: Partial<Record<PoliticaFinanciamento, string>> = {
+  direto: 'Financiamento direto',
+  bancario: 'Financiamento bancário',
+  hibrido: 'Direto ou bancário',
 }
 
 function StatusBadge({ status }: { status?: StatusObra }) {
@@ -92,7 +106,9 @@ function CatalogCard({ emp }: { emp: Empreendimento }) {
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(26,24,20,0.55), transparent 50%)' }} />
           <div style={{ position: 'absolute', top: 16, left: 16, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             <StatusBadge status={emp.statusObra} />
-            <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.22em', textTransform: 'uppercase', background: 'rgba(184,155,94,0.15)', color: '#8A7240', padding: '4px 10px', fontFamily: t.body }}>Financiamento direto</span>
+            {emp.politicaFinanciamento && BADGE_FINANCIAMENTO[emp.politicaFinanciamento] && (
+              <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.22em', textTransform: 'uppercase', background: 'rgba(184,155,94,0.15)', color: '#8A7240', padding: '4px 10px', fontFamily: t.body }}>{BADGE_FINANCIAMENTO[emp.politicaFinanciamento]}</span>
+            )}
           </div>
           <div style={{ position: 'absolute', bottom: 16, left: 16, right: 16 }}>
             <p style={{ margin: 0, fontFamily: t.body, fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(245,241,234,0.70)', marginBottom: 4 }}>{construtoraNome}</p>
@@ -145,7 +161,28 @@ export default async function EmpreendimentosPage() {
     })
   )].sort((a, b) => a - b)
   const totalCidades = cidades.length
-  const breadcrumbSchema = { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [ { '@type': 'ListItem', position: 1, name: 'Início', item: 'https://stivenallan.com.br' }, { '@type': 'ListItem', position: 2, name: 'Empreendimentos', item: 'https://stivenallan.com.br/empreendimentos' } ] }
+  // Auditoria da integração final: a maioria dos cards Fontana ganhou área
+  // real vinda de `properties.metragem` (Supabase) — só falta alguns poucos
+  // empreendimentos (ex.: Villammare, Aura Residence). Nunca inventamos os
+  // que faltam; o filtro se adapta à cobertura real: oculto se ninguém tem
+  // área, com nota explicativa se a cobertura for parcial.
+  const comAreaConhecida = lista.filter((e) => e.areaMin !== undefined).length
+  const coberturaArea: 'nenhuma' | 'parcial' | 'total' =
+    comAreaConhecida === 0 ? 'nenhuma' : comAreaConhecida < lista.length ? 'parcial' : 'total'
+  // Achado da integração final: o subtítulo afirmava "todos... sem depender
+  // de banco" incondicionalmente, mas 6 empreendimentos Fontana (Avezzano,
+  // Bellante, Calalzo Di Cadore, Mar di Arienzo, Parco Savello, Thiene) e 3
+  // da Eraldo (Gran Michel, Horizon, Lessence) oferecem ou dependem de banco
+  // — ver @/lib/fontana-politica-financiamento e @/lib/eraldo-politica-financiamento.
+  // Computado a partir da classificação real de cada card carregado (não um
+  // texto fixo), pra continuar correto se a composição do portfólio mudar.
+  const temFinanciamentoBancario = lista.some(
+    (e) => e.politicaFinanciamento === 'bancario' || e.politicaFinanciamento === 'hibrido'
+  )
+  const subtituloFinanciamento = temFinanciamentoBancario
+    ? 'com financiamento direto da construtora disponível na maioria dos empreendimentos — em alguns, também financiamento bancário'
+    : 'todos com financiamento direto da construtora'
+  const breadcrumbSchema ={ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [ { '@type': 'ListItem', position: 1, name: 'Início', item: 'https://stivenallan.com.br' }, { '@type': 'ListItem', position: 2, name: 'Empreendimentos', item: 'https://stivenallan.com.br/empreendimentos' } ] }
   const itemListSchema = { '@context': 'https://schema.org', '@type': 'ItemList', itemListElement: lista.map((emp, i) => ({ '@type': 'ListItem', position: i + 1, name: emp.nome, url: 'https://stivenallan.com.br/empreendimento/' + emp.construtoraSlug + '/' + emp.slug })) }
 
   return (
@@ -220,7 +257,7 @@ export default async function EmpreendimentosPage() {
           <h1 className="cat-h2 fade-in fade-in-1" style={{ color: t.onDark, maxWidth: '20ch' }}>Empreendimentos em Criciúma e região</h1>
           <hr className="cat-rule fade-in fade-in-2" style={{ margin: '24px 0' }} />
           <p className="cat-serif fade-in fade-in-2" style={{ color: t.onDarkMuted, fontSize: 'clamp(15px,1.8vw,19px)', maxWidth: 560, lineHeight: 1.65 }}>
-            {lista.length} empreendimentos em {totalCidades} cidades do Sul de Santa Catarina, todos com financiamento direto da construtora, sem depender de banco.
+            {lista.length} empreendimentos em {totalCidades} cidades do Sul de Santa Catarina, {subtituloFinanciamento}.
           </p>
         </div>
       </section>
@@ -241,6 +278,7 @@ export default async function EmpreendimentosPage() {
               statusDisponiveis={statusDisponiveis}
               dormitoriosDisponiveis={dormitoriosDisponiveis}
               totalGeral={lista.length}
+              coberturaArea={coberturaArea}
             />
           </Suspense>
           <div className="cat-cards-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(300px,1fr))', gap: 'clamp(16px,2.5vw,28px)' }}>

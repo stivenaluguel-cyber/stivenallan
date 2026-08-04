@@ -15,10 +15,11 @@ import { lessence } from '@/data/eraldo/lessence'
 import { play } from '@/data/eraldo/play'
 import { symphony } from '@/data/eraldo/symphony'
 import type { Empreendimento as EraldoData, Tipologia } from '@/data/eraldo/types'
+import { classificarPoliticaFinanciamento, type PoliticaFinanciamento } from '@/lib/eraldo-politica-financiamento'
 
 const ERALDO_EMPREENDIMENTOS: readonly EraldoData[] = [arbor, granMichel, granPalazzo, harmony, horizon, lessence, play, symphony]
 
-export type EraldoCardSpecs = {
+export type EraldoTipologiaSpecs = {
   dormitoriosMin?: number
   dormitoriosMax?: number
   suitesMin?: number
@@ -27,7 +28,11 @@ export type EraldoCardSpecs = {
   areaMax?: number
   vagasMin?: number
   vagasMax?: number
+}
+
+export type EraldoCardSpecs = EraldoTipologiaSpecs & {
   previsaoEntrega?: string
+  politicaFinanciamento: PoliticaFinanciamento
 }
 
 function faixa(nums: (number | undefined)[]): { min?: number; max?: number } {
@@ -36,7 +41,7 @@ function faixa(nums: (number | undefined)[]): { min?: number; max?: number } {
   return { min: Math.min(...validos), max: Math.max(...validos) }
 }
 
-export function specsDeTipologias(tipologias: readonly Tipologia[]): EraldoCardSpecs {
+export function specsDeTipologias(tipologias: readonly Tipologia[]): EraldoTipologiaSpecs {
   const dorms = faixa(tipologias.map((t) => t.dormitorios))
   const suites = faixa(tipologias.map((t) => t.suites))
   const area = faixa(tipologias.map((t) => t.areaPrivativa))
@@ -52,10 +57,22 @@ export function specsDeTipologias(tipologias: readonly Tipologia[]): EraldoCardS
 const INDICE: Map<string, EraldoCardSpecs> = new Map(
   ERALDO_EMPREENDIMENTOS.map((e) => [
     e.slug,
-    { ...specsDeTipologias(e.tipologias), previsaoEntrega: e.status === 'entregue' ? e.dataConclusao : e.previsaoEntrega },
+    {
+      ...specsDeTipologias(e.tipologias),
+      previsaoEntrega: e.status === 'entregue' ? e.dataConclusao : e.previsaoEntrega,
+      politicaFinanciamento: classificarPoliticaFinanciamento(e.politicaComercial),
+    },
   ])
 )
 
 export function getEraldoCardSpecs(slug: string): EraldoCardSpecs | undefined {
   return INDICE.get(slug)
 }
+
+// Aura Residence é hand-crafted (não usa EmpreendimentoTemplate, não tem
+// arquivo em @/data/eraldo/*), então fica fora do índice acima — mas o
+// catálogo ainda precisa saber a política dela pro badge do card. Classificado
+// a mão a partir do texto real da própria página: a FAQ do Aura descreve
+// "parcelamento direto com a construtora... sem depender de financiamento
+// bancário" — nenhuma menção a banco como opção, portanto 'direto'.
+export const AURA_RESIDENCE_POLITICA_FINANCIAMENTO: PoliticaFinanciamento = 'direto'

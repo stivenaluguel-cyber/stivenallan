@@ -41,6 +41,7 @@ const PROPS = {
   statusDisponiveis: ['na planta', 'em obras'] as StatusObra[],
   dormitoriosDisponiveis: [2, 3],
   totalGeral: 2,
+  coberturaArea: 'total' as const,
 }
 
 function montarCards(container: HTMLElement) {
@@ -149,5 +150,37 @@ describe('CatalogFilters — Limpar filtros (P2-2/P2-3)', () => {
   it('não renderiza o botão "Limpar filtros" quando nenhum filtro está ativo', () => {
     montar()
     expect(document.querySelector('button')).toBeNull()
+  })
+})
+
+describe('CatalogFilters — cobertura de área (auditoria da integração final)', () => {
+  it('coberturaArea "nenhuma" oculta os campos de área e não mostra nota', () => {
+    act(() => {
+      root = createRoot(container)
+      root.render(<CatalogFilters {...PROPS} coberturaArea="nenhuma" />)
+    })
+    expect(document.getElementById('filtro-area-min')).toBeNull()
+    expect(document.getElementById('filtro-area-max')).toBeNull()
+    expect(document.body.textContent).not.toContain('metragem cadastrada')
+  })
+
+  it('coberturaArea "parcial" mostra os campos de área com a nota explicativa', () => {
+    act(() => {
+      root = createRoot(container)
+      root.render(<CatalogFilters {...PROPS} coberturaArea="parcial" />)
+    })
+    expect(document.getElementById('filtro-area-min')).not.toBeNull()
+    expect(document.getElementById('filtro-area-max')).not.toBeNull()
+    expect(document.body.textContent).toContain('O filtro de área considera apenas os empreendimentos com metragem cadastrada.')
+  })
+
+  it('coberturaArea "total" mostra os campos de área sem a nota', () => {
+    act(() => {
+      root = createRoot(container)
+      root.render(<CatalogFilters {...PROPS} coberturaArea="total" />)
+    })
+    expect(document.getElementById('filtro-area-min')).not.toBeNull()
+    expect(document.getElementById('filtro-area-max')).not.toBeNull()
+    expect(document.body.textContent).not.toContain('metragem cadastrada')
   })
 })

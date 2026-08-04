@@ -7,6 +7,8 @@ import { HeroImage } from '@/components/HeroImage'
 import { CookiePreferencesLink } from '@/components/CookiePreferencesLink'
 import { SkipLink } from '@/components/SkipLink'
 import { buscarCub } from '@/lib/cub-sinduscon'
+import { politicaFinanciamentoFontana } from '@/lib/fontana-politica-financiamento'
+import type { PoliticaFinanciamento } from '@/lib/eraldo-politica-financiamento'
 
 const WPP = 'https://wa.me/5548991642332'
 const WPP_MSG = WPP + '?text=Ol%C3%A1+Stiven!+Vi+seu+site+e+quero+conhecer+as+condi%C3%A7%C3%B5es+de+financiamento+direto.'
@@ -57,7 +59,7 @@ const AREAS_ATENDIDAS = ['Criciúma', 'Balneário Rincão', 'Laguna', 'Içara', 
 
 const COMO_FUNCIONA = [
   { n: '01', titulo: 'Escolha o imóvel', desc: 'Comece pelos destaques ou navegue pelo portfólio completo e escolha o empreendimento ideal para o seu momento.' },
-  { n: '02', titulo: 'Simulação personalizada', desc: 'Stiven estrutura um plano de pagamento sob medida, sem intermediação bancária.' },
+  { n: '02', titulo: 'Simulação personalizada', desc: 'Stiven estrutura um plano de pagamento sob medida, direto com a construtora ou com apoio na análise bancária.' },
   { n: '03', titulo: 'Contrato com a construtora', desc: 'Revise a documentação e as condições contratuais antes de assinar.' },
 ]
 
@@ -69,6 +71,16 @@ const DESTAQUES_HOME = [
   { slug: 'mar-positano-centro-balneario-rincao-sc', motivo: 'Para viver o mar' },
   { slug: 'monte-leone-centro-criciuma-sc', motivo: 'Para viver o centro' },
 ]
+
+// Mesma classificação de 4 categorias de @/lib/fontana-politica-financiamento —
+// os 3 destaques da home são sempre Fontana (ver DESTAQUES_HOME). 'nao_informado'
+// não gera badge (mesmo raciocínio do catálogo: preço "Sob consulta" já
+// comunica que a condição comercial não está publicada).
+const BADGE_FINANCIAMENTO: Partial<Record<PoliticaFinanciamento, string>> = {
+  direto: 'Financiamento direto',
+  bancario: 'Financiamento bancário',
+  hibrido: 'Direto ou bancário',
+}
 
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, { label: string; bg: string; color: string }> = {
@@ -89,6 +101,8 @@ function StatusBadge({ status }: { status: string }) {
 function EmpCard({ emp }: { emp: typeof imoveis[0] }) {
   const href = `/empreendimento/${emp.construtora_slug}/${emp.slug}`
   const wpp = WPP + `?text=Ol%C3%A1+Stiven!+Tenho+interesse+no+${encodeURIComponent(emp.nome)}.`
+  const politicaFinanciamento = politicaFinanciamentoFontana(emp.slug)
+  const badgeFinanciamento = BADGE_FINANCIAMENTO[politicaFinanciamento]
   return (
     <article className="home-card" style={{ position: 'relative' }}>
       <Link href={href} style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
@@ -97,7 +111,9 @@ function EmpCard({ emp }: { emp: typeof imoveis[0] }) {
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(26,24,20,0.55), transparent 50%)' }} />
           <div style={{ position: 'absolute', top: 16, left: 16, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             <StatusBadge status={emp.status} />
-            <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.22em', textTransform: 'uppercase', background: 'rgba(184,155,94,0.15)', color: '#8A7240', padding: '4px 10px', fontFamily: t.body }}>Financiamento direto</span>
+            {badgeFinanciamento && (
+              <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.22em', textTransform: 'uppercase', background: 'rgba(184,155,94,0.15)', color: '#8A7240', padding: '4px 10px', fontFamily: t.body }}>{badgeFinanciamento}</span>
+            )}
           </div>
           <div style={{ position: 'absolute', bottom: 16, left: 16, right: 16 }}>
             <p style={{ margin: 0, fontFamily: t.body, fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(245,241,234,0.70)', marginBottom: 4 }}>{emp.construtora}</p>
@@ -215,7 +231,7 @@ export default async function HomePage() {
             Morar bem não deveria depender de um banco.
           </p>
           <p className="fade-in fade-in-2" style={{ fontFamily: t.body, fontSize: 'clamp(13px,1.6vw,16px)', color: 'rgba(245,241,234,0.82)', maxWidth: 620, margin: '0 0 28px', lineHeight: 1.7, textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
-            Empreendimentos de alto padrão com financiamento direto da construtora em Criciúma, Balneário Rincão, Laguna e todo o Sul de Santa Catarina. Sem depender de banco.
+            Empreendimentos de alto padrão com financiamento direto da construtora em Criciúma, Balneário Rincão, Laguna e todo o Sul de Santa Catarina.
           </p>
           <div className="fade-in fade-in-3" style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
             <Link href="/#empreendimentos" className="home-btn" style={{ background: 'rgba(245,241,234,0.12)', borderColor: 'rgba(245,241,234,0.40)', color: '#FFFFFF', backdropFilter: 'blur(8px)' }}>Ver empreendimentos</Link>
@@ -291,7 +307,7 @@ export default async function HomePage() {
                 CRECI 60.275 · Corretor de Imóveis
               </p>
               <p className="home-serif" style={{ fontSize: 'clamp(15px,1.8vw,19px)', color: t.ink, lineHeight: 1.65, marginBottom: 24, maxWidth: 560 }}>
-                Atendimento exclusivo e especializado em empreendimentos Fontana e Eraldo com financiamento direto da construtora, sem depender de banco.
+                Atendimento exclusivo e especializado em empreendimentos Fontana e Eraldo com financiamento direto da construtora.
               </p>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 24 }}>
                 {AREAS_ATENDIDAS.map((cidade) => (
@@ -350,9 +366,9 @@ export default async function HomePage() {
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 'clamp(48px,8vh,72px)' }}>
             <p className="home-eyebrow" style={{ color: t.champagne, marginBottom: 16 }}>Como funciona</p>
-            <h2 className="home-h2" style={{ color: t.onDark }}>Financiamento direto</h2>
+            <h2 className="home-h2" style={{ color: t.onDark }}>Financiamento direto ou bancário</h2>
             <p className="home-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(15px,1.8vw,19px)', marginTop: 20, maxWidth: 520, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.65 }}>
-              Financiamento negociado diretamente com a construtora, sem intermediação bancária.
+              Condições de pagamento negociadas conforme a política comercial de cada construtora, incluindo modalidades de financiamento direto e, em alguns empreendimentos, financiamento bancário.
             </p>
           </div>
           <div className="home-how-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 'clamp(24px,3vw,40px)' }}>

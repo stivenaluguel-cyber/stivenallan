@@ -18,6 +18,11 @@ type Props = {
   statusDisponiveis: StatusObra[]
   dormitoriosDisponiveis: number[]
   totalGeral: number
+  /** 'nenhuma' oculta os campos de área (nenhum resultado tem metragem
+   * cadastrada); 'parcial' mostra os campos com uma nota explicando que só
+   * empreendimentos com metragem cadastrada entram no filtro; 'total' mostra
+   * os campos sem nota. Nunca inventamos área pra quem não tem. */
+  coberturaArea: 'nenhuma' | 'parcial' | 'total'
 }
 
 const selectStyle: React.CSSProperties = {
@@ -51,7 +56,7 @@ function empreendimentoDoCard(card: HTMLElement): Empreendimento {
   }
 }
 
-export default function CatalogFilters({ cidades, bairros, construtoras, statusDisponiveis, dormitoriosDisponiveis, totalGeral }: Props) {
+export default function CatalogFilters({ cidades, bairros, construtoras, statusDisponiveis, dormitoriosDisponiveis, totalGeral, coberturaArea }: Props) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -209,28 +214,38 @@ export default function CatalogFilters({ cidades, bairros, construtoras, statusD
           </select>
         </div>
 
-        <div>
-          <label htmlFor="filtro-area-min" style={labelStyle}>Área mín. (m²)</label>
-          <input
-            key={`area-min-${resetKey}`}
-            id="filtro-area-min" type="number" min={0} inputMode="numeric" placeholder="Ex.: 60"
-            defaultValue={filtros.areaMin ?? ''}
-            onChange={(e) => atualizar({ areaMin: e.target.value ? Number(e.target.value) : undefined })}
-            style={{ ...selectStyle, cursor: 'text' }}
-          />
-        </div>
+        {coberturaArea !== 'nenhuma' && (
+          <>
+            <div>
+              <label htmlFor="filtro-area-min" style={labelStyle}>Área mín. (m²)</label>
+              <input
+                key={`area-min-${resetKey}`}
+                id="filtro-area-min" type="number" min={0} inputMode="numeric" placeholder="Ex.: 60"
+                defaultValue={filtros.areaMin ?? ''}
+                onChange={(e) => atualizar({ areaMin: e.target.value ? Number(e.target.value) : undefined })}
+                style={{ ...selectStyle, cursor: 'text' }}
+              />
+            </div>
 
-        <div>
-          <label htmlFor="filtro-area-max" style={labelStyle}>Área máx. (m²)</label>
-          <input
-            key={`area-max-${resetKey}`}
-            id="filtro-area-max" type="number" min={0} inputMode="numeric" placeholder="Ex.: 200"
-            defaultValue={filtros.areaMax ?? ''}
-            onChange={(e) => atualizar({ areaMax: e.target.value ? Number(e.target.value) : undefined })}
-            style={{ ...selectStyle, cursor: 'text' }}
-          />
-        </div>
+            <div>
+              <label htmlFor="filtro-area-max" style={labelStyle}>Área máx. (m²)</label>
+              <input
+                key={`area-max-${resetKey}`}
+                id="filtro-area-max" type="number" min={0} inputMode="numeric" placeholder="Ex.: 200"
+                defaultValue={filtros.areaMax ?? ''}
+                onChange={(e) => atualizar({ areaMax: e.target.value ? Number(e.target.value) : undefined })}
+                style={{ ...selectStyle, cursor: 'text' }}
+              />
+            </div>
+          </>
+        )}
       </div>
+
+      {coberturaArea === 'parcial' && (
+        <p style={{ margin: '-6px 0 16px', fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 12, color: '#8A7240', lineHeight: 1.5 }}>
+          O filtro de área considera apenas os empreendimentos com metragem cadastrada.
+        </p>
+      )}
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
         <p ref={statusRef} tabIndex={-1} role="status" aria-live="polite" style={{ margin: 0, fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 13, color: '#6B655B' }}>

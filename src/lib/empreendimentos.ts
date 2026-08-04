@@ -3,6 +3,8 @@
 // Dados (nome/status/preço/etc.) vêm de @/data/imoveis; home e sitemap leem
 // @/data/imoveis diretamente via getVitrineImoveis.
 import { imoveis } from '@/data/imoveis';
+import { politicaFinanciamentoFontana } from './fontana-politica-financiamento';
+import type { PoliticaFinanciamento } from './eraldo-politica-financiamento';
 
 export type StatusObra = 'na planta' | 'em obras' | 'pronto' | 'entregue';
 
@@ -42,6 +44,14 @@ export interface Empreendimento {
   suitesMax?: number;
   vagasMin?: number;
   vagasMax?: number;
+  // Classificação real da política de financiamento (mesmo sistema de
+  // @/lib/eraldo-politica-financiamento) — populada pro card do catálogo nunca
+  // afirmar "financiamento direto" quando o texto real da página descreve
+  // banco como única opção ou como alternativa. Opcional como as outras da
+  // ficha técnica — ausente só em reconstruções parciais (ex.: filtro
+  // client-side), nunca em EMPREENDIMENTOS (ver teste de cobertura completa
+  // em fontana-politica-financiamento.test.ts).
+  politicaFinanciamento?: PoliticaFinanciamento;
 }
 
 // Imagem do Mar di Atrani em /empreendimentos usa uma URL diferente da capa no
@@ -71,6 +81,7 @@ export const EMPREENDIMENTOS: Empreendimento[] = [...imoveis]
     precoAPartirDe: i.preco ?? undefined,
     frase: i.frase,
     construtoraNome: i.construtora,
+    politicaFinanciamento: politicaFinanciamentoFontana(i.slug),
   }));
 
 export function getEmpreendimentosVisiveis(): Empreendimento[] {

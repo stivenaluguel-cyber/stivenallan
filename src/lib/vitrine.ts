@@ -1,7 +1,7 @@
 import { imoveis } from "@/data/imoveis";
 import { EMPREENDIMENTOS, type Empreendimento } from "@/lib/empreendimentos";
 import { createClient } from "@/lib/supabase/server";
-import { getEraldoCardSpecs } from "@/lib/eraldo-specs";
+import { getEraldoCardSpecs, AURA_RESIDENCE_POLITICA_FINANCIAMENTO } from "@/lib/eraldo-specs";
 import { extrairFaixaNumerica, extrairInteiro } from "@/lib/imoveis/specs";
 
 // Item da vitrine da Home, no mesmo formato do array estatico @/data/imoveis.
@@ -157,9 +157,18 @@ export async function getVitrineEmpreendimentos(): Promise<Empreendimento[]> {
 
 function enriquecerComEraldo(e: Empreendimento): Empreendimento {
   const specs = getEraldoCardSpecs(e.slug);
-  if (!specs) return e;
+  if (!specs) {
+    // Aura Residence é hand-crafted e não tem arquivo em @/data/eraldo/*, então
+    // não aparece no índice de specs — mas o card do catálogo ainda precisa da
+    // política de financiamento real dela (classificada a mão, ver eraldo-specs.ts).
+    if (e.slug === 'aura-residence-centro-criciuma-sc') {
+      return { ...e, politicaFinanciamento: AURA_RESIDENCE_POLITICA_FINANCIAMENTO };
+    }
+    return e;
+  }
   return {
     ...e,
+    politicaFinanciamento: specs.politicaFinanciamento,
     dorms: specs.dormitoriosMin !== undefined ? (specs.dormitoriosMin === specs.dormitoriosMax ? String(specs.dormitoriosMin) : `${specs.dormitoriosMin} a ${specs.dormitoriosMax}`) : undefined,
     dormitoriosMin: specs.dormitoriosMin,
     dormitoriosMax: specs.dormitoriosMax,
