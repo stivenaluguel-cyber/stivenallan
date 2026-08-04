@@ -1,11 +1,12 @@
 import OpenAI from 'openai'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { buscarConhecimentoRelevante, montarBlocoContexto } from '@/lib/leads/base-conhecimento'
 
 // Lazy initialization - evita erro de build quando env vars nao estao presentes
 let _openai: OpenAI | null = null
 let _supabase: SupabaseClient<any, any, any> | null = null
 
-function getOpenAI(): OpenAI {
+export function getOpenAI(): OpenAI {
   if (!_openai) {
     _openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
@@ -218,8 +219,15 @@ export async function processarMensagem(
 ): Promise<string> {
   const openai = getOpenAI()
 
+  // Contexto de atendimentos anteriores (loop de auto-aprendizado, item 2) —
+  // só acrescenta ao prompt base, nunca substitui. Falha de busca já
+  // devolve [] internamente (ver base-conhecimento.ts), então isso nunca
+  // atrasa nem derruba a resposta principal.
+  const conhecimentoRelevante = await buscarConhecimentoRelevante(getSupabase(), mensagem)
+  const systemPromptFinal = SYSTEM_PROMPT + montarBlocoContexto(conhecimentoRelevante)
+
   const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
-    { role: 'system', content: SYSTEM_PROMPT },
+    { role: 'system', content: systemPromptFinal },
     ...historico.map(m => ({ role: m.role, content: m.content } as OpenAI.Chat.Completions.ChatCompletionMessageParam)),
     { role: 'user', content: mensagem },
   ]

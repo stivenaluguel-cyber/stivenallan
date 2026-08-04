@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { processarMensagem, type MensagemChat } from '@/lib/agent'
 import { enviarMensagem, enviarAlertaEscalada } from '@/lib/evolution'
+import { detectarPalavraChaveOptOut, MENSAGEM_CONFIRMACAO_OPTOUT } from '@/lib/leads/whatsapp-optout'
+import { podeEnviarAutomatico } from '@/lib/leads/whatsapp-envio-limite'
+import { classificarSentimento } from '@/lib/leads/sentimento'
 
 export const dynamic = 'force-dynamic'
 
@@ -103,20 +106,68 @@ async function processarEResponder(whatsapp: string, texto: string) {
       .map((m) => ({ role: m.direcao === 'entrada' ? ('user' as const) : ('assistant' as const), content: m.mensagem }))
 
     // Loga a mensagem recebida sempre — mesmo se o bot estiver pausado, o
-    // corretor precisa ver isso na caixa de entrada do painel.
-    await supabase.from('interacoes').insert({
-      lead_id: lead.id,
-      canal: 'whatsapp',
-      direcao: 'entrada',
-      mensagem: texto,
-    })
+    // corretor precisa ver isso na caixa de entrada do painel. Guarda o id
+    // pra poder gravar o sentimento nessa mesma linha logo abaixo.
+    const { data: interacaoEntrada } = await supabase
+      .from('interacoes')
+      .insert({
+        lead_id: lead.id,
+        canal: 'whatsapp',
+        direcao: 'entrada',
+        mensagem: texto,
+      })
+      .select('id')
+      .single()
+
+    // Opt-out por palavra-chave (PARAR/STOP/SAIR/...) — verificado antes de
+    // qualquer resposta automática. Uma única confirmação FIXA (não gerada
+    // pela IA) e para por aqui: nenhuma automação futura manda mensagem pra
+    // esse lead até ele escrever de novo por conta própria.
+    if (detectarPalavraChaveOptOut(texto)) {
+      await supabase
+        .from('leads')
+        .update({ whatsapp_optout_at: new Date().toISOString(), whatsapp_optout_motivo: 'pedido_via_whatsapp' })
+        .eq('id', lead.id)
+
+      const enviouConfirmacao = await enviarMensagem(whatsapp, MENSAGEM_CONFIRMACAO_OPTOUT)
+      if (enviouConfirmacao) {
+        await supabase.from('interacoes').insert({
+          lead_id: lead.id,
+          canal: 'whatsapp',
+          direcao: 'saida',
+          mensagem: MENSAGEM_CONFIRMACAO_OPTOUT,
+          processado_por_ia: false,
+          intencao_detectada: 'optout_confirmado',
+        })
+      }
+      return
+    }
 
     if (lead.atendimento_humano_ativo) {
       // Corretor assumiu a conversa manualmente pelo painel — bot fica calado.
       return
     }
 
-    const resposta = await processarMensagem(whatsapp, texto, historico)
+    // Sentimento roda em paralelo com a geração da resposta — chamada extra
+    // pequena e barata (sem tools), nunca atrasa o caminho principal e cai
+    // em 'neutro' se falhar (ver classificarSentimento).
+    const [resposta, sentimento] = await Promise.all([
+      processarMensagem(whatsapp, texto, historico),
+      classificarSentimento(texto),
+    ])
+
+    if (interacaoEntrada?.id) {
+      await supabase.from('interacoes').update({ sentimento }).eq('id', interacaoEntrada.id)
+    }
+
+    // Reaproveita o mecanismo de escalada que já existe pra requer_atencao —
+    // sentimento negativo/urgente também precisa acordar o Stiven, não só
+    // score alto. Persiste already aqui (não só no flag local) pra não se
+    // perder se algo falhar antes do bloco de alerta lá embaixo.
+    const precisaEscalarPorSentimento = sentimento === 'negativo' || sentimento === 'urgente'
+    if (precisaEscalarPorSentimento && !lead.requer_atencao) {
+      await supabase.from('leads').update({ requer_atencao: true }).eq('id', lead.id)
+    }
 
     // Reconfere fresh: o corretor pode ter assumido a conversa nos segundos
     // entre o início do processamento e a resposta do LLM. Não elimina a
@@ -128,6 +179,15 @@ async function processarEResponder(whatsapp: string, texto: string) {
       .single()
 
     if (leadFresh?.atendimento_humano_ativo) return
+
+    // Teto diário de mensagens automáticas por lead — protege contra bug de
+    // loop/reenvio. A mensagem da IA já foi gerada e continua visível pro
+    // corretor no painel (foi logada como 'entrada' a pergunta do lead);
+    // só o envio automático fica em espera até o corretor assumir.
+    if (!(await podeEnviarAutomatico(supabase, lead.id))) {
+      console.warn('[processarEResponder] limite diário de envio automático atingido', whatsapp)
+      return
+    }
 
     const enviado = await enviarMensagem(whatsapp, resposta)
 
@@ -143,7 +203,7 @@ async function processarEResponder(whatsapp: string, texto: string) {
       })
     }
 
-    if (lead.requer_atencao) {
+    if (lead.requer_atencao || precisaEscalarPorSentimento) {
       await enviarAlertaEscalada(whatsapp, lead.nome, lead.lead_score)
       await supabase
         .from('leads')
