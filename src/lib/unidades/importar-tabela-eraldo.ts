@@ -71,7 +71,20 @@ export type UnidadeEraldo = {
   metragem_global: number
   /** Quantidade de CUB — a coluna que sustenta a conferência. */
   cub_quantidade: number
+  /**
+   * O que se paga de fato — base das colunas de pagamento abaixo. Em mês de
+   * campanha (Aura, agosto/2026) é o preço COM desconto: a tabela imprime uma
+   * coluna extra ("CAMPANHA") entre o preço cheio e a entrada, e é sobre ela
+   * que entrada/reforço/mensal são calculados, não sobre o preço de tabela.
+   */
   preco: number
+  /**
+   * Preço de tabela, sem o desconto da campanha. Nulo quando não há campanha
+   * — `preco` já É o de tabela, duplicar seria redundância que pode divergir.
+   * A conferência de CUB usa sempre este valor (ou `preco`, na ausência
+   * dele): o CUB é propriedade do imóvel, não muda com desconto comercial.
+   */
+  preco_tabela: number | null
   colunas: ColunaPagamento[]
 }
 
@@ -89,6 +102,16 @@ export type CabecalhoEraldo = {
   endereco: string | null
   /** A última coluna é saldo financiado (pós-chaves / bancário / direto). */
   tem_financiamento: boolean
+  /**
+   * A tabela imprime uma coluna extra de preço promocional ("PREÇO CAMPANHA")
+   * antes das colunas de pagamento. Achado em agosto/2026: a Eraldo lançou o
+   * "Mês do Corretor" com condições especiais em vários prédios, e a Aura foi
+   * a única a materializar isso como COLUNA (as outras — Árbor, Gran Palazzo,
+   * Horizon, L'Essence — só mudaram os PERCENTUAIS do cabeçalho, que o parser
+   * já lê sem ajuda). Sem detectar a coluna extra, a linha da unidade tem um
+   * valor a mais do que as invariantes esperam e a tabela inteira é rejeitada.
+   */
+  tem_preco_campanha: boolean
   /** Do rodapé: "Prazo de entrega Junho de 2028". */
   previsao_entrega: string | null
   /** Condições comerciais do rodapé — os descontos de 5%, 7% e 10%. */
@@ -173,6 +196,7 @@ function parseCabecalho(texto: string): CabecalhoEraldo {
   // de financiamento em todas as tabelas ("Condição 2 - … financiamento
   // bancário"), inclusive nas que não têm essa coluna.
   const tem_financiamento = /P[ÓO]S\s*CHAVES|FINANC|FIN\.|BANC[ÁA]RI|DIRETO\s+CONSTR/i.test(cabecalho)
+  const tem_preco_campanha = /CAMPANHA/i.test(cabecalho)
 
   const meses = texto.match(/AT[ÉE]\s*(\d{1,3})\s*(?:X|PARCELAS)/i)
   // O rodapé do Gran Michel escreve "IGPM + 075% ao mês" — sem a vírgula. Um
@@ -197,6 +221,7 @@ function parseCabecalho(texto: string): CabecalhoEraldo {
     indice: /IGPM/i.test(texto) ? 'IGPM' : null,
     endereco: end ? end[1].trim() : null,
     tem_financiamento,
+    tem_preco_campanha,
     previsao_entrega: entrega ? entrega[1].trim() : null,
     // Preenchidos depois, quando se sabe onde termina a última unidade.
     opcoes_pagamento: [],
@@ -316,18 +341,26 @@ export function parsearTabelaEraldo(texto: string): ResultadoEraldo {
       rejeitadas.push({ unidade, motivo: 'percentuais do cabeçalho não lidos' })
       continue
     }
-    // Uma coluna de preço + uma por percentual. Nem mais nem menos: valor
-    // sobrando é linha colada de outra unidade, valor faltando é coluna que
-    // não foi lida.
-    if (reais.length !== pct.length + 1 || areas.length < 3) {
+    // Uma coluna de preço + uma por percentual — e mais uma, em mês de
+    // campanha, para o preço promocional. Nem mais nem menos: valor sobrando
+    // é linha colada de outra unidade, valor faltando é coluna que não foi
+    // lida.
+    const esperado = pct.length + (cabecalho.tem_preco_campanha ? 2 : 1)
+    if (reais.length !== esperado || areas.length < 3) {
       rejeitadas.push({
         unidade,
-        motivo: `colunas fora do esperado (${areas.length} áreas, ${reais.length} valores; esperados 3 e ${pct.length + 1})`,
+        motivo: `colunas fora do esperado (${areas.length} áreas, ${reais.length} valores; esperados 3 e ${esperado})`,
       })
       continue
     }
 
-    const [preco, ...fatias] = reais
+    // Com campanha: reais = [tabela, campanha, ...fatias]. O CUB é do imóvel
+    // — não muda com desconto —, então a conferência usa sempre o preço de
+    // TABELA; as colunas de pagamento (entrada, reforço, mensal) usam o
+    // preço de CAMPANHA, que é o que o cabeçalho declara ser a base delas.
+    const precoTabela = reais[0]
+    const preco = cabecalho.tem_preco_campanha ? reais[1] : reais[0]
+    const fatias = cabecalho.tem_preco_campanha ? reais.slice(2) : reais.slice(1)
     const cubQtd = areas[2]
     if (!Number.isFinite(preco) || preco <= 0) problemas.push('preço ausente')
 
@@ -335,8 +368,8 @@ export function parsearTabelaEraldo(texto: string): ResultadoEraldo {
     // impressa vezes o CUB do mês.
     if (cub === null) {
       problemas.push('CUB do cabeçalho não lido')
-    } else if (Math.abs(preco / cub - cubQtd) > TOLERANCIA_CUB) {
-      problemas.push(`CUB não fecha: ${(preco / cub).toFixed(2)} calculado ≠ ${cubQtd.toFixed(2)} impresso`)
+    } else if (Math.abs(precoTabela / cub - cubQtd) > TOLERANCIA_CUB) {
+      problemas.push(`CUB não fecha: ${(precoTabela / cub).toFixed(2)} calculado ≠ ${cubQtd.toFixed(2)} impresso`)
     }
 
     const qtds: number[] = []
@@ -387,6 +420,7 @@ export function parsearTabelaEraldo(texto: string): ResultadoEraldo {
         metragem_global: areas[1],
         cub_quantidade: cubQtd,
         preco,
+        preco_tabela: cabecalho.tem_preco_campanha ? precoTabela : null,
       },
     })
   }

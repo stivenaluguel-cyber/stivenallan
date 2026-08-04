@@ -72,6 +72,70 @@ Apto 301 2 1 - 61,18 115,76 191,00 R$ 596.239,95 R$ 178.871,98 R$ 417.367,96
 6- Prazo de entrega dos aptos decorados:OUTUBRO/2025
 `
 
+// Tabela de agosto/2026 — "Mês do Corretor". A Eraldo inseriu uma coluna de
+// preço promocional entre o preço de tabela e a entrada; as três colunas de
+// pagamento são fração do preço COM desconto, não do preço cheio.
+const AURA_CAMPANHA = `CUB (AGOSTO/2026)  R$ 3.151,24 LANÇAMENTO
+ÁREAS REFORÇOS PARCELAS
+UNIDADES
+APTO PREÇO CAMPANHA ENTRADA ANUAIS X MENSAIS x
+GLOBAL TOTAL CUB
+(m²) (R$) (R$) 6 74
+APTO DEP. VAGAS GARAGEM (m²)
+PRIVAT. 10% 20% 70%
+Dep. 12 V 01 V 28
+Apto 201 - 155,82 281,06 563,96 R$ 1.777.176,28 R$ 1.682.806,28 R$ 168.280,63 R$ 56.093,54 R$ 15.918,44
+(Subsolo 3) (Subsolo 3) (Subsolo 3)
+Dep. 2 V 04 V 05
+Apto 203 - 155,76 277,38 581,03 R$ 1.830.975,62 R$ 1.660.748,86 R$ 166.074,89 R$ 55.358,30 R$ 15.709,79
+(Subsolo 3) (Subsolo 3) (Subsolo 3)
+4 - Prazo de entrega ABR/29.
+`
+
+describe('preço de campanha (agosto/2026 — Mês do Corretor)', () => {
+  it('detecta a coluna extra pelo cabeçalho', () => {
+    expect(parsearTabelaEraldo(AURA_CAMPANHA).cabecalho.tem_preco_campanha).toBe(true)
+    expect(parsearTabelaEraldo(GRAN_MICHEL).cabecalho.tem_preco_campanha).toBe(false)
+  })
+
+  it('calcula entrada/reforço/mensal sobre o preço COM desconto, não o de tabela', () => {
+    const r = parsearTabelaEraldo(AURA_CAMPANHA)
+
+    expect(r.rejeitadas).toEqual([])
+    expect(r.unidades).toHaveLength(2)
+    // 10% de R$ 1.682.806,28 (campanha) = R$ 168.280,63 — bate.
+    // 10% de R$ 1.777.176,28 (tabela) seria R$ 177.717,63 — não bate.
+    expect(coluna(r.unidades[0], 'entrada')?.valor).toBe(168280.63)
+    expect(r.unidades[0].preco).toBe(1682806.28)
+    expect(r.unidades[0].preco_tabela).toBe(1777176.28)
+  })
+
+  it('a conferência de CUB usa o preço de TABELA — o CUB é do imóvel, não muda com desconto', () => {
+    // Se a conferência usasse o preço de campanha aqui, a linha seria
+    // rejeitada: 1.682.806,28 / 3.151,24 = 534,04, muito longe de 563,96.
+    const r = parsearTabelaEraldo(AURA_CAMPANHA)
+    expect(r.rejeitadas).toEqual([])
+    expect(r.unidades[0].cub_quantidade).toBe(563.96)
+  })
+
+  it('sem campanha, preco_tabela fica nulo — preco já É o de tabela', () => {
+    const r = parsearTabelaEraldo(GRAN_MICHEL)
+    expect(r.unidades.every((u) => u.preco_tabela === null)).toBe(true)
+  })
+
+  it('a linha rejeita com o número certo de colunas esperadas quando falta a de campanha', () => {
+    // Simula a coluna de campanha desaparecer de uma única linha (erro de
+    // extração) — a tabela inteira já foi identificada como "tem campanha"
+    // pelo cabeçalho, então a linha tem que ter as 5 colunas, não 4.
+    const semCampanhaNaLinha = AURA_CAMPANHA.replace(
+      'R$ 1.777.176,28 R$ 1.682.806,28 R$ 168.280,63 R$ 56.093,54 R$ 15.918,44',
+      'R$ 1.682.806,28 R$ 168.280,63 R$ 56.093,54 R$ 15.918,44',
+    )
+    const r = parsearTabelaEraldo(semCampanhaNaLinha)
+    expect(r.rejeitadas.find((x) => x.unidade === '201')?.motivo).toContain('colunas fora do esperado')
+  })
+})
+
 describe('estrutura de pagamento — cada tabela tem a sua', () => {
   it('lê as quatro colunas do Gran Michel e deriva as quantidades', () => {
     const r = parsearTabelaEraldo(GRAN_MICHEL)
