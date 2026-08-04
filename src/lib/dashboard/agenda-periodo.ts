@@ -11,6 +11,8 @@
  * mesmo dia e a semana volta com seis dias.
  */
 
+import { toSaoPauloDateString } from './timezone-sp'
+
 export const VISTAS = [
   { value: 'dia', label: 'Dia' },
   { value: 'semana', label: 'Semana' },
@@ -94,9 +96,11 @@ export function agruparPorDia<T extends { data_hora: string }>(eventos: T[]): { 
   const mapa = new Map<string, T[]>()
 
   for (const ev of eventos) {
-    // Fatiar o ISO pegaria a data em UTC e jogaria evento das 21h de SP para
-    // o dia seguinte. A data tem que sair do horário local.
-    const dia = paraTexto(new Date(ev.data_hora))
+    // Os getters locais (getFullYear/getMonth/getDate) leem no fuso do
+    // PROCESSO, não de São Paulo — corretos só numa máquina configurada pra
+    // SP; na Vercel e no CI (UTC) jogam evento das 21h de SP pro dia
+    // seguinte. Precisa do conversor explícito de fuso.
+    const dia = toSaoPauloDateString(ev.data_hora)
     const lista = mapa.get(dia) ?? []
     lista.push(ev)
     mapa.set(dia, lista)
