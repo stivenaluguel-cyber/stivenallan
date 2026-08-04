@@ -50,10 +50,6 @@ function linkBuscaCnpj(nome: string, endereco: string | null): string {
   return 'https://www.google.com/search?q=' + encodeURIComponent(termo)
 }
 
-function confirmarPromover(nome: string): boolean {
-  return window.confirm('Promover "' + nome + '" para o CRM de clientes? Isso cria um lead de verdade — não dá pra desfazer clicando de novo.')
-}
-
 export default function ProspeccaoDetalhePage() {
   const params = useParams<{ id: string }>()
   const router = useRouter()
@@ -125,8 +121,13 @@ export default function ProspeccaoDetalhePage() {
     }
   }
 
+  // Sem confirm() nativo de propósito: trava a renderização (inclusive
+  // testes automatizados e, em navegador embutido/PWA, pode nem aparecer
+  // direito) e o resto do dashboard já resolve confirmação de ação
+  // irreversível com um passo a mais na própria UI (ver "Excluir" em
+  // /dashboard/leads). Quem chama já pediu essa confirmação antes de
+  // invocar promover — ver `confirmando` em LeadCard/LeadDetalheModal.
   async function promover(lead: ProspeccaoLead) {
-    if (!confirmarPromover(lead.nome)) return
     setPromovendoId(lead.id); setErro('')
     try {
       const res = await fetch('/api/admin/prospeccao/leads/' + lead.id + '/promover', { method: 'POST' })
@@ -259,6 +260,7 @@ function LeadCard({
   onPromover: () => void
   onAbrirNoCrm: () => void
 }) {
+  const [confirmando, setConfirmando] = useState(false)
   const cor = CLASSIFICACAO_COR[lead.classificacao ?? ''] ?? D.muted
   const wa = linkWhatsappProspeccao(lead.telefone, lead.nome, produto)
   const arrastavel = lead.status !== 'promovido'
@@ -306,13 +308,22 @@ function LeadCard({
           <button onClick={(e) => { parar(e); onAbrirNoCrm() }} style={{ background: D.ink, color: '#fff', border: 'none', borderRadius: 6, padding: '5px 8px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
             Ver no CRM
           </button>
+        ) : confirmando ? (
+          <>
+            <button
+              onClick={(e) => { parar(e); setConfirmando(false); onPromover() }}
+              disabled={promovendo}
+              style={{ background: D.red, color: '#fff', border: 'none', borderRadius: 6, padding: '5px 8px', fontSize: 11, fontWeight: 700, cursor: promovendo ? 'default' : 'pointer', opacity: promovendo ? 0.6 : 1 }}
+            >
+              {promovendo ? 'Promovendo...' : 'Confirma?'}
+            </button>
+            <button onClick={(e) => { parar(e); setConfirmando(false) }} style={{ background: 'none', border: '1px solid ' + D.line, color: D.muted, borderRadius: 6, padding: '5px 8px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
+              Cancelar
+            </button>
+          </>
         ) : (
-          <button
-            onClick={(e) => { parar(e); onPromover() }}
-            disabled={promovendo}
-            style={{ background: D.bronze, color: '#fff', border: 'none', borderRadius: 6, padding: '5px 8px', fontSize: 11, fontWeight: 700, cursor: promovendo ? 'default' : 'pointer', opacity: promovendo ? 0.6 : 1 }}
-          >
-            {promovendo ? 'Promovendo...' : 'Promover'}
+          <button onClick={(e) => { parar(e); setConfirmando(true) }} style={{ background: D.bronze, color: '#fff', border: 'none', borderRadius: 6, padding: '5px 8px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
+            Promover
           </button>
         )}
       </div>
@@ -346,6 +357,7 @@ function LeadDetalheModal({
   onPromover: () => void
   onAbrirNoCrm: () => void
 }) {
+  const [confirmando, setConfirmando] = useState(false)
   const cor = CLASSIFICACAO_COR[lead.classificacao ?? ''] ?? D.muted
   const wa = linkWhatsappProspeccao(lead.telefone, lead.nome, produto)
 
@@ -436,13 +448,25 @@ function LeadDetalheModal({
               <button onClick={onAbrirNoCrm} style={{ flex: '1 1 140px', background: D.ink, color: '#fff', border: 'none', borderRadius: 8, padding: '10px 12px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
                 Ver no CRM
               </button>
+            ) : confirmando ? (
+              <>
+                <button
+                  onClick={() => { setConfirmando(false); onPromover() }}
+                  disabled={promovendo}
+                  style={{ flex: '1 1 140px', background: D.red, color: '#fff', border: 'none', borderRadius: 8, padding: '10px 12px', fontSize: 13, fontWeight: 700, cursor: promovendo ? 'default' : 'pointer', opacity: promovendo ? 0.6 : 1 }}
+                >
+                  {promovendo ? 'Promovendo...' : 'Confirma? Cria lead de verdade'}
+                </button>
+                <button onClick={() => setConfirmando(false)} style={{ flex: '1 1 100px', background: 'none', border: '1px solid ' + D.line, color: D.muted, borderRadius: 8, padding: '10px 12px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                  Cancelar
+                </button>
+              </>
             ) : (
               <button
-                onClick={onPromover}
-                disabled={promovendo}
-                style={{ flex: '1 1 140px', background: D.bronze, color: '#fff', border: 'none', borderRadius: 8, padding: '10px 12px', fontSize: 13, fontWeight: 700, cursor: promovendo ? 'default' : 'pointer', opacity: promovendo ? 0.6 : 1 }}
+                onClick={() => setConfirmando(true)}
+                style={{ flex: '1 1 140px', background: D.bronze, color: '#fff', border: 'none', borderRadius: 8, padding: '10px 12px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
               >
-                {promovendo ? 'Promovendo...' : 'Promover para o CRM'}
+                Promover para o CRM
               </button>
             )}
           </div>
