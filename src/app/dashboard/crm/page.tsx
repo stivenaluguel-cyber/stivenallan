@@ -465,6 +465,8 @@ function LeadCard({ lead, onDragStart, onSelect, onMover }: { lead: Lead; onDrag
   // corretores. Só aparece enquanto ainda faz diferença: depois de atendido,
   // o selo some em vez de virar alarme permanente.
   const sla = statusSla(lead)
+  // 'fora_da_janela' e 'atendido' devolvem texto vazio: o selo some em vez
+  // de virar alarme permanente em lead antigo.
   const mostrarSla = sla.estado !== 'atendido' && sla.texto !== ''
 
   return (
