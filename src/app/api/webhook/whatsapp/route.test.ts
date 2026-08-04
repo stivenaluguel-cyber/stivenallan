@@ -47,6 +47,8 @@ import { POST } from './route'
 type MockConfig = {
   lead?: Record<string, unknown>
   leadFreshAtendimentoHumano?: boolean
+  midJaExiste?: boolean
+  midConflitoNoInsert?: string
 }
 
 function makeSupabase(cfg: MockConfig = {}) {
@@ -88,17 +90,29 @@ function makeSupabase(cfg: MockConfig = {}) {
       }
       if (table === 'interacoes') {
         return {
-          select: () => ({
-            eq: () => ({
-              eq: () => ({
-                order: () => ({
-                  limit: async () => ({ data: [], error: null }),
-                }),
-              }),
-            }),
-          }),
+          // Serve duas consultas bem diferentes: o histórico (.eq().eq().order().limit())
+          // e o check de idempotência por mid (.eq('mid', mid).maybeSingle()). Como
+          // .eq() sempre devolve a própria chain, os dois caminhos convivem no mesmo objeto.
+          select: () => {
+            const chain = {
+              eq: () => chain,
+              order: () => ({ limit: async () => ({ data: [], error: null }) }),
+              maybeSingle: async () => ({ data: cfg.midJaExiste ? { id: 'interacao-existente' } : null, error: null }),
+            }
+            return chain
+          },
           insert: (row: Record<string, unknown>) => {
             interacoesInserts.push(row)
+            if (cfg.midConflitoNoInsert && row.mid === cfg.midConflitoNoInsert) {
+              return {
+                select: () => ({
+                  single: async () => ({
+                    data: null,
+                    error: { code: '23505', message: 'duplicate key value violates unique constraint "interacoes_mid_key"' },
+                  }),
+                }),
+              }
+            }
             return {
               select: () => ({
                 single: async () => ({ data: { id: 'interacao-' + interacoesInserts.length }, error: null }),
@@ -117,18 +131,23 @@ function makeSupabase(cfg: MockConfig = {}) {
   }
 }
 
-function makeReq(body: unknown) {
+const SECRET_VALIDO = 'segredo-de-teste-evolution'
+
+// Por padrão já manda o Authorization correto — a maioria dos testes aqui
+// não é sobre autenticação, e sem isso todo teste existente quebraria com
+// 401. O describe de autenticação abaixo sobrescreve headers explicitamente.
+function makeReq(body: unknown, headers: Record<string, string> = { authorization: `Bearer ${SECRET_VALIDO}` }) {
   return {
-    headers: new Headers(),
+    headers: new Headers(headers),
     json: async () => body,
   } as unknown as NextRequest
 }
 
-const EVENTO_MENSAGEM = (texto: string) => ({
+const EVENTO_MENSAGEM = (texto: string, mid = 'MID-PADRAO-TESTE') => ({
   event: 'messages.upsert',
   instance: 'stiven',
   data: {
-    key: { remoteJid: '5548999999999@s.whatsapp.net', fromMe: false },
+    key: { remoteJid: '5548999999999@s.whatsapp.net', fromMe: false, id: mid },
     message: { conversation: texto },
   },
 })
@@ -146,6 +165,7 @@ describe('POST /api/webhook/whatsapp', () => {
   beforeEach(() => {
     process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://test'
     process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-key'
+    process.env.EVOLUTION_WEBHOOK_SECRET = SECRET_VALIDO
     vi.spyOn(console, 'log').mockImplementation(() => {})
     vi.spyOn(console, 'warn').mockImplementation(() => {})
     vi.spyOn(console, 'error').mockImplementation(() => {})
@@ -228,5 +248,139 @@ describe('POST /api/webhook/whatsapp', () => {
     expect(evolutionHolder.enviarAlertaEscalada).toHaveBeenCalledTimes(1)
     expect(mock.leadsUpdates.some((u) => u.requer_atencao === true)).toBe(true)
     expect(mock.leadsUpdates.some((u) => u.requer_atencao === false)).toBe(true)
+  })
+})
+
+describe('POST /api/webhook/whatsapp — autenticação', () => {
+  beforeEach(() => {
+    process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://test'
+    process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-key'
+    process.env.EVOLUTION_WEBHOOK_SECRET = SECRET_VALIDO
+    vi.spyOn(console, 'log').mockImplementation(() => {})
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    agentHolder.processarMensagem.mockClear().mockResolvedValue('resposta da IA')
+    evolutionHolder.enviarMensagem.mockClear().mockResolvedValue(true)
+  })
+
+  afterEach(() => {
+    supabaseHolder.current = null as unknown as ReturnType<typeof makeSupabase>
+    vi.restoreAllMocks()
+  })
+
+  it('401 sem header Authorization', async () => {
+    const res = await POST(makeReq(EVENTO_MENSAGEM('oi'), {}))
+    await aguardarProcessamentoAssincrono()
+
+    expect(res.status).toBe(401)
+    expect(agentHolder.processarMensagem).not.toHaveBeenCalled()
+  })
+
+  it('401 com segredo incorreto', async () => {
+    const res = await POST(makeReq(EVENTO_MENSAGEM('oi'), { authorization: 'Bearer segredo-errado' }))
+    await aguardarProcessamentoAssincrono()
+
+    expect(res.status).toBe(401)
+    expect(agentHolder.processarMensagem).not.toHaveBeenCalled()
+  })
+
+  it('401 com header Authorization sem o prefixo Bearer', async () => {
+    const res = await POST(makeReq(EVENTO_MENSAGEM('oi'), { authorization: SECRET_VALIDO }))
+    expect(res.status).toBe(401)
+  })
+
+  it('401 quando EVOLUTION_WEBHOOK_SECRET não está configurado — fail-closed, não "aceita tudo"', async () => {
+    delete process.env.EVOLUTION_WEBHOOK_SECRET
+    const res = await POST(makeReq(EVENTO_MENSAGEM('oi')))
+    await aguardarProcessamentoAssincrono()
+
+    expect(res.status).toBe(401)
+    expect(agentHolder.processarMensagem).not.toHaveBeenCalled()
+  })
+
+  it('200 e processa normalmente com o segredo correto', async () => {
+    const mock = makeSupabase()
+    supabaseHolder.current = mock
+
+    const res = await POST(makeReq(EVENTO_MENSAGEM('oi')))
+    await aguardarProcessamentoAssincrono()
+
+    expect(res.status).toBe(200)
+    expect(agentHolder.processarMensagem).toHaveBeenCalledTimes(1)
+  })
+
+  it('não loga o segredo esperado nem o header recebido, nem em caso de rejeição', async () => {
+    const logSpy = vi.spyOn(console, 'warn')
+    await POST(makeReq(EVENTO_MENSAGEM('oi'), { authorization: 'Bearer segredo-errado-para-o-teste' }))
+
+    const textoLogado = logSpy.mock.calls.flat().map(String).join(' | ')
+    expect(textoLogado).not.toContain('segredo-errado-para-o-teste')
+    expect(textoLogado).not.toContain(SECRET_VALIDO)
+  })
+})
+
+describe('POST /api/webhook/whatsapp — idempotência', () => {
+  beforeEach(() => {
+    process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://test'
+    process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-key'
+    process.env.EVOLUTION_WEBHOOK_SECRET = SECRET_VALIDO
+    vi.spyOn(console, 'log').mockImplementation(() => {})
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    agentHolder.processarMensagem.mockClear().mockResolvedValue('resposta da IA')
+    evolutionHolder.enviarMensagem.mockClear().mockResolvedValue(true)
+  })
+
+  afterEach(() => {
+    supabaseHolder.current = null as unknown as ReturnType<typeof makeSupabase>
+    vi.restoreAllMocks()
+  })
+
+  it('mid ausente no payload: ignora sem processar (200, sem side effect)', async () => {
+    const evento = EVENTO_MENSAGEM('oi')
+    delete (evento.data.key as { id?: string }).id
+
+    const res = await POST(makeReq(evento))
+    await aguardarProcessamentoAssincrono()
+
+    expect(await res.json()).toEqual({ ok: true })
+    expect(agentHolder.processarMensagem).not.toHaveBeenCalled()
+  })
+
+  it('reentrega (mid já existe em interacoes): responde 200 sem duplicar mensagem, chamar IA ou enviar de novo', async () => {
+    const mock = makeSupabase({ midJaExiste: true })
+    supabaseHolder.current = mock
+
+    const res = await POST(makeReq(EVENTO_MENSAGEM('oi')))
+    await aguardarProcessamentoAssincrono()
+
+    expect(res.status).toBe(200)
+    expect(agentHolder.processarMensagem).not.toHaveBeenCalled()
+    expect(evolutionHolder.enviarMensagem).not.toHaveBeenCalled()
+    expect(mock.interacoesInserts).toHaveLength(0)
+  })
+
+  it('concorrência: duas reentregas simultâneas — a que perde a corrida no INSERT (23505) não duplica a resposta', async () => {
+    const mock = makeSupabase({ midConflitoNoInsert: 'MID-PADRAO-TESTE' })
+    supabaseHolder.current = mock
+
+    const res = await POST(makeReq(EVENTO_MENSAGEM('oi')))
+    await aguardarProcessamentoAssincrono()
+
+    expect(res.status).toBe(200)
+    expect(agentHolder.processarMensagem).not.toHaveBeenCalled()
+    expect(evolutionHolder.enviarMensagem).not.toHaveBeenCalled()
+  })
+
+  it('mids diferentes não são tratados como duplicata um do outro', async () => {
+    const mock = makeSupabase()
+    supabaseHolder.current = mock
+
+    await POST(makeReq(EVENTO_MENSAGEM('primeira mensagem', 'MID-1')))
+    await aguardarProcessamentoAssincrono()
+    await POST(makeReq(EVENTO_MENSAGEM('segunda mensagem', 'MID-2')))
+    await aguardarProcessamentoAssincrono()
+
+    expect(agentHolder.processarMensagem).toHaveBeenCalledTimes(2)
   })
 })

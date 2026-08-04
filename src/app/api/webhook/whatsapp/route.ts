@@ -4,16 +4,29 @@ import { enviarMensagem, enviarAlertaEscalada } from '@/lib/evolution'
 import { detectarPalavraChaveOptOut, MENSAGEM_CONFIRMACAO_OPTOUT } from '@/lib/leads/whatsapp-optout'
 import { podeEnviarAutomatico } from '@/lib/leads/whatsapp-envio-limite'
 import { classificarSentimento } from '@/lib/leads/sentimento'
+import { autenticarWebhookEvolution } from '@/lib/leads/evolution-webhook-auth'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
-  try {
-    // Debug: logar todos os headers para identificar o que a Evolution envia
-    const allHeaders: Record<string, string> = {}
-    req.headers.forEach((value, key) => { allHeaders[key] = value })
-    console.log('[webhook] headers:', JSON.stringify(allHeaders).substring(0, 200))
+  // Autenticação ANTES de qualquer leitura/alteração de lead — sem isso,
+  // qualquer um que descubra a URL do webhook (previews da Vercel postam a
+  // própria URL em comentário público de PR) conseguiria gerar leads falsos,
+  // acionar a IA e disparar respostas em nome do corretor. Vale em TODO
+  // ambiente, inclusive preview/development — não existe bypass por VERCEL_ENV
+  // aqui de propósito, a autenticação é a mesma em qualquer lugar.
+  const autenticado = autenticarWebhookEvolution({
+    secretConfigurado: process.env.EVOLUTION_WEBHOOK_SECRET,
+    authorizationHeader: req.headers.get('authorization'),
+  })
+  if (!autenticado) {
+    // Nunca logar o header recebido nem o segredo esperado — só o fato de
+    // ter sido rejeitado.
+    console.warn('[webhook/whatsapp] autenticacao rejeitada')
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
 
+  try {
     const body = await req.json()
     console.log('[webhook] event:', body.event, '| instance:', body.instance)
 
@@ -24,8 +37,12 @@ export async function POST(req: NextRequest) {
 
     const msg = body.data?.message
     const from = body.data?.key?.remoteJid
+    const mid = body.data?.key?.id
 
     if (!msg || !from) return NextResponse.json({ ok: true })
+    // Sem id estável não dá pra deduplicar reentrega — mais seguro ignorar
+    // do que processar um evento que não conseguimos proteger contra retry.
+    if (typeof mid !== 'string' || !mid) return NextResponse.json({ ok: true })
     if (body.data?.key?.fromMe) return NextResponse.json({ ok: true })
     if (from.includes('@g.us')) return NextResponse.json({ ok: true })
     if (from === 'status@broadcast') return NextResponse.json({ ok: true })
@@ -42,7 +59,7 @@ export async function POST(req: NextRequest) {
     const whatsapp = from.replace('@s.whatsapp.net', '')
     console.log('[webhook] processando:', whatsapp, '|', texto.substring(0, 80))
 
-    processarEResponder(whatsapp, texto).catch(console.error)
+    processarEResponder(whatsapp, texto, mid).catch(console.error)
 
     return NextResponse.json({ ok: true })
 
@@ -52,7 +69,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-async function processarEResponder(whatsapp: string, texto: string) {
+async function processarEResponder(whatsapp: string, texto: string, mid: string) {
   const { createClient } = await import('@supabase/supabase-js')
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -60,6 +77,24 @@ async function processarEResponder(whatsapp: string, texto: string) {
   )
 
   try {
+    // Idempotência: a Evolution reentrega o mesmo evento em timeout/resposta
+    // não-2xx (WEBHOOK_RETRY_MAX_ATTEMPTS=10 por padrão) — sem isso, uma
+    // reentrega processaria a mensagem de novo: nova chamada de IA, nova
+    // resposta enviada, novo consumo do teto diário. Mesmo mecanismo já
+    // usado pro Instagram (upsert-instagram-lead.ts, migração
+    // 20260731090000): reaproveita interacoes.mid, que já é único
+    // globalmente (não por canal) — o formato do id do WhatsApp (Baileys,
+    // hex maiúsculo) e do Instagram (mid da Meta) não colidem na prática,
+    // então não precisou de migração nova só pra isso. Este check-then-insert
+    // evita trabalho redundante no caminho feliz; o 23505 no insert abaixo é
+    // quem realmente impede duplicata numa corrida entre reentregas
+    // concorrentes.
+    const { data: jaProcessado } = await supabase.from('interacoes').select('id').eq('mid', mid).maybeSingle()
+    if (jaProcessado) {
+      console.log('[processarEResponder] evento duplicado (mid ja processado), ignorando')
+      return
+    }
+
     // Resolve-ou-cria o lead atomicamente (unique index em leads.whatsapp,
     // migração 0010). Antes só nascia lead quando a IA decidia chamar
     // atualizar_lead() — agora toda mensagem recebida garante um lead_id,
@@ -107,17 +142,28 @@ async function processarEResponder(whatsapp: string, texto: string) {
 
     // Loga a mensagem recebida sempre — mesmo se o bot estiver pausado, o
     // corretor precisa ver isso na caixa de entrada do painel. Guarda o id
-    // pra poder gravar o sentimento nessa mesma linha logo abaixo.
-    const { data: interacaoEntrada } = await supabase
+    // pra poder gravar o sentimento nessa mesma linha logo abaixo. Grava o
+    // mid pra valer como registro de deduplicação (ver check no início desta
+    // função) — é o INSERT em si, não o SELECT de lá em cima, que fecha a
+    // corrida entre duas reentregas concorrentes via o unique index.
+    const { data: interacaoEntrada, error: interacaoEntradaErr } = await supabase
       .from('interacoes')
       .insert({
         lead_id: lead.id,
         canal: 'whatsapp',
         direcao: 'entrada',
         mensagem: texto,
+        mid,
       })
       .select('id')
       .single()
+
+    if (interacaoEntradaErr?.code === '23505') {
+      // Perdeu a corrida pra outra invocação concorrente da mesma reentrega
+      // — ela já está processando (ou já processou) este mid.
+      console.log('[processarEResponder] evento duplicado (corrida detectada no insert), ignorando')
+      return
+    }
 
     // Opt-out por palavra-chave (PARAR/STOP/SAIR/...) — verificado antes de
     // qualquer resposta automática. Uma única confirmação FIXA (não gerada

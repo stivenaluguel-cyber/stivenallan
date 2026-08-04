@@ -3,7 +3,7 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { enviarFollowUp, enviarAlertaEscalada, verificarInstancia } from '@/lib/evolution'
 import { logError, logInfo, logWarn } from '@/lib/log'
 import { finishCronRun, startCronRun, type CronRunFinal } from '@/lib/cron/tracker'
-import { podeEnviarAutomatico } from '@/lib/leads/whatsapp-envio-limite'
+import { podeEnviarAutomatico, automacaoProativaAtiva } from '@/lib/leads/whatsapp-envio-limite'
 import { leadCasaNaRegra, executarAcao, type RegraAutomacao, type LeadParaRegra } from '@/lib/automacoes/regras'
 import { sugerirConhecimentoDeConversasResolvidas } from '@/lib/leads/base-conhecimento-auto-sugestao'
 
@@ -98,7 +98,7 @@ type LeadRow = {
 }
 
 async function processarLeadFollowUp(supabase: SupabaseClient, lead: LeadRow, config: ConfigFollowUp): Promise<
-  { id: string; acao: 'mensagem_enviada' | 'escalado' | 'erro' | 'limite_atingido' }
+  { id: string; acao: 'mensagem_enviada' | 'escalado' | 'erro' | 'limite_atingido' | 'automacao_desativada' }
 > {
   const {
     id,
@@ -140,6 +140,14 @@ async function processarLeadFollowUp(supabase: SupabaseClient, lead: LeadRow, co
       observacoes_ia: 'Sequencia de follow-up esgotada sem resposta. Encaminhado para avaliacao manual.',
     }).eq('id', id)
     return { id, acao: 'escalado' as const }
+  }
+
+  // Interruptor mestre da automação proativa — checado ANTES do teto diário
+  // de propósito: se está desligada, não vale a pena gastar uma query só
+  // pra descobrir um limite que nem importa agora.
+  if (!automacaoProativaAtiva()) {
+    logWarn(SOURCE, 'automação proativa desativada (FOLLOWUP_AUTOMATICO_ATIVO), pulando lead', { leadId: id })
+    return { id, acao: 'automacao_desativada' as const }
   }
 
   if (!(await podeEnviarAutomatico(supabase, id))) {
@@ -364,7 +372,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ message: 'Nenhum lead para follow-up.', processados: 0, regras: regrasResumo, baseConhecimento: baseConhecimentoResumo })
     }
 
-    const resultados: Array<{ id: string; acao: 'mensagem_enviada' | 'escalado' | 'erro' | 'limite_atingido' }> = []
+    const resultados: Array<{ id: string; acao: 'mensagem_enviada' | 'escalado' | 'erro' | 'limite_atingido' | 'automacao_desativada' }> = []
     for (const lead of leads as LeadRow[]) {
       const resultado = await processarLeadFollowUp(supabase, lead, config)
       resultados.push(resultado)
@@ -378,11 +386,12 @@ export async function GET(req: NextRequest) {
     const escalados = resultados.filter((r) => r.acao === 'escalado').length
     const erros_envio = resultados.filter((r) => r.acao === 'erro').length
     const limite_atingido = resultados.filter((r) => r.acao === 'limite_atingido').length
-    const summary = { processados: leads.length, enviados, escalados, erros_envio, limite_atingido }
+    const automacao_desativada = resultados.filter((r) => r.acao === 'automacao_desativada').length
+    const summary = { processados: leads.length, enviados, escalados, erros_envio, limite_atingido, automacao_desativada }
     logInfo(SOURCE, 'run summary', summary)
     result = {
       status: 'ok', processados: leads.length, enviados, erros_envio,
-      details: { escalados, limite_atingido, regras: regrasResumo, baseConhecimento: baseConhecimentoResumo },
+      details: { escalados, limite_atingido, automacao_desativada, regras: regrasResumo, baseConhecimento: baseConhecimentoResumo },
     }
     return NextResponse.json({ message: 'Follow-ups processados.', ...summary, regras: regrasResumo, baseConhecimento: baseConhecimentoResumo })
   } catch (err: unknown) {

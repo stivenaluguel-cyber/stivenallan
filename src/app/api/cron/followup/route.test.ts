@@ -211,6 +211,9 @@ describe('GET /api/cron/followup', () => {
     process.env.EVOLUTION_API_URL = 'http://evo.local'
     process.env.EVOLUTION_API_KEY = 'evo-key'
     process.env.EVOLUTION_INSTANCE = 'stiven'
+    // Ligada por padrão nos testes existentes abaixo, que já esperam envio
+    // real acontecer (evolution mockado). O teste da trava desliga explicitamente.
+    process.env.FOLLOWUP_AUTOMATICO_ATIVO = 'true'
     vi.spyOn(console, 'log').mockImplementation(() => {})
     vi.spyOn(console, 'warn').mockImplementation(() => {})
     vi.spyOn(console, 'error').mockImplementation(() => {})
@@ -352,6 +355,37 @@ describe('GET /api/cron/followup', () => {
     expect(json.enviados).toBe(0)
     expect(json.limite_atingido).toBe(1)
     expect(evolutionHolder.enviarFollowUp).not.toHaveBeenCalled()
+  })
+
+  it('pula o envio quando a automação proativa está desativada (FOLLOWUP_AUTOMATICO_ATIVO ausente)', async () => {
+    delete process.env.FOLLOWUP_AUTOMATICO_ATIVO
+    const mock = makeSupabase({
+      leads: [
+        {
+          id: 'lead-1',
+          nome: 'Ana',
+          whatsapp: '48991642332',
+          estagio_funil: 'primeiro_contato',
+          tentativas_followup: 0,
+          property_name: 'Monte Leone',
+          lead_score: 50,
+        },
+      ],
+    })
+    supabaseHolder.current = mock
+
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    const p = GET(makeReq({ authorization: 'Bearer cron-secret' }))
+    await vi.runAllTimersAsync()
+    const res = await p
+    vi.useRealTimers()
+
+    const json = (await res.json()) as { processados: number; enviados: number; automacao_desativada: number }
+    expect(json.processados).toBe(1)
+    expect(json.enviados).toBe(0)
+    expect(json.automacao_desativada).toBe(1)
+    expect(evolutionHolder.enviarFollowUp).not.toHaveBeenCalled()
+    expect(mock.cronRunUpdates[0]).toMatchObject({ status: 'ok', processados: 1, enviados: 0 })
   })
 
   it('motor de regras roda mesmo sem leads pra follow-up e sem candidatos, sem quebrar o cron', async () => {

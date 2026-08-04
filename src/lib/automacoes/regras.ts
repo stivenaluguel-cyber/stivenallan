@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { enviarMensagem, enviarAlertaEscalada } from '@/lib/evolution'
-import { podeEnviarAutomatico } from '@/lib/leads/whatsapp-envio-limite'
+import { podeEnviarAutomatico, automacaoProativaAtiva } from '@/lib/leads/whatsapp-envio-limite'
 import { logError, logWarn } from '@/lib/log'
 
 export type GatilhoTipo = 'estagio_parado_dias' | 'score_acima' | 'sem_resposta_dias'
@@ -102,6 +102,14 @@ export async function executarAcao(
     }
 
     case 'enviar_whatsapp': {
+      // Mesmo interruptor mestre da cadência de follow-up — uma regra pode
+      // nascer ativa=true sem que a automação proativa como um todo esteja
+      // autorizada. mover_estagio e notificar_stiven não passam por aqui:
+      // não mandam mensagem pra lead, então não são cobertos por este freio.
+      if (!automacaoProativaAtiva()) {
+        logWarn('automacao-regras', 'automação proativa desativada (FOLLOWUP_AUTOMATICO_ATIVO), pulando enviar_whatsapp', { regraId: regra.id })
+        return false
+      }
       const template = String(regra.acao_params.mensagem ?? '').trim()
       if (!template) {
         logWarn('automacao-regras', 'enviar_whatsapp sem mensagem configurada', { regraId: regra.id })

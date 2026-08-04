@@ -31,3 +31,16 @@ export async function podeEnviarAutomatico(
 
   return (count ?? 0) < limite
 }
+
+// Interruptor mestre da automação PROATIVA (cadência de follow-up +
+// enviar_whatsapp do motor de regras) — decisão de negócio, não de infra.
+// EVOLUTION_API_URL/_KEY/_INSTANCE também são exigidos pelo bot que responde
+// mensagem recebida (reativo, sempre aceito e nunca contestado), então a
+// ausência deles não serve pra desligar só a automação proativa sem também
+// apagar o atendimento. Default OFF de propósito — nasce esperando
+// autorização comercial explícita, não "ligada até alguém desligar". Só a
+// string exata 'true' liga; qualquer outro valor (incluindo ausente/typo)
+// conta como desligado — fail-closed.
+export function automacaoProativaAtiva(): boolean {
+  return process.env.FOLLOWUP_AUTOMATICO_ATIVO === 'true'
+}

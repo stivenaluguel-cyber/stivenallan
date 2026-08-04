@@ -7,6 +7,11 @@ beforeEach(() => {
   process.env.EVOLUTION_API_URL = 'https://evo.example.com'
   process.env.EVOLUTION_API_KEY = 'test-key'
   process.env.EVOLUTION_INSTANCE = 'stiven'
+  // Testes de enviarMensagem abaixo verificam o comportamento do envio em si
+  // (formato do body, jitter, tratamento de erro) — a trava de ambiente tem
+  // describe próprio logo abaixo, então aqui simula produção pra não
+  // interferir nesses testes já existentes.
+  process.env.VERCEL_ENV = 'production'
 })
 
 afterEach(() => {
@@ -64,6 +69,59 @@ describe('evolution enviarMensagem', () => {
     const ok = await enviarMensagem('5548999999999', 'Olá')
 
     expect(ok).toBe(false)
+  })
+})
+
+// Trava fail-closed: preview/development compartilham as mesmas credenciais
+// Evolution de produção na Vercel (Preview tem os mesmos EVOLUTION_API_URL/
+// _KEY/_INSTANCE), então sem isso todo deploy de PR mandaria WhatsApp real.
+describe('evolution enviarMensagem — trava de ambiente (VERCEL_ENV)', () => {
+  it('bloqueia e não chama fetch quando VERCEL_ENV está ausente', async () => {
+    delete process.env.VERCEL_ENV
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+
+    const { enviarMensagem } = await import('./evolution')
+    const ok = await enviarMensagem('5548999999999', 'oi')
+
+    expect(ok).toBe(false)
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it('bloqueia quando VERCEL_ENV="preview"', async () => {
+    process.env.VERCEL_ENV = 'preview'
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+
+    const { enviarMensagem } = await import('./evolution')
+    const ok = await enviarMensagem('5548999999999', 'oi')
+
+    expect(ok).toBe(false)
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it('bloqueia quando VERCEL_ENV="development"', async () => {
+    process.env.VERCEL_ENV = 'development'
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+
+    const { enviarMensagem } = await import('./evolution')
+    const ok = await enviarMensagem('5548999999999', 'oi')
+
+    expect(ok).toBe(false)
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it('permite quando VERCEL_ENV="production"', async () => {
+    process.env.VERCEL_ENV = 'production'
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, text: async () => '' })
+    vi.stubGlobal('fetch', fetchMock)
+
+    const { enviarMensagem } = await import('./evolution')
+    const ok = await enviarMensagem('5548999999999', 'oi')
+
+    expect(ok).toBe(true)
+    expect(fetchMock).toHaveBeenCalledTimes(1)
   })
 })
 
