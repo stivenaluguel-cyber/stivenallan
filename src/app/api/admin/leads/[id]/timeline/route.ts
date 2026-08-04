@@ -24,7 +24,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
     client.from('leads').select('anotacoes').eq('id', leadId).maybeSingle(),
     client.from('leads_interacoes').select('id, tipo, descricao, estagio_de, estagio_para, created_at')
       .eq('lead_id', leadId).order('created_at', { ascending: false }).limit(100),
-    client.from('interacoes').select('id, canal, direcao, mensagem, created_at')
+    client.from('interacoes').select('id, canal, direcao, mensagem, created_at, processado_por_ia, sentimento')
       .eq('lead_id', leadId).order('created_at', { ascending: false }).limit(100),
     client.from('crm_agenda').select('id, titulo, tipo, inicio, status')
       .eq('lead_id', leadId).order('inicio', { ascending: false }).limit(50),

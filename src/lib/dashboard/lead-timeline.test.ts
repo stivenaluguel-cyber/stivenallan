@@ -100,4 +100,39 @@ describe('buildLeadTimeline', () => {
   it('lead sem nenhum histórico devolve lista vazia, não quebra', () => {
     expect(buildLeadTimeline({})).toEqual([])
   })
+
+  it('deriva autor: mensagem de entrada é sempre humano (é o lead falando)', () => {
+    const timeline = buildLeadTimeline({
+      mensagens: [{ id: 'm1', canal: 'whatsapp', direcao: 'entrada', mensagem: 'oi', created_at: '2026-07-06T10:00:00Z', processado_por_ia: true }],
+    })
+    expect(timeline[0].autor).toBe('humano')
+  })
+
+  it('deriva autor: saída com processado_por_ia=true é ia', () => {
+    const timeline = buildLeadTimeline({
+      mensagens: [{ id: 'm1', canal: 'whatsapp', direcao: 'saida', mensagem: 'resposta do bot', created_at: '2026-07-06T10:00:00Z', processado_por_ia: true }],
+    })
+    expect(timeline[0].autor).toBe('ia')
+  })
+
+  it('deriva autor: saída sem processado_por_ia é humano (Stiven digitou)', () => {
+    const timeline = buildLeadTimeline({
+      mensagens: [{ id: 'm1', canal: 'whatsapp', direcao: 'saida', mensagem: 'resposta manual', created_at: '2026-07-06T10:00:00Z', processado_por_ia: false }],
+    })
+    expect(timeline[0].autor).toBe('humano')
+  })
+
+  it('carrega sentimento da mensagem quando presente', () => {
+    const timeline = buildLeadTimeline({
+      mensagens: [{ id: 'm1', canal: 'whatsapp', direcao: 'entrada', mensagem: 'urgente!', created_at: '2026-07-06T10:00:00Z', sentimento: 'urgente' }],
+    })
+    expect(timeline[0].sentimento).toBe('urgente')
+  })
+
+  it('sentimento ausente vira null, não undefined-quebrando-serialização', () => {
+    const timeline = buildLeadTimeline({
+      mensagens: [{ id: 'm1', canal: 'whatsapp', direcao: 'entrada', mensagem: 'oi', created_at: '2026-07-06T10:00:00Z' }],
+    })
+    expect(timeline[0].sentimento).toBeNull()
+  })
 })
