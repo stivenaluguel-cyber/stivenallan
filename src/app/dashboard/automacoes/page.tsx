@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
+import { ESTAGIOS_FUNIL } from '@/lib/dashboard/estagios'
 
 const D = {
   bg: '#F3F2EE', surface: '#FAFAF7', ink: '#161512', bronze: '#D24E22',
@@ -18,6 +19,30 @@ type MensagemRow = { estagio_funil: string; ordem: number; mensagem: string }
 type IntervaloRow = { ordem: number; dias: number }
 type PassoEmail = { ordem: number; dias_minimos: number; assunto: string; corpo_html: string }
 
+type GatilhoTipo = 'estagio_parado_dias' | 'score_acima' | 'sem_resposta_dias'
+type AcaoTipo = 'mover_estagio' | 'notificar_stiven' | 'enviar_whatsapp'
+type RegraRow = {
+  id: string
+  nome: string
+  ativo: boolean
+  gatilho_tipo: GatilhoTipo
+  gatilho_params: Record<string, unknown>
+  filtro_estagio: string[] | null
+  acao_tipo: AcaoTipo
+  acao_params: Record<string, unknown>
+}
+
+const LABEL_GATILHO: Record<GatilhoTipo, string> = {
+  estagio_parado_dias: 'Parado no estágio há X dias',
+  score_acima: 'Score acima de X',
+  sem_resposta_dias: 'Sem resposta há X dias',
+}
+const LABEL_ACAO: Record<AcaoTipo, string> = {
+  mover_estagio: 'Mover para outro estágio',
+  notificar_stiven: 'Notificar Stiven no WhatsApp',
+  enviar_whatsapp: 'Enviar mensagem de WhatsApp',
+}
+
 export default function AutomacoesPage() {
   const [intervalos, setIntervalos] = useState<IntervaloRow[]>([])
   const [mensagens, setMensagens] = useState<MensagemRow[]>([])
@@ -28,16 +53,27 @@ export default function AutomacoesPage() {
   const [msgWpp, setMsgWpp] = useState('')
   const [msgEmail, setMsgEmail] = useState('')
 
+  const [regras, setRegras] = useState<RegraRow[]>([])
+  const [novaRegra, setNovaRegra] = useState({
+    nome: '', gatilho_tipo: 'estagio_parado_dias' as GatilhoTipo, valorGatilho: 3,
+    filtro_estagio: [] as string[], acao_tipo: 'notificar_stiven' as AcaoTipo,
+    estagioDestino: '', mensagem: '',
+  })
+  const [salvandoRegra, setSalvandoRegra] = useState(false)
+  const [msgRegra, setMsgRegra] = useState('')
+
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const [wpp, email] = await Promise.all([
+      const [wpp, email, regrasResp] = await Promise.all([
         fetch('/api/admin/automacoes/whatsapp').then(r => r.json()),
         fetch('/api/admin/automacoes/email').then(r => r.json()),
+        fetch('/api/admin/automacoes/regras').then(r => r.json()),
       ])
       setIntervalos(wpp.intervalos ?? [])
       setMensagens(wpp.mensagens ?? [])
       setPassosEmail(email.passos ?? [])
+      setRegras(regrasResp.regras ?? [])
     } finally {
       setLoading(false)
     }
@@ -124,6 +160,74 @@ export default function AutomacoesPage() {
     } finally {
       setSalvandoEmail(false)
     }
+  }
+
+  function gatilhoParamsDe(tipo: GatilhoTipo, valor: number): Record<string, unknown> {
+    return tipo === 'score_acima' ? { score: valor } : { dias: valor }
+  }
+
+  async function criarRegra() {
+    if (!novaRegra.nome.trim()) { setMsgRegra('Dê um nome pra regra.'); return }
+    if (novaRegra.acao_tipo === 'mover_estagio' && !novaRegra.estagioDestino) { setMsgRegra('Escolha o estágio de destino.'); return }
+    if (novaRegra.acao_tipo === 'enviar_whatsapp' && !novaRegra.mensagem.trim()) { setMsgRegra('Escreva a mensagem a enviar.'); return }
+
+    setSalvandoRegra(true); setMsgRegra('')
+    try {
+      const res = await fetch('/api/admin/automacoes/regras', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nome: novaRegra.nome.trim(),
+          gatilho_tipo: novaRegra.gatilho_tipo,
+          gatilho_params: gatilhoParamsDe(novaRegra.gatilho_tipo, novaRegra.valorGatilho),
+          filtro_estagio: novaRegra.filtro_estagio,
+          acao_tipo: novaRegra.acao_tipo,
+          acao_params: novaRegra.acao_tipo === 'mover_estagio'
+            ? { estagio_funil: novaRegra.estagioDestino }
+            : novaRegra.acao_tipo === 'enviar_whatsapp'
+              ? { mensagem: novaRegra.mensagem.trim() }
+              : {},
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) { setMsgRegra(data.error || 'Erro ao criar regra.'); return }
+      setMsgRegra('Regra criada — pausada por padrão, ative quando revisar.')
+      setNovaRegra({ nome: '', gatilho_tipo: 'estagio_parado_dias', valorGatilho: 3, filtro_estagio: [], acao_tipo: 'notificar_stiven', estagioDestino: '', mensagem: '' })
+      await load()
+    } catch {
+      setMsgRegra('Falha ao conectar.')
+    } finally {
+      setSalvandoRegra(false)
+    }
+  }
+
+  async function alternarAtivoRegra(id: string, ativo: boolean) {
+    setRegras(prev => prev.map(r => r.id === id ? { ...r, ativo } : r))
+    await fetch('/api/admin/automacoes/regras', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, ativo }),
+    })
+  }
+
+  async function apagarRegra(id: string) {
+    if (!confirm('Apagar essa regra?')) return
+    setRegras(prev => prev.filter(r => r.id !== id))
+    await fetch('/api/admin/automacoes/regras?id=' + id, { method: 'DELETE' })
+  }
+
+  function descreverGatilho(r: RegraRow): string {
+    const valor = r.gatilho_tipo === 'score_acima' ? r.gatilho_params.score : r.gatilho_params.dias
+    return LABEL_GATILHO[r.gatilho_tipo].replace('X', String(valor ?? '?'))
+  }
+
+  function descreverAcao(r: RegraRow): string {
+    if (r.acao_tipo === 'mover_estagio') {
+      const destino = ESTAGIOS_FUNIL.find(e => e.key === r.acao_params.estagio_funil)?.label ?? String(r.acao_params.estagio_funil ?? '?')
+      return `Mover para "${destino}"`
+    }
+    if (r.acao_tipo === 'enviar_whatsapp') return `Enviar: "${String(r.acao_params.mensagem ?? '').slice(0, 60)}${String(r.acao_params.mensagem ?? '').length > 60 ? '…' : ''}"`
+    return LABEL_ACAO[r.acao_tipo]
   }
 
   if (loading) {
@@ -213,6 +317,104 @@ export default function AutomacoesPage() {
               {salvandoEmail ? 'Salvando...' : 'Salvar cadência de e-mail'}
             </button>
             {msgEmail && <span style={{ fontSize: 13, color: msgEmail.includes('salva') ? D.green : D.red }}>{msgEmail}</span>}
+          </div>
+        </section>
+
+        {/* Regras SE/ENTÃO */}
+        <section style={{ background: D.surface, border: '1px solid ' + D.line, borderRadius: 12, padding: 20, marginTop: 28 }}>
+          <h2 style={{ fontFamily: "'Bricolage Grotesque',system-ui", fontSize: 16, fontWeight: 700, margin: '0 0 6px' }}>Regras SE/ENTÃO</h2>
+          <p style={{ margin: '0 0 16px', fontSize: 13, color: D.muted }}>
+            Além da cadência fixa por tempo acima. Roda 1x/dia junto com o cron de follow-up. Toda regra nova nasce pausada.
+          </p>
+
+          {regras.length === 0 ? (
+            <p style={{ fontSize: 13, color: D.muted, margin: '0 0 16px' }}>Nenhuma regra criada ainda.</p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 20 }}>
+              {regras.map(r => (
+                <div key={r.id} style={{ display: 'flex', alignItems: 'center', gap: 12, border: '1px solid ' + D.line, borderRadius: 8, padding: 12 }}>
+                  <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                    <input type="checkbox" checked={r.ativo} onChange={e => alternarAtivoRegra(r.id, e.target.checked)} />
+                  </label>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700 }}>{r.nome} {!r.ativo && <span style={{ color: D.muted, fontWeight: 400 }}>(pausada)</span>}</div>
+                    <div style={{ fontSize: 12, color: D.muted, marginTop: 2 }}>SE {descreverGatilho(r)} ENTÃO {descreverAcao(r)}</div>
+                  </div>
+                  <button onClick={() => apagarRegra(r.id)} style={{ border: 'none', background: 'none', color: D.red, cursor: 'pointer', fontSize: 16 }}>×</button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div style={{ border: '1px dashed ' + D.line, borderRadius: 10, padding: 14 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>Nova regra</div>
+
+            <label style={{ fontSize: 11, color: D.muted, display: 'block', marginBottom: 4 }}>Nome</label>
+            <input value={novaRegra.nome} onChange={e => setNovaRegra(p => ({ ...p, nome: e.target.value }))}
+              placeholder="Ex: Escalar lead quente parado"
+              style={{ width: '100%', border: '1px solid ' + D.line, borderRadius: 6, padding: 8, fontSize: 13, marginBottom: 10, boxSizing: 'border-box' }} />
+
+            <div style={{ display: 'flex', gap: 10, marginBottom: 10, flexWrap: 'wrap' }}>
+              <div>
+                <label style={{ fontSize: 11, color: D.muted, display: 'block', marginBottom: 4 }}>SE</label>
+                <select value={novaRegra.gatilho_tipo} onChange={e => setNovaRegra(p => ({ ...p, gatilho_tipo: e.target.value as GatilhoTipo }))}
+                  style={{ border: '1px solid ' + D.line, borderRadius: 6, padding: 8, fontSize: 13 }}>
+                  {(Object.keys(LABEL_GATILHO) as GatilhoTipo[]).map(g => <option key={g} value={g}>{LABEL_GATILHO[g]}</option>)}
+                </select>
+              </div>
+              <div>
+                <label style={{ fontSize: 11, color: D.muted, display: 'block', marginBottom: 4 }}>Valor (X)</label>
+                <input type="number" min={0} value={novaRegra.valorGatilho} onChange={e => setNovaRegra(p => ({ ...p, valorGatilho: Number(e.target.value) }))}
+                  style={{ width: 80, border: '1px solid ' + D.line, borderRadius: 6, padding: 8, fontSize: 13 }} />
+              </div>
+            </div>
+
+            <label style={{ fontSize: 11, color: D.muted, display: 'block', marginBottom: 4 }}>Restringir a estágios (opcional — vazio = todos)</label>
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
+              {ESTAGIOS_FUNIL.map(e => {
+                const marcado = novaRegra.filtro_estagio.includes(e.key)
+                return (
+                  <button key={e.key} type="button"
+                    onClick={() => setNovaRegra(p => ({ ...p, filtro_estagio: marcado ? p.filtro_estagio.filter(k => k !== e.key) : [...p.filtro_estagio, e.key] }))}
+                    style={{ border: '1px solid ' + (marcado ? D.bronze : D.line), background: marcado ? D.bronze : 'transparent', color: marcado ? '#fff' : D.ink, borderRadius: 999, padding: '4px 10px', fontSize: 12, cursor: 'pointer' }}>
+                    {e.label}
+                  </button>
+                )
+              })}
+            </div>
+
+            <label style={{ fontSize: 11, color: D.muted, display: 'block', marginBottom: 4 }}>ENTÃO</label>
+            <select value={novaRegra.acao_tipo} onChange={e => setNovaRegra(p => ({ ...p, acao_tipo: e.target.value as AcaoTipo }))}
+              style={{ border: '1px solid ' + D.line, borderRadius: 6, padding: 8, fontSize: 13, marginBottom: 10 }}>
+              {(Object.keys(LABEL_ACAO) as AcaoTipo[]).map(a => <option key={a} value={a}>{LABEL_ACAO[a]}</option>)}
+            </select>
+
+            {novaRegra.acao_tipo === 'mover_estagio' && (
+              <div style={{ marginBottom: 10 }}>
+                <label style={{ fontSize: 11, color: D.muted, display: 'block', marginBottom: 4 }}>Novo estágio</label>
+                <select value={novaRegra.estagioDestino} onChange={e => setNovaRegra(p => ({ ...p, estagioDestino: e.target.value }))}
+                  style={{ border: '1px solid ' + D.line, borderRadius: 6, padding: 8, fontSize: 13 }}>
+                  <option value="">Selecione...</option>
+                  {ESTAGIOS_FUNIL.map(e => <option key={e.key} value={e.key}>{e.label}</option>)}
+                </select>
+              </div>
+            )}
+
+            {novaRegra.acao_tipo === 'enviar_whatsapp' && (
+              <div style={{ marginBottom: 10 }}>
+                <label style={{ fontSize: 11, color: D.muted, display: 'block', marginBottom: 4 }}>Mensagem (use {'{nome}'} como placeholder)</label>
+                <textarea value={novaRegra.mensagem} onChange={e => setNovaRegra(p => ({ ...p, mensagem: e.target.value }))} rows={3}
+                  style={{ width: '100%', border: '1px solid ' + D.line, borderRadius: 6, padding: 8, fontSize: 13, fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box' }} />
+              </div>
+            )}
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 6 }}>
+              <button onClick={criarRegra} disabled={salvandoRegra}
+                style={{ background: D.bronze, color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', fontWeight: 700, fontSize: 14, cursor: salvandoRegra ? 'default' : 'pointer', opacity: salvandoRegra ? 0.6 : 1 }}>
+                {salvandoRegra ? 'Criando...' : 'Criar regra (pausada)'}
+              </button>
+              {msgRegra && <span style={{ fontSize: 13, color: msgRegra.includes('criada') ? D.green : D.red }}>{msgRegra}</span>}
+            </div>
           </div>
         </section>
       </div>

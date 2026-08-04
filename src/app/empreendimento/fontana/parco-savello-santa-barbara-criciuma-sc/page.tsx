@@ -9,6 +9,7 @@ import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
 import { EspelhoPublico } from '@/components/EspelhoPublico'
+import ShareButton from '@/components/ShareButton'
 
 // Hotsite premium Parco Savello Residencial (Fontana, Santa Bárbara Criciúma/SC). Padrão EPIC.
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Parco%20Savello%20Residencial.'
@@ -366,8 +367,9 @@ Tendo o bem-estar e a natureza como seus melhores vizinhos. O Parque da Prefeitu
 <div style={{ position: 'relative', zIndex: 2, padding: '0 clamp(18px,5vw,56px)', maxWidth: 880 }}>
 <p className="ps-eyebrow ps-onimg" style={{ color: '#fff', marginBottom: 22 }}>Atendimento Exclusivo</p>
 <h2 className="ps-h2 ps-onimg" style={{ color: '#fff', fontSize: 'clamp(30px,5vw,56px)', fontStyle: 'italic', fontWeight: 400 }}>Vivi la Vita.</h2>
-<div style={{ marginTop: 38 }}>
+<div style={{ marginTop: 38, display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
 <a href={WPP} target="_blank" rel="noopener noreferrer" className="ps-cta ps-cta-light" data-wpp="1">Atendimento Exclusivo</a>
+<ShareButton nome="Parco Savello Residencial" className="ps-cta ps-cta-light" />
 </div>
 </div>
 </section>

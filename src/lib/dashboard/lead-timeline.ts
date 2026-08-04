@@ -17,6 +17,12 @@ export type TimelineItem = {
   titulo: string
   descricao?: string | null
   origem: string
+  // Quem gerou o item: só populado pra mensagens (o resto do log é sempre
+  // ação humana/sistema, não vale a pena inferir). 'ia' = respondida pelo
+  // Allan IA sem intervenção (interacoes.processado_por_ia); 'humano' cobre
+  // tanto a mensagem do lead quanto uma resposta que Stiven digitou.
+  autor?: 'ia' | 'humano'
+  sentimento?: string | null
 }
 
 type NotaLegada = { data?: string; texto?: string; clientEventId?: string }
@@ -60,7 +66,7 @@ const ACOES_FOCO_JA_COBERTAS = new Set([
 export type TimelineSources = {
   anotacoesLegadas?: string | null
   interacoesLead?: { id: string; tipo: string; descricao: string; estagio_de?: string | null; estagio_para?: string | null; created_at: string }[]
-  mensagens?: { id: string; canal: string | null; direcao: string; mensagem: string; created_at: string }[]
+  mensagens?: { id: string; canal: string | null; direcao: string; mensagem: string; created_at: string; processado_por_ia?: boolean | null; sentimento?: string | null }[]
   agenda?: { id: string; titulo: string; tipo: string | null; inicio: string; status: string | null }[]
   eventosFoco?: { id: string; action_type: string; created_at: string; metadata?: Record<string, unknown> | null }[]
 }
@@ -103,6 +109,8 @@ export function buildLeadTimeline(sources: TimelineSources): TimelineItem[] {
       titulo: (m.direcao === 'entrada' ? 'Recebida' : 'Enviada') + ' · ' + canal,
       descricao: m.mensagem,
       origem: canal,
+      autor: m.direcao === 'saida' && m.processado_por_ia ? 'ia' : 'humano',
+      sentimento: m.sentimento ?? null,
     })
   }
 

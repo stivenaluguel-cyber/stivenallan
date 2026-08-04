@@ -10,7 +10,7 @@ import { ProjecaoMeta } from '@/components/dashboard/ProjecaoMeta'
 const D = {
   bg: '#F3F2EE', surface: '#FAFAF7', sidebar: '#131211', ink: '#161512',
   bronze: '#D24E22', muted: '#6B655B', line: 'rgba(26,24,21,0.08)',
-  green: '#22c55e', red: '#ef4444', blue: '#3b82f6',
+  green: '#22c55e', red: '#ef4444', blue: '#3b82f6', amber: '#f59e0b',
   onDark: '#F3F2EE', onDarkMuted: 'rgba(245,241,234,0.65)',
 }
 const fmt = (n: number) => 'R$\u00a0' + Math.round(n).toLocaleString('pt-BR')
@@ -35,6 +35,7 @@ type Lead = {
 }
 type Cub = { valor_m2: number; mes_referencia: string; variacao_mensal?: number }
 type Insights = { insights: string; resumo?: { score_medio: number; requer_atencao: number; total: number } }
+type ResumoComissoes = { previsto: number; confirmado: number; recebido: number; totalVendas: number; quantidade: number }
 // Scraping do Sinduscon usado no site público (/indicadores e home) — distinto
 // do CUB/SC acima (configuracoes_cub, mantido manualmente pra correção de
 // contrato). online:false significa que o scraping falhou e a página pública
@@ -58,6 +59,7 @@ export default function DashboardHome() {
   // Quantos empreendimentos ativos estão sem a tabela deste mês guardada.
   const [semTabela, setSemTabela] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [comissoes, setComissoes] = useState<ResumoComissoes | null>(null)
   const [insights, setInsights] = useState<Insights | null>(null)
   const [insightsLoading, setInsightsLoading] = useState(false)
   const [insightsErro, setInsightsErro] = useState('')
@@ -78,14 +80,16 @@ export default function DashboardHome() {
 
   const load = useCallback(async () => {
     try {
-      const [lRes, cRes, cubScraperRes] = await Promise.all([
+      const [lRes, cRes, cubScraperRes, comissoesRes] = await Promise.all([
         fetch('/api/admin/leads').then(r => r.json()),
         fetch('/api/admin/cub').then(r => r.json()).catch(() => ({})),
         fetch('/api/cub').then(r => r.json()).catch(() => null),
+        fetch('/api/admin/comissoes').then(r => r.json()).catch(() => null),
       ])
       setLeads(Array.isArray(lRes) ? lRes : (lRes.data ?? []))
       setCub(cRes.vigente ?? null)
       setCubScraper(cubScraperRes)
+      setComissoes(comissoesRes?.resumo ?? null)
     } finally {
       setLoading(false)
     }
@@ -118,6 +122,13 @@ export default function DashboardHome() {
     .filter(l => l.estagio_funil !== 'fechado')
     .reduce((s, l) => s + (l.orcamento_max ?? 0), 0)
 
+  // "A receber" junta prevista + confirmada (ainda não caiu na conta, mas já
+  // é esperado); "recebida" é o que já entrou de fato. Mesmos três status de
+  // src/lib/comissoes/calcular.ts, só reagrupados pro headline da home —
+  // antes esses números só apareciam enterrados em /dashboard/comissoes.
+  const comissaoAReceber = (comissoes?.previsto ?? 0) + (comissoes?.confirmado ?? 0)
+  const comissaoRecebida = comissoes?.recebido ?? 0
+
   const KPIS = [
     { l: 'Total de Leads', v: String(total), cor: D.blue, href: '/dashboard/crm' },
     { l: 'Leads Quentes', v: String(quentes), cor: D.red, href: '/dashboard/crm' },
@@ -125,6 +136,8 @@ export default function DashboardHome() {
     { l: 'Fechados', v: String(fechados), cor: D.green, href: '/dashboard/crm' },
     { l: 'Requer Atenção', v: String(atencao), cor: '#f59e0b', href: '/dashboard/crm/foco' },
     { l: 'Pipeline Estimado', v: fmt(pipeline), cor: D.ink, href: '/dashboard/crm' },
+    { l: 'Comissão a Receber', v: fmt(comissaoAReceber), cor: D.amber, href: '/dashboard/comissoes' },
+    { l: 'Comissão Recebida', v: fmt(comissaoRecebida), cor: D.green, href: '/dashboard/comissoes' },
   ]
 
   return (

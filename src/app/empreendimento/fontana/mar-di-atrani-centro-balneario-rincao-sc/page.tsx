@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import { HeroImage } from '@/components/HeroImage'
 import Link from 'next/link'
+import ShareButton from '@/components/ShareButton'
 import GalleryWithLightbox, { LightboxPhoto } from './gallery-lightbox'
 import { LeadCaptureButton } from '@/components/LeadCaptureButton'
 import { PropertySchema } from '@/components/PropertySchema'
@@ -237,7 +238,7 @@ details.mt-menu > summary::-webkit-details-marker { display: none; }
 <div style={{ position: 'relative', zIndex: 2, padding: '0 clamp(18px,5vw,56px)', maxWidth: 880 }}>
 <p className="mt-eyebrow mt-onimg" style={{ color: '#fff', marginBottom: 22 }}>Atendimento Exclusivo</p>
 <h2 className="mt-serif mt-onimg" style={{ color: '#fff', fontSize: 'clamp(30px,5vw,56px)' }}>A vida no agora.</h2>
-<div style={{ marginTop: 38 }}><a href={WPP} target="_blank" rel="noopener noreferrer" className="mt-cta mt-cta-light">Atendimento Exclusivo</a></div>
+<div style={{ marginTop: 38, display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}><a href={WPP} target="_blank" rel="noopener noreferrer" className="mt-cta mt-cta-light">Atendimento Exclusivo</a><ShareButton nome="Mar di Atrani Residencial" className="mt-cta mt-cta-light" /></div>
 </div>
 </section>
 <footer style={{ background: t.azureDark, color: t.onDarkMuted, padding: 'clamp(56px,9vh,96px) clamp(18px,5vw,56px)' }}>

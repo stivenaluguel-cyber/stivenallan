@@ -8,6 +8,7 @@ import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
 import { EspelhoPublico } from '@/components/EspelhoPublico'
+import ShareButton from '@/components/ShareButton'
 
 const WPP = "https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Due%20Fratelli%20Residencial."
 const CATALOGO_PDF = "https://estilofontana.com.br/upload/empreendimento/catalogo/due-fratelli-residencial-1602177598.pdf"
@@ -252,7 +253,10 @@ details.df-menu > summary::-webkit-details-marker { display: none; }
 <div style={{ position: 'relative', zIndex: 2, padding: '0 clamp(18px,5vw,56px)', maxWidth: 880 }}>
 <p className="df-eyebrow df-onimg" style={{ color: '#fff', marginBottom: 22 }}>Atendimento Exclusivo</p>
 <h2 className="df-h2 df-onimg" style={{ color: '#fff', fontSize: 'clamp(30px,5vw,56px)' }}>Qualidade de vida e praticidade.</h2>
-<div style={{ marginTop: 38 }}><a href={WPP} target="_blank" rel="noopener noreferrer" className="df-cta df-cta-light">Atendimento Exclusivo</a></div>
+<div style={{ marginTop: 38, display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+<a href={WPP} target="_blank" rel="noopener noreferrer" className="df-cta df-cta-light">Atendimento Exclusivo</a>
+<ShareButton nome="Due Fratelli Residencial" className="df-cta df-cta-light" />
+</div>
 </div>
 </section>
 <footer style={{ background: t.slateDark, color: t.onDarkMuted, padding: 'clamp(56px,9vh,96px) clamp(18px,5vw,56px)' }}>

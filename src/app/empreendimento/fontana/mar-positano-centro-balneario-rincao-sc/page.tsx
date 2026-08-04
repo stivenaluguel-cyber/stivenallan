@@ -9,6 +9,7 @@ import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
 import { EspelhoPublico } from '@/components/EspelhoPublico'
+import ShareButton from '@/components/ShareButton'
 
 const WPP = "https://wa.me/5548991642332?text=Olá!%20Tenho%20interesse%20no%20Mar%20Positano%20Residencial%20em%20Balneário%20Rincão."
 const CATALOGO_PDF = "https://estilofontana.com.br/upload/empreendimento/catalogo/mar-positano-residencial-1761677677.pdf"
@@ -335,9 +336,12 @@ export default function Page() {
         <div style={{ position:'relative', textAlign:'center', padding:'0 32px' }}>
           <h2 className="mp-h2" style={{ color:'#fff', margin:'0 0 16px' }}>Mar Positano Residencial</h2>
           <p style={{ color:'rgba(255,255,255,0.75)', marginBottom:40, fontFamily:t.body, fontSize:18 }}>Preço sob consulta · Balneário Rincão / SC</p>
-          <a href={WPP} target="_blank" rel="noopener noreferrer" className="mp-cta" style={{ color:'#fff', borderColor:'rgba(255,255,255,0.6)', fontSize:15 }}>
-            Falar com Stiven Allan
-          </a>
+          <div style={{ display:'flex', gap:16, flexWrap:'wrap', justifyContent:'center' }}>
+            <a href={WPP} target="_blank" rel="noopener noreferrer" className="mp-cta" style={{ color:'#fff', borderColor:'rgba(255,255,255,0.6)', fontSize:15 }}>
+              Falar com Stiven Allan
+            </a>
+            <ShareButton nome="Mar Positano Residencial" className="mp-cta" style={{ color:'#fff', borderColor:'rgba(255,255,255,0.6)', fontSize:15 }} />
+          </div>
         </div>
       </section>
 

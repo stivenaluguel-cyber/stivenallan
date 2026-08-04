@@ -12,6 +12,7 @@ export { ESTAGIOS_FUNIL }
 export type LeadStageRow = {
   id: string
   estagio_funil: string | null
+  orcamento_max?: number | null
 }
 
 export type StageTransitionRow = {
@@ -62,6 +63,46 @@ export function snapshotPorEstagio(leads: LeadStageRow[]): StageSnapshot[] {
       total: n,
       pct: total === 0 ? 0 : Math.round((n / total) * 100),
       cascataPct: e.key === OUTROS.key || base === 0 ? 0 : Math.round((acumulado / base) * 100),
+    }
+  })
+}
+
+export type VgvStage = {
+  key: string
+  label: string
+  cor: string
+  vgv: number
+  pct: number
+}
+
+// Mesma agregação de snapshotPorEstagio, mas somando orcamento_max em vez de
+// contar leads — "quantos leads tem em Proposta Enviada" e "quanto dinheiro
+// está parado em Proposta Enviada" são perguntas diferentes; a segunda é o
+// que orienta prioridade real de follow-up. orcamento_max é o mesmo proxy
+// já usado no "Pipeline Estimado" da home (dashboard/page.tsx) — orçamento
+// DECLARADO pelo lead, não valor de contrato confirmado.
+export function vgvPorEstagio(leads: LeadStageRow[]): VgvStage[] {
+  const known = new Set<string>(ESTAGIOS_FUNIL.map((e) => e.key))
+  const somas: Record<string, number> = {}
+  for (const e of ESTAGIOS_FUNIL) somas[e.key] = 0
+  somas[OUTROS.key] = 0
+
+  for (const l of leads) {
+    const k = l.estagio_funil && known.has(l.estagio_funil) ? l.estagio_funil : OUTROS.key
+    somas[k] = (somas[k] ?? 0) + (l.orcamento_max ?? 0)
+  }
+
+  const totalVgv = Object.values(somas).reduce((s, v) => s + v, 0)
+  const ordem = [...ESTAGIOS_FUNIL, OUTROS]
+
+  return ordem.map((e) => {
+    const vgv = somas[e.key] ?? 0
+    return {
+      key: e.key,
+      label: e.label,
+      cor: e.cor,
+      vgv,
+      pct: totalVgv === 0 ? 0 : Math.round((vgv / totalVgv) * 100),
     }
   })
 }
