@@ -67,6 +67,7 @@ function StatusBadge({ status }: { status: string }) {
     'pronto':    { label: 'Pronto',    bg: 'rgba(40,120,60,0.10)',  color: '#2a7840' },
     'entregue':  { label: 'Entregue',  bg: 'rgba(40,120,60,0.10)',  color: '#2a7840' },
     'sob consulta': { label: 'Sob consulta', bg: 'rgba(0,0,0,0.06)', color: '#5a5a52' },
+    'loteamento': { label: 'Loteamento', bg: 'rgba(0,0,0,0.06)', color: '#5a5a52' },
   }
   const s = map[status] || map['na planta']
   return (
