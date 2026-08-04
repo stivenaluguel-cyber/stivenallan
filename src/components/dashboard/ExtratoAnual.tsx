@@ -127,7 +127,7 @@ export function ExtratoAnual() {
 
           {mostrarParte && (
             <p style={{ fontSize: 11, color: D.muted, margin: '10px 0 0', lineHeight: 1.5 }}>
-              "Sua parte" desconta o que foi repassado aos outros envolvidos do negócio. O
+              &quot;Sua parte&quot; desconta o que foi repassado aos outros envolvidos do negócio. O
               repasse passou pela conta mas não é receita sua.
             </p>
           )}

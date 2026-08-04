@@ -1,15 +1,25 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useFocusTrapModal } from '@/lib/a11y/useFocusTrapModal';
 
 interface GalleryImage { src: string; alt: string; }
 
 export default function GalleryWithLightbox({ images, accent }: { images: GalleryImage[]; accent: string }) {
 const [open, setOpen] = useState<number | null>(null);
+const openerRef = useRef<HTMLElement | null>(null);
+const dialogRef = useRef<HTMLDivElement>(null);
+const closeBtnRef = useRef<HTMLButtonElement>(null);
+
+useFocusTrapModal(dialogRef, {
+open: open !== null,
+onClose: () => setOpen(null),
+openerRef,
+initialFocusRef: closeBtnRef,
+});
 
 useEffect(() => {
 if (open === null) return;
 const onKeyDown = (e: KeyboardEvent) => {
-if (e.key === 'Escape') setOpen(null);
 if (e.key === 'ArrowLeft') setOpen(i => (i !== null && i > 0 ? i - 1 : i));
 if (e.key === 'ArrowRight') setOpen(i => (i !== null && i < images.length - 1 ? i + 1 : i));
 };
@@ -21,9 +31,9 @@ return (
 <>
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '8px' }}>
 {images.map((img, i) => (
-<figure key={i} onClick={() => setOpen(i)}
+<figure key={i} onClick={(e) => { openerRef.current = e.currentTarget; setOpen(i); }}
 role="button" tabIndex={0} aria-label={`Ampliar: ${img.alt}`}
-onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setOpen(i); } }}
+onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openerRef.current = e.currentTarget; setOpen(i); } }}
 style={{ margin: 0, cursor: 'pointer', overflow: 'hidden', position: 'relative', aspectRatio: '16/10', background: '#222' }}>
 <img src={img.src} alt={img.alt}
 style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform 0.4s ease' }}
@@ -37,10 +47,10 @@ onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')} />
 </div>
 
 {open !== null && (
-<div onClick={() => setOpen(null)}
+<div ref={dialogRef} onClick={() => setOpen(null)}
 role="dialog" aria-modal="true" aria-label={`Galeria — ${images[open].alt}`}
 style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
-<button onClick={() => setOpen(null)} aria-label="Fechar galeria"
+<button ref={closeBtnRef} onClick={() => setOpen(null)} aria-label="Fechar galeria"
 style={{ position: 'absolute', top: '1rem', right: '1.25rem', background: 'none', border: 'none', color: '#fff', fontSize: '2rem', cursor: 'pointer', lineHeight: 1 }}>
 ×
 </button>

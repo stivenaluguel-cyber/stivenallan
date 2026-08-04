@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { extrairFaixaNumerica, extrairInteiro, formatarFaixa } from './specs'
+import { extrairFaixaNumerica, extrairInteiro } from './specs'
 
 describe('extrairFaixaNumerica', () => {
   it('extrai min e max de uma faixa "93 a 94"', () => {
@@ -34,17 +34,5 @@ describe('extrairInteiro', () => {
   it('ausente não inventa número', () => {
     expect(extrairInteiro(undefined)).toBeUndefined()
     expect(extrairInteiro('')).toBeUndefined()
-  })
-})
-
-describe('formatarFaixa', () => {
-  it('min===max mostra um único número', () => {
-    expect(formatarFaixa(93, 93)).toBe('93')
-  })
-  it('min!==max mostra faixa', () => {
-    expect(formatarFaixa(93, 94)).toBe('93 a 94')
-  })
-  it('sem min não formata nada', () => {
-    expect(formatarFaixa(undefined, undefined)).toBeUndefined()
   })
 })

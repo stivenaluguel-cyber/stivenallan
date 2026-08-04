@@ -147,11 +147,11 @@ function Populated({ leads, transicoes }: { leads: LeadStageRow[]; transicoes: S
       </section>
 
       <p id="nota-historico" style={{ fontSize: 12, color: T.mutedInk, maxWidth: 720, lineHeight: 1.6 }}>
-        <strong>Nota sobre os dados:</strong> "Cascata" é a % de leads que estão nesta etapa ou além, calculada a
+        <strong>Nota sobre os dados:</strong> &quot;Cascata&quot; é a % de leads que estão nesta etapa ou além, calculada a
         partir do snapshot de hoje — não é uma taxa de conversão de coorte real (não temos histórico de todas as
-        transições passadas). "Tempo médio na etapa" vem do log de mudança de estágio, que só passou a existir a
+        transições passadas). &quot;Tempo médio na etapa&quot; vem do log de mudança de estágio, que só passou a existir a
         partir do momento em que o Kanban (arrastar-e-soltar) começou a registrar transições — os números vão
-        ficando mais confiáveis com o tempo. Leads com estágio fora dos 7 conhecidos aparecem em "Outros".
+        ficando mais confiáveis com o tempo. Leads com estágio fora dos 7 conhecidos aparecem em &quot;Outros&quot;.
       </p>
     </>
   )

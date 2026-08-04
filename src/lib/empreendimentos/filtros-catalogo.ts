@@ -29,12 +29,23 @@ function contemFaixa(faixaMin: number | undefined, faixaMax: number | undefined,
 // Só é chamada quando o filtro de área já está confirmado ativo (ver
 // chamador) — por isso, se o empreendimento não tem área cadastrada
 // (min2 undefined), a resposta correta é "não casa", não "deixa passar".
+//
+// Semântica do filtro (min1/max1 — o que o usuário digitou):
+//   só mínimo  -> [min1, +Infinity)
+//   só máximo  -> (-Infinity, max1]
+//   os dois    -> [min1, max1]
+// BUG CORRIGIDO (revisão 93cf1e8, achado P1-2): a versão anterior fazia
+// `max1 ?? min1 ?? Infinity` — na ausência de teto, o limite superior do
+// filtro caía pro PRÓPRIO piso em vez de +Infinity, colapsando "a partir de
+// 100 m²" num intervalo fechado [100,100] e excluindo qualquer imóvel maior
+// que 100. `?? Infinity` direto (sem o `?? min1` no meio) resolve.
 function faixasSeCruzam(min1: number | undefined, max1: number | undefined, min2?: number, max2?: number): boolean {
-  if (min2 === undefined) return false
-  const a1 = max1 ?? min1 ?? Infinity
-  const b1 = min1 ?? -Infinity
-  const a2 = max2 ?? min2
-  return b1 <= a2 && a1 >= min2
+  if (min2 === undefined) return false // imóvel sem área cadastrada nunca casa com um filtro de área ativo
+  const filtroMin = min1 ?? -Infinity
+  const filtroMax = max1 ?? Infinity
+  const imovelMin = min2
+  const imovelMax = max2 ?? min2 // imóvel com um único valor cadastrado (sem faixa) vira um ponto
+  return filtroMin <= imovelMax && imovelMin <= filtroMax
 }
 
 export function passaNosFiltrosCatalogo(emp: Empreendimento, filtros: FiltrosCatalogo): boolean {
@@ -103,17 +114,63 @@ function numeroOpcional(v: string | null): number | undefined {
 
 const STATUS_VALIDOS: readonly StatusObra[] = ['na planta', 'em obras', 'pronto', 'entregue']
 
-export function filtrosDaQueryString(params: URLSearchParams): FiltrosCatalogo {
-  const status = listaDeTexto(params.get('status'))?.filter((s): s is StatusObra =>
-    (STATUS_VALIDOS as readonly string[]).includes(s)
-  )
+// Achado P1-4 da revisão independente: cidade/bairro/construtora/dormitórios
+// eram lidos da URL sem checar se o valor ainda existe no inventário atual —
+// um link salvo/compartilhado com um valor que saiu de catálogo (imóvel
+// vendido, faixa de dormitórios que não existe mais) deixava o filtro real
+// ativo (excluindo tudo) enquanto o <select> mostrava "Qualquer"/"Todas",
+// uma contradição visível entre o que a UI diz e o que ela faz. Como a UI é
+// de selects simples (um valor por vez), a normalização certa não é só
+// "descartar inválido" — é também "manter só o primeiro válido", igual já
+// era feito para status.
+//
+// Retorna o valor CANÔNICO da lista de disponíveis (não o texto cru da URL)
+// pra garantir que bata exatamente com o que `passaNosFiltrosCatalogo` compara.
+function primeiroValorValido<T extends string>(v: string | null, validos: readonly T[]): T | undefined {
+  const itens = listaDeTexto(v)
+  if (!itens || !validos.length) return undefined
+  const porChaveNormalizada = new Map(validos.map((val) => [normalizarTexto(val), val]))
+  for (const item of itens) {
+    const achado = porChaveNormalizada.get(normalizarTexto(item))
+    if (achado !== undefined) return achado
+  }
+  return undefined
+}
+
+function primeiroNumeroValido(v: string | null, validos: readonly number[]): number | undefined {
+  const itens = listaDeNumeros(v)
+  if (!itens || !validos.length) return undefined
+  const validosSet = new Set(validos)
+  return itens.find((n) => validosSet.has(n))
+}
+
+/** Inventário atual contra o qual a URL é validada — normalmente derivado dos
+ * mesmos dados já carregados pro catálogo (cidades/bairros/construtoras
+ * presentes na vitrine, faixas de dormitórios com pelo menos um imóvel). */
+export type OpcoesDisponiveis = {
+  cidades: readonly string[]
+  bairros: readonly string[]
+  construtoras: readonly string[]
+  dormitorios: readonly number[]
+}
+
+export function filtrosDaQueryString(params: URLSearchParams, disponiveis: OpcoesDisponiveis): FiltrosCatalogo {
+  const cidade = primeiroValorValido(params.get('cidade'), disponiveis.cidades)
+  const bairro = primeiroValorValido(params.get('bairro'), disponiveis.bairros)
+  const construtora = primeiroValorValido(params.get('construtora'), disponiveis.construtoras)
+  const dorms = primeiroNumeroValido(params.get('dorms'), disponiveis.dormitorios)
+  // status: mantém a validação existente (contra STATUS_VALIDOS), só
+  // normalizando pra um único valor pra bater com o <select> simples — igual
+  // às outras 4 dimensões, ver comentário acima.
+  const status = primeiroValorValido(params.get('status'), STATUS_VALIDOS)
+
   return {
     busca: params.get('q') || undefined,
-    cidades: listaDeTexto(params.get('cidade')),
-    bairros: listaDeTexto(params.get('bairro')),
-    construtoras: listaDeTexto(params.get('construtora')),
-    status: status?.length ? status : undefined,
-    dormitorios: listaDeNumeros(params.get('dorms')),
+    cidades: cidade ? [cidade] : undefined,
+    bairros: bairro ? [bairro] : undefined,
+    construtoras: construtora ? [construtora] : undefined,
+    status: status ? [status] : undefined,
+    dormitorios: dorms !== undefined ? [dorms] : undefined,
     areaMin: numeroOpcional(params.get('areaMin')),
     areaMax: numeroOpcional(params.get('areaMax')),
   }

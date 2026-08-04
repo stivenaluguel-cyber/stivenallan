@@ -27,11 +27,3 @@ export function extrairInteiro(valor?: string | null): number | undefined {
   const m = valor.match(/\d+/)
   return m ? Number(m[0]) : undefined
 }
-
-/** Formata um par {min,max} como "93" ou "93 a 94" (pt-BR, sem casas decimais desnecessárias). */
-export function formatarFaixa(min?: number, max?: number): string | undefined {
-  if (min === undefined) return undefined
-  const fmt = (n: number) => n.toLocaleString('pt-BR', { maximumFractionDigits: 2 })
-  if (max === undefined || max === min) return fmt(min)
-  return `${fmt(min)} a ${fmt(max)}`
-}

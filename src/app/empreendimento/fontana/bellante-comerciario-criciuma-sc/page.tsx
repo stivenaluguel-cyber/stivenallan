@@ -11,6 +11,7 @@ import { RelatedProperties } from '@/components/RelatedProperties'
 import { FontanaCompactNav } from '@/components/FontanaCompactNav'
 import { SITE_URL } from '@/lib/site'
 import { EspelhoPublico } from '@/components/EspelhoPublico'
+import { SkipLink } from '@/components/SkipLink'
 
 export const revalidate = 3600;
 
@@ -76,7 +77,9 @@ export const metadata: Metadata = {
 
 export default function BellantePage() {
   return (
-    <main style={{ fontFamily: "'Inter', sans-serif", color: '#1a1a1a', overflowX: 'hidden' }}>
+    <>
+      <SkipLink />
+
       <PropertySchema nome="Bellante" slug="bellante-comerciario-criciuma-sc" construtora_slug="fontana" cidade="Criciúma" uf="SC" bairro="Comerciário" descricao="Bellante Residencial — 2 dormitórios (1 suíte), 62–66 m², Comerciário em Criciúma/SC. Em obras. Financiamento direto Fontana. Conheça com Stiven Allan." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/bellante-comerciario-criciuma-sc.jpg" faq={FAQ_ITEMS} />
 
       {/* NAV */}
@@ -84,6 +87,7 @@ export default function BellantePage() {
         <FontanaCompactNav title="BELLANTE RESIDENCIAL" accent={ACCENT} wa={WA} />
       </header>
 
+      <main id="main-content" tabIndex={-1} style={{ fontFamily: "'Inter', sans-serif", color: '#1a1a1a', overflowX: 'hidden', outline: 'none' }}>
       {/* HERO */}
       <section style={{ position: 'relative', height: '100vh', minHeight: '600px', overflow: 'hidden' }}>
         <HeroImage unoptimized src={HERO} alt="Bellante Residencial — Fachada"
@@ -96,7 +100,7 @@ export default function BellantePage() {
             Bellante<br /><strong style={{ fontWeight: 700 }}>Residencial</strong>
           </h1>
           <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#c8d8ef', fontSize: 'clamp(1.4rem,3vw,2.2rem)', fontStyle: 'italic', marginBottom: '2rem' }}>
-            "Feito para você."
+            &quot;Feito para você.&quot;
           </p>
           <a href={WA} target="_blank" rel="noopener"
             style={{ background: ACCENT, color: '#fff', padding: '1rem 2.5rem', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', borderRadius: '2px' }}>
@@ -117,7 +121,7 @@ export default function BellantePage() {
             No Bellante Residencial, a arquitetura é única e os motivos para viver nele são muitos. Um projeto moderno que acolhe e expressa a personalidade de seus moradores, em localização privilegiada de Criciúma.
           </p>
           <blockquote style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 'clamp(1.5rem,2.5vw,2rem)', fontStyle: 'italic', color: '#333', borderLeft: `4px solid ${ACCENT}`, paddingLeft: '1.5rem', margin: '2.5rem auto', maxWidth: '600px', textAlign: 'left' }}>
-            "Feito para você."
+            &quot;Feito para você.&quot;
           </blockquote>
           <p style={{ fontSize: '1rem', lineHeight: 1.9, color: '#555' }}>
             2 dormitórios com 1 suíte, apartamentos de 62 a 66 m² privativos no Comerciário em Criciúma/SC. Em obras. Uma construção que honra cada detalhe com acabamentos nobres e espaços que respiram elegância.
@@ -285,7 +289,7 @@ export default function BellantePage() {
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.65)' }} />
         <div style={{ position: 'relative', zIndex: 2, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 1.5rem' }}>
           <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#c8d8ef', fontSize: 'clamp(1.5rem,3vw,2.5rem)', fontStyle: 'italic', marginBottom: '2rem' }}>
-            "Feito para você."
+            &quot;Feito para você.&quot;
           </p>
           <a href={WA} target="_blank" rel="noopener"
             style={{ background: ACCENT, color: '#fff', padding: '1rem 2.5rem', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', borderRadius: '2px' }}>
@@ -293,6 +297,8 @@ export default function BellantePage() {
           </a>
         </div>
       </section>
+
+      </main>
 
       {/* FOOTER */}
       <footer style={{ background: '#0d0d0d', color: 'rgba(255,255,255,0.55)', padding: '3rem 1.5rem', textAlign: 'center' }}>
@@ -308,6 +314,6 @@ export default function BellantePage() {
         <MessageCircle size={26} strokeWidth={2} aria-hidden="true" />
       </a>
 
-    </main>
+    </>
   );
 }

@@ -11,6 +11,7 @@ import { RelatedProperties } from '@/components/RelatedProperties'
 import { FontanaCompactNav } from '@/components/FontanaCompactNav'
 import { SITE_URL } from '@/lib/site'
 import { EspelhoPublico } from '@/components/EspelhoPublico'
+import { SkipLink } from '@/components/SkipLink'
 
 export const revalidate = 3600;
 
@@ -72,7 +73,9 @@ export const metadata: Metadata = {
 
 export default function AvezzanoPage() {
   return (
-    <main style={{ fontFamily: "'Inter', sans-serif", color: '#1a1a1a', overflowX: 'hidden' }}>
+    <>
+      <SkipLink />
+
       <PropertySchema nome="Avezzano" slug="avezzano-centro-sideropolis-sc" construtora_slug="fontana" cidade="Siderópolis" uf="SC" bairro="Centro" descricao="Avezzano Residencial — 3 dormitórios (1 suíte e 2 demi-suítes), 127 m², Centro de Siderópolis/SC. Financiamento direto Fontana. Conheça com Stiven Allan." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/avezzano-centro-sideropolis-sc.jpg" faq={FAQ_ITEMS} />
 
       {/* NAV */}
@@ -80,6 +83,7 @@ export default function AvezzanoPage() {
         <FontanaCompactNav title="AVEZZANO RESIDENCIAL" accent={ACCENT} wa={WA} />
       </header>
 
+      <main id="main-content" tabIndex={-1} style={{ fontFamily: "'Inter', sans-serif", color: '#1a1a1a', overflowX: 'hidden', outline: 'none' }}>
       {/* HERO */}
       <section style={{ position: 'relative', height: '100vh', minHeight: '600px', overflow: 'hidden' }}>
         <HeroImage src={HERO} alt="Avezzano Residencial — Salão de Festas" fill priority sizes="100vw"
@@ -91,7 +95,7 @@ export default function AvezzanoPage() {
             Avezzano<br /><strong style={{ fontWeight: 700 }}>Residencial</strong>
           </h1>
           <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#e8d5c0', fontSize: 'clamp(1.4rem,3vw,2.2rem)', fontStyle: 'italic', marginBottom: '2rem' }}>
-            "Permita-se viver no melhor."
+            &quot;Permita-se viver no melhor.&quot;
           </p>
           <a href={WA} target="_blank" rel="noopener"
             style={{ background: ACCENT, color: '#fff', padding: '1rem 2.5rem', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', borderRadius: '2px' }}>
@@ -112,7 +116,7 @@ export default function AvezzanoPage() {
             Conforto e segurança em uma construção moderna. Espaços amplos e arejados em perfeita sintonia entre conforto e liberdade — uma experiência de morar que transcende o cotidiano.
           </p>
           <blockquote style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 'clamp(1.5rem,2.5vw,2rem)', fontStyle: 'italic', color: '#333', borderLeft: `4px solid ${ACCENT}`, paddingLeft: '1.5rem', margin: '2.5rem auto', maxWidth: '600px', textAlign: 'left' }}>
-            "Permita-se viver no melhor."
+            &quot;Permita-se viver no melhor.&quot;
           </blockquote>
           <p style={{ fontSize: '1rem', lineHeight: 1.9, color: '#555' }}>
             3 dormitórios (1 suíte e 2 demi-suítes), apartamentos de 127 m² privativos no coração de Siderópolis/SC. Uma construção que honra cada detalhe com acabamentos nobres e espaços que respiram elegância.
@@ -271,7 +275,7 @@ export default function AvezzanoPage() {
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.65)' }} />
         <div style={{ position: 'relative', zIndex: 2, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 1.5rem' }}>
           <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#e8d5c0', fontSize: 'clamp(1.5rem,3vw,2.5rem)', fontStyle: 'italic', marginBottom: '2rem' }}>
-            "Permita-se viver no melhor."
+            &quot;Permita-se viver no melhor.&quot;
           </p>
           <a href={WA} target="_blank" rel="noopener"
             style={{ background: ACCENT, color: '#fff', padding: '1rem 2.5rem', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', borderRadius: '2px' }}>
@@ -279,6 +283,8 @@ export default function AvezzanoPage() {
           </a>
         </div>
       </section>
+
+      </main>
 
       {/* FOOTER */}
       <footer style={{ background: '#0d0d0d', color: 'rgba(255,255,255,0.55)', padding: '3rem 1.5rem', textAlign: 'center' }}>
@@ -294,6 +300,6 @@ export default function AvezzanoPage() {
         <MessageCircle size={26} strokeWidth={2} aria-hidden="true" />
       </a>
 
-    </main>
+    </>
   );
 }

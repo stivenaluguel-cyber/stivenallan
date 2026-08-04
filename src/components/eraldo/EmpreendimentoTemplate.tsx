@@ -9,6 +9,7 @@ import { RelatedProperties } from '@/components/RelatedProperties'
 import { EspelhoPublico } from '@/components/EspelhoPublico'
 import { SkipLink } from '@/components/SkipLink'
 import type { Empreendimento, StatusEmpreendimento } from '@/data/eraldo/types'
+import { classificarPoliticaFinanciamento, TITULO_FINANCIAMENTO, TEXTO_FINANCIAMENTO } from '@/lib/eraldo-politica-financiamento'
 
 const WPP_NUMERO = '5548991642332'
 function wppLink(nome: string) {
@@ -43,6 +44,10 @@ function ctaFinalBotaoSecundario(status: StatusEmpreendimento) {
 export default function EmpreendimentoTemplate({ data }: { data: Empreendimento }) {
   const WPP = wppLink(data.nome)
   const passos = PASSOS_POR_STATUS[data.status]
+  // P1-6: classifica a política de financiamento REAL antes de escolher o
+  // texto da seção — nunca afirmar "sem intermediação bancária" quando a
+  // tabela vigente exige banco (Gran Palazzo, Play Residence e outros).
+  const politicaFinanciamento = classificarPoliticaFinanciamento(data.politicaComercial)
 
   const CSS = `
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -343,11 +348,11 @@ export default function EmpreendimentoTemplate({ data }: { data: Empreendimento 
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 64 }}>
             <p style={{ fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 10, letterSpacing: '0.45em', textTransform: 'uppercase', color: '#9C5F2E', display: 'block', marginBottom: 16 }}>Como funciona</p>
-            <h2 className="ec-h2" style={{ fontSize: 'clamp(24px,3.5vw,42px)', color: '#1A1814', marginBottom: 16 }}>Financiamento direto</h2>
+            <h2 className="ec-h2" style={{ fontSize: 'clamp(24px,3.5vw,42px)', color: '#1A1814', marginBottom: 16 }}>{TITULO_FINANCIAMENTO[politicaFinanciamento]}</h2>
             {data.politicaComercial ? (
               <>
                 <p className="ec-serif" style={{ fontSize: 'clamp(15px,1.8vw,19px)', color: '#6B655B', maxWidth: 560, margin: '0 auto 32px', lineHeight: 1.7 }}>
-                  Negociado diretamente com a Eraldo Construções, sem intermediação bancária.
+                  {TEXTO_FINANCIAMENTO[politicaFinanciamento]}
                 </p>
                 <div style={{ maxWidth: 720, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 12, textAlign: 'left' }}>
                   {data.politicaComercial.condicoes.map(({ titulo, texto }) => (
@@ -367,7 +372,7 @@ export default function EmpreendimentoTemplate({ data }: { data: Empreendimento 
               </>
             ) : (
               <p className="ec-serif" style={{ fontSize: 'clamp(15px,1.8vw,19px)', color: '#6B655B', maxWidth: 480, margin: '0 auto', lineHeight: 1.7 }}>
-                Negociado diretamente com a Eraldo Construções, sem intermediação bancária. Condições sob consulta — fale com Stiven para a tabela de pagamento atualizada.
+                {TEXTO_FINANCIAMENTO.nao_informado}
               </p>
             )}
           </div>

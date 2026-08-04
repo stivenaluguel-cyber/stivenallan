@@ -108,9 +108,13 @@ export const granMichel: Empreendimento = {
     { src: `${SITE}/2024/11/Background-2-5.png`, alt: 'Gran Michel — coworking', label: 'Coworking' },
   ],
 
+  // dormitorios não preenchido: o site só confirma "2 e 3 quartos" no nível do
+  // prédio (ver conceitoTexto/FAQ), sem dizer qual tipologia é qual — inventar
+  // a correspondência seria adivinhar. vagas vem do próprio nome da tipologia
+  // (inequívoco, já está escrito ali).
   tipologias: [
-    { nome: 'Apartamento (1 vaga)', areaPrivativa: 70.71 },
-    { nome: 'Apartamento (2 vagas)', areaPrivativa: 93.20 },
+    { nome: 'Apartamento (1 vaga)', areaPrivativa: 70.71, vagas: 1 },
+    { nome: 'Apartamento (2 vagas)', areaPrivativa: 93.20, vagas: 2 },
   ],
   plantasTitulo: 'Escolha o seu layout',
   plantasTexto: 'Apartamentos, unidades garden e rooftop — plantas por tipo de unidade.',

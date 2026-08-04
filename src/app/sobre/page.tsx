@@ -53,7 +53,6 @@ export const metadata: Metadata = {
                                                                                                                                                                               'Apartamentos na planta',
                                                                                                                                                                                 'Lançamentos Fontana Construtora',
   'Financiamento direto com a construtora',
-  'Sem depender de banco',
                                                                                                                                                                                       'Imóveis para investimento',
                                                                                                                                                                                         'Consultoria de documentação',
                                                                                                                                                                                           'Acompanhamento pós-venda',

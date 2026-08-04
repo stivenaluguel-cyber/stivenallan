@@ -1,6 +1,7 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { trackPlantaOpen } from '@/lib/tracking'
+import { useFocusTrapModal } from '@/lib/a11y/useFocusTrapModal'
 
 type PlantaItem = { src: string; alt: string; label: string; quartos?: number; suites?: number; area?: number }
 
@@ -18,11 +19,20 @@ export default function PlantasLightbox({ plantas, accent, trackPlantas }: {
   trackPlantas?: { empreendimento: string; content_name: string }
 }) {
   const [open, setOpen] = useState<number | null>(null)
+  const openerRef = useRef<HTMLElement | null>(null)
+  const dialogRef = useRef<HTMLDivElement>(null)
+  const closeBtnRef = useRef<HTMLButtonElement>(null)
+
+  useFocusTrapModal(dialogRef, {
+    open: open !== null,
+    onClose: () => setOpen(null),
+    openerRef,
+    initialFocusRef: closeBtnRef,
+  })
 
   useEffect(() => {
     if (open === null) return
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(null)
       if (e.key === 'ArrowLeft') setOpen(i => (i !== null && i > 0 ? i - 1 : i))
       if (e.key === 'ArrowRight') setOpen(i => (i !== null && i < plantas.length - 1 ? i + 1 : i))
     }
@@ -36,9 +46,9 @@ export default function PlantasLightbox({ plantas, accent, trackPlantas }: {
         {plantas.map((p, i) => {
           const ficha = fichaTecnica(p)
           return (
-            <figure key={i} onClick={() => { setOpen(i); if (trackPlantas) trackPlantaOpen(p.label, trackPlantas) }}
+            <figure key={i} onClick={(e) => { openerRef.current = e.currentTarget; setOpen(i); if (trackPlantas) trackPlantaOpen(p.label, trackPlantas) }}
               role="button" tabIndex={0} aria-label={`Ampliar planta: ${p.label}`}
-              onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setOpen(i); if (trackPlantas) trackPlantaOpen(p.label, trackPlantas) } }}
+              onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openerRef.current = e.currentTarget; setOpen(i); if (trackPlantas) trackPlantaOpen(p.label, trackPlantas) } }}
               style={{ margin: 0, cursor: 'pointer', overflow: 'hidden', position: 'relative', aspectRatio: '4/3', background: '#222' }}>
               <img src={p.src} alt={p.alt}
                 style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform 0.4s ease' }}
@@ -55,10 +65,10 @@ export default function PlantasLightbox({ plantas, accent, trackPlantas }: {
       </div>
 
       {open !== null && (
-        <div onClick={() => setOpen(null)}
+        <div ref={dialogRef} onClick={() => setOpen(null)}
           role="dialog" aria-modal="true" aria-label={`Lightbox — ${plantas[open].label}`}
           style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
-          <button onClick={() => setOpen(null)} aria-label="Fechar lightbox"
+          <button ref={closeBtnRef} onClick={() => setOpen(null)} aria-label="Fechar lightbox"
             style={{ position: 'absolute', top: '1rem', right: '1.25rem', background: 'none', border: 'none', color: '#fff', fontSize: '2rem', cursor: 'pointer', lineHeight: 1 }}>
             ×
           </button>

@@ -74,7 +74,7 @@ export default function CampanhasPage() {
         ) : campanhas.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '48px 24px', background: D.surface, border: '1px solid ' + D.line, borderRadius: 12 }}>
             <p style={{ fontSize: 15, fontWeight: 600, margin: '0 0 6px' }}>Nenhuma campanha ainda.</p>
-            <p style={{ fontSize: 13, color: D.muted, margin: 0 }}>Clique em "Nova campanha" pra começar.</p>
+            <p style={{ fontSize: 13, color: D.muted, margin: 0 }}>Clique em &quot;Nova campanha&quot; pra começar.</p>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>

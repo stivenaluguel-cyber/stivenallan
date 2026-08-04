@@ -55,7 +55,7 @@ export async function GET(req: NextRequest) {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   const linhas = data ?? []
-  let assinados: Record<string, string> = {}
+  const assinados: Record<string, string> = {}
   if (linhas.length > 0) {
     const { data: urls, error: erroUrl } = await client.storage
       .from(BUCKET)

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useId } from 'react'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import {
   passaNosFiltrosCatalogo, filtrosDaQueryString, queryStringDosFiltros, contarFiltrosAtivos,
-  type FiltrosCatalogo,
+  type FiltrosCatalogo, type OpcoesDisponiveis,
 } from '@/lib/empreendimentos/filtros-catalogo'
 import type { Empreendimento, StatusObra } from '@/lib/empreendimentos'
 import { statusLabel } from '@/lib/empreendimentos'
@@ -55,10 +55,22 @@ export default function CatalogFilters({ cidades, bairros, construtoras, statusD
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
-  const [filtros, setFiltros] = useState<FiltrosCatalogo>(() => filtrosDaQueryString(searchParams))
+  // Inventário atual pra validar o que vier da URL (achado P1-4: um valor que
+  // não existe mais — cidade sem imóvel, faixa de dormitórios que sumiu — não
+  // pode deixar um filtro "invisível" ativo enquanto o <select> mostra
+  // "Qualquer"/"Todas". Ver filtros-catalogo.ts.
+  const disponiveis: OpcoesDisponiveis = { cidades, bairros, construtoras, dormitorios: dormitoriosDisponiveis }
+  const [filtros, setFiltros] = useState<FiltrosCatalogo>(() => filtrosDaQueryString(searchParams, disponiveis))
   const [visiveis, setVisiveis] = useState(totalGeral)
+  // Incrementado a cada "Limpar filtros" — usado como `key` nos 3 campos de
+  // texto/número não controlados (busca, área mín./máx.) pra forçar o React a
+  // remontá-los com o valor inicial em branco (achado P2-2: `defaultValue`
+  // não some sozinho quando o estado é zerado por fora).
+  const [resetKey, setResetKey] = useState(0)
   const idBusca = useId()
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const statusRef = useRef<HTMLParagraphElement>(null)
+  const acabouDeLimparRef = useRef(false)
 
   // Aplica os filtros nos cards já renderizados (mesmo padrão leve de
   // mostrar/esconder via DOM que o filtro anterior já usava — sem re-render
@@ -78,6 +90,16 @@ export default function CatalogFilters({ cidades, bairros, construtoras, statusD
     const qs = queryStringDosFiltros(filtros)
     const url = qs ? `${pathname}?${qs}` : pathname
     router.replace(url, { scroll: false })
+
+    // Achado P2-3: o botão "Limpar filtros" some do DOM assim que os filtros
+    // zeram (filtrosAtivos vira 0), levando junto o foco de quem clicou nele
+    // via teclado — sem isso, o foco cai pro <body> e o usuário perde a
+    // posição. Move pro contador de resultados (mesmo elemento que já
+    // anuncia a contagem via aria-live), que é estável e sempre existe.
+    if (acabouDeLimparRef.current) {
+      acabouDeLimparRef.current = false
+      statusRef.current?.focus()
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filtros])
 
@@ -91,9 +113,10 @@ export default function CatalogFilters({ cidades, bairros, construtoras, statusD
   }
 
   function limparFiltros() {
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    acabouDeLimparRef.current = true
     setFiltros({})
-    const buscaInput = document.getElementById(idBusca) as HTMLInputElement | null
-    if (buscaInput) buscaInput.value = ''
+    setResetKey((k) => k + 1)
   }
 
   const filtrosAtivos = contarFiltrosAtivos(filtros)
@@ -109,6 +132,7 @@ export default function CatalogFilters({ cidades, bairros, construtoras, statusD
         <div style={{ gridColumn: '1 / -1' }}>
           <label htmlFor={idBusca} style={labelStyle}>Buscar por nome, bairro ou cidade</label>
           <input
+            key={`busca-${resetKey}`}
             id={idBusca}
             type="search"
             placeholder="Ex.: Monte Leone, Centro, Içara..."
@@ -188,6 +212,7 @@ export default function CatalogFilters({ cidades, bairros, construtoras, statusD
         <div>
           <label htmlFor="filtro-area-min" style={labelStyle}>Área mín. (m²)</label>
           <input
+            key={`area-min-${resetKey}`}
             id="filtro-area-min" type="number" min={0} inputMode="numeric" placeholder="Ex.: 60"
             defaultValue={filtros.areaMin ?? ''}
             onChange={(e) => atualizar({ areaMin: e.target.value ? Number(e.target.value) : undefined })}
@@ -198,6 +223,7 @@ export default function CatalogFilters({ cidades, bairros, construtoras, statusD
         <div>
           <label htmlFor="filtro-area-max" style={labelStyle}>Área máx. (m²)</label>
           <input
+            key={`area-max-${resetKey}`}
             id="filtro-area-max" type="number" min={0} inputMode="numeric" placeholder="Ex.: 200"
             defaultValue={filtros.areaMax ?? ''}
             onChange={(e) => atualizar({ areaMax: e.target.value ? Number(e.target.value) : undefined })}
@@ -207,7 +233,7 @@ export default function CatalogFilters({ cidades, bairros, construtoras, statusD
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
-        <p role="status" aria-live="polite" style={{ margin: 0, fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 13, color: '#6B655B' }}>
+        <p ref={statusRef} tabIndex={-1} role="status" aria-live="polite" style={{ margin: 0, fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 13, color: '#6B655B' }}>
           {visiveis === totalGeral
             ? `${totalGeral} empreendimento${totalGeral !== 1 ? 's' : ''}`
             : `${visiveis} de ${totalGeral} empreendimentos`}

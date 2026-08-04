@@ -134,7 +134,7 @@ export const metadata: Metadata = {
                             Balneario Rincao é um município litorâneo, com empreendimentos concentrados no bairro Centro, proximos a orla. É a opção para quem busca um imóvel de veraneio ou moradia com acesso direto a praia.
                             </p>
                             <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333', marginTop: 16 }}>
-                            Os lancamentos ativos são o Mar di Arienzo Residencial, o Mar di Atrani Residencial, o Mar Positano Residencial e o Villammare Residencial. Os proprios nomes e frases de marketing desses empreendimentos, como "Onde o mar habita, estar perto e o melhor destino", reforcam o posicionamento litorâneo da região.
+                            Os lancamentos ativos são o Mar di Arienzo Residencial, o Mar di Atrani Residencial, o Mar Positano Residencial e o Villammare Residencial. Os proprios nomes e frases de marketing desses empreendimentos, como &quot;Onde o mar habita, estar perto e o melhor destino&quot;, reforcam o posicionamento litorâneo da região.
                             </p>
 
                             <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Laguna - litoral no bairro Mar Grosso</h2>
@@ -157,12 +157,12 @@ export const metadata: Metadata = {
 
                             <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Balneario Picarras - frente mar</h2>
                             <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-                            Balneario Picarras é um município litorâneo de Santa Catarina onde a Fontana tem um lançamento no bairro Centro: o <Link href="/empreendimento/fontana/aguas-de-marano-frente-mar-balneario-picarras-sc" style={{ color: '#B89B5E' }}>Aguas de Marano Residencial</Link>, com a propria frase de marketing "Frente mar - mergulhe em cada detalhe", reforcando a proximidade direta com a praia.
+                            Balneario Picarras é um município litorâneo de Santa Catarina onde a Fontana tem um lançamento no bairro Centro: o <Link href="/empreendimento/fontana/aguas-de-marano-frente-mar-balneario-picarras-sc" style={{ color: '#B89B5E' }}>Aguas de Marano Residencial</Link>, com a propria frase de marketing &quot;Frente mar - mergulhe em cada detalhe&quot;, reforcando a proximidade direta com a praia.
                             </p>
 
                             <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Bom Jardim da Serra - natureza e serra</h2>
                             <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
-                            Bom Jardim da Serra é o único município de serra com lançamento Fontana ativo: o Campos da Montanha Residencial, cuja propria frase de marketing e "Sinta o bem-estar da serra em todos os seus dias". É a opção para quem busca contato com a natureza e um ritmo de vida diferente do litoral ou do centro urbano.
+                            Bom Jardim da Serra é o único município de serra com lançamento Fontana ativo: o Campos da Montanha Residencial, cuja propria frase de marketing e &quot;Sinta o bem-estar da serra em todos os seus dias&quot;. É a opção para quem busca contato com a natureza e um ritmo de vida diferente do litoral ou do centro urbano.
                             </p>
 
                             <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Resumo das regioes</h2>

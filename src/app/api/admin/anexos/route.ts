@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
 
   // Um createSignedUrls para a lista inteira; assinar um a um seria N
   // round-trips para abrir uma aba.
-  let assinados: Record<string, string> = {}
+  const assinados: Record<string, string> = {}
   if (anexos.length > 0) {
     const { data: urls, error: erroUrl } = await client.storage
       .from(BUCKET)

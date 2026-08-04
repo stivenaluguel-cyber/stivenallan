@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import { HeroImage } from '@/components/HeroImage'
+import Link from 'next/link'
 import type { Metadata } from 'next'
 import GalleryWithLightbox from './gallery-lightbox'
 import { LeadCaptureButton } from '@/components/LeadCaptureButton'
@@ -110,9 +111,9 @@ export default function PiazzaCastelloPage() {
       
 <PropertySchema nome="Piazza Castello Residencial" slug="piazza-castello-centro-icara-sc" construtora_slug="fontana" cidade="Içara" uf="SC" bairro="Centro" descricao="Piazza Castello Residencial — 3 dormitórios (3 suítes), até 172 m² privativos, no Centro de Içara/SC." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/piazza-castello-centro-icara-sc.jpg" faq={[{"pergunta":"Como funciona o pagamento do Piazza Castello Residencial?","resposta":"Condições de pagamento sob consulta. Fale com um corretor para receber a composição comercial e a disponibilidade atualizadas."},{"pergunta":"Posso usar financiamento bancário ou FGTS?","resposta":"Fale com um corretor para confirmar as modalidades de pagamento disponíveis, incluindo financiamento bancário e FGTS."},{"pergunta":"Onde fica o Piazza Castello Residencial?","resposta":"O Piazza Castello Residencial está localizado na Praça Presidente João Goulart, frente à Praça Castelo Branco, no Centro de Içara/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"O empreendimento oferece apartamentos com 3 dormitórios (3 suítes) e até 172 m² privativos."}]} />
 <header style={{position:'absolute',top:0,left:0,right:0,zIndex:10,padding:'1.5rem'}}>
-        <a href="/" style={{color:'#fff',fontSize:'1rem',fontWeight:700,textDecoration:'none',letterSpacing:'.04em'}}>
+        <Link href="/" style={{color:'#fff',fontSize:'1rem',fontWeight:700,textDecoration:'none',letterSpacing:'.04em'}}>
           Stiven Allan
-        </a>
+        </Link>
       </header>
 
       <main id="main-content" tabIndex={-1} style={{ outline: 'none' }}>
@@ -242,7 +243,7 @@ export default function PiazzaCastelloPage() {
         <p className="pc-footer-logo">Stiven Allan · Corretor de Imóveis</p>
         <p>CRECI 60.275 · Empreendimentos Fontana em Criciúma e região</p>
         <p style={{marginTop:'.5rem'}}><a href={WA} target="_blank" rel="noopener noreferrer" style={{color:'#25D366',textDecoration:'none'}}>WhatsApp: (48) 99164-2332</a></p>
-        <p style={{marginTop:'.5rem',fontSize:'.75rem'}}><a href="/" style={{color:'#666',textDecoration:'none'}}>← Ver todos os empreendimentos</a></p>
+        <p style={{marginTop:'.5rem',fontSize:'.75rem'}}><Link href="/" style={{color:'#666',textDecoration:'none'}}>← Ver todos os empreendimentos</Link></p>
       </footer>
 
       <a href={WA} target="_blank" rel="noopener noreferrer" className="pc-fab" aria-label="WhatsApp">

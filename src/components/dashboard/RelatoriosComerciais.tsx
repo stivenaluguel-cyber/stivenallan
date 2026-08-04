@@ -210,7 +210,7 @@ export function RelatoriosComerciais() {
                   aviso o relatório passaria a impressão de cobrir tudo, quando
                   cobre só o que passou pelo Modo Foco. */}
               <p style={{ fontSize: 10.5, color: D.muted, margin: '10px 0 0', lineHeight: 1.5 }}>
-                {dados!.motivosPerda.perdidosNoFunil} lead(s) estão hoje na etapa "perdido" no total.
+                {dados!.motivosPerda.perdidosNoFunil} lead(s) estão hoje na etapa &quot;perdido&quot; no total.
                 Quem foi marcado como perdido direto no CRM, fora do Modo Foco, entra nessa conta
                 mas não tem motivo registrado aqui.
               </p>

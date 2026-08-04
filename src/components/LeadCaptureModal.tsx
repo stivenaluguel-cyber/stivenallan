@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { getAnonId, getVisitas } from '@/components/VisitTracker'
 import { getAttribution, trackLeadEvent, sendLeadToCapi, trackFormOpen, trackFormStart, trackFormSubmit } from '@/lib/tracking'
+import { useFocusTrapModal } from '@/lib/a11y/useFocusTrapModal'
 
 type Props = {
   propertyId: string
@@ -40,33 +41,15 @@ export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName
   const startedRef = useRef(false)
   const funilParams = { empreendimento: propertyName, content_name: propertyDisplayName || propertyName, form_type: 'catalog_modal' as const }
 
-  // Acessibilidade do modal: Escape fecha, foco vai para o diálogo ao abrir e
-  // volta pro botão que abriu ao fechar (sem isso, usuário de teclado/leitor de
-  // tela perde a posição e o scroll do fundo continua rolando atrás do overlay).
-  useEffect(() => {
-    if (!open) return
-    const previouslyFocused = (document.activeElement as HTMLElement | null) || openerRef.current
-    dialogRef.current?.focus()
-    document.body.style.overflow = 'hidden'
-    function onKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') { setOpen(false); return }
-      if (e.key !== 'Tab' || !dialogRef.current) return
-      const focusables = dialogRef.current.querySelectorAll<HTMLElement>(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-      )
-      if (focusables.length === 0) return
-      const first = focusables[0]
-      const last = focusables[focusables.length - 1]
-      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus() }
-      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus() }
-    }
-    window.addEventListener('keydown', onKeyDown)
-    return () => {
-      window.removeEventListener('keydown', onKeyDown)
-      document.body.style.overflow = ''
-      previouslyFocused?.focus()
-    }
-  }, [open])
+  // Acessibilidade do modal (focus trap + Escape + scroll-lock + restauração de
+  // foco): extraída para useFocusTrapModal, compartilhada com os lightboxes dos
+  // empreendimentos. openerRef aponta pro botão que abriu o modal e é priorizado
+  // sobre document.activeElement na restauração — ver P2-5 na doc do hook.
+  useFocusTrapModal(dialogRef, {
+    open,
+    onClose: () => setOpen(false),
+    openerRef,
+  })
 
   // Cada abertura do modal (inclui autoOpen no mount e reaberturas depois de fechar)
   // dispara form_open uma vez e reabre a janela do form_start — sem isso, fechar e

@@ -327,7 +327,7 @@ export default async function EmpreendimentoPage({ params }: PageProps) {
             {emp.bairro}, {emp.cidade}/{emp.uf}
           </p>
           <p style={{ fontStyle: 'italic', color: '#3a342b', fontSize: 18, margin: '0 0 24px' }}>
-            "{emp.frase}"
+            &quot;{emp.frase}&quot;
           </p>
           <p style={{ fontSize: 16, lineHeight: 1.7, color: '#2a2620' }}>{emp.descricao}</p>
 

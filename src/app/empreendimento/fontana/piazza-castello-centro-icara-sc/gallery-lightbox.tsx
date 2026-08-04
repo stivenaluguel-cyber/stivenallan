@@ -1,26 +1,36 @@
 'use client'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import Image from 'next/image'
+import { useFocusTrapModal } from '@/lib/a11y/useFocusTrapModal'
 
 interface GalleryItem { src: string; alt: string }
 interface Props { galeria: GalleryItem[]; prefix: string; gradient: string }
 
 export default function GalleryWithLightbox({ galeria, prefix, gradient }: Props) {
   const [lightbox, setLightbox] = useState<number | null>(null)
+  const openerRef = useRef<HTMLElement | null>(null)
+  const dialogRef = useRef<HTMLDivElement>(null)
+  const closeBtnRef = useRef<HTMLButtonElement>(null)
   const fechar = useCallback(() => setLightbox(null), [])
   const anterior = useCallback(() => setLightbox(i => i !== null ? (i - 1 + galeria.length) % galeria.length : null), [galeria.length])
   const proximo = useCallback(() => setLightbox(i => i !== null ? (i + 1) % galeria.length : null), [galeria.length])
 
+  useFocusTrapModal(dialogRef, {
+    open: lightbox !== null,
+    onClose: fechar,
+    openerRef,
+    initialFocusRef: closeBtnRef,
+  })
+
   useEffect(() => {
     if (lightbox === null) return
     const h = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') fechar()
       if (e.key === 'ArrowLeft') anterior()
       if (e.key === 'ArrowRight') proximo()
     }
     window.addEventListener('keydown', h)
     return () => window.removeEventListener('keydown', h)
-  }, [lightbox, fechar, anterior, proximo])
+  }, [lightbox, anterior, proximo])
 
   return (
     <>
@@ -39,20 +49,20 @@ export default function GalleryWithLightbox({ galeria, prefix, gradient }: Props
       `}</style>
       <div className={`${prefix}-grid`}>
         {galeria.map((item, i) => (
-          <div key={i} className={`${prefix}-thumb`} role="button" tabIndex={0} aria-label={`Ampliar: ${item.alt}`} onClick={() => setLightbox(i)} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && setLightbox(i)}>
+          <div key={i} className={`${prefix}-thumb`} role="button" tabIndex={0} aria-label={`Ampliar: ${item.alt}`} onClick={(e) => { openerRef.current = e.currentTarget; setLightbox(i) }} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { openerRef.current = e.currentTarget; setLightbox(i) } }}>
             <Image unoptimized src={item.src} alt={item.alt} fill sizes="(max-width:640px) 50vw,33vw" style={{objectFit:'cover'}} />
             <div style={{position:'absolute',inset:0,background:gradient,opacity:.2}} />
           </div>
         ))}
       </div>
       {lightbox !== null && (
-        <div className={`${prefix}-lb`} onClick={fechar} role="dialog" aria-modal="true" aria-label={`Lightbox — ${galeria[lightbox].alt}`}>
+        <div ref={dialogRef} className={`${prefix}-lb`} onClick={fechar} role="dialog" aria-modal="true" aria-label={`Lightbox — ${galeria[lightbox].alt}`}>
           <div className={`${prefix}-lb-img`} onClick={e => e.stopPropagation()}>
             <Image unoptimized src={galeria[lightbox].src} alt={galeria[lightbox].alt} fill sizes="90vw" style={{objectFit:'contain'}} />
           </div>
           <button className={`${prefix}-lb-btn ${prefix}-lb-prev`} onClick={e=>{e.stopPropagation();anterior()}} aria-label="Imagem anterior">‹</button>
           <button className={`${prefix}-lb-btn ${prefix}-lb-next`} onClick={e=>{e.stopPropagation();proximo()}} aria-label="Próxima imagem">›</button>
-          <button className={`${prefix}-lb-close`} onClick={fechar} aria-label="Fechar lightbox">×</button>
+          <button ref={closeBtnRef} className={`${prefix}-lb-close`} onClick={fechar} aria-label="Fechar lightbox">×</button>
         </div>
       )}
     </>

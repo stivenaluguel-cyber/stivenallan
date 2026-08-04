@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import Link from 'next/link'
 import { HeroImage } from '@/components/HeroImage'
 import GalleryWithLightbox, { LightboxPhoto } from './gallery-lightbox'
 import { LeadCaptureButton } from '@/components/LeadCaptureButton'
@@ -124,9 +125,9 @@ export default function CallianoPage() {
 
       {/* HEADER */}
       <header style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 100, padding: '28px 48px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <a href="/" style={{ textDecoration: 'none' }}>
+        <Link href="/" style={{ textDecoration: 'none' }}>
           <span style={{ fontFamily: t.display, fontWeight: 300, fontSize: 18, letterSpacing: '.18em', textTransform: 'uppercase', color: '#fff' }}>Stiven Allan</span>
-        </a>
+        </Link>
         <nav className="ca-nav-links" style={{ display: 'flex', alignItems: 'center', gap: 36 }}>
           <a href="#residencial" className="ca-navlink">O Residencial</a>
           <a href="#galeria" className="ca-navlink">Galeria</a>
@@ -347,7 +348,7 @@ export default function CallianoPage() {
         </div>
         <div style={{ maxWidth: 1100, margin: '32px auto 0', paddingTop: 24, borderTop: `1px solid rgba(246,237,232,0.1)`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <p style={{ fontSize: 12, color: t.onDarkMuted, margin: 0 }}>© {new Date().getFullYear()} Stiven Allan · Todos os direitos reservados</p>
-          <a href="/" style={{ fontSize: 12, color: t.onDarkMuted, textDecoration: 'none' }}>Ver todos os imóveis</a>
+          <Link href="/" style={{ fontSize: 12, color: t.onDarkMuted, textDecoration: 'none' }}>Ver todos os imóveis</Link>
         </div>
       </footer>
 
