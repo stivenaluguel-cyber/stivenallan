@@ -3,9 +3,11 @@ import { createClient } from '@supabase/supabase-js'
 import OpenAI from 'openai'
 import { requireAdmin } from '@/lib/dashboard/admin-auth'
 import { montarPromptIcp, parseIcp } from '@/lib/prospeccao/prompts'
+import { logInfo } from '@/lib/log'
 
 export const dynamic = 'force-dynamic'
 const sb = () => createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+const SOURCE = 'api/admin/prospeccao/campanhas'
 
 export async function GET() {
   if (!await requireAdmin()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -54,6 +56,10 @@ export async function POST(req: NextRequest) {
       temperature: 0.5,
     })
     bruto = resposta.choices[0]?.message?.content ?? ''
+    // Groq (llama-3.3-70b) tem teto diário de tokens no plano gratuito —
+    // este log é o jeito de saber quanto cada operação consome sem precisar
+    // adivinhar (ver get_runtime_logs da Vercel pra somar o dia).
+    logInfo(SOURCE, 'ICP gerado', { operacao: 'icp', tokens: resposta.usage?.total_tokens ?? null })
   } catch {
     return NextResponse.json({ error: 'Falha ao falar com a IA. Tente de novo.' }, { status: 502 })
   }
