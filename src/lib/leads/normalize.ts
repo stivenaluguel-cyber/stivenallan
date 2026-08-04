@@ -42,6 +42,19 @@ export function temWhatsappReal(whatsapp: string | null | undefined): whatsapp i
   return !!whatsapp && !PLACEHOLDER_PREFIXES.some((prefixo) => whatsapp.startsWith(prefixo))
 }
 
+/**
+ * Por que este lead não tem WhatsApp confirmado — pra tela mostrar o motivo
+ * certo em vez de sempre dizer "veio do Instagram" (verdade só até a
+ * Prospecção existir; hoje "sem WhatsApp real" tem duas causas possíveis).
+ * `null` quando o WhatsApp É real — nada a explicar.
+ */
+export function motivoSemWhatsappReal(whatsapp: string | null | undefined): { emoji: string; label: string } | null {
+  if (temWhatsappReal(whatsapp)) return null
+  const valor = whatsapp ?? ''
+  if (valor.startsWith(PJ_WHATSAPP_PLACEHOLDER_PREFIX)) return { emoji: '🏢', label: 'Prospecção' }
+  return { emoji: '📷', label: 'Instagram' }
+}
+
 // Celular brasileiro tem 11 dígitos (DDD + 9 + 8 dígitos); fixo tem 10 (DDD +
 // 8 dígitos, sem o 9). `normalizarCelularBR` aceita as duas formas — correto
 // pro formulário público, que pede "WhatsApp" e confia no usuário — mas a
