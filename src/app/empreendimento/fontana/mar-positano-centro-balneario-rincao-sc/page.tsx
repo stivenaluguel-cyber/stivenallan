@@ -342,6 +342,14 @@ export default function Page() {
         </div>
       </section>
 
+{/* SEO FAQ */}
+<PropertyFAQ items={[{"pergunta":"Como funciona o financiamento direto do Mar Positano Residencial?","resposta":"Entrada de 20% (parcela única), 6 reforços anuais, conforme a composição da tabela vigente, e saldo em 72 parcelas mensais, corrigidas pelo CUB/SC durante a obra. Condições conforme tabela de julho/2026, sujeitas à atualização — fale com Stiven para simular sua unidade. Consulte a tabela vigente para valores e disponibilidade por unidade."},{"pergunta":"Qual a previsão de entrega do Mar Positano Residencial?","resposta":"A previsão de entrega é agosto de 2029, em Centro, Balneário Rincão/SC."},{"pergunta":"Como é a correção monetária após a entrega das chaves?","resposta":"O saldo remanescente é corrigido mensalmente, à escolha do comprador, por uma de duas opções: IGPM acrescido de juros compensatórios de 0,75% ao mês, ou apenas pelo CUB/SC."},{"pergunta":"Onde fica o Mar Positano Residencial?","resposta":"O Mar Positano Residencial está localizado na Rua Waldemar Carlos Petrini, esq. Rua Espírito Santo, no Centro de Balneário Rincão/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"Apartamentos de 3 dormitórios (1 suíte), de 107,38 a 126 m² privativos, em 5 tipos de planta — confira as plantas oficiais na página."}]} accent="#1B3A5B" />
+{/* Espelho de vendas — some quando o empreendimento não tem
+    unidades cadastradas, que é o caso da maioria. */}
+<EspelhoPublico slug="mar-positano-centro-balneario-rincao-sc" />
+
+<RelatedProperties atualSlug="mar-positano-centro-balneario-rincao-sc" cidade="Balneário Rincão" />
+
       {/* FOOTER */}
       <footer style={{ background:t.navyDark, padding:'48px 32px', textAlign:'center' }}>
         <p style={{ color:t.onDarkMuted, fontSize:12, letterSpacing:'0.2em', textTransform:'uppercase', margin:'0 0 8px' }}>Stiven Allan</p>
@@ -360,15 +368,6 @@ export default function Page() {
           <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.528 5.855L.057 23.117a.75.75 0 0 0 .917.913l5.352-1.483A11.95 11.95 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.952 9.952 0 0 1-5.127-1.416l-.367-.217-3.785 1.048 1.015-3.7-.239-.381A9.953 9.953 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
         </svg>
       </a>
-
-{/* SEO FAQ */}
-<PropertyFAQ items={[{"pergunta":"Como funciona o financiamento direto do Mar Positano Residencial?","resposta":"Entrada de 20% (parcela única), 6 reforços anuais, conforme a composição da tabela vigente, e saldo em 72 parcelas mensais, corrigidas pelo CUB/SC durante a obra. Condições conforme tabela de julho/2026, sujeitas à atualização — fale com Stiven para simular sua unidade. Consulte a tabela vigente para valores e disponibilidade por unidade."},{"pergunta":"Qual a previsão de entrega do Mar Positano Residencial?","resposta":"A previsão de entrega é agosto de 2029, em Centro, Balneário Rincão/SC."},{"pergunta":"Como é a correção monetária após a entrega das chaves?","resposta":"O saldo remanescente é corrigido mensalmente, à escolha do comprador, por uma de duas opções: IGPM acrescido de juros compensatórios de 0,75% ao mês, ou apenas pelo CUB/SC."},{"pergunta":"Onde fica o Mar Positano Residencial?","resposta":"O Mar Positano Residencial está localizado na Rua Waldemar Carlos Petrini, esq. Rua Espírito Santo, no Centro de Balneário Rincão/SC."},{"pergunta":"Quais as plantas e metragens disponíveis?","resposta":"Apartamentos de 3 dormitórios (1 suíte), de 107,38 a 126 m² privativos, em 5 tipos de planta — confira as plantas oficiais na página."}]} accent="#1B3A5B" />
-{/* Espelho de vendas — some quando o empreendimento não tem
-    unidades cadastradas, que é o caso da maioria. */}
-<EspelhoPublico slug="mar-positano-centro-balneario-rincao-sc" />
-
-<RelatedProperties atualSlug="mar-positano-centro-balneario-rincao-sc" cidade="Balneário Rincão" />
-
 
     </main>
   )

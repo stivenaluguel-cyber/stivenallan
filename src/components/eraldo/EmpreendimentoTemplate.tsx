@@ -7,6 +7,7 @@ import { PropertySchema } from '@/components/PropertySchema'
 import { PropertyFAQ } from '@/components/PropertyFAQ'
 import { RelatedProperties } from '@/components/RelatedProperties'
 import { EspelhoPublico } from '@/components/EspelhoPublico'
+import { SkipLink } from '@/components/SkipLink'
 import type { Empreendimento, StatusEmpreendimento } from '@/data/eraldo/types'
 
 const WPP_NUMERO = '5548991642332'
@@ -52,9 +53,12 @@ export default function EmpreendimentoTemplate({ data }: { data: Empreendimento 
       .ec-nav { animation: ec-nav-fill linear both; animation-timeline: scroll(); animation-range: 0px 80px; }
       @keyframes ec-nav-fill { to { background: rgba(250,250,248,0.96); backdrop-filter: blur(20px); box-shadow: 0 1px 0 rgba(26,24,20,0.10); } }
     }
-    .ec-fade { opacity: 0; transform: translateY(24px); animation: ecfade .9s ease forwards; }
-    .ec-fade-1 { animation-delay: .1s; } .ec-fade-2 { animation-delay: .25s; } .ec-fade-3 { animation-delay: .4s; }
-    @keyframes ecfade { to { opacity: 1; transform: none; } }
+    @media (prefers-reduced-motion: no-preference) {
+      .ec-fade { opacity: 0; transform: translateY(24px); animation: ecfade .9s ease forwards; }
+      .ec-fade-1 { animation-delay: .1s; } .ec-fade-2 { animation-delay: .25s; } .ec-fade-3 { animation-delay: .4s; }
+      @keyframes ecfade { to { opacity: 1; transform: none; } }
+    }
+    a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid #D9A066; outline-offset: 2px; }
     .ec-gcard img, .ecp-gcard img { transition: transform .8s ease; }
     .ec-gcard:hover img, .ecp-gcard:hover img { transform: scale(1.06); }
     .ec-btn { display: inline-flex; align-items: center; gap: 8px; padding: 14px 32px; font-family: var(--font-bricolage), system-ui, sans-serif; font-size: 11px; font-weight: 400; letter-spacing: 0.3em; text-transform: uppercase; text-decoration: none; border: 1px solid #9C5F2E; color: #9C5F2E; background: transparent; cursor: pointer; transition: all .25s ease; border-radius: 2px; }
@@ -89,6 +93,7 @@ export default function EmpreendimentoTemplate({ data }: { data: Empreendimento 
         faq={data.faq}
       />
       <style>{`${CSS}`}</style>
+      <SkipLink />
 
       {/* NAV */}
       <nav className="ec-nav">
@@ -103,6 +108,7 @@ export default function EmpreendimentoTemplate({ data }: { data: Empreendimento 
         </div>
       </nav>
 
+      <main id="main-content" tabIndex={-1} style={{ outline: 'none' }}>
       {/* HERO */}
       <section style={{ position: 'relative', height: '100vh', minHeight: 600, overflow: 'hidden' }}>
         <HeroImage unoptimized src={data.heroImg} alt={data.heroImgAlt} fill priority style={{ objectFit: 'cover', objectPosition: 'center 40%' }} sizes="100vw" />
@@ -397,6 +403,16 @@ export default function EmpreendimentoTemplate({ data }: { data: Empreendimento 
         </div>
       </section>
 
+      <PropertyFAQ items={data.faq} accent="#9C5F2E" />
+
+      {/* Espelho de vendas — some sozinho quando o empreendimento ainda não
+          tem unidade cadastrada. Oito das nove páginas da Eraldo passam por
+          este template; só a do Aura monta o espelho por conta própria. */}
+      <EspelhoPublico slug={data.slug} />
+
+      <RelatedProperties atualSlug={data.slug} cidade={data.cidade} nomeAtual={data.nome} propertyIdAtual={null} />
+      </main>
+
       {/* RODAPÉ */}
       <footer style={{ background: '#1A1410', borderTop: '1px solid rgba(245,238,230,0.08)', padding: 'clamp(32px,4vw,48px) clamp(24px,6vw,80px)' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
@@ -425,15 +441,6 @@ export default function EmpreendimentoTemplate({ data }: { data: Empreendimento 
       <a href={WPP} target="_blank" rel="noopener noreferrer" className="ec-wa-float" aria-label={`Falar com Stiven pelo WhatsApp sobre o ${data.nome}`} data-wpp="float" data-wpp-emp={data.slug} data-wpp-nome={data.nome}>
         <svg width="26" height="26" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
       </a>
-
-      <PropertyFAQ items={data.faq} accent="#9C5F2E" />
-
-      {/* Espelho de vendas — some sozinho quando o empreendimento ainda não
-          tem unidade cadastrada. Oito das nove páginas da Eraldo passam por
-          este template; só a do Aura monta o espelho por conta própria. */}
-      <EspelhoPublico slug={data.slug} />
-
-      <RelatedProperties atualSlug={data.slug} cidade={data.cidade} nomeAtual={data.nome} propertyIdAtual={null} />
     </>
   )
 }

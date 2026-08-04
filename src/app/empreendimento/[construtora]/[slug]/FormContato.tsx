@@ -137,9 +137,19 @@ export default function FormContato({ empreendimento, propertyId, propertySlug, 
     appearance: 'auto',
   };
 
+  const labelStyle: React.CSSProperties = {
+    display: 'block',
+    fontSize: 11,
+    fontWeight: 600,
+    letterSpacing: '0.06em',
+    textTransform: 'uppercase',
+    color: '#8A7240',
+    marginBottom: 4,
+  };
+
   if (status === 'ok') {
     return (
-      <div style={{ textAlign: 'center' }}>
+      <div role="status" aria-live="polite" style={{ textAlign: 'center' }}>
         <p style={{ fontSize: 14, color: '#2a7d4f', margin: '0 0 12px' }}>
           Recebido! Continue no WhatsApp para receber as condições.
         </p>
@@ -191,75 +201,81 @@ export default function FormContato({ empreendimento, propertyId, propertySlug, 
           onChange={(e) => setHp(e.target.value)}
         />
       </div>
+      <label htmlFor="fc-nome" style={labelStyle}>Seu nome</label>
       <input
+        id="fc-nome"
         type="text"
-        placeholder="Seu nome"
+        placeholder="Nome completo"
         value={nome}
         onChange={(e) => setNome(e.target.value)}
         onFocus={markStarted}
         required
         style={inputStyle}
-        aria-label="Seu nome"
       />
+      <label htmlFor="fc-telefone" style={labelStyle}>Telefone / WhatsApp</label>
       <input
+        id="fc-telefone"
         type="tel"
-        placeholder="Telefone / WhatsApp"
+        placeholder="(48) 99999-9999"
         value={telefone}
         onChange={(e) => setTelefone(e.target.value)}
         onFocus={markStarted}
         required
         style={inputStyle}
-        aria-label="Telefone ou WhatsApp"
       />
+      <label htmlFor="fc-email" style={labelStyle}>E-mail <span style={{ fontWeight: 400, textTransform: 'none', color: '#a1a1aa' }}>(opcional)</span></label>
       <input
+        id="fc-email"
         type="email"
-        placeholder="E-mail (opcional)"
+        placeholder="seu@email.com"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         onFocus={markStarted}
         style={inputStyle}
-        aria-label="E-mail"
       />
       {!isCasaGuaiba && (
         <>
+          <label htmlFor="fc-faixa" style={labelStyle}>Faixa de investimento</label>
           <select
+            id="fc-faixa"
             value={faixaInvestimento}
             onChange={(e) => setFaixaInvestimento(e.target.value)}
             onFocus={markStarted}
             required
             style={selectStyle}
-            aria-label="Faixa de investimento"
           >
             <option value="" disabled>
-              Faixa de investimento
+              Selecione
             </option>
             {faixasInvestimento.map((faixa) => (
               <option key={faixa} value={faixa}>{faixa}</option>
             ))}
           </select>
+          <label htmlFor="fc-prazo" style={labelStyle}>Quando pretende comprar?</label>
           <select
+            id="fc-prazo"
             value={prazoCompra}
             onChange={(e) => setPrazoCompra(e.target.value)}
             onFocus={markStarted}
             required
             style={selectStyle}
-            aria-label="Quando pretende comprar"
           >
             <option value="" disabled>
-              Quando pretende comprar?
+              Selecione
             </option>
             <option value="Imediato">Imediato</option>
             <option value="3 a 6 meses">3 a 6 meses</option>
             <option value="6 a 12 meses">6 a 12 meses</option>
             <option value="Apenas pesquisando">Apenas pesquisando</option>
           </select>
+          <label htmlFor="fc-entrada" style={labelStyle}>Entrada disponível</label>
           <select
+            id="fc-entrada"
             value={entradaDisponivel}
             onChange={(e) => setEntradaDisponivel(e.target.value)}
             onFocus={markStarted}
             required
             style={selectStyle}
-            aria-label="Entrada disponível"
           >
             {/* Faixas quebradas na casa dos 20% de propósito. A antiga opção
                 "Até 20% do valor" juntava quem tem 3% e quem tem 19% na mesma
@@ -267,7 +283,7 @@ export default function FormContato({ empreendimento, propertyId, propertySlug, 
                 com a construtora. Sem separar, o lead chega sem a única
                 informação que decide se existe negócio. */}
             <option value="" disabled>
-              Entrada disponível
+              Selecione
             </option>
             <option value="Menos de 10%">Menos de 10% do valor</option>
             <option value="10% a 19%">10% a 19% do valor</option>
@@ -296,11 +312,13 @@ export default function FormContato({ empreendimento, propertyId, propertySlug, 
       >
         {status === 'enviando' ? 'Enviando...' : 'Quero ser contatado'}
       </button>
-      {status === 'erro' && (
-        <p style={{ fontSize: 13, color: '#c0392b', marginTop: 8, textAlign: 'center' }}>
-          Não foi possível enviar. Tente pelo WhatsApp.
-        </p>
-      )}
+      <div role="alert" aria-live="assertive">
+        {status === 'erro' && (
+          <p style={{ fontSize: 13, color: '#c0392b', marginTop: 8, textAlign: 'center' }}>
+            Não foi possível enviar. Tente pelo WhatsApp.
+          </p>
+        )}
+      </div>
       <p style={{ fontSize: 11, color: '#a1a1aa', marginTop: 10, textAlign: 'center', lineHeight: 1.5 }}>
         Usamos seus dados só para retornar seu contato sobre {empreendimento} pelo WhatsApp ou e-mail.{' '}
         <Link href="/politica-de-privacidade" style={{ color: '#71717a', textDecoration: 'underline' }}>

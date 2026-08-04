@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import { MessageCircle } from 'lucide-react';
+import { HeroImage } from '@/components/HeroImage';
 import GalleryWithLightbox from './gallery-lightbox';
 import PlantasLightbox from './plantas-lightbox';
 import { LeadCaptureButton } from '@/components/LeadCaptureButton'
@@ -74,12 +76,14 @@ export default function AvezzanoPage() {
       <PropertySchema nome="Avezzano" slug="avezzano-centro-sideropolis-sc" construtora_slug="fontana" cidade="Siderópolis" uf="SC" bairro="Centro" descricao="Avezzano Residencial — 3 dormitórios (1 suíte e 2 demi-suítes), 127 m², Centro de Siderópolis/SC. Financiamento direto Fontana. Conheça com Stiven Allan." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/avezzano-centro-sideropolis-sc.jpg" faq={FAQ_ITEMS} />
 
       {/* NAV */}
-      <FontanaCompactNav title="AVEZZANO RESIDENCIAL" accent={ACCENT} wa={WA} />
+      <header style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50 }}>
+        <FontanaCompactNav title="AVEZZANO RESIDENCIAL" accent={ACCENT} wa={WA} />
+      </header>
 
       {/* HERO */}
       <section style={{ position: 'relative', height: '100vh', minHeight: '600px', overflow: 'hidden' }}>
-        <img src={HERO} alt="Avezzano Residencial — Salão de Festas"
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />
+        <HeroImage src={HERO} alt="Avezzano Residencial — Salão de Festas" fill priority sizes="100vw"
+          style={{ objectFit: 'cover', objectPosition: 'center' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.6) 100%)' }} />
         <div style={{ position: 'relative', zIndex: 2, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 1.5rem' }}>
           <p style={{ color: ACCENT, fontSize: '0.75rem', letterSpacing: '0.25em', textTransform: 'uppercase', marginBottom: '1rem' }}>Centro · Siderópolis / SC</p>
@@ -262,8 +266,8 @@ export default function AvezzanoPage() {
 
       {/* CTA FINAL */}
       <section style={{ position: 'relative', height: '60vh', minHeight: '400px', overflow: 'hidden' }}>
-        <img src={HERO} alt="Avezzano Residencial"
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }} />
+        <Image unoptimized src={HERO} alt="Avezzano Residencial" fill loading="lazy" sizes="100vw"
+          style={{ objectFit: 'cover', objectPosition: 'center top' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.65)' }} />
         <div style={{ position: 'relative', zIndex: 2, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 1.5rem' }}>
           <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#e8d5c0', fontSize: 'clamp(1.5rem,3vw,2.5rem)', fontStyle: 'italic', marginBottom: '2rem' }}>

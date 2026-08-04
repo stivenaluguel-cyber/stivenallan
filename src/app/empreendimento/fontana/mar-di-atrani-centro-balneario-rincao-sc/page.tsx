@@ -240,6 +240,15 @@ details.mt-menu > summary::-webkit-details-marker { display: none; }
 <div style={{ marginTop: 38 }}><a href={WPP} target="_blank" rel="noopener noreferrer" className="mt-cta mt-cta-light">Atendimento Exclusivo</a></div>
 </div>
 </section>
+
+{/* SEO FAQ */}
+<PropertyFAQ items={FAQ_ITEMS} accent="#1B5E8B" />
+{/* Espelho de vendas — some quando o empreendimento não tem
+    unidades cadastradas, que é o caso da maioria. */}
+<EspelhoPublico slug="mar-di-atrani-centro-balneario-rincao-sc" />
+
+<RelatedProperties atualSlug="mar-di-atrani-centro-balneario-rincao-sc" cidade="Balneário Rincão" />
+
 <footer style={{ background: t.azureDark, color: t.onDarkMuted, padding: 'clamp(56px,9vh,96px) clamp(18px,5vw,56px)' }}>
 <div style={{ maxWidth: 1180, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px,1fr))', gap: 'clamp(28px,5vw,56px)' }}>
 <div><div style={{ fontFamily: t.display, fontWeight: 400, letterSpacing: '0.22em', fontSize: 18, color: t.onDark, textTransform: 'uppercase' }}>Stiven Allan</div><p style={{ marginTop: 14, fontSize: 14, lineHeight: 1.6 }}>Imóveis de alto padrão em Santa Catarina.<br />CRECI 60.275</p></div>
@@ -263,14 +272,6 @@ details.mt-menu > summary::-webkit-details-marker { display: none; }
       imagem="/images/empreendimentos/mar-di-atrani-centro-balneario-rincao-sc/mar-di-atrani-residencial-675c232fef052.jpg"
       faq={FAQ_ITEMS}
     />
-{/* SEO FAQ */}
-<PropertyFAQ items={FAQ_ITEMS} accent="#1B5E8B" />
-{/* Espelho de vendas — some quando o empreendimento não tem
-    unidades cadastradas, que é o caso da maioria. */}
-<EspelhoPublico slug="mar-di-atrani-centro-balneario-rincao-sc" />
-
-<RelatedProperties atualSlug="mar-di-atrani-centro-balneario-rincao-sc" cidade="Balneário Rincão" />
-
 
 </main>
 )

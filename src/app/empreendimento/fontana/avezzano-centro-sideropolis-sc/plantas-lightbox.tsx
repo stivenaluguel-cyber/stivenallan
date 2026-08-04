@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { trackPlantaOpen } from '@/lib/tracking'
 
 type PlantaItem = { src: string; alt: string; label: string; quartos?: number; suites?: number; area?: number }
@@ -19,6 +19,17 @@ export default function PlantasLightbox({ plantas, accent, trackPlantas }: {
 }) {
   const [open, setOpen] = useState<number | null>(null)
 
+  useEffect(() => {
+    if (open === null) return
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(null)
+      if (e.key === 'ArrowLeft') setOpen(i => (i !== null && i > 0 ? i - 1 : i))
+      if (e.key === 'ArrowRight') setOpen(i => (i !== null && i < plantas.length - 1 ? i + 1 : i))
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [open, plantas.length])
+
   return (
     <>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
@@ -26,6 +37,8 @@ export default function PlantasLightbox({ plantas, accent, trackPlantas }: {
           const ficha = fichaTecnica(p)
           return (
             <figure key={i} onClick={() => { setOpen(i); if (trackPlantas) trackPlantaOpen(p.label, trackPlantas) }}
+              role="button" tabIndex={0} aria-label={`Ampliar planta: ${p.label}`}
+              onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setOpen(i); if (trackPlantas) trackPlantaOpen(p.label, trackPlantas) } }}
               style={{ margin: 0, cursor: 'pointer', overflow: 'hidden', position: 'relative', aspectRatio: '4/3', background: '#222' }}>
               <img src={p.src} alt={p.alt}
                 style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform 0.4s ease' }}
@@ -43,13 +56,14 @@ export default function PlantasLightbox({ plantas, accent, trackPlantas }: {
 
       {open !== null && (
         <div onClick={() => setOpen(null)}
+          role="dialog" aria-modal="true" aria-label={`Lightbox — ${plantas[open].label}`}
           style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
-          <button onClick={() => setOpen(null)}
+          <button onClick={() => setOpen(null)} aria-label="Fechar lightbox"
             style={{ position: 'absolute', top: '1rem', right: '1.25rem', background: 'none', border: 'none', color: '#fff', fontSize: '2rem', cursor: 'pointer', lineHeight: 1 }}>
             ×
           </button>
           {open > 0 && (
-            <button onClick={e => { e.stopPropagation(); setOpen(open - 1); }}
+            <button onClick={e => { e.stopPropagation(); setOpen(open - 1); }} aria-label="Planta anterior"
               style={{ position: 'absolute', left: '1rem', background: 'none', border: `1px solid ${accent}`, color: '#fff', fontSize: '1.5rem', cursor: 'pointer', padding: '0.5rem 1rem', borderRadius: '2px' }}>
               ‹
             </button>
@@ -57,7 +71,7 @@ export default function PlantasLightbox({ plantas, accent, trackPlantas }: {
           <img src={plantas[open].src} alt={plantas[open].alt}
             style={{ maxWidth: '90vw', maxHeight: '85vh', objectFit: 'contain', borderRadius: '2px' }} />
           {open < plantas.length - 1 && (
-            <button onClick={e => { e.stopPropagation(); setOpen(open + 1); }}
+            <button onClick={e => { e.stopPropagation(); setOpen(open + 1); }} aria-label="Próxima planta"
               style={{ position: 'absolute', right: '1rem', background: 'none', border: `1px solid ${accent}`, color: '#fff', fontSize: '1.5rem', cursor: 'pointer', padding: '0.5rem 1rem', borderRadius: '2px' }}>
               ›
             </button>

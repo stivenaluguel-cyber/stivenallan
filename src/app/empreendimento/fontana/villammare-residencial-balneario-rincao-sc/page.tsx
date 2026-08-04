@@ -270,6 +270,20 @@ export default function Page() {
         </div>
       </section>
 
+      <PropertyFAQ items={[
+        {pergunta:"Como funciona o financiamento direto do Villammare Residencial?",resposta:"Condições de pagamento sob consulta. Fale com um corretor para receber a composição comercial e a disponibilidade atualizadas."},
+        {pergunta:"Qual a previsao de entrega do Villammare Residencial?",resposta:"Previsao de entrega setembro de 2029, em Balneário Rincão/SC."},
+        {pergunta:"Quais sao as plantas do Villammare Residencial?",resposta:"4 dormitórios (4 suítes: 1 master, 1 com terraço, 2 demi-suítes), de 172 a 275 m2 privativos, a passos da praia em Balneário Rincão/SC."},
+        {pergunta:"O Villammare tem vista para o mar?",resposta:"Sim. O Villammare fica a passos da praia em Balneário Rincão com sacada e vista privilegiada para o mar."},
+        {pergunta:"Posso usar FGTS ou financiamento bancario no Villammare?",resposta:"Fale com um corretor para confirmar as modalidades de pagamento disponíveis, incluindo financiamento bancário e FGTS."},
+      ]} accent="#1B3A4B" />
+
+      {/* Espelho de vendas — some quando o empreendimento não tem
+          unidades cadastradas, que é o caso da maioria. */}
+      <EspelhoPublico slug="villammare-residencial-balneario-rincao-sc" />
+
+      <RelatedProperties atualSlug="villammare-residencial-balneario-rincao-sc" cidade="Balneário Rincão" />
+
       <footer style={{ background:t.navyDark, padding:'48px 32px', textAlign:'center' }}>
         <p style={{ color:t.onDarkMuted, fontSize:12, letterSpacing:'0.2em', textTransform:'uppercase', margin:'0 0 8px' }}>Stiven Allan</p>
         <p style={{ color:t.onDarkMuted, fontSize:11, margin:'0 0 4px' }}>CRECI 60.275</p>
@@ -285,20 +299,6 @@ export default function Page() {
           <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.528 5.855L.057 23.117a.75.75 0 0 0 .917.913l5.352-1.483A11.95 11.95 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.952 9.952 0 0 1-5.127-1.416l-.367-.217-3.785 1.048 1.015-3.7-.239-.381A9.953 9.953 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
         </svg>
       </a>
-
-      <PropertyFAQ items={[
-        {pergunta:"Como funciona o financiamento direto do Villammare Residencial?",resposta:"Condições de pagamento sob consulta. Fale com um corretor para receber a composição comercial e a disponibilidade atualizadas."},
-        {pergunta:"Qual a previsao de entrega do Villammare Residencial?",resposta:"Previsao de entrega setembro de 2029, em Balneário Rincão/SC."},
-        {pergunta:"Quais sao as plantas do Villammare Residencial?",resposta:"4 dormitórios (4 suítes: 1 master, 1 com terraço, 2 demi-suítes), de 172 a 275 m2 privativos, a passos da praia em Balneário Rincão/SC."},
-        {pergunta:"O Villammare tem vista para o mar?",resposta:"Sim. O Villammare fica a passos da praia em Balneário Rincão com sacada e vista privilegiada para o mar."},
-        {pergunta:"Posso usar FGTS ou financiamento bancario no Villammare?",resposta:"Fale com um corretor para confirmar as modalidades de pagamento disponíveis, incluindo financiamento bancário e FGTS."},
-      ]} accent="#1B3A4B" />
-
-      {/* Espelho de vendas — some quando o empreendimento não tem
-          unidades cadastradas, que é o caso da maioria. */}
-      <EspelhoPublico slug="villammare-residencial-balneario-rincao-sc" />
-
-      <RelatedProperties atualSlug="villammare-residencial-balneario-rincao-sc" cidade="Balneário Rincão" />
     </main>
   )
 }

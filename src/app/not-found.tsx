@@ -2,8 +2,8 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Pagina nao encontrada — Stiven Allan Corretor de Imoveis',
-  description: 'A pagina que você procura nao existe. Explore os lançamentos imobiliarios em Criciuma com Stiven Allan, CRECI 60.275.',
+  title: 'Página não encontrada — Stiven Allan Corretor de Imóveis',
+  description: 'A página que você procura não existe. Explore os lançamentos imobiliários em Criciúma com Stiven Allan, CRECI 60.275.',
 }
 
 export default function NotFound() {
@@ -13,14 +13,14 @@ export default function NotFound() {
       <div style={{ textAlign: 'center', maxWidth: 560 }}>
         <div style={{ fontSize: 80, fontWeight: 900, color: '#D24E22', lineHeight: 1, marginBottom: 8, opacity: 0.2 }}>404</div>
         <h1 style={{ fontFamily: "'Bricolage Grotesque',system-ui", fontSize: 'clamp(1.5rem,4vw,2.2rem)', fontWeight: 800, marginBottom: 16, color: '#161512' }}>
-          Pagina nao encontrada
+          Página não encontrada
         </h1>
         <p style={{ fontSize: 15, color: '#6B655B', lineHeight: 1.7, marginBottom: 40 }}>
-          A pagina que você procura nao existe ou foi removida. Mas temos varios lançamentos incriveis esperando por você!
+          A página que você procura não existe ou foi removida. Mas temos vários lançamentos incríveis esperando por você!
         </p>
         <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
           <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#D24E22', color: '#fff', fontWeight: 700, fontSize: 14, padding: '13px 26px', borderRadius: 3, textDecoration: 'none', minHeight: 44 }}>
-            Ir para o inicio
+            Ir para o início
           </Link>
           <Link href="/empreendimentos" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'transparent', border: '1px solid rgba(26,24,21,0.25)', color: '#161512', fontWeight: 600, fontSize: 14, padding: '13px 26px', borderRadius: 3, textDecoration: 'none', minHeight: 44 }}>
             Ver lançamentos

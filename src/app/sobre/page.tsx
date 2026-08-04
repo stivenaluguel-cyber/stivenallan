@@ -52,8 +52,8 @@ export const metadata: Metadata = {
                                                                                                                                                                             const especialidades = [
                                                                                                                                                                               'Apartamentos na planta',
                                                                                                                                                                                 'Lançamentos Fontana Construtora',
-                                                                                                                                                                                  'Financiamento Caixa e bancos',
-                                                                                                                                                                                    'MCMV — Minha Casa Minha Vida',
+  'Financiamento direto com a construtora',
+  'Sem depender de banco',
                                                                                                                                                                                       'Imóveis para investimento',
                                                                                                                                                                                         'Consultoria de documentação',
                                                                                                                                                                                           'Acompanhamento pós-venda',

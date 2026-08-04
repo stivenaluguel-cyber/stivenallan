@@ -1,8 +1,10 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import Link from 'next/link'
 import { getVitrineEmpreendimentos } from '@/lib/vitrine'
 import { HeroImage } from '@/components/HeroImage'
-import RegionFilter from '@/components/RegionFilter'
+import CatalogFilters from '@/components/CatalogFilters'
+import { SkipLink } from '@/components/SkipLink'
 import { statusLabel, precoLabel, type Empreendimento, type StatusObra } from '@/lib/empreendimentos'
 
 export const revalidate = 3600
@@ -51,28 +53,65 @@ function StatusBadge({ status }: { status?: StatusObra }) {
   )
 }
 
+// Ficha técnica compacta pro card — só entra o que realmente existe pra este
+// empreendimento (nunca inventa dado ausente). Cada item já vem formatado
+// (dormitoriosLabel via `dorms`, os demais via vitrine.ts).
+function fichaTecnicaCard(emp: Empreendimento): string[] {
+  const itens: string[] = []
+  if (emp.dorms) itens.push(`${emp.dorms} dorm.`)
+  if (emp.suitesLabel) itens.push(`${emp.suitesLabel} suíte${emp.suitesLabel !== '1' ? 's' : ''}`)
+  if (emp.metragemLabel) itens.push(`${emp.metragemLabel} m²`)
+  if (emp.vagasLabel) itens.push(`${emp.vagasLabel} vaga${emp.vagasLabel !== '1' ? 's' : ''}`)
+  return itens
+}
+
 function CatalogCard({ emp }: { emp: Empreendimento }) {
   const href = `/empreendimento/${emp.construtoraSlug}/${emp.slug}`
   const wpp = WPP + `?text=Ol%C3%A1+Stiven!+Tenho+interesse+no+${encodeURIComponent(emp.nome)}.`
   const localizacao = [emp.bairro, `${emp.cidade}/${emp.uf}`].filter(Boolean).join(' · ')
+  const ficha = fichaTecnicaCard(emp)
+  const construtoraNome = emp.construtoraNome || 'Construtora Fontana'
   return (
-    <article className="cat-card" style={{ position: 'relative' }}>
+    <article
+      className="cat-card"
+      style={{ position: 'relative' }}
+      data-slug={emp.slug}
+      data-nome={emp.nome}
+      data-cidade={emp.cidade}
+      data-bairro={emp.bairro || ''}
+      data-construtora={construtoraNome}
+      data-status={emp.statusObra || ''}
+      data-dorm-min={emp.dormitoriosMin ?? ''}
+      data-dorm-max={emp.dormitoriosMax ?? ''}
+      data-area-min={emp.areaMin ?? ''}
+      data-area-max={emp.areaMax ?? ''}
+    >
       <Link href={href} style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
         <div style={{ position: 'relative', aspectRatio: '4/3', overflow: 'hidden', background: '#e8e4dc' }}>
-          <HeroImage src={emp.imagem} alt={emp.nome} fill sizes="(max-width:768px)100vw,50vw" style={{ objectFit: 'cover' }} />
+          <HeroImage src={emp.imagem} alt={emp.nome} fill sizes="(max-width:768px)100vw,(max-width:1200px)50vw,380px" style={{ objectFit: 'cover' }} />
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(26,24,20,0.55), transparent 50%)' }} />
           <div style={{ position: 'absolute', top: 16, left: 16, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             <StatusBadge status={emp.statusObra} />
             <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.22em', textTransform: 'uppercase', background: 'rgba(184,155,94,0.15)', color: '#8A7240', padding: '4px 10px', fontFamily: t.body }}>Financiamento direto</span>
           </div>
           <div style={{ position: 'absolute', bottom: 16, left: 16, right: 16 }}>
-            <p style={{ margin: 0, fontFamily: t.body, fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(245,241,234,0.70)', marginBottom: 4 }}>{emp.construtoraNome || 'Construtora Fontana'}</p>
+            <p style={{ margin: 0, fontFamily: t.body, fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(245,241,234,0.70)', marginBottom: 4 }}>{construtoraNome}</p>
             <h3 style={{ margin: 0, fontFamily: t.display, fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.10em', fontSize: 'clamp(18px,2.5vw,24px)', color: '#F5F1EA', lineHeight: 1.1 }}>{emp.nome}</h3>
           </div>
         </div>
         <div style={{ padding: '20px 22px 22px', background: t.bg, borderBottom: `1px solid ${t.line}` }}>
           <p style={{ margin: '0 0 8px', fontFamily: t.body, fontSize: 12, color: '#6B5A3A', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 500 }}>{localizacao}</p>
-          <p style={{ margin: '0 0 16px', fontFamily: t.serif, fontStyle: 'italic', fontSize: 'clamp(15px,1.6vw,17px)', color: t.ink, lineHeight: 1.5, minHeight: '1.5em' }}>{emp.frase}</p>
+          <p style={{ margin: '0 0 14px', fontFamily: t.serif, fontStyle: 'italic', fontSize: 'clamp(15px,1.6vw,17px)', color: t.ink, lineHeight: 1.5, minHeight: '1.5em' }}>{emp.frase}</p>
+          {ficha.length > 0 && (
+            <p style={{ margin: '0 0 12px', fontFamily: t.body, fontSize: 12, color: t.muted, display: 'flex', flexWrap: 'wrap', gap: '4px 10px' }}>
+              {ficha.map((item, i) => (
+                <span key={item}>{i > 0 && <span aria-hidden="true" style={{ marginRight: 10, opacity: 0.5 }}>·</span>}{item}</span>
+              ))}
+            </p>
+          )}
+          {emp.previsaoEntregaLabel && (
+            <p style={{ margin: '0 0 12px', fontFamily: t.body, fontSize: 11, color: '#8A7240', letterSpacing: '0.04em' }}>Entrega: {emp.previsaoEntregaLabel}</p>
+          )}
           <p style={{ margin: '0 0 18px', fontFamily: t.body, fontSize: 13, color: t.muted, fontWeight: 500 }}>{precoLabel(emp)}</p>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <span className="cat-cta-primary" style={{ fontFamily: t.body, fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.ink, borderBottom: `1px solid ${t.champagne}`, paddingBottom: 2, fontWeight: 500 }}>Ver detalhes →</span>
@@ -92,8 +131,19 @@ export default async function EmpreendimentosPage() {
   const lista = listaEmp
     .filter((e) => !e.oculto && e.construtoraSlug && e.slug && e.imagem)
     .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' }))
-  const cidades = [...new Set(lista.map((e) => e.cidade))].sort()
-  const construtoras = [...new Set(lista.map((e) => e.construtoraNome || 'Construtora Fontana'))].sort()
+  const cidades = [...new Set(lista.map((e) => e.cidade))].sort((a, b) => a.localeCompare(b, 'pt-BR'))
+  const bairros = [...new Set(lista.map((e) => e.bairro).filter((b): b is string => Boolean(b)))].sort((a, b) => a.localeCompare(b, 'pt-BR'))
+  const construtoras = [...new Set(lista.map((e) => e.construtoraNome || 'Construtora Fontana'))].sort((a, b) => a.localeCompare(b, 'pt-BR'))
+  const statusDisponiveis = [...new Set(lista.map((e) => e.statusObra).filter((s): s is StatusObra => Boolean(s)))]
+  const dormitoriosDisponiveis = [...new Set(
+    lista.flatMap((e) => {
+      if (e.dormitoriosMin === undefined) return []
+      const max = e.dormitoriosMax ?? e.dormitoriosMin
+      const vals: number[] = []
+      for (let n = e.dormitoriosMin; n <= max; n++) vals.push(n)
+      return vals
+    })
+  )].sort((a, b) => a - b)
   const totalCidades = cidades.length
   const breadcrumbSchema = { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [ { '@type': 'ListItem', position: 1, name: 'Início', item: 'https://stivenallan.com.br' }, { '@type': 'ListItem', position: 2, name: 'Empreendimentos', item: 'https://stivenallan.com.br/empreendimentos' } ] }
   const itemListSchema = { '@context': 'https://schema.org', '@type': 'ItemList', itemListElement: lista.map((emp, i) => ({ '@type': 'ListItem', position: i + 1, name: emp.nome, url: 'https://stivenallan.com.br/empreendimento/' + emp.construtoraSlug + '/' + emp.slug })) }
@@ -124,26 +174,38 @@ export default async function EmpreendimentosPage() {
         .cat-region-select { font-family: var(--font-hanken), system-ui, sans-serif; font-size: 11px; letter-spacing: 0.20em; text-transform: uppercase; color: #6B655B; border: 1px solid rgba(26,24,20,0.15); padding: 12px 40px 12px 20px; background: transparent; width: 100%; cursor: pointer; appearance: none; -webkit-appearance: none; -moz-appearance: none; transition: border-color .25s, color .25s; }
         .cat-region-select:hover, .cat-region-select:focus { border-color: #B89B5E; color: #B89B5E; outline: none; }
         .cat-region-select option { color: #1A1814; background: #FAFAF8; }
-        @keyframes fadein { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:none; } }
-        .fade-in { animation: fadein .7s ease both; }
-        .fade-in-1 { animation-delay: .10s; } .fade-in-2 { animation-delay: .22s; } .fade-in-3 { animation-delay: .34s; } .fade-in-4 { animation-delay: .46s; }
+        @media (prefers-reduced-motion: no-preference) {
+          @keyframes fadein { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:none; } }
+          .fade-in { animation: fadein .7s ease both; }
+          .fade-in-1 { animation-delay: .10s; } .fade-in-2 { animation-delay: .22s; } .fade-in-3 { animation-delay: .34s; } .fade-in-4 { animation-delay: .46s; }
+        }
+        a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible, [tabindex]:focus-visible { outline: 2px solid #B89B5E; outline-offset: 3px; }
         @media (max-width: 1200px) { section { padding-left: clamp(16px,4vw,32px) !important; padding-right: clamp(16px,4vw,32px) !important; } }
         @media (max-width: 768px) { .cat-cards-grid { grid-template-columns: 1fr !important; } .cat-footer-grid { grid-template-columns: 1fr !important; gap: 40px !important; } }
+        @media (max-width: 480px) {
+          .cat-nav-brand { font-size: 13px !important; letter-spacing: 0.10em !important; }
+          .cat-nav-links { gap: 14px !important; }
+          .cat-nav-link { font-size: 9px !important; letter-spacing: 0.10em !important; }
+        }
       `}</style>
+      <SkipLink />
 
-      {/* NAV */}
-      <nav className="cat-nav">
+      {/* HEADER / NAV */}
+      <header>
+      <nav className="cat-nav" aria-label="Principal">
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 clamp(18px,4vw,48px)', height: 68, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Link href="/" style={{ fontFamily: t.display, fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.22em', fontSize: 16, textDecoration: 'none', color: t.onDark }}>
+          <Link href="/" className="cat-nav-brand" style={{ fontFamily: t.display, fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.22em', fontSize: 16, textDecoration: 'none', color: t.onDark, whiteSpace: 'nowrap' }}>
             Stiven Allan
           </Link>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
-            <Link href="/empreendimentos" style={{ fontFamily: t.body, fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: t.onDark, textDecoration: 'none' }}>Empreendimentos</Link>
-            <a href={WPP_MSG} data-wpp="1" target="_blank" rel="noopener noreferrer" style={{ fontFamily: t.body, fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: t.champagne, textDecoration: 'none' }}>WhatsApp</a>
+          <div className="cat-nav-links" style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
+            <Link href="/empreendimentos" className="cat-nav-link" style={{ fontFamily: t.body, fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: t.onDark, textDecoration: 'none', whiteSpace: 'nowrap' }}>Empreendimentos</Link>
+            <a href={WPP_MSG} data-wpp="1" target="_blank" rel="noopener noreferrer" className="cat-nav-link" style={{ fontFamily: t.body, fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: t.champagne, textDecoration: 'none', whiteSpace: 'nowrap' }}>WhatsApp</a>
           </div>
         </div>
       </nav>
+      </header>
 
+      <main id="main-content" tabIndex={-1} style={{ outline: 'none' }}>
       {/* HEADER */}
       <section style={{ background: t.dark, color: t.onDark, padding: 'calc(68px + clamp(48px,8vh,72px)) clamp(18px,4vw,40px) clamp(72px,12vh,120px)' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
@@ -171,15 +233,19 @@ export default async function EmpreendimentosPage() {
             <h2 className="cat-h2">Todos os empreendimentos</h2>
             <hr className="cat-rule" style={{ margin: '20px auto 0' }} />
           </div>
-          <RegionFilter cidades={cidades} construtoras={construtoras} />
+          <Suspense fallback={<div style={{ height: 154, marginBottom: 40 }} aria-hidden="true" />}>
+            <CatalogFilters
+              cidades={cidades}
+              bairros={bairros}
+              construtoras={construtoras}
+              statusDisponiveis={statusDisponiveis}
+              dormitoriosDisponiveis={dormitoriosDisponiveis}
+              totalGeral={lista.length}
+            />
+          </Suspense>
           <div className="cat-cards-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(300px,1fr))', gap: 'clamp(16px,2.5vw,28px)' }}>
             {lista.map((emp, i) => (
-              <div
-                key={emp.slug}
-                data-cidade={emp.cidade}
-                data-construtora={emp.construtoraNome || 'Construtora Fontana'}
-                className={'fade-in fade-in-' + ((i % 4) + 1)}
-              >
+              <div key={emp.slug} className={'fade-in fade-in-' + ((i % 4) + 1)}>
                 <CatalogCard emp={emp} />
               </div>
             ))}
@@ -197,13 +263,14 @@ export default async function EmpreendimentosPage() {
       <section style={{ background: t.dark, color: t.onDark, padding: 'clamp(72px,12vh,120px) clamp(18px,4vw,40px)', textAlign: 'center' }}>
         <div style={{ maxWidth: 620, margin: '0 auto' }}>
           <p className="cat-eyebrow" style={{ marginBottom: 24 }}>Não sabe qual escolher?</p>
-          <h2 className="cat-serif" style={{ color: t.onDark, fontSize: 'clamp(28px,4.5vw,48px)', fontStyle: 'italic', fontWeight: 300, letterSpacing: '0.01em', lineHeight: 1.15 }}>Stiven é especialista nos empreendimentos Fontana da região.</h2>
+          <h2 className="cat-serif" style={{ color: t.onDark, fontSize: 'clamp(28px,4.5vw,48px)', fontStyle: 'italic', fontWeight: 300, letterSpacing: '0.01em', lineHeight: 1.15 }}>Stiven é especialista nos empreendimentos Fontana e Eraldo da região.</h2>
           <p className="cat-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(15px,1.8vw,19px)', margin: '20px 0 36px', lineHeight: 1.6 }}>
             Fale com Stiven e receba uma recomendação sob medida para o seu momento. CRECI 60.275.
           </p>
           <a href={WPP_MSG} data-wpp="1" target="_blank" rel="noopener noreferrer" className="cat-btn" style={{ background: t.champagne, borderColor: t.champagne, color: t.ink }}>Falar com Stiven — WhatsApp</a>
         </div>
       </section>
+      </main>
 
       {/* FOOTER */}
       <footer style={{ background: '#0E0C0A', color: t.onDark, padding: 'clamp(56px,10vh,96px) clamp(18px,4vw,40px) clamp(32px,6vh,56px)' }}>
@@ -216,7 +283,7 @@ export default async function EmpreendimentosPage() {
             </div>
             <div>
               <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.25em', textTransform: 'uppercase', color: t.champagne, marginBottom: 20 }}>Menu</div>
-              {[['/', 'Início'], ['/empreendimentos', 'Empreendimentos'], ['/#como-funciona', 'Financiamento direto'], ['/guia', 'Guias']].map(([href, label]) => (
+              {[['/', 'Início'], ['/empreendimentos', 'Empreendimentos'], ['/#sobre', 'Sobre Stiven'], ['/#como-funciona', 'Financiamento direto'], ['/guia', 'Guias']].map(([href, label]) => (
                 <div key={href} style={{ marginBottom: 10 }}>
                   <Link href={href} style={{ fontSize: 13, color: 'rgba(245,241,234,0.55)', textDecoration: 'none', letterSpacing: '0.04em' }}>{label}</Link>
                 </div>

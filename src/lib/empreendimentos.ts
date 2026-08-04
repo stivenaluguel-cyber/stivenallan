@@ -29,6 +29,19 @@ export interface Empreendimento {
   videoUrl?: string;
   catalogoUrl?: string;
   construtoraNome?: string;
+  // Ficha técnica pro catálogo (/empreendimentos) — sempre opcional, só
+  // populado quando existe dado real na fonte (properties/Supabase pra
+  // Fontana, tipologias reais pra Eraldo). Nunca inventar valor ausente.
+  suitesLabel?: string;
+  metragemLabel?: string;
+  vagasLabel?: string;
+  previsaoEntregaLabel?: string;
+  dormitoriosMin?: number;
+  dormitoriosMax?: number;
+  suitesMin?: number;
+  suitesMax?: number;
+  vagasMin?: number;
+  vagasMax?: number;
 }
 
 // Imagem do Mar di Atrani em /empreendimentos usa uma URL diferente da capa no

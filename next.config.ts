@@ -1,7 +1,16 @@
 import type { NextConfig } from 'next'
 import { withSentryConfig } from '@sentry/nextjs'
+import path from 'path'
 
 const nextConfig: NextConfig = {
+  // Sem isto, o Next tenta adivinhar a raiz do workspace subindo diretórios
+  // até achar outro package-lock.json — e este projeto tem vários "irmãos"
+  // (sistema-imoveis-stiven-kpm-gaps, worktrees em .claude/worktrees/, o
+  // scraper na raiz sistema-imoveis-stiven) com lockfile próprio. Raiz errada
+  // detectada = tracing de arquivos e ids de módulo client/server incorretos,
+  // o que já causou erro intermitente "Cannot read properties of undefined
+  // (reading 'call')" em dev. Fixar explicitamente elimina a ambiguidade.
+  outputFileTracingRoot: path.join(__dirname),
   typescript: {
     ignoreBuildErrors: true,
   },

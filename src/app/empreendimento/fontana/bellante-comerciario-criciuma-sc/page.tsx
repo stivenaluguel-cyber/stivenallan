@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
+import { HeroImage } from '@/components/HeroImage';
 import { MessageCircle } from 'lucide-react';
 import GalleryWithLightbox from './gallery-lightbox';
 import PlantasLightbox from './plantas-lightbox';
@@ -78,12 +80,15 @@ export default function BellantePage() {
       <PropertySchema nome="Bellante" slug="bellante-comerciario-criciuma-sc" construtora_slug="fontana" cidade="Criciúma" uf="SC" bairro="Comerciário" descricao="Bellante Residencial — 2 dormitórios (1 suíte), 62–66 m², Comerciário em Criciúma/SC. Em obras. Financiamento direto Fontana. Conheça com Stiven Allan." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/bellante-comerciario-criciuma-sc.jpg" faq={FAQ_ITEMS} />
 
       {/* NAV */}
-      <FontanaCompactNav title="BELLANTE RESIDENCIAL" accent={ACCENT} wa={WA} />
+      <header style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50 }}>
+        <FontanaCompactNav title="BELLANTE RESIDENCIAL" accent={ACCENT} wa={WA} />
+      </header>
 
       {/* HERO */}
       <section style={{ position: 'relative', height: '100vh', minHeight: '600px', overflow: 'hidden' }}>
-        <img src={HERO} alt="Bellante Residencial — Fachada"
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />
+        <HeroImage unoptimized src={HERO} alt="Bellante Residencial — Fachada"
+          fill priority sizes="100vw"
+          style={{ objectFit: 'cover', objectPosition: 'center' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.6) 100%)' }} />
         <div style={{ position: 'relative', zIndex: 2, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 1.5rem' }}>
           <p style={{ color: '#a8bfdf', fontSize: '0.75rem', letterSpacing: '0.25em', textTransform: 'uppercase', marginBottom: '1rem' }}>Comerciário · Criciúma / SC</p>
@@ -195,9 +200,12 @@ export default function BellantePage() {
             Rua Treze de Maio, 92 — Comerciário, Criciúma/SC
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '2.5rem' }}>
-            <img src="/images/empreendimentos/bellante-comerciario-criciuma-sc/localizacao-bellante-642edb705c4c6.jpg"
-              alt="Localização Bellante Residencial — Comerciário Criciúma"
-              style={{ width: '100%', height: '300px', objectFit: 'cover', borderRadius: '4px' }} />
+            <div style={{ position: 'relative', width: '100%', height: '300px' }}>
+              <Image unoptimized src="/images/empreendimentos/bellante-comerciario-criciuma-sc/localizacao-bellante-642edb705c4c6.jpg"
+                alt="Localização Bellante Residencial — Comerciário Criciúma"
+                fill loading="lazy" sizes="(max-width: 768px) 100vw, 50vw"
+                style={{ objectFit: 'cover', borderRadius: '4px' }} />
+            </div>
             <div style={{ borderRadius: '4px', overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.1)' }}>
               <iframe
                 src="https://maps.google.com/maps?q=Rua+Treze+de+Maio+92,+Comerci%C3%A1rio,+Crici%C3%BAma,+SC&output=embed"
@@ -271,8 +279,9 @@ export default function BellantePage() {
 
       {/* CTA FINAL */}
       <section style={{ position: 'relative', height: '60vh', minHeight: '400px', overflow: 'hidden' }}>
-        <img src={HERO} alt="Bellante Residencial"
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }} />
+        <Image unoptimized src={HERO} alt="Bellante Residencial"
+          fill loading="lazy" sizes="100vw"
+          style={{ objectFit: 'cover', objectPosition: 'center top' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.65)' }} />
         <div style={{ position: 'relative', zIndex: 2, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 1.5rem' }}>
           <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#c8d8ef', fontSize: 'clamp(1.5rem,3vw,2.5rem)', fontStyle: 'italic', marginBottom: '2rem' }}>

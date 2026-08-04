@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { SITE_URL } from '@/lib/site'
 import { HeroImage } from '@/components/HeroImage'
 import { CookiePreferencesLink } from '@/components/CookiePreferencesLink'
+import { SkipLink } from '@/components/SkipLink'
 import { buscarCub } from '@/lib/cub-sinduscon'
 
 const WPP = 'https://wa.me/5548991642332'
@@ -39,11 +40,20 @@ const t = {
   body: "var(--font-hanken), system-ui, sans-serif",
 }
 
-const DEPOIMENTOS = [
+// Estrutura preparada para depoimentos reais (foto, empreendimento e data de
+// quando o cliente comprou) — campos opcionais, só renderizam quando existirem.
+// Os 3 depoimentos abaixo já estavam publicados; mantidos como estão (sem
+// inventar foto/empreendimento/data que não temos confirmados).
+type Depoimento = { nome: string; cidade: string; texto: string; foto?: string; empreendimento?: string; data?: string }
+const DEPOIMENTOS: Depoimento[] = [
   { nome: 'Rafael T.', cidade: 'Criciúma, SC', texto: 'Nunca imaginei que compraria um apartamento sem depender de banco. O processo foi simples, rápido e as condições são incríveis.' },
   { nome: 'Camila S.', cidade: 'Içara, SC', texto: 'O Stiven apresentou um empreendimento perfeito para mim e estruturou um pagamento que coube no meu orçamento. Recomendo muito.' },
   { nome: 'Fernando B.', cidade: 'Nova Veneza, SC', texto: 'A flexibilidade do financiamento direto foi o que fez a diferença. Negociação direta com a construtora, sem depender de banco.' },
 ]
+
+// Áreas atendidas: mesma lista publicada no schema.org RealEstateAgent
+// (src/app/layout.tsx) — não duplicar aqui com uma lista diferente.
+const AREAS_ATENDIDAS = ['Criciúma', 'Balneário Rincão', 'Laguna', 'Içara', 'Siderópolis', 'Balneário Piçarras']
 
 const COMO_FUNCIONA = [
   { n: '01', titulo: 'Escolha o imóvel', desc: 'Comece pelos destaques ou navegue pelo portfólio completo e escolha o empreendimento ideal para o seu momento.' },
@@ -155,37 +165,50 @@ export default async function HomePage() {
         .home-dep-card { background: #fff; padding: 36px 32px; border-top: 2px solid #B89B5E; }
         .home-wa-float { position: fixed; right: 22px; bottom: 22px; z-index: 60; width: 54px; height: 54px; border-radius: 50%; background: #25D366; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(37,211,102,0.35); transition: transform .2s ease; }
         .home-wa-float:hover { transform: scale(1.08); }
-        @keyframes fadein { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:none; } }
-        .fade-in { animation: fadein .7s ease both; }
-        .fade-in-1 { animation-delay: .10s; } .fade-in-2 { animation-delay: .22s; } .fade-in-3 { animation-delay: .34s; } .fade-in-4 { animation-delay: .46s; }
+        @media (prefers-reduced-motion: no-preference) {
+          @keyframes fadein { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:none; } }
+          .fade-in { animation: fadein .7s ease both; }
+          .fade-in-1 { animation-delay: .10s; } .fade-in-2 { animation-delay: .22s; } .fade-in-3 { animation-delay: .34s; } .fade-in-4 { animation-delay: .46s; }
+        }
+        a:focus-visible, button:focus-visible, select:focus-visible, [tabindex]:focus-visible { outline: 2px solid #B89B5E; outline-offset: 3px; }
         @media (max-width: 1200px) { section { padding-left: clamp(16px,4vw,32px) !important; padding-right: clamp(16px,4vw,32px) !important; } }
         @media (max-width: 900px) { .home-how-grid { grid-template-columns: 1fr 1fr !important; } }
-        @media (max-width: 768px) { .home-cards-grid { grid-template-columns: 1fr !important; } .home-how-grid { grid-template-columns: 1fr 1fr !important; } .home-footer-grid { grid-template-columns: 1fr !important; gap: 40px !important; } .home-dep-grid { grid-template-columns: 1fr !important; } }
-        @media (max-width: 480px) { .home-how-grid { grid-template-columns: 1fr !important; } }
+        @media (max-width: 768px) { .home-cards-grid { grid-template-columns: 1fr !important; } .home-how-grid { grid-template-columns: 1fr 1fr !important; } .home-footer-grid { grid-template-columns: 1fr !important; gap: 40px !important; } .home-dep-grid { grid-template-columns: 1fr !important; } .home-authority-grid { grid-template-columns: 1fr !important; } }
+        @media (max-width: 480px) {
+          .home-how-grid { grid-template-columns: 1fr !important; }
+          .home-nav-brand { font-size: 13px !important; letter-spacing: 0.10em !important; }
+          .home-nav-links { gap: 14px !important; }
+          .home-nav-link, .home-nav-wpp { font-size: 9px !important; letter-spacing: 0.10em !important; }
+          .home-h1 { font-size: 26px !important; }
+        }
       `}</style>
+      <SkipLink />
 
-      {/* NAV */}
-      <nav className="home-nav">
+      {/* HEADER / NAV */}
+      <header>
+      <nav className="home-nav" aria-label="Principal">
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 clamp(18px,4vw,48px)', height: 68, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Link href="/" style={{ fontFamily: t.display, fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.22em', fontSize: 16, textDecoration: 'none', color: '#FFFFFF', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }} className="home-nav-brand">
+          <Link href="/" style={{ fontFamily: t.display, fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.22em', fontSize: 16, textDecoration: 'none', color: '#FFFFFF', textShadow: '0 1px 4px rgba(0,0,0,0.4)', whiteSpace: 'nowrap' }} className="home-nav-brand">
             Stiven Allan
           </Link>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
-            <Link href="/empreendimentos" style={{ fontFamily: t.body, fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#FFFFFF', textDecoration: 'none', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }} className="home-nav-link">Empreendimentos</Link>
-            <a href={WPP_MSG} data-wpp="1" target="_blank" rel="noopener noreferrer" style={{ fontFamily: t.body, fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: t.champagne, textDecoration: 'none', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }} className="home-nav-wpp">WhatsApp</a>
+          <div className="home-nav-links" style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
+            <Link href="/empreendimentos" style={{ fontFamily: t.body, fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#FFFFFF', textDecoration: 'none', textShadow: '0 1px 4px rgba(0,0,0,0.4)', whiteSpace: 'nowrap' }} className="home-nav-link">Empreendimentos</Link>
+            <a href={WPP_MSG} data-wpp="1" target="_blank" rel="noopener noreferrer" style={{ fontFamily: t.body, fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: t.champagne, textDecoration: 'none', textShadow: '0 1px 4px rgba(0,0,0,0.4)', whiteSpace: 'nowrap' }} className="home-nav-wpp">WhatsApp</a>
           </div>
         </div>
       </nav>
       <script dangerouslySetInnerHTML={{ __html: `(function(){var n=document.querySelector('.home-nav');if(!n)return;function u(){n.classList.toggle('home-nav--solid',window.scrollY>40);}window.addEventListener('scroll',u,{passive:true});u();})();` }} />
+      </header>
 
+      <main id="main-content" tabIndex={-1} style={{ outline: 'none' }}>
       {/* HERO */}
       <section style={{ position: 'relative', minHeight: '100svh', overflow: 'hidden', display: 'flex', flexDirection: 'column', justifyContent: 'center', background: '#1a1814' }}>
         <HeroImage src="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/due-fratelli-centro-criciuma-sc.jpg" alt="Hall de entrada iluminado de empreendimento de alto padrão — Sul de Santa Catarina" fill priority sizes="100vw" style={{ objectFit: 'cover', objectPosition: 'center center' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.10) 40%, rgba(0,0,0,0.65) 100%)' }} />
         <div style={{ position: 'relative', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: 'calc(68px + 2vh) clamp(24px,6vw,80px) 4vh' }}>
           <p className="home-eyebrow fade-in" style={{ color: 'rgba(184,155,94,0.85)', marginBottom: 24, textShadow: '0 1px 8px rgba(0,0,0,0.5)' }}>Stiven Allan · CRECI 60.275</p>
-          <h1 className="home-h1 fade-in fade-in-1" style={{ fontSize: 'clamp(30px,3.6vw,52px)', lineHeight: 1.08, color: '#FFFFFF', textShadow: '0 2px 8px rgba(0,0,0,0.5), 0 2px 32px rgba(0,0,0,0.60)', maxWidth: '28ch' }}>
-            Apartamentos na planta com financiamento direto — negociado direto com a construtora
+          <h1 className="home-h1 fade-in fade-in-1" style={{ fontSize: 'clamp(30px,3.6vw,52px)', lineHeight: 1.1, color: '#FFFFFF', textShadow: '0 2px 8px rgba(0,0,0,0.55), 0 2px 32px rgba(0,0,0,0.65)', maxWidth: '38ch' }}>
+            Apartamentos na planta no Sul de SC com financiamento direto
           </h1>
           <hr className="home-rule fade-in fade-in-2" style={{ margin: '20px auto' }} />
           <p className="home-serif fade-in fade-in-2" style={{ fontSize: 'clamp(16px,2.2vw,22px)', color: '#FFFFFF', maxWidth: 560, margin: '0 0 20px', lineHeight: 1.6, textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
@@ -195,7 +218,7 @@ export default async function HomePage() {
             Empreendimentos de alto padrão com financiamento direto da construtora em Criciúma, Balneário Rincão, Laguna e todo o Sul de Santa Catarina. Sem depender de banco.
           </p>
           <div className="fade-in fade-in-3" style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
-            <Link href="/#empreendimentos" className="home-btn" style={{ background: 'rgba(245,241,234,0.12)', borderColor: 'rgba(245,241,234,0.40)', color: '#FFFFFF', backdropFilter: 'blur(8px)' }}>Explorar empreendimentos</Link>
+            <Link href="/#empreendimentos" className="home-btn" style={{ background: 'rgba(245,241,234,0.12)', borderColor: 'rgba(245,241,234,0.40)', color: '#FFFFFF', backdropFilter: 'blur(8px)' }}>Ver empreendimentos</Link>
             <a href={WPP_MSG} data-wpp="1" target="_blank" rel="noopener noreferrer" style={{ fontFamily: t.body, fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: 'rgba(245,241,234,0.55)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8, padding: '15px 0' }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
               Falar com Stiven
@@ -204,7 +227,7 @@ export default async function HomePage() {
           <div className="fade-in fade-in-4" style={{ display: 'flex', gap: 'clamp(28px,6vw,64px)', justifyContent: 'center', marginTop: 20, paddingTop: 16, borderTop: '1px solid rgba(245,241,234,0.18)' }}>
             <div>
               <div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 'clamp(22px,3vw,30px)', color: t.champagne, textShadow: '0 2px 8px rgba(0,0,0,0.4)' }}>{totalEmpreendimentos}</div>
-              <p style={{ margin: '4px 0 0', fontFamily: t.body, fontSize: 10, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(245,241,234,0.60)' }}>Empreendimentos ativos</p>
+              <p style={{ margin: '4px 0 0', fontFamily: t.body, fontSize: 10, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(245,241,234,0.60)' }}>No portfólio</p>
             </div>
             <div>
               <div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 'clamp(22px,3vw,30px)', color: t.champagne, textShadow: '0 2px 8px rgba(0,0,0,0.4)' }}>{totalCidades}</div>
@@ -243,6 +266,53 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* AUTORIDADE — quem está por trás do atendimento */}
+      <section id="sobre" style={{ padding: 'clamp(72px,12vh,120px) clamp(18px,4vw,40px)', background: t.bg, borderTop: `1px solid ${t.line}` }}>
+        <div style={{ maxWidth: 1000, margin: '0 auto' }}>
+          <div
+            className="home-authority-grid"
+            style={{ display: 'grid', gridTemplateColumns: '160px 1fr', gap: 'clamp(28px,4vw,56px)', alignItems: 'start' }}
+          >
+            <div
+              aria-hidden="true"
+              style={{
+                width: 120, height: 120, borderRadius: '50%',
+                background: 'linear-gradient(135deg, #B89B5E, #8A7240)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontFamily: t.display, fontWeight: 300, fontSize: 40, color: '#FFFFFF', letterSpacing: '0.04em',
+              }}
+            >
+              SA
+            </div>
+            <div>
+              <p className="home-eyebrow" style={{ marginBottom: 16, color: '#8A7240' }}>Seu corretor</p>
+              <h2 className="home-h2" style={{ marginBottom: 6 }}>Stiven Allan</h2>
+              <p style={{ fontFamily: t.body, fontSize: 13, letterSpacing: '0.08em', textTransform: 'uppercase', color: t.chamDark, marginBottom: 20 }}>
+                CRECI 60.275 · Corretor de Imóveis
+              </p>
+              <p className="home-serif" style={{ fontSize: 'clamp(15px,1.8vw,19px)', color: t.ink, lineHeight: 1.65, marginBottom: 24, maxWidth: 560 }}>
+                Atendimento exclusivo e especializado em empreendimentos Fontana e Eraldo com financiamento direto da construtora, sem depender de banco.
+              </p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 24 }}>
+                {AREAS_ATENDIDAS.map((cidade) => (
+                  <span key={cidade} style={{ fontFamily: t.body, fontSize: 11, letterSpacing: '0.06em', color: t.muted, background: '#fff', border: `1px solid ${t.line}`, padding: '6px 12px' }}>
+                    {cidade}
+                  </span>
+                ))}
+              </div>
+              <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 24 }}>
+                <a href={WPP_MSG} data-wpp="1" target="_blank" rel="noopener noreferrer" className="home-btn" style={{ background: t.ink, borderColor: t.ink, color: t.bg }}>Falar com Stiven</a>
+                <a href="https://www.instagram.com/stivenallan.ofc" target="_blank" rel="noopener noreferrer" className="home-btn home-btn--cham">Instagram @stivenallan.ofc</a>
+              </div>
+              <p style={{ fontFamily: t.body, fontSize: 12, color: t.muted, lineHeight: 1.6, maxWidth: 560 }}>
+                Construtoras parceiras: Fontana e Eraldo. Disponibilidade e condições comerciais podem mudar sem aviso prévio — fale com Stiven para a tabela vigente.{' '}
+                <Link href="/politica-de-privacidade" style={{ color: t.chamDark, textDecoration: 'underline' }}>Política de Privacidade</Link>.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* DEPOIMENTOS */}
       <section style={{ padding: 'clamp(72px,12vh,120px) clamp(18px,4vw,40px)', background: '#F5F1EA' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
@@ -255,12 +325,18 @@ export default async function HomePage() {
               <div key={d.nome} className={'home-dep-card fade-in fade-in-' + (i + 1)}>
                 <p style={{ fontFamily: t.serif, fontStyle: 'italic', fontSize: 'clamp(16px,1.7vw,19px)', color: t.ink, lineHeight: 1.65, margin: '0 0 24px' }}>“{d.texto}”</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: t.champagne, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <span style={{ fontFamily: t.display, fontWeight: 300, fontSize: 14, color: t.ink, textTransform: 'uppercase' }}>{d.nome[0]}</span>
-                  </div>
+                  {d.foto ? (
+                    <Image src={d.foto} alt="" width={36} height={36} style={{ borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                  ) : (
+                    <div aria-hidden="true" style={{ width: 36, height: 36, borderRadius: '50%', background: t.champagne, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <span style={{ fontFamily: t.display, fontWeight: 300, fontSize: 14, color: t.ink, textTransform: 'uppercase' }}>{d.nome[0]}</span>
+                    </div>
+                  )}
                   <div>
                     <p style={{ margin: 0, fontFamily: t.body, fontWeight: 500, fontSize: 13, color: t.ink }}>{d.nome}</p>
-                    <p style={{ margin: 0, fontFamily: t.body, fontSize: 11, color: t.muted, letterSpacing: '0.08em' }}>{d.cidade}</p>
+                    <p style={{ margin: 0, fontFamily: t.body, fontSize: 11, color: t.muted, letterSpacing: '0.08em' }}>
+                      {d.cidade}{d.empreendimento ? ` · ${d.empreendimento}` : ''}{d.data ? ` · ${d.data}` : ''}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -316,6 +392,8 @@ export default async function HomePage() {
         </div>
       </section>
 
+      </main>
+
       {/* FOOTER */}
       <footer style={{ background: '#0E0C0A', color: t.onDark, padding: 'clamp(56px,10vh,96px) clamp(18px,4vw,40px) clamp(32px,6vh,56px)' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
@@ -327,7 +405,7 @@ export default async function HomePage() {
             </div>
             <div>
               <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.25em', textTransform: 'uppercase', color: t.champagne, marginBottom: 20 }}>Menu</div>
-              {[['/', 'Início'], ['/empreendimentos', 'Empreendimentos'], ['/#como-funciona', 'Financiamento direto'], ['/guia', 'Guias']].map(([href, label]) => (
+              {[['/', 'Início'], ['/empreendimentos', 'Empreendimentos'], ['/#sobre', 'Sobre Stiven'], ['/#como-funciona', 'Financiamento direto'], ['/guia', 'Guias']].map(([href, label]) => (
                 <div key={href} style={{ marginBottom: 10 }}>
                   <Link href={href} style={{ fontSize: 13, color: 'rgba(245,241,234,0.55)', textDecoration: 'none', letterSpacing: '0.04em' }}>{label}</Link>
                 </div>

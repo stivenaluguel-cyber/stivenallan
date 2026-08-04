@@ -35,8 +35,38 @@ export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName
   const [hp, setHp] = useState('') // honeypot: usuário real nunca vê, bot preenche → server responde 400
   const [status, setStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
   const backdropRef = useRef<HTMLDivElement>(null)
+  const dialogRef = useRef<HTMLDivElement>(null)
+  const openerRef = useRef<HTMLButtonElement>(null)
   const startedRef = useRef(false)
   const funilParams = { empreendimento: propertyName, content_name: propertyDisplayName || propertyName, form_type: 'catalog_modal' as const }
+
+  // Acessibilidade do modal: Escape fecha, foco vai para o diálogo ao abrir e
+  // volta pro botão que abriu ao fechar (sem isso, usuário de teclado/leitor de
+  // tela perde a posição e o scroll do fundo continua rolando atrás do overlay).
+  useEffect(() => {
+    if (!open) return
+    const previouslyFocused = (document.activeElement as HTMLElement | null) || openerRef.current
+    dialogRef.current?.focus()
+    document.body.style.overflow = 'hidden'
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') { setOpen(false); return }
+      if (e.key !== 'Tab' || !dialogRef.current) return
+      const focusables = dialogRef.current.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      )
+      if (focusables.length === 0) return
+      const first = focusables[0]
+      const last = focusables[focusables.length - 1]
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus() }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus() }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => {
+      window.removeEventListener('keydown', onKeyDown)
+      document.body.style.overflow = ''
+      previouslyFocused?.focus()
+    }
+  }, [open])
 
   // Cada abertura do modal (inclui autoOpen no mount e reaberturas depois de fechar)
   // dispara form_open uma vez e reabre a janela do form_start — sem isso, fechar e
@@ -118,6 +148,7 @@ export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName
   return (
     <>
       <button
+        ref={openerRef}
         onClick={() => setOpen(true)}
         style={{ width: '100%', background: '#18181b', color: '#fff', border: 'none', borderRadius: '8px', padding: '12px 24px', fontSize: '14px', fontWeight: '600', cursor: 'pointer', fontFamily: 'inherit' }}
       >
@@ -130,7 +161,14 @@ export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName
           onClick={(e) => { if (e.target === backdropRef.current) setOpen(false) }}
           style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.7)', padding: 0 }}
         >
-          <div style={{ position: 'relative', width: '100%', maxWidth: '440px', backgroundColor: '#ffffff', borderRadius: '20px 20px 0 0', boxShadow: '0 -8px 40px rgba(0,0,0,0.3)', overflow: 'hidden', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+          <div
+            ref={dialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="lcm-title"
+            tabIndex={-1}
+            style={{ position: 'relative', width: '100%', maxWidth: '440px', backgroundColor: '#ffffff', borderRadius: '20px 20px 0 0', boxShadow: '0 -8px 40px rgba(0,0,0,0.3)', overflow: 'hidden', fontFamily: 'system-ui, -apple-system, sans-serif', outline: 'none' }}
+          >
 
             {/* Fechar */}
             <button
@@ -142,7 +180,7 @@ export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName
             {/* Header */}
             <div style={{ background: '#18181b', padding: '28px 24px 20px', textAlign: 'center' }}>
               <p style={{ color: '#a1a1aa', fontSize: '10px', letterSpacing: '0.15em', textTransform: 'uppercase', margin: '0 0 8px', fontWeight: 500 }}>Material exclusivo</p>
-              <h2 style={{ color: '#ffffff', fontSize: '22px', fontWeight: '700', margin: '0 0 6px', lineHeight: 1.2 }}>
+              <h2 id="lcm-title" style={{ color: '#ffffff', fontSize: '22px', fontWeight: '700', margin: '0 0 6px', lineHeight: 1.2 }}>
                 {propertyDisplayName || propertyName}
               </h2>
               <p style={{ color: '#71717a', fontSize: '13px', margin: 0 }}>Catálogo completo + plantas baixas</p>
@@ -181,8 +219,8 @@ export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName
                   </button>
                 </div>
               ) : status === 'done' ? (
-                <div style={{ textAlign: 'center', padding: '20px 0' }}>
-                  <div style={{ fontSize: '36px', marginBottom: '10px', color: '#22c55e' }}>✓</div>
+                <div role="status" aria-live="polite" style={{ textAlign: 'center', padding: '20px 0' }}>
+                  <div aria-hidden="true" style={{ fontSize: '36px', marginBottom: '10px', color: '#22c55e' }}>✓</div>
                   <p style={{ fontWeight: '700', color: '#18181b', fontSize: '17px', margin: '0 0 6px', fontFamily: 'inherit' }}>Pronto! Download iniciando...</p>
                   <p style={{ color: '#71717a', fontSize: '13px', margin: 0, fontFamily: 'inherit' }}>Em instantes você recebe o material.</p>
                 </div>
@@ -247,7 +285,7 @@ export function LeadCaptureModal({ propertyId, propertyName, propertyDisplayName
                   </div>
 
                   {status === 'error' && (
-                    <p style={{ fontSize: '12px', color: '#ef4444', background: '#fef2f2', padding: '8px 12px', borderRadius: '8px', margin: 0, fontFamily: 'inherit' }}>
+                    <p role="alert" style={{ fontSize: '12px', color: '#ef4444', background: '#fef2f2', padding: '8px 12px', borderRadius: '8px', margin: 0, fontFamily: 'inherit' }}>
                       Erro ao salvar. Tente novamente.
                     </p>
                   )}
