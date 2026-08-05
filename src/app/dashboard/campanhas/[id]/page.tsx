@@ -48,7 +48,7 @@ type Segmento = {
 
 type Campanha = {
   id: string; titulo: string; assunto: string; corpo_html: string
-  segmento: Segmento; status: string
+  segmento: Segmento; status: string; agendada_para: string | null
 }
 
 export default function CampanhaDetalhePage() {
@@ -69,6 +69,8 @@ export default function CampanhaDetalhePage() {
   const [salvando, setSalvando] = useState(false)
   const [enviando, setEnviando] = useState(false)
   const [msg, setMsg] = useState('')
+  const [agendarPara, setAgendarPara] = useState('')
+  const [agendando, setAgendando] = useState(false)
 
   const corpoRef = useRef<HTMLTextAreaElement>(null)
   const [empreendimentos, setEmpreendimentos] = useState<Empreendimento[]>([])
@@ -137,6 +139,7 @@ export default function CampanhaDetalhePage() {
       setCorpoHtml(c.corpo_html)
       setSegmento(c.segmento ?? {})
       setCidades((c.segmento?.cidade_interesse ?? []).join(', '))
+      setAgendarPara(c.agendada_para ? c.agendada_para.slice(0, 16) : '')
     } finally {
       setLoading(false)
     }
@@ -207,10 +210,43 @@ export default function CampanhaDetalhePage() {
     }
   }
 
+  async function agendar() {
+    if (!agendarPara) return
+    setAgendando(true); setMsg('')
+    try {
+      const iso = new Date(agendarPara).toISOString()
+      const res = await fetch('/api/admin/campanhas/' + id + '/agendar', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ agendada_para: iso }),
+      })
+      const data = await res.json()
+      setMsg(res.ok ? 'Envio agendado.' : (data.error || 'Erro ao agendar.'))
+      await carregar()
+    } finally {
+      setAgendando(false)
+    }
+  }
+
+  async function desagendar() {
+    setAgendando(true); setMsg('')
+    try {
+      const res = await fetch('/api/admin/campanhas/' + id + '/agendar', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ agendada_para: null }),
+      })
+      const data = await res.json()
+      setMsg(res.ok ? 'Agendamento removido — voltou pra rascunho.' : (data.error || 'Erro ao desagendar.'))
+      await carregar()
+    } finally {
+      setAgendando(false)
+    }
+  }
+
   if (loading) return <div style={{ padding: 32, color: D.muted }}>Carregando...</div>
   if (!campanha) return <div style={{ padding: 32, color: D.red }}>{msg || 'Campanha não encontrada.'}</div>
 
   const editavel = campanha.status === 'rascunho'
+  const podeAgendar = campanha.status === 'rascunho' || campanha.status === 'agendada'
   const temPendentes = destinatarios.pendente > 0
 
   return (
@@ -219,7 +255,12 @@ export default function CampanhaDetalhePage() {
         <button onClick={() => router.push('/dashboard/campanhas')} style={{ background: 'none', border: 'none', color: D.muted, fontSize: 13, cursor: 'pointer', marginBottom: 12, padding: 0 }}>← Campanhas</button>
 
         <h1 style={{ fontFamily: "'Bricolage Grotesque',system-ui", fontSize: 'clamp(1.4rem,3vw,1.8rem)', fontWeight: 800, margin: '0 0 4px' }}>{titulo || 'Campanha'}</h1>
-        <p style={{ fontSize: 13, color: D.muted, margin: '0 0 20px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Status: {campanha.status}</p>
+        <p style={{ fontSize: 13, color: D.muted, margin: '0 0 20px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          Status: {campanha.status}
+          {campanha.status === 'agendada' && campanha.agendada_para && (
+            <span> — para {new Date(campanha.agendada_para).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}</span>
+          )}
+        </p>
 
         <section style={{ background: D.surface, border: '1px solid ' + D.line, borderRadius: 12, padding: 20, marginBottom: 20 }}>
           <label style={{ fontSize: 11, color: D.muted, display: 'block', marginBottom: 4 }}>Título (interno)</label>
@@ -361,6 +402,32 @@ export default function CampanhaDetalhePage() {
               {salvando ? 'Salvando...' : 'Salvar rascunho'}
             </button>
           </div>
+        )}
+
+        {podeAgendar && (
+          <section style={{ background: D.surface, border: '1px solid ' + D.line, borderRadius: 12, padding: 20, marginBottom: 20 }}>
+            <h2 style={{ fontFamily: "'Bricolage Grotesque',system-ui", fontSize: 15, fontWeight: 700, margin: '0 0 12px' }}>Agendamento</h2>
+            <p style={{ fontSize: 12, color: D.muted, margin: '0 0 10px' }}>Horário de Brasília (America/Sao_Paulo, o fuso do servidor).</p>
+            <p style={{ fontSize: 12, color: D.bronze, margin: '0 0 10px', fontWeight: 600 }}>
+              O envio é processado 1x por dia, às 08h (horário de Brasília) — não é instantâneo. Uma campanha agendada
+              pra qualquer horário antes das 08h sai nesse mesmo dia; depois das 08h, só no dia seguinte às 08h. Pra
+              enviar sem esperar, use &quot;Enviar agora&quot; em vez de agendar.
+            </p>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+              <input type="datetime-local" value={agendarPara} onChange={(e) => setAgendarPara(e.target.value)} aria-label="Data e hora para agendar o envio"
+                style={{ border: '1px solid ' + D.line, borderRadius: 6, padding: 8, fontSize: 13 }} />
+              <button onClick={agendar} disabled={!agendarPara || agendando}
+                style={{ border: '1px solid ' + D.line, background: '#fff', borderRadius: 8, padding: '8px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', opacity: agendarPara ? 1 : 0.5 }}>
+                {agendando ? 'Salvando...' : campanha.status === 'agendada' ? 'Alterar agendamento' : 'Agendar envio'}
+              </button>
+              {campanha.status === 'agendada' && (
+                <button onClick={desagendar} disabled={agendando}
+                  style={{ border: 'none', background: 'none', color: D.muted, fontSize: 12, cursor: 'pointer', textDecoration: 'underline' }}>
+                  Remover agendamento
+                </button>
+              )}
+            </div>
+          </section>
         )}
 
         <section style={{ background: D.surface, border: '1px solid ' + D.line, borderRadius: 12, padding: 20 }}>

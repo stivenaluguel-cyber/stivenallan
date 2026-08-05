@@ -9,6 +9,7 @@ const D = {
 
 const STATUS_INFO: Record<string, { label: string; cor: string }> = {
   rascunho: { label: 'Rascunho', cor: D.muted },
+  agendada: { label: 'Agendada', cor: D.blue },
   enviando: { label: 'Enviando', cor: D.blue },
   enviada: { label: 'Enviada', cor: D.green },
   erro: { label: 'Erro', cor: D.red },
