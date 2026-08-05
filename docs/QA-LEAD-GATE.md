@@ -18,8 +18,8 @@ Documento de retomada. **Não contém segredo nenhum** — só nomes de variáve
 |---|---|
 | Branch | `feat/lead-gate-cadastro-unico` |
 | Worktree | `stivenallan-lead-gate` |
-| HEAD | `74b4c7d` |
-| Publicado no remoto | até `4363ed3`. **Os 6 commits novos são locais** — nada foi enviado |
+| HEAD | `b804ef0` |
+| Publicado no remoto | até `4363ed3`. **Os 8 commits novos são locais** — nada foi enviado |
 | Drift com `origin/main` | nenhum. `origin/main` continua em `a73a1e7` |
 | Diff vs main | 55 arquivos, +4002 / −28 |
 | `TZ=UTC npx vitest run` | 1740 testes, 136 arquivos, tudo verde |
@@ -28,9 +28,12 @@ Documento de retomada. **Não contém segredo nenhum** — só nomes de variáve
 | `npm run lint` | **não configurado** — `next lint` abre prompt interativo pedindo pra criar ESLint. Não criei config: seria decisão ampla, fora do escopo desta QA |
 | Produção | intocada. Migration não aplicada, flags inexistentes na Vercel, nenhum merge/deploy |
 
-### Commits locais desta noite
+### Commits locais
 
 ```
+b804ef0 docs(lead-gate): resultado da QA funcional executada com a chave real
+7c6d945 fix(lead-gate): banner de cookies enterrava o formulário no 1º acesso
+ff8c861 docs(lead-gate): estado, achados e roteiro de QA para retomada
 74b4c7d fix(lead-gate): acessibilidade do formulário e do painel
 1e759ed fix(lead-gate): build sorteava quais páginas saíam estáticas
 f63d692 fix(lead-gate): 4 bugs de identidade em resolve_lead_for_gate
@@ -55,9 +58,10 @@ cronológica (os 10 arquivos "marcador histórico", que contêm só `SELECT 1;`,
 foram pulados de propósito — o DDL real deles já está no baseline), depois a
 migration da feature. 55 tabelas no schema `public`.
 
-**Estado dos dados agora:** 3 `properties` de seed, **zero leads, zero sessões,
-zero interesses, zero conflitos**. Limpei tudo depois dos testes para a QA de
-amanhã começar do zero.
+**Estado dos dados agora:** 3 `properties` de seed **mais os dados sintéticos
+da QA executada** (6 leads `QA_LEAD_GATE`, 7 sessões, 7 interesses, 11
+eventos). Deixei tudo no lugar para você poder revisar — inventário e SQL de
+limpeza em §10.
 
 Properties de seed:
 - `parco-savello-santa-barbara-criciuma-sc` (9 fotos, 7 plantas sintéticas)
@@ -80,10 +84,8 @@ LEAD_PROPERTY_HISTORY_ENABLED         -> true
 NEXT_PUBLIC_ANALYTICS_DISABLED        -> true
 ```
 
-**Faltando (única pendência bloqueante):**
-
 ```
-SUPABASE_SERVICE_ROLE_KEY             -> ainda com o placeholder
+SUPABASE_SERVICE_ROLE_KEY             -> preenchida em 05/08, formato sb_secret_
 ```
 
 Deixadas ausentes de propósito: `META_CAPI_TOKEN`, `EVOLUTION_API_URL`,
