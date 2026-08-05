@@ -11,6 +11,7 @@ vi.mock('@supabase/supabase-js', () => ({
 
 import { GET } from './route'
 import { hashSessionToken } from '@/lib/lead-gate/session'
+import { PREVIEW_SUPABASE_REF_HEADER } from '@/lib/lead-gate/preview-ref-header'
 
 const FUTURE = new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString()
 const PAST = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
@@ -49,6 +50,7 @@ describe('GET /api/lead-access/status', () => {
 
   afterEach(() => {
     supabaseHolder.current = null as unknown as ReturnType<typeof makeSupabase>
+    delete process.env.VERCEL_ENV
   })
 
   it('sem cookie: unlocked=false sem tocar o banco', async () => {
@@ -121,5 +123,48 @@ describe('GET /api/lead-access/status', () => {
     expect(hashSessionToken(tokenReal)).not.toBe(hashSessionToken(tokenAdulterado))
     const res = await callGet(tokenAdulterado)
     expect(await res.json()).toEqual({ unlocked: false })
+  })
+
+  describe('header de diagnostico X-Preview-Supabase-Ref', () => {
+    it('presente em Preview, com somente o project ref', async () => {
+      process.env.VERCEL_ENV = 'preview'
+      process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://pauvicgtaqgulwdxwcgf.supabase.co'
+      supabaseHolder.current = makeSupabase(null)
+      const res = await callGet(undefined)
+      expect(res.headers.get(PREVIEW_SUPABASE_REF_HEADER)).toBe('pauvicgtaqgulwdxwcgf')
+    })
+
+    it('ausente em Production, mesmo com a mesma URL', async () => {
+      process.env.VERCEL_ENV = 'production'
+      process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://xpkznaqgctfkoonqpcye.supabase.co'
+      supabaseHolder.current = makeSupabase(null)
+      const res = await callGet(undefined)
+      expect(res.headers.get(PREVIEW_SUPABASE_REF_HEADER)).toBeNull()
+    })
+
+    it('ausente fora da Vercel (dev local, VERCEL_ENV indefinido)', async () => {
+      delete process.env.VERCEL_ENV
+      supabaseHolder.current = makeSupabase(null)
+      const res = await callGet(undefined)
+      expect(res.headers.get(PREVIEW_SUPABASE_REF_HEADER)).toBeNull()
+    })
+
+    it('URL invalida em preview nao lanca erro e nao inclui o header', async () => {
+      process.env.VERCEL_ENV = 'preview'
+      process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://test'
+      supabaseHolder.current = makeSupabase(null)
+      const res = await callGet(undefined)
+      expect(res.headers.get(PREVIEW_SUPABASE_REF_HEADER)).toBeNull()
+    })
+
+    it('nunca vaza a service role ou a URL completa no header', async () => {
+      process.env.VERCEL_ENV = 'preview'
+      process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://pauvicgtaqgulwdxwcgf.supabase.co'
+      supabaseHolder.current = makeSupabase(null)
+      const res = await callGet(undefined)
+      const value = res.headers.get(PREVIEW_SUPABASE_REF_HEADER)
+      expect(value).not.toContain('supabase.co')
+      expect(value).not.toContain('test-key')
+    })
   })
 })
