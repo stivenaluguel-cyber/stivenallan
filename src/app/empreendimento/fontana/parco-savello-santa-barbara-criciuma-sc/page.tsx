@@ -160,9 +160,19 @@ export default async function ParcoSavelloPage() {
   // Uma única resolução por render, repassada aos blocos E ao RelatedProperties
   // (via propertyIdAtual), pra não fazer duas idas à rede na mesma página.
   const propertyId = gateEnabled ? await getPropertyIdBySlug(SLUG) : null
-  // Sem id não há como registrar interesse nem validar o par id+slug no
-  // servidor: melhor servir tudo público do que gatear sem conseguir liberar.
   const gateOn = gateEnabled && !!propertyId
+  // Flag ligada mas sem id (linha ausente ou falha de rede na resolução).
+  //
+  // A tentação é servir tudo público — "melhor a página inteira do que uma
+  // página quebrada". Numa rota ISR isso é inaceitável: o HTML SEM gate é
+  // gravado no cache e servido a todo mundo até a próxima revalidação. Um
+  // timeout de 1s do Supabase numa regeneração de madrugada deixaria plantas e
+  // espelho abertos até de manhã.
+  //
+  // Fail-closed: o conteúdo restrito não é renderizado. A página continua
+  // servindo tudo que é público (hero, diferenciais, amenidades, FAQ, CRECI),
+  // então ninguém vê página quebrada — só não vê o que exigiria cadastro.
+  const gateFalhou = gateEnabled && !propertyId
   const gateProps = { propertyId: propertyId ?? '', propertySlug: SLUG, gateEnabled: gateOn, historyEnabled }
 
   const fotosPublicas = GALERIA.slice(0, FOTOS_PUBLICAS)
@@ -276,7 +286,7 @@ No coração do bairro Santa Bárbara, com o Parque da Prefeitura como extensão
 <h2 className="ps-h2">Natureza<br />e elegância</h2>
 </div>
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 2 }}>
-<GalleryWithLightbox galeria={gateOn ? fotosPublicas : GALERIA} prefix="ps" gradient="rgba(14,26,15,0.55)" />
+<GalleryWithLightbox galeria={gateOn || gateFalhou ? fotosPublicas : GALERIA} prefix="ps" gradient="rgba(14,26,15,0.55)" />
 </div>
 {gateOn && qtdFotosRestritas > 0 && (
 <ConteudoLiberado
@@ -343,7 +353,7 @@ Falar sobre estas plantas
 </WhatsAppAfterLead>
 </div>
 </ConteudoLiberado>
-) : (
+) : gateFalhou ? null : (
 PLANTAS_GRUPOS.map(({ titulo, categoria }) => {
 const itens = PLANTAS.filter(p => p.categoria === categoria)
 if (!itens.length) return null
@@ -498,7 +508,7 @@ teaser={<TeaserGate titulo="Disponibilidade real por unidade" descricao="Andar, 
 >
 <EspelhoPublico slug={SLUG} />
 </GatedContent>
-) : (
+) : gateFalhou ? null : (
 <EspelhoPublico slug={SLUG} />
 )}
 

@@ -40,10 +40,19 @@ export async function RelatedProperties({ atualSlug, cidade, nomeAtual, property
   // páginas de empreendimento são `revalidate = 3600` de propósito. Essa
   // consulta é um SELECT público em `properties`, não precisa de sessão
   // nenhuma, então usa o client "puro" pra não regredir o cache.
-  // Páginas que já resolveram o id (a do piloto passa via propertyIdAtual, pra
-  // alimentar os blocos GatedContent) não pagam uma segunda ida à rede aqui.
+  // Resolve o id SÓ quando o gate está ligado — e a página do piloto já o
+  // passa via propertyIdAtual, então na prática isto quase nunca roda.
+  //
+  // A versão anterior resolvia também quando havia `nome`, para melhorar a
+  // atribuição do FormContato legado nas 27 páginas fora do piloto. Custava uma
+  // ida à rede por página DURANTE O BUILD, e o tempo dessas chamadas empurrava
+  // páginas para além do limite de geração estática: builds limpos do mesmo
+  // commit deram 31, 24 e 25 páginas estáticas — o deploy sorteava quais
+  // ficavam estáticas. Não vale trocar previsibilidade de build por um
+  // property_id opcional num formulário que funcionava sem ele desde sempre
+  // (em origin/main todas as 36 páginas passam propertyId null).
   let propertyId = propertyIdAtual ?? null
-  if (!propertyId && (nome || gateEnabled)) {
+  if (!propertyId && gateEnabled) {
     propertyId = await getPropertyIdBySlug(atualSlug)
   }
 
