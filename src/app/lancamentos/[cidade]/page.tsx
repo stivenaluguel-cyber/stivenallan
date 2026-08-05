@@ -402,20 +402,20 @@ export default async function LancamentosCidadePage({ params }: Props) {
         <nav style={{ marginBottom: 40 }}>
           <ol style={{ display: 'flex', gap: 8, listStyle: 'none', padding: 0, margin: 0, fontSize: 14, color: '#a7adb4' }}>
             <li><Link href="/" style={{ color: '#a7adb4', textDecoration: 'none' }}>Início</Link></li>
-            <li style={{ color: '#c9a24b' }}>&rsaquo;</li>
+            <li style={{ color: '#D24E22' }}>&rsaquo;</li>
             <li><Link href="/lancamentos/criciuma-sc" style={{ color: '#a7adb4', textDecoration: 'none' }}>Lançamentos</Link></li>
-            <li style={{ color: '#c9a24b' }}>&rsaquo;</li>
+            <li style={{ color: '#D24E22' }}>&rsaquo;</li>
             <li style={{ color: '#fff' }}>{info.nome}/{info.uf}</li>
           </ol>
         </nav>
 
         {/* "Região Sul Catarinense" só faz sentido em SC — o painel aceita 15 UFs. */}
-        <p style={{ fontSize: 13, letterSpacing: '0.12em', color: '#c9a24b', textTransform: 'uppercase', marginBottom: 16 }}>
+        <p style={{ fontSize: 13, letterSpacing: '0.12em', color: '#D24E22', textTransform: 'uppercase', marginBottom: 16 }}>
           {info.uf === 'SC' ? `${info.uf} — Região Sul Catarinense` : info.uf}
         </p>
         <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 800, lineHeight: 1.1, marginBottom: 20 }}>
           Lançamentos em{' '}
-          <span style={{ color: '#c9a24b' }}>{info.nome}, {info.uf}</span>
+          <span style={{ color: '#D24E22' }}>{info.nome}, {info.uf}</span>
         </h1>
         <p style={{ fontSize: 17, color: '#a7adb4', lineHeight: 1.7, maxWidth: 600, marginBottom: 40 }}>
           {info.descricao} Atendimento exclusivo do corretor Stiven Allan, CRECI 60.275.
@@ -425,14 +425,14 @@ export default async function LancamentosCidadePage({ params }: Props) {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 24, marginBottom: 60 }}>
             {empreendimentos.map((emp, i) => (
               <Link key={i} href={emp.slug} style={{ display: 'block', background: '#202327', borderRadius: 12, padding: '28px 24px', border: '1px solid #2e3338', textDecoration: 'none', color: '#fff' }}>
-                {emp.fase && (<span style={{ display: 'inline-block', fontSize: 11, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: '#c9a24b', border: '1px solid #c9a24b', borderRadius: 40, padding: '3px 10px', marginBottom: 12 }}>{emp.fase}</span>)}
-                <p style={{ fontSize: 12, color: '#c9a24b', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>{emp.construtora}</p>
+                {emp.fase && (<span style={{ display: 'inline-block', fontSize: 11, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: '#D24E22', border: '1px solid #D24E22', borderRadius: 40, padding: '3px 10px', marginBottom: 12 }}>{emp.fase}</span>)}
+                <p style={{ fontSize: 12, color: '#D24E22', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>{emp.construtora}</p>
                 <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>{emp.nome}</h2>
                 <p style={{ fontSize: 14, color: '#a7adb4', marginBottom: 4 }}>{emp.dorms}</p>
-                <p style={{ fontSize: 15, fontWeight: 600, color: '#c9a24b', marginBottom: 16 }}>
+                <p style={{ fontSize: 15, fontWeight: 600, color: '#D24E22', marginBottom: 16 }}>
                   {formatPreco(emp.exibir_preco, emp.preco_a_partir_de)}
                 </p>
-                <span style={{ fontSize: 13, color: '#c9a24b', fontWeight: 600 }}>Ver detalhes →</span>
+                <span style={{ fontSize: 13, color: '#D24E22', fontWeight: 600 }}>Ver detalhes →</span>
               </Link>
             ))}
           </div>
@@ -506,7 +506,7 @@ export default async function LancamentosCidadePage({ params }: Props) {
             </p>
             {BAIRRO_LINK_POR_CIDADE[cityKey] && (
               <p style={{ fontSize: 15, marginBottom: 40 }}>
-                <Link href={`/lancamentos/${cidade}/${BAIRRO_LINK_POR_CIDADE[cityKey].slug}`} style={{ color: '#c9a24b', fontWeight: 600, textDecoration: 'underline' }}>
+                <Link href={`/lancamentos/${cidade}/${BAIRRO_LINK_POR_CIDADE[cityKey].slug}`} style={{ color: '#D24E22', fontWeight: 600, textDecoration: 'underline' }}>
                   Ver todos os lançamentos no {BAIRRO_LINK_POR_CIDADE[cityKey].nome} →
                 </Link>
               </p>
@@ -533,7 +533,7 @@ export default async function LancamentosCidadePage({ params }: Props) {
           </section>
         )}
 
-        <div style={{ background: 'linear-gradient(135deg, #c9a24b15, #c9a24b05)', borderRadius: 16, padding: '48px 32px', border: '1px solid #c9a24b30', textAlign: 'center' }}>
+        <div style={{ background: 'linear-gradient(135deg, #D24E2215, #D24E2205)', borderRadius: 16, padding: '48px 32px', border: '1px solid #D24E2230', textAlign: 'center' }}>
           <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2rem)', fontWeight: 800, marginBottom: 12 }}>
             Quer saber mais sobre lançamentos em {info.nome}?
           </h2>

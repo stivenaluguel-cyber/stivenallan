@@ -260,16 +260,16 @@ export default async function BlogPostPage({ params }: Props) {
         <div className="container mx-auto px-6 max-w-4xl">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-sm text-[#a7adb4] mb-8" aria-label="Breadcrumb">
-            <Link href="/" className="hover:text-[#c9a24b] transition-colors">Início</Link>
+            <Link href="/" className="hover:text-[#D24E22] transition-colors">Início</Link>
             <span>/</span>
-            <Link href="/blog" className="hover:text-[#c9a24b] transition-colors">Blog</Link>
+            <Link href="/blog" className="hover:text-[#D24E22] transition-colors">Blog</Link>
             <span>/</span>
             <span className="text-[#f4f4f4] truncate max-w-xs">{post.titulo}</span>
           </nav>
 
           {/* Header do Post */}
           <header className="mb-10">
-            <span className="inline-block mb-4 px-3 py-1 bg-[#c9a24b]/20 text-[#c9a24b] rounded-full text-sm font-semibold">
+            <span className="inline-block mb-4 px-3 py-1 bg-[#D24E22]/20 text-[#D24E22] rounded-full text-sm font-semibold">
               {post.categoria}
             </span>
             <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-4 leading-tight">
@@ -279,7 +279,7 @@ export default async function BlogPostPage({ params }: Props) {
 
             <div className="flex items-center gap-4 text-sm text-[#a7adb4] pb-8 border-b border-white/10">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-[#c9a24b]/20 flex items-center justify-center text-[#c9a24b] font-bold text-sm">
+                <div className="w-8 h-8 rounded-full bg-[#D24E22]/20 flex items-center justify-center text-[#D24E22] font-bold text-sm">
                   SA
                 </div>
                 <span className="text-white font-medium">{post.autor}</span>
@@ -337,7 +337,7 @@ export default async function BlogPostPage({ params }: Props) {
           </div>
 
           {/* CTA */}
-          <div className="mt-10 bg-[#202327] border border-[#c9a24b]/20 rounded-2xl p-8">
+          <div className="mt-10 bg-[#202327] border border-[#D24E22]/20 rounded-2xl p-8">
             <h2 className="text-xl font-bold text-white mb-2">Precisa de ajuda para encontrar seu imóvel?</h2>
             <p className="text-[#a7adb4] mb-4">
               Sou Stiven Allan, corretor CRECI 60.275, especialista em lançamentos e imóveis no sul catarinense. 
@@ -363,10 +363,10 @@ export default async function BlogPostPage({ params }: Props) {
                 <Link
                   key={relPost.slug}
                   href={`/blog/${relPost.slug}`}
-                  className="bg-[#202327] border border-[#2c3035] rounded-xl p-5 hover:border-[#c9a24b]/30 transition-all group"
+                  className="bg-[#202327] border border-[#2c3035] rounded-xl p-5 hover:border-[#D24E22]/30 transition-all group"
                 >
-                  <span className="text-xs text-[#c9a24b] font-semibold">{relPost.categoria}</span>
-                  <h3 className="text-white font-bold mt-1 mb-2 line-clamp-2 group-hover:text-[#c9a24b] transition-colors text-sm">
+                  <span className="text-xs text-[#D24E22] font-semibold">{relPost.categoria}</span>
+                  <h3 className="text-white font-bold mt-1 mb-2 line-clamp-2 group-hover:text-[#D24E22] transition-colors text-sm">
                     {relPost.titulo}
                   </h3>
                   <span className="text-[#a7adb4] text-xs">{relPost.tempo_leitura} min de leitura</span>

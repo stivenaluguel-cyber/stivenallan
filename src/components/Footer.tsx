@@ -3,7 +3,7 @@ import { CookiePreferencesLink } from '@/components/CookiePreferencesLink'
 
 const C = {
   bg: '#0d0e10',
-  accent: '#c9a24b',
+  accent: '#D24E22',
   muted: '#a7adb4',
   border: '#2c3035',
   green: '#1f9d55',

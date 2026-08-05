@@ -88,7 +88,7 @@ const POSTS: Post[] = [
 
 const CATEGORIA_CORES: Record<string, string> = {
   'Guia de Compra': 'bg-blue-500/20 text-blue-400',
-  'Lançamentos': 'bg-[#c9a24b]/20 text-[#c9a24b]',
+  'Lançamentos': 'bg-[#D24E22]/20 text-[#D24E22]',
   'Financiamento': 'bg-green-500/20 text-green-400',
   'Dicas': 'bg-purple-500/20 text-purple-400',
   'Guia de Bairros': 'bg-orange-500/20 text-orange-400',
@@ -138,12 +138,12 @@ export default function BlogPage() {
       <section className="pt-32 pb-12 bg-[#1a1c1f]">
         <div className="container mx-auto px-6">
           <nav className="flex items-center gap-2 text-sm text-[#a7adb4] mb-6" aria-label="Breadcrumb">
-            <Link href="/" className="hover:text-[#c9a24b] transition-colors">Início</Link>
+            <Link href="/" className="hover:text-[#D24E22] transition-colors">Início</Link>
             <span aria-hidden="true">/</span>
             <span className="text-[#f4f4f4]">Blog</span>
           </nav>
           <h1 className="text-4xl md:text-5xl font-extrabold mb-4">
-            Blog <span className="text-[#c9a24b]">Imobiliário</span>
+            Blog <span className="text-[#D24E22]">Imobiliário</span>
           </h1>
           <p className="text-[#a7adb4] text-lg max-w-2xl">
             Dicas, guias e novidades do mercado imobiliário em Criciúma e no sul catarinense. 
@@ -157,15 +157,15 @@ export default function BlogPage() {
         <div className="container mx-auto px-6">
           <Link
             href={`/blog/${destaque.slug}`}
-            className="group block bg-[#202327] border border-[#2c3035] rounded-2xl overflow-hidden hover:border-[#c9a24b]/30 transition-all"
+            className="group block bg-[#202327] border border-[#2c3035] rounded-2xl overflow-hidden hover:border-[#D24E22]/30 transition-all"
           >
             <div className="md:grid md:grid-cols-2 gap-0">
               <div className="relative h-64 md:h-auto bg-[#2c3035] overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-[#c9a24b]/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-br from-[#D24E22]/20 to-transparent" />
                 <div className="flex items-center justify-center h-full">
-                  <Building2 size={60} strokeWidth={1} aria-hidden="true" className="text-[#c9a24b]/60" />
+                  <Building2 size={60} strokeWidth={1} aria-hidden="true" className="text-[#D24E22]/60" />
                 </div>
-                <span className="absolute top-4 left-4 px-3 py-1 bg-[#c9a24b] text-[#121315] rounded-full text-xs font-bold">
+                <span className="absolute top-4 left-4 px-3 py-1 bg-[#D24E22] text-[#121315] rounded-full text-xs font-bold">
                   Destaque
                 </span>
               </div>
@@ -173,7 +173,7 @@ export default function BlogPage() {
                 <span className={`inline-block mb-3 px-3 py-1 rounded-full text-xs font-semibold w-fit ${CATEGORIA_CORES[destaque.categoria] ?? 'bg-white/10 text-white'}`}>
                   {destaque.categoria}
                 </span>
-                <h2 className="text-2xl font-bold text-white mb-3 group-hover:text-[#c9a24b] transition-colors">
+                <h2 className="text-2xl font-bold text-white mb-3 group-hover:text-[#D24E22] transition-colors">
                   {destaque.titulo}
                 </h2>
                 <p className="text-[#a7adb4] mb-4 line-clamp-3">{destaque.resumo}</p>
@@ -196,20 +196,20 @@ export default function BlogPage() {
             {demais.map((post) => (
               <article
                 key={post.slug}
-                className="bg-[#202327] border border-[#2c3035] rounded-2xl overflow-hidden hover:border-[#c9a24b]/30 transition-all group"
+                className="bg-[#202327] border border-[#2c3035] rounded-2xl overflow-hidden hover:border-[#D24E22]/30 transition-all group"
               >
                 <Link href={`/blog/${post.slug}`}>
                   <div className="relative h-44 bg-[#2c3035] overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#c9a24b]/10 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#D24E22]/10 to-transparent" />
                     <div className="flex items-center justify-center h-full">
-                      <House size={36} strokeWidth={1} aria-hidden="true" className="text-[#c9a24b] opacity-50" />
+                      <House size={36} strokeWidth={1} aria-hidden="true" className="text-[#D24E22] opacity-50" />
                     </div>
                   </div>
                   <div className="p-5">
                     <span className={`inline-block mb-2 px-2 py-0.5 rounded-full text-xs font-semibold ${CATEGORIA_CORES[post.categoria] ?? 'bg-white/10 text-white'}`}>
                       {post.categoria}
                     </span>
-                    <h3 className="text-white font-bold text-base mb-2 group-hover:text-[#c9a24b] transition-colors line-clamp-2">
+                    <h3 className="text-white font-bold text-base mb-2 group-hover:text-[#D24E22] transition-colors line-clamp-2">
                       {post.titulo}
                     </h3>
                     <p className="text-[#a7adb4] text-sm mb-3 line-clamp-2">{post.resumo}</p>

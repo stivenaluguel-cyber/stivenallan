@@ -39,7 +39,7 @@ export default function Header() {
           position: absolute;
           bottom: 0; left: 0; right: 0;
           height: 1px;
-          background: linear-gradient(90deg, #c9a24b, #e2c275);
+          background: linear-gradient(90deg, #D24E22, #E28465);
           transform: scaleX(0);
           transition: transform 0.25s ease;
         }
@@ -71,7 +71,7 @@ export default function Header() {
           transition: color 0.2s;
         }
         .mobile-nav-link:hover {
-          color: #c9a24b;
+          color: #D24E22;
         }
       `}</style>
 
@@ -107,7 +107,7 @@ export default function Header() {
               color: '#f4f4f4',
             }}>
               <span style={{
-                background: 'linear-gradient(90deg, #c9a24b, #e2c275)',
+                background: 'linear-gradient(90deg, #D24E22, #E28465)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
@@ -141,12 +141,12 @@ export default function Header() {
               target="_blank"
               rel="noopener noreferrer"
               style={{
-                background: 'linear-gradient(135deg, #c9a24b, #e2c275)',
-                color: '#1a1305', fontWeight: 800,
+                background: 'linear-gradient(135deg, #D24E22, #E28465)',
+                color: '#fff', fontWeight: 800,
                 padding: '10px 24px', borderRadius: '50px',
                 fontSize: '13px', textDecoration: 'none',
                 letterSpacing: '0.3px',
-                boxShadow: '0 4px 16px rgba(201,162,75,0.3)',
+                boxShadow: '0 4px 16px rgba(210,78,34,0.3)',
               }}
             >
               WhatsApp
@@ -216,8 +216,8 @@ export default function Header() {
               rel="noopener noreferrer"
               style={{
                 display: 'block',
-                background: 'linear-gradient(135deg, #c9a24b, #e2c275)',
-                color: '#1a1305', fontWeight: 800,
+                background: 'linear-gradient(135deg, #D24E22, #E28465)',
+                color: '#fff', fontWeight: 800,
                 padding: '14px', borderRadius: '14px',
                 fontSize: '15px', textDecoration: 'none',
                 textAlign: 'center', marginTop: '20px',

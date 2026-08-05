@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 const C = {
   bg: '#0d0e10',
   card: '#1a1c1f',
-  accent: '#c9a24b',
+  accent: '#D24E22',
   muted: '#a7adb4',
   border: '#2c3035',
   text: '#f4f4f4',
