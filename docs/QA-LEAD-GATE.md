@@ -676,3 +676,128 @@ piloto, conforme combinado.
 
 Todos com prefixo `QA_LEAD_GATE`, telefones `489000xxxxx`, e-mails
 `@exemplo.invalid`. Limpeza com o SQL do §7 (não executado).
+
+---
+
+## 12. Continuação — 05/08/2026, tarde (commit `8a55e7c` em diante)
+
+Autorização adicional para: revisão independente do diff completo, QA visual do Kanban com admin sintético provisionado pelo fluxo oficial, testes de dedup/concorrência/WhatsApp entre empreendimentos, diagnóstico do `next dev`, e plano de publicação sem executar.
+
+### 12.1 Dois P1 novos, achados por auditoria independente e corrigidos (`8a55e7c`)
+
+**P1 — o fetch de `getPropertyIdBySlug` rebaixava o `revalidate` de 21 páginas estáticas puras.**
+`next: { revalidate: 3600 }` no fetch do supabase-js parece inofensivo, mas em `patch-fetch.js` do Next o revalidate do **fetch** rebaixa o revalidate do **segmento** (`if (finalRevalidate < revalidateStore.revalidate)`). Só 7 dos 28 hotsites que usam `RelatedProperties` declaram `export const revalidate`; os outros 21 eram estáticos puros e passaram a ISR de 1h sem ninguém pedir. Medido: 35 páginas com "1h" no build quando só 7 deveriam. Corrigido com `force-cache` + tag — cada página volta a manter a política que ela mesma declara.
+
+**P1 — falha de rede publicava o conteúdo restrito e o congelava no cache ISR.**
+`gateOn = gateEnabled && !!propertyId` fazia a página servir **tudo público** quando a resolução do id falhava. Em render dinâmico seria degrade aceitável; em rota ISR o HTML sem gate é gravado no cache e servido a todos até a próxima regeneração — um timeout de 1s numa regeneração de madrugada deixaria plantas e espelho abertos até de manhã. Corrigido com `gateFalhou`: fail-closed — conteúdo restrito não renderiza, público continua servido, ninguém vê página quebrada.
+
+Também: 27 páginas fora do piloto pararam de resolver `property_id` (existia só para atribuição do `FormContato` legado, que sempre funcionou sem ele); `autoRefreshToken: false` no client anônimo (evita `setInterval` do GoTrue por render).
+
+**Achado da mesma auditoria que NÃO era regressão:** a instabilidade de builds limpos (estático vs dinâmico oscilando) já existe em `origin/main` — testei explicitamente fazendo checkout e 2 builds limpos: 35/2 e depois 14/23 estáticas/dinâmicas, **mesmo código, sem esta feature**. Não é algo que esta branch introduziu; é dívida pré-existente do projeto (rota catch-all `/empreendimento/[construtora]/[slug]` já mistura `force-dynamic` + `revalidate` + `generateStaticParams`, que são mutuamente conflitantes — `force-dynamic` sempre vence).
+
+### 12.2 Auditoria de segurança do endpoint — sem P0/P1
+
+Segunda auditoria independente, focada em `/api/lead-gate/content`, `conteudo-restrito.ts`, `espelho/[slug]`. Resultado: **nenhum P0/P1**. Testei pessoalmente o ponto mais crítico que ela levantou (prototype pollution via `slug='__proto__'` indexando `REGISTRO[slug]?.[bloco]`) — inofensivo, porque `bloco` é whitelist (`['plantas','fotos']`) e nem `Object.prototype` nem `Object` têm essas chaves.
+
+Achados P2/P3 registrados para decisão futura, não corrigidos nesta sessão (fora do escopo do piloto):
+- **P2** — o gate do espelho chaveia por `slug`, mas os dados são resolvidos por `nome` com fallback por continência (`k.includes(alvo) || alvo.includes(k)`) em `lib/unidades/espelho.ts`. Um `properties.nome` duplicado/legado fora do piloto poderia servir o espelho gateado sem sessão. Não confirmei se tal linha existe hoje.
+- **P3** — 404 (slug fora do piloto) responde antes da checagem de sessão em `/api/lead-gate/content`, permitindo enumerar `LEAD_GATE_SLUGS` com qualquer cookie lixo. Mesmo padrão já existe em `unlock/route.ts`.
+- **P3** — falta `Vary: Cookie` nas respostas dependentes de sessão (hoje seguro por `no-store`, mas frágil a mudança futura).
+
+### 12.3 Kanban — validado visualmente, com um bug real corrigido no meio do caminho
+
+**Bloqueio original superado com autorização:** provisionei um admin sintético (`QA_LEAD_GATE_ADMIN` / `qa_lead_gate_admin@exemplo.invalid`) no descartável, usando o mecanismo oficial (bcrypt via `admin_users`, sem nenhum bypass). A senha foi gerada, gravada só num arquivo local `chmod 600` fora do git, digitada no **formulário real de login** pelo navegador, e o arquivo apagado logo depois — nunca apareceu em chat, log ou commit.
+
+**Bug real encontrado no caminho:** a primeira tentativa de autenticar retornou 401 em `/api/admin/leads/[id]/interesses` mesmo com sessão válida (confirmada por `/api/admin/leads` funcionando). Causa raiz: `src/lib/dashboard/admin-auth.ts` (`requireAdmin()`) usa `process.env.JWT_SECRET!` **sem** o fallback que `middleware.ts` e `lib/auth.ts` têm (`|| 'stiven-dashboard-secret-2026-xk9p3m7q'`). Meu `.env.local` não tinha `JWT_SECRET` — o middleware autenticava com o fallback, mas `requireAdmin()` verificava contra a string literal `"undefined"` e rejeitava. **Não é bug desta feature**: `admin-auth.ts` é pré-existente e usado por ~55 rotas `/api/admin/*`; produção quase certamente tem `JWT_SECRET` configurado (é variável documentada em `.env.example`). Resolvido só no meu ambiente (gerei um `JWT_SECRET` local); a inconsistência do código foi registrada como tarefa separada, fora desta branch, pois é infraestrutura compartilhada não relacionada ao lead gate.
+
+**Resultado visual, com prova:**
+- Chip "Interesses · 2" no card de `QA_LEAD_GATE Maria Teste`.
+- Drawer abre a seção "INTERESSES" com os dois empreendimentos: "Monte Leone Residencial (QA sintético) — 1 visita — 1ª visita: 05/08 · liberado hoje" e "Parco Savello Residencial — 1 visita — 1ª visita: 05/08 · liberado hoje".
+- Sem `[object Object]`, sem data inválida, sem campo vazio estranho.
+- `/api/admin/leads/[id]/interesses` devolve `view_count`, `first_seen_at`/`last_seen_at` distintos, marcos (`unlocked_at`) — tudo batendo com o banco.
+- Screenshot capturado com WhatsApp e e-mail mascarados antes da captura (substituição de texto no DOM), mesmo sendo dados 100% sintéticos.
+- Abrir o drawer não alterou nenhum campo do lead (confirmado comparando o registro antes/depois).
+
+### 12.4 Sessão global, dedup e WhatsApp — todos confirmados
+
+| Teste | Resultado |
+|---|---|
+| WhatsApp sem cadastro | clique cancelado (`defaultPrevented`), URL intacta, painel/formulário focado |
+| Cadastro cria lead+sessão+interesse+eventos | ✅ |
+| E-mail mesmo, caixa diferente | ✅ dedup — 1 lead |
+| Telefone mesmo, com/sem DDI, espaços, pontuação | ✅ dedup — 1 lead |
+| E-mail de um lead + telefone de outro (conflito) | ✅ 1 registro em `lead_identity_conflicts`, ambos `requer_atencao=true`, nenhum 3º lead |
+| Duas submissões concorrentes, telefone novo | ✅ ambas 201, **1 lead só** (handler de corrida do commit anterior confirmado ao vivo) |
+| Habilitar Monte Leone só localmente, abrir com sessão do Parco | ✅ `unlocked:true` sem formulário, sem novo cadastro |
+| Segundo interesse registrado | ✅ `lead_property_interests` com o slug do Monte Leone |
+| Empreendimento principal preservado | ✅ `property_name` continua "Parco Savello Residencial" mesmo após visitar Monte Leone |
+| Voltar ao Parco | ✅ `unlocked:true`, sem novo cadastro |
+| Rate limit (5/60s) | ✅ confirmado nesta e na sessão anterior |
+
+### 12.5 Acessibilidade — 360×800 verificado visualmente, demais por medição
+
+360×800: screenshot confirma painel limpo, teaser com contagem real ("4 fotos e 7 plantas liberadas"), WhatsApp flutuante visível ao lado (reserva de 88px), zero overflow horizontal, zero alvo de toque abaixo de 24px, botão fechar 44×44 dentro da tela. Escape fecha o painel de forma confiável (confirmado, com pequeno atraso assíncrono). Foco inicial em campo do formulário testado e correto.
+
+**Não verificado nesta sessão, por restrição de tempo:** 390×844/768×1024/1440×900 com screenshot real (medição geométrica já feita em sessão anterior para os 4 breakpoints, ver §10); zoom 200%; teste completo de focus-restore com elemento externo focado antes da abertura do painel (mecanismo existe no código, comportamento de Escape fechando já confirmado).
+
+### 12.6 Diagnóstico do `next dev` — causa raiz identificada e reproduzida
+
+**Reproduzido de forma determinística:** o gatilho é criar um arquivo de Client Component **novo** enquanto o `next dev` já está rodando. Confirmado com um componente mínimo (`ProbeRepro`, só uma `<div>`): o servidor entrega o HTML correndo (`grep` confirma o texto no HTML), mas o React não hidrata — `Cannot read properties of undefined (reading 'call')` em `options.factory`, dentro do runtime do Webpack (`.next/static/chunks/webpack.js`).
+
+**Não é**:
+- lockfile duplicado (existe um `package-lock.json` extra no diretório pai, mas não gera aviso do Next e não é a causa — testei isoladamente);
+- `server-only` mal configurado (removido temporariamente, erro persistiu);
+- symlink na worktree (caminho físico = caminho lógico);
+- Turbopack (o projeto usa Webpack, `next dev` sem `--turbo`);
+- capitalização de arquivo/import (nomes conferem exatamente).
+
+**É**: uma falha de HMR/module-resolution do Webpack em dev quando um módulo novo entra no grafo de dependências depois que o servidor já compilou uma primeira vez. `rm -rf .next` sozinho não resolve enquanto o processo do servidor continua rodando (o Webpack mantém estado em memória). **Recuperação confirmada:** matar o processo do `next dev`, `rm -rf .next`, e reiniciar — depois disso, o mesmo componente hidrata normalmente.
+
+**Não reproduzido**: em `next build` + `next start`, nenhuma vez, em nenhum teste desta ou da sessão anterior.
+
+**Recomendação de trabalho, registrada, não implementada**: ao adicionar um Client Component novo durante uma sessão de dev já aberta, reiniciar o servidor (matar processo + `rm -rf .next` + `next dev` de novo) antes de testar no navegador, em vez de confiar no Fast Refresh. Não é um problema desta feature — é um comportamento do Next 15.3.9 + Webpack nesta máquina; não tentei isolar mais a fundo (ex.: bisseccionar versão do Next) por estar fora do escopo do piloto.
+
+### 12.7 Validação mecânica final
+
+```
+TZ=UTC npx vitest run    → 1740 testes, 136 arquivos, tudo verde
+npx tsc --noEmit         → limpo
+npm run build            → build limpo; Parco Savello ○ estático, revalidate 1h
+```
+
+Bundle cliente (build final, `.next/static`):
+- `sb_secret` / `SUPABASE_SERVICE_ROLE_KEY` / JWT de service_role: **0 ocorrências**
+- Source maps públicos: **0**
+- URLs de `estilofontana.com.br` (plantas restritas): **0 ocorrências no bundle client** (confirmado de novo nesta sessão, além da verificação de HTML/RSC anônimo já feita antes)
+
+`npm run lint`: continua sem configuração não-interativa (`next lint` pede pra criar ESLint). Registrado como débito pré-existente, nenhuma configuração ampla criada nesta branch.
+
+### 12.8 Commits desta continuação
+
+```
+8a55e7c fix(lead-gate): rede no build rebaixava ISR e podia publicar conteúdo restrito
+```
+
+Nenhum outro commit de código foi necessário nesta fase — Kanban, dedup, WhatsApp e sessão global foram QA ao vivo (sem alteração de código) porque já funcionavam corretamente. A correção do `JWT_SECRET` ficou só no `.env.local` local (fora do git). A inconsistência em `admin-auth.ts` foi registrada como tarefa separada, fora desta branch.
+
+---
+
+## 13. Plano de publicação (documentado, NADA executado)
+
+1. **Backup do Supabase de produção** antes de qualquer migration — snapshot completo via painel ou `pg_dump`.
+2. **Aplicar a migration** `20260805003000_lead_gate_identity_and_sessions.sql` em produção, isolada (não em lote com outras pendentes).
+3. **Validar o schema pós-aplicação**: `list_tables`, `get_advisors` (RLS habilitado sem policy nas 3 tabelas novas — padrão do projeto), conferir os 13 objetos do rollback existem com nome exato.
+4. **Deploy do código com as flags desligadas** (`LEAD_GATE_ENABLED` ausente/false em produção) — zero mudança visível nas 36 páginas.
+5. **Smoke test sem gate ativo**: as 36 páginas carregam normalmente, build de produção confirma Parco `○` estático.
+6. **Ativar `LEAD_GATE_ENABLED=true` + `LEAD_GATE_SLUGS=parco-savello-santa-barbara-criciuma-sc`** só em produção, via env var da Vercel (não via código/deploy).
+7. **Monitorar**: erros no Sentry, taxa de conversão do gate (cadastros / visitas), taxa de abandono no formulário.
+8. **Comparar cliques de WhatsApp interceptados vs. cadastros completados** — é a métrica que originou o projeto (315 visitas, 0 leads).
+9. **Critérios objetivos para pausar o piloto**: taxa de erro do endpoint de conteúdo acima de 1%; conversão do gate abaixo da conversão histórica do formulário antigo por mais de 72h; qualquer vazamento de conteúdo restrito reportado.
+10. **Rollback imediato por feature flag**: `LEAD_GATE_ENABLED=false` na Vercel — reverte ao comportamento anterior sem precisar de deploy.
+11. **Rollback de código**: reverter o merge; a migration é aditiva (não altera coluna existente), então o código antigo continua funcionando com o schema novo presente.
+12. **Política de rollback do banco**: NÃO remover tabelas/colunas em rollback emergencial. O rollback SQL (`supabase/rollback/...`) só deve rodar em manutenção planejada, nunca como reação a incidente — remove `lead_eventos.client_event_id`/`property_id`, o que destrói dado gravado depois da migration.
+13. **Corrigir credenciais de produção herdadas por Preview** (achado de segurança de sessão anterior, §5): aplicar o plano de escopo de env var da Vercel antes ou junto da ativação do piloto.
+14. **Avaliar rotação da service role de produção**: ela esteve disponível em todo Preview construído nos últimos 41+ dias, de um repositório público. Decisão do usuário, não técnica.
+15. **Expansão gradual**: só depois de validar métricas do Parco por um período definido pelo usuário, habilitar o segundo slug — mesmo processo, sem novo deploy de código (só env var).
+
+Nenhum item acima foi executado. Produção (`xpkznaqgctfkoonqpcye`) permanece sem a migration, sem as flags, sem nenhuma escrita desta sessão.
