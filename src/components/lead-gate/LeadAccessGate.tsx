@@ -64,7 +64,12 @@ export default function LeadAccessGate({ propertyId, propertySlug, propertyName,
     }
   }, [variant, bloqueado, dispensado, access.status])
 
-  if (!gateEnabled || access.status === 'unlocked') return null
+  // Só aparece em 'locked'. Antes era `=== 'unlocked'` (ou seja, aparecia
+  // também durante 'loading'): quem já tinha sessão via o formulário inteiro
+  // renderizar e sumir quando o fetch de status resolvia — flash de ~700px no
+  // rodapé. Com o default do provider agora sendo 'loading', esse ramo passaria
+  // a valer no SSR também, o que tornaria o flash universal.
+  if (!gateEnabled || access.status !== 'locked') return null
 
   if (variant === 'early-inline') {
     if (!visivelCedo) return null

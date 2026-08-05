@@ -16,11 +16,20 @@ type LeadAccessContextValue = {
 const noop = () => {}
 
 // Default context = comportamento de hoje em qualquer página sem a flag: gate
-// nunca aparece, WhatsApp nunca é bloqueado. Só páginas que chamam
-// registerProperty com gateEnabled=true saem desse estado neutro.
+// nunca aparece, WhatsApp nunca é bloqueado (garantido por gateEnabled=false,
+// que curto-circuita todo consumidor). Só páginas que chamam registerProperty
+// com gateEnabled=true saem desse estado neutro.
+//
+// status começa 'loading', NÃO 'unlocked'. O default anterior vazava conteúdo:
+// no SSR não existe cookie nem fetch, então o status default é o que vale — e
+// com 'unlocked' o GatedContent caía em `if (unlocked) return children` e
+// escrevia o conteúdo protegido dentro do HTML da página, que é ISR
+// (revalidate=3600) e servido igual para todo mundo. Bastava "ver código-fonte"
+// para ler plantas e disponibilidade sem cadastro. 'loading' é o único default
+// seguro: nenhum consumidor trata 'loading' como liberado.
 const LeadAccessContext = createContext<LeadAccessContextValue>({
   gateEnabled: false,
-  status: 'unlocked',
+  status: 'loading',
   registerProperty: noop,
   requestUnlock: noop,
   onUnlocked: noop,
@@ -38,7 +47,10 @@ export function useLeadAccessContext() {
 // carregamento de página com a flag ativa.
 export function LeadSessionProvider({ children }: { children: React.ReactNode }) {
   const [gateEnabled, setGateEnabled] = useState(false)
-  const [status, setStatus] = useState<LeadAccessStatus>('unlocked')
+  // 'loading' pelo mesmo motivo do default do contexto acima: este é o valor
+  // que vale durante o SSR e o primeiro render do client. Páginas sem gate
+  // saem daqui via registerProperty({gateEnabled:false}) → 'unlocked'.
+  const [status, setStatus] = useState<LeadAccessStatus>('loading')
   const registeredSlugRef = useRef<string | null>(null)
   const unlockHandlerRef = useRef<(() => void) | null>(null)
 
