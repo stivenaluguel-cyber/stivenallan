@@ -43,7 +43,30 @@ export async function RelatedProperties({ atualSlug, cidade, nomeAtual, property
   let propertyId = propertyIdAtual ?? null
   if (!propertyId && (nome || gateEnabled)) {
     try {
-      const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+      const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
+        auth: { persistSession: false },
+        // `next: { revalidate }` no fetch do supabase-js é obrigatório aqui, não
+        // otimização. No Next 15 um fetch NÃO cacheado dentro de Server
+        // Component tira a rota do prerender — e como isso depende de o
+        // prerender conseguir concluir a ida à rede, o resultado passa a variar
+        // por LATÊNCIA. Medido: dois builds limpos do mesmo commit deram 8 e 28
+        // páginas de empreendimento dinâmicas (o conjunto maior era
+        // superconjunto estrito do menor — assinatura de bailout por tempo, não
+        // de diferença de código).
+        //
+        // Consequência sem isto: cada deploy sorteia quais das 36 páginas saem
+        // estáticas, o que muda TTFB, custo de função e o que o crawler recebe,
+        // sem nenhum aviso no log do build. origin/main não tinha esse risco —
+        // lá RelatedProperties é síncrono e não faz I/O nenhum; a chamada de
+        // rede foi introduzida por esta branch.
+        //
+        // 3600 casa com o `export const revalidate = 3600` das páginas: o id do
+        // empreendimento por slug é dado praticamente imutável, então nem
+        // precisaria de janela tão curta.
+        global: {
+          fetch: (input, init) => fetch(input, { ...init, next: { revalidate: 3600 } }),
+        },
+      })
       const { data } = await supabase.from('properties').select('id').eq('slug', atualSlug).maybeSingle()
       propertyId = data?.id ?? null
     } catch {
