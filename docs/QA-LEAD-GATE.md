@@ -557,3 +557,115 @@ prefixo `QA_LEAD_GATE`, telefones na faixa `489000xxxxx` e e-mails em
 | `properties` | 3 (seed) |
 
 Limpeza quando quiser, com o SQL do §7.
+
+---
+
+## 11. Liberação progressiva conectada — 05/08/2026 (commit `dfe0c6c`)
+
+### Mapa do conteúdo
+
+**Público (prévia, sem cadastro)**
+
+| Bloco | Detalhe |
+|---|---|
+| Hero + imagem principal | completo |
+| Nome, construtora, cidade/bairro | completo |
+| Status e previsão de entrega | maio/2028, Santa Bárbara |
+| Resumo e especificações | 3 dorm (2 suítes), 93–94 m², vaga |
+| Galeria | **4 das 8 fotos** (hero, fachada, vista aérea, acesso principal) |
+| Diferenciais | os 11 |
+| Lazer e amenidades | as 12 |
+| Localização | completo |
+| Financiamento direto | explicação geral + os 3 passos |
+| FAQ (SEO/JSON-LD) | completo |
+| CRECI, privacidade, rodapé | completo |
+
+**Atrás do cadastro**
+
+| Bloco | Detalhe |
+|---|---|
+| Galeria | as outras **4 fotos** (torre, entorno, lazer, paisagismo) |
+| Plantas | as **7 oficiais**, com metragem |
+| Disponibilidade | espelho por unidade |
+| Catálogo/materiais | `LeadCaptureButton` com `gateEnabled` |
+| CTA de WhatsApp contextualizado | "Falar sobre estas plantas" |
+
+Nenhuma contagem foi inventada: os teasers calculam por subtração sobre os
+dados reais da página.
+
+### O achado que mudou a arquitetura
+
+Envolver os blocos em `<GatedContent>` passando o conteúdo como `children`
+**não protege nada**. Medido no HTML servido a um visitante sem cookie:
+
+```
+\"galeria\":[{\"src\":\"https://estilofontana.com.br/.../apartamento-tipo-final-01...\"}]
+```
+
+`GatedContent` é Client Component, e o Next serializa os `children` no payload
+RSC embutido no HTML — mesmo sem renderizá-los. As 7 URLs de planta e as 4
+fotos restritas saíam para qualquer `curl`.
+
+Ler o cookie no servidor também não resolve: `cookies()` tira a rota do cache
+estático, e as 36 páginas são `revalidate = 3600` de propósito.
+
+**Arquitetura adotada:** o conteúdo restrito vive em
+`lib/lead-gate/conteudo-restrito.ts` (marcado `server-only`), só as CONTAGENS
+atravessam para o lado público, e `/api/lead-gate/content` entrega os itens
+após validar a sessão. `ConteudoLiberado` busca de lá depois do desbloqueio.
+
+`/api/espelho/[slug]` passou a exigir sessão **só nos slugs do piloto** — sem
+isso, gatear o espelho na página seria teatro. As 35 páginas fora do piloto
+seguem anônimas (verificado: Piazza Castello continua 200).
+
+### Verificações
+
+| Verificação | Resultado |
+|---|---|
+| HTML anônimo: URLs de planta | **0** (antes: 7) |
+| HTML anônimo: fotos restritas | **0** (antes: 4) |
+| HTML anônimo: conteúdo público | íntegro (diferenciais, amenidades, financiamento, CRECI) |
+| Teasers com contagem real | "Mais 4 imagens", "7 plantas oficiais" |
+| `/api/lead-gate/content` sem sessão | 401 |
+| `/api/espelho/parco-savello` sem sessão | 401 |
+| `/api/espelho/piazza-castello` (fora do piloto) | 200, inalterado |
+| Cadastro → sessão | 201, `{unlocked:true}` |
+| API entrega plantas com sessão | 7 itens |
+| Após recarregar: plantas no DOM | 7 |
+| Após recarregar: fotos restritas no DOM | 4 |
+| Teaser some, formulário do rodapé some | sim |
+| CTA "Falar sobre estas plantas" | presente, com mensagem citando a planta |
+| Marcos no banco | `unlocked_at`, `floorplan_viewed_at`, `gallery_viewed_at` |
+| Build | Parco `○` estático, `revalidate 1h` |
+| Testes / tsc | 1740 verdes / limpo |
+
+### Bloqueios encontrados
+
+**1. Dev server não carrega Client Components novos.** Qualquer arquivo de
+client component recém-criado falha na hidratação com
+`Cannot read properties of undefined (reading 'call')` em `options.factory`.
+Provado com um componente trivial (`ProbeNovo`) que só renderiza uma `<div>`:
+o servidor entrega o HTML certo, o cliente não monta. Persiste após
+`rm -rf .next`, `rm -rf node_modules/.cache` e reinícios limpos. **Não é bug do
+código** — o build de produção funciona. A QA foi feita em `next start` na
+porta 3008. Investigar antes da próxima sessão de QA em dev.
+
+**2. Kanban não verificado visualmente.** O banco descartável tem **zero
+`admin_users`**, então não existe conta para autenticar; e criar conta ou
+digitar senha está fora do que posso fazer. Verifiquei o que alimenta a tela
+(as queries do chip e do drawer devolvem os empreendimentos com contagem,
+datas e marcos), não o visual. A aba do Chrome disponível era a página de
+**API keys** do Supabase — não interagi com ela.
+
+### Limitação documentada, não resolvida
+
+As URLs das plantas apontam para `estilofontana.com.br`, host público de
+terceiro. O gate impede a **descoberta** da URL sem cadastro, não o acesso de
+quem já a tem. Proteção do arquivo exigiria proxy autenticado ou URL assinada,
+o que depende de mover o material para storage próprio — fora do escopo do
+piloto, conforme combinado.
+
+### Dados sintéticos acumulados
+
+Todos com prefixo `QA_LEAD_GATE`, telefones `489000xxxxx`, e-mails
+`@exemplo.invalid`. Limpeza com o SQL do §7 (não executado).
