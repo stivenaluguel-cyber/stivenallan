@@ -1048,3 +1048,201 @@ Só depois do passo 4 acima confirmar o ref do descartável:
    descartável (prova em produção-de-Preview do que §15.1 provou no banco).
 6. Abrir um segundo empreendimento no mesmo navegador → sem novo cadastro.
 7. Conferir no descartável que só um lead foi criado no percurso inteiro.
+
+---
+
+## 16. Preview isolado publicado e QA executada de ponta a ponta — 05/08/2026, tarde
+
+Objetivo desta rodada: publicar um Preview realmente isolado da branch, provar em
+runtime que ele aponta para o Supabase descartável, e rodar o smoke test completo
+contra esse Preview. **Push e deploy foram autorizados explicitamente nesta
+tarefa.** Produção intocada do início ao fim.
+
+### 16.1 Overrides específicos da branch (Preview, git branch `feat/lead-gate-cadastro-unico`)
+
+Todos criados com `vercel env add NOME preview feat/lead-gate-cadastro-unico
+--force`, valor sempre via stdin (nunca argumento visível, nunca impresso).
+Diferente de §15, aqui os overrides são **por branch**, não globais de Preview —
+não afetam nenhum outro Preview do projeto nem Production.
+
+**Identidade do Preview (valores reais do `.env.local`, mesmo projeto descartável
+já validado em §15.1):** `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
+`SUPABASE_SERVICE_ROLE_KEY`.
+
+**Segredo próprio, nunca reaproveitado:** `JWT_SECRET` — 48 bytes aleatórios,
+exclusivo desta branch, diferente do de Production e do `.env.local` local. Fecha
+o achado de §15.4 (token de Preview deixando de ter assinatura válida em
+Production) para todo Preview criado a partir de agora nesta branch.
+
+**Flags do piloto:** `NEXT_PUBLIC_ANALYTICS_DISABLED=true`, `LEAD_GATE_ENABLED=true`,
+`LEAD_GATE_SLUGS=parco-savello-santa-barbara-criciuma-sc`,
+`LEAD_PROPERTY_HISTORY_ENABLED=true`, `FOLLOWUP_AUTOMATICO_ATIVO=false`.
+
+**Integrações reais neutralizadas nesta branch (24 variáveis, valores inertes ou
+aleatórios, nunca reais, nunca impressos):** `EVOLUTION_API_URL/API_KEY/INSTANCE/
+WEBHOOK_SECRET`, `RESEND_API_KEY/WEBHOOK_SECRET`, `OPENAI_API_KEY`,
+`ANTHROPIC_API_KEY`, `CNPJA_API_KEY`, `GOOGLE_PLACES_API_KEY`, os 7 `GOOGLE_ADS_*`,
+`UNSUBSCRIBE_SECRET`, `ICS_FEED_TOKEN`, `CRON_SECRET`, `SENTRY_DSN` e
+`NEXT_PUBLIC_SENTRY_DSN` (apontando para host `.invalid`, TLD reservada pela
+RFC 2606 que nunca resolve), `NEXT_PUBLIC_META_PIXEL_ID`, `NEXT_PUBLIC_GADS_ID`,
+`NEXT_PUBLIC_GADS_CONVERSION`, `GOOGLE_ADS_CONVERSION_ACTION_VISITA_AGENDADA`.
+
+Nenhuma variável combinada `Production, Preview` foi tocada — todas as 33 acima
+são entradas **novas**, específicas desta branch, sem ambiguidade de escopo.
+
+### 16.2 Diagnóstico do ref — commit `79de583`
+
+`src/lib/lead-gate/preview-ref-header.ts` — `previewSupabaseRefHeaders()` só
+adiciona `X-Preview-Supabase-Ref` quando `process.env.VERCEL_ENV === 'preview'`,
+com o project ref extraído por regex de `NEXT_PUBLIC_SUPABASE_URL`. Nunca inclui
+anon key, service role ou a URL completa. Cabeado em `GET /api/lead-access/status`
+(rota pública já chamada em toda página com o gate). 5 testes novos no header
+isolado + 5 na rota (Preview presente, Production ausente, dev local ausente,
+URL ausente/ inválida não lança erro, nunca retorna a URL/chaves) — todos verdes.
+
+### 16.3 Bug real encontrado e corrigido antes do push — `package-lock.json` desincronizado
+
+O primeiro push (`79de583`) **quebrou o CI** (`npm ci` → `EUSAGE: Missing:
+server-only@0.0.1 from lock file`). Não foi flakiness: um commit anterior desta
+branch adicionou `server-only` ao `package.json` sem regenerar o lockfile.
+Corrigido com `npm install` + `rm -rf node_modules && npm ci` limpo localmente
+para reproduzir exatamente o passo do CI antes de reenviar — commit `5177bf9`.
+CI ficou verde (`31019817688`, 1m13s, testes + typecheck).
+
+### 16.4 Push e CI
+
+```
+git push origin feat/lead-gate-cadastro-unico
+4363ed3..79de583  (commit com o header de diagnóstico — CI falhou, ver 16.3)
+79de583..5177bf9  (fix do lockfile — CI verde)
+```
+`git fetch` antes do push confirmou `origin/main` ainda em `a73a1e7`, sem avanço
+— push foi fast-forward simples, sem necessidade de reconciliação. Nenhum arquivo
+fora do escopo desta branch entrou no diff.
+
+### 16.5 Preview novo — prova do ref ANTES de qualquer escrita
+
+Deployment `dpl_6W22usqkEyoYFYpkHR53sQYwAeRJ`, commit `5177bf9` (HEAD exato desta
+branch), estado READY, alvo Preview.
+URL: `stivenallan-11k614k25-stiven-allan-s-projects.vercel.app`.
+
+SSO Protection do projeto (`prod_deployment_urls_and_all_previews`) bloqueou
+`curl` direto — confirmado como esperado, não alterado (mexer nisso afetaria
+também a proteção de Production, mesmo problema de escopo combinado já
+documentado em §15.3 para os env vars; não executado). A verificação em runtime
+foi feita pelo Chrome real do usuário (sessão Vercel já autenticada), nunca pelo
+navegador sandbox nem por bypass de segurança.
+
+**Resultado da leitura do header, antes de qualquer cadastro:**
+`X-Preview-Supabase-Ref` presente, valor exatamente `pauvicgtaqgulwdxwcgf`
+(descartável) — confirmado **não** ser `xpkznaqgctfkoonqpcye` (produção). Isso
+resolve definitivamente a dúvida deixada em aberto em §15.3: **este Preview, com
+os overrides por-branch aplicados em 16.1, aponta para o descartável.**
+
+### 16.6 Auditoria de rede — visitante anônimo, cookies limpos
+
+Aba nova, sem cookie prévio, carregando o Parco Savello no Preview. Todas as
+requisições de rede capturadas:
+
+| Destino | Ocorre? |
+|---|---|
+| Google Analytics / Google Tag Manager | Não |
+| Meta/Facebook (pixel) | Não |
+| Google Ads | Não |
+| Evolution (WhatsApp) | Não |
+| Resend | Não |
+| OpenAI / Anthropic | Não |
+| Supabase de produção | Não |
+| Sentry real | Não — 2 tentativas foram para `o0.ingest.invalid` (host inerte criado em 16.1), retornando 503 (DNS/rede falha, engolido pelo SDK) |
+| Próprio domínio do Preview (página, `/api/lead-access/status`, `/.well-known/vercel/jwe`, ícones) | Sim — esperado |
+
+Zero chamada externa real. O kill switch (`NEXT_PUBLIC_ANALYTICS_DISABLED=true`)
+funcionou: nenhum script de GA4/Pixel/Ads sequer foi baixado (confirmado no
+código de `tracking-config.ts` — `ANALYTICS_DISABLED` zera os IDs antes de
+qualquer decisão de renderizar o `<Script>`).
+
+### 16.7 Smoke test — resultado passo a passo
+
+Executado com dados sintéticos `QA_LEAD_GATE_PREVIEW*`, contra o Preview real
+(commit `5177bf9`), confirmado escrevendo somente no descartável (SQL de
+verificação após cada etapa).
+
+| # | Passo | Resultado |
+|---|---|---|
+| 1-2 | Prévia pública visível, teaser com contagem real ("4 fotos e 7 plantas liberadas") | OK |
+| 3 | Fotos/plantas restritas ausentes do HTML/RSC anônimo | OK — confirmado por texto extraído da página antes do cadastro |
+| 4-5 | `/api/lead-gate/content` sem sessão / cookie lixo → 401 para slug válido e inválido | Não replicado manualmente neste Preview — `sa_session` é `HttpOnly` (não pode ser forjado via `document.cookie`/`fetch` no browser) e a Vercel SSO bloqueia replay via `curl` externo. Evidência usada: suíte automatizada (`route.test.ts`, commit `23d5595`), 100% verde, testando exatamente esses 2 casos no código que está publicado neste Preview |
+| 6 | Formulário abre, rola e foca ao interceptar clique de WhatsApp pré-cadastro | OK — clique no CTA "Atendimento Exclusivo" não abriu `wa.me` (nenhuma aba nova), rolou até o formulário |
+| 7-8 | Validações específicas por campo, consentimento obrigatório | OK — submit incompleto mostrou "Selecione a entrada disponível" e "É necessário concordar com os termos para continuar" (nunca genérico), dados preservados |
+| 9 | Honeypot bloqueado | OK — `hp_url` preenchido → 400 "Payload inválido", nenhum lead criado (confirmado por SQL) |
+| 10-15 | Cadastro sintético cria lead só no descartável, sessão criada, interesse criado, conteúdo libera sem reload | OK — `POST /api/lead-gate/unlock` → 201, lead único confirmado via SQL (`d9c33862-…`), `GET .../content?bloco=fotos` e `?bloco=plantas` → 200 logo em seguida, sem reload |
+| 16 | Recarregar mantém liberação | OK — reload mostrou as 8 fotos completas (Torre, Entorno, Lazer, Paisagismo antes restritas) |
+| 17-19 | Segundo empreendimento não pede cadastro de novo / segundo interesse no Kanban | **Não exercido nesta rodada** — `LEAD_GATE_SLUGS` piloto tem só 1 slug (por desenho, conforme instruído); não há um 2º empreendimento com o gate ligado neste Preview para gerar um 2º interesse pela UI. A lógica de merge/identidade entre propriedades já foi exaustivamente provada em §15.1 (10 cenários na função SQL, incluindo troca de propriedade) |
+| 20 | Telefone com/sem `55` não duplica | OK — reenviado com `5548999990001`, resposta pública idêntica (`201`/`unlocked:true`, sem revelar novo-vs-existente), SQL confirma **1 único lead** |
+| 21 | E-mail com caixa diferente não duplica | OK — reenviado com e-mail em maiúsculas, mesmo resultado, SQL confirma ainda **1 único lead** |
+| 22 | WhatsApp antes do cadastro interceptado | OK (mesmo teste do passo 6) |
+| 23 | WhatsApp depois do cadastro monta URL correta, sem navegar | OK — `href` inspecionado (`wa.me/5548991642332?text=...Parco Savello Residencial`), nunca clicado até o fim, nenhuma navegação real |
+| 24-25 | Kanban mostra o lead, dados corretos | OK — card em "Novo Contato", modal mostra WhatsApp `48999990001` (normalizado, sem `+55`), e-mail em minúsculas, empreendimento "Parco Savello Residencial", entrada 20-29%, prazo 3-6 meses; linha do tempo com 2 eventos de submit + 3 de visita à página. Chip "Interesses" não apareceu — por desenho, só aparece com ≥2 empreendimentos (ver limitação do passo 17-19) |
+| 26 | Nenhum dado aparece em produção | OK — confirmado por `list_migrations` (produção sem a migration do gate) e por auditoria de env (produção nunca recebeu os overrides desta branch) |
+
+Ação comercial nenhuma foi feita no Kanban (sem mover estágio, sem enviar
+mensagem, sem excluir lead real).
+
+### 16.8 Provisionamento e revogação do admin sintético do Kanban
+
+Necessário para abrir o Kanban (rota exige login). Seguido o mecanismo oficial:
+senha aleatória de 24 bytes gerada localmente, hash bcrypt inserido direto em
+`admin_users` do **descartável**, login feito via `POST /api/auth/login` (nunca
+bypass de autenticação). Após a verificação do Kanban, a linha foi **excluída**
+do `admin_users` do descartável e os arquivos locais com a senha em texto puro
+foram apagados do disco. Nenhuma linha de admin real foi tocada.
+
+### 16.9 Responsividade — limitação encontrada
+
+Redimensionar a janela real do Chrome (`resize_window`) não alterou o viewport
+de fato (`window.innerWidth` continuou 1470px após pedir 390×844) — o
+comportamento não foi confiável nesta janela, e forçar isso na janela de
+verdade do usuário enquanto ele está fora do teclado arriscaria bagunçar o
+espaço de trabalho dele sem necessidade. **Não testado**: os 4 breakpoints
+(360×800, 390×844, 768×1024, 1440×900), zoom 200%, navegação por teclado,
+`prefers-reduced-motion`. O que foi verificado é o layout no tamanho real da
+janela usada (~1470×684), que se comportou corretamente. Recomendação: repetir
+esse passo especificamente com o usuário presente (usando o próprio Chrome dele
+com DevTools) ou após resolver o acesso SSO do navegador sandbox.
+
+### 16.10 Validação final
+
+```
+npx tsc --noEmit         → limpo
+TZ=UTC npx vitest run    → 1758 testes, 139 arquivos, tudo verde (inclui os
+                            10 novos testes do header de diagnóstico)
+npm run build            → limpo
+CI (GitHub Actions)      → verde no commit 5177bf9 (31019817688)
+```
+
+### 16.11 Confirmações finais
+
+- Nenhum merge foi feito.
+- Nenhum deploy em Production.
+- Nenhuma migration aplicada em Production.
+- Nenhuma variável de Production foi lida, copiada, alterada ou removida.
+- Nenhuma mensagem real de WhatsApp ou e-mail foi enviada.
+- Nenhuma escrita fora do projeto Supabase descartável.
+- Nenhum segredo de Production foi exposto. Os únicos valores gerados nesta
+  sessão (JWT_SECRET do Preview, senha do admin sintético, valores inertes de
+  neutralização) são exclusivos deste Preview/descartável — o `JWT_SECRET` e os
+  valores inertes seguem plantados no Preview (uso normal); a senha do admin
+  sintético foi revogada e os arquivos locais que a continham foram apagados.
+- Deployment antigo (`dpl_2AxjjJ9oEaQTm8i8DNxhaPGvSbJr`) preservado, não usado.
+
+### 16.12 Pendências
+
+1. Responsividade (§16.9) — repetir com o usuário presente.
+2. Passos 17-19 do smoke test (segundo empreendimento) — só testável habilitando
+   um 2º slug em `LEAD_GATE_SLUGS`, decisão de produto do usuário.
+3. Aprovação explícita para levar o gate a Production, mesmo depois deste Preview
+   validado — não solicitada nem assumida nesta tarefa.
+4. Itens já registrados em pendências anteriores (§6, §15) continuam abertos:
+   correção do `JWT_SECRET` fallback (JÁ FEITA no commit `73c4670`, ver início
+   deste documento), decisão de backfill de telefone, `next dev` com Client
+   Component novo.
