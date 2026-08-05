@@ -63,6 +63,7 @@ const PAGE_LABELS: Record<string, string> = {
   '/dashboard/campanhas': 'Campanhas',
   '/dashboard/cron': 'Cron', '/dashboard/instagram': 'Instagram',
   '/dashboard/instagram/calendario': 'Calendário Instagram',
+  '/dashboard/instagram/automacoes': 'Automações Instagram (comentário → DM)',
   '/dashboard/ativacao': 'Ativação IG',
   '/dashboard/prospeccao': 'Prospecção',
 };
