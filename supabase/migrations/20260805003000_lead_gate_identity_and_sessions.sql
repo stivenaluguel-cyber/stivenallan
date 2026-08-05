@@ -106,6 +106,17 @@ alter table public.lead_identity_conflicts add constraint lead_identity_conflict
 alter table public.lead_identity_conflicts add constraint lead_identity_conflicts_resolved_by_fkey
   foreign key (resolved_by) references public.admin_users(id) on delete set null;
 create index lead_identity_conflicts_pending_idx on public.lead_identity_conflicts using btree (detected_at) where (resolved_at is null);
+-- Um par de leads em conflito só pode ocupar UMA vaga na fila de revisão
+-- enquanto estiver pendente. Sem isto, cada nova submissão do mesmo contato
+-- (duplo clique, ou o sujeito voltando por outro empreendimento) empilhava
+-- outra linha do mesmo par — reproduzido no banco de QA: 2 submissões, 2
+-- linhas. least/greatest normaliza a ordem do par, senão (A,B) e (B,A)
+-- seriam tratados como conflitos diferentes. Parcial em `resolved_at is
+-- null` de propósito: um par já resolvido que volte a conflitar deve
+-- ressurgir como item novo, não ser silenciosamente engolido.
+create unique index lead_identity_conflicts_par_pendente_unique
+  on public.lead_identity_conflicts (least(lead_id_a, lead_id_b), greatest(lead_id_a, lead_id_b))
+  where (resolved_at is null);
 alter table public.lead_identity_conflicts enable row level security;
 comment on table public.lead_identity_conflicts is
   'Registrado quando telefone e e-mail submetidos no gate apontam para leads diferentes — nunca mesclado automaticamente. Fila de revisão manual no dashboard (fora do escopo desta migration).';
@@ -183,11 +194,34 @@ begin
     raise exception 'resolve_lead_for_gate: email é obrigatório';
   end if;
 
-  -- Ordem fixa de lock (telefone antes de e-mail) em toda chamada — evita
-  -- deadlock entre duas requisições concorrentes que travam os mesmos dois
-  -- leads em ordem invertida.
+  -- Ordem fixa de busca (telefone antes de e-mail) em toda chamada. Isso
+  -- REDUZ o risco de deadlock, mas não elimina: a ordem é fixa por tipo de
+  -- busca, não por identidade de linha — duas requisições cruzadas (o
+  -- telefone de uma casando com o lead que é o e-mail da outra) ainda podem
+  -- travar as mesmas duas linhas em ordem oposta. Exige dois conflitos
+  -- cruzados simultâneos; documentado em vez de resolvido com lock ordenado
+  -- por id, que complicaria a função sem ganho prático nesse volume.
   select id into v_by_phone from public.leads where whatsapp = p_whatsapp for update;
-  select id into v_by_email from public.leads where email = p_email for update;
+
+  -- lower() dos DOIS lados, não `email = p_email`. Dois motivos, ambos
+  -- reproduzidos no banco de QA antes desta correção:
+  --  (1) leads_email_lower_idx é um índice FUNCIONAL em lower(email) e não
+  --      era usado pelo predicado antigo — EXPLAIN mostrava "Seq Scan on
+  --      leads" a cada submissão do gate. O índice existia morto.
+  --  (2) `=` em text é case-sensitive. A rota normaliza a ENTRADA, mas o
+  --      dado já gravado não é normalizado (/api/admin/leads grava
+  --      body.email cru), então um lead salvo como "Joao@Ex.com" nunca era
+  --      encontrado e a submissão criava um lead DUPLICADO.
+  -- order by created_at: leads.email não tem UNIQUE (dado legado já tem
+  -- duplicata, ver nota na seção 5). Sem ordenação explícita a linha
+  -- escolhida seria arbitrária e a dedup deixaria de ser determinística.
+  -- Política explícita: o lead mais antigo vence.
+  select id into v_by_email
+    from public.leads
+   where lower(email) = lower(p_email)
+   order by created_at asc
+   limit 1
+     for update;
 
   if v_by_phone.id is not null and v_by_email.id is not null and v_by_phone.id <> v_by_email.id then
     -- Telefone e e-mail apontam para leads DIFERENTES: nunca mescla
@@ -197,23 +231,44 @@ begin
     v_lead_id := v_by_phone.id;
     v_conflito := true;
     insert into public.lead_identity_conflicts (lead_id_a, lead_id_b, whatsapp, email)
-      values (v_by_phone.id, v_by_email.id, p_whatsapp, p_email);
+      values (v_by_phone.id, v_by_email.id, p_whatsapp, p_email)
+      on conflict do nothing;
     update public.leads set requer_atencao = true where id in (v_by_phone.id, v_by_email.id);
   elsif v_by_phone.id is not null then
     v_lead_id := v_by_phone.id;
   elsif v_by_email.id is not null then
     v_lead_id := v_by_email.id;
   else
-    insert into public.leads (
-      whatsapp, email, nome, property_id, property_name, origem, source, status, estagio_funil,
-      utm_source, utm_medium, utm_campaign, utm_content, utm_term, gclid, fbclid,
-      faixa_investimento, prazo_compra, entrada_disponivel, requer_atencao
-    ) values (
-      p_whatsapp, p_email, p_nome, p_property_id, p_property_name, 'Site', p_source, 'novo', 'primeiro_contato',
-      p_utm_source, p_utm_medium, p_utm_campaign, p_utm_content, p_utm_term, p_gclid, p_fbclid,
-      p_faixa_investimento, p_prazo_compra, p_entrada_disponivel, false
-    ) returning id into v_lead_id;
-    v_created := true;
+    -- Sub-bloco com EXCEPTION próprio (não a função inteira: EXCEPTION abre
+    -- subtransação, e envolver tudo faria rollback do que veio antes).
+    --
+    -- O `FOR UPDATE` acima NÃO fecha a corrida quando o lead ainda não
+    -- existe: não há linha para travar, então duas requisições simultâneas
+    -- com o mesmo telefone novo passam as duas pelo SELECT e as duas tentam
+    -- inserir. Quem perde bate no unique de leads.whatsapp
+    -- (leads_whatsapp_key). Sem este handler o 23505 subia pelo PostgREST e
+    -- virava HTTP 500 na cara do segundo usuário — que ficava sem cookie e
+    -- sem conteúdo liberado, apesar de o lead dele já existir no banco.
+    --
+    -- Mesmo padrão de insert-otimista-com-catch que o projeto já usa em
+    -- upsert-instagram-lead.ts e upsert-ads-lead.ts.
+    begin
+      insert into public.leads (
+        whatsapp, email, nome, property_id, property_name, origem, source, status, estagio_funil,
+        utm_source, utm_medium, utm_campaign, utm_content, utm_term, gclid, fbclid,
+        faixa_investimento, prazo_compra, entrada_disponivel, requer_atencao
+      ) values (
+        p_whatsapp, p_email, p_nome, p_property_id, p_property_name, 'Site', p_source, 'novo', 'primeiro_contato',
+        p_utm_source, p_utm_medium, p_utm_campaign, p_utm_content, p_utm_term, p_gclid, p_fbclid,
+        p_faixa_investimento, p_prazo_compra, p_entrada_disponivel, false
+      ) returning id into v_lead_id;
+      v_created := true;
+    exception when unique_violation then
+      -- O concorrente venceu: adota o lead que ele criou e segue para o
+      -- merge normal, como se tivesse encontrado o lead desde o início.
+      select id into v_lead_id from public.leads where whatsapp = p_whatsapp;
+      v_created := false;
+    end;
   end if;
 
   if not v_created then
@@ -222,9 +277,19 @@ begin
     -- setado se estava NULL — depois de preenchido, nunca troca por aqui.
     update public.leads set
       nome = coalesce(nome, p_nome),
-      email = coalesce(email, p_email),
-      property_id = coalesce(property_id, p_property_id),
-      property_name = coalesce(property_name, p_property_name),
+      -- Em CONFLITO, o e-mail submetido pertence comprovadamente a OUTRO
+      -- lead. Preencher o campo vazio deste lead com ele faria dois leads
+      -- passarem a compartilhar o mesmo e-mail — permanentemente, e sem
+      -- UNIQUE para impedir. A partir daí o lookup por e-mail vira
+      -- não-determinístico e a própria fila de revisão manual recebe um
+      -- conflito que o sistema criou sozinho. Reproduzido no banco de QA
+      -- antes desta correção. Fora de conflito, o preenchimento normal vale.
+      email = coalesce(email, case when v_conflito then null else p_email end),
+      -- Par id+nome movido junto: com dois coalesce independentes, um lead
+      -- com property_id preenchido e property_name NULL recebia o NOME de
+      -- OUTRO empreendimento ao lado do id do primeiro.
+      property_id   = case when property_id is null then p_property_id   else property_id   end,
+      property_name = case when property_id is null then p_property_name else property_name end,
       faixa_investimento = coalesce(faixa_investimento, p_faixa_investimento),
       prazo_compra = coalesce(prazo_compra, p_prazo_compra),
       entrada_disponivel = coalesce(entrada_disponivel, p_entrada_disponivel),
