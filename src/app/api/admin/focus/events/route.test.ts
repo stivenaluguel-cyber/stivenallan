@@ -47,7 +47,7 @@ function callPost(body: unknown) {
 beforeEach(() => {
   process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://x.supabase.co'
   process.env.SUPABASE_SERVICE_ROLE_KEY = 'service-role'
-  process.env.JWT_SECRET = 'segredo'
+  process.env.JWT_SECRET = 'segredo-de-teste-com-32-caracteres-minimos'
   supabaseHolder.current = makeSupabase()
 })
 afterEach(() => { supabaseHolder.current = null })

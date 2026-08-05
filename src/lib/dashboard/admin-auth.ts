@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers'
 import { jwtVerify } from 'jose'
+import { getJwtSecret } from '@/lib/auth-secret'
 
 // Verificação de sessão admin em um lugar só. Antes, 25 rotas sob
 // /api/admin repetiam este mesmo bloco de jwtVerify inline, em 3 variações
@@ -14,8 +15,10 @@ export async function requireAdmin(): Promise<string | null> {
   const store = await cookies()
   const token = store.get('dashboard_token')?.value
   if (!token) return null
+  const secret = getJwtSecret()
+  if (!secret) return null
   try {
-    const { payload } = await jwtVerify(token, new TextEncoder().encode(process.env.JWT_SECRET!))
+    const { payload } = await jwtVerify(token, secret)
     return (payload.adminId as string) ?? null
   } catch {
     return null

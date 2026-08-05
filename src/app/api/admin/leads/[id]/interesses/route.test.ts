@@ -36,7 +36,7 @@ describe('GET /api/admin/leads/[id]/interesses', () => {
   beforeEach(() => {
     process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://test'
     process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-key'
-    process.env.JWT_SECRET = 'test-secret'
+    process.env.JWT_SECRET = 'segredo-de-teste-com-32-caracteres-minimos'
     cookieHolder.logado = true
   })
 
