@@ -18,8 +18,8 @@ Documento de retomada. **Não contém segredo nenhum** — só nomes de variáve
 |---|---|
 | Branch | `feat/lead-gate-cadastro-unico` |
 | Worktree | `stivenallan-lead-gate` |
-| HEAD | `d8c7e37` |
-| Publicado no remoto | até `4363ed3`. **Os 10 commits novos são locais** — nada foi enviado |
+| HEAD | `a76d21a` (ver §15 para o estado mais recente) |
+| Publicado no remoto | até `4363ed3`. **Todos os commits acima disso são locais** — nada foi enviado |
 | Drift com `origin/main` | nenhum. `origin/main` continua em `a73a1e7` |
 | Diff vs main | 55 arquivos, +4002 / −28 |
 | `TZ=UTC npx vitest run` | 1740 testes, 136 arquivos, tudo verde |
@@ -870,3 +870,181 @@ npm run build            → limpo; Parco estático, revalidate 1h
 `git diff --check` limpo. Nenhum segredo novo, `.env.local` ou arquivo
 temporário entrou no Git. Nenhum push, merge, deploy ou escrita em produção foi
 feito.
+
+---
+
+## 15. Migration telefônica validada + auditoria completa do escopo Preview — 05/08/2026
+
+Objetivo desta rodada: preparar um Preview seguro. Migration validada, auditoria
+concluída, **push e deploy NÃO executados** — sem autorização explícita nesta
+tarefa. Produção intocada.
+
+### 15.1 Migration `20260805180000_lead_gate_phone_identity.sql`
+
+Aplicada **somente** em `pauvicgtaqgulwdxwcgf` ("qa-lead-gate-descartavel"),
+via `apply_migration`. `pg_get_functiondef` conferido antes e depois: o corpo em
+produção do descartável é byte a byte o do arquivo versionado. Produção
+(`xpkznaqgctfkoonqpcye`) não recebeu nenhum comando.
+
+Os 10 cenários exigidos passaram:
+
+| # | Cenário | Esperado | Resultado |
+|---|---|---|---|
+| 1 | Telefone local novo | cria lead | `created:true` |
+| 2 | Mesmo telefone com `+55` | reaproveita | `created:false`, mesmo `leadId` |
+| 3 | Mesmo telefone com máscara `(48) 9…` | reaproveita | `created:false`, mesmo `leadId` |
+| 4 | Telefone só com DDI já existente no banco | reaproveita, não cria 3º | `created:false` |
+| 5 | Ambos formatos no banco | escolhe o local, determinístico | local vence |
+| 6 | E-mail com caixa alta | dedup case-insensitive | `created:false` |
+| 7 | Telefone e e-mail em leads diferentes | conflito, sem 3º lead | `conflito:true`, linha em `lead_identity_conflicts`, `requer_atencao` nos dois |
+| 8 | Telefone inválido (9 ou 14 dígitos) | rejeita | `raise exception` |
+| 9 | Duas requisições HTTP concorrentes de verdade | um lead só | 1 lead, sem `unique_violation` vazando |
+| 10 | Lead pré-existente com status avançado | preserva | `status`, `estagio_funil`, `property_name`, `origem`, `email` intactos |
+
+O cenário 9 foi feito com dois `curl` em background disparados no mesmo
+instante — concorrência real de sistema operacional, não SQL sequencial.
+
+Lead sintético remanescente no descartável: `QA_LEAD_GATE Corrida Fone`
+(`48955554444`). Mantido — a limpeza do projeto descartável está fora do escopo
+autorizado.
+
+### 15.2 Auditoria do escopo Preview — nada foi removido, e por quê
+
+A instrução era remover do Preview as credenciais que não deveriam estar lá,
+**desde que a operação aceitasse explicitamente o alvo `preview`**, parando e
+documentando em caso de ambiguidade. Foi o que aconteceu com quase tudo.
+
+Praticamente toda variável sensível existe como **uma entrada única combinada**
+`Production, Preview`, não como duas entradas por ambiente. Remover a entrada
+apaga o valor **dos dois ambientes** de uma vez; recriar a de Production exigiria
+manusear o valor real da credencial, o que é proibido nesta sessão. Logo:
+**nenhuma remoção foi executada.** A separação correta precisa ser feita no
+painel da Vercel por quem já tem os valores.
+
+Classificação completa (só nomes e escopos; nenhum valor foi lido ou impresso):
+
+**Devem ficar ausentes do Preview — risco financeiro ou de comunicação real**
+`EVOLUTION_API_KEY`, `EVOLUTION_API_URL`, `EVOLUTION_WEBHOOK_SECRET`,
+`EVOLUTION_INSTANCE` (envio real de WhatsApp — o maior risco da lista),
+`RESEND_API_KEY` (envio real de e-mail), `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`
+(custo real de inferência), `CNPJA_API_KEY`, `GOOGLE_PLACES_API_KEY` (APIs pagas),
+`GOOGLE_ADS_*` (7 variáveis, acesso real à conta de Ads).
+
+**Podem ficar com valor falso/público**
+`NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_META_PIXEL_ID`, `NEXT_PUBLIC_GADS_ID`,
+`NEXT_PUBLIC_GADS_CONVERSION`.
+
+**Podem ficar como estão**
+`ICS_FEED_TOKEN`, `RESEND_FROM`, `UNSUBSCRIBE_SECRET`, `CRON_SECRET`,
+`SENTRY_DSN`/`NEXT_PUBLIC_SENTRY_DSN` (só mistura eventos de Preview e Production
+no mesmo projeto Sentry — higiene, não risco).
+
+**Precisam de configuração própria por ambiente**
+As 3 do Supabase (§15.3) e `JWT_SECRET` (§15.4).
+
+### 15.3 As 3 variáveis do Supabase: a premissa não se confirmou
+
+A tarefa partia de que `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_SUPABASE_URL` e
+`NEXT_PUBLIC_SUPABASE_ANON_KEY` já teriam sido separadas e apontariam para o
+descartável no Preview. A listagem diz o contrário: as três aparecem com o
+**mesmo timestamp "42d ago"** em `env ls production` e em `env ls preview`, como
+uma entrada combinada. Uma atualização de valor gera timestamp novo; um
+timestamp idêntico e antigo nos dois é o oposto do que a separação produziria.
+
+Não é prova absoluta — a CLI redige valores, então a listagem não é capaz de
+confirmar nem desmentir de forma definitiva. É exatamente por isso que a
+verificação tem de ser em runtime: publicar o Preview e conferir o `ref` efetivo
+**antes** de exercitar qualquer rota que escreva. Enquanto isso não for feito, a
+hipótese de trabalho é que um Preview novo apontaria para **produção**.
+
+### 15.4 `JWT_SECRET` compartilhado entre Preview e Production
+
+Mesma variável nos dois ambientes. Como `middleware.ts` valida só a assinatura
+do token (não confirma no banco que o `adminId` pertence àquele ambiente), um
+token emitido por um login em Preview teria assinatura válida em Production. Não
+é o vetor mais provável, mas é falta real de isolamento. Corrigir com um valor
+distinto por ambiente.
+
+Bom lado: a variável **existe** em Production. Como o commit `73c4670` removeu o
+fallback conhecido e passou a falhar fechado, o dashboard em produção continua
+funcionando e deixou de aceitar o segredo hardcoded que estava no repositório.
+
+### 15.5 Deployment Preview antigo
+
+`dpl_2AxjjJ9oEaQTm8i8DNxhaPGvSbJr`, criado em 05/08/2026 03:24 UTC, commit
+`4363ed3c` — anterior a todo o hardening desta sessão. Estado READY, alvo
+Preview. **Não serve para QA** e não foi excluído. A proteção SSO do projeto
+cobre `prod_deployment_urls_and_all_previews`, então só quem tem acesso ao time
+Vercel abre qualquer Preview — mitiga, não elimina, o risco de credencial.
+
+Deployments Preview existentes mantêm o snapshot de env do momento em que foram
+criados: mexer nas variáveis hoje não altera este deployment.
+
+### 15.6 Falta o interruptor de mensuração em TODOS os ambientes
+
+`NEXT_PUBLIC_ANALYTICS_DISABLED` não existe nem em Preview nem em Production. Com
+pixel e Google Ads reais presentes no Preview e o GA4 caindo no fallback
+hardcoded de `tracking-config.ts`, qualquer Preview novo dispara mensuração real
+no navegador. O interruptor só existe no `.env.local` desta máquina. Antes de
+publicar Preview, criar `NEXT_PUBLIC_ANALYTICS_DISABLED=true` com alvo `preview`
+— essa é uma variável nova, sem entrada combinada, então dá para criar sem
+ambiguidade de escopo.
+
+### 15.7 Validação local
+
+```
+npx tsc --noEmit         → limpo
+TZ=UTC npx vitest run    → 1747 testes, 138 arquivos, tudo verde
+npm run build            → limpo
+```
+
+Varredura de segurança no bundle publicável (`.next/static`): zero ocorrências de
+segredo, zero JWT de service role, zero source map publicado, zero URL de planta
+restrita.
+
+Sobre o `npm run build`: três builds limpos seguidos (`rm -rf .next` entre eles)
+deram `ƒ` dinâmico no primeiro e `○` estático (`1h`/`1y`) nos dois seguintes para
+o Parco Savello. É a oscilação já documentada em §12 — reproduzida em
+`origin/main` puro, sem nenhum código desta branch —, causada por variação de
+latência de rede ao resolver o slug no build. Não é regressão desta rodada.
+
+### 15.8 Comando exato para publicar, quando autorizado
+
+Ordem obrigatória. O passo 2 não pode ser pulado.
+
+1. Criar o interruptor de mensuração (§15.6), só no Preview:
+
+```
+npx vercel env add NEXT_PUBLIC_ANALYTICS_DISABLED preview --project stivenallan
+```
+
+2. Corrigir no painel da Vercel as 3 variáveis do Supabase, separando Preview de
+   Production, com o Preview apontando para `pauvicgtaqgulwdxwcgf`. Sem isso o
+   Preview pode escrever em produção.
+
+3. Publicar:
+
+```
+git push -u origin feat/lead-gate-cadastro-unico
+```
+
+4. Verificar o ref efetivo **antes** de qualquer teste de escrita, no deployment
+   novo — abrir uma rota que exponha o host do Supabase em uso, ou conferir o
+   valor de `NEXT_PUBLIC_SUPABASE_URL` no bundle do deployment. Se aparecer
+   `xpkznaqgctfkoonqpcye`, **parar** — o Preview está apontando para produção.
+
+### 15.9 Smoke test planejado (não executado)
+
+Só depois do passo 4 acima confirmar o ref do descartável:
+
+1. Abrir o hotsite do Parco Savello sem cookie — conferir que plantas, fotos
+   extras, espelho e catálogo não aparecem no HTML nem no payload RSC.
+2. `GET /api/lead-gate/content?slug=…&bloco=plantas` sem cookie → 401.
+3. Mesma rota com cookie lixo → 401 (não 404), confirmando que a ordem
+   autenticação-antes-de-slug do commit `23d5595` está publicada.
+4. Preencher o cadastro com telefone em formato local → conteúdo libera sem
+   reload.
+5. Repetir o cadastro com o mesmo telefone em `+55` → nenhum lead novo no
+   descartável (prova em produção-de-Preview do que §15.1 provou no banco).
+6. Abrir um segundo empreendimento no mesmo navegador → sem novo cadastro.
+7. Conferir no descartável que só um lead foi criado no percurso inteiro.
