@@ -18,8 +18,8 @@ Documento de retomada. **Não contém segredo nenhum** — só nomes de variáve
 |---|---|
 | Branch | `feat/lead-gate-cadastro-unico` |
 | Worktree | `stivenallan-lead-gate` |
-| HEAD | `b804ef0` |
-| Publicado no remoto | até `4363ed3`. **Os 8 commits novos são locais** — nada foi enviado |
+| HEAD | `d8c7e37` |
+| Publicado no remoto | até `4363ed3`. **Os 10 commits novos são locais** — nada foi enviado |
 | Drift com `origin/main` | nenhum. `origin/main` continua em `a73a1e7` |
 | Diff vs main | 55 arquivos, +4002 / −28 |
 | `TZ=UTC npx vitest run` | 1740 testes, 136 arquivos, tudo verde |
@@ -31,6 +31,9 @@ Documento de retomada. **Não contém segredo nenhum** — só nomes de variáve
 ### Commits locais
 
 ```
+d8c7e37 docs(lead-gate): mapa do conteúdo, arquitetura do gate real e bloqueios
+dfe0c6c feat(lead-gate): liberação progressiva real no Parco Savello
+8539c13 docs(lead-gate): sincroniza o estado do documento com a QA já executada
 b804ef0 docs(lead-gate): resultado da QA funcional executada com a chave real
 7c6d945 fix(lead-gate): banner de cookies enterrava o formulário no 1º acesso
 ff8c861 docs(lead-gate): estado, achados e roteiro de QA para retomada
@@ -108,7 +111,7 @@ Teste novo (`gated-content-ssr.test.tsx`) faz `renderToStaticMarkup` e afirma
 que a marcação não contém o conteúdo. **Confirmei que ele falha com o default
 antigo restaurado** — é guarda de verdade.
 
-Alcance real: latente, porque `GatedContent` ainda não tem ponto de uso (ver §6).
+Alcance real na época: latente, porque `GatedContent` ainda não tinha ponto de uso. **Resolvido em `dfe0c6c`** — e ao plugar descobriu-se que passar children pra Client Component vaza no payload RSC de qualquer jeito (ver §11).
 
 ### P1 — Token de sessão e JWT de admin iam em claro pro Sentry (`6a68bcd`)
 
@@ -309,7 +312,9 @@ redeployar — decisão sua, fora do escopo desta QA.
 gate não escrevem e a QA funcional não roda. É a única coisa que me impediu de
 executar os 20 passos.
 
-### Achado de escopo — a metade "liberação progressiva" não está ligada
+### ~~Achado de escopo — a metade "liberação progressiva" não está ligada~~ RESOLVIDO em `dfe0c6c` (ver §11)
+
+<details><summary>Registro do que estava pendente</summary>
 
 `GatedContent` e `WhatsAppAfterLead` têm **zero pontos de uso**. Confirmado por
 grep: fora dos próprios arquivos, só aparecem em comentários.
@@ -323,6 +328,8 @@ Na prática, hoje o piloto no Parco Savello:
 A infraestrutura existe e está testada, mas nenhuma página a chama. Se a
 expectativa era ver conteúdo bloqueado amanhã, isso precisa ser plugado antes —
 é trabalho de integração nas páginas, não de componente.
+
+</details>
 
 ### Não corrigido, precisa de decisão sua
 
