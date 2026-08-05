@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { SITE_URL } from '@/lib/site'
 import { VisitTracker } from '@/components/VisitTracker'
 import { TrackingProvider } from '@/components/TrackingProvider'
+import { LeadSessionProvider } from '@/components/lead-gate/LeadSessionProvider'
 import { AnalyticsScripts } from '@/components/AnalyticsScripts'
 import { CookieConsent } from '@/components/CookieConsent'
 import { Bricolage_Grotesque, Hanken_Grotesk, Cormorant_Garamond } from 'next/font/google'
@@ -142,9 +143,11 @@ try{var sc=JSON.parse(localStorage.getItem('sa_consent'));if(sc&&sc.version===1&
             antigas do iOS abrem como uma aba normal do Safari. */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
       </head>
-      <body><VisitTracker /><TrackingProvider />{children}
+      <body><VisitTracker /><LeadSessionProvider><TrackingProvider />{children}</LeadSessionProvider>
 {/* GA4/Meta/Google Ads carregam SÓ após consentimento (LGPD) — ver AnalyticsScripts.
-    O clique em [data-wpp] (Contact/contact_whatsapp) é delegado no TrackingProvider. */}
+    O clique em [data-wpp] (Contact/contact_whatsapp) é delegado no TrackingProvider,
+    que também intercepta esses cliques nas páginas com o lead gate ativo — por isso
+    TrackingProvider precisa estar DENTRO do LeadSessionProvider, não fora. */}
 <AnalyticsScripts />
 <CookieConsent />
 </body>

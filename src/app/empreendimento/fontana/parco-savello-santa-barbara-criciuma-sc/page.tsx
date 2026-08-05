@@ -406,7 +406,10 @@ Tendo o bem-estar e a natureza como seus melhores vizinhos. O Parque da Prefeitu
     unidades cadastradas, que é o caso da maioria. */}
 <EspelhoPublico slug="parco-savello-santa-barbara-criciuma-sc" />
 
-<RelatedProperties atualSlug="parco-savello-santa-barbara-criciuma-sc" cidade="Criciúma" />
+{/* previewCount alimenta a prévia real do formulário do lead gate ("9 fotos e
+    7 plantas liberadas após o cadastro") quando este slug estiver em
+    LEAD_GATE_SLUGS — nas demais páginas (sem a flag), a prop é ignorada. */}
+<RelatedProperties atualSlug="parco-savello-santa-barbara-criciuma-sc" cidade="Criciúma" previewCount={{ fotos: GALERIA.length, plantas: PLANTAS.length }} />
 
 
 </main>
