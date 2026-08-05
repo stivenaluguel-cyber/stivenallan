@@ -206,6 +206,10 @@ export default function LeadUnlockForm({ propertyId, propertySlug, propertyName,
           ref={(el) => { fieldRefs.current.nome = el ?? undefined }}
           type="text" style={inputStyle} value={valores.nome as string}
           onChange={(e) => setValor('nome', e.target.value)} onFocus={markStarted}
+          // name + autoComplete: WCAG 1.3.5 (AA) exige o token de propósito em
+          // campo que coleta dado do próprio usuário. Sem isso, quem depende de
+          // preenchimento automático digita tudo à mão no teclado virtual.
+          name="nome" autoComplete="name" required aria-required="true"
           aria-invalid={!!erros.nome} aria-describedby={erros.nome ? `${formId}-nome-erro` : undefined}
         />
       ))}
@@ -215,6 +219,7 @@ export default function LeadUnlockForm({ propertyId, propertySlug, propertyName,
           ref={(el) => { fieldRefs.current.whatsapp = el ?? undefined }}
           type="tel" style={inputStyle} value={valores.whatsapp as string}
           onChange={(e) => setValor('whatsapp', e.target.value)} onFocus={markStarted}
+          name="whatsapp" autoComplete="tel-national" inputMode="tel" required aria-required="true"
           aria-invalid={!!erros.whatsapp} aria-describedby={erros.whatsapp ? `${formId}-whatsapp-erro` : undefined}
         />
       ))}
@@ -224,6 +229,7 @@ export default function LeadUnlockForm({ propertyId, propertySlug, propertyName,
           ref={(el) => { fieldRefs.current.email = el ?? undefined }}
           type="email" style={inputStyle} value={valores.email as string}
           onChange={(e) => setValor('email', e.target.value)} onFocus={markStarted}
+          name="email" autoComplete="email" inputMode="email" required aria-required="true"
           aria-invalid={!!erros.email} aria-describedby={erros.email ? `${formId}-email-erro` : undefined}
         />
       ))}
@@ -237,7 +243,13 @@ export default function LeadUnlockForm({ propertyId, propertySlug, propertyName,
           ref={(el) => { fieldRefs.current.faixaInvestimento = el ?? undefined }}
           style={inputStyle} value={valores.faixaInvestimento as string}
           onChange={(e) => setValor('faixaInvestimento', e.target.value)} onFocus={markStarted}
+          // aria-describedby também nos selects: o helper campo() sempre
+          // renderiza o <p> do erro, mas antes só os <input> apontavam pra ele.
+          // O foco pós-submit vai pro primeiro campo inválido — se fosse um
+          // select, o leitor de tela anunciava "inválido" sem dizer por quê.
+          name="faixaInvestimento" required aria-required="true"
           aria-invalid={!!erros.faixaInvestimento}
+          aria-describedby={erros.faixaInvestimento ? `${formId}-faixaInvestimento-erro` : undefined}
         >
           <option value="" disabled>Selecione</option>
           {faixas.map((f) => <option key={f} value={f}>{f}</option>)}
@@ -249,7 +261,9 @@ export default function LeadUnlockForm({ propertyId, propertySlug, propertyName,
           ref={(el) => { fieldRefs.current.prazoCompra = el ?? undefined }}
           style={inputStyle} value={valores.prazoCompra as string}
           onChange={(e) => setValor('prazoCompra', e.target.value)} onFocus={markStarted}
+          name="prazoCompra" required aria-required="true"
           aria-invalid={!!erros.prazoCompra}
+          aria-describedby={erros.prazoCompra ? `${formId}-prazoCompra-erro` : undefined}
         >
           <option value="" disabled>Selecione</option>
           <option value="Imediato">Imediato</option>
@@ -264,7 +278,9 @@ export default function LeadUnlockForm({ propertyId, propertySlug, propertyName,
           ref={(el) => { fieldRefs.current.entradaDisponivel = el ?? undefined }}
           style={inputStyle} value={valores.entradaDisponivel as string}
           onChange={(e) => setValor('entradaDisponivel', e.target.value)} onFocus={markStarted}
+          name="entradaDisponivel" required aria-required="true"
           aria-invalid={!!erros.entradaDisponivel}
+          aria-describedby={erros.entradaDisponivel ? `${formId}-entradaDisponivel-erro` : undefined}
         >
           <option value="" disabled>Selecione</option>
           <option value="Menos de 10%">Menos de 10% do valor</option>
@@ -281,8 +297,12 @@ export default function LeadUnlockForm({ propertyId, propertySlug, propertyName,
           ref={(el) => { fieldRefs.current.consentimento = el ?? undefined }}
           type="checkbox" checked={valores.consentimento as boolean}
           onChange={(e) => setValor('consentimento', e.target.checked)}
-          style={{ width: 20, height: 20, minWidth: 20, marginTop: 2 }}
+          // 24px é o mínimo de alvo de toque da WCAG 2.2 (2.5.8); os 20px
+          // anteriores ficavam abaixo. O <label htmlFor> ao lado amplia a área
+          // clicável, mas o próprio quadrado também precisa ser alcançável.
+          style={{ width: 24, height: 24, minWidth: 24, marginTop: 2 }}
           aria-invalid={!!erros.consentimento}
+          aria-describedby={erros.consentimento ? `${formId}-consentimento-erro` : undefined}
         />
         <label htmlFor={`${formId}-consentimento`} style={{ fontSize: 12, color: 'var(--muted)', lineHeight: 1.5 }}>
           Ao enviar, você autoriza Stiven Allan a entrar em contato sobre os empreendimentos consultados por
@@ -293,7 +313,9 @@ export default function LeadUnlockForm({ propertyId, propertySlug, propertyName,
           </a>.
         </label>
       </div>
-      {erros.consentimento && <p style={erroStyle}>{erros.consentimento}</p>}
+      {/* id obrigatório: o consentimento não passa pelo helper campo(), então
+          o <p> nascia sem id e o aria-describedby do checkbox não tinha alvo. */}
+      {erros.consentimento && <p style={erroStyle} id={`${formId}-consentimento-erro`}>{erros.consentimento}</p>}
 
       <button
         type="submit"
