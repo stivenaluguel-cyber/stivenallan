@@ -15,4 +15,6 @@ alter table public.lead_eventos drop column if exists property_id;
 
 drop table if exists public.lead_identity_conflicts;
 drop table if exists public.lead_property_interests;
+
+drop index if exists public.lead_access_sessions_expires_at_idx;
 drop table if exists public.lead_access_sessions;
