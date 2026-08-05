@@ -88,12 +88,20 @@ export default async function InstagramOverviewPage() {
             Metas 30/60/90 dias, snapshot semanal e gatilhos de decisão do plano de growth.
           </p>
         </div>
-        <Link
-          href="/dashboard/instagram/calendario"
-          style={{ fontSize: 13, fontWeight: 700, color: '#fff', background: T.bronze, padding: '9px 16px', borderRadius: 8, textDecoration: 'none' }}
-        >
-          Ver calendário de conteúdo
-        </Link>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <Link
+            href="/dashboard/instagram/automacoes"
+            style={{ fontSize: 13, fontWeight: 700, color: T.bronze, background: '#fff', border: `1px solid ${T.bronze}`, padding: '9px 16px', borderRadius: 8, textDecoration: 'none' }}
+          >
+            Automações comentário → DM
+          </Link>
+          <Link
+            href="/dashboard/instagram/calendario"
+            style={{ fontSize: 13, fontWeight: 700, color: '#fff', background: T.bronze, padding: '9px 16px', borderRadius: 8, textDecoration: 'none' }}
+          >
+            Ver calendário de conteúdo
+          </Link>
+        </div>
       </div>
 
       <section>

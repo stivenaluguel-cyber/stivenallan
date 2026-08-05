@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { verificarAssinaturaMeta, resolverDesafioVerificacaoMeta } from '@/lib/leads/meta-leadgen-webhook'
 import { extrairMensagensInstagram } from '@/lib/leads/instagram-dm-webhook'
 import { resolveOrCreateInstagramLead, mensagemInstagramJaProcessada, registrarInteracaoInstagram } from '@/lib/leads/upsert-instagram-lead'
 import { notificarLeadNovo } from '@/lib/leads/notificar-lead-novo'
+import { processarComentario, processarFollowPostback } from '@/lib/instagram/comment-automations'
 import { logError, logInfo, logWarn } from '@/lib/log'
 
 export const dynamic = 'force-dynamic'
@@ -45,6 +46,46 @@ async function buscarNomeInstagram(igsid: string, pageAccessToken: string): Prom
   }
 }
 
+type MetaWebhookEntry = {
+  id?: string
+  changes?: Array<{ field?: string; value?: unknown }>
+  messaging?: Array<{ sender?: { id?: string }; postback?: { payload?: string } }>
+}
+
+// Automação "comentário → DM" (src/lib/instagram/comment-automations.ts) —
+// roda ANTES do fluxo de DM→lead abaixo e independente dele: um mesmo
+// payload pode trazer só `changes` (comentário) ou só `messaging` (DM/postback).
+async function processarComentariosEPostbacks(
+  supabase: SupabaseClient,
+  payload: unknown,
+  pageAccessToken: string,
+): Promise<void> {
+  const entries = Array.isArray((payload as { entry?: unknown })?.entry) ? ((payload as { entry: MetaWebhookEntry[] }).entry) : []
+
+  for (const entry of entries) {
+    const igUserId = entry.id
+    if (!igUserId) continue
+
+    for (const change of entry.changes ?? []) {
+      if (change.field !== 'comments' || !change.value) continue
+      try {
+        await processarComentario(supabase, igUserId, change.value as never, pageAccessToken)
+      } catch (err) {
+        logError(SOURCE, 'falha ao processar comentario do instagram', err, { igUserId })
+      }
+    }
+
+    for (const ev of entry.messaging ?? []) {
+      if (ev.postback?.payload !== 'FOLLOW_CHECK' || !ev.sender?.id) continue
+      try {
+        await processarFollowPostback(supabase, igUserId, ev.sender.id, pageAccessToken)
+      } catch (err) {
+        logError(SOURCE, 'falha ao processar postback do gate de seguir', err, { igUserId })
+      }
+    }
+  }
+}
+
 export async function POST(req: NextRequest) {
   const appSecret = process.env.META_APP_SECRET
   const pageAccessToken = process.env.META_PAGE_ACCESS_TOKEN
@@ -64,10 +105,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'JSON invalido' }, { status: 400 })
   }
 
+  const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+
+  await processarComentariosEPostbacks(supabase, payload, pageAccessToken)
+
   const mensagens = extrairMensagensInstagram(payload)
   if (mensagens.length === 0) return NextResponse.json({ ok: true })
-
-  const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 
   for (const msg of mensagens) {
     try {
