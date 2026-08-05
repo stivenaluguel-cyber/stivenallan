@@ -801,3 +801,72 @@ Nenhum outro commit de código foi necessário nesta fase — Kanban, dedup, Wha
 15. **Expansão gradual**: só depois de validar métricas do Parco por um período definido pelo usuário, habilitar o segundo slug — mesmo processo, sem novo deploy de código (só env var).
 
 Nenhum item acima foi executado. Produção (`xpkznaqgctfkoonqpcye`) permanece sem a migration, sem as flags, sem nenhuma escrita desta sessão.
+
+---
+
+## 14. Hardening pré-Preview — 05/08/2026
+
+### 14.1 Autenticação administrativa fail-closed
+
+Removido o fallback JWT conhecido e compartilhado entre `middleware.ts` e
+`lib/auth.ts`. Login, middleware e as rotas que usam `requireAdmin()` agora
+consomem o mesmo helper. Se `JWT_SECRET` estiver ausente ou tiver menos de 32
+caracteres, o dashboard fecha com segurança: não assina token novo e não aceita
+sessão existente. A suíte usa uma chave exclusivamente de teste por
+`setupFiles`; nenhum fallback chega ao runtime da aplicação.
+
+### 14.2 Endpoint de conteúdo: autenticação antes da enumeração
+
+`/api/lead-gate/content` agora valida a sessão real antes de distinguir slug ou
+bloco. Um cookie arbitrário recebe o mesmo 401 para slug válido ou inexistente.
+Todas as respostas carregam `Cache-Control: private, no-store` e `Vary: Cookie`.
+Quatro testes novos cobrem ausência de cookie, token inválido, enumeração e
+sessão válida.
+
+### 14.3 Identidade telefônica com e sem DDI
+
+Adicionada a migration aditiva
+`20260805180000_lead_gate_phone_identity.sql`. A RPC reduz a entrada ao formato
+local e procura tanto `DDD+número` quanto `55+DDD+número` antes de criar lead.
+Isso impede o gate de duplicar um contato legado vindo de Meta/Evolution com
+DDI. Não há backfill, alteração destrutiva nem índice único funcional: se o
+legado já contiver os dois formatos, o formato local exato vence de forma
+determinística e a reconciliação histórica continua sendo uma tarefa separada.
+
+Esta migration ainda **não foi aplicada** nem no descartável nem em produção
+nesta sessão. O código/migration foi validado estaticamente, mas o cenário SQL
+deve ser repetido no banco descartável antes de qualquer aplicação em produção.
+
+### 14.4 Isolamento do Supabase no escopo Preview da Vercel
+
+As três variáveis abaixo foram atualizadas com alvo explícito `preview`, usando
+os valores já validados do projeto descartável e sem imprimi-los:
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+
+Nenhum comando de update foi dirigido a `production`. A CLI 58.5.1 passou a
+devolver sentinelas redigidas de 11 caracteres ao executar `env pull` para
+variáveis sensíveis; por isso não foi possível fazer uma segunda comparação
+por hash após o update. A confirmação disponível é o alvo `preview` aceito pela
+CLI e as três respostas de sucesso. Um deploy Preview novo deve confirmar o ref
+efetivo antes de qualquer QA.
+
+Importante: deployments Preview já existentes mantêm o snapshot antigo de env
+até serem recriados. Nenhum redeploy foi executado. Além disso, outras
+credenciais de produção (Evolution, Resend, provedores de IA e Google) ainda
+aparecem no escopo Preview; portanto a correção global de segredos do Preview
+continua aberta mesmo com o banco do próximo Preview direcionado ao descartável.
+
+### 14.5 Validação
+
+```
+npx tsc --noEmit         → limpo
+TZ=UTC npx vitest run    → 1747 testes, 138 arquivos, tudo verde
+npm run build            → limpo; Parco estático, revalidate 1h
+```
+
+`git diff --check` limpo. Nenhum segredo novo, `.env.local` ou arquivo
+temporário entrou no Git. Nenhum push, merge, deploy ou escrita em produção foi
+feito.
