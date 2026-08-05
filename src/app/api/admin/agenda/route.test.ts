@@ -82,7 +82,7 @@ describe('POST /api/admin/agenda — idempotência por client_event_id', () => {
   beforeEach(() => {
     process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://test'
     process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-key'
-    process.env.JWT_SECRET = 'test-secret'
+    process.env.JWT_SECRET = 'segredo-de-teste-com-32-caracteres-minimos'
     supabaseHolder.current = makeSupabase()
   })
 
@@ -168,7 +168,7 @@ describe('PATCH /api/admin/agenda — visita futura não pode ser dada como real
   beforeEach(() => {
     process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://test'
     process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-key'
-    process.env.JWT_SECRET = 'test-secret'
+    process.env.JWT_SECRET = 'segredo-de-teste-com-32-caracteres-minimos'
   })
 
   const futuro = new Date(Date.now() + 3 * 86_400_000).toISOString()

@@ -1,7 +1,13 @@
 import { createHash } from 'crypto'
 import { logError, logInfo } from '@/lib/log'
 
-const PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID || '364836344657445'
+// Importado de tracking-config para respeitar NEXT_PUBLIC_ANALYTICS_DISABLED —
+// senão o lado servidor continuaria mirando o pixel REAL de produção mesmo com
+// a mensuração desligada no ambiente. Defesa em profundidade: sem
+// META_CAPI_TOKEN a função já retorna {skipped} antes de chegar aqui.
+import { META_PIXEL_ID } from '@/lib/tracking-config'
+
+const PIXEL_ID = META_PIXEL_ID
 const SOURCE = 'lib/meta-capi'
 
 function sha256(value: string) {

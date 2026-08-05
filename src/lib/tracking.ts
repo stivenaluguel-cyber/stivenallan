@@ -414,3 +414,51 @@ export function sendLeadToCapi(payload: {
     keepalive: true,
   }).catch(() => {})
 }
+
+// ---------------------------------------------------------------------------
+// Cadastro único / liberação progressiva de conteúdo (lead gate) — GA4 only.
+// Parâmetros deliberadamente restritos a property_slug/construtora/cidade/
+// cta_position/utm_campaign/experiment_variant: nunca nome, telefone, e-mail,
+// lead_id ou texto livre. `generate_lead` (só após 201 da API) e `whatsapp_click`
+// reaproveitam trackLeadEvent/trackWhatsappClick já existentes — não duplicados aqui.
+// ---------------------------------------------------------------------------
+
+type GateParams = { property_slug: string; construtora?: string; cidade?: string }
+type GateCtaParams = { property_slug: string; cta_position?: string }
+
+export function trackPropertyView(params: GateParams) {
+  gtagAnalytics()?.('event', 'property_view', params)
+}
+
+export function trackGatedContentView(params: GateCtaParams) {
+  gtagAnalytics()?.('event', 'gated_content_view', params)
+}
+
+export function trackLeadFormView(params: GateCtaParams) {
+  gtagAnalytics()?.('event', 'lead_form_view', params)
+}
+
+export function trackLeadFormStart(params: GateCtaParams) {
+  gtagAnalytics()?.('event', 'lead_form_start', params)
+}
+
+export function trackContentUnlocked(params: { property_slug: string }) {
+  gtagAnalytics()?.('event', 'content_unlocked', params)
+}
+
+export type PropertyInterestGaEventType =
+  | 'floorplan_view'
+  | 'gallery_view'
+  | 'catalog_download'
+  | 'availability_view'
+
+export function trackPropertyInterestRecorded(params: { property_slug: string; event_type: PropertyInterestGaEventType }) {
+  gtagAnalytics()?.('event', 'property_interest_recorded', params)
+  // Cada marco também dispara seu próprio evento nomeado — mais fácil de
+  // montar funil no GA4 do que filtrar property_interest_recorded por parâmetro.
+  gtagAnalytics()?.('event', params.event_type, { property_slug: params.property_slug })
+}
+
+export function trackPreferencesUpdated(params: { property_slug: string }) {
+  gtagAnalytics()?.('event', 'preferences_updated', params)
+}

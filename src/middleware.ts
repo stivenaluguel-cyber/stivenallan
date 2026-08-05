@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { jwtVerify } from 'jose'
-
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'stiven-dashboard-secret-2026-xk9p3m7q'
-)
+import { getJwtSecret } from '@/lib/auth-secret'
 
 // Rotas publicas que nao precisam de autenticacao
 const PUBLIC_PATHS = [
@@ -58,8 +55,15 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/dashboard/login', request.url))
   }
 
+  const secret = getJwtSecret()
+  if (!secret) {
+    const response = NextResponse.redirect(new URL('/dashboard/login', request.url))
+    response.cookies.delete('dashboard_token')
+    return response
+  }
+
   try {
-    await jwtVerify(token, JWT_SECRET)
+    await jwtVerify(token, secret)
     return NextResponse.next()
   } catch {
     const response = NextResponse.redirect(new URL('/dashboard/login', request.url))

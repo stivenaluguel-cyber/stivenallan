@@ -39,9 +39,16 @@ export function AnalyticsScripts() {
   const marketing = cats?.marketing === true
   // gtag.js serve GA4 (analytics) e Google Ads (marketing) — carrega se qualquer
   // um foi aceito; cada produto só recebe config da própria categoria.
-  const loadGtagJs = analytics || (marketing && Boolean(GADS_ID))
+  //
+  // Cada produto exige o PRÓPRIO id não-vazio. Antes bastava `analytics` para
+  // decidir carregar e o src virava `analytics ? GA4_ID : GADS_ID` — com GA4_ID
+  // vazio isso resultava em src vazio E, pior, sequestrava o caso do Google Ads
+  // (aceitar analytics impedia o Ads de carregar, porque o src ficava preso no
+  // GA4 inexistente). Id vazio agora é um estado suportado de primeira classe:
+  // é assim que NEXT_PUBLIC_ANALYTICS_DISABLED desliga a mensuração de verdade.
+  const loadGtagJs = (analytics && Boolean(GA4_ID)) || (marketing && Boolean(GADS_ID))
   if (loadGtagJs && !gtagSrcId.current) {
-    gtagSrcId.current = analytics ? GA4_ID : GADS_ID
+    gtagSrcId.current = analytics && GA4_ID ? GA4_ID : GADS_ID
   }
 
   // Configs imperativas: rodam no primeiro aceite E em upgrades de categoria na
@@ -59,7 +66,10 @@ export function AnalyticsScripts() {
       {gtagSrcId.current && (
         <Script src={`https://www.googletagmanager.com/gtag/js?id=${gtagSrcId.current}`} strategy="afterInteractive" />
       )}
-      {marketing && (
+      {/* Boolean(META_PIXEL_ID): sem esta checagem, id vazio ainda injetava o
+          snippet — que baixa connect.facebook.net ANTES de usar o id. O
+          download acontecia mesmo com pixel falso/desligado. */}
+      {marketing && Boolean(META_PIXEL_ID) && (
         <Script id={extraPixelId ? `meta-pixel-${extraPixelId}` : 'meta-pixel'} strategy="afterInteractive">{`!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('consent','grant');fbq('init','${META_PIXEL_ID}');${extraPixelId ? `fbq('init','${extraPixelId}');` : ''}fbq('track','PageView');`}</Script>
       )}
     </>

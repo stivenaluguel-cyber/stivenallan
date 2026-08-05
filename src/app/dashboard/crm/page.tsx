@@ -10,6 +10,7 @@ import { motivoSemWhatsappReal, temWhatsappReal } from '@/lib/leads/normalize'
 import { PainelScore, type DetalheScore } from '@/components/dashboard/PainelScore'
 import { AnexosLead } from '@/components/dashboard/AnexosLead'
 import { EnvolvidosLead } from '@/components/dashboard/EnvolvidosLead'
+import { InteressesLead } from '@/components/dashboard/InteressesLead'
 import { CORES_SLA, statusSla } from '@/lib/leads/sla'
 import type { TimelineItem, TimelineKind } from '@/lib/dashboard/lead-timeline'
 import {
@@ -67,6 +68,9 @@ type Lead = {
   prazo_compra?: string | null; cidade_interesse?: string | null
   primeiro_atendimento_em?: string | null
   lead_score_detalhe?: DetalheScore | null
+  // Cadastro único / histórico de interesse por empreendimento (lead_property_interests).
+  interesses_count?: number
+  ultimo_interesse?: { nome: string | null; slug: string | null; em: string } | null
 }
 type Unidade = { id: string; unidade: string; bloco?: string; metragem: number; dormitorios?: number; disponivel: boolean; valor_tabela?: number; valor_promocional?: number; condicoes_negociacao?: string; plano_pagamento?: unknown }
 type Emp = { id: string; nome: string; status_venda: string; status_obra?: string }
@@ -494,6 +498,15 @@ function LeadCard({ lead, onDragStart, onSelect, onMover, onToqueInicio, ignorar
             sem entrada não há contrato, por mais quente que o lead pareça. */}
         {lead.entrada_disponivel && <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 999, background: 'rgba(34,197,94,0.14)', color: '#15803d', fontWeight: 700 }}>entrada {lead.entrada_disponivel}</span>}
         {lead.prazo_compra && <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 999, background: D.bg, color: D.muted }}>{lead.prazo_compra}</span>}
+        {/* Só aparece com 2+ empreendimentos distintos — com 1 só, o nome já
+            está na linha de cima e o chip seria redundante. Detalhe completo
+            (por empreendimento, cronológico) fica na seção "Interesses" do
+            modal, aberta clicando em qualquer parte do card. */}
+        {(lead.interesses_count ?? 0) >= 2 && (
+          <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 999, background: 'rgba(210,78,34,0.12)', color: D.bronze, fontWeight: 700 }}>
+            Interesses · {lead.interesses_count}
+          </span>
+        )}
       </div>
 
       {mostrarSla && (
@@ -872,6 +885,9 @@ function LeadModal({ lead, onClose, onUpdated, onDeleted }: { lead: Lead; onClos
               próxima ação. */}
           <label style={labelCss}>Score</label>
           <PainelScore score={lead.lead_score ?? 0} detalhe={lead.lead_score_detalhe} compacto />
+
+          <label style={labelCss}>Interesses</label>
+          <InteressesLead leadId={lead.id} />
 
           <label style={labelCss}>Documentos</label>
           <AnexosLead leadId={lead.id} onMudou={carregarTimeline} />

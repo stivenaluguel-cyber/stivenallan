@@ -24,7 +24,14 @@ import {
   normalizeFirstNameForHash,
   normalizePhoneForHash,
   sha256Hex,
+  trackContentUnlocked,
+  trackGatedContentView,
   trackLeadEvent,
+  trackLeadFormStart,
+  trackLeadFormView,
+  trackPreferencesUpdated,
+  trackPropertyInterestRecorded,
+  trackPropertyView,
   trackSpaPageView,
   trackViewContent,
   trackWhatsappClick,
@@ -599,5 +606,85 @@ describe('trackLeadEvent — sinal pro Sentry (F-Match-Verify)', () => {
     expect((options.tags as Record<string, unknown>).check).toBe('match-verify')
     // Breadcrumb não é adicionado nesse path
     expect(sentrySpies.addBreadcrumb).not.toHaveBeenCalled()
+  })
+})
+
+describe('eventos do lead gate — sem PII, gated por consentimento de analytics', () => {
+  afterEach(() => vi.unstubAllGlobals())
+
+  const PII_KEYS = ['nome', 'telefone', 'email', 'lead_id', 'whatsapp']
+
+  function expectNoPii(payload: Record<string, unknown>) {
+    for (const key of PII_KEYS) expect(payload).not.toHaveProperty(key)
+  }
+
+  it('trackPropertyView dispara property_view com property_slug/construtora/cidade', () => {
+    const gtag = vi.fn()
+    mountBrowser({ search: '', gtag })
+    trackPropertyView({ property_slug: 'parco-savello-santa-barbara-criciuma-sc', construtora: 'fontana', cidade: 'Criciúma' })
+    expect(gtag).toHaveBeenCalledWith('event', 'property_view', {
+      property_slug: 'parco-savello-santa-barbara-criciuma-sc',
+      construtora: 'fontana',
+      cidade: 'Criciúma',
+    })
+  })
+
+  it('trackGatedContentView / trackLeadFormView / trackLeadFormStart disparam com cta_position', () => {
+    const gtag = vi.fn()
+    mountBrowser({ search: '', gtag })
+    trackGatedContentView({ property_slug: 'parco-savello-santa-barbara-criciuma-sc', cta_position: 'early-inline' })
+    trackLeadFormView({ property_slug: 'parco-savello-santa-barbara-criciuma-sc', cta_position: 'section-bottom' })
+    trackLeadFormStart({ property_slug: 'parco-savello-santa-barbara-criciuma-sc', cta_position: 'section-bottom' })
+    expect(gtag).toHaveBeenNthCalledWith(1, 'event', 'gated_content_view', { property_slug: 'parco-savello-santa-barbara-criciuma-sc', cta_position: 'early-inline' })
+    expect(gtag).toHaveBeenNthCalledWith(2, 'event', 'lead_form_view', { property_slug: 'parco-savello-santa-barbara-criciuma-sc', cta_position: 'section-bottom' })
+    expect(gtag).toHaveBeenNthCalledWith(3, 'event', 'lead_form_start', { property_slug: 'parco-savello-santa-barbara-criciuma-sc', cta_position: 'section-bottom' })
+  })
+
+  it('trackContentUnlocked dispara content_unlocked so com property_slug', () => {
+    const gtag = vi.fn()
+    mountBrowser({ search: '', gtag })
+    trackContentUnlocked({ property_slug: 'parco-savello-santa-barbara-criciuma-sc' })
+    expect(gtag).toHaveBeenCalledWith('event', 'content_unlocked', { property_slug: 'parco-savello-santa-barbara-criciuma-sc' })
+  })
+
+  it('trackPropertyInterestRecorded dispara o evento agregado E o evento nomeado do marco', () => {
+    const gtag = vi.fn()
+    mountBrowser({ search: '', gtag })
+    trackPropertyInterestRecorded({ property_slug: 'parco-savello-santa-barbara-criciuma-sc', event_type: 'catalog_download' })
+    expect(gtag).toHaveBeenCalledWith('event', 'property_interest_recorded', { property_slug: 'parco-savello-santa-barbara-criciuma-sc', event_type: 'catalog_download' })
+    expect(gtag).toHaveBeenCalledWith('event', 'catalog_download', { property_slug: 'parco-savello-santa-barbara-criciuma-sc' })
+  })
+
+  it('trackPreferencesUpdated dispara preferences_updated so com property_slug', () => {
+    const gtag = vi.fn()
+    mountBrowser({ search: '', gtag })
+    trackPreferencesUpdated({ property_slug: 'parco-savello-santa-barbara-criciuma-sc' })
+    expect(gtag).toHaveBeenCalledWith('event', 'preferences_updated', { property_slug: 'parco-savello-santa-barbara-criciuma-sc' })
+  })
+
+  it('nenhum payload de nenhum evento do gate carrega PII', () => {
+    const gtag = vi.fn()
+    mountBrowser({ search: '', gtag })
+    trackPropertyView({ property_slug: 'x', construtora: 'fontana', cidade: 'Criciúma' })
+    trackGatedContentView({ property_slug: 'x', cta_position: 'early-inline' })
+    trackLeadFormView({ property_slug: 'x' })
+    trackLeadFormStart({ property_slug: 'x' })
+    trackContentUnlocked({ property_slug: 'x' })
+    trackPropertyInterestRecorded({ property_slug: 'x', event_type: 'floorplan_view' })
+    trackPreferencesUpdated({ property_slug: 'x' })
+
+    expect(gtag.mock.calls.length).toBeGreaterThan(0)
+    for (const call of gtag.mock.calls) {
+      expectNoPii(call[2] as Record<string, unknown>)
+    }
+  })
+
+  it('sem consentimento de analytics, nenhum evento do gate dispara', () => {
+    const gtag = vi.fn()
+    mountBrowser({ search: '', gtag, consent: consentJson({ analytics: false, marketing: false }) })
+    trackPropertyView({ property_slug: 'x' })
+    trackGatedContentView({ property_slug: 'x' })
+    trackContentUnlocked({ property_slug: 'x' })
+    expect(gtag).not.toHaveBeenCalled()
   })
 })

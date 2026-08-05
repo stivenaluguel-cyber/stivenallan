@@ -8,6 +8,9 @@ import {
   type UnidadeEspelho,
 } from '@/lib/unidades/espelho'
 import { logError } from '@/lib/log'
+import { isLeadGateEnabledForSlug } from '@/lib/lead-gate/flags'
+import { lookupSessionByToken } from '@/lib/lead-gate/session-lookup'
+import { SESSION_COOKIE_NAME } from '@/lib/lead-gate/session'
 
 export const dynamic = 'force-dynamic'
 const SOURCE = 'api/espelho/[slug]'
@@ -25,6 +28,22 @@ type Params = { params: Promise<{ slug: string }> }
 // pode sair (nada de condição de negociação, lead da reserva ou cub_fator).
 export async function GET(_req: NextRequest, { params }: Params) {
   const { slug } = await params
+
+  // Exceção à regra "rota anônima": nos slugs do piloto de cadastro único, a
+  // disponibilidade é conteúdo liberado só após cadastro. Sem isto, gatear o
+  // espelho na página seria teatro — bastaria chamar esta rota direto.
+  // Fora do piloto (35 páginas) nada muda: a checagem só liga com a flag.
+  if (isLeadGateEnabledForSlug(slug)) {
+    const token = _req.cookies.get(SESSION_COOKIE_NAME)?.value
+    if (!token) {
+      return NextResponse.json({ error: 'Sessão inválida' }, { status: 401 })
+    }
+    const sessao = await lookupSessionByToken(sb(), token)
+    if (sessao.status === 'invalid') {
+      return NextResponse.json({ error: 'Sessão inválida' }, { status: 401 })
+    }
+  }
+
   const client = sb()
 
   // O slug da URL é o de `properties` (o site público navega por lá), mas as

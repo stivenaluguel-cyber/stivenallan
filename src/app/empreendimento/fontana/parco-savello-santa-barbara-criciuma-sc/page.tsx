@@ -10,6 +10,23 @@ import { RelatedProperties } from '@/components/RelatedProperties'
 import { SITE_URL } from '@/lib/site'
 import { EspelhoPublico } from '@/components/EspelhoPublico'
 import ShareButton from '@/components/ShareButton'
+import GatedContent from '@/components/lead-gate/GatedContent'
+import WhatsAppAfterLead from '@/components/lead-gate/WhatsAppAfterLead'
+import TeaserGate from '@/components/lead-gate/TeaserGate'
+import ConteudoLiberado from './ConteudoLiberado'
+import { isLeadGateEnabledForSlug, isPropertyHistoryEnabledForSlug } from '@/lib/lead-gate/flags'
+import { getPropertyIdBySlug } from '@/lib/lead-gate/property-id'
+import { contarConteudoRestrito } from '@/lib/lead-gate/conteudo-restrito'
+
+const SLUG = 'parco-savello-santa-barbara-criciuma-sc'
+const NOME = 'Parco Savello Residencial'
+const WPP_NUMERO = '5548991642332'
+
+// Quantas fotos ficam públicas antes do cadastro. 4 de 8: o suficiente pra
+// mostrar fachada, torre e entorno (a decisão de gostar do prédio), deixando
+// pro cadastro o que é material de decisão de compra. Não é número inventado —
+// GALERIA tem 8 itens reais e o teaser abaixo calcula o resto por subtração.
+const FOTOS_PUBLICAS = 4
 
 // Hotsite premium Parco Savello Residencial (Fontana, Santa Bárbara Criciúma/SC). Padrão EPIC.
 const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20interesse%20no%20Parco%20Savello%20Residencial.'
@@ -133,7 +150,39 @@ images: [IMG.aerea],
 robots: { index: true, follow: true },
 }
 
-export default function ParcoSavelloPage() {
+export default async function ParcoSavelloPage() {
+  // Flags lidas no servidor (nunca NEXT_PUBLIC_): a lista de slugs habilitados
+  // não pode vazar no bundle público. Com a flag desligada, `gateEnabled` é
+  // false e todo GatedContent devolve os children — a página fica idêntica ao
+  // que era antes desta feature.
+  const gateEnabled = isLeadGateEnabledForSlug(SLUG)
+  const historyEnabled = isPropertyHistoryEnabledForSlug(SLUG)
+  // Uma única resolução por render, repassada aos blocos E ao RelatedProperties
+  // (via propertyIdAtual), pra não fazer duas idas à rede na mesma página.
+  const propertyId = gateEnabled ? await getPropertyIdBySlug(SLUG) : null
+  const gateOn = gateEnabled && !!propertyId
+  // Flag ligada mas sem id (linha ausente ou falha de rede na resolução).
+  //
+  // A tentação é servir tudo público — "melhor a página inteira do que uma
+  // página quebrada". Numa rota ISR isso é inaceitável: o HTML SEM gate é
+  // gravado no cache e servido a todo mundo até a próxima revalidação. Um
+  // timeout de 1s do Supabase numa regeneração de madrugada deixaria plantas e
+  // espelho abertos até de manhã.
+  //
+  // Fail-closed: o conteúdo restrito não é renderizado. A página continua
+  // servindo tudo que é público (hero, diferenciais, amenidades, FAQ, CRECI),
+  // então ninguém vê página quebrada — só não vê o que exigiria cadastro.
+  const gateFalhou = gateEnabled && !propertyId
+  const gateProps = { propertyId: propertyId ?? '', propertySlug: SLUG, gateEnabled: gateOn, historyEnabled }
+
+  const fotosPublicas = GALERIA.slice(0, FOTOS_PUBLICAS)
+  // Só CONTAGENS atravessam pro lado público — as URLs do conteúdo restrito
+  // vivem em lib/lead-gate/conteudo-restrito.ts (server-only) e só saem de lá
+  // pela rota que valida sessão. Passar os itens como prop de Client Component
+  // colocaria as URLs no payload RSC do HTML estático.
+  const qtdFotosRestritas = contarConteudoRestrito(SLUG, 'fotos')
+  const qtdPlantas = contarConteudoRestrito(SLUG, 'plantas')
+
 return (
 <main style={{ background: t.bg, color: t.ink, fontFamily: t.body, overflowX: 'hidden' }}>
 <PropertySchema nome="Parco Savello Residencial" slug="parco-savello-santa-barbara-criciuma-sc" construtora_slug="fontana" cidade="Criciúma" uf="SC" bairro="Santa Bárbara" descricao="Parco Savello Residencial — 3 dormitórios (2 suítes), 93 a 94 m² privativos no Santa Bárbara, Criciúma/SC. Financiamento direto Fontana." imagem="https://xpkznaqgctfkoonqpcye.supabase.co/storage/v1/object/public/imoveis/capas/parco-savello-santa-barbara-criciuma-sc.jpg" faq={FAQ_ITEMS} />
@@ -237,8 +286,18 @@ No coração do bairro Santa Bárbara, com o Parque da Prefeitura como extensão
 <h2 className="ps-h2">Natureza<br />e elegância</h2>
 </div>
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 2 }}>
-<GalleryWithLightbox galeria={GALERIA} prefix="ps" gradient="rgba(14,26,15,0.55)" />
+<GalleryWithLightbox galeria={gateOn || gateFalhou ? fotosPublicas : GALERIA} prefix="ps" gradient="rgba(14,26,15,0.55)" />
 </div>
+{gateOn && qtdFotosRestritas > 0 && (
+<ConteudoLiberado
+{...gateProps}
+bloco="fotos"
+ctaPosition="galeria"
+interestEventType="gallery_view"
+gradient="rgba(14,26,15,0.55)"
+teaser={<TeaserGate titulo={`Mais ${qtdFotosRestritas} ${qtdFotosRestritas === 1 ? 'imagem' : 'imagens'} do Parco Savello`} descricao="Torre, entorno, lazer e paisagismo ficam disponíveis assim que você fizer o cadastro." />}
+/>
+)}
 </section>
 
 {/* 4 AS RESIDÊNCIAS */}
@@ -260,21 +319,54 @@ No coração do bairro Santa Bárbara, com o Parque da Prefeitura como extensão
 ))}
 </div>
 <a href={WPP} target="_blank" rel="noopener noreferrer" className="ps-cta ps-cta-light" data-wpp="1">Solicitar Catálogo</a>
-<LeadCaptureButton slug="parco-savello-santa-barbara-criciuma-sc" construtora_slug="fontana"  propertyDisplayName="Parco Savello Residencial" />
+{/* gateEnabled faz o botão usar o cadastro único em vez do modal leve
+    próprio dele — sem isso conviveriam dois cadastros na mesma página,
+    e o do modal não dedupa contra a identidade nova. Já liberado, abre o
+    PDF direto e registra catalog_download. */}
+<LeadCaptureButton slug={SLUG} construtora_slug="fontana" propertyDisplayName={NOME} gateEnabled={gateOn} />
 </div>
 <div style={{ maxWidth: 1160, margin: 'clamp(64px,10vh,96px) auto 0', textAlign: 'left' }}>
-{PLANTAS_GRUPOS.map(({ titulo, categoria }) => {
+{gateOn ? (
+<ConteudoLiberado
+{...gateProps}
+bloco="plantas"
+ctaPosition="plantas"
+interestEventType="floorplan_view"
+gradient="rgba(14,26,15,0.6)"
+badge="Planta oficial"
+grupos={PLANTAS_GRUPOS}
+eyebrowColor={t.onDarkMuted}
+teaser={<TeaserGate titulo={`${qtdPlantas} plantas oficiais, com metragem por unidade`} descricao="Apartamentos tipo, área de lazer, térreo e garagem — as mesmas plantas da Construtora Fontana." acao="Ver as plantas" />}
+>
+{/* CTA contextualizado: só existe depois do cadastro, dentro do conteúdo
+    liberado, e já cita a planta — diferente do CTA genérico do topo. */}
+<div style={{ textAlign: 'center', marginTop: 8 }}>
+<WhatsAppAfterLead
+{...gateProps}
+propertyName={NOME}
+whatsappNumber={WPP_NUMERO}
+message={`Olá Stiven, vi as plantas do ${NOME} e quero falar sobre disponibilidade e condições.`}
+position="plantas_pos_cadastro"
+className="ps-cta ps-cta-light"
+>
+Falar sobre estas plantas
+</WhatsAppAfterLead>
+</div>
+</ConteudoLiberado>
+) : gateFalhou ? null : (
+PLANTAS_GRUPOS.map(({ titulo, categoria }) => {
 const itens = PLANTAS.filter(p => p.categoria === categoria)
 if (!itens.length) return null
 return (
 <div key={categoria} style={{ marginBottom: 40 }}>
 <p className="ps-eyebrow" style={{ color: t.onDarkMuted, marginBottom: 16, textAlign: 'center' }}>{titulo}</p>
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
-<GalleryWithLightbox galeria={itens} prefix="ps" gradient="rgba(14,26,15,0.6)" badge="Planta oficial" trackPlantas={{ empreendimento: 'parco-savello-santa-barbara-criciuma-sc', content_name: 'Parco Savello Residencial' }} />
+<GalleryWithLightbox galeria={itens} prefix="ps" gradient="rgba(14,26,15,0.6)" badge="Planta oficial" trackPlantas={{ empreendimento: SLUG, content_name: NOME }} />
 </div>
 </div>
 )
-})}
+})
+)}
 </div>
 </section>
 
@@ -403,10 +495,27 @@ Tendo o bem-estar e a natureza como seus melhores vizinhos. O Parque da Prefeitu
 
 
 {/* Espelho de vendas — some quando o empreendimento não tem
-    unidades cadastradas, que é o caso da maioria. */}
-<EspelhoPublico slug="parco-savello-santa-barbara-criciuma-sc" />
+    unidades cadastradas, que é o caso da maioria.
+    Disponibilidade por unidade é o dado mais comercial da página: fica atrás
+    do cadastro. O componente já se esconde sozinho quando não há unidades,
+    então o teaser só aparece de fato quando existe espelho pra mostrar. */}
+{gateOn ? (
+<GatedContent
+{...gateProps}
+ctaPosition="espelho"
+interestEventType="availability_view"
+teaser={<TeaserGate titulo="Disponibilidade real por unidade" descricao="Andar, final, metragem e situação de cada unidade, conforme a tabela vigente da Construtora Fontana." acao="Ver disponibilidade" />}
+>
+<EspelhoPublico slug={SLUG} />
+</GatedContent>
+) : gateFalhou ? null : (
+<EspelhoPublico slug={SLUG} />
+)}
 
-<RelatedProperties atualSlug="parco-savello-santa-barbara-criciuma-sc" cidade="Criciúma" />
+{/* previewCount alimenta a contagem real do formulário. `fotosRestantes`, não
+    GALERIA.length: as 4 primeiras já estão visíveis sem cadastro, então
+    prometer 8 seria vender o que a pessoa já viu. */}
+<RelatedProperties atualSlug={SLUG} cidade="Criciúma" propertyIdAtual={propertyId} previewCount={{ fotos: qtdFotosRestritas, plantas: qtdPlantas }} />
 
 
 </main>

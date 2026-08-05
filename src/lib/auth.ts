@@ -1,10 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import { SignJWT, jwtVerify } from 'jose'
-
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'stiven-dashboard-secret-2026-xk9p3m7q'
-)
+import { getJwtSecret, requireJwtSecret } from '@/lib/auth-secret'
 
 export async function getSupabaseAdmin() {
   return createClient(
@@ -18,12 +15,14 @@ export async function createToken(adminId: string): Promise<string> {
     .setProtectedHeader({ alg: 'HS256' })
     .setExpirationTime('7d')
     .setIssuedAt()
-    .sign(JWT_SECRET)
+    .sign(requireJwtSecret())
 }
 
 export async function verifyToken(token: string): Promise<{ adminId: string } | null> {
+  const secret = getJwtSecret()
+  if (!secret) return null
   try {
-    const { payload } = await jwtVerify(token, JWT_SECRET)
+    const { payload } = await jwtVerify(token, secret)
     return { adminId: payload.adminId as string }
   } catch {
     return null

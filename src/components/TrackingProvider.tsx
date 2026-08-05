@@ -9,6 +9,7 @@ import {
   trackWhatsappLinkFallback,
 } from '@/lib/tracking'
 import { onConsentChange } from '@/lib/consent'
+import { useLeadAccessContext } from '@/components/lead-gate/LeadSessionProvider'
 
 // Delays de retentativa do ViewContent: o script do Pixel monta assíncrono
 // (depois do aceite ou da hidratação), então a 1ª tentativa pode rodar antes de
@@ -21,6 +22,7 @@ const VIEW_CONTENT_RETRIES_MS = [400, 1500, 4000]
 // Tudo passa pelos gates de consentimento de src/lib/tracking.ts.
 export function TrackingProvider() {
   const pathname = usePathname()
+  const leadAccess = useLeadAccessContext()
   const isFirstRender = useRef(true)
   // Canais já entregues do ViewContent da página atual (dedupe: 1x por canal por página)
   const viewContent = useRef<{ slug: string; meta: boolean; ga4: boolean } | null>(null)
@@ -50,23 +52,54 @@ export function TrackingProvider() {
     captureAttribution()
   }, [])
 
+  // leadAccess muda de valor a cada status resolvido — lido via ref dentro do
+  // handler pra não precisar remontar o listener (que fica montado 1x, igual
+  // ao resto deste componente) a cada mudança de status.
+  const leadAccessRef = useRef(leadAccess)
+  useEffect(() => {
+    leadAccessRef.current = leadAccess
+  })
+
   // Clique delegado nos CTAs de WhatsApp — substitui o script inline do layout
-  // pra passar pelos gates de consentimento e padronizar os parâmetros.
+  // pra passar pelos gates de consentimento e padronizar os parâmetros. Nas
+  // páginas com o lead gate ativo, também INTERCEPTA o clique antes do
+  // cadastro: em vez de deixar o wa.me abrir, cancela a navegação e manda o
+  // visitante pro formulário — cobre WppFloat, FontanaCompactNav, os CTAs
+  // hardcoded das 27 páginas Fontana e EmpreendimentoTemplate de uma vez,
+  // sem editar nenhum deles (a interceptação acontece na delegação em
+  // `document`, não no elemento).
   useEffect(() => {
     function onClick(e: MouseEvent) {
       const target = e.target as Element | null
       const a = target?.closest?.('[data-wpp]')
+      const wa = a ?? target?.closest?.('a[href*="wa.me/"], a[href*="api.whatsapp.com"]')
+      if (!wa) return
+
+      const access = leadAccessRef.current
+      const bloqueadoPeloGate = access.gateEnabled && access.status !== 'unlocked'
+      const position = a?.getAttribute('data-wpp')
+
+      if (bloqueadoPeloGate) {
+        e.preventDefault()
+        trackWhatsappClick({
+          content_name: a?.getAttribute('data-wpp-nome') || 'WhatsApp',
+          empreendimento: a?.getAttribute('data-wpp-emp'),
+          position: position ? `${position}_blocked` : 'blocked',
+        })
+        access.requestUnlock()
+        return
+      }
+
       if (a) {
         trackWhatsappClick({
           content_name: a.getAttribute('data-wpp-nome') || 'WhatsApp',
           empreendimento: a.getAttribute('data-wpp-emp'),
-          position: a.getAttribute('data-wpp'),
+          position,
         })
         return
       }
       // Links wa.me sem anotação (páginas antigas): fallback derivado da URL.
-      const wa = target?.closest?.('a[href*="wa.me/"], a[href*="api.whatsapp.com"]')
-      if (wa) trackWhatsappLinkFallback(window.location.pathname)
+      trackWhatsappLinkFallback(window.location.pathname)
     }
     document.addEventListener('click', onClick)
     return () => document.removeEventListener('click', onClick)
