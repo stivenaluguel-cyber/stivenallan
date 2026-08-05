@@ -28,7 +28,7 @@ const C = {
 function Secao({ id, titulo, children }: { id: string; titulo: string; children: React.ReactNode }) {
   return (
     <section id={id} style={{ paddingTop: 8, marginBottom: 40, scrollMarginTop: 24 }}>
-      <h2 style={{ fontSize: 18, fontWeight: 700, color: C.accent, marginBottom: 12 }}>{titulo}</h2>
+      <h2 style={{ fontSize: 18, fontWeight: 700, color: C.accent, marginBottom: 12, fontFamily: 'var(--font-piazzolla), Georgia, serif' }}>{titulo}</h2>
       <div style={{ color: C.muted, fontSize: 15, lineHeight: 1.8, display: 'flex', flexDirection: 'column', gap: 12 }}>
         {children}
       </div>
@@ -40,7 +40,7 @@ const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20quero%20sol
 
 export default function ExclusaoDeDadosPage() {
   return (
-    <main style={{ background: C.bg, minHeight: '100vh', color: C.text, fontFamily: 'Inter, system-ui, sans-serif' }}>
+    <main style={{ background: C.bg, minHeight: '100vh', color: C.text, fontFamily: 'var(--font-public-sans), system-ui, sans-serif' }}>
       <section style={{ padding: '80px 24px 40px', maxWidth: 760, margin: '0 auto' }}>
         <nav style={{ marginBottom: 40 }}>
           <ol style={{ display: 'flex', gap: 8, listStyle: 'none', padding: 0, margin: 0, fontSize: 14, color: C.muted }}>
@@ -53,7 +53,7 @@ export default function ExclusaoDeDadosPage() {
         <p style={{ fontSize: 13, letterSpacing: '0.12em', color: C.accent, textTransform: 'uppercase', marginBottom: 16 }}>
           Última atualização: julho de 2026
         </p>
-        <h1 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.6rem)', fontWeight: 800, marginBottom: 20, lineHeight: 1.15 }}>
+        <h1 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.6rem)', fontWeight: 800, marginBottom: 20, lineHeight: 1.15, fontFamily: 'var(--font-piazzolla), Georgia, serif' }}>
           Exclusão de Dados
         </h1>
         <p style={{ fontSize: 16, color: C.muted, lineHeight: 1.75 }}>
