@@ -5,6 +5,7 @@ import { useLeadAccessContext } from './LeadSessionProvider'
 import { computeScrollFraction, shouldShowEarlyGate } from './scroll-fraction'
 import LeadUnlockForm from './LeadUnlockForm'
 import { RESERVA_WHATSAPP_PX } from '@/components/CtaFixoEmpreendimento'
+import { getConsent, onConsentChange } from '@/lib/consent'
 
 type Props = {
   propertyId: string
@@ -39,6 +40,23 @@ export default function LeadAccessGate({ propertyId, propertySlug, propertyName,
 
   const bloqueado = gateEnabled && access.status === 'locked'
 
+  // O banner de consentimento LGPD também é fixo no rodapé, e com z-index
+  // 9999 contra os 60 daqui. Medido em 375x812 durante a QA: ele cobria 232px
+  // do painel — justamente a faixa do checkbox de consentimento e do botão de
+  // enviar. Quem chega pela primeira vez (que é exatamente o público do gate)
+  // via um formulário impossível de submeter.
+  //
+  // Empilhar o painel ACIMA do banner seria pior: obrigaria a pessoa a decidir
+  // sobre cookies e sobre o cadastro ao mesmo tempo, com o aviso de privacidade
+  // escondido atrás do formulário que coleta os dados. O gate espera a decisão
+  // de cookies sair da frente. O bloco do rodapé (#contato) continua disponível
+  // o tempo todo — ninguém fica sem caminho para se cadastrar.
+  const [consentiuDecidiu, setConsentiuDecidiu] = useState(false)
+  useEffect(() => {
+    setConsentiuDecidiu(getConsent() !== null)
+    return onConsentChange(() => setConsentiuDecidiu(true))
+  }, [])
+
   // O bloco tardio (fim da página) é sempre o alvo que WhatsApp bloqueado
   // rola até — é o único que está sempre no DOM (o early-inline pode estar
   // dispensado/oculto), replicando o padrão já usado por CtaFixoEmpreendimento.
@@ -55,7 +73,7 @@ export default function LeadAccessGate({ propertyId, propertySlug, propertyName,
   }, [variant])
 
   useEffect(() => {
-    if (variant !== 'early-inline' || !bloqueado || dispensado) {
+    if (variant !== 'early-inline' || !bloqueado || dispensado || !consentiuDecidiu) {
       setVisivelCedo(false)
       return
     }
@@ -85,7 +103,7 @@ export default function LeadAccessGate({ propertyId, propertySlug, propertyName,
       window.removeEventListener('scroll', onScroll)
       if (rafRef.current !== null) window.cancelAnimationFrame(rafRef.current)
     }
-  }, [variant, bloqueado, dispensado, access.status])
+  }, [variant, bloqueado, dispensado, access.status, consentiuDecidiu])
 
   // Escape fecha. Sem isto o único jeito de sair era o ×, que fica em
   // position:absolute DENTRO do container rolável — ou seja, rola junto com o
