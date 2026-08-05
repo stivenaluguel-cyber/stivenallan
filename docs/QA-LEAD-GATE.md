@@ -1,4 +1,10 @@
-# Lead gate — estado, achados e roteiro de QA
+# Lead gate — estado, achados e QA executada
+
+> **QA funcional EXECUTADA em 05/08/2026 com a service role real.** Resultado
+> passo a passo em §10, no fim deste documento. Um P0 novo foi encontrado e
+> corrigido (banner de cookies enterrando o formulário). O que ficou de fora:
+> a tela do Kanban, que exige login de admin.
+
 
 Documento de retomada. **Não contém segredo nenhum** — só nomes de variáveis.
 
@@ -450,3 +456,102 @@ Não executei o rollback: derrubaria o schema que a QA de amanhã precisa.
 
 Atenção: o rollback **remove colunas** de `lead_eventos`, então destrói o dado
 gravado nelas depois da migration.
+
+---
+
+## 10. QA funcional executada — 05/08/2026
+
+Servidor local `npm run dev` na porta 3007, apontando só para o descartável.
+**O Vercel Preview não foi usado** (herda credencial de produção, §5).
+
+### Gates de segurança antes de começar
+
+Todos verdes: `project_ref` = `pauvicgtaqgulwdxwcgf`; ref de produção ausente
+de qualquer valor de variável; service role provada com privilégio real
+(leu `lead_access_sessions`, que tem RLS ligada e zero policy, enquanto a
+mesma leitura com a chave anon veio bloqueada).
+
+**Rede durante toda a sessão: 100% em `localhost:3007`.** Zero requisição para
+google-analytics, googletagmanager, connect.facebook.net, graph.facebook.com,
+Evolution ou Supabase de produção. Verificado no painel de rede, não presumido.
+
+### Resultados
+
+| # | Passo | Resultado |
+|---|---|---|
+| 1 | Página carrega, gate ativo | ✅ `/api/lead-access/status` → `{unlocked:false}` |
+| 2 | Painel aparece na faixa 25–40% | ✅ apareceu em 0,30 |
+| 3 | WhatsApp interceptado com gate bloqueado | ✅ clique cancelado, URL intacta |
+| 4 | Submit vazio → erro por campo | ✅ 3 mensagens específicas, `aria-describedby` ligado, foco no 1º inválido |
+| 5 | Cadastro completo | ✅ lead + sessão + interesse + 3 eventos gravados |
+| 6 | Cookie `sa_session` | ✅ `HttpOnly`, `SameSite=lax`, `Path=/`, 180 dias, sem `Secure` (correto em http) e invisível ao JS |
+| 7 | Telefone normalizado | ✅ `(48) 90000-1234` → `48900001234` |
+| 8 | Dedup por e-mail em caixa mista | ✅ `QA.Lead.Gate.MARIA@…` casou com o lead existente — 1 lead, 0 conflitos |
+| 9 | Segundo empreendimento | ✅ sem novo cadastro, sessão reconhecida |
+| 10 | WhatsApp já liberado | ✅ abre direto, sem interceptar |
+| 11 | Histórico de interesses | ✅ 2 empreendimentos, `view_count` 1 em cada |
+| 12 | Dados do chip/drawer do Kanban | ✅ query devolve os 2 empreendimentos com datas e marcos |
+| 13 | Revogar sessão no banco | ✅ status volta a `false`, `/lead-track` → 401 |
+| 14 | Cookie adulterado | ✅ `{unlocked:false}` + `Set-Cookie` de expiração |
+| 15 | Sem cookie | ✅ `{unlocked:false}`; `/lead-track` → 401 |
+| 16 | Rate limit (5/60s) | ✅ 1–5 → 201, 6ª e 7ª → 429 |
+| 17 | Honeypot preenchido | ✅ 400, nenhum lead criado |
+| 18 | Consentimento desmarcado | ✅ 400, nenhum lead criado |
+| 19 | `propertyId` de outro imóvel com slug do Parco | ✅ 400 — o servidor revalida o par |
+| 20 | Slug fora do piloto (Piazza Castello) | ✅ formulário legado "Tenho interesse", WhatsApp NÃO interceptado |
+| 21 | Escape fecha o painel | ✅ fecha (assíncrono, um tick depois) |
+| 22 | Latch: rolar para fora da faixa | ✅ painel permanece aberto, dado digitado preservado |
+
+### Breakpoints
+
+| Viewport | Altura do painel | Reserva do WhatsApp | × dentro da tela | Alvos < 24px | Overflow horizontal |
+|---|---|---|---|---|---|
+| 360×800 | 560 (70dvh) | 88px | ✅ 44×44 | 0 | não |
+| 390×844 | 591 (70dvh) | 88px | ✅ | 0 | não |
+| 768×1024 | 717 (70dvh) | 93px | ✅ | 0 | não |
+| 1440×900 | 630 (70dvh) | 93px | ✅ | 0 | não |
+
+(93px nos maiores = 88 + largura da barra de rolagem.)
+
+### P0 novo encontrado e corrigido — `7c6d945`
+
+**O banner de cookies enterrava o formulário no primeiro acesso.** Os dois são
+`position: fixed` no rodapé; o banner tem z-index 9999 contra os 60 do painel.
+Medido em 375×812: **232px do painel cobertos**, exatamente a faixa do checkbox
+de consentimento e do botão de enviar.
+
+Só aparece para quem chega pela primeira vez — que é precisamente o público que
+o gate existe para converter. Nenhum teste unitário pegaria: depende de dois
+elementos fixos coexistirem numa tela real.
+
+Corrigido fazendo o painel esperar a decisão de cookies. Não empilhei o painel
+acima do banner de propósito: isso obrigaria a pessoa a decidir sobre
+privacidade e sobre entregar os dados ao mesmo tempo, com o aviso de
+privacidade escondido atrás do formulário que coleta os dados.
+
+### O que NÃO foi verificado
+
+- **Tela do Kanban.** Exige login de admin, e não posso digitar senha. Verifiquei
+  os dados que a alimentam (query do chip e do drawer), não o visual.
+- **Leitor de tela real.** Verifiquei a semântica (`aria-describedby`, `role`,
+  labels, foco), não o comportamento do VoiceOver/NVDA.
+- **Teclado virtual real.** O `dvh` está aplicado, mas só um aparelho físico
+  confirma o comportamento com o teclado aberto.
+- **Contraste.** Segue como pendência (§6.2) — decisão de token, afeta o site todo.
+
+### Dados sintéticos deixados no descartável
+
+Deixei tudo no banco para você revisar. Nada de PII real; todos os nomes têm o
+prefixo `QA_LEAD_GATE`, telefones na faixa `489000xxxxx` e e-mails em
+`@exemplo.invalid`.
+
+| Tabela | Linhas |
+|---|---|
+| `leads` | 6 (1 do fluxo completo + 5 do teste de rate limit) |
+| `lead_access_sessions` | 7 |
+| `lead_property_interests` | 7 |
+| `lead_eventos` | 11 |
+| `lead_identity_conflicts` | 0 |
+| `properties` | 3 (seed) |
+
+Limpeza quando quiser, com o SQL do §7.
