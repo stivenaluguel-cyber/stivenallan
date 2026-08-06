@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
+import { NotasFiscais } from '@/components/dashboard/NotasFiscais'
 
 interface Proposta {
   id: string
@@ -344,6 +345,8 @@ export default function FinanceiroPage() {
           </div>
         )}
       </div>
+
+      <NotasFiscais />
 
       {/* Calculadora */}
       <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '1.25rem', marginBottom: '1.5rem' }}>
