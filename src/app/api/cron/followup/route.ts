@@ -10,9 +10,12 @@ import { recalcularBaseAtiva } from '@/lib/leads/score-server'
 
 export const dynamic = 'force-dynamic'
 
-// Cron de follow-up por WhatsApp (Evolution API). Igual ao email-followup:
-// guards operacionais (Evolution) ficam DENTRO do try pra que dias pulados
-// por env ausente apareçam no histórico como status='skipped'.
+// Cron de follow-up por WhatsApp (Evolution API), motor de regras "se/então"
+// e sugestão automática de base de conhecimento — três tarefas independentes
+// compartilhando a mesma execução agendada (Vercel Hobby só permite os crons
+// já cadastrados em vercel.json). O guard Evolution fica DENTRO do try e cobre
+// só o pedaço de follow-up por WhatsApp: as outras duas tarefas não usam
+// Evolution e continuam rodando mesmo com a instância fora do ar.
 
 const SOURCE = 'followup'
 const CRON_NAME = 'followup'
@@ -339,59 +342,61 @@ export async function GET(req: NextRequest) {
     const scores = await recalcularBaseAtiva(supabase)
     logInfo(SOURCE, 'scores recalculados', { processados: scores.processados })
 
-    // Guards Evolution — dias pulados por env ausente aparecem no histórico
+    // Guard Evolution — cobre só a busca/envio de follow-up por WhatsApp logo
+    // abaixo. NÃO pode derrubar o motor de regras nem a sugestão de base de
+    // conhecimento: nenhum dos dois depende do WhatsApp estar no ar (achado
+    // em produção — a checagem cancelava a função inteira com um `return` e
+    // arrastava junto duas tarefas sem relação nenhuma com Evolution).
+    let whatsappIndisponivel: string | null = null
     if (!process.env.EVOLUTION_API_URL || !process.env.EVOLUTION_API_KEY || !process.env.EVOLUTION_INSTANCE) {
-      logWarn(SOURCE, 'skipped: envs Evolution ausentes')
-      result = { status: 'skipped', motivo: 'EVOLUTION_API_URL / _API_KEY / _INSTANCE ausente' }
-      return NextResponse.json({ skipped: true, motivo: result.motivo })
-    }
-
-    // Checa a instância UMA vez, antes de processar qualquer lead — sem isso,
-    // uma instância desconectada gera o mesmo erro repetido por lead (achado
-    // em produção: dias de falha silenciosa até alguém notar). Com a checagem
-    // aqui, o motivo fica visível direto no histórico de /dashboard/cron.
-    const instancia = await verificarInstancia()
-    if (!instancia.ok) {
-      logWarn(SOURCE, 'skipped: instância Evolution indisponível', { motivo: instancia.reason })
-      result = { status: 'skipped', motivo: `Instância Evolution indisponível: ${instancia.reason}` }
-      return NextResponse.json({ skipped: true, motivo: result.motivo })
-    }
-
-    const config = await carregarConfigFollowUp(supabase)
-
-    const agora = new Date().toISOString()
-    const { data: leads, error } = await supabase
-      .from('leads')
-      .select('id, nome, whatsapp, estagio_funil, tentativas_followup, empreendimento_interesse, property_id, property_name, lead_score')
-      .lte('proximo_followup', agora)
-      .eq('requer_atencao', false)
-      .in('status', ['novo', 'ativo', 'qualificado'])
-      .not('whatsapp', 'is', null)
-      .is('whatsapp_optout_at', null)
-      .limit(50)
-
-    if (error) {
-      logError(SOURCE, 'db select failed', error)
-      result = { status: 'error', motivo: error.message ?? 'DB error' }
-      return NextResponse.json({ error: 'DB error', details: error.message }, { status: 500 })
-    }
-
-    if (!leads || leads.length === 0) {
-      const regrasResumo = await processarRegrasAutomacao(supabase)
-      const baseConhecimentoResumo = await sugerirConhecimentoDeConversasResolvidas(supabase)
-      const summary = { processados: 0, enviados: 0, escalados: 0, erros_envio: 0 }
-      logInfo(SOURCE, 'run summary', summary)
-      result = { status: 'ok', ...summary, details: { regras: regrasResumo, baseConhecimento: baseConhecimentoResumo } }
-      return NextResponse.json({ message: 'Nenhum lead para follow-up.', processados: 0, regras: regrasResumo, baseConhecimento: baseConhecimentoResumo })
+      whatsappIndisponivel = 'EVOLUTION_API_URL / _API_KEY / _INSTANCE ausente'
+      logWarn(SOURCE, 'follow-up por WhatsApp pulado: envs Evolution ausentes')
+    } else {
+      // Checa a instância UMA vez, antes de processar qualquer lead — sem isso,
+      // uma instância desconectada gera o mesmo erro repetido por lead (achado
+      // em produção: dias de falha silenciosa até alguém notar). Com a checagem
+      // aqui, o motivo fica visível direto no histórico de /dashboard/cron.
+      const instancia = await verificarInstancia()
+      if (!instancia.ok) {
+        whatsappIndisponivel = `Instância Evolution indisponível: ${instancia.reason}`
+        logWarn(SOURCE, 'follow-up por WhatsApp pulado: instância indisponível', { motivo: instancia.reason })
+      }
     }
 
     const resultados: Array<{ id: string; acao: 'mensagem_enviada' | 'escalado' | 'erro' | 'limite_atingido' | 'automacao_desativada' }> = []
-    for (const lead of leads as LeadRow[]) {
-      const resultado = await processarLeadFollowUp(supabase, lead, config)
-      resultados.push(resultado)
-      await new Promise((r) => setTimeout(r, 2000))
+    let leadsProcessados = 0
+
+    if (!whatsappIndisponivel) {
+      const config = await carregarConfigFollowUp(supabase)
+
+      const agora = new Date().toISOString()
+      const { data: leads, error } = await supabase
+        .from('leads')
+        .select('id, nome, whatsapp, estagio_funil, tentativas_followup, empreendimento_interesse, property_id, property_name, lead_score')
+        .lte('proximo_followup', agora)
+        .eq('requer_atencao', false)
+        .in('status', ['novo', 'ativo', 'qualificado'])
+        .not('whatsapp', 'is', null)
+        .is('whatsapp_optout_at', null)
+        .limit(50)
+
+      if (error) {
+        logError(SOURCE, 'db select failed', error)
+        result = { status: 'error', motivo: error.message ?? 'DB error' }
+        return NextResponse.json({ error: 'DB error', details: error.message }, { status: 500 })
+      }
+
+      leadsProcessados = leads?.length ?? 0
+      for (const lead of (leads ?? []) as LeadRow[]) {
+        const resultado = await processarLeadFollowUp(supabase, lead, config)
+        resultados.push(resultado)
+        await new Promise((r) => setTimeout(r, 2000))
+      }
     }
 
+    // Motor de regras e sugestão de base de conhecimento não dependem do
+    // WhatsApp/Evolution — rodam sempre, mesmo quando o follow-up acima foi
+    // pulado por instância indisponível.
     const regrasResumo = await processarRegrasAutomacao(supabase)
     const baseConhecimentoResumo = await sugerirConhecimentoDeConversasResolvidas(supabase)
 
@@ -400,13 +405,29 @@ export async function GET(req: NextRequest) {
     const erros_envio = resultados.filter((r) => r.acao === 'erro').length
     const limite_atingido = resultados.filter((r) => r.acao === 'limite_atingido').length
     const automacao_desativada = resultados.filter((r) => r.acao === 'automacao_desativada').length
-    const summary = { processados: leads.length, enviados, escalados, erros_envio, limite_atingido, automacao_desativada }
-    logInfo(SOURCE, 'run summary', summary)
+    const summary = { processados: leadsProcessados, enviados, escalados, erros_envio, limite_atingido, automacao_desativada }
+    logInfo(SOURCE, 'run summary', { ...summary, whatsapp_pulado: whatsappIndisponivel })
+
+    // status continua 'ok': score, regras e base de conhecimento rodaram de
+    // verdade neste run — 'skipped' ficaria incorreto no histórico. O motivo
+    // descreve especificamente que só o follow-up por WhatsApp foi pulado.
     result = {
-      status: 'ok', processados: leads.length, enviados, erros_envio,
-      details: { escalados, limite_atingido, automacao_desativada, regras: regrasResumo, baseConhecimento: baseConhecimentoResumo },
+      status: 'ok',
+      processados: leadsProcessados,
+      enviados,
+      erros_envio,
+      motivo: whatsappIndisponivel ? `Follow-up por WhatsApp pulado: ${whatsappIndisponivel}` : undefined,
+      details: { escalados, limite_atingido, automacao_desativada, regras: regrasResumo, baseConhecimento: baseConhecimentoResumo, whatsapp_pulado: whatsappIndisponivel },
     }
-    return NextResponse.json({ message: 'Follow-ups processados.', ...summary, regras: regrasResumo, baseConhecimento: baseConhecimentoResumo })
+    return NextResponse.json({
+      message: whatsappIndisponivel
+        ? `Follow-up por WhatsApp pulado (${whatsappIndisponivel}); regras e base de conhecimento processados normalmente.`
+        : 'Follow-ups processados.',
+      ...summary,
+      whatsapp_pulado: whatsappIndisponivel,
+      regras: regrasResumo,
+      baseConhecimento: baseConhecimentoResumo,
+    })
   } catch (err: unknown) {
     logError(SOURCE, 'run failed', err)
     result = { status: 'error', motivo: err instanceof Error ? err.message : String(err) }
