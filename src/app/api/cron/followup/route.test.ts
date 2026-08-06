@@ -239,40 +239,73 @@ describe('GET /api/cron/followup', () => {
     expect(res.status).toBe(503)
   })
 
-  it('persiste skipped quando EVOLUTION_API_URL ausente', async () => {
+  it('pula só o follow-up por WhatsApp quando EVOLUTION_API_URL ausente, mas roda score/regras/base de conhecimento', async () => {
     delete process.env.EVOLUTION_API_URL
-    const mock = makeSupabase()
+    const mock = makeSupabase({
+      // Este mesmo mock de `leads` alimenta o candidato do motor de regras
+      // (o follow-up de WhatsApp nem chega a consultar, pois é pulado antes).
+      leads: [{ id: 'lead-1', nome: 'Ana', whatsapp: '48991642332', estagio_funil: 'qualificado', lead_score: 90, updated_at: null, ultimo_contato: null }],
+      automacaoRegras: [{
+        id: 'regra-1', nome: 'Score alto sem contato', ativo: true,
+        gatilho_tipo: 'score_acima', gatilho_params: { score: 80 },
+        filtro_estagio: null, acao_tipo: 'notificar_stiven', acao_params: {},
+      }],
+    })
     supabaseHolder.current = mock
 
     const res = await GET(makeReq({ authorization: 'Bearer cron-secret' }))
-    const json = (await res.json()) as { skipped?: boolean; motivo?: string }
+    const json = (await res.json()) as {
+      whatsapp_pulado?: string | null
+      regras?: { avaliados: number; executados: number }
+      baseConhecimento?: { avaliados: number; sugeridos: number }
+    }
 
-    expect(json.skipped).toBe(true)
-    expect(json.motivo).toMatch(/EVOLUTION/)
-    expect(mock.cronRunInserts[0]).toMatchObject({ cron_name: 'followup', status: 'running' })
+    expect(res.status).toBe(200)
+    expect(json.whatsapp_pulado).toMatch(/EVOLUTION/)
+    // status continua 'ok' — score, regras e base de conhecimento rodaram de verdade,
+    // só o pedaço de WhatsApp foi pulado. 'skipped' aqui seria enganoso no histórico.
     expect(mock.cronRunUpdates[0]).toMatchObject({
-      status: 'skipped',
+      status: 'ok',
       motivo: expect.stringMatching(/EVOLUTION/),
     })
     expect(evolutionHolder.enviarFollowUp).not.toHaveBeenCalled()
+    // Motor de regras foi de fato acionado, mesmo com Evolution indisponível
+    // — a regra usa notificar_stiven, que falha/segue sem derrubar o loop.
+    expect(json.regras).toEqual({ avaliados: 1, executados: 1 })
+    expect(json.baseConhecimento).toBeDefined()
   })
 
-  it('persiste skipped com motivo claro quando a instância Evolution está desconectada', async () => {
+  it('pula só o follow-up por WhatsApp quando a instância Evolution está desconectada, mas roda score/regras/base de conhecimento', async () => {
     evolutionHolder.verificarInstancia.mockResolvedValue({ ok: false, reason: 'HTTP 404: Application not found' })
-    const mock = makeSupabase()
+    const mock = makeSupabase({
+      leads: [{ id: 'lead-1', nome: 'Ana', whatsapp: '48991642332', estagio_funil: 'novo', lead_score: 50, updated_at: null, ultimo_contato: null }],
+      automacaoRegras: [{
+        id: 'regra-1', nome: 'Move estágio sem depender de WhatsApp', ativo: true,
+        gatilho_tipo: 'score_acima', gatilho_params: { score: 0 },
+        filtro_estagio: null, acao_tipo: 'mover_estagio', acao_params: { estagio_funil: 'qualificado' },
+      }],
+    })
     supabaseHolder.current = mock
 
     const res = await GET(makeReq({ authorization: 'Bearer cron-secret' }))
-    const json = (await res.json()) as { skipped?: boolean; motivo?: string }
+    const json = (await res.json()) as {
+      whatsapp_pulado?: string | null
+      regras?: { avaliados: number; executados: number }
+      baseConhecimento?: { avaliados: number; sugeridos: number }
+    }
 
-    expect(json.skipped).toBe(true)
-    expect(json.motivo).toMatch(/instância Evolution indisponível.*Application not found/i)
+    expect(res.status).toBe(200)
+    expect(json.whatsapp_pulado).toMatch(/instância Evolution indisponível.*Application not found/i)
     expect(mock.cronRunUpdates[0]).toMatchObject({
-      status: 'skipped',
+      status: 'ok',
       motivo: expect.stringMatching(/instância Evolution indisponível/i),
     })
-    // Falha rápido, antes de processar qualquer lead — não gera N erros repetidos.
+    // Falha rápido, antes de processar qualquer lead de follow-up — não gera N erros repetidos.
     expect(evolutionHolder.enviarFollowUp).not.toHaveBeenCalled()
+    // mover_estagio não depende de Evolution — deve ter executado normalmente.
+    expect(json.regras).toEqual({ avaliados: 1, executados: 1 })
+    expect(mock.leadsUpdates.some((u) => u.estagio_funil === 'qualificado')).toBe(true)
+    expect(json.baseConhecimento).toBeDefined()
   })
 
   it('persiste ok com processados=0 quando não há leads elegíveis', async () => {
