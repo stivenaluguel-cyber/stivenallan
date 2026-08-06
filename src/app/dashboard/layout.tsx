@@ -48,6 +48,12 @@ const GRUPOS: { titulo: string; itens: NavItem[] }[] = [
       { href: '/dashboard/prospeccao', label: 'Prospecção', icon: '⛏️' },
     ],
   },
+  {
+    titulo: 'CONTA',
+    itens: [
+      { href: '/dashboard/preferencias', label: 'Preferências', icon: '⚙️' },
+    ],
+  },
 ];
 
 const PAGE_LABELS: Record<string, string> = {
@@ -66,6 +72,7 @@ const PAGE_LABELS: Record<string, string> = {
   '/dashboard/instagram/automacoes': 'Automações Instagram (comentário → DM)',
   '/dashboard/ativacao': 'Ativação IG',
   '/dashboard/prospeccao': 'Prospecção',
+  '/dashboard/preferencias': 'Preferências',
 };
 
 function getLabel(pathname: string) {
