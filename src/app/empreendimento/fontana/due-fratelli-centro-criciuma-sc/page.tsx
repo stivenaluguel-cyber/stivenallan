@@ -16,8 +16,8 @@ const CATALOGO_PDF = "https://estilofontana.com.br/upload/empreendimento/catalog
 const t = {
 bg: '#FAFAF8', ink: '#16201A', slate: '#3A5068', slateDark: '#243240', muted: '#5A6870',
 line: 'rgba(22,32,26,0.12)', dark: '#0D141A', onDark: '#E8EFF6', onDarkMuted: 'rgba(232,239,246,0.66)',
-display: "'Jost', system-ui, sans-serif", serif: "'Cormorant Garamond', Georgia, serif",
-body: "'Hanken Grotesk', system-ui, sans-serif",
+display: 'var(--font-piazzolla), Georgia, serif',
+body: 'var(--font-public-sans), system-ui, sans-serif',
 }
 const IMG = {
 hero: '/images/empreendimentos/due-fratelli-centro-criciuma-sc/due-fratelli-residencial-5f889c789761e.jpg',
@@ -98,17 +98,17 @@ return (
 
 <style>{`
 html { scroll-behavior: smooth; }
-.df-eyebrow { font-size: 11px; letter-spacing: 0.42em; text-transform: uppercase; color: ${t.slate}; font-family: ${t.body}; font-weight: 500; }
-.df-h1 { font-family: ${t.display}; font-weight: 300; text-transform: uppercase; letter-spacing: 0.14em; line-height: 1.04; text-shadow: 0 2px 24px rgba(0,0,0,0.55); }
+.df-eyebrow { font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase; color: ${t.slate}; font-family: ${t.body}; font-weight: 600; }
+.df-h1 { font-family: ${t.display}; font-weight: 600; line-height: 1.04; text-shadow: 0 2px 24px rgba(0,0,0,0.55); }
 .df-onimg { text-shadow: 0 1px 16px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.5); }
-.df-h2 { font-family: ${t.display}; font-weight: 300; text-transform: uppercase; letter-spacing: 0.16em; line-height: 1.1; font-size: clamp(26px,4vw,46px); margin: 0; }
-.df-serif { font-family: ${t.serif}; font-style: italic; font-weight: 400; }
+.df-h2 { font-family: ${t.display}; font-weight: 600; line-height: 1.1; font-size: clamp(26px,4vw,46px); margin: 0; }
+.df-serif { font-family: ${t.display}; font-style: italic; font-weight: 400; }
 .df-rule { width: 56px; height: 1px; background: ${t.slate}; border: 0; }
-.df-cta { display: inline-block; font-family: ${t.body}; font-size: 12px; letter-spacing: 0.3em; text-transform: uppercase; color: ${t.ink}; border: 1px solid ${t.slate}; padding: 16px 34px; text-decoration: none; transition: background .35s ease, color .35s ease; cursor: pointer; }
+.df-cta { display: inline-block; font-family: ${t.body}; font-size: 15px; font-weight: 600; color: ${t.ink}; border: 1px solid ${t.slate}; padding: 16px 34px; text-decoration: none; transition: background .35s ease, color .35s ease; cursor: pointer; }
 .df-cta:hover { background: ${t.slate}; color: #fff; }
 .df-cta-light { color: ${t.onDark}; border-color: rgba(232,239,246,0.55); }
 .df-cta-light:hover { background: ${t.onDark}; color: ${t.slateDark}; }
-.df-navlink { font-family: ${t.body}; font-size: 11px; letter-spacing: 0.28em; text-transform: uppercase; color: rgba(255,255,255,0.85); text-decoration: none; transition: color .3s ease; }
+.df-navlink { font-family: ${t.body}; font-size: 15px; font-weight: 500; color: rgba(255,255,255,0.85); text-decoration: none; transition: color .3s ease; }
 .df-navlink:hover { color: #fff; }
 .df-fade { opacity: 0; transform: translateY(24px); animation: dffade .9s ease forwards; }
 @keyframes dffade { to { opacity: 1; transform: none; } }
@@ -130,7 +130,7 @@ details.df-menu > summary::-webkit-details-marker { display: none; }
 `}</style>
 <header style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 50 }}>
 <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '22px clamp(18px,5vw,56px)' }}>
-<a href="#top" style={{ fontFamily: t.display, fontWeight: 400, letterSpacing: '0.26em', fontSize: 16, color: '#fff', textDecoration: 'none', textTransform: 'uppercase' }}>Due Fratelli</a>
+<a href="#top" style={{ fontFamily: t.display, fontWeight: 400, fontSize: 16, color: '#fff', textDecoration: 'none' }}>Due Fratelli</a>
 <div className="df-nav-links" style={{ display: 'flex', alignItems: 'center', gap: 30 }}>
 <a href="#residencial" className="df-navlink">O Residencial</a>
 <a href="#galeria" className="df-navlink">Galeria</a>
@@ -163,7 +163,7 @@ details.df-menu > summary::-webkit-details-marker { display: none; }
 <section id="residencial" style={{ padding: 'clamp(80px,14vh,160px) clamp(18px,5vw,56px)', textAlign: 'center' }}>
 <div style={{ maxWidth: 820, margin: '0 auto' }}>
 <p className="df-eyebrow" style={{ marginBottom: 26 }}>O Residencial</p>
-<p className="df-serif" style={{ fontSize: 'clamp(24px,3.4vw,40px)', lineHeight: 1.35, color: t.ink, margin: 0 }}>Atento ao potencial de expansão da região, o Due Fratelli une a melhor seleção de serviços e lojas comerciais à tranquilidade do seu lar. Dar valor à sua vida é aproveitar e reservar mais tempo com quem você ama.</p>
+<p style={{ fontFamily: t.body, fontWeight: 500, fontSize: 'clamp(24px,3.4vw,40px)', lineHeight: 1.35, color: t.ink, margin: 0 }}>Atento ao potencial de expansão da região, o Due Fratelli une a melhor seleção de serviços e lojas comerciais à tranquilidade do seu lar. Dar valor à sua vida é aproveitar e reservar mais tempo com quem você ama.</p>
 <hr className="df-rule" style={{ margin: '46px auto 0' }} />
 </div>
 </section>
@@ -180,10 +180,10 @@ details.df-menu > summary::-webkit-details-marker { display: none; }
 <div style={{ maxWidth: 1080, margin: '0 auto', textAlign: 'center' }}>
 <p className="df-eyebrow" style={{ color: t.onDark, marginBottom: 18 }}>As Residências</p>
 <h2 className="df-h2" style={{ color: t.onDark }}>Espaço para a sua família</h2>
-<p className="df-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 56 }}>2 e 3 dormítórios de 91 a 256 m² privativos.</p>
+<p style={{ fontFamily: t.body, fontWeight: 500, color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 56 }}>2 e 3 dormítórios de 91 a 256 m² privativos.</p>
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 'clamp(28px,5vw,64px)', marginBottom: 56 }}>
 {[{n:'2 e 3',l:'Dormítórios'},{n:'1',l:'Suíte'},{n:'91–256',l:'m² privativos'},{n:'2',l:'Elevadores'}].map((it,i)=>(
-<div key={i}><div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 'clamp(34px,5vw,58px)', letterSpacing: '0.04em', lineHeight: 1 }}>{it.n}</div><div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDarkMuted, marginTop: 12 }}>{it.l}</div></div>
+<div key={i}><div style={{ fontFamily: t.display, fontWeight: 600, fontSize: 'clamp(34px,5vw,58px)', lineHeight: 1 }}>{it.n}</div><div style={{ fontSize: 11, color: t.onDarkMuted, marginTop: 12 }}>{it.l}</div></div>
 ))}
 </div>
 <LeadCaptureButton slug="due-fratelli-centro-criciuma-sc" construtora_slug="fontana" className="df-cta df-cta-light"  propertyDisplayName="Due Fratelli Residencial" />
@@ -198,7 +198,7 @@ details.df-menu > summary::-webkit-details-marker { display: none; }
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 1, background: t.line }}>
 {DIFERENCIAIS.map((d,i)=>(
 <div key={i} style={{ background: t.bg, padding: 'clamp(28px,4vw,44px)' }}>
-<div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 22, color: t.slate, marginBottom: 14 }}>{String(i+1).padStart(2,'0')}</div>
+<div style={{ fontFamily: t.display, fontWeight: 600, fontSize: 22, color: t.slate, marginBottom: 14 }}>{String(i+1).padStart(2,'0')}</div>
 <p style={{ margin: 0, fontSize: 16, lineHeight: 1.5, color: t.ink }}>{d}</p>
 </div>
 ))}
@@ -238,13 +238,13 @@ details.df-menu > summary::-webkit-details-marker { display: none; }
 <div style={{ maxWidth: 1080, margin: '0 auto', textAlign: 'center' }}>
 <p className="df-eyebrow" style={{ color: t.onDark, marginBottom: 18 }}>Investimento</p>
 <h2 className="df-h2" style={{ color: t.onDark }}>A liberdade de comprar sem banco</h2>
-<p className="df-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 60 }}>Condições de pagamento definidas pela Construtora Fontana, conforme a tabela vigente.</p>
+<p style={{ fontFamily: t.body, fontWeight: 500, color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 60 }}>Condições de pagamento definidas pela Construtora Fontana, conforme a tabela vigente.</p>
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px,1fr))', gap: 'clamp(28px,4vw,52px)' }}>
 {[{n:'01',tt:'Converse com o corretor',d:'Atendimento exclusivo e personalizado para entender o seu momento e as melhores condições.'},{n:'02',tt:'Escolha a sua planta',d:'Selecione a unidade ideal e defina uma proposta sob medida, sem amarras bancárias.'},{n:'03',tt:'Negocie direto',d:'Condições flexíveis diretamente com a Construtora Fontana, com a liberdade que você merece.'}].map((s,i)=>(
-<div key={i} style={{ textAlign: 'left' }}><div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 40, opacity: 0.55, marginBottom: 14 }}>{s.n}</div><h3 style={{ fontFamily: t.display, fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: 17, margin: '0 0 12px' }}>{s.tt}</h3><p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.6, margin: 0 }}>{s.d}</p></div>
+<div key={i} style={{ textAlign: 'left' }}><div style={{ fontFamily: t.display, fontWeight: 600, fontSize: 40, opacity: 0.55, marginBottom: 14 }}>{s.n}</div><h3 style={{ fontFamily: t.body, fontWeight: 600, fontSize: 17, margin: '0 0 12px' }}>{s.tt}</h3><p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.6, margin: 0 }}>{s.d}</p></div>
 ))}
 </div>
-<p style={{ marginTop: 56, fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: t.onDark }}>Qualidade &amp; praticidade &middot; Sob consulta</p>
+<p style={{ marginTop: 56, fontSize: 11, color: t.onDark }}>Qualidade &amp; praticidade &middot; Sob consulta</p>
 </div>
 </section>
 <section style={{ position: 'relative', minHeight: '78vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
@@ -261,9 +261,9 @@ details.df-menu > summary::-webkit-details-marker { display: none; }
 </section>
 <footer style={{ background: t.slateDark, color: t.onDarkMuted, padding: 'clamp(56px,9vh,96px) clamp(18px,5vw,56px)' }}>
 <div style={{ maxWidth: 1180, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px,1fr))', gap: 'clamp(28px,5vw,56px)' }}>
-<div><div style={{ fontFamily: t.display, fontWeight: 400, letterSpacing: '0.22em', fontSize: 18, color: t.onDark, textTransform: 'uppercase' }}>Stiven Allan</div><p style={{ marginTop: 14, fontSize: 14, lineHeight: 1.6 }}>Imóveis de alto padrão em Santa Catarina.<br />CRECI 60.275</p></div>
-<div><div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDark, marginBottom: 14 }}>Contato</div><a href={WPP} target="_blank" rel="noopener noreferrer" style={{ color: t.onDarkMuted, textDecoration: 'none', fontSize: 14 }}>WhatsApp &middot; (48) 99164-2332</a></div>
-<div><div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDark, marginBottom: 14 }}>Empreendimento</div><p style={{ fontSize: 14, lineHeight: 1.6, margin: 0 }}>Due Fratelli Residencial<br />Construtora Fontana<br />Centro, Criciúma/SC</p></div>
+<div><div style={{ fontFamily: t.display, fontWeight: 400, fontSize: 18, color: t.onDark }}>Stiven Allan</div><p style={{ marginTop: 14, fontSize: 14, lineHeight: 1.6 }}>Imóveis de alto padrão em Santa Catarina.<br />CRECI 60.275</p></div>
+<div><div style={{ fontSize: 11, color: t.onDark, marginBottom: 14 }}>Contato</div><a href={WPP} target="_blank" rel="noopener noreferrer" style={{ color: t.onDarkMuted, textDecoration: 'none', fontSize: 14 }}>WhatsApp &middot; (48) 99164-2332</a></div>
+<div><div style={{ fontSize: 11, color: t.onDark, marginBottom: 14 }}>Empreendimento</div><p style={{ fontSize: 14, lineHeight: 1.6, margin: 0 }}>Due Fratelli Residencial<br />Construtora Fontana<br />Centro, Criciúma/SC</p></div>
 </div>
 <div style={{ maxWidth: 1180, margin: '40px auto 0', paddingTop: 24, borderTop: '1px solid rgba(232,239,246,0.12)', fontSize: 12 }}>&copy; {new Date().getFullYear()} Stiven Allan. Imagens meramente ilustrativas. Valores sob consulta.</div>
 </footer>

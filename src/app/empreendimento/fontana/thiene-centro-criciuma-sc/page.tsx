@@ -24,9 +24,8 @@ line: 'rgba(17,24,32,0.12)',
 dark: '#0A1520',
 onDark: '#E8EFF5',
 onDarkMuted: 'rgba(232,239,245,0.66)',
-display: "\'Bricolage Grotesque\', system-ui, sans-serif",
-serif: "\'Cormorant Garamond\', Georgia, serif",
-body: "\'Hanken Grotesk\', system-ui, sans-serif",
+display: 'var(--font-piazzolla), Georgia, serif',
+body: 'var(--font-public-sans), system-ui, sans-serif',
 }
 
 const IMG = {
@@ -131,17 +130,17 @@ return (
 
 <style>{`
 html { scroll-behavior: smooth; }
-.th-eyebrow { font-size: 11px; letter-spacing: 0.42em; text-transform: uppercase; color: ${t.blue}; font-family: ${t.body}; font-weight: 500; }
-.th-h1 { font-family: ${t.display}; font-weight: 300; text-transform: uppercase; letter-spacing: 0.14em; line-height: 1.04; text-shadow: 0 2px 24px rgba(0,0,0,0.55), 0 1px 4px rgba(0,0,0,0.4); font-size: clamp(40px,8vw,104px); margin: 0; }
+.th-eyebrow { font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase; color: ${t.blue}; font-family: ${t.body}; font-weight: 500; }
+.th-h1 { font-family: ${t.display}; font-weight: 600; line-height: 1.04; text-shadow: 0 2px 24px rgba(0,0,0,0.55), 0 1px 4px rgba(0,0,0,0.4); font-size: clamp(40px,8vw,104px); margin: 0; }
 .th-onimg { text-shadow: 0 1px 16px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.5); }
-.th-h2 { font-family: ${t.display}; font-weight: 300; text-transform: uppercase; letter-spacing: 0.16em; line-height: 1.1; font-size: clamp(26px,4vw,46px); margin: 0; }
-.th-serif { font-family: ${t.serif}; font-style: italic; font-weight: 400; }
+.th-h2 { font-family: ${t.display}; font-weight: 600; line-height: 1.1; font-size: clamp(26px,4vw,46px); margin: 0; }
+.th-serif { font-family: ${t.display}; font-style: italic; font-weight: 400; }
 .th-rule { width: 56px; height: 1px; background: ${t.blue}; border: 0; }
-.th-cta { display: inline-block; font-family: ${t.body}; font-size: 12px; letter-spacing: 0.3em; text-transform: uppercase; color: ${t.ink}; border: 1px solid ${t.blue}; padding: 16px 34px; text-decoration: none; transition: background .35s ease, color .35s ease; cursor: pointer; }
+.th-cta { display: inline-block; font-family: ${t.body}; font-size: 15px; font-weight: 600; color: ${t.ink}; border: 1px solid ${t.blue}; padding: 16px 34px; text-decoration: none; transition: background .35s ease, color .35s ease; cursor: pointer; }
 .th-cta:hover { background: ${t.blue}; color: #fff; }
 .th-cta-light { color: ${t.onDark}; border-color: rgba(232,239,245,0.55); }
 .th-cta-light:hover { background: ${t.onDark}; color: ${t.blueDark}; }
-.th-navlink { font-family: ${t.body}; font-size: 11px; letter-spacing: 0.28em; text-transform: uppercase; color: rgba(255,255,255,0.85); text-decoration: none; transition: color .3s ease; }
+.th-navlink { font-family: ${t.body}; font-size: 15px; font-weight: 500; color: rgba(255,255,255,0.85); text-decoration: none; transition: color .3s ease; }
 .th-navlink:hover { color: #fff; }
 .th-fade { opacity: 0; transform: translateY(24px); animation: thfade .9s ease forwards; }
 @keyframes thfade { to { opacity: 1; transform: none; } }
@@ -164,7 +163,7 @@ details.th-menu > summary::-webkit-details-marker { display: none; }
 {/* NAV */}
 <header style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 50 }}>
 <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '22px clamp(18px,5vw,56px)' }}>
-<a href="#top" style={{ fontFamily: t.display, fontWeight: 400, letterSpacing: '0.26em', fontSize: 16, color: '#fff', textDecoration: 'none', textTransform: 'uppercase' }}>Thiene</a>
+<a href="#top" style={{ fontFamily: t.display, fontWeight: 600, fontSize: 18, color: '#fff', textDecoration: 'none' }}>Thiene</a>
 <div className="th-nav-links" style={{ display: 'flex', alignItems: 'center', gap: 30 }}>
 <a href="#residencial" className="th-navlink">O Residencial</a>
 <a href="#galeria" className="th-navlink">Galeria</a>
@@ -206,13 +205,13 @@ details.th-menu > summary::-webkit-details-marker { display: none; }
 <p className="th-eyebrow" style={{ marginBottom: 26 }}>O Residencial</p>
 <h2 className="th-h2">Onde a história<br />se escreve</h2>
 <hr className="th-rule" style={{ margin: '34px auto' }} />
-<p className="th-serif" style={{ fontSize: 'clamp(22px,3.2vw,38px)', lineHeight: 1.38, color: t.ink, margin: 0 }}>
+<p style={{ fontFamily: t.body, fontWeight: 500, fontSize: 'clamp(22px,3.2vw,38px)', lineHeight: 1.38, color: t.ink, margin: 0 }}>
 O Thiene Residencial nasce no coração de Criciúma para quem escreve grandes histórias.
 </p>
 <p style={{ fontSize: 18, lineHeight: 1.8, color: t.muted, marginTop: 28, maxWidth: 640, marginLeft: 'auto', marginRight: 'auto' }}>
 No Centro da cidade, com tudo a poucos passos, o Thiene entrega espaço, sofisticação e diferenciais que transformam o cotidiano em algo extraordinário.
 </p>
-<p className="th-serif" style={{ fontSize: 'clamp(18px,2.2vw,26px)', color: t.blue, marginTop: 30 }}>Grandioso como a sua história.</p>
+<p style={{ fontFamily: t.body, fontWeight: 500, fontSize: 'clamp(18px,2.2vw,26px)', color: t.blue, marginTop: 30 }}>Grandioso como a sua história.</p>
 </div>
 </section>
 
@@ -232,7 +231,7 @@ No Centro da cidade, com tudo a poucos passos, o Thiene entrega espaço, sofisti
 <div style={{ maxWidth: 1080, margin: '0 auto', textAlign: 'center' }}>
 <p className="th-eyebrow" style={{ color: t.onDark, marginBottom: 18 }}>As Residências</p>
 <h2 className="th-h2" style={{ color: t.onDark }}>Espaço para viver<br />com grandiosidade</h2>
-<p className="th-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 56 }}>3 dormitórios, 1 suíte, espaço generoso.</p>
+<p style={{ fontFamily: t.body, fontWeight: 500, color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 56 }}>3 dormitórios, 1 suíte, espaço generoso.</p>
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 'clamp(28px,5vw,64px)', marginBottom: 56 }}>
 {[
 { n: '3', l: 'Dormitórios (1 suíte)' },
@@ -240,8 +239,8 @@ No Centro da cidade, com tudo a poucos passos, o Thiene entrega espaço, sofisti
 { n: 'Centro', l: 'Criciúma/SC' },
 ].map((it, i) => (
 <div key={i}>
-<div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 'clamp(34px,5vw,58px)', letterSpacing: '0.04em', lineHeight: 1 }}>{it.n}</div>
-<div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDarkMuted, marginTop: 12 }}>{it.l}</div>
+<div style={{ fontFamily: t.display, fontWeight: 600, fontSize: 'clamp(34px,5vw,58px)', letterSpacing: '0.04em', lineHeight: 1 }}>{it.n}</div>
+<div style={{ fontSize: 11, letterSpacing: '0.07em', textTransform: 'uppercase', color: t.onDarkMuted, marginTop: 12 }}>{it.l}</div>
 </div>
 ))}
 </div>
@@ -274,7 +273,7 @@ return (
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 1, background: t.line }}>
 {DIFERENCIAIS.map((d, i) => (
 <div key={i} style={{ background: t.bg, padding: 'clamp(28px,4vw,44px)' }}>
-<div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 22, color: t.blue, marginBottom: 14 }}>{String(i + 1).padStart(2, '0')}</div>
+<div style={{ fontFamily: t.display, fontWeight: 600, fontSize: 22, color: t.blue, marginBottom: 14 }}>{String(i + 1).padStart(2, '0')}</div>
 <p style={{ margin: 0, fontSize: 16, lineHeight: 1.5, color: t.ink }}>{d}</p>
 </div>
 ))}
@@ -323,7 +322,7 @@ Com tudo a poucos passos, o Thiene coloca você no centro da vida urbana de Cric
 <div style={{ maxWidth: 1080, margin: '0 auto', textAlign: 'center' }}>
 <p className="th-eyebrow" style={{ color: t.onDark, marginBottom: 18 }}>Financiamento Direto</p>
 <h2 className="th-h2" style={{ color: t.onDark }}>A liberdade de comprar sem banco</h2>
-<p className="th-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 40 }}>Condições de pagamento definidas pela Construtora Fontana, conforme a tabela vigente.</p>
+<p style={{ fontFamily: t.body, fontWeight: 500, color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 40 }}>Condições de pagamento definidas pela Construtora Fontana, conforme a tabela vigente.</p>
 <p style={{ color: t.onDarkMuted, fontSize: 17, lineHeight: 1.7, maxWidth: 720, margin: '0 auto 16px' }}>{COMERCIAL.padrao}</p>
 <p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.7, maxWidth: 720, margin: '0 auto 20px' }}>{COMERCIAL.correcaoPadrao}</p>
 <p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.7, maxWidth: 720, margin: '0 auto 40px' }}>{COMERCIAL.alternativas}</p>
@@ -334,13 +333,13 @@ Com tudo a poucos passos, o Thiene coloca você no centro da vida urbana de Cric
 { n: '03', ti: 'Realize', d: 'Sua unidade no Thiene Residencial, com a tranquilidade de negociar diretamente com a Construtora Fontana.' },
 ].map((s, i) => (
 <div key={i} style={{ textAlign: 'left' }}>
-<div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 40, opacity: 0.55, marginBottom: 14 }}>{s.n}</div>
-<h3 style={{ fontFamily: t.display, fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: 17, margin: '0 0 12px', color: t.onDark }}>{s.ti}</h3>
+<div style={{ fontFamily: t.display, fontWeight: 600, fontSize: 40, opacity: 0.55, marginBottom: 14 }}>{s.n}</div>
+<h3 style={{ fontFamily: t.body, fontWeight: 600, fontSize: 17, margin: '0 0 12px', color: t.onDark }}>{s.ti}</h3>
 <p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.6, margin: 0 }}>{s.d}</p>
 </div>
 ))}
 </div>
-<p style={{ marginTop: 56, fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: t.onDark }}>{COMERCIAL.vigencia}</p>
+<p style={{ marginTop: 56, fontSize: 13, color: t.onDarkMuted }}>{COMERCIAL.vigencia}</p>
 </div>
 </section>
 
@@ -350,7 +349,7 @@ Com tudo a poucos passos, o Thiene coloca você no centro da vida urbana de Cric
 <div style={{ position: 'absolute', inset: 0, background: 'rgba(10,21,32,0.65)' }} />
 <div style={{ position: 'relative', zIndex: 2, padding: '0 clamp(18px,5vw,56px)', maxWidth: 880 }}>
 <p className="th-eyebrow th-onimg" style={{ color: '#fff', marginBottom: 22 }}>Atendimento Exclusivo</p>
-<h2 className="th-h2 th-onimg" style={{ color: '#fff', fontSize: 'clamp(30px,5vw,56px)' }}>Grandioso como a sua história.</h2>
+<h2 className="th-h2 th-onimg" style={{ color: '#fff', fontSize: 'clamp(30px,5vw,56px)', fontStyle: 'italic', fontWeight: 400 }}>Grandioso como a sua história.</h2>
 <div style={{ marginTop: 38, display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
 <a href={WPP} target="_blank" rel="noopener noreferrer" className="th-cta th-cta-light" data-wpp="1">Atendimento Exclusivo</a>
 <ShareButton nome="Thiene Residencial" className="th-cta th-cta-light" />
@@ -362,15 +361,15 @@ Com tudo a poucos passos, o Thiene coloca você no centro da vida urbana de Cric
 <footer style={{ background: t.blueDark, color: t.onDarkMuted, padding: 'clamp(56px,9vh,96px) clamp(18px,5vw,56px)' }}>
 <div style={{ maxWidth: 1180, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px,1fr))', gap: 'clamp(28px,5vw,56px)' }}>
 <div>
-<div style={{ fontFamily: t.display, fontWeight: 400, letterSpacing: '0.22em', fontSize: 18, color: t.onDark, textTransform: 'uppercase' }}>Stiven Allan</div>
+<div style={{ fontFamily: t.display, fontWeight: 600, fontSize: 18, color: t.onDark }}>Stiven Allan</div>
 <p style={{ marginTop: 14, fontSize: 14, lineHeight: 1.6 }}>Imóveis de alto padrão em Santa Catarina.<br />CRECI 60.275</p>
 </div>
 <div>
-<div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDark, marginBottom: 14 }}>Contato</div>
+<div style={{ fontSize: 11, letterSpacing: '0.07em', textTransform: 'uppercase', color: t.onDark, marginBottom: 14 }}>Contato</div>
 <a href={WPP} target="_blank" rel="noopener noreferrer" data-wpp="1" style={{ color: t.onDarkMuted, textDecoration: 'none', fontSize: 14 }}>WhatsApp &middot; (48) 99164-2332</a>
 </div>
 <div>
-<div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDark, marginBottom: 14 }}>Empreendimento</div>
+<div style={{ fontSize: 11, letterSpacing: '0.07em', textTransform: 'uppercase', color: t.onDark, marginBottom: 14 }}>Empreendimento</div>
 <p style={{ fontSize: 14, lineHeight: 1.6, margin: 0 }}>Thiene Residencial<br />Construtora Fontana<br />Centro, Criciúma/SC</p>
 </div>
 </div>

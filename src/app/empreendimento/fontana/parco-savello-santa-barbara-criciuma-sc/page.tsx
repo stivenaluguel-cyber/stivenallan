@@ -41,9 +41,8 @@ line: 'rgba(26,43,27,0.12)',
 dark: '#0E1A0F',
 onDark: '#EAF2EA',
 onDarkMuted: 'rgba(234,242,234,0.66)',
-display: "\'Bricolage Grotesque\', system-ui, sans-serif",
-serif: "\'Cormorant Garamond\', Georgia, serif",
-body: "\'Hanken Grotesk\', system-ui, sans-serif",
+display: 'var(--font-piazzolla), Georgia, serif',
+body: 'var(--font-public-sans), system-ui, sans-serif',
 }
 
 // Imagens hospedadas localmente (baixadas e comprimidas do Estilo Fontana em
@@ -191,17 +190,17 @@ return (
 
 <style>{`
 html { scroll-behavior: smooth; }
-.ps-eyebrow { font-size: 11px; letter-spacing: 0.42em; text-transform: uppercase; color: ${t.green}; font-family: ${t.body}; font-weight: 500; }
-.ps-h1 { font-family: ${t.display}; font-weight: 300; text-transform: uppercase; letter-spacing: 0.14em; line-height: 1.04; text-shadow: 0 2px 24px rgba(0,0,0,0.55), 0 1px 4px rgba(0,0,0,0.4); font-size: clamp(40px,8vw,104px); margin: 0; }
+.ps-eyebrow { font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase; color: ${t.green}; font-family: ${t.body}; font-weight: 500; }
+.ps-h1 { font-family: ${t.display}; font-weight: 600; line-height: 1.04; text-shadow: 0 2px 24px rgba(0,0,0,0.55), 0 1px 4px rgba(0,0,0,0.4); font-size: clamp(40px,8vw,104px); margin: 0; }
 .ps-onimg { text-shadow: 0 1px 16px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.5); }
-.ps-h2 { font-family: ${t.display}; font-weight: 300; text-transform: uppercase; letter-spacing: 0.16em; line-height: 1.1; font-size: clamp(26px,4vw,46px); margin: 0; }
-.ps-serif { font-family: ${t.serif}; font-style: italic; font-weight: 400; }
+.ps-h2 { font-family: ${t.display}; font-weight: 600; line-height: 1.1; font-size: clamp(26px,4vw,46px); margin: 0; }
+.ps-serif { font-family: ${t.display}; font-style: italic; font-weight: 400; }
 .ps-rule { width: 56px; height: 1px; background: ${t.green}; border: 0; }
-.ps-cta { display: inline-block; font-family: ${t.body}; font-size: 12px; letter-spacing: 0.3em; text-transform: uppercase; color: ${t.ink}; border: 1px solid ${t.green}; padding: 16px 34px; text-decoration: none; transition: background .35s ease, color .35s ease; cursor: pointer; }
+.ps-cta { display: inline-block; font-family: ${t.body}; font-size: 15px; color: ${t.ink}; border: 1px solid ${t.green}; padding: 16px 34px; text-decoration: none; transition: background .35s ease, color .35s ease; cursor: pointer; }
 .ps-cta:hover { background: ${t.green}; color: #fff; }
 .ps-cta-light { color: ${t.onDark}; border-color: rgba(234,242,234,0.55); }
 .ps-cta-light:hover { background: ${t.onDark}; color: ${t.greenDark}; }
-.ps-navlink { font-family: ${t.body}; font-size: 11px; letter-spacing: 0.28em; text-transform: uppercase; color: rgba(255,255,255,0.85); text-decoration: none; transition: color .3s ease; }
+.ps-navlink { font-family: ${t.body}; font-size: 15px; color: rgba(255,255,255,0.85); text-decoration: none; transition: color .3s ease; }
 .ps-navlink:hover { color: #fff; }
 .ps-fade { opacity: 0; transform: translateY(24px); animation: psfade .9s ease forwards; }
 @keyframes psfade { to { opacity: 1; transform: none; } }
@@ -228,7 +227,7 @@ details.ps-menu > summary::-webkit-details-marker { display: none; }
 {/* NAV */}
 <header style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 50 }}>
 <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '22px clamp(18px,5vw,56px)' }}>
-<a href="#top" style={{ fontFamily: t.display, fontWeight: 400, letterSpacing: '0.26em', fontSize: 16, color: '#fff', textDecoration: 'none', textTransform: 'uppercase' }}>Parco Savello</a>
+<a href="#top" style={{ fontFamily: t.display, fontWeight: 600, fontSize: 16, color: '#fff', textDecoration: 'none' }}>Parco Savello</a>
 <div className="ps-nav-links" style={{ display: 'flex', alignItems: 'center', gap: 30 }}>
 <a href="#residencial" className="ps-navlink">O Residencial</a>
 <a href="#galeria" className="ps-navlink">Galeria</a>
@@ -313,8 +312,8 @@ teaser={<TeaserGate titulo={`Mais ${qtdFotosRestritas} ${qtdFotosRestritas === 1
 { n: 'Simples, Est. ou Dupla', l: 'Vaga de garagem' },
 ].map((it, i) => (
 <div key={i}>
-<div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 'clamp(34px,5vw,58px)', letterSpacing: '0.04em', lineHeight: 1 }}>{it.n}</div>
-<div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDarkMuted, marginTop: 12 }}>{it.l}</div>
+<div style={{ fontFamily: t.display, fontWeight: 600, fontSize: 'clamp(34px,5vw,58px)', lineHeight: 1 }}>{it.n}</div>
+<div style={{ fontSize: 11, color: t.onDarkMuted, marginTop: 12 }}>{it.l}</div>
 </div>
 ))}
 </div>
@@ -380,7 +379,7 @@ return (
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 1, background: t.line }}>
 {DIFERENCIAIS.map((d, i) => (
 <div key={i} style={{ background: t.bg, padding: 'clamp(28px,4vw,44px)' }}>
-<div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 22, color: t.green, marginBottom: 14 }}>{String(i + 1).padStart(2, '0')}</div>
+<div style={{ fontFamily: t.display, fontWeight: 600, fontSize: 22, color: t.green, marginBottom: 14 }}>{String(i + 1).padStart(2, '0')}</div>
 <p style={{ margin: 0, fontSize: 16, lineHeight: 1.5, color: t.ink }}>{d}</p>
 </div>
 ))}
@@ -440,13 +439,13 @@ Tendo o bem-estar e a natureza como seus melhores vizinhos. O Parque da Prefeitu
 { n: '03', ti: 'Realize', d: 'Sua unidade no Parco Savello, com a tranquilidade de negociar diretamente com a Construtora Fontana.' },
 ].map((s, i) => (
 <div key={i} style={{ textAlign: 'left' }}>
-<div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 40, opacity: 0.55, marginBottom: 14 }}>{s.n}</div>
-<h3 style={{ fontFamily: t.display, fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: 17, margin: '0 0 12px', color: t.onDark }}>{s.ti}</h3>
+<div style={{ fontFamily: t.display, fontWeight: 600, fontSize: 40, opacity: 0.55, marginBottom: 14 }}>{s.n}</div>
+<h3 style={{ fontFamily: t.display, fontWeight: 600, fontSize: 17, margin: '0 0 12px', color: t.onDark }}>{s.ti}</h3>
 <p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.6, margin: 0 }}>{s.d}</p>
 </div>
 ))}
 </div>
-<p style={{ marginTop: 56, fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: t.onDark }}>{COMERCIAL.vigencia}</p>
+<p style={{ marginTop: 56, fontSize: 11, color: t.onDark }}>{COMERCIAL.vigencia}</p>
 </div>
 </section>
 
@@ -459,7 +458,7 @@ Tendo o bem-estar e a natureza como seus melhores vizinhos. O Parque da Prefeitu
 <div style={{ position: 'absolute', inset: 0, background: 'rgba(14,26,15,0.62)' }} />
 <div style={{ position: 'relative', zIndex: 2, padding: '0 clamp(18px,5vw,56px)', maxWidth: 880 }}>
 <p className="ps-eyebrow ps-onimg" style={{ color: '#fff', marginBottom: 22 }}>Atendimento Exclusivo</p>
-<h2 className="ps-h2 ps-onimg" style={{ color: '#fff', fontSize: 'clamp(30px,5vw,56px)' }}>Vivi la Vita.</h2>
+<h2 className="ps-h2 ps-onimg" style={{ color: '#fff', fontSize: 'clamp(30px,5vw,56px)', fontStyle: 'italic', fontWeight: 400 }}>Vivi la Vita.</h2>
 <div style={{ marginTop: 38, display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
 <a href={WPP} target="_blank" rel="noopener noreferrer" className="ps-cta ps-cta-light" data-wpp="1">Atendimento Exclusivo</a>
 <ShareButton nome="Parco Savello Residencial" className="ps-cta ps-cta-light" />
@@ -471,15 +470,15 @@ Tendo o bem-estar e a natureza como seus melhores vizinhos. O Parque da Prefeitu
 <footer style={{ background: t.greenDark, color: t.onDarkMuted, padding: 'clamp(56px,9vh,96px) clamp(18px,5vw,56px)' }}>
 <div style={{ maxWidth: 1180, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px,1fr))', gap: 'clamp(28px,5vw,56px)' }}>
 <div>
-<div style={{ fontFamily: t.display, fontWeight: 400, letterSpacing: '0.22em', fontSize: 18, color: t.onDark, textTransform: 'uppercase' }}>Stiven Allan</div>
+<div style={{ fontFamily: t.display, fontWeight: 600, fontSize: 18, color: t.onDark }}>Stiven Allan</div>
 <p style={{ marginTop: 14, fontSize: 14, lineHeight: 1.6 }}>Imóveis de alto padrão em Santa Catarina.<br />CRECI 60.275</p>
 </div>
 <div>
-<div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDark, marginBottom: 14 }}>Contato</div>
+<div style={{ fontSize: 11, color: t.onDark, marginBottom: 14 }}>Contato</div>
 <a href={WPP} target="_blank" rel="noopener noreferrer" data-wpp="1" style={{ color: t.onDarkMuted, textDecoration: 'none', fontSize: 14 }}>WhatsApp &middot; (48) 99164-2332</a>
 </div>
 <div>
-<div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDark, marginBottom: 14 }}>Empreendimento</div>
+<div style={{ fontSize: 11, color: t.onDark, marginBottom: 14 }}>Empreendimento</div>
 <p style={{ fontSize: 14, lineHeight: 1.6, margin: 0 }}>Parco Savello Residencial<br />Construtora Fontana<br />Santa Bárbara, Criciúma/SC</p>
 </div>
 </div>

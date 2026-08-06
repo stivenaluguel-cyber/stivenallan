@@ -42,7 +42,7 @@ function fmtBrl(v: number): string {
   return `R$ ${v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 }
 
-const H2 = { fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase' as const, letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }
+const H2 = { fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }
 const P = { fontSize: 16, lineHeight: 1.8, color: '#333' }
 
 export default async function IndicadoresPage() {
@@ -59,22 +59,22 @@ export default async function IndicadoresPage() {
   ]
 
   return (
-    <main style={{ background: '#FAFAF8', color: '#1A1A1A', fontFamily: "'Hanken Grotesk', system-ui, sans-serif" }}>
+    <main style={{ background: '#FAFAF8', color: '#1A1A1A', fontFamily: 'var(--font-public-sans), system-ui, sans-serif' }}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHEMA) }} />
 
       {/* HEADER */}
       <header style={{ background: '#fff', borderBottom: '1px solid rgba(0,0,0,0.08)', padding: '16px clamp(18px,5vw,64px)' }}>
         <nav style={{ maxWidth: 1080, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Link href="/" style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 400, letterSpacing: '0.22em', fontSize: 15, color: '#1A1A1A', textDecoration: 'none', textTransform: 'uppercase' }}>Stiven Allan</Link>
-          <Link href="/empreendimentos" style={{ fontSize: 12, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#1B5E8B', textDecoration: 'none' }}>Ver Empreendimentos</Link>
+          <Link href="/" style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 400, fontSize: 15, color: '#1A1A1A', textDecoration: 'none' }}>Stiven Allan</Link>
+          <Link href="/empreendimentos" style={{ fontSize: 15, color: '#1B5E8B', textDecoration: 'none' }}>Ver Empreendimentos</Link>
         </nav>
       </header>
 
       {/* HERO */}
       <section style={{ background: '#0F1C22', color: '#E4EEF6', padding: 'clamp(64px,12vh,120px) clamp(18px,5vw,64px)' }}>
         <div style={{ maxWidth: 1080, margin: '0 auto' }}>
-          <p style={{ fontSize: 11, letterSpacing: '0.42em', textTransform: 'uppercase', color: 'rgba(228,238,246,0.55)', marginBottom: 20 }}>Mercado</p>
-          <h1 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.12em', fontSize: 'clamp(28px,5vw,52px)', lineHeight: 1.1, margin: 0 }}>
+          <p style={{ fontSize: 11, letterSpacing: '0.07em', textTransform: 'uppercase', color: 'rgba(228,238,246,0.55)', marginBottom: 20 }}>Mercado</p>
+          <h1 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(28px,5vw,52px)', lineHeight: 1.1, margin: 0 }}>
             Indicadores do Mercado Imobiliário
           </h1>
           <p style={{ fontSize: 'clamp(16px,2vw,20px)', color: 'rgba(228,238,246,0.75)', marginTop: 24, lineHeight: 1.6, maxWidth: 680 }}>
@@ -88,8 +88,8 @@ export default async function IndicadoresPage() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
           {cards.map((c) => (
             <div key={c.label} style={{ background: '#fff', border: '1px solid rgba(0,0,0,0.08)', borderRadius: 2, padding: '24px 24px' }}>
-              <p style={{ margin: 0, fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#1B5E8B', fontWeight: 600 }}>{c.label}</p>
-              <p style={{ margin: '10px 0 0', fontSize: 'clamp(22px,3vw,30px)', fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, letterSpacing: '0.02em' }}>{c.valor}</p>
+              <p style={{ margin: 0, fontSize: 12, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#1B5E8B', fontWeight: 600 }}>{c.label}</p>
+              <p style={{ margin: '10px 0 0', fontSize: 'clamp(22px,3vw,30px)', fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600 }}>{c.valor}</p>
               <p style={{ margin: '8px 0 0', fontSize: 12, color: '#888' }}>{c.nota}</p>
             </div>
           ))}
@@ -113,7 +113,7 @@ export default async function IndicadoresPage() {
 
         <div style={{ marginTop: 40, background: '#0F1C22', color: '#E4EEF6', borderRadius: 2, padding: '32px 28px', textAlign: 'center' }}>
           <p style={{ margin: 0, fontSize: 18, lineHeight: 1.6 }}>Quer simular o impacto desses indicadores no seu financiamento?</p>
-          <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', marginTop: 20, background: '#1B5E8B', color: '#fff', textDecoration: 'none', padding: '14px 32px', borderRadius: 2, fontSize: 13, letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 600 }}>
+          <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', marginTop: 20, background: '#1B5E8B', color: '#fff', textDecoration: 'none', padding: '14px 32px', borderRadius: 2, fontSize: 15, fontWeight: 600 }}>
             Falar com Stiven no WhatsApp
           </a>
         </div>

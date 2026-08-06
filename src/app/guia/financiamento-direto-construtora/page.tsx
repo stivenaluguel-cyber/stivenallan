@@ -74,23 +74,23 @@ const FAQ_SCHEMA = {
 
 export default function GuiaFinanciamentoDiretoPage() {
   return (
-    <main style={{ background: '#FAFAF8', color: '#1A1A1A', fontFamily: "'Hanken Grotesk', system-ui, sans-serif" }}>
+    <main style={{ background: '#FAFAF8', color: '#1A1A1A', fontFamily: 'var(--font-public-sans), system-ui, sans-serif' }}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHEMA) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_SCHEMA) }} />
 
       {/* HEADER */}
       <header style={{ background: '#fff', borderBottom: '1px solid rgba(0,0,0,0.08)', padding: '16px clamp(18px,5vw,64px)' }}>
         <nav style={{ maxWidth: 1080, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Link href="/" style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 400, letterSpacing: '0.22em', fontSize: 15, color: '#1A1A1A', textDecoration: 'none', textTransform: 'uppercase' }}>Stiven Allan</Link>
-          <Link href="/empreendimentos" style={{ fontSize: 12, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#1A5C3A', textDecoration: 'none' }}>Ver Empreendimentos</Link>
+          <Link href="/" style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 400, fontSize: 15, color: '#1A1A1A', textDecoration: 'none' }}>Stiven Allan</Link>
+          <Link href="/empreendimentos" style={{ fontSize: 15, color: '#1A5C3A', textDecoration: 'none' }}>Ver Empreendimentos</Link>
         </nav>
       </header>
 
       {/* HERO */}
       <section style={{ background: '#1A1A1A', color: '#F5F2ED', padding: 'clamp(64px,12vh,120px) clamp(18px,5vw,64px)' }}>
         <div style={{ maxWidth: 800, margin: '0 auto' }}>
-          <p style={{ fontSize: 11, letterSpacing: '0.42em', textTransform: 'uppercase', color: 'rgba(245,242,237,0.55)', marginBottom: 20 }}>Guia - Financiamento</p>
-          <h1 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.12em', fontSize: 'clamp(28px,5vw,52px)', lineHeight: 1.1, margin: 0 }}>
+          <p style={{ fontSize: 11, letterSpacing: '0.07em', textTransform: 'uppercase', color: 'rgba(245,242,237,0.55)', marginBottom: 20 }}>Guia - Financiamento</p>
+          <h1 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(28px,5vw,52px)', lineHeight: 1.1, margin: 0 }}>
             Financiamento Direto com a Construtora
           </h1>
           <p style={{ fontSize: 'clamp(16px,2vw,20px)', color: 'rgba(245,242,237,0.75)', marginTop: 24, lineHeight: 1.6 }}>
@@ -116,7 +116,7 @@ export default function GuiaFinanciamentoDiretoPage() {
           ]}
         />
 
-        <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>O que é financiamento direto?</h2>
+        <h2 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>O que é financiamento direto?</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
           A negociação ocorre diretamente com a construtora, sem depender de financiamento bancário. A construtora poderá realizar análise cadastral e de capacidade de pagamento conforme suas políticas — a aprovação não é automática. As parcelas são corrigidas pelo <strong>CUB/SC (Custo Unitário Básico do Sinduscon-SC)</strong> durante a obra. Os custos e encargos variam conforme o contrato e podem ser diferentes dos encontrados no financiamento bancário. Compare o custo total e confirme cada item na minuta contratual.
         </p>
@@ -124,7 +124,7 @@ export default function GuiaFinanciamentoDiretoPage() {
           O modelo pode ser uma alternativa para quem não atende aos critérios de um financiamento bancário convencional, para investidores avaliando o retorno sobre o capital investido durante a obra, ou para quem prefere negociar condições diretamente com a construtora. A Construtora Fontana atua com esse modelo em Criciuma e região.
         </p>
 
-        <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Como funciona o plano padrão Fontana?</h2>
+        <h2 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Como funciona o plano padrão Fontana?</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
           O plano padrão da Construtora Fontana para imóveis em obras divide o pagamento em três partes: <strong>entrada (Parcela A - ato)</strong>, <strong>parcelas mensais</strong> e <strong>reforços anuais</strong>.
         </p>
@@ -135,7 +135,7 @@ export default function GuiaFinanciamentoDiretoPage() {
           <li><strong>CUB/SC jun/2026:</strong> R$ 3.121,62/m2 (maio/2026: R$ 3.096,25/m2, alta de 0,82%), fonte: série histórica compilada pelo SENGE-SC — consulte sempre o índice do mês vigente.</li>
         </ul>
 
-        <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Simulação prática: imóvel de R$ 600.000</h2>
+        <h2 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Simulação prática: imóvel de R$ 600.000</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
           Para ilustrar como funciona na prática, veja uma simulação com um apartamento de <strong>R$ 600.000</strong> no modelo padrão Fontana:
         </p>
@@ -153,7 +153,7 @@ export default function GuiaFinanciamentoDiretoPage() {
           Note que o saldo restante ao final da obra pode ser quitado com recursos próprios, com financiamento bancário (o uso do FGTS nessa etapa depende das regras vigentes e da aprovação da instituição financeira), ou financiado diretamente com a Fontana pelo saldo direto corrigido por IGPM mais 0,75% a.m., em prazos de até 180 ou 240 meses.
         </p>
 
-        <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>O que é o CUB/SC?</h2>
+        <h2 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>O que é o CUB/SC?</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
           O CUB (Custo Unitário Básico) é publicado mensalmente pelo Sinduscon-SC e reflete o custo de construção civil no estado de Santa Catarina. Em junho de 2026, o CUB/SC estava em <strong>R$ 3.121,62/m2</strong> (alta de 0,82% frente a maio/2026, R$ 3.096,25/m2). As parcelas do financiamento direto Fontana sobem mensalmente de acordo com a variação do CUB: se o CUB subir 0,6% no mês, suas parcelas também sobem 0,6%.
         </p>
@@ -164,7 +164,7 @@ export default function GuiaFinanciamentoDiretoPage() {
           Para entender em detalhe como a correção pelo CUB/SC afeta suas parcelas mês a mês, veja o <Link href="/guia/cub-sc-correcao-parcelas" style={{ color: '#1A5C3A', fontWeight: 600 }}>guia dedicado sobre CUB/SC e correção de parcelas</Link>.
         </p>
 
-        <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Passo a passo para comprar com financiamento direto</h2>
+        <h2 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Passo a passo para comprar com financiamento direto</h2>
         <ol style={{ fontSize: 15, lineHeight: 2.2, color: '#333', paddingLeft: 24 }}>
           <li><strong>Escolha o empreendimento:</strong> Verifique localização, tipologia, prazo de entrega e valores de partida.</li>
           <li><strong>Simulação personalizada:</strong> Stiven calcula as parcelas mensais e reforços anuais de acordo com o imóvel e a tabela vigente.</li>
@@ -175,7 +175,7 @@ export default function GuiaFinanciamentoDiretoPage() {
           <li><strong>Registro do imóvel:</strong> Após quitar o saldo, você registra o imóvel em seu nome no cartório de imóveis.</li>
         </ol>
 
-        <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Vantagens do financiamento direto</h2>
+        <h2 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Vantagens do financiamento direto</h2>
         <ul style={{ fontSize: 15, lineHeight: 2, color: '#333', paddingLeft: 24 }}>
           <li>Negociação direta com a construtora, sem depender de financiamento bancário, com mais flexibilidade nas condições — a construtora poderá fazer sua própria análise cadastral e de capacidade de pagamento, conforme suas políticas.</li>
           <li>Os custos e encargos variam conforme o contrato e podem ser diferentes dos encontrados no financiamento bancário — compare o custo total e confirme cada item na minuta contratual.</li>
@@ -190,7 +190,7 @@ export default function GuiaFinanciamentoDiretoPage() {
           Se você está avaliando financiamento direto com a construtora versus financiamento bancário tradicional, veja a <Link href="/guia/financiamento-direto-vs-bancario" style={{ color: '#1A5C3A', fontWeight: 600 }}>comparação completa entre os dois modelos</Link>.
         </p>
 
-        <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Empreendimentos com financiamento direto em Criciuma e região</h2>
+        <h2 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Empreendimentos com financiamento direto em Criciuma e região</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
           A Construtora Fontana tem empreendimentos com financiamento direto em Criciuma (bairros Centro, Michel, Rio Maina, Santa Barbara, Cruzeiro do Sul), Icara, Sideropolis, Laguna, Balneario Rincao e Balneario Picarras. Cada empreendimento tem seu próprio plano de pagamento: alguns com entrega mais próxima e parcelas menores, outros em fase inicial com mais prazo e condições diferenciadas de entrada.
         </p>
@@ -201,7 +201,7 @@ export default function GuiaFinanciamentoDiretoPage() {
           Para saber qual empreendimento tem a melhor combinação de localização, prazo de entrega e condições de pagamento para o seu perfil, o ideal é conversar diretamente com Stiven Allan, CRECI 60.275, que acompanha todos os lançamentos Fontana e monta simulações personalizadas sem custo.
         </p>
 
-        <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Perguntas Frequentes</h2>
+        <h2 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Perguntas Frequentes</h2>
 
         {FAQ_SCHEMA.mainEntity.map((item, i) => (
           <details key={i} style={{ borderTop: '1px solid rgba(0,0,0,0.10)', padding: '20px 0' }}>
@@ -216,15 +216,15 @@ export default function GuiaFinanciamentoDiretoPage() {
 
         {/* CTA */}
         <div style={{ background: '#1A5C3A', color: '#fff', borderRadius: 2, padding: 'clamp(32px,5vw,56px)', marginTop: 64, textAlign: 'center' }}>
-          <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,28px)', margin: 0 }}>Simule seu financiamento</h2>
+          <h2 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(20px,3vw,28px)', margin: 0 }}>Simule seu financiamento</h2>
           <p style={{ color: 'rgba(255,255,255,0.8)', marginTop: 16, marginBottom: 32, fontSize: 15, lineHeight: 1.6 }}>
             Veja as condições dos empreendimentos Fontana disponíveis em Criciuma e região. Stiven Allan, CRECI 60.275.
           </p>
           <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', fontSize: 12, letterSpacing: '0.3em', textTransform: 'uppercase', color: '#fff', border: '1px solid rgba(255,255,255,0.55)', padding: '14px 28px', textDecoration: 'none' }}>
+            <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', fontSize: 15, color: '#fff', border: '1px solid rgba(255,255,255,0.55)', padding: '14px 28px', textDecoration: 'none' }}>
               Falar no WhatsApp
             </a>
-            <Link href="/empreendimentos" style={{ display: 'inline-block', fontSize: 12, letterSpacing: '0.3em', textTransform: 'uppercase', color: '#fff', border: '1px solid rgba(255,255,255,0.55)', padding: '14px 28px', textDecoration: 'none' }}>
+            <Link href="/empreendimentos" style={{ display: 'inline-block', fontSize: 15, color: '#fff', border: '1px solid rgba(255,255,255,0.55)', padding: '14px 28px', textDecoration: 'none' }}>
               Ver Empreendimentos
             </Link>
           </div>

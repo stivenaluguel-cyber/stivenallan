@@ -18,9 +18,8 @@ const t = {
 bg:'#F8FAF8', ink:'#0F1A12', forest:'#2D4A2F', forestDark:'#1A2E1C',
 muted:'#536455', line:'rgba(15,26,18,0.12)', dark:'#080F09',
 onDark:'#E8F2E8', onDarkMuted:'rgba(232,242,232,0.66)',
-display:"'Jost',system-ui,sans-serif",
-serif:"'Cormorant Garamond',Georgia,serif",
-body:"'Hanken Grotesk',system-ui,sans-serif",
+display: 'var(--font-piazzolla), Georgia, serif',
+body: 'var(--font-public-sans), system-ui, sans-serif',
 }
 
 const IMG = {
@@ -100,16 +99,16 @@ return (
 
 <style>{`
 html { scroll-behavior: smooth; }
-.cm-eyebrow { font-size:11px; letter-spacing:0.42em; text-transform:uppercase; color:${t.forest}; font-family:${t.body}; font-weight:500; }
-.cm-h1 { font-family:${t.display}; font-weight:300; text-transform:uppercase; letter-spacing:0.14em; line-height:1.04; text-shadow:0 2px 24px rgba(0,0,0,0.55); }
+.cm-eyebrow { font-size:11px; letter-spacing:0.07em; text-transform:uppercase; color:${t.forest}; font-family:${t.body}; font-weight:600; }
+.cm-h1 { font-family:${t.display}; font-weight:600; line-height:1.04; text-shadow:0 2px 24px rgba(0,0,0,0.55); }
 .cm-onimg { text-shadow:0 1px 16px rgba(0,0,0,0.6); }
-.cm-h2 { font-family:${t.display}; font-weight:300; text-transform:uppercase; letter-spacing:0.16em; line-height:1.1; font-size:clamp(26px,4vw,46px); margin:0; }
+.cm-h2 { font-family:${t.display}; font-weight:600; line-height:1.1; font-size:clamp(26px,4vw,46px); margin:0; }
 .cm-rule { width:56px; height:1px; background:${t.forest}; border:0; }
-.cm-cta { display:inline-block; font-family:${t.body}; font-size:12px; letter-spacing:0.3em; text-transform:uppercase; color:${t.ink}; border:1px solid ${t.forest}; padding:16px 34px; text-decoration:none; transition:background .2s,color .2s; }
+.cm-cta { display:inline-block; font-family:${t.body}; font-size:15px; font-weight:600; color:${t.ink}; border:1px solid ${t.forest}; padding:16px 34px; text-decoration:none; transition:background .2s,color .2s; }
 .cm-cta:hover { background:${t.forest}; color:#fff; }
 .cm-cta-light { color:${t.onDark}; border-color:rgba(232,242,232,0.55); }
 .cm-cta-light:hover { background:${t.onDark}; color:${t.forestDark}; }
-.cm-navlink { font-family:${t.body}; font-size:11px; letter-spacing:0.28em; text-transform:uppercase; color:rgba(255,255,255,0.85); text-decoration:none; }
+.cm-navlink { font-family:${t.body}; font-size:15px; font-weight:500; color:rgba(255,255,255,0.85); text-decoration:none; }
 .cm-navlink:hover { color:#fff; }
 .cm-fade { opacity:0; transform:translateY(24px); animation:cmfade .9s ease forwards; }
 @keyframes cmfade { to { opacity:1; transform:none; } }
@@ -127,7 +126,7 @@ html { scroll-behavior: smooth; }
 @media (max-width:860px) { .cm-nav-links { display:none !important; } }
 `}</style>
 <header style={{ position:'absolute', top:0, left:0, right:0, zIndex:50, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 32px', height:64 }}>
-<Link href="/" style={{ fontFamily:t.display, fontSize:15, fontWeight:300, letterSpacing:'0.22em', textTransform:'uppercase', color:t.onDark, textDecoration:'none' }}>Stiven Allan</Link>
+<Link href="/" style={{ fontFamily:t.display, fontSize:15, fontWeight:600, color:t.onDark, textDecoration:'none' }}>Stiven Allan</Link>
 <nav className="cm-nav-links" style={{ display:'flex', gap:32 }}>
 <a href="#galeria" className="cm-navlink">Galeria</a>
 <a href="#diferenciais" className="cm-navlink">Diferenciais</a>
@@ -141,14 +140,14 @@ html { scroll-behavior: smooth; }
 <div style={{ position:'relative', padding:'0 48px', maxWidth:840 }} className="cm-fade">
 <p className="cm-eyebrow cm-onimg" style={{ color:t.onDarkMuted, marginBottom:16 }}>Rod. SC-390 · Bom Jardim da Serra / SC</p>
 <h1 className="cm-h1 cm-onimg" style={{ fontSize:'clamp(34px,6vw,80px)', color:t.onDark, margin:'0 0 12px', fontFamily:t.display }}>Campos da<br/>Montanha</h1>
-<p style={{ fontFamily:t.serif, fontSize:'clamp(18px,2.2vw,26px)', color:t.onDarkMuted, margin:'0 0 32px', fontStyle:'italic' }}>Sinta o bem-estar da serra em todos os seus dias.</p>
+<p style={{ fontFamily:t.display, fontWeight:400, fontSize:'clamp(18px,2.2vw,26px)', color:t.onDarkMuted, margin:'0 0 32px', fontStyle:'italic' }}>Sinta o bem-estar da serra em todos os seus dias.</p>
 <a href={WPP} className="cm-cta cm-cta-light">Fale com Stiven</a>
 </div>
 </section>
 <section style={{ maxWidth:780, margin:'0 auto', padding:'96px 32px 80px' }}>
 <p className="cm-eyebrow" style={{ marginBottom:20 }}>O Empreendimento</p>
 <hr className="cm-rule" style={{ marginBottom:32 }} />
-<p style={{ fontFamily:t.serif, fontSize:'clamp(20px,2.4vw,30px)', lineHeight:1.55, color:t.ink, fontStyle:'italic', margin:0 }}>Um caminho sinuoso desenhado pela natureza lhe conectará ao verde das montanhas e ao azul do céu. Águas límpidas, cachoeiras, cânions e neve no inverno — este é o cenário que envolve o Campos da Montanha. A Capital das Águas como palco da sua nova vida.</p>
+<p style={{ fontFamily:t.body, fontWeight:500, fontSize:'clamp(20px,2.4vw,30px)', lineHeight:1.55, color:t.ink, margin:0 }}>Um caminho sinuoso desenhado pela natureza lhe conectará ao verde das montanhas e ao azul do céu. Águas límpidas, cachoeiras, cânions e neve no inverno — este é o cenário que envolve o Campos da Montanha. A Capital das Águas como palco da sua nova vida.</p>
 </section>
 <section style={{ background:t.dark, padding:'80px 32px' }}>
 <div style={{ maxWidth:1100, margin:'0 auto' }}>
@@ -157,8 +156,8 @@ html { scroll-behavior: smooth; }
 <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))', gap:2 }}>
 {([{n:'800 a 1.823',l:'m² por lote'},{n:'100%',l:'Infraestrutura'},{n:'1.000+',l:'metros de altitude'},{n:'Serra',l:'Catarinense'}] as {n:string,l:string}[]).map((s,i) => (
 <div key={i} style={{ background:'rgba(232,242,232,0.04)', padding:'40px 32px', borderLeft:'1px solid rgba(232,242,232,0.08)' }}>
-<p style={{ fontFamily:t.display, fontSize:'clamp(28px,4vw,52px)', fontWeight:300, color:t.onDark, margin:'0 0 6px', letterSpacing:'0.04em' }}>{s.n}</p>
-<p style={{ fontFamily:t.body, fontSize:12, letterSpacing:'0.3em', textTransform:'uppercase', color:t.onDarkMuted, margin:0 }}>{s.l}</p>
+<p style={{ fontFamily:t.display, fontSize:'clamp(28px,4vw,52px)', fontWeight:600, color:t.onDark, margin:'0 0 6px' }}>{s.n}</p>
+<p style={{ fontFamily:t.body, fontSize:12, color:t.onDarkMuted, margin:0 }}>{s.l}</p>
 </div>
 ))}
 </div>
@@ -180,7 +179,7 @@ html { scroll-behavior: smooth; }
 <hr className="cm-rule" style={{ background:t.onDark, marginBottom:40 }} />
 {DIFERENCIAIS.map((d,i) => (
 <div key={i} style={{ display:'grid', gridTemplateColumns:'40px 1fr', gap:20, marginBottom:32, alignItems:'start' }}>
-<span style={{ fontFamily:t.serif, fontSize:'clamp(22px,2vw,30px)', color:t.forest, lineHeight:1 }}>{String(i+1).padStart(2,'0')}</span>
+<span style={{ fontFamily:t.display, fontWeight:600, fontSize:'clamp(22px,2vw,30px)', color:t.forest, lineHeight:1 }}>{String(i+1).padStart(2,'0')}</span>
 <p style={{ margin:0, color:t.onDarkMuted, fontSize:15, lineHeight:1.7 }}>{d}</p>
 </div>
 ))}
@@ -223,7 +222,7 @@ html { scroll-behavior: smooth; }
 </div>
 </section>
 <footer style={{ background:t.dark, borderTop:'1px solid rgba(232,242,232,0.06)', padding:'32px', textAlign:'center' }}>
-<p style={{ color:t.onDarkMuted, fontSize:12, letterSpacing:'0.2em', textTransform:'uppercase', margin:0 }}>© {new Date().getFullYear()} Stiven Allan · Campos da Montanha Residencial · Bom Jardim da Serra/SC</p>
+<p style={{ color:t.onDarkMuted, fontSize:12, margin:0 }}>© {new Date().getFullYear()} Stiven Allan · Campos da Montanha Residencial · Bom Jardim da Serra/SC</p>
 </footer>
 <a href={WPP} target="_blank" rel="noopener noreferrer" className="cm-wa" aria-label="Falar no WhatsApp com Stiven Allan">
 <svg width="30" height="30" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.515 5.26l-.999 3.648 3.973-1.042zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>

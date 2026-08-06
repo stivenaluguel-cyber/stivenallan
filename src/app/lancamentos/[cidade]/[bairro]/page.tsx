@@ -71,7 +71,7 @@ const STATUS_LABELS: Record<string, string> = {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  'na planta': 'bg-[#c9a24b] text-[#121315]',
+  'na planta': 'bg-[#D24E22] text-[#121315]',
   'em obras': 'bg-blue-500/20 text-blue-400',
   'pronto': 'bg-green-500/20 text-green-400',
   'entregue': 'bg-white/10 text-white',
@@ -99,7 +99,7 @@ export default async function BairroPage({ params }: Props) {
         <section className="pt-32 pb-16 bg-[#1a1c1f] text-center">
           <div className="container mx-auto px-6">
             <h1 className="text-3xl font-extrabold mb-4">Bairro não encontrado</h1>
-            <Link href="/empreendimentos" className="text-[#c9a24b]">Ver todos os empreendimentos</Link>
+            <Link href="/empreendimentos" className="text-[#D24E22]">Ver todos os empreendimentos</Link>
           </div>
         </section>
         <Footer />
@@ -165,9 +165,9 @@ export default async function BairroPage({ params }: Props) {
       <section className="pt-32 pb-16 bg-[#1a1c1f]">
         <div className="container mx-auto px-6">
           <nav className="flex items-center gap-2 text-sm text-[#a7adb4] mb-6" aria-label="Breadcrumb">
-            <Link href="/" className="hover:text-[#c9a24b] transition-colors">Início</Link>
+            <Link href="/" className="hover:text-[#D24E22] transition-colors">Início</Link>
             <span aria-hidden="true">/</span>
-            <Link href={`/lancamentos/${cidade}`} className="hover:text-[#c9a24b] transition-colors">
+            <Link href={`/lancamentos/${cidade}`} className="hover:text-[#D24E22] transition-colors">
               Lançamentos {nomeCidade}
             </Link>
             <span aria-hidden="true">/</span>
@@ -175,7 +175,7 @@ export default async function BairroPage({ params }: Props) {
           </nav>
           <h1 className="text-4xl md:text-5xl font-extrabold mb-4">
             Lançamentos no{' '}
-            <span className="text-[#c9a24b]">{nomeBairro}</span>
+            <span className="text-[#D24E22]">{nomeBairro}</span>
             {', '}
             <span className="text-white">{nomeCidade}/SC</span>
           </h1>
@@ -185,7 +185,7 @@ export default async function BairroPage({ params }: Props) {
             com Stiven Allan, CRECI 60.275.
           </p>
           {empreendimentos.length > 0 && (
-            <p className="mt-4 text-[#c9a24b] font-semibold">
+            <p className="mt-4 text-[#D24E22] font-semibold">
               {empreendimentos.length} empreendimento{empreendimentos.length > 1 ? 's' : ''} encontrado{empreendimentos.length > 1 ? 's' : ''}
             </p>
           )}
@@ -206,7 +206,7 @@ export default async function BairroPage({ params }: Props) {
               </p>
               <Link
                 href={`/lancamentos/${cidade}`}
-                className="inline-block px-6 py-3 border border-[#c9a24b]/40 text-[#c9a24b] rounded-full hover:bg-[#c9a24b]/10 transition-colors"
+                className="inline-block px-6 py-3 border border-[#D24E22]/40 text-[#D24E22] rounded-full hover:bg-[#D24E22]/10 transition-colors"
               >
                 Ver todos em {nomeCidade}
               </Link>
@@ -216,7 +216,7 @@ export default async function BairroPage({ params }: Props) {
               {empreendimentos.map((emp) => (
                 <article
                   key={emp.id}
-                  className="bg-[#202327] border border-[#2c3035] rounded-2xl overflow-hidden hover:border-[#c9a24b]/30 transition-all group"
+                  className="bg-[#202327] border border-[#2c3035] rounded-2xl overflow-hidden hover:border-[#D24E22]/30 transition-all group"
                 >
                   <Link href={`/empreendimento/${emp.construtora_slug}/${emp.slug}`}>
                     <div className="relative h-52 bg-[#2c3035] overflow-hidden">
@@ -235,10 +235,10 @@ export default async function BairroPage({ params }: Props) {
                     </div>
                     <div className="p-5">
                       <p className="text-[#a7adb4] text-xs mb-1">Apartamento · {nomeBairro}</p>
-                      <h2 className="text-white font-bold text-lg mb-2 group-hover:text-[#c9a24b] transition-colors line-clamp-2">
+                      <h2 className="text-white font-bold text-lg mb-2 group-hover:text-[#D24E22] transition-colors line-clamp-2">
                         {emp.nome}
                       </h2>
-                      <p className="text-[#c9a24b] font-semibold text-sm">
+                      <p className="text-[#D24E22] font-semibold text-sm">
                         {emp.exibir_preco && emp.preco ? `A partir de ${formatPreco(emp.preco)}` : 'Sob consulta'}
                       </p>
                     </div>
@@ -275,7 +275,7 @@ export default async function BairroPage({ params }: Props) {
                   <Link
                     key={slug}
                     href={`/lancamentos/${cidade}/${slug}`}
-                    className="px-4 py-2 bg-[#202327] border border-[#2c3035] rounded-full text-[#a7adb4] text-sm hover:border-[#c9a24b]/40 hover:text-[#c9a24b] transition-colors"
+                    className="px-4 py-2 bg-[#202327] border border-[#2c3035] rounded-full text-[#a7adb4] text-sm hover:border-[#D24E22]/40 hover:text-[#D24E22] transition-colors"
                   >
                     {nome}
                   </Link>

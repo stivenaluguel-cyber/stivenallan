@@ -17,16 +17,15 @@ const WPP = 'https://wa.me/5548991642332?text=Ol%C3%A1%20Stiven%2C%20tenho%20int
 const t = {
   bg: '#FAFAF8',
   ink: '#201610',
-  terra: '#B0734E',
-  terraDark: '#7D4B2A',
+  terra: '#D24E22',
+  terraDark: '#D24E22',
   muted: '#6E6058',
   line: 'rgba(32,22,16,0.12)',
   dark: '#14100A',
   onDark: '#F5EFE8',
   onDarkMuted: 'rgba(245,239,232,0.66)',
-  display: "'Bricolage Grotesque', system-ui, sans-serif",
-  serif: "'Cormorant Garamond', Georgia, serif",
-  body: "'Hanken Grotesk', system-ui, sans-serif",
+  display: 'var(--font-piazzolla), Georgia, serif',
+  body: 'var(--font-public-sans), system-ui, sans-serif',
 }
 
 const IMG = {
@@ -141,17 +140,17 @@ export default function LavisPage() {
 
       <style>{`
         html { scroll-behavior: smooth; }
-        .lv-eyebrow { font-size: 11px; letter-spacing: 0.42em; text-transform: uppercase; color: ${t.terra}; font-family: ${t.body}; font-weight: 500; }
-        .lv-h1 { font-family: ${t.display}; font-weight: 300; text-transform: uppercase; letter-spacing: 0.14em; line-height: 1.04; text-shadow: 0 2px 24px rgba(0,0,0,0.55), 0 1px 4px rgba(0,0,0,0.4); font-size: clamp(40px,8vw,104px); margin: 0; }
+        .lv-eyebrow { font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase; color: ${t.terra}; font-family: ${t.body}; font-weight: 500; }
+        .lv-h1 { font-family: ${t.display}; font-weight: 600; line-height: 1.04; text-shadow: 0 2px 24px rgba(0,0,0,0.55), 0 1px 4px rgba(0,0,0,0.4); font-size: clamp(40px,8vw,104px); margin: 0; }
         .lv-onimg { text-shadow: 0 1px 16px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.5); }
-        .lv-h2 { font-family: ${t.display}; font-weight: 300; text-transform: uppercase; letter-spacing: 0.16em; line-height: 1.1; font-size: clamp(26px,4vw,46px); margin: 0; }
-        .lv-serif { font-family: ${t.serif}; font-style: italic; font-weight: 400; }
+        .lv-h2 { font-family: ${t.display}; font-weight: 600; line-height: 1.1; font-size: clamp(26px,4vw,46px); margin: 0; }
+        .lv-serif { font-family: ${t.display}; font-style: italic; font-weight: 400; }
         .lv-rule { width: 56px; height: 1px; background: ${t.terra}; border: 0; }
-        .lv-cta { display: inline-block; font-family: ${t.body}; font-size: 12px; letter-spacing: 0.3em; text-transform: uppercase; color: ${t.ink}; border: 1px solid ${t.terra}; padding: 16px 34px; text-decoration: none; transition: background .35s ease, color .35s ease; cursor: pointer; }
+        .lv-cta { display: inline-block; font-family: ${t.body}; font-size: 15px; color: ${t.ink}; border: 1px solid ${t.terra}; padding: 16px 34px; text-decoration: none; transition: background .35s ease, color .35s ease; cursor: pointer; }
         .lv-cta:hover { background: ${t.terra}; color: #fff; }
         .lv-cta-light { color: ${t.onDark}; border-color: rgba(245,239,232,0.55); }
         .lv-cta-light:hover { background: ${t.onDark}; color: ${t.terraDark}; }
-        .lv-navlink { font-family: ${t.body}; font-size: 11px; letter-spacing: 0.28em; text-transform: uppercase; color: rgba(255,255,255,0.85); text-decoration: none; transition: color .3s ease; }
+        .lv-navlink { font-family: ${t.body}; font-size: 15px; color: rgba(255,255,255,0.85); text-decoration: none; transition: color .3s ease; }
         .lv-navlink:hover { color: #fff; }
         .lv-fade { opacity: 0; transform: translateY(24px); animation: lvfade .9s ease forwards; }
         @keyframes lvfade { to { opacity: 1; transform: none; } }
@@ -173,7 +172,7 @@ export default function LavisPage() {
       {/* NAV */}
       <header style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 50 }}>
         <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '22px clamp(18px,5vw,56px)' }}>
-          <a href="#top" style={{ fontFamily: t.display, fontWeight: 400, letterSpacing: '0.26em', fontSize: 16, color: '#fff', textDecoration: 'none', textTransform: 'uppercase' }}>Lavis</a>
+          <a href="#top" style={{ fontFamily: t.display, fontWeight: 600, fontSize: 16, color: '#fff', textDecoration: 'none' }}>Lavis</a>
           <div className="lv-nav-links" style={{ display: 'flex', alignItems: 'center', gap: 30 }}>
             <a href="#residencial" className="lv-navlink">O Residencial</a>
             <a href="#galeria" className="lv-navlink">Galeria</a>
@@ -214,7 +213,7 @@ export default function LavisPage() {
           <p className="lv-eyebrow" style={{ marginBottom: 26 }}>O Residencial</p>
           <h2 className="lv-h2">No seu ritmo,<br />em equilíbrio</h2>
           <hr className="lv-rule" style={{ margin: '34px auto' }} />
-          <p className="lv-serif" style={{ fontSize: 'clamp(24px,3.4vw,40px)', lineHeight: 1.35, color: t.ink, margin: 0 }}>
+          <p style={{ fontFamily: t.body, fontWeight: 500, fontSize: 'clamp(24px,3.4vw,40px)', lineHeight: 1.35, color: t.ink, margin: 0 }}>
             No Lavis, a vida moderna encontra o equilíbrio. E, mesmo em constante movimento, a harmonia permanece.
           </p>
           <p style={{ fontSize: 18, lineHeight: 1.8, color: t.muted, marginTop: 26, maxWidth: 620, marginLeft: 'auto', marginRight: 'auto' }}>
@@ -254,7 +253,7 @@ export default function LavisPage() {
         <div style={{ maxWidth: 1080, margin: '0 auto', textAlign: 'center' }}>
           <p className="lv-eyebrow" style={{ color: t.onDark, marginBottom: 18 }}>As Residências</p>
           <h2 className="lv-h2" style={{ color: t.onDark }}>Espaço para viver no seu ritmo</h2>
-          <p className="lv-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 56 }}>Plantas pensadas para o equilíbrio do morar.</p>
+          <p style={{ fontFamily: t.body, fontWeight: 500, color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 56 }}>Plantas pensadas para o equilíbrio do morar.</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 'clamp(28px,5vw,64px)', marginBottom: 56 }}>
             {[
               { n: '3', l: 'Dormitórios (todos suítes)' },
@@ -263,8 +262,8 @@ export default function LavisPage() {
               { n: 'Sim', l: 'Personalização de planta' },
             ].map((it, i) => (
               <div key={i}>
-                <div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 'clamp(34px,5vw,58px)', letterSpacing: '0.04em', lineHeight: 1 }}>{it.n}</div>
-                <div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDarkMuted, marginTop: 12 }}>{it.l}</div>
+                <div style={{ fontFamily: t.display, fontWeight: 600, fontSize: 'clamp(34px,5vw,58px)', letterSpacing: '0.04em', lineHeight: 1 }}>{it.n}</div>
+                <div style={{ fontSize: 11, color: t.onDarkMuted, marginTop: 12 }}>{it.l}</div>
               </div>
             ))}
           </div>
@@ -296,7 +295,7 @@ export default function LavisPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', borderTop: `1px solid ${t.line}`, borderLeft: `1px solid ${t.line}` }}>
             {DIFERENCIAIS.map((d, i) => (
               <div key={i} style={{ background: t.bg, padding: 'clamp(28px,4vw,44px)', borderBottom: `1px solid ${t.line}`, borderRight: `1px solid ${t.line}` }}>
-                <div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 22, color: t.terra, marginBottom: 14 }}>{String(i + 1).padStart(2, '0')}</div>
+                <div style={{ fontFamily: t.display, fontWeight: 600, fontSize: 22, color: t.terra, marginBottom: 14 }}>{String(i + 1).padStart(2, '0')}</div>
                 <p style={{ margin: 0, fontSize: 16, lineHeight: 1.5, color: t.ink }}>{d}</p>
               </div>
             ))}
@@ -345,7 +344,7 @@ export default function LavisPage() {
         <div style={{ maxWidth: 1080, margin: '0 auto', textAlign: 'center' }}>
           <p className="lv-eyebrow" style={{ color: t.onDark, marginBottom: 18 }}>Financiamento Direto</p>
           <h2 className="lv-h2" style={{ color: t.onDark }}>A liberdade de comprar sem banco</h2>
-          <p className="lv-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 40 }}>Condições de pagamento definidas pela Construtora Fontana, conforme a tabela vigente.</p>
+          <p style={{ fontFamily: t.body, fontWeight: 500, color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 40 }}>Condições de pagamento definidas pela Construtora Fontana, conforme a tabela vigente.</p>
           <p style={{ color: t.onDarkMuted, fontSize: 17, lineHeight: 1.7, maxWidth: 720, margin: '0 auto 16px' }}>{COMERCIAL.principal}</p>
           <p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.7, maxWidth: 720, margin: '0 auto 20px' }}>{COMERCIAL.correcaoPrincipal}</p>
           <p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.7, maxWidth: 720, margin: '0 auto 40px' }}>{COMERCIAL.alternativa}</p>
@@ -356,13 +355,13 @@ export default function LavisPage() {
               { n: '03', ti: 'Negocie direto com a Fontana', d: 'Condições negociadas direto com a construtora, sem depender de banco.' },
             ].map((s, i) => (
               <div key={i} style={{ textAlign: 'left' }}>
-                <div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 40, opacity: 0.55, marginBottom: 14 }}>{s.n}</div>
-                <h3 style={{ fontFamily: t.display, fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: 17, margin: '0 0 12px', color: t.onDark }}>{s.ti}</h3>
+                <div style={{ fontFamily: t.display, fontWeight: 600, fontSize: 40, opacity: 0.55, marginBottom: 14 }}>{s.n}</div>
+                <h3 style={{ fontFamily: t.display, fontWeight: 400, fontSize: 17, margin: '0 0 12px', color: t.onDark }}>{s.ti}</h3>
                 <p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.6, margin: 0 }}>{s.d}</p>
               </div>
             ))}
           </div>
-          <p style={{ marginTop: 56, fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: t.onDark }}>{COMERCIAL.vigencia}</p>
+          <p style={{ marginTop: 56, fontSize: 11, letterSpacing: '0.07em', textTransform: 'uppercase', color: t.onDark }}>{COMERCIAL.vigencia}</p>
         </div>
       </section>
 
@@ -381,7 +380,7 @@ export default function LavisPage() {
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(20,16,10,0.62)' }} />
         <div style={{ position: 'relative', zIndex: 2, padding: '0 clamp(18px,5vw,56px)', maxWidth: 880 }}>
           <p className="lv-eyebrow lv-onimg" style={{ color: '#fff', marginBottom: 22 }}>Atendimento Exclusivo</p>
-          <h2 className="lv-h2 lv-onimg" style={{ color: '#fff', fontSize: 'clamp(30px,5vw,56px)' }}>Sofisticação em movimento.</h2>
+          <h2 className="lv-serif lv-onimg" style={{ color: '#fff', fontSize: 'clamp(30px,5vw,56px)' }}>Sofisticação em movimento.</h2>
           <div style={{ marginTop: 38, display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
             <a href={WPP} target="_blank" rel="noopener noreferrer" className="lv-cta lv-cta-light">Atendimento Exclusivo</a>
             <ShareButton nome="Lavis Residencial" className="lv-cta lv-cta-light" />
@@ -393,15 +392,15 @@ export default function LavisPage() {
       <footer style={{ background: t.terraDark, color: t.onDarkMuted, padding: 'clamp(56px,9vh,96px) clamp(18px,5vw,56px)' }}>
         <div style={{ maxWidth: 1180, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px,1fr))', gap: 'clamp(28px,5vw,56px)' }}>
           <div>
-            <div style={{ fontFamily: t.display, fontWeight: 400, letterSpacing: '0.22em', fontSize: 18, color: t.onDark, textTransform: 'uppercase' }}>Stiven Allan</div>
+            <div style={{ fontFamily: t.display, fontWeight: 600, fontSize: 18, color: t.onDark }}>Stiven Allan</div>
             <p style={{ marginTop: 14, fontSize: 14, lineHeight: 1.6 }}>Imóveis de alto padrão em Santa Catarina.<br />CRECI 60.275</p>
           </div>
           <div>
-            <div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDark, marginBottom: 14 }}>Contato</div>
+            <div style={{ fontSize: 11, color: t.onDark, marginBottom: 14 }}>Contato</div>
             <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ color: t.onDarkMuted, textDecoration: 'none', fontSize: 14 }}>WhatsApp &middot; (48) 99164-2332</a>
           </div>
           <div>
-            <div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDark, marginBottom: 14 }}>Empreendimento</div>
+            <div style={{ fontSize: 11, color: t.onDark, marginBottom: 14 }}>Empreendimento</div>
             <p style={{ fontSize: 14, lineHeight: 1.6, margin: 0 }}>Lavis Residencial<br />Construtora Fontana<br />Centro, Criciúma/SC</p>
           </div>
         </div>

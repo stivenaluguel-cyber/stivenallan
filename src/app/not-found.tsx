@@ -9,10 +9,10 @@ export const metadata: Metadata = {
 export default function NotFound() {
   const wppUrl = 'https://wa.me/5548991642332?text=Ola%20Stiven!%20Preciso%20de%20ajuda.'
   return (
-    <main style={{ background: '#F3F2EE', minHeight: '100vh', color: '#161512', fontFamily: "'Hanken Grotesk',system-ui,sans-serif", display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 24px' }}>
+    <main style={{ background: '#F3F2EE', minHeight: '100vh', color: '#161512', fontFamily: 'var(--font-public-sans), system-ui, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 24px' }}>
       <div style={{ textAlign: 'center', maxWidth: 560 }}>
         <div style={{ fontSize: 80, fontWeight: 900, color: '#D24E22', lineHeight: 1, marginBottom: 8, opacity: 0.2 }}>404</div>
-        <h1 style={{ fontFamily: "'Bricolage Grotesque',system-ui", fontSize: 'clamp(1.5rem,4vw,2.2rem)', fontWeight: 800, marginBottom: 16, color: '#161512' }}>
+        <h1 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontSize: 'clamp(1.5rem,4vw,2.2rem)', fontWeight: 800, marginBottom: 16, color: '#161512' }}>
           Pagina nao encontrada
         </h1>
         <p style={{ fontSize: 15, color: '#6B655B', lineHeight: 1.7, marginBottom: 40 }}>

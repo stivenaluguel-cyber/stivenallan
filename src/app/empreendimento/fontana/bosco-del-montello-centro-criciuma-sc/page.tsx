@@ -16,8 +16,8 @@ const CATALOGO_PDF = "https://estilofontana.com.br/upload/empreendimento/catalog
 const t = {
   bg: '#FAFAF8', ink: '#16201A', brown: '#5C3D2E', brownDark: '#3A2419', muted: '#6A5A50',
   line: 'rgba(22,32,26,0.12)', dark: '#100C09', onDark: '#F5EDE8', onDarkMuted: 'rgba(245,237,232,0.66)',
-  display: "'Jost', system-ui, sans-serif", serif: "'Cormorant Garamond', Georgia, serif",
-  body: "'Hanken Grotesk', system-ui, sans-serif",
+  display: 'var(--font-piazzolla), Georgia, serif',
+  body: 'var(--font-public-sans), system-ui, sans-serif',
 }
 
 const IMG = {
@@ -110,17 +110,17 @@ export default function BoscoDelMontelloPage() {
 
       <style>{`
         html { scroll-behavior: smooth; }
-        .bm-eyebrow { font-size: 11px; letter-spacing: 0.42em; text-transform: uppercase; color: ${t.brown}; font-family: ${t.body}; font-weight: 500; }
-        .bm-h1 { font-family: ${t.display}; font-weight: 300; text-transform: uppercase; letter-spacing: 0.14em; line-height: 1.04; text-shadow: 0 2px 24px rgba(0,0,0,0.55); }
+        .bm-eyebrow { font-size: 12px; letter-spacing: 0.07em; text-transform: uppercase; color: ${t.brown}; font-family: ${t.body}; font-weight: 600; }
+        .bm-h1 { font-family: ${t.display}; font-weight: 600; line-height: 1.1; text-shadow: 0 2px 24px rgba(0,0,0,0.55); }
         .bm-onimg { text-shadow: 0 1px 16px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.5); }
-        .bm-h2 { font-family: ${t.display}; font-weight: 300; text-transform: uppercase; letter-spacing: 0.16em; line-height: 1.1; font-size: clamp(26px,4vw,46px); margin: 0; }
-        .bm-serif { font-family: ${t.serif}; font-style: italic; font-weight: 400; }
+        .bm-h2 { font-family: ${t.display}; font-weight: 600; line-height: 1.2; font-size: clamp(26px,4vw,46px); margin: 0; }
+        .bm-serif { font-family: ${t.display}; font-style: italic; font-weight: 400; }
         .bm-rule { width: 56px; height: 1px; background: ${t.brown}; border: 0; }
-        .bm-cta { display: inline-block; font-family: ${t.body}; font-size: 12px; letter-spacing: 0.3em; text-transform: uppercase; color: ${t.ink}; border: 1px solid ${t.brown}; padding: 16px 34px; text-decoration: none; transition: background .35s ease, color .35s ease; cursor: pointer; }
+        .bm-cta { display: inline-block; font-family: ${t.body}; font-size: 15px; font-weight: 600; color: ${t.ink}; border: 1px solid ${t.brown}; padding: 16px 34px; text-decoration: none; transition: background .35s ease, color .35s ease; cursor: pointer; }
         .bm-cta:hover { background: ${t.brown}; color: #fff; }
         .bm-cta-light { color: ${t.onDark}; border-color: rgba(245,237,232,0.55); }
         .bm-cta-light:hover { background: ${t.onDark}; color: ${t.brownDark}; }
-        .bm-navlink { font-family: ${t.body}; font-size: 11px; letter-spacing: 0.28em; text-transform: uppercase; color: rgba(255,255,255,0.85); text-decoration: none; transition: color .3s ease; }
+        .bm-navlink { font-family: ${t.body}; font-size: 15px; font-weight: 500; color: rgba(255,255,255,0.85); text-decoration: none; transition: color .3s ease; }
         .bm-navlink:hover { color: #fff; }
         .bm-fade { opacity: 0; transform: translateY(24px); animation: bmfade .9s ease forwards; }
         @keyframes bmfade { to { opacity: 1; transform: none; } }
@@ -144,7 +144,7 @@ export default function BoscoDelMontelloPage() {
       {/* NAV */}
       <header style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 50 }}>
         <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '22px clamp(18px,5vw,56px)' }}>
-          <a href="#top" style={{ fontFamily: t.display, fontWeight: 400, letterSpacing: '0.26em', fontSize: 16, color: '#fff', textDecoration: 'none', textTransform: 'uppercase' }}>Bosco Del Montello</a>
+          <a href="#top" style={{ fontFamily: t.display, fontWeight: 600, fontSize: 16, color: '#fff', textDecoration: 'none' }}>Bosco Del Montello</a>
           <div className="bm-nav-links" style={{ display: 'flex', alignItems: 'center', gap: 30 }}>
             <a href="#residencial" className="bm-navlink">O Residencial</a>
             <a href="#galeria" className="bm-navlink">Galeria</a>
@@ -181,7 +181,7 @@ export default function BoscoDelMontelloPage() {
       <section id="residencial" style={{ padding: 'clamp(80px,14vh,160px) clamp(18px,5vw,56px)', textAlign: 'center' }}>
         <div style={{ maxWidth: 820, margin: '0 auto' }}>
           <p className="bm-eyebrow" style={{ marginBottom: 26 }}>O Residencial</p>
-          <p className="bm-serif" style={{ fontSize: 'clamp(24px,3.4vw,40px)', lineHeight: 1.35, color: t.ink, margin: 0 }}>Aqui você vai viver o melhor dos dois mundos: desfrutar da privacidade dentro do seu apartamento e ainda dividir muitas horas de alegria nos espaços inspirados no seu estilo.</p>
+          <p style={{ fontFamily: t.body, fontWeight: 400, fontSize: 'clamp(16px,1.9vw,20px)', lineHeight: 1.7, color: t.muted, margin: 0 }}>Aqui você vai viver o melhor dos dois mundos: desfrutar da privacidade dentro do seu apartamento e ainda dividir muitas horas de alegria nos espaços inspirados no seu estilo.</p>
           <hr className="bm-rule" style={{ margin: '46px auto 0' }} />
         </div>
       </section>
@@ -202,10 +202,10 @@ export default function BoscoDelMontelloPage() {
         <div style={{ maxWidth: 1080, margin: '0 auto', textAlign: 'center' }}>
           <p className="bm-eyebrow" style={{ color: t.onDark, marginBottom: 18 }}>As Residências</p>
           <h2 className="bm-h2" style={{ color: t.onDark }}>Espaço para viver bem</h2>
-          <p className="bm-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 56 }}>Até 66 m² privativos, 2 dormitórios.</p>
+          <p style={{ fontFamily: t.body, fontWeight: 500, color: t.onDarkMuted, fontSize: 'clamp(15px,1.6vw,18px)', marginTop: 18, marginBottom: 56 }}>Até 66 m² privativos, 2 dormitórios.</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 'clamp(28px,5vw,64px)', marginBottom: 56 }}>
             {[{n:'2',l:'Dormitórios'},{n:'1',l:'Suíte'},{n:'66',l:'m² privativos'},{n:'2',l:'Elevadores'}].map((it,i)=>(
-              <div key={i}><div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 'clamp(34px,5vw,58px)', letterSpacing: '0.04em', lineHeight: 1 }}>{it.n}</div><div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDarkMuted, marginTop: 12 }}>{it.l}</div></div>
+              <div key={i}><div style={{ fontFamily: t.display, fontWeight: 600, fontSize: 'clamp(34px,5vw,58px)', lineHeight: 1 }}>{it.n}</div><div style={{ fontSize: 12, color: t.onDarkMuted, marginTop: 12 }}>{it.l}</div></div>
             ))}
           </div>
           <LeadCaptureButton slug="bosco-del-montello-centro-criciuma-sc" construtora_slug="fontana" className="bm-cta bm-cta-light"  propertyDisplayName="Bosco del Montello Residencial" />
@@ -236,7 +236,7 @@ export default function BoscoDelMontelloPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 1, background: t.line }}>
             {DIFERENCIAIS.map((d,i)=>(
               <div key={i} style={{ background: t.bg, padding: 'clamp(28px,4vw,44px)' }}>
-                <div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 22, color: t.brown, marginBottom: 14 }}>{String(i+1).padStart(2,'0')}</div>
+                <div style={{ fontFamily: t.display, fontWeight: 600, fontSize: 22, color: t.brown, marginBottom: 14 }}>{String(i+1).padStart(2,'0')}</div>
                 <p style={{ margin: 0, fontSize: 16, lineHeight: 1.5, color: t.ink }}>{d}</p>
               </div>
             ))}
@@ -282,19 +282,19 @@ export default function BoscoDelMontelloPage() {
         <div style={{ maxWidth: 1080, margin: '0 auto', textAlign: 'center' }}>
           <p className="bm-eyebrow" style={{ color: t.onDark, marginBottom: 18 }}>Financiamento Direto</p>
           <h2 className="bm-h2" style={{ color: t.onDark }}>A liberdade de comprar sem banco</h2>
-          <p className="bm-serif" style={{ color: t.onDarkMuted, fontSize: 'clamp(18px,2.4vw,26px)', marginTop: 18, marginBottom: 40 }}>Condições de pagamento definidas pela Construtora Fontana, conforme a tabela vigente.</p>
+          <p style={{ fontFamily: t.body, fontWeight: 500, color: t.onDarkMuted, fontSize: 'clamp(15px,1.6vw,18px)', marginTop: 18, marginBottom: 40 }}>Condições de pagamento definidas pela Construtora Fontana, conforme a tabela vigente.</p>
           <p style={{ color: t.onDarkMuted, fontSize: 17, lineHeight: 1.7, maxWidth: 720, margin: '0 auto 16px' }}>{COMERCIAL.texto}</p>
           <p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.7, maxWidth: 720, margin: '0 auto 40px' }}>{COMERCIAL.saldo}</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px,1fr))', gap: 'clamp(28px,4vw,52px)' }}>
             {[{n:'01',t:'Converse com o corretor',d:'Atendimento exclusivo e personalizado para entender o seu momento e as melhores condições.'},{n:'02',t:'Escolha a sua unidade',d:'Selecione o apartamento ideal e defina uma proposta sob medida, sem amarras bancárias.'},{n:'03',t:'Negocie direto',d:'Condições flexíveis diretamente com a Construtora Fontana, com a liberdade que você merece.'}].map((s,i)=>(
-              <div key={i} style={{ textAlign: 'left' }}><div style={{ fontFamily: t.display, fontWeight: 300, fontSize: 40, opacity: 0.55, marginBottom: 14 }}>{s.n}</div><h3 style={{ fontFamily: t.display, fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: 17, margin: '0 0 12px', color: t.onDark }}>{s.t}</h3><p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.6, margin: 0 }}>{s.d}</p></div>
+              <div key={i} style={{ textAlign: 'left' }}><div style={{ fontFamily: t.display, fontWeight: 600, fontSize: 40, opacity: 0.55, marginBottom: 14 }}>{s.n}</div><h3 style={{ fontFamily: t.display, fontWeight: 600, fontSize: 17, margin: '0 0 12px', color: t.onDark }}>{s.t}</h3><p style={{ color: t.onDarkMuted, fontSize: 15, lineHeight: 1.6, margin: 0 }}>{s.d}</p></div>
             ))}
           </div>
           <div style={{ marginTop: 56, display: 'flex', gap: 20, justifyContent: 'center', flexWrap: 'wrap' }}>
             <a href={CATALOGO_PDF} target="_blank" rel="noopener noreferrer" className="bm-cta bm-cta-light">Baixar Catálogo</a>
             <a href={WPP} target="_blank" rel="noopener noreferrer" className="bm-cta bm-cta-light">Atendimento Exclusivo</a>
           </div>
-          <p style={{ marginTop: 40, fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: t.onDark }}>{COMERCIAL.vigencia}</p>
+          <p style={{ marginTop: 40, fontSize: 13, color: t.onDark }}>{COMERCIAL.vigencia}</p>
         </div>
       </section>
 
@@ -313,7 +313,7 @@ export default function BoscoDelMontelloPage() {
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(16,12,9,0.65)' }} />
         <div style={{ position: 'relative', zIndex: 2, padding: '0 clamp(18px,5vw,56px)', maxWidth: 880 }}>
           <p className="bm-eyebrow bm-onimg" style={{ color: '#fff', marginBottom: 22 }}>Atendimento Exclusivo</p>
-          <h2 className="bm-h2 bm-onimg" style={{ color: '#fff', fontSize: 'clamp(30px,5vw,56px)' }}>Repleto de detalhes únicos.</h2>
+          <h2 className="bm-onimg" style={{ fontFamily: t.display, fontStyle: 'italic', fontWeight: 400, color: '#fff', fontSize: 'clamp(30px,5vw,56px)', lineHeight: 1.2 }}>Repleto de detalhes únicos.</h2>
           <div style={{ marginTop: 38, display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
             <a href={WPP} target="_blank" rel="noopener noreferrer" className="bm-cta bm-cta-light">Atendimento Exclusivo</a>
             <ShareButton nome="Bosco Del Montello Residencial" className="bm-cta bm-cta-light" style={{ borderColor: 'rgba(245,237,232,0.3)' }} />
@@ -324,9 +324,9 @@ export default function BoscoDelMontelloPage() {
       {/* FOOTER */}
       <footer style={{ background: t.brownDark, color: t.onDarkMuted, padding: 'clamp(56px,9vh,96px) clamp(18px,5vw,56px)' }}>
         <div style={{ maxWidth: 1180, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px,1fr))', gap: 'clamp(28px,5vw,56px)' }}>
-          <div><div style={{ fontFamily: t.display, fontWeight: 400, letterSpacing: '0.22em', fontSize: 18, color: t.onDark, textTransform: 'uppercase' }}>Stiven Allan</div><p style={{ marginTop: 14, fontSize: 14, lineHeight: 1.6 }}>Imóveis de alto padrão em Santa Catarina.<br />CRECI 60.275</p></div>
-          <div><div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDark, marginBottom: 14 }}>Contato</div><a href={WPP} target="_blank" rel="noopener noreferrer" style={{ color: t.onDarkMuted, textDecoration: 'none', fontSize: 14 }}>WhatsApp &middot; (48) 99164-2332</a></div>
-          <div><div style={{ fontSize: 11, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.onDark, marginBottom: 14 }}>Empreendimento</div><p style={{ fontSize: 14, lineHeight: 1.6, margin: 0 }}>Bosco Del Montello Residencial<br />Construtora Fontana<br />Centro, Criciúma/SC</p></div>
+          <div><div style={{ fontFamily: t.display, fontWeight: 600, fontSize: 18, color: t.onDark }}>Stiven Allan</div><p style={{ marginTop: 14, fontSize: 14, lineHeight: 1.6 }}>Imóveis de alto padrão em Santa Catarina.<br />CRECI 60.275</p></div>
+          <div><div style={{ fontSize: 13, fontWeight: 700, color: t.onDark, marginBottom: 14 }}>Contato</div><a href={WPP} target="_blank" rel="noopener noreferrer" style={{ color: t.onDarkMuted, textDecoration: 'none', fontSize: 14 }}>WhatsApp &middot; (48) 99164-2332</a></div>
+          <div><div style={{ fontSize: 13, fontWeight: 700, color: t.onDark, marginBottom: 14 }}>Empreendimento</div><p style={{ fontSize: 14, lineHeight: 1.6, margin: 0 }}>Bosco Del Montello Residencial<br />Construtora Fontana<br />Centro, Criciúma/SC</p></div>
         </div>
         <div style={{ maxWidth: 1180, margin: '40px auto 0', paddingTop: 24, borderTop: '1px solid rgba(245,237,232,0.12)', fontSize: 12 }}>&copy; {new Date().getFullYear()} Stiven Allan. Imagens meramente ilustrativas. Valores sob consulta.</div>
       </footer>

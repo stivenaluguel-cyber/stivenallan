@@ -36,14 +36,14 @@ export default async function LandingPage({ params }: Props) {
   const local = [imovel.bairro, `${imovel.cidade}/${imovel.uf}`].filter(Boolean).join(' · ')
 
   return (
-    <main style={{ fontFamily: 'var(--font-hanken), system-ui, sans-serif', background: '#faf7f1', color: '#1a1a1a', minHeight: '100svh' }}>
+    <main style={{ fontFamily: 'var(--font-public-sans), system-ui, sans-serif', background: '#faf7f1', color: '#1a1a1a', minHeight: '100svh' }}>
       <section style={{ position: 'relative', minHeight: '46svh', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', background: '#111', overflow: 'hidden' }}>
         {imovel.img && (
           <Image unoptimized src={imovel.img} alt={imovel.nome} fill priority sizes="100vw" style={{ objectFit: 'cover', opacity: 0.85 }} />
         )}
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.25) 60%)' }} />
         <div style={{ position: 'relative', padding: '48px 20px 28px', maxWidth: 640, margin: '0 auto', width: '100%' }}>
-          <p style={{ fontSize: 11, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#e2c275', margin: '0 0 10px' }}>
+          <p style={{ fontSize: 11, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#E28465', margin: '0 0 10px' }}>
             {imovel.status} · financiamento direto com a construtora
           </p>
           <h1 style={{ fontSize: 'clamp(28px,7vw,44px)', lineHeight: 1.08, color: '#fff', margin: 0, fontWeight: 700 }}>{imovel.nome}</h1>

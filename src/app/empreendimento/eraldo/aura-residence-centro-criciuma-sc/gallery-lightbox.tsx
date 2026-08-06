@@ -65,7 +65,7 @@ function Lightbox({ images, startIndex, onClose }: { images: GalItem[]; startInd
         />
       </div>
       <button onClick={next} aria-label="Próximo" style={{ position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.18)', borderRadius: 4, color: '#fff', fontSize: 22, cursor: 'pointer', padding: '10px 16px', zIndex: 2 }}>&#8250;</button>
-      <p style={{ marginTop: 16, color: 'rgba(255,255,255,0.65)', fontSize: 13, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+      <p style={{ marginTop: 16, color: 'rgba(255,255,255,0.65)', fontSize: 13, letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: 'var(--font-public-sans), system-ui, sans-serif' }}>
         {images[idx].label}
         {fichaTecnica(images[idx]) && <span style={{ opacity: 0.7 }}> · {fichaTecnica(images[idx])}</span>}
       </p>
@@ -103,16 +103,16 @@ export default function GalleryWithLightbox({ galeria, prefix, gradient, badge, 
           >
             <Image unoptimized src={item.src} alt={item.alt} fill style={{ objectFit: 'cover' }} sizes="(min-width:1024px) 33vw,50vw" />
             <div style={{ position: 'absolute', inset: 0, background: gradient }} />
-            <figcaption style={{ position: 'absolute', bottom: 12, left: 14, right: 14, color: '#fff', fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: 'var(--font-hanken), system-ui, sans-serif' }}>
+            <figcaption style={{ position: 'absolute', bottom: 12, left: 14, right: 14, color: '#fff', fontSize: 12, letterSpacing: '0.07em', textTransform: 'uppercase', fontFamily: 'var(--font-public-sans), system-ui, sans-serif' }}>
               {item.label}
               {fichaTecnica(item) && (
-                <span style={{ display: 'block', fontSize: 10, letterSpacing: '0.08em', opacity: 0.75, marginTop: 3, textTransform: 'none' }}>
+                <span style={{ display: 'block', fontSize: 10, letterSpacing: '0.06em', opacity: 0.75, marginTop: 3, textTransform: 'none' }}>
                   {fichaTecnica(item)}
                 </span>
               )}
             </figcaption>
             {badge && (
-              <div style={{ position: 'absolute', top: 10, right: 10, background: 'rgba(156,95,46,0.88)', borderRadius: 2, padding: '4px 10px', fontFamily: 'var(--font-hanken), system-ui, sans-serif', fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#fff' }}>{badge}</div>
+              <div style={{ position: 'absolute', top: 10, right: 10, background: 'rgba(210,78,34,0.88)', borderRadius: 2, padding: '4px 10px', fontFamily: 'var(--font-public-sans), system-ui, sans-serif', fontSize: 10, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#fff' }}>{badge}</div>
             )}
           </figure>
         ))}

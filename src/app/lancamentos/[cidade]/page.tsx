@@ -395,27 +395,27 @@ export default async function LancamentosCidadePage({ params }: Props) {
   }
 
   return (
-    <main style={{ background: '#121315', minHeight: '100vh', color: '#fff', fontFamily: 'Inter, sans-serif' }}>
+    <main style={{ background: '#121315', minHeight: '100vh', color: '#fff', fontFamily: 'var(--font-public-sans), system-ui, sans-serif' }}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }} />
       <section style={{ padding: '80px 24px 60px', maxWidth: 1100, margin: '0 auto' }}>
         <nav style={{ marginBottom: 40 }}>
           <ol style={{ display: 'flex', gap: 8, listStyle: 'none', padding: 0, margin: 0, fontSize: 14, color: '#a7adb4' }}>
             <li><Link href="/" style={{ color: '#a7adb4', textDecoration: 'none' }}>Início</Link></li>
-            <li style={{ color: '#c9a24b' }}>&rsaquo;</li>
+            <li style={{ color: '#D24E22' }}>&rsaquo;</li>
             <li><Link href="/lancamentos/criciuma-sc" style={{ color: '#a7adb4', textDecoration: 'none' }}>Lançamentos</Link></li>
-            <li style={{ color: '#c9a24b' }}>&rsaquo;</li>
+            <li style={{ color: '#D24E22' }}>&rsaquo;</li>
             <li style={{ color: '#fff' }}>{info.nome}/{info.uf}</li>
           </ol>
         </nav>
 
         {/* "Região Sul Catarinense" só faz sentido em SC — o painel aceita 15 UFs. */}
-        <p style={{ fontSize: 13, letterSpacing: '0.12em', color: '#c9a24b', textTransform: 'uppercase', marginBottom: 16 }}>
+        <p style={{ fontSize: 13, letterSpacing: '0.12em', color: '#D24E22', textTransform: 'uppercase', marginBottom: 16 }}>
           {info.uf === 'SC' ? `${info.uf} — Região Sul Catarinense` : info.uf}
         </p>
-        <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 800, lineHeight: 1.1, marginBottom: 20 }}>
+        <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 800, lineHeight: 1.1, marginBottom: 20, fontFamily: 'var(--font-piazzolla), Georgia, serif' }}>
           Lançamentos em{' '}
-          <span style={{ color: '#c9a24b' }}>{info.nome}, {info.uf}</span>
+          <span style={{ color: '#D24E22' }}>{info.nome}, {info.uf}</span>
         </h1>
         <p style={{ fontSize: 17, color: '#a7adb4', lineHeight: 1.7, maxWidth: 600, marginBottom: 40 }}>
           {info.descricao} Atendimento exclusivo do corretor Stiven Allan, CRECI 60.275.
@@ -425,20 +425,20 @@ export default async function LancamentosCidadePage({ params }: Props) {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 24, marginBottom: 60 }}>
             {empreendimentos.map((emp, i) => (
               <Link key={i} href={emp.slug} style={{ display: 'block', background: '#202327', borderRadius: 12, padding: '28px 24px', border: '1px solid #2e3338', textDecoration: 'none', color: '#fff' }}>
-                {emp.fase && (<span style={{ display: 'inline-block', fontSize: 11, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: '#c9a24b', border: '1px solid #c9a24b', borderRadius: 40, padding: '3px 10px', marginBottom: 12 }}>{emp.fase}</span>)}
-                <p style={{ fontSize: 12, color: '#c9a24b', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>{emp.construtora}</p>
-                <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>{emp.nome}</h2>
+                {emp.fase && (<span style={{ display: 'inline-block', fontSize: 11, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: '#D24E22', border: '1px solid #D24E22', borderRadius: 40, padding: '3px 10px', marginBottom: 12 }}>{emp.fase}</span>)}
+                <p style={{ fontSize: 12, color: '#D24E22', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>{emp.construtora}</p>
+                <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8, fontFamily: 'var(--font-piazzolla), Georgia, serif' }}>{emp.nome}</h2>
                 <p style={{ fontSize: 14, color: '#a7adb4', marginBottom: 4 }}>{emp.dorms}</p>
-                <p style={{ fontSize: 15, fontWeight: 600, color: '#c9a24b', marginBottom: 16 }}>
+                <p style={{ fontSize: 15, fontWeight: 600, color: '#D24E22', marginBottom: 16 }}>
                   {formatPreco(emp.exibir_preco, emp.preco_a_partir_de)}
                 </p>
-                <span style={{ fontSize: 13, color: '#c9a24b', fontWeight: 600 }}>Ver detalhes →</span>
+                <span style={{ fontSize: 13, color: '#D24E22', fontWeight: 600 }}>Ver detalhes →</span>
               </Link>
             ))}
           </div>
         ) : (
           <div style={{ background: '#202327', borderRadius: 12, padding: '40px 32px', border: '1px solid #2e3338', marginBottom: 60, textAlign: 'center' }}>
-            <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 12 }}>Em breve lançamentos em {info.nome}</h2>
+            <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 12, fontFamily: 'var(--font-piazzolla), Georgia, serif' }}>Em breve lançamentos em {info.nome}</h2>
             <p style={{ fontSize: 15, color: '#a7adb4', marginBottom: 24 }}>Cadastre-se para receber novidades em primeira mão.</p>
             <a href={wppUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', background: '#25D366', color: '#fff', fontWeight: 700, padding: '12px 24px', borderRadius: 8, textDecoration: 'none' }}>
               Avisar quando lançar
@@ -448,17 +448,17 @@ export default async function LancamentosCidadePage({ params }: Props) {
 
         {cityKey === 'criciuma' && (
           <section style={{ marginBottom: 60 }}>
-            <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 16 }}>O mercado de lançamentos em Criciúma</h2>
+            <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 16, fontFamily: 'var(--font-piazzolla), Georgia, serif' }}>O mercado de lançamentos em Criciúma</h2>
             <p style={{ fontSize: 16, color: '#a7adb4', lineHeight: 1.8, marginBottom: 40, maxWidth: 760 }}>
               Criciúma é um dos polos mais ativos da construção civil no sul de Santa Catarina, com lançamentos concentrados principalmente no Centro, mas também presentes em bairros como Cruzeiro do Sul, Santa Bárbara, Comerciário, Michel, Rio Maina e Grande Próspera. A Construtora Fontana mantém, atualmente, empreendimentos em diferentes fases de obra na cidade — desde unidades ainda na planta até prédios em obras e edifícios já entregues — o que mostra o ritmo constante de novos lançamentos na região. Entre os empreendimentos ativos no Centro estão o Monte Leone Residencial, o Lavis Residencial, o Tremezzo Residencial, o Thiene Residencial, o Bosco Del Montello Residencial e o Pineto Residencial, além do Calliano Residencial e do Due Fratelli Residencial, já entregues. Fora do Centro, a Fontana também constrói o Fidenza Residencial no Cruzeiro do Sul, o Parco Savello Residencial em Santa Bárbara, o Bellante Residencial no Comerciário, o Calalzo Di Cadore Residencial no Michel, o Pavia Residencial no Rio Maina e o Villaggio Verde Residenziale no Grande Próspera.
             </p>
 
-            <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 16 }}>Por que financiamento direto com a construtora</h2>
+            <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 16, fontFamily: 'var(--font-piazzolla), Georgia, serif' }}>Por que financiamento direto com a construtora</h2>
             <p style={{ fontSize: 16, color: '#a7adb4', lineHeight: 1.8, marginBottom: 40, maxWidth: 760 }}>
               A maior parte dos lançamentos da Fontana em Criciúma é comercializada com financiamento direto com a construtora. A negociação ocorre diretamente com a construtora, sem depender de financiamento bancário. A construtora poderá realizar análise cadastral e de capacidade de pagamento conforme suas políticas, e a aprovação não é automática. Entrada, parcelas, reforços, índices, prazos e demais condições variam conforme o empreendimento, o contrato e a tabela vigente. Na prática, o modelo padrão funciona com entrada de 20% no ato da assinatura do contrato, saldo dividido em parcelas mensais e reforços anuais, todos corrigidos pelo CUB/SC ao longo da obra — confirme sempre a tabela vigente de cada empreendimento. Ao final da obra, o comprador pode optar por quitar o saldo devedor à vista ou migrar para um financiamento bancário tradicional, conforme sua necessidade. Esse modelo tem sido um dos principais motivos pelos quais famílias da região Sul Catarinense — e também de outras cidades — têm escolhido comprar apartamentos na planta em Criciúma diretamente com a Fontana.
             </p>
 
-            <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 16 }}>Bairros com lançamentos ativos em Criciúma</h2>
+            <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 16, fontFamily: 'var(--font-piazzolla), Georgia, serif' }}>Bairros com lançamentos ativos em Criciúma</h2>
             <p style={{ fontSize: 16, color: '#a7adb4', lineHeight: 1.8, marginBottom: 24, maxWidth: 760 }}>
               Veja abaixo os bairros de Criciúma que concentram lançamentos ativos da Construtora Fontana atualmente, com o nome de cada empreendimento e o status da obra:
             </p>
@@ -472,22 +472,22 @@ export default async function LancamentosCidadePage({ params }: Props) {
               <li style={{ background: '#202327', border: '1px solid #2e3338', borderRadius: 10, padding: '16px 20px', fontSize: 15, color: '#a7adb4', lineHeight: 1.7 }}><strong style={{ color: '#fff' }}>Grande Próspera:</strong> Villaggio Verde Residenziale, pronto para morar.</li>
             </ul>
 
-            <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 16 }}>Perguntas frequentes sobre lançamentos em Criciúma</h2>
+            <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 16, fontFamily: 'var(--font-piazzolla), Georgia, serif' }}>Perguntas frequentes sobre lançamentos em Criciúma</h2>
             <div style={{ display: 'grid', gap: 24, maxWidth: 760, marginBottom: 40 }}>
               <div>
-                <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Quais bairros de Criciúma têm lançamentos da Fontana atualmente?</h3>
+                <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8, fontFamily: 'var(--font-piazzolla), Georgia, serif' }}>Quais bairros de Criciúma têm lançamentos da Fontana atualmente?</h3>
                 <p style={{ fontSize: 15, color: '#a7adb4', lineHeight: 1.7 }}>Atualmente a Fontana tem empreendimentos ativos no Centro, no Cruzeiro do Sul, em Santa Bárbara, no Comerciário, no Michel, no Rio Maina e no Grande Próspera, com unidades em fases que vão de na planta a entregues.</p>
               </div>
               <div>
-                <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Como funciona o financiamento direto da Fontana em Criciúma?</h3>
+                <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8, fontFamily: 'var(--font-piazzolla), Georgia, serif' }}>Como funciona o financiamento direto da Fontana em Criciúma?</h3>
                 <p style={{ fontSize: 15, color: '#a7adb4', lineHeight: 1.7 }}>O modelo de financiamento direto prevê entrada de 20% no ato da assinatura, saldo parcelado mensalmente com reforços anuais, e correção pelo CUB/SC durante toda a obra, sem depender de financiamento bancário — a construtora poderá realizar análise cadastral e de capacidade de pagamento conforme suas políticas.</p>
               </div>
               <div>
-                <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Qual a diferença entre comprar um lançamento na planta e um empreendimento pronto em Criciúma?</h3>
+                <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8, fontFamily: 'var(--font-piazzolla), Georgia, serif' }}>Qual a diferença entre comprar um lançamento na planta e um empreendimento pronto em Criciúma?</h3>
                 <p style={{ fontSize: 15, color: '#a7adb4', lineHeight: 1.7 }}>Na planta, as parcelas costumam ser menores e o pagamento acompanha o andamento da obra. Empreendimentos prontos ou entregues, como o Calliano Residencial e o Due Fratelli Residencial, ambos no Centro, permitem mudança imediata, mas geralmente exigem mais capital disponível no momento da compra.</p>
               </div>
               <div>
-                <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>É seguro comprar um apartamento na planta em Criciúma?</h3>
+                <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8, fontFamily: 'var(--font-piazzolla), Georgia, serif' }}>É seguro comprar um apartamento na planta em Criciúma?</h3>
                 <p style={{ fontSize: 15, color: '#a7adb4', lineHeight: 1.7 }}>Sim, desde que o empreendimento esteja regularizado e a construtora tenha histórico comprovado de entregas. A Fontana atua há décadas na região Sul Catarinense, com empreendimentos entregues no Centro de Criciúma, como o Calliano Residencial e o Due Fratelli Residencial.</p>
               </div>
             </div>
@@ -500,28 +500,28 @@ export default async function LancamentosCidadePage({ params }: Props) {
 
         {CONTEUDO_POR_CIDADE[cityKey] && (
           <section style={{ marginBottom: 60 }}>
-            <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 16 }}>O mercado de lançamentos em {info.nome}</h2>
+            <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 16, fontFamily: 'var(--font-piazzolla), Georgia, serif' }}>O mercado de lançamentos em {info.nome}</h2>
             <p style={{ fontSize: 16, color: '#a7adb4', lineHeight: 1.8, marginBottom: 16, maxWidth: 760 }}>
               {CONTEUDO_POR_CIDADE[cityKey].mercado}
             </p>
             {BAIRRO_LINK_POR_CIDADE[cityKey] && (
               <p style={{ fontSize: 15, marginBottom: 40 }}>
-                <Link href={`/lancamentos/${cidade}/${BAIRRO_LINK_POR_CIDADE[cityKey].slug}`} style={{ color: '#c9a24b', fontWeight: 600, textDecoration: 'underline' }}>
+                <Link href={`/lancamentos/${cidade}/${BAIRRO_LINK_POR_CIDADE[cityKey].slug}`} style={{ color: '#D24E22', fontWeight: 600, textDecoration: 'underline' }}>
                   Ver todos os lançamentos no {BAIRRO_LINK_POR_CIDADE[cityKey].nome} →
                 </Link>
               </p>
             )}
 
-            <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 16 }}>Por que financiamento direto com a construtora</h2>
+            <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 16, fontFamily: 'var(--font-piazzolla), Georgia, serif' }}>Por que financiamento direto com a construtora</h2>
             <p style={{ fontSize: 16, color: '#a7adb4', lineHeight: 1.8, marginBottom: 40, maxWidth: 760 }}>
               A maior parte dos lançamentos da Fontana em {info.nome} é comercializada com financiamento direto com a construtora. A negociação ocorre diretamente com a construtora, sem depender de financiamento bancário. A construtora poderá realizar análise cadastral e de capacidade de pagamento conforme suas políticas, e a aprovação não é automática. Entrada, parcelas, reforços, índices, prazos e demais condições variam conforme o empreendimento, o contrato e a tabela vigente. Na prática, o modelo padrão funciona com entrada de 20% no ato da assinatura do contrato, saldo dividido em parcelas mensais e reforços anuais, todos corrigidos pelo CUB/SC ao longo da obra — confirme sempre a tabela vigente de cada empreendimento. Ao final da obra, o comprador pode optar por quitar o saldo devedor à vista ou migrar para um financiamento bancário tradicional, conforme sua necessidade.
             </p>
 
-            <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 16 }}>Perguntas frequentes sobre lançamentos em {info.nome}</h2>
+            <h2 style={{ fontSize: 26, fontWeight: 800, marginBottom: 16, fontFamily: 'var(--font-piazzolla), Georgia, serif' }}>Perguntas frequentes sobre lançamentos em {info.nome}</h2>
             <div style={{ display: 'grid', gap: 24, maxWidth: 760, marginBottom: 40 }}>
               {CONTEUDO_POR_CIDADE[cityKey].faqs.map((faq, i) => (
                 <div key={i}>
-                  <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>{faq.pergunta}</h3>
+                  <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8, fontFamily: 'var(--font-piazzolla), Georgia, serif' }}>{faq.pergunta}</h3>
                   <p style={{ fontSize: 15, color: '#a7adb4', lineHeight: 1.7 }}>{faq.resposta}</p>
                 </div>
               ))}
@@ -533,8 +533,8 @@ export default async function LancamentosCidadePage({ params }: Props) {
           </section>
         )}
 
-        <div style={{ background: 'linear-gradient(135deg, #c9a24b15, #c9a24b05)', borderRadius: 16, padding: '48px 32px', border: '1px solid #c9a24b30', textAlign: 'center' }}>
-          <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2rem)', fontWeight: 800, marginBottom: 12 }}>
+        <div style={{ background: 'linear-gradient(135deg, #D24E2215, #D24E2205)', borderRadius: 16, padding: '48px 32px', border: '1px solid #D24E2230', textAlign: 'center' }}>
+          <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2rem)', fontWeight: 800, marginBottom: 12, fontFamily: 'var(--font-piazzolla), Georgia, serif' }}>
             Quer saber mais sobre lançamentos em {info.nome}?
           </h2>
           <p style={{ fontSize: 16, color: '#a7adb4', marginBottom: 28 }}>

@@ -73,23 +73,23 @@ const FAQ_SCHEMA = {
 
 export default function GuiaComprarNaPlantaPage() {
   return (
-    <main style={{ background: '#FAFAF8', color: '#1A1A1A', fontFamily: "'Hanken Grotesk', system-ui, sans-serif" }}>
+    <main style={{ background: '#FAFAF8', color: '#1A1A1A', fontFamily: 'var(--font-public-sans), system-ui, sans-serif' }}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SCHEMA) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_SCHEMA) }} />
 
       {/* HEADER */}
       <header style={{ background: '#fff', borderBottom: '1px solid rgba(0,0,0,0.08)', padding: '16px clamp(18px,5vw,64px)' }}>
         <nav style={{ maxWidth: 1080, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Link href="/" style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 400, letterSpacing: '0.22em', fontSize: 15, color: '#1A1A1A', textDecoration: 'none', textTransform: 'uppercase' }}>Stiven Allan</Link>
-          <Link href="/empreendimentos" style={{ fontSize: 12, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#1A5C3A', textDecoration: 'none' }}>Ver Empreendimentos</Link>
+          <Link href="/" style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 400, fontSize: 15, color: '#1A1A1A', textDecoration: 'none' }}>Stiven Allan</Link>
+          <Link href="/empreendimentos" style={{ fontSize: 15, color: '#1A5C3A', textDecoration: 'none' }}>Ver Empreendimentos</Link>
         </nav>
       </header>
 
       {/* HERO */}
       <section style={{ background: '#1A2E1A', color: '#EAF2E8', padding: 'clamp(64px,12vh,120px) clamp(18px,5vw,64px)' }}>
         <div style={{ maxWidth: 800, margin: '0 auto' }}>
-          <p style={{ fontSize: 11, letterSpacing: '0.42em', textTransform: 'uppercase', color: 'rgba(234,242,232,0.55)', marginBottom: 20 }}>Guia - Compra na Planta</p>
-          <h1 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.12em', fontSize: 'clamp(28px,5vw,52px)', lineHeight: 1.1, margin: 0 }}>
+          <p style={{ fontSize: 11, letterSpacing: '0.07em', textTransform: 'uppercase', color: 'rgba(234,242,232,0.55)', marginBottom: 20 }}>Guia - Compra na Planta</p>
+          <h1 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(28px,5vw,52px)', lineHeight: 1.1, margin: 0 }}>
             Comprar Apartamento na Planta em Criciúma
           </h1>
           <p style={{ fontSize: 'clamp(16px,2vw,20px)', color: 'rgba(234,242,232,0.75)', marginTop: 24, lineHeight: 1.6 }}>
@@ -113,7 +113,7 @@ export default function GuiaComprarNaPlantaPage() {
           ]}
         />
 
-        <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Por que comprar na planta em Criciúma?</h2>
+        <h2 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Por que comprar na planta em Criciúma?</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
           Comprar na planta permite pagar o imóvel em parcelas menores durante a obra, com potencial de valorização até a entrega — a tabela de venda costuma subir a cada fase da obra concluída, mas essa valorização não é garantida e depende do mercado, da região e do momento da compra. Além disso, a negociação do financiamento direto da Fontana é feita diretamente com a construtora, sem depender de banco — a construtora poderá realizar sua própria análise cadastral e de capacidade de pagamento, conforme suas políticas.
         </p>
@@ -124,7 +124,7 @@ export default function GuiaComprarNaPlantaPage() {
           Se você está em dúvida entre comprar na planta ou um imóvel pronto, veja o <Link href="/guia/apartamento-na-planta-vs-pronto" style={{ color: '#1A5C3A', fontWeight: 600 }}>guia comparativo entre apartamento na planta e pronto para morar</Link>.
         </p>
 
-        <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Etapas para comprar na planta</h2>
+        <h2 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Etapas para comprar na planta</h2>
         <ol style={{ fontSize: 15, lineHeight: 2.2, color: '#333', paddingLeft: 24 }}>
           <li><strong>Escolha o empreendimento:</strong> Verifique a localização, a construtora, a tipologia e a previsão de entrega do imóvel. Em Criciúma e no Sul Catarinense, os lançamentos Fontana vão de bairros como Michel e Centro até empreendimentos de veraneio no litoral. Compare a planta, o padrão de acabamento e a data prevista de conclusão antes de decidir.</li>
           <li><strong>Conheça o plano de financiamento:</strong> O plano padrão Fontana tem entrada de 20%, até 72 parcelas mensais corrigidas pelo CUB/SC e até 6 reforços anuais. Cada reforço anual equivale a 5 parcelas mensais. Sem depender de financiamento bancário; a construtora poderá realizar análise cadastral e de capacidade de pagamento conforme suas políticas, e a aprovação não é automática.</li>
@@ -135,7 +135,7 @@ export default function GuiaComprarNaPlantaPage() {
           <li><strong>Quite o saldo e registre o imóvel:</strong> Após as chaves, quite o saldo devedor remanescente, seja pelo saldo direto com a Fontana ou por financiamento bancário. Em seguida, registre o imóvel em seu nome no cartório de registro de imóveis. Somente com o registro a propriedade passa oficialmente para o comprador.</li>
         </ol>
 
-        <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Como funciona o financiamento direto na planta?</h2>
+        <h2 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Como funciona o financiamento direto na planta?</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
           O plano padrão Fontana divide o pagamento em entrada de 20%, até 72 parcelas mensais corrigidas pelo CUB/SC e até 6 reforços anuais (cada reforço equivale a 5 parcelas mensais). Sem depender de financiamento bancário; a construtora poderá realizar análise cadastral e de capacidade de pagamento conforme suas políticas, e a aprovação não é automática.
         </p>
@@ -153,7 +153,7 @@ export default function GuiaComprarNaPlantaPage() {
           O CUB/SC (Custo Unitário Básico do Sinduscon-SC) corrige as parcelas todo mês. Em junho de 2026, o CUB/SC estava em R$ 3.121,62/m2 (alta de 0,82% frente a maio/2026, quando estava em R$ 3.096,25/m2). A variação muda mês a mês — consulte a série histórica para o valor real de cada período, não uma média fixa.
         </p>
 
-        <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Principais bairros e regiões com lançamentos em Criciúma</h2>
+        <h2 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Principais bairros e regiões com lançamentos em Criciúma</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
           A Construtora Fontana tem lançamentos em diversas regiões de Criciúma e Sul Catarinense: <strong>Centro</strong>, <strong>Michel</strong>, <strong>Rio Maina</strong>, <strong>Santa Bárbara</strong>, <strong>Cruzeiro do Sul</strong>, além de empreendimentos de veraneio em <strong>Balneário Rincão</strong>, <strong>Balneário Piçarras</strong> e <strong>Laguna</strong>.
         </p>
@@ -167,10 +167,10 @@ export default function GuiaComprarNaPlantaPage() {
           Para uma visão mais ampla de onde investir no Sul de Santa Catarina, considerando cada cidade e perfil de comprador, veja o <Link href="/guia/onde-investir-sul-santa-catarina" style={{ color: '#1A5C3A', fontWeight: 600 }}>guia dedicado</Link>.
         </p>
 
-        <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Vantagens e atenções ao comprar na planta</h2>
+        <h2 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Vantagens e atenções ao comprar na planta</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px,1fr))', gap: 24, marginTop: 16 }}>
           <div style={{ background: '#F0F7F0', padding: 24, borderRadius: 2 }}>
-            <h3 style={{ fontSize: 14, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#1A5C3A', marginTop: 0 }}>Vantagens</h3>
+            <h3 style={{ fontSize: 14, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#1A5C3A', marginTop: 0 }}>Vantagens</h3>
             <ul style={{ fontSize: 14, lineHeight: 2, color: '#333', paddingLeft: 20, margin: 0 }}>
               <li>Preço de lançamento geralmente menor</li>
               <li>Parcelas menores durante a obra</li>
@@ -180,7 +180,7 @@ export default function GuiaComprarNaPlantaPage() {
             </ul>
           </div>
           <div style={{ background: '#FFF8F0', padding: 24, borderRadius: 2 }}>
-            <h3 style={{ fontSize: 14, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#8B4513', marginTop: 0 }}>Atenções</h3>
+            <h3 style={{ fontSize: 14, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#8B4513', marginTop: 0 }}>Atenções</h3>
             <ul style={{ fontSize: 14, lineHeight: 2, color: '#333', paddingLeft: 20, margin: 0 }}>
               <li>Parcelas corrigidas pelo CUB/SC podem subir</li>
               <li>Prazo de entrega pode ser prorrogado</li>
@@ -191,12 +191,12 @@ export default function GuiaComprarNaPlantaPage() {
           </div>
         </div>
 
-        <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>O que verificar antes de assinar?</h2>
+        <h2 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>O que verificar antes de assinar?</h2>
         <p style={{ fontSize: 16, lineHeight: 1.8, color: '#333' }}>
           Antes de assinar o contrato de compra de um apartamento na planta, verifique: registro da incorporação no cartório de registro de imóveis (memorial de incorporação, art. 32 da Lei 4.591/1964); CRECI do corretor (Stiven Allan: CRECI 60.275); cláusulas de correção das parcelas (deve ser CUB/SC na Fontana); prazo de entrega e tolerância prevista no contrato; especificação técnica do acabamento e dos materiais; forma de quitação do saldo pós-chaves via saldo direto ou financiamento bancário.
         </p>
 
-        <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Perguntas Frequentes</h2>
+        <h2 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(20px,3vw,30px)', marginTop: 48, marginBottom: 16 }}>Perguntas Frequentes</h2>
 
         {FAQ_SCHEMA.mainEntity.map((item, i) => (
           <details key={i} style={{ borderTop: '1px solid rgba(0,0,0,0.10)', padding: '20px 0' }}>
@@ -211,15 +211,15 @@ export default function GuiaComprarNaPlantaPage() {
 
         {/* CTA */}
         <div style={{ background: '#1A2E1A', color: '#EAF2E8', borderRadius: 2, padding: 'clamp(32px,5vw,56px)', marginTop: 64, textAlign: 'center' }}>
-          <h2 style={{ fontFamily: "'Jost', system-ui, sans-serif", fontWeight: 300, textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 'clamp(20px,3vw,28px)', margin: 0 }}>Veja os lançamentos</h2>
+          <h2 style={{ fontFamily: 'var(--font-piazzolla), Georgia, serif', fontWeight: 600, fontSize: 'clamp(20px,3vw,28px)', margin: 0 }}>Veja os lançamentos</h2>
           <p style={{ color: 'rgba(234,242,232,0.8)', marginTop: 16, marginBottom: 32, fontSize: 15, lineHeight: 1.6 }}>
             Empreendimentos Fontana disponíveis em Criciúma e região. Atendimento exclusivo com Stiven Allan, CRECI 60.275.
           </p>
           <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', fontSize: 12, letterSpacing: '0.3em', textTransform: 'uppercase', color: '#EAF2E8', border: '1px solid rgba(234,242,232,0.55)', padding: '14px 28px', textDecoration: 'none' }}>
+            <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', fontSize: 15, color: '#EAF2E8', border: '1px solid rgba(234,242,232,0.55)', padding: '14px 28px', textDecoration: 'none' }}>
               Falar no WhatsApp
             </a>
-            <Link href="/empreendimentos" style={{ display: 'inline-block', fontSize: 12, letterSpacing: '0.3em', textTransform: 'uppercase', color: '#EAF2E8', border: '1px solid rgba(234,242,232,0.55)', padding: '14px 28px', textDecoration: 'none' }}>
+            <Link href="/empreendimentos" style={{ display: 'inline-block', fontSize: 15, color: '#EAF2E8', border: '1px solid rgba(234,242,232,0.55)', padding: '14px 28px', textDecoration: 'none' }}>
               Ver Empreendimentos
             </Link>
           </div>

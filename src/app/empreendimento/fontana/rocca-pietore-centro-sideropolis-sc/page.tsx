@@ -20,9 +20,8 @@ const t = {
   bg: '#F5F2ED', ink: '#1A1A1A', navy: '#3A4F6B', navyDark: '#243347',
   muted: '#6B6B6B', line: 'rgba(0,0,0,0.10)', dark: '#0D1B2A',
   onDark: '#F5F2ED', onDarkMuted: 'rgba(245,242,237,0.65)',
-  display: "'Playfair Display', Georgia, serif",
-  serif: "Georgia, serif",
-  body: "'Inter', system-ui, sans-serif"
+  display: 'var(--font-piazzolla), Georgia, serif',
+  body: 'var(--font-public-sans), system-ui, sans-serif'
 }
 
 const D = 'https://lh3.googleusercontent.com/d/'
@@ -130,10 +129,10 @@ export default function Page() {
       
       <style>{`
         html { scroll-behavior: smooth; }
-        .rc-eyebrow { font-size:11px; letter-spacing:0.42em; text-transform:uppercase; }
-        .rc-h1 { font-family:${t.display}; font-weight:300; text-transform:uppercase; letter-spacing:0.14em; }
-        .rc-h2 { font-family:${t.display}; font-weight:300; text-transform:uppercase; font-size:clamp(26px,4vw,46px); }
-        .rc-cta { display:inline-block; letter-spacing:0.3em; border:1px solid; padding:16px 34px; text-decoration:none; }
+        .rc-eyebrow { font-size:11px; letter-spacing:0.07em; text-transform:uppercase; }
+        .rc-h1 { font-family:${t.display}; font-weight:600; }
+        .rc-h2 { font-family:${t.display}; font-weight:600; font-size:clamp(26px,4vw,46px); }
+        .rc-cta { display:inline-block; border:1px solid; padding:16px 34px; text-decoration:none; }
         .rc-gcard { position:relative; overflow:hidden; }
         .rc-amen { display:flex; align-items:center; gap:12px; padding:14px 0; border-bottom:1px solid rgba(0,0,0,0.08); }
         .rc-amen::before { content:''; width:6px; height:6px; background:${t.navy}; border-radius:50%; flex-shrink:0; }
@@ -143,12 +142,12 @@ export default function Page() {
       `}</style>
 
       <header style={{ position:'absolute', top:0, left:0, right:0, zIndex:50, padding:'24px 32px', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-        <Link href="/" style={{ color:'#fff', textDecoration:'none', fontFamily:t.display, fontWeight:300, fontSize:18, letterSpacing:'0.12em' }}>
-          STIVEN ALLAN
+        <Link href="/" style={{ color:'#fff', textDecoration:'none', fontFamily:t.display, fontWeight:600, fontSize:18 }}>
+          Stiven Allan
         </Link>
         <nav style={{ display:'flex', gap:32, alignItems:'center' }}>
-          <Link href="/#empreendimentos" style={{ color:'rgba(255,255,255,0.85)', textDecoration:'none', fontSize:12, letterSpacing:'0.24em', textTransform:'uppercase' }}>Empreendimentos</Link>
-          <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ color:'rgba(255,255,255,0.85)', textDecoration:'none', fontSize:12, letterSpacing:'0.24em', textTransform:'uppercase' }}>Contato</a>
+          <Link href="/#empreendimentos" style={{ color:'rgba(255,255,255,0.85)', textDecoration:'none', fontSize:15 }}>Empreendimentos</Link>
+          <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ color:'rgba(255,255,255,0.85)', textDecoration:'none', fontSize:15 }}>Contato</a>
         </nav>
       </header>
 
@@ -158,10 +157,10 @@ export default function Page() {
         <div style={{ position:'relative', padding:'0 32px 64px', maxWidth:760 }}>
           <p className="rc-eyebrow" style={{ color:'rgba(255,255,255,0.7)', marginBottom:16 }}>Centro · Siderópolis / SC</p>
           <h1 className="rc-h1" style={{ color:'#fff', fontSize:'clamp(32px,5vw,64px)', lineHeight:1.1, margin:'0 0 16px' }}>Rocca Pietore<br/>Residencial</h1>
-          <p style={{ color:'rgba(255,255,255,0.8)', fontSize:'clamp(15px,2vw,18px)', fontFamily:t.serif, fontStyle:'italic', marginBottom:36 }}>
+          <p style={{ color:'rgba(255,255,255,0.8)', fontSize:'clamp(15px,2vw,18px)', fontFamily:t.display, fontStyle:'italic', marginBottom:36 }}>
             O encontro do bem-estar.
           </p>
-          <a href={WPP} target="_blank" rel="noopener noreferrer" className="rc-cta" style={{ color:'#fff', borderColor:'rgba(255,255,255,0.6)', fontSize:11, letterSpacing:'0.3em', textTransform:'uppercase' }}>
+          <a href={WPP} target="_blank" rel="noopener noreferrer" className="rc-cta" style={{ color:'#fff', borderColor:'rgba(255,255,255,0.6)', fontSize:15 }}>
             Quero Saber Mais
           </a>
         </div>
@@ -182,7 +181,7 @@ export default function Page() {
               </li>
             ))}
           </ul>
-          <a href={WPP} target="_blank" rel="noopener noreferrer" className="rc-cta" style={{ color:t.navy, borderColor:t.navy, fontSize:11, textTransform:'uppercase' }}>
+          <a href={WPP} target="_blank" rel="noopener noreferrer" className="rc-cta" style={{ color:t.navy, borderColor:t.navy, fontSize:15 }}>
             Consultar Condições
           </a>
         </div>
@@ -213,8 +212,8 @@ export default function Page() {
               <div style={{ display:'flex', gap:32 }}>
                 {[['2—3','Dorm.'],['1','Suíte'],['91','m² máx']].map(([n,l]) => (
                   <div key={l}>
-                    <p style={{ fontFamily:t.display, fontSize:40, fontWeight:300, color:t.onDark, margin:0 }}>{n}</p>
-                    <p style={{ fontSize:11, letterSpacing:'0.3em', textTransform:'uppercase', color:t.onDarkMuted, margin:0 }}>{l}</p>
+                    <p style={{ fontFamily:t.display, fontSize:40, fontWeight:600, color:t.onDark, margin:0 }}>{n}</p>
+                    <p style={{ fontSize:11, color:t.onDarkMuted, margin:0 }}>{l}</p>
                   </div>
                 ))}
               </div>
@@ -232,7 +231,7 @@ export default function Page() {
         <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:'28px 64px' }}>
           {DIFERENCIAIS.map((d,i) => (
             <div key={i} style={{ display:'flex', gap:24, alignItems:'flex-start' }}>
-              <span style={{ fontFamily:t.display, fontSize:32, fontWeight:300, color:t.navy, lineHeight:1, flexShrink:0 }}>{String(i+1).padStart(2,'0')}</span>
+              <span style={{ fontFamily:t.display, fontSize:32, fontWeight:600, color:t.navy, lineHeight:1, flexShrink:0 }}>{String(i+1).padStart(2,'0')}</span>
               <p style={{ margin:0, fontSize:15, lineHeight:1.7, color:t.ink }}>{d}</p>
             </div>
           ))}
@@ -277,7 +276,7 @@ export default function Page() {
           <p style={{ color:t.onDarkMuted, fontSize:16, lineHeight:1.8, maxWidth:640, margin:'0 auto 48px' }}>
             As condições de pagamento do Rocca Pietore são definidas pela Construtora Fontana e variam conforme a unidade e a tabela vigente. Entrada, parcelas, reajustes, prazos e eventual aprovação devem ser confirmados antes da contratação.
           </p>
-          <a href={WPP} target="_blank" rel="noopener noreferrer" className="rc-cta" style={{ color:t.onDark, borderColor:'rgba(245,242,237,0.4)', fontSize:11, textTransform:'uppercase' }}>
+          <a href={WPP} target="_blank" rel="noopener noreferrer" className="rc-cta" style={{ color:t.onDark, borderColor:'rgba(245,242,237,0.4)', fontSize:15 }}>
             Consultar Condições
           </a>
         </div>
@@ -288,15 +287,15 @@ export default function Page() {
         <div style={{ position:'absolute', inset:0, background:'rgba(13,27,42,0.70)' }} />
         <div style={{ position:'relative', textAlign:'center', padding:'0 32px' }}>
           <h2 className="rc-h2" style={{ color:'#fff', margin:'0 0 16px' }}>Rocca Pietore Residencial</h2>
-          <p style={{ color:'rgba(255,255,255,0.75)', marginBottom:40, fontFamily:t.serif, fontStyle:'italic', fontSize:18 }}>Preço sob consulta · Centro · Siderópolis / SC</p>
+          <p style={{ color:'rgba(255,255,255,0.75)', marginBottom:40, fontFamily:t.display, fontStyle:'italic', fontSize:18 }}>Preço sob consulta · Centro · Siderópolis / SC</p>
           <div style={{ display:'flex', gap:16, flexWrap:'wrap', justifyContent:'center' }}>
-            <a href={WPP} target="_blank" rel="noopener noreferrer" className="rc-cta" style={{ color:'#fff', borderColor:'rgba(255,255,255,0.6)', fontSize:11, textTransform:'uppercase' }}>
+            <a href={WPP} target="_blank" rel="noopener noreferrer" className="rc-cta" style={{ color:'#fff', borderColor:'rgba(255,255,255,0.6)', fontSize:15 }}>
               Falar com Stiven Allan
             </a>
             <ShareButton
               nome="Rocca Pietore Residencial"
               className="rc-cta"
-              style={{ color:'#fff', borderColor:'rgba(255,255,255,0.6)', fontSize:11, textTransform:'uppercase', background:'transparent', cursor:'pointer' }}
+              style={{ color:'#fff', borderColor:'rgba(255,255,255,0.6)', fontSize:15, background:'transparent', cursor:'pointer' }}
             />
           </div>
         </div>
@@ -316,7 +315,7 @@ export default function Page() {
         <p style={{ color:t.onDarkMuted, fontSize:11, margin:'0 0 4px' }}>CRECI 60.275</p>
         <p style={{ color:t.onDarkMuted, fontSize:11, margin:0 }}>Siderópolis · SC</p>
         <div style={{ marginTop:24 }}>
-          <Link href="/" style={{ color:t.onDarkMuted, fontSize:11, letterSpacing:'0.2em', textTransform:'uppercase', textDecoration:'none' }}>← Todos os Empreendimentos</Link>
+          <Link href="/" style={{ color:t.onDarkMuted, fontSize:15, textDecoration:'none' }}>← Todos os Empreendimentos</Link>
         </div>
       </footer>
 

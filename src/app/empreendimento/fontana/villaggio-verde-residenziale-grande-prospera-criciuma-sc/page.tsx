@@ -17,9 +17,8 @@ const t = {
   bg: '#F5F2ED', ink: '#1A1A1A', green: '#2D4A2D', greenDark: '#1A2E1A',
   muted: '#6B6B6B', line: 'rgba(0,0,0,0.10)', dark: '#0D1A0D',
   onDark: '#F5F2ED', onDarkMuted: 'rgba(245,242,237,0.65)',
-  display: "'Playfair Display', Georgia, serif",
-  serif: "Georgia, serif",
-  body: "'Inter', system-ui, sans-serif"
+  display: 'var(--font-piazzolla), Georgia, serif',
+  body: 'var(--font-public-sans), system-ui, sans-serif'
 }
 
 const CDN = '/images/empreendimentos/villaggio-verde-residenziale-grande-prospera-criciuma-sc/'
@@ -100,22 +99,22 @@ export default function Page() {
       />
       <style>{`
         html { scroll-behavior: smooth; }
-        .vv-eyebrow { font-size:11px; letter-spacing:0.42em; text-transform:uppercase; }
-        .vv-h1 { font-family:${t.display}; font-weight:300; text-transform:uppercase; letter-spacing:0.14em; }
-        .vv-h2 { font-family:${t.display}; font-weight:300; text-transform:uppercase; font-size:clamp(26px,4vw,46px); }
-        .vv-cta { display:inline-block; letter-spacing:0.3em; border:1px solid; padding:16px 34px; text-decoration:none; text-transform:uppercase; font-size:11px; }
+        .vv-eyebrow { font-size:11px; letter-spacing:0.07em; text-transform:uppercase; font-family:${t.body}; }
+        .vv-h1 { font-family:${t.display}; font-weight:600; }
+        .vv-h2 { font-family:${t.display}; font-weight:600; font-size:clamp(26px,4vw,46px); }
+        .vv-cta { display:inline-block; font-family:${t.body}; font-weight:600; border:1px solid; padding:16px 34px; text-decoration:none; font-size:15px; }
         .vv-amen { display:flex; align-items:center; gap:12px; padding:14px 0; border-bottom:1px solid rgba(0,0,0,0.08); }
         .vv-amen::before { content:''; width:6px; height:6px; background:${t.green}; border-radius:50%; flex-shrink:0; }
         .vv-wa { position:fixed; right:20px; bottom:20px; width:56px; height:56px; border-radius:50%; background:#25D366; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 16px rgba(0,0,0,0.25); z-index:200; }
       `}</style>
 
       <header style={{ position:'absolute', top:0, left:0, right:0, zIndex:50, padding:'24px 32px', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-        <Link href="/" style={{ color:'#fff', textDecoration:'none', fontFamily:t.display, fontWeight:300, fontSize:18, letterSpacing:'0.12em' }}>
-          STIVEN ALLAN
+        <Link href="/" style={{ color:'#fff', textDecoration:'none', fontFamily:t.display, fontWeight:600, fontSize:18 }}>
+          Stiven Allan
         </Link>
         <nav style={{ display:'flex', gap:32, alignItems:'center' }}>
-          <Link href="/#empreendimentos" style={{ color:'rgba(255,255,255,0.85)', textDecoration:'none', fontSize:12, letterSpacing:'0.24em', textTransform:'uppercase' }}>Empreendimentos</Link>
-          <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ color:'rgba(255,255,255,0.85)', textDecoration:'none', fontSize:12, letterSpacing:'0.24em', textTransform:'uppercase' }}>Contato</a>
+          <Link href="/#empreendimentos" style={{ color:'rgba(255,255,255,0.85)', textDecoration:'none', fontSize:15, fontWeight:500 }}>Empreendimentos</Link>
+          <a href={WPP} target="_blank" rel="noopener noreferrer" style={{ color:'rgba(255,255,255,0.85)', textDecoration:'none', fontSize:15, fontWeight:500 }}>Contato</a>
         </nav>
       </header>
 
@@ -125,7 +124,7 @@ export default function Page() {
         <div style={{ position:'relative', padding:'0 32px 64px', maxWidth:800 }}>
           <p className="vv-eyebrow" style={{ color:'rgba(255,255,255,0.7)', marginBottom:16 }}>Grande Próspera · Criciúma / SC</p>
           <h1 className="vv-h1" style={{ color:'#fff', fontSize:'clamp(28px,4.5vw,60px)', lineHeight:1.1, margin:'0 0 16px' }}>Villaggio Verde<br/>Residenziale</h1>
-          <p style={{ color:'rgba(255,255,255,0.8)', fontSize:'clamp(15px,2vw,18px)', fontFamily:t.serif, fontStyle:'italic', marginBottom:36 }}>
+          <p style={{ color:'rgba(255,255,255,0.8)', fontSize:'clamp(15px,2vw,18px)', fontFamily:t.display, fontStyle:'italic', fontWeight:400, marginBottom:36 }}>
             Viva seu hobby no jardim da sua casa.
           </p>
           <a href={WPP} target="_blank" rel="noopener noreferrer" className="vv-cta" style={{ color:'#fff', borderColor:'rgba(255,255,255,0.6)' }}>
@@ -181,8 +180,8 @@ export default function Page() {
               <div style={{ display:'flex', gap:48, marginBottom:40 }}>
                 {[['794','m² mín'],['1.038','m² máx'],['12k','m² lazer']].map(([n,l]) => (
                   <div key={l}>
-                    <p style={{ fontFamily:t.display, fontSize:40, fontWeight:300, color:t.onDark, margin:0, lineHeight:1 }}>{n}</p>
-                    <p style={{ fontSize:11, letterSpacing:'0.3em', textTransform:'uppercase', color:t.onDarkMuted, margin:'6px 0 0' }}>{l}</p>
+                    <p style={{ fontFamily:t.display, fontSize:40, fontWeight:600, color:t.onDark, margin:0, lineHeight:1 }}>{n}</p>
+                    <p style={{ fontFamily:t.body, fontSize:11, letterSpacing:'0.07em', textTransform:'uppercase', color:t.onDarkMuted, margin:'6px 0 0' }}>{l}</p>
                   </div>
                 ))}
               </div>
@@ -203,7 +202,7 @@ export default function Page() {
         <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:'28px 64px' }}>
           {DIFERENCIAIS.map((d,i) => (
             <div key={i} style={{ display:'flex', gap:24, alignItems:'flex-start' }}>
-              <span style={{ fontFamily:t.display, fontSize:32, fontWeight:300, color:t.green, lineHeight:1, flexShrink:0 }}>{String(i+1).padStart(2,'0')}</span>
+              <span style={{ fontFamily:t.display, fontSize:32, fontWeight:600, color:t.green, lineHeight:1, flexShrink:0 }}>{String(i+1).padStart(2,'0')}</span>
               <p style={{ margin:0, fontSize:15, lineHeight:1.7, color:t.ink }}>{d}</p>
             </div>
           ))}
@@ -249,7 +248,7 @@ export default function Page() {
           <Image unoptimized src={IMG.hero} alt="Localização Villaggio Verde Criciúma" fill sizes="(max-width:768px) 100vw, 1100px" style={{ objectFit:'cover', objectPosition:'center 30%' }} />
           <div style={{ position:'absolute', inset:0, background:'rgba(13,26,13,0.35)' }} />
           <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
-            <p style={{ color:'#fff', fontSize:'clamp(14px,2vw,18px)', letterSpacing:'0.15em', textTransform:'uppercase', fontFamily:t.display, fontWeight:300 }}>Rodovia Leonardo Bialeck, 525 · Criciúma/SC</p>
+            <p style={{ color:'#fff', fontSize:'clamp(14px,2vw,18px)', fontFamily:t.display, fontWeight:600 }}>Rodovia Leonardo Bialeck, 525 · Criciúma/SC</p>
           </div>
         </div>
       </section>
@@ -272,7 +271,7 @@ export default function Page() {
         <div style={{ position:'absolute', inset:0, background:'rgba(13,26,13,0.72)' }} />
         <div style={{ position:'relative', textAlign:'center', padding:'0 32px' }}>
           <h2 className="vv-h2" style={{ color:'#fff', margin:'0 0 16px' }}>Villaggio Verde Residenziale</h2>
-          <p style={{ color:'rgba(255,255,255,0.75)', marginBottom:40, fontFamily:t.serif, fontStyle:'italic', fontSize:18 }}>Preço sob consulta · Grande Próspera · Criciúma / SC</p>
+          <p style={{ color:'rgba(255,255,255,0.75)', marginBottom:40, fontFamily:t.body, fontSize:18 }}>Preço sob consulta · Grande Próspera · Criciúma / SC</p>
           <div style={{ display:'flex', gap:16, justifyContent:'center', flexWrap:'wrap' }}>
             <a href={WPP} target="_blank" rel="noopener noreferrer" className="vv-cta" style={{ color:'#fff', borderColor:'rgba(255,255,255,0.6)' }}>
               Falar com Stiven Allan
@@ -283,11 +282,11 @@ export default function Page() {
       </section>
 
       <footer style={{ background:t.greenDark, padding:'48px 32px', textAlign:'center' }}>
-        <p style={{ color:t.onDarkMuted, fontSize:12, letterSpacing:'0.2em', textTransform:'uppercase', margin:'0 0 8px' }}>Stiven Allan</p>
+        <p style={{ color:t.onDarkMuted, fontSize:12, letterSpacing:'0.07em', textTransform:'uppercase', margin:'0 0 8px' }}>Stiven Allan</p>
         <p style={{ color:t.onDarkMuted, fontSize:11, margin:'0 0 4px' }}>CRECI 60.275</p>
         <p style={{ color:t.onDarkMuted, fontSize:11, margin:0 }}>Criciúma · SC</p>
         <div style={{ marginTop:24 }}>
-          <Link href="/" style={{ color:t.onDarkMuted, fontSize:11, letterSpacing:'0.2em', textTransform:'uppercase', textDecoration:'none' }}>← Todos os Empreendimentos</Link>
+          <Link href="/" style={{ color:t.onDarkMuted, fontSize:13, textDecoration:'none' }}>← Todos os Empreendimentos</Link>
         </div>
       </footer>
 
