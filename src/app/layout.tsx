@@ -5,6 +5,7 @@ import { TrackingProvider } from '@/components/TrackingProvider'
 import { LeadSessionProvider } from '@/components/lead-gate/LeadSessionProvider'
 import { AnalyticsScripts } from '@/components/AnalyticsScripts'
 import { CookieConsent } from '@/components/CookieConsent'
+import { Analytics } from '@vercel/analytics/next'
 import { Bricolage_Grotesque, Hanken_Grotesk, Cormorant_Garamond } from 'next/font/google'
 import './globals.css'
 
@@ -150,6 +151,12 @@ try{var sc=JSON.parse(localStorage.getItem('sa_consent'));if(sc&&sc.version===1&
     TrackingProvider precisa estar DENTRO do LeadSessionProvider, não fora. */}
 <AnalyticsScripts />
 <CookieConsent />
+{/* Vercel Web Analytics — client-side, sem cookie, sem fingerprint, sem PII;
+    métrica agregada e anônima da própria Vercel (Hobby: grátis até 2.500
+    eventos/mês). Diferente de GA4/Pixel, não depende do consentimento LGPD
+    acima. Dados aparecem no painel do projeto na Vercel, aba Analytics,
+    depois do deploy (nada aparece em ambiente local/dev). */}
+<Analytics />
 </body>
     </html>
   )
