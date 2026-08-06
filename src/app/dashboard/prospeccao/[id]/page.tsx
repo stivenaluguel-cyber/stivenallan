@@ -4,6 +4,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { Star } from 'lucide-react'
 import { enderecoResumido } from '@/lib/prospeccao/formatacao'
 import { linkWhatsappProspeccao } from '@/lib/prospeccao/whatsapp'
+import { planejarEnvioWhatsapp } from '@/lib/prospeccao/fila'
 
 const D = {
   bg: '#F3F2EE', surface: '#FAFAF7', ink: '#161512', bronze: '#D24E22',
@@ -69,6 +70,7 @@ export default function ProspeccaoDetalhePage() {
   const [dragId, setDragId] = useState<string | null>(null)
   const [promovendoId, setPromovendoId] = useState<string | null>(null)
   const [leadAberto, setLeadAberto] = useState<ProspeccaoLead | null>(null)
+  const [mensagemFila, setMensagemFila] = useState('')
 
   const carregar = useCallback(async () => {
     setLoading(true); setErro('')
@@ -123,6 +125,28 @@ export default function ProspeccaoDetalhePage() {
       setLeads((prev) => prev.map((l) => (l.id === leadProspeccaoId ? { ...l, status: anterior ?? l.status } : l)))
       setErro('Não deu pra mudar o status — tente de novo.')
     }
+  }
+
+  // "Enviar e avançar": abrir o WhatsApp de um lead 'novo' dentro do modal
+  // marca contatado (otimista, via mudarStatus) e já troca o modal pro
+  // próximo da fila — sem fechar, pra virar uma fila contínua de cliques.
+  // A decisão de qual é o próximo (ou se a fila zerou) é pura, em
+  // planejarEnvioWhatsapp — aqui só executa o plano.
+  function enviarWhatsappEAvancar(lead: ProspeccaoLead) {
+    const plano = planejarEnvioWhatsapp(leads, lead)
+    if (!plano.avancar) return
+    mudarStatus(lead.id, 'contatado')
+    if (plano.proximoLead) {
+      setLeadAberto(plano.proximoLead)
+    } else {
+      setLeadAberto(null)
+      setMensagemFila('Fila zerada — bom trabalho.')
+    }
+  }
+
+  function abrirLead(lead: ProspeccaoLead) {
+    setMensagemFila('')
+    setLeadAberto(lead)
   }
 
   // Sem confirm() nativo de propósito: trava a renderização (inclusive
@@ -190,6 +214,7 @@ export default function ProspeccaoDetalhePage() {
       </div>
 
       {erro && <p role="alert" style={{ color: '#dc2626', fontSize: 13, marginBottom: 16 }}>{erro}</p>}
+      {mensagemFila && <p style={{ color: D.green, fontSize: 13, fontWeight: 700, marginBottom: 16 }}>{mensagemFila}</p>}
 
       <p style={{ fontSize: 12.5, color: D.muted, marginBottom: 12 }}>
         {leads.length} lead{leads.length === 1 ? '' : 's'} nesta campanha · {campanha.leads_solicitados} solicitados no total · clique num card pra ver a ficha completa
@@ -227,7 +252,7 @@ export default function ProspeccaoDetalhePage() {
                       produto={campanha.produto}
                       promovendo={promovendoId === lead.id}
                       onDragStart={setDragId}
-                      onAbrir={() => setLeadAberto(lead)}
+                      onAbrir={() => abrirLead(lead)}
                       onPromover={() => promover(lead)}
                       onAbrirNoCrm={() => lead.lead_id && abrirNoCrm(lead.lead_id)}
                     />
@@ -241,12 +266,18 @@ export default function ProspeccaoDetalhePage() {
 
       {leadAberto && (
         <LeadDetalheModal
+          // key força remount ao trocar de lead (fila contínua do "enviar e
+          // avançar") — sem isso, estado interno do modal (CNPJ buscado,
+          // confirmação de promover) ficaria grudado no lead anterior.
+          key={leadAberto.id}
           lead={leadAberto}
           produto={campanha.produto}
           promovendo={promovendoId === leadAberto.id}
+          restantesNaFila={leads.filter((l) => l.status === 'novo').length}
           onClose={() => setLeadAberto(null)}
           onPromover={() => promover(leadAberto)}
           onAbrirNoCrm={() => leadAberto.lead_id && abrirNoCrm(leadAberto.lead_id)}
+          onEnviarWhatsapp={() => enviarWhatsappEAvancar(leadAberto)}
         />
       )}
     </div>
@@ -352,14 +383,16 @@ function BarraScore({ label, valor }: { label: string; valor: number | null }) {
 }
 
 function LeadDetalheModal({
-  lead, produto, promovendo, onClose, onPromover, onAbrirNoCrm,
+  lead, produto, promovendo, restantesNaFila, onClose, onPromover, onAbrirNoCrm, onEnviarWhatsapp,
 }: {
   lead: ProspeccaoLead
   produto: string
   promovendo: boolean
+  restantesNaFila: number
   onClose: () => void
   onPromover: () => void
   onAbrirNoCrm: () => void
+  onEnviarWhatsapp: () => void
 }) {
   const [confirmando, setConfirmando] = useState(false)
   const [cnpjInfo, setCnpjInfo] = useState<{ cnpj: string; razaoSocial: string; situacao: string | null; socios: Socio[] } | null>(
@@ -392,6 +425,14 @@ function LeadDetalheModal({
     >
       <div style={{ position: 'relative', width: '100%', maxWidth: 520, maxHeight: '85vh', overflowY: 'auto', background: '#fff', borderRadius: 16, boxShadow: '0 20px 60px rgba(0,0,0,0.25)' }}>
         <div style={{ background: D.bronze, padding: '20px 60px 20px 24px', borderRadius: '16px 16px 0 0' }}>
+          {/* Só faz sentido enquanto o lead aberto está 'novo' — é a fila de
+              quem ainda não foi contatado; some depois que "enviar e
+              avançar" marca esse lead como contatado. */}
+          {lead.status === 'novo' && (
+            <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 4px' }}>
+              {restantesNaFila} restante{restantesNaFila === 1 ? '' : 's'} na fila
+            </p>
+          )}
           <h2 style={{ color: '#fff', fontSize: 19, fontWeight: 700, margin: 0 }}>{lead.nome}</h2>
           <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12.5, margin: '4px 0 0' }}>
             {lead.score ?? '—'} pts · {lead.classificacao ?? 'sem classificação'} · {STATUS_LABEL[lead.status] ?? lead.status}
@@ -490,7 +531,10 @@ function LeadDetalheModal({
 
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {wa && (
-              <a href={wa} target="_blank" rel="noopener noreferrer" style={{ flex: '1 1 120px', background: '#25D366', color: '#fff', borderRadius: 8, padding: '10px 12px', fontSize: 13, fontWeight: 700, textAlign: 'center', textDecoration: 'none' }}>
+              // Sem preventDefault: o link abre a aba do wa.me normalmente,
+              // e o clique dispara "enviar e avançar" (marca contatado +
+              // pula pro próximo da fila) em paralelo — ver planejarEnvioWhatsapp.
+              <a href={wa} target="_blank" rel="noopener noreferrer" onClick={onEnviarWhatsapp} style={{ flex: '1 1 120px', background: '#25D366', color: '#fff', borderRadius: 8, padding: '10px 12px', fontSize: 13, fontWeight: 700, textAlign: 'center', textDecoration: 'none' }}>
                 WhatsApp
               </a>
             )}
