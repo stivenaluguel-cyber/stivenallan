@@ -182,3 +182,51 @@ export async function DELETE(req: NextRequest, { params }: Params) {
 
   return NextResponse.json({ success: true })
 }
+
+/**
+ * PATCH — /api/admin/empreendimentos/[id]/fotos?fotoId=...
+ *
+ * Remove a marca d'água de UMA foto específica (não apaga a foto — o
+ * original continua). Diferente da exclusão de foto: aqui a coluna sai
+ * primeiro, o arquivo do storage depois — na ordem inversa, se o delete
+ * do arquivo funcionasse mas a coluna não fosse atualizada, a linha
+ * continuaria apontando pra um `storage_path_processada` inexistente e a
+ * galeria mostraria uma URL quebrada. Com a coluna zerada primeiro, o pior
+ * caso de falha do storage é só um arquivo órfão (inofensivo) — a UI já
+ * mostra o original corretamente assim que a coluna vira null.
+ */
+export async function PATCH(req: NextRequest, { params }: Params) {
+  if (!(await requireAdmin())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const { id: propertyId } = await params
+
+  const fotoId = new URL(req.url).searchParams.get('fotoId')
+  if (!fotoId) return NextResponse.json({ error: 'fotoId obrigatório' }, { status: 400 })
+
+  const client = sb()
+  const { data: foto } = await client
+    .from('properties_fotos')
+    .select('*')
+    .eq('id', fotoId)
+    .eq('property_id', propertyId)
+    .maybeSingle()
+  if (!foto) return NextResponse.json({ error: 'Foto não encontrada' }, { status: 404 })
+
+  if (!foto.storage_path_processada) {
+    // Já está sem marca — nada a fazer, não é erro (idempotente).
+    return NextResponse.json({ data: { ...foto, urls: urlsPublicas(client, foto) } })
+  }
+
+  const pathProcessada = foto.storage_path_processada as string
+  const { data: linha, error } = await client
+    .from('properties_fotos')
+    .update({ storage_path_processada: null, processado_em: null })
+    .eq('id', fotoId)
+    .select()
+    .single()
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  const { error: erroStorage } = await client.storage.from(BUCKET_FOTOS).remove([pathProcessada])
+  if (erroStorage) logError(SOURCE, 'marca d\'água removida da linha mas arquivo processado permaneceu no storage', erroStorage, { propertyId, fotoId })
+
+  return NextResponse.json({ data: { ...linha, urls: urlsPublicas(client, linha) } })
+}

@@ -27,6 +27,7 @@ export function FotosImovel({ propertyId }: { propertyId: string }) {
   const [carregando, setCarregando] = useState(true)
   const [enviando, setEnviando] = useState(false)
   const [excluindo, setExcluindo] = useState<string | null>(null)
+  const [removendoMarca, setRemovendoMarca] = useState<string | null>(null)
   const [erro, setErro] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -81,6 +82,22 @@ export function FotosImovel({ propertyId }: { propertyId: string }) {
     }
   }
 
+  async function removerMarca(fotoId: string) {
+    if (!confirm('Remover a marca d’água desta foto? A foto continua no ar, só sem a marca.')) return
+    setRemovendoMarca(fotoId)
+    setErro('')
+    try {
+      const res = await fetch(`/api/admin/empreendimentos/${propertyId}/fotos?fotoId=${fotoId}`, { method: 'PATCH' })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error || 'Falha ao remover a marca d’água')
+      setFotos((atual) => atual.map((f) => (f.id === fotoId ? json.data : f)))
+    } catch (e) {
+      setErro(e instanceof Error ? e.message : 'Falha ao remover a marca d’água')
+    } finally {
+      setRemovendoMarca(null)
+    }
+  }
+
   return (
     <div style={card}>
       <h2 style={h2}>📸 Fotos do Imóvel</h2>
@@ -120,6 +137,21 @@ export function FotosImovel({ propertyId }: { propertyId: string }) {
                 <span style={{ position: 'absolute', bottom: 4, left: 4, background: 'rgba(0,0,0,0.6)', color: '#fff', fontSize: 9.5, padding: '2px 6px', borderRadius: 4 }}>
                   sem marca
                 </span>
+              )}
+              {f.urls.processada && (
+                <button
+                  type="button"
+                  onClick={() => removerMarca(f.id)}
+                  disabled={removendoMarca === f.id}
+                  title="Remover marca d'água desta foto (a foto continua, só sem a marca)"
+                  style={{
+                    position: 'absolute', bottom: 4, left: 4, background: 'rgba(0,0,0,0.6)', color: '#fff',
+                    border: 'none', fontSize: 9.5, padding: '2px 6px', borderRadius: 4,
+                    cursor: removendoMarca === f.id ? 'default' : 'pointer', opacity: removendoMarca === f.id ? 0.6 : 1,
+                  }}
+                >
+                  {removendoMarca === f.id ? 'removendo…' : 'remover marca'}
+                </button>
               )}
               <button
                 type="button"
