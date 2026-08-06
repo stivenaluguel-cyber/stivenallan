@@ -6,6 +6,7 @@ import { ESTAGIOS_FUNIL as ESTAGIOS } from '@/lib/dashboard/estagios'
 import { MetasDiarias } from '@/components/dashboard/MetasDiarias'
 import { CalendarioMetas } from '@/components/dashboard/CalendarioMetas'
 import { ProjecaoMeta } from '@/components/dashboard/ProjecaoMeta'
+import { PortfolioTiers } from '@/components/dashboard/PortfolioTiers'
 
 const D = {
   bg: '#F3F2EE', surface: '#FAFAF7', sidebar: '#131211', ink: '#161512',
@@ -146,6 +147,10 @@ export default function DashboardHome() {
         <div style={{ marginBottom: 24 }}>
           <h1 style={{ fontFamily: "'Bricolage Grotesque',system-ui", fontSize: 'clamp(1.5rem,3vw,2rem)', fontWeight: 800, margin: 0, color: D.ink }}>Painel · SA Imóveis</h1>
           <p style={{ margin: '6px 0 0', fontSize: 14, color: D.muted }}>Visão geral da sua operação de vendas.</p>
+        </div>
+
+        <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'stretch', marginBottom: 24 }}>
+          <PortfolioTiers />
         </div>
 
         <MetasDiarias />
