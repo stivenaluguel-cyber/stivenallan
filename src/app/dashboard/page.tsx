@@ -4,6 +4,7 @@ import { competenciaDoMes } from '@/lib/unidades/tabela-precos'
 import { useRouter } from 'next/navigation'
 import { ESTAGIOS_FUNIL as ESTAGIOS } from '@/lib/dashboard/estagios'
 import { MetasDiarias } from '@/components/dashboard/MetasDiarias'
+import { ScoreOperacao } from '@/components/dashboard/ScoreOperacao'
 import { CalendarioMetas } from '@/components/dashboard/CalendarioMetas'
 import { ProjecaoMeta } from '@/components/dashboard/ProjecaoMeta'
 
@@ -147,6 +148,8 @@ export default function DashboardHome() {
           <h1 style={{ fontFamily: "'Bricolage Grotesque',system-ui", fontSize: 'clamp(1.5rem,3vw,2rem)', fontWeight: 800, margin: 0, color: D.ink }}>Painel · SA Imóveis</h1>
           <p style={{ margin: '6px 0 0', fontSize: 14, color: D.muted }}>Visão geral da sua operação de vendas.</p>
         </div>
+
+        <ScoreOperacao />
 
         <MetasDiarias />
 
