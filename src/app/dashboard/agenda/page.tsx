@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useCallback, useMemo } from 'react'
+import { Calendar, Car, Check, Map, MapPin, User, X } from 'lucide-react'
 import {
   agruparPorDia, deslocar, intervaloDaVista, linksDeNavegacao, rotuloDoPeriodo,
   VISTAS, type Vista,
@@ -134,7 +135,7 @@ export default function AgendaPage() {
           <div style={{ padding: '3rem', textAlign: 'center', color: '#666' }}>Carregando...</div>
         ) : eventos.length === 0 ? (
           <div style={{ background: '#fff', borderRadius: '12px', border: '1px solid #e5e7eb', padding: '3rem', textAlign: 'center' }}>
-            <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📅</div>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.5rem', color: '#9ca3af' }}><Calendar size={32} aria-hidden /></div>
             <div style={{ color: '#666', fontSize: '0.875rem' }}>
               Nenhum evento {vista === 'dia' ? 'para este dia' : vista === 'semana' ? 'nesta semana' : 'neste mês'}
             </div>
@@ -168,7 +169,7 @@ export default function AgendaPage() {
                 </div>
                 {ev.local && (
                   <div style={{ color: '#666', fontSize: '0.8rem', marginBottom: '0.35rem' }}>
-                    <div>📍 {ev.local}</div>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><MapPin size={13} aria-hidden /> {ev.local}</div>
                     {/* O endereço era texto morto: para sair para a visita o
                         corretor copiava e colava no app de navegação. */}
                     {(() => {
@@ -178,11 +179,11 @@ export default function AgendaPage() {
                         <div style={{ display: 'flex', gap: '0.4rem', marginTop: '0.35rem', flexWrap: 'wrap' }}>
                           <a href={nav.maps} target="_blank" rel="noopener noreferrer"
                             style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', padding: '0.35rem 0.6rem', borderRadius: '6px', border: '1px solid #e5e7eb', background: '#fff', color: '#374151', fontSize: '0.75rem', fontWeight: 600, textDecoration: 'none', minHeight: 32 }}>
-                            🗺️ Maps
+                            <Map size={13} aria-hidden /> Maps
                           </a>
                           <a href={nav.waze} target="_blank" rel="noopener noreferrer"
                             style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', padding: '0.35rem 0.6rem', borderRadius: '6px', border: '1px solid #e5e7eb', background: '#fff', color: '#374151', fontSize: '0.75rem', fontWeight: 600, textDecoration: 'none', minHeight: 32 }}>
-                            🚗 Waze
+                            <Car size={13} aria-hidden /> Waze
                           </a>
                         </div>
                       )
@@ -192,16 +193,16 @@ export default function AgendaPage() {
                 {ev.descricao && <div style={{ color: '#666', fontSize: '0.8rem', marginBottom: '0.2rem' }}>{ev.descricao}</div>}
                 {ev.leads && (
                   <a href={'https://wa.me/55' + ev.leads.whatsapp?.replace(/\D/g,'')} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', color: '#16a34a', fontSize: '0.8rem', textDecoration: 'none', fontWeight: 500 }}>
-                    👤 {ev.leads.nome}
+                    <User size={13} aria-hidden /> {ev.leads.nome}
                   </a>
                 )}
               </div>
               <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
                 {!concluido && (
-                  <button onClick={() => concluir(ev.id)} style={{ background: '#dcfce7', color: '#16a34a', border: 'none', borderRadius: '6px', padding: '0.3rem 0.6rem', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600 }}>✓</button>
+                  <button onClick={() => concluir(ev.id)} title="Concluir" style={{ display: 'inline-flex', background: '#dcfce7', color: '#16a34a', border: 'none', borderRadius: '6px', padding: '0.3rem 0.6rem', cursor: 'pointer' }}><Check size={13} aria-hidden /></button>
                 )}
                 <button onClick={() => abrirModal(ev)} style={{ background: 'none', border: '1px solid #e5e7eb', borderRadius: '6px', padding: '0.3rem 0.6rem', cursor: 'pointer', fontSize: '0.75rem' }}>Editar</button>
-                <button onClick={() => excluir(ev.id)} style={{ background: '#fef2f2', color: '#dc2626', border: 'none', borderRadius: '6px', padding: '0.3rem 0.6rem', cursor: 'pointer', fontSize: '0.75rem' }}>✕</button>
+                <button onClick={() => excluir(ev.id)} title="Excluir" style={{ display: 'inline-flex', background: '#fef2f2', color: '#dc2626', border: 'none', borderRadius: '6px', padding: '0.3rem 0.6rem', cursor: 'pointer' }}><X size={13} aria-hidden /></button>
               </div>
             </div>
           )

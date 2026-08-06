@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import { Star } from 'lucide-react'
 import { enderecoResumido } from '@/lib/prospeccao/formatacao'
 import { linkWhatsappProspeccao } from '@/lib/prospeccao/whatsapp'
 
@@ -420,7 +421,7 @@ function LeadDetalheModal({
                 <tr>
                   <td style={{ color: D.muted, padding: '6px 0', borderBottom: '1px solid ' + D.line, fontSize: 13 }}>Avaliação Google</td>
                   <td style={{ padding: '6px 0', borderBottom: '1px solid ' + D.line, fontSize: 13.5, fontWeight: 600 }}>
-                    {lead.rating ? '★ ' + lead.rating.toFixed(1) + ' (' + (lead.rating_count ?? 0) + ' avaliações)' : '—'}
+                    {lead.rating ? <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><Star size={13} fill="currentColor" aria-hidden /> {lead.rating.toFixed(1)} ({lead.rating_count ?? 0} avaliações)</span> : '—'}
                   </td>
                 </tr>
                 <tr>

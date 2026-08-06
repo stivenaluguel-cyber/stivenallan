@@ -1,5 +1,6 @@
 'use client'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { Camera, X } from 'lucide-react'
 
 type FotoImovel = {
   id: string
@@ -100,7 +101,7 @@ export function FotosImovel({ propertyId }: { propertyId: string }) {
 
   return (
     <div style={card}>
-      <h2 style={h2}>📸 Fotos do Imóvel</h2>
+      <h2 style={{ ...h2, display: 'flex', alignItems: 'center', gap: 8 }}><Camera size={16} aria-hidden /> Fotos do Imóvel</h2>
       <p style={{ fontSize: 13, color: '#6b7280', margin: '0 0 16px', lineHeight: 1.5 }}>
         Upload de verdade (não é URL colada) — a marca d&apos;água configurada em{' '}
         <a href="/dashboard/preferencias" style={{ color: '#D24E22', fontWeight: 600 }}>Preferências</a>{' '}
@@ -165,7 +166,7 @@ export function FotosImovel({ propertyId }: { propertyId: string }) {
                   opacity: excluindo === f.id ? 0.5 : 1,
                 }}
               >
-                {excluindo === f.id ? '…' : '✕'}
+                {excluindo === f.id ? '…' : <X size={13} aria-hidden />}
               </button>
             </div>
           ))}

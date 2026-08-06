@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { Check } from 'lucide-react'
 
 type Notificacao = {
   id: string
@@ -152,9 +153,9 @@ export function NotificationBell({ variant = 'dark', align = 'right' }: { varian
                 <button
                   onClick={() => marcarLida(n.id)}
                   title="Marcar como lida"
-                  style={{ flexShrink: 0, background: 'none', border: `1px solid ${T.border}`, borderRadius: 6, width: 22, height: 22, cursor: 'pointer', color: T.mutedInk, fontSize: 12, lineHeight: 1 }}
+                  style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: 'none', border: `1px solid ${T.border}`, borderRadius: 6, width: 22, height: 22, cursor: 'pointer', color: T.mutedInk }}
                 >
-                  ✓
+                  <Check size={12} aria-hidden />
                 </button>
               </div>
             ))

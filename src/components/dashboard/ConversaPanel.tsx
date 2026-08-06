@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { Bot } from 'lucide-react'
 
 type Mensagem = {
   id: string
@@ -72,7 +73,7 @@ export function ConversaPanel({ leadId }: { leadId: string }) {
     <div>
       {pausado && (
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.3)', borderRadius: 8, padding: '8px 12px', marginBottom: 10 }}>
-          <span style={{ fontSize: 12, color: '#1d4ed8', fontWeight: 600 }}>🤖 Bot pausado — você está atendendo manualmente</span>
+          <span style={{ fontSize: 12, color: '#1d4ed8', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 6 }}><Bot size={14} aria-hidden /> Bot pausado — você está atendendo manualmente</span>
           <button onClick={reativarIA} style={{ background: 'none', border: 'none', color: D.bronze, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Reativar IA</button>
         </div>
       )}

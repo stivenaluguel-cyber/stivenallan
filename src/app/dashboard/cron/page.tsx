@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import { Clock } from 'lucide-react'
 import {
   aggregate,
   aggregateByDay,
@@ -301,7 +302,7 @@ function EmptyState() {
         borderRadius: 12,
       }}
     >
-      <div style={{ fontSize: 40 }}>⏱</div>
+      <div style={{ display: 'flex', justifyContent: 'center', color: T.mutedInk }}><Clock size={36} aria-hidden /></div>
       <p style={{ fontSize: 15, fontWeight: 600, color: T.ink, margin: '12px 0 6px' }}>
         Nenhuma execução registrada ainda.
       </p>

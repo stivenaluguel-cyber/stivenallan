@@ -1,7 +1,8 @@
 'use client'
 import { useState, useEffect, useCallback, useRef, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Crosshair } from 'lucide-react'
+import { Crosshair, Flame, CloudSun, Snowflake, Star, Clock } from 'lucide-react'
+import { IconeOrigemMotivo } from '@/components/dashboard/IconeOrigemMotivo'
 import { ConversaPanel } from '@/components/dashboard/ConversaPanel'
 import { ESTAGIOS_FUNIL as ESTAGIOS } from '@/lib/dashboard/estagios'
 import { useKanbanTouchDrag } from '@/lib/dashboard/use-kanban-touch-drag'
@@ -79,9 +80,9 @@ type Evento = { tipo: string; slug?: string; descricao?: string; created_at: str
 
 
 const TEMPERATURAS = [
-  { v: 3, label: 'Quente', cor: '#ef4444', emoji: '🔥' },
-  { v: 2, label: 'Morno', cor: '#f59e0b', emoji: '🌤️' },
-  { v: 1, label: 'Frio', cor: '#3b82f6', emoji: '❄️' },
+  { v: 3, label: 'Quente', cor: '#ef4444', icon: <Flame size={12} aria-hidden /> },
+  { v: 2, label: 'Morno', cor: '#f59e0b', icon: <CloudSun size={12} aria-hidden /> },
+  { v: 1, label: 'Frio', cor: '#3b82f6', icon: <Snowflake size={12} aria-hidden /> },
 ]
 const tempInfo = (t?: number) => TEMPERATURAS.find(x => x.v === t) ?? TEMPERATURAS[2]
 
@@ -486,14 +487,14 @@ function LeadCard({ lead, onDragStart, onSelect, onMover, onToqueInicio, ignorar
       style={{ background: '#fff', borderRadius: 8, padding: '10px 11px', marginBottom: 8, border: '1px solid ' + D.line, borderLeft: '4px solid ' + t.cor, cursor: 'grab', boxShadow: '0 1px 2px rgba(0,0,0,0.04)', position: 'relative' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 6 }}>
         <span style={{ fontWeight: 700, fontSize: 13, color: D.ink, lineHeight: 1.25 }}>{lead.nome || '+' + lead.whatsapp}</span>
-        <span title={t.label} style={{ fontSize: 11, fontWeight: 700, color: t.cor, whiteSpace: 'nowrap' }}>{t.emoji}</span>
+        <span title={t.label} style={{ display: 'inline-flex', fontWeight: 700, color: t.cor, whiteSpace: 'nowrap' }}>{t.icon}</span>
       </div>
       {lead.empreendimentos?.nome && <div style={{ fontSize: 11, color: D.muted, marginTop: 3 }}>{lead.empreendimentos.nome}</div>}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginTop: 7 }}>
         {lead.origem && <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 999, background: D.bg, color: D.muted }}>{lead.origem}</span>}
         {typeof lead.orcamento_max === 'number' && lead.orcamento_max > 0 && <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 999, background: D.bg, color: D.muted }}>{fmt(lead.orcamento_max)}</span>}
-        {esfriando && <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 999, background: '#EFF6FF', color: '#1D4ED8', fontWeight: 700 }}>❄ esfriando</span>}
-        {lead.requer_atencao && <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 999, background: 'rgba(210,78,34,0.12)', color: D.bronze, fontWeight: 700 }}>★ atenção</span>}
+        {esfriando && <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontSize: 10, padding: '2px 7px', borderRadius: 999, background: '#EFF6FF', color: '#1D4ED8', fontWeight: 700 }}><Snowflake size={10} aria-hidden /> esfriando</span>}
+        {lead.requer_atencao && <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontSize: 10, padding: '2px 7px', borderRadius: 999, background: 'rgba(210,78,34,0.12)', color: D.bronze, fontWeight: 700 }}><Star size={10} fill="currentColor" aria-hidden /> atenção</span>}
         {/* Entrada é o campo que mais decide venda no financiamento direto:
             sem entrada não há contrato, por mais quente que o lead pareça. */}
         {lead.entrada_disponivel && <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 999, background: 'rgba(34,197,94,0.14)', color: '#15803d', fontWeight: 700 }}>entrada {lead.entrada_disponivel}</span>}
@@ -512,7 +513,7 @@ function LeadCard({ lead, onDragStart, onSelect, onMover, onToqueInicio, ignorar
       {mostrarSla && (
         <div style={{ marginTop: 7 }}>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 10.5, fontWeight: 700, padding: '3px 8px', borderRadius: 999, background: CORES_SLA[sla.estado].fundo, color: CORES_SLA[sla.estado].texto }}>
-            ⏱ {sla.texto}
+            <Clock size={10} aria-hidden /> {sla.texto}
           </span>
         </div>
       )}
@@ -529,7 +530,9 @@ function LeadCard({ lead, onDragStart, onSelect, onMover, onToqueInicio, ignorar
           <a href={'https://wa.me/55' + (lead.whatsapp || '').replace(/\D/g, '')} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}
             style={{ flex: 1, background: '#25d366', color: '#fff', borderRadius: 6, padding: '5px 0', fontSize: 11, textAlign: 'center', textDecoration: 'none', fontWeight: 700, minHeight: 26, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>WhatsApp</a>
         ) : (
-          <span title={'Lead veio d' + (motivoSemWhatsappReal(lead.whatsapp)?.artigo ?? 'o') + ' ' + (motivoSemWhatsappReal(lead.whatsapp)?.label ?? 'Instagram') + ' — ainda sem telefone'} style={{ flex: 1, background: D.line, color: D.muted, borderRadius: 6, padding: '5px 0', fontSize: 11, textAlign: 'center', fontWeight: 700, minHeight: 26, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{motivoSemWhatsappReal(lead.whatsapp)?.emoji} {motivoSemWhatsappReal(lead.whatsapp)?.label}</span>
+          <span title={'Lead veio d' + (motivoSemWhatsappReal(lead.whatsapp)?.artigo ?? 'o') + ' ' + (motivoSemWhatsappReal(lead.whatsapp)?.label ?? 'Instagram') + ' — ainda sem telefone'} style={{ flex: 1, background: D.line, color: D.muted, borderRadius: 6, padding: '5px 0', fontSize: 11, textAlign: 'center', fontWeight: 700, minHeight: 26, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+            {(() => { const m = motivoSemWhatsappReal(lead.whatsapp); return m ? <><IconeOrigemMotivo origem={m.origem} size={11} /> {m.label}</> : null })()}
+          </span>
         )}
         <button onClick={(e) => { e.stopPropagation(); onSelect(lead) }} style={{ flex: 1, background: D.bg, color: D.ink, border: '1px solid ' + D.line, borderRadius: 6, padding: '5px 0', fontSize: 11, fontWeight: 700, cursor: 'pointer', minHeight: 26 }}>Abrir</button>
       </div>
@@ -816,8 +819,8 @@ function LeadModal({ lead, onClose, onUpdated, onDeleted }: { lead: Lead; onClos
           <label style={labelCss}>Qualificação</label>
           <div style={{ display: 'flex', gap: 8 }}>
             {TEMPERATURAS.map(x => (
-              <button key={x.v} onClick={() => salvarTemp(x.v)} style={{ flex: 1, padding: '8px 0', borderRadius: 8, border: '1.5px solid ' + (temp === x.v ? x.cor : D.line), background: temp === x.v ? x.cor + '18' : '#fff', color: temp === x.v ? x.cor : D.muted, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
-                {x.emoji} {x.label}
+              <button key={x.v} onClick={() => salvarTemp(x.v)} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 5, flex: 1, padding: '8px 0', borderRadius: 8, border: '1.5px solid ' + (temp === x.v ? x.cor : D.line), background: temp === x.v ? x.cor + '18' : '#fff', color: temp === x.v ? x.cor : D.muted, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                {x.icon} {x.label}
               </button>
             ))}
           </div>
@@ -941,8 +944,8 @@ function LeadModal({ lead, onClose, onUpdated, onDeleted }: { lead: Lead; onClos
               </a>
             </>
           ) : (
-            <div style={{ display: 'block', marginTop: 18, background: '#F3F2EE', color: '#8a8a85', borderRadius: 10, padding: 12, fontSize: 13, textAlign: 'center' }}>
-              {motivoSemWhatsappReal(lead.whatsapp)?.emoji} Lead veio d{motivoSemWhatsappReal(lead.whatsapp)?.artigo} {motivoSemWhatsappReal(lead.whatsapp)?.label} — edite acima quando conseguir o telefone
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, marginTop: 18, background: '#F3F2EE', color: '#8a8a85', borderRadius: 10, padding: 12, fontSize: 13, textAlign: 'center' }}>
+              {(() => { const m = motivoSemWhatsappReal(lead.whatsapp); if (!m) return null; return <><IconeOrigemMotivo origem={m.origem} size={13} /> Lead veio d{m.artigo} {m.label} — edite acima quando conseguir o telefone</> })()}
             </div>
           )}
         </div>

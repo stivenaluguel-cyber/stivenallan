@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { AlertTriangle } from 'lucide-react'
 import { competenciaDoMes, competenciaLabel, TABELAS_GUARDADAS, tabelaVencida } from '@/lib/unidades/tabela-precos'
 import { useRouter } from 'next/navigation'
 
@@ -273,7 +274,7 @@ export default function EmpreendimentosPage() {
         </div>
         {!loading && semTabelaDoMes.length > 0 && (
           <div style={{ background: '#FEF3C7', border: '1px solid #F5C542', borderRadius: 3, padding: '14px 18px', marginBottom: 16, display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-            <span style={{ fontSize: 18, flexShrink: 0 }}>⚠️</span>
+            <AlertTriangle size={18} color="#8A5A00" style={{ flexShrink: 0 }} aria-hidden />
             <div style={{ flex: 1, minWidth: 0 }}>
               <p style={{ margin: 0, fontSize: 13.5, fontWeight: 700, color: '#8A5A00' }}>
                 {semTabelaDoMes.length} empreendimento{semTabelaDoMes.length !== 1 ? 's' : ''} sem a tabela de {competenciaLabel(mesAtual)} guardada

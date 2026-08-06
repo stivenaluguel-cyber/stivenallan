@@ -1,6 +1,7 @@
 'use client'
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { ClipboardList, FileText, Home, ImageIcon, HelpCircle, Sparkles, X } from 'lucide-react'
 
 const inp: React.CSSProperties = {
   background: '#2a2d31', border: '1px solid #3a3d41', borderRadius: 8,
@@ -98,7 +99,7 @@ export default function NovoEmpreendimentoPage() {
 
         {/* Informações Básicas */}
         <div style={card}>
-          <h2 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20, marginTop: 0, color: '#c9a24b' }}>📋 Informações Básicas</h2>
+          <h2 style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 16, fontWeight: 700, marginBottom: 20, marginTop: 0, color: '#c9a24b' }}><ClipboardList size={17} aria-hidden /> Informações Básicas</h2>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
             <div><label style={lbl}>Nome do Empreendimento *</label><input required style={inp} value={form.nome} onChange={e => setField('nome', e.target.value)} placeholder="Ex: Monte Leone" /></div>
             <div><label style={lbl}>Construtora *</label><input required style={inp} value={form.construtora} onChange={e => setField('construtora', e.target.value)} placeholder="Ex: Fontana" /></div>
@@ -142,14 +143,14 @@ export default function NovoEmpreendimentoPage() {
 
         {/* Descrição */}
         <div style={card}>
-          <h2 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20, marginTop: 0, color: '#c9a24b' }}>📝 Descrição</h2>
+          <h2 style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 16, fontWeight: 700, marginBottom: 20, marginTop: 0, color: '#c9a24b' }}><FileText size={17} aria-hidden /> Descrição</h2>
           <div style={{ marginBottom: 16 }}><label style={lbl}>Descrição Curta</label><input style={inp} value={form.descricao_curta} onChange={e => setField('descricao_curta', e.target.value)} /></div>
           <div><label style={lbl}>Descrição Completa</label><textarea rows={5} style={{ ...inp, resize: 'vertical' } as React.CSSProperties} value={form.descricao_completa} onChange={e => setField('descricao_completa', e.target.value)} /></div>
         </div>
 
         {/* Imagens */}
         <div style={card}>
-          <h2 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20, marginTop: 0, color: '#c9a24b' }}>🖼️ Imagens e Vídeo</h2>
+          <h2 style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 16, fontWeight: 700, marginBottom: 20, marginTop: 0, color: '#c9a24b' }}><ImageIcon size={17} aria-hidden /> Imagens e Vídeo</h2>
           <div style={{ marginBottom: 16 }}>
             <label style={lbl}>URLs das Imagens (uma por linha)</label>
             <textarea rows={4} style={{ ...inp, resize: 'vertical', fontFamily: 'monospace', fontSize: 12 } as React.CSSProperties} value={form.imagens_urls} onChange={e => setField('imagens_urls', e.target.value)} placeholder="https://drive.google.com/uc?export=view&id=..." />
@@ -167,12 +168,12 @@ export default function NovoEmpreendimentoPage() {
 
         {/* Tipologias */}
         <div style={card}>
-          <h2 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20, marginTop: 0, color: '#c9a24b' }}>🏠 Tipologias</h2>
+          <h2 style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 16, fontWeight: 700, marginBottom: 20, marginTop: 0, color: '#c9a24b' }}><Home size={17} aria-hidden /> Tipologias</h2>
           {tipologias.map((t, idx) => (
             <div key={idx} style={{ background: '#2a2d31', borderRadius: 8, padding: 16, marginBottom: 12 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
                 <span style={{ fontWeight: 600, fontSize: 14 }}>Tipologia {idx + 1}</span>
-                {tipologias.length > 1 && <button type="button" onClick={() => remTip(idx)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: 18 }}>✕</button>}
+                {tipologias.length > 1 && <button type="button" onClick={() => remTip(idx)} aria-label="Remover tipologia" style={{ display: 'inline-flex', background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer' }}><X size={16} aria-hidden /></button>}
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12, marginBottom: 12 }}>
                 {[['Dormitórios','dormitorios'],['Suítes','suites'],['Vagas','vagas']].map(([l,f]) => (
@@ -191,7 +192,7 @@ export default function NovoEmpreendimentoPage() {
 
         {/* Diferenciais */}
         <div style={card}>
-          <h2 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20, marginTop: 0, color: '#c9a24b' }}>⭐ Diferenciais</h2>
+          <h2 style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 16, fontWeight: 700, marginBottom: 20, marginTop: 0, color: '#c9a24b' }}><Sparkles size={17} aria-hidden /> Diferenciais</h2>
           {diferenciais.map((d, idx) => (
             <div key={idx} style={{ display: 'grid', gridTemplateColumns: '60px 1fr 140px 36px', gap: 10, marginBottom: 10, alignItems: 'end' }}>
               <div><label style={{ ...lbl, fontSize: 12 }}>Ícone</label><input style={{ ...inp, textAlign: 'center', fontSize: 20 } as React.CSSProperties} value={d.icone} onChange={e => updDif(idx, 'icone', e.target.value)} /></div>
@@ -201,7 +202,7 @@ export default function NovoEmpreendimentoPage() {
                   {['lazer','seguranca','servicos','infraestrutura','sustentabilidade'].map(c => <option key={c}>{c}</option>)}
                 </select>
               </div>
-              <button type="button" onClick={() => remDif(idx)} style={{ background: '#ef444422', border: '1px solid #ef444433', color: '#ef4444', borderRadius: 8, cursor: 'pointer', height: 38, fontSize: 16 }}>✕</button>
+              <button type="button" onClick={() => remDif(idx)} aria-label="Remover diferencial" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: '#ef444422', border: '1px solid #ef444433', color: '#ef4444', borderRadius: 8, cursor: 'pointer', height: 38 }}><X size={15} aria-hidden /></button>
             </div>
           ))}
           <button type="button" onClick={addDif} style={{ background: 'none', border: '1px dashed #c9a24b', color: '#c9a24b', borderRadius: 8, padding: '8px 16px', cursor: 'pointer', width: '100%' }}>+ Adicionar Diferencial</button>
@@ -209,7 +210,7 @@ export default function NovoEmpreendimentoPage() {
 
         {/* Perguntas frequentes */}
         <div style={card}>
-          <h2 style={{ fontSize: 16, fontWeight: 700, marginBottom: 8, marginTop: 0, color: '#c9a24b' }}>❓ Perguntas Frequentes</h2>
+          <h2 style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 16, fontWeight: 700, marginBottom: 8, marginTop: 0, color: '#c9a24b' }}><HelpCircle size={17} aria-hidden /> Perguntas Frequentes</h2>
           <p style={{ fontSize: 13, color: '#a7adb4', marginTop: 0, marginBottom: 20, lineHeight: 1.6 }}>
             É o que faz a página aparecer no Google com as perguntas em destaque e ser citada por assistentes de IA.
             Se você deixar em branco, geramos automaticamente a partir dos dados acima (localização, plantas, obra e pagamento).
@@ -220,7 +221,7 @@ export default function NovoEmpreendimentoPage() {
                 <input style={{ ...inp, marginBottom: 8 }} value={q.pergunta} onChange={e => updFaq(idx, 'pergunta', e.target.value)} placeholder="Pergunta. Ex: O condomínio aceita pet?" />
                 <textarea rows={2} style={{ ...inp, resize: 'vertical' } as React.CSSProperties} value={q.resposta} onChange={e => updFaq(idx, 'resposta', e.target.value)} placeholder="Resposta completa — é este texto que o Google e as IAs leem." />
               </div>
-              <button type="button" onClick={() => remFaq(idx)} style={{ background: '#ef444422', border: '1px solid #ef444433', color: '#ef4444', borderRadius: 8, cursor: 'pointer', height: 38, fontSize: 16 }}>✕</button>
+              <button type="button" onClick={() => remFaq(idx)} aria-label="Remover pergunta" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: '#ef444422', border: '1px solid #ef444433', color: '#ef4444', borderRadius: 8, cursor: 'pointer', height: 38 }}><X size={15} aria-hidden /></button>
             </div>
           ))}
           <button type="button" onClick={addFaq} style={{ background: 'none', border: '1px dashed #c9a24b', color: '#c9a24b', borderRadius: 8, padding: '8px 16px', cursor: 'pointer', width: '100%' }}>+ Adicionar Pergunta</button>
@@ -229,7 +230,7 @@ export default function NovoEmpreendimentoPage() {
         <div style={{ display: 'flex', gap: 16, justifyContent: 'flex-end' }}>
           <button type="button" onClick={() => router.push('/dashboard/empreendimentos')} style={{ background: '#2a2d31', color: '#a7adb4', border: 'none', borderRadius: 8, padding: '12px 24px', cursor: 'pointer', fontWeight: 600 }}>Cancelar</button>
           <button type="submit" disabled={saving} style={{ background: saving ? '#a07a30' : '#c9a24b', color: '#000', border: 'none', borderRadius: 8, padding: '12px 32px', fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer', fontSize: 15 }}>
-            {saving ? 'Salvando...' : '✓ Salvar Empreendimento'}
+            {saving ? 'Salvando...' : 'Salvar Empreendimento'}
           </button>
         </div>
       </form>

@@ -96,7 +96,7 @@ export function FocusLeadCard({ item, contatoPendenteConfirmacao, processando, t
               <h2 ref={tituloRef} tabIndex={-1} style={{ fontFamily: "'Bricolage Grotesque',system-ui", fontSize: 18, fontWeight: 800, color: D.ink, margin: 0, outline: 'none' }}>
                 {lead.nome || '+' + lead.whatsapp}
               </h2>
-              <span title={t.label} style={{ fontSize: 12, fontWeight: 700, color: t.cor, display: 'inline-flex', alignItems: 'center', gap: 3 }}>{t.emoji} {t.label}</span>
+              <span title={t.label} style={{ fontSize: 12, fontWeight: 700, color: t.cor, display: 'inline-flex', alignItems: 'center', gap: 3 }}>{t.icon} {t.label}</span>
             </div>
             <div style={{ fontSize: 12.5, color: D.muted, marginTop: 2 }}>
               {est?.label ?? lead.estagio_funil} · {lead.origem ?? 'origem desconhecida'}

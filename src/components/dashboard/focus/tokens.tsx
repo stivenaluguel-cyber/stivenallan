@@ -1,3 +1,5 @@
+import { CloudSun, Flame, Snowflake } from 'lucide-react'
+
 // Mesma paleta usada em src/app/dashboard/crm/page.tsx — o Modo Foco precisa
 // parecer nativo do dashboard, não um módulo à parte. Centralizado aqui (e
 // não redeclarado em cada arquivo) só porque esta feature tem muitos
@@ -14,9 +16,9 @@ export const D = {
 export const fmt = (n: number) => 'R$ ' + Math.round(n).toLocaleString('pt-BR')
 
 export const TEMPERATURAS = [
-  { v: 3, label: 'Quente', cor: '#ef4444', emoji: '🔥' },
-  { v: 2, label: 'Morno', cor: '#f59e0b', emoji: '🌤️' },
-  { v: 1, label: 'Frio', cor: '#3b82f6', emoji: '❄️' },
-] as const
+  { v: 3, label: 'Quente', cor: '#ef4444', icon: <Flame size={13} aria-hidden /> },
+  { v: 2, label: 'Morno', cor: '#f59e0b', icon: <CloudSun size={13} aria-hidden /> },
+  { v: 1, label: 'Frio', cor: '#3b82f6', icon: <Snowflake size={13} aria-hidden /> },
+]
 
 export const tempInfo = (t?: number | null) => TEMPERATURAS.find((x) => x.v === t) ?? TEMPERATURAS[2]
