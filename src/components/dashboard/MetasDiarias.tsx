@@ -1,12 +1,14 @@
 'use client'
 import { useCallback, useEffect, useState } from 'react'
-import { CalendarDays, Check, Plus, Settings2, X } from 'lucide-react'
+import { CalendarDays, Check, Minus, Plus, Settings2, X } from 'lucide-react'
 import { D } from '@/components/dashboard/focus/tokens'
 import type { ProgressoDia, MetasDiarias as Metas } from '@/lib/dashboard/metas-diarias'
 
 type Resposta = { data: string; metas: Metas; progresso: ProgressoDia; mensagem: string | null; configurado: boolean }
 
-const CHAVE_MANUAL: Record<string, string> = { conteudos: 'conteudo', reunioes: 'reuniao_presencial' }
+// tipo no banco === chave, exceto estes dois legados — mesmo mapeamento de
+// src/app/api/admin/metas/route.ts (CHAVE_PARA_TIPO).
+const CHAVE_PARA_TIPO: Record<string, string> = { conteudos: 'conteudo', reunioes: 'reuniao_presencial' }
 
 export function MetasDiarias() {
   const [dados, setDados] = useState<Resposta | null>(null)
@@ -32,16 +34,18 @@ export function MetasDiarias() {
 
   useEffect(() => { carregar() }, [carregar])
 
-  // Só as duas atividades que o sistema não observa sozinho têm botão de
-  // registrar — o resto sobe automaticamente conforme o corretor trabalha.
-  async function registrar(chave: string, novoValor: number) {
-    const tipo = CHAVE_MANUAL[chave]
-    if (!tipo) return
+  // Todas as 5 atividades aceitam registro manual agora — nas 3 automáticas
+  // (novos_contatos/followups/visitas) é um COMPLEMENTO somado por cima do
+  // que o sistema já mede sozinho, não uma substituição: por isso o valor
+  // enviado é sempre baseado em `manual`, nunca em `feito` (que já inclui a
+  // parte automática).
+  async function registrar(chave: string, novoValorManual: number) {
+    const tipo = CHAVE_PARA_TIPO[chave] ?? chave
     setSalvando(chave)
     try {
       const res = await fetch('/api/admin/metas', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tipo, quantidade: novoValor, ...(outroDia ? { data: outroDia } : {}) }),
+        body: JSON.stringify({ tipo, quantidade: Math.max(0, novoValorManual), ...(outroDia ? { data: outroDia } : {}) }),
       })
       if (!res.ok) throw new Error((await res.json()).error || 'Falha ao registrar')
       await carregar()
@@ -132,19 +136,33 @@ export function MetasDiarias() {
                  style={{ height: 6, borderRadius: 999, background: D.line, overflow: 'hidden' }}>
               <div style={{ width: item.percentual + '%', height: '100%', background: item.cumprida ? D.green : D.bronze, transition: 'width .25s ease' }} />
             </div>
-            {item.origem === 'manual' ? (
+            <div style={{ marginTop: 8 }}>
+            {item.origem === 'automatica' && (
+              <div style={{ fontSize: 10, color: D.muted, marginBottom: 5 }}>
+                Conta sozinho — o registro aqui é um complemento
+              </div>
+            )}
+            <div style={{ display: 'flex', gap: 6 }}>
               <button
-                onClick={() => registrar(item.chave, item.feito + 1)}
+                onClick={() => registrar(item.chave, item.manual + 1)}
                 disabled={salvando === item.chave}
-                style={{ marginTop: 8, width: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 5, background: D.bg, border: '1px solid ' + D.line, borderRadius: 7, padding: '7px 10px', fontSize: 12, fontWeight: 700, color: D.ink, cursor: salvando === item.chave ? 'default' : 'pointer', minHeight: 44, opacity: salvando === item.chave ? 0.6 : 1 }}
+                style={{ flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 5, background: D.bg, border: '1px solid ' + D.line, borderRadius: 7, padding: '7px 10px', fontSize: 12, fontWeight: 700, color: D.ink, cursor: salvando === item.chave ? 'default' : 'pointer', minHeight: 44, opacity: salvando === item.chave ? 0.6 : 1 }}
               >
                 <Plus size={13} /> Registrar
               </button>
-            ) : (
-              <div style={{ marginTop: 8, fontSize: 10.5, color: D.muted, minHeight: 44, display: 'flex', alignItems: 'center' }}>
-                Contado automaticamente
-              </div>
-            )}
+              {item.manual > 0 && (
+                <button
+                  onClick={() => registrar(item.chave, item.manual - 1)}
+                  disabled={salvando === item.chave}
+                  title="Remover um registro manual (clique errado, cancelado, etc.)"
+                  aria-label="Remover um registro manual"
+                  style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 44, background: '#fff', border: '1px solid ' + D.line, borderRadius: 7, color: D.muted, cursor: salvando === item.chave ? 'default' : 'pointer', minHeight: 44, opacity: salvando === item.chave ? 0.6 : 1 }}
+                >
+                  <Minus size={13} />
+                </button>
+              )}
+            </div>
+            </div>
           </div>
         ))}
       </div>

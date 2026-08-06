@@ -9,11 +9,17 @@ export const dynamic = 'force-dynamic'
 const sb = () => createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 const SOURCE = 'api/admin/metas'
 
-const TIPOS_MANUAIS = new Set(['conteudo', 'reuniao_presencial'])
+// tipo no banco === chave em ATIVIDADES, exceto estes dois legados (nome
+// veio antes de existir a chave 'conteudos'/'reunioes' em metas-diarias.ts).
+const CHAVE_PARA_TIPO: Record<string, string> = { conteudos: 'conteudo', reunioes: 'reuniao_presencial' }
+const TIPO_PARA_CHAVE: Record<string, string> = Object.fromEntries(Object.entries(CHAVE_PARA_TIPO).map(([c, t]) => [t, c]))
+const TIPOS_MANUAIS = new Set(['novos_contatos', 'followups', 'visitas', ...Object.values(CHAVE_PARA_TIPO)])
 
 // GET — progresso do dia. Contatos/follow-ups/visitas vêm da RPC
-// resumo_atividades_dia, que lê os eventos que o sistema já grava; o
-// corretor não digita nada disso.
+// resumo_atividades_dia (eventos reais que o sistema já grava) SOMADOS a um
+// eventual complemento manual — o corretor pode registrar por cima uma
+// atividade real que aconteceu fora do sistema, sem que isso desligue ou
+// substitua a contagem automática.
 export async function GET(req: NextRequest) {
   const adminId = await requireAdmin()
   if (!adminId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -22,21 +28,30 @@ export async function GET(req: NextRequest) {
   const data = searchParams.get('data') || hojeEmSaoPaulo()
   const client = sb()
 
-  const [{ data: metaRow }, { data: resumoRpc, error: rpcError }] = await Promise.all([
+  const [{ data: metaRow }, { data: resumoRpc, error: rpcError }, { data: manuaisRows, error: manuaisError }] = await Promise.all([
     client.from('crm_metas_diarias').select('*').eq('admin_id', adminId).maybeSingle(),
     client.rpc('resumo_atividades_dia', { p_admin_id: adminId, p_data: data }),
+    client.from('crm_atividades_manuais').select('tipo, quantidade').eq('admin_id', adminId).eq('data', data),
   ])
 
   if (rpcError) {
     logError(SOURCE, 'falha ao agregar atividades do dia', rpcError, { data })
     return NextResponse.json({ error: 'Falha ao calcular o progresso do dia' }, { status: 500 })
   }
+  if (manuaisError) logError(SOURCE, 'falha ao buscar complemento manual do dia — seguindo sem ele', manuaisError, { data })
 
   // Sem configuração salva, vale o padrão — o painel funciona no primeiro
   // acesso, sem exigir setup.
   const metas = metaRow?.ativo === false ? { novos_contatos: 0, followups: 0, visitas: 0, conteudos: 0, reunioes: 0 } : normalizarMetas(metaRow)
   const resumo = normalizarResumo(resumoRpc as Record<string, unknown> | null)
-  const progresso = calcularProgresso(resumo, metas)
+
+  const resumoManual: Record<string, number> = {}
+  for (const row of manuaisRows ?? []) {
+    const chave = TIPO_PARA_CHAVE[row.tipo as string] ?? (row.tipo as string)
+    resumoManual[chave] = Number(row.quantidade) || 0
+  }
+
+  const progresso = calcularProgresso(resumo, metas, resumoManual)
 
   return NextResponse.json({
     data,
@@ -70,9 +85,12 @@ export async function PATCH(req: NextRequest) {
   return NextResponse.json({ data })
 }
 
-// POST — registra o que o sistema não tem como observar: vídeo publicado e
-// reunião presencial. Idempotente por (admin, dia, tipo): reenviar o mesmo
-// dia substitui a quantidade em vez de somar duas vezes.
+// POST — registra manualmente uma atividade do dia. Pra conteúdo/reunião
+// (que o sistema nunca vê) é o total; pras 3 automáticas, é um COMPLEMENTO
+// somado por cima da contagem real — não substitui o que o sistema mediu
+// sozinho (ver resumo_atividades_dia). Idempotente por (admin, dia, tipo):
+// reenviar o mesmo dia substitui a quantidade em vez de somar duas vezes,
+// o que também é como o "desfazer" funciona (reenvia com quantidade-1).
 export async function POST(req: NextRequest) {
   const adminId = await requireAdmin()
   if (!adminId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -83,7 +101,7 @@ export async function POST(req: NextRequest) {
   const tipo = String(body.tipo ?? '')
   if (!TIPOS_MANUAIS.has(tipo)) {
     return NextResponse.json(
-      { error: 'tipo deve ser "conteudo" ou "reuniao_presencial" — as demais atividades são derivadas automaticamente' },
+      { error: `tipo deve ser um de: ${[...TIPOS_MANUAIS].join(', ')}` },
       { status: 400 },
     )
   }
