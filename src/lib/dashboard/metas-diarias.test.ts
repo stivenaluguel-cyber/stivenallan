@@ -53,6 +53,35 @@ describe('calcularProgresso', () => {
     const p = calcularProgresso({ ...zerado, visitas: -5 }, metas)
     expect(p.itens.find((i) => i.chave === 'visitas')?.feito).toBe(0)
   })
+
+  it('sem resumoManual, manual fica em 0 pra todo mundo (retrocompatível com quem chama só com 2 args)', () => {
+    const p = calcularProgresso({ ...zerado, conteudos: 1, novos_contatos: 5 }, metas)
+    expect(p.itens.find((i) => i.chave === 'conteudos')?.manual).toBe(0)
+    expect(p.itens.find((i) => i.chave === 'novos_contatos')?.manual).toBe(0)
+  })
+
+  it('atividade manual (conteudos/reunioes): manual === feito, sempre — não tem componente automático', () => {
+    const p = calcularProgresso({ ...zerado, conteudos: 1 }, metas, { conteudos: 1 })
+    expect(p.itens.find((i) => i.chave === 'conteudos')?.manual).toBe(1)
+  })
+
+  it('atividade automática com complemento manual: manual é só a parte lançada por cima, feito continua sendo o total', () => {
+    // 8 contatos automáticos + 3 lançados manualmente = 11 no resumo (a RPC já soma isso antes de chegar aqui)
+    const p = calcularProgresso({ ...zerado, novos_contatos: 11 }, metas, { novos_contatos: 3 })
+    const item = p.itens.find((i) => i.chave === 'novos_contatos')
+    expect(item?.feito).toBe(11)
+    expect(item?.manual).toBe(3)
+  })
+
+  it('manual nunca passa de feito, mesmo com dado inconsistente vindo de fora', () => {
+    const p = calcularProgresso({ ...zerado, visitas: 1 }, metas, { visitas: 99 })
+    expect(p.itens.find((i) => i.chave === 'visitas')?.manual).toBe(1)
+  })
+
+  it('manual negativo é tratado como zero', () => {
+    const p = calcularProgresso({ ...zerado, visitas: 1 }, metas, { visitas: -3 })
+    expect(p.itens.find((i) => i.chave === 'visitas')?.manual).toBe(0)
+  })
 })
 
 describe('mensagemDoDia', () => {

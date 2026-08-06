@@ -32,6 +32,15 @@ export type ProgressoAtividade = {
   label: string
   origem: OrigemAtividade
   feito: number
+  /**
+   * Parte de `feito` que veio de registro manual (crm_atividades_manuais),
+   * não do sistema. Nas atividades 'manual' (conteudos/reunioes), manual ===
+   * feito sempre — não têm componente automático. Nas 'automatica', manual é
+   * só o COMPLEMENTO que o corretor lançou por cima da contagem real; existe
+   * pra saber até onde o botão de remover pode descer sem mexer no que o
+   * sistema mediu sozinho.
+   */
+  manual: number
   meta: number
   percentual: number
   cumprida: boolean
@@ -47,15 +56,24 @@ export type ProgressoDia = {
 
 // Metas em 0 significam "não acompanho isso" — a atividade some do painel
 // em vez de aparecer eternamente como 0/0 cumprida.
-export function calcularProgresso(resumo: ResumoDia, metas: MetasDiarias): ProgressoDia {
+//
+// `resumoManual` é opcional e por padrão zerado — quem só quer o total
+// (feito) continua chamando com 2 argumentos, como sempre (ex.: o selamento
+// de dias encerrados em /historico não precisa saber quanto era manual).
+export function calcularProgresso(resumo: ResumoDia, metas: MetasDiarias, resumoManual?: Partial<ResumoDia>): ProgressoDia {
   const itens: ProgressoAtividade[] = ATIVIDADES.filter((a) => (metas[a.chave] ?? 0) > 0).map((a) => {
     const meta = metas[a.chave]
     const feito = Math.max(0, resumo[a.chave] ?? 0)
+    // Clampado a `feito`: nunca deveria passar (manual é um componente de
+    // feito, não algo independente), mas se passar por alguma inconsistência
+    // de dado, o botão de remover não pode oferecer descer abaixo de zero.
+    const manual = Math.max(0, Math.min(feito, resumoManual?.[a.chave] ?? 0))
     return {
       chave: a.chave,
       label: a.label,
       origem: a.origem,
       feito,
+      manual,
       meta,
       // Limitado a 100: fazer 40 contatos não compensa não ter feito visita
       // nenhuma — o painel é sobre cumprir a rotina, não sobre somar pontos.
