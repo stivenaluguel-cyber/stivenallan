@@ -67,6 +67,9 @@ type Lead = {
   // No financiamento direto a entrada é o que decide a venda.
   entrada_disponivel?: string | null; faixa_investimento?: string | null
   prazo_compra?: string | null; cidade_interesse?: string | null
+  // CLT vs autônomo/PJ vs empresário — decide se o financiamento direto
+  // (sem comprovação bancária de renda) é o argumento certo pra esse lead.
+  tipo_renda?: string | null
   primeiro_atendimento_em?: string | null
   lead_score_detalhe?: DetalheScore | null
   // Cadastro único / histórico de interesse por empreendimento (lead_property_interests).
@@ -699,6 +702,7 @@ function LeadModal({ lead, onClose, onUpdated, onDeleted }: { lead: Lead; onClos
     // Os três campos que mais pesam no score de financiamento direto e que
     // até agora só podiam ser preenchidos por webhook.
     entrada_disponivel: lead.entrada_disponivel ?? '',
+    tipo_renda: lead.tipo_renda ?? '',
     prazo_compra: lead.prazo_compra ?? '',
     cidade_interesse: lead.cidade_interesse ?? '',
     // O imóvel dado na troca. Alimenta o cruzamento em /dashboard/permutas —
@@ -761,6 +765,7 @@ function LeadModal({ lead, onClose, onUpdated, onDeleted }: { lead: Lead; onClos
       nome: form.nome, whatsapp: form.whatsapp, email: form.email || null, origem: form.origem,
       orcamento_max: form.orcamento_max ? Number(form.orcamento_max) : null,
       entrada_disponivel: form.entrada_disponivel || null,
+      tipo_renda: form.tipo_renda || null,
       prazo_compra: form.prazo_compra || null,
       cidade_interesse: form.cidade_interesse || null,
       permuta_descricao: form.permuta_descricao || null,
@@ -841,6 +846,11 @@ function LeadModal({ lead, onClose, onUpdated, onDeleted }: { lead: Lead; onClos
               <input type="number" style={inputCss} value={form.orcamento_max} onChange={e => setForm(p => ({ ...p, orcamento_max: e.target.value }))} />
               <label style={labelCss}>Entrada disponível</label>
               <input style={inputCss} placeholder="Ex.: R$ 60.000 ou FGTS + 30 mil" value={form.entrada_disponivel} onChange={e => setForm(p => ({ ...p, entrada_disponivel: e.target.value }))} />
+              <label style={labelCss}>Tipo de renda</label>
+              <select style={inputCss} value={form.tipo_renda} onChange={e => setForm(p => ({ ...p, tipo_renda: e.target.value }))}>
+                <option value="">Não informado</option>
+                {['CLT (carteira assinada)', 'Autônomo / Profissional liberal', 'Empresário / Sócio de empresa', 'Aposentado / Outro'].map(o => <option key={o} value={o}>{o}</option>)}
+              </select>
               <label style={labelCss}>Prazo de compra</label>
               <select style={inputCss} value={form.prazo_compra} onChange={e => setForm(p => ({ ...p, prazo_compra: e.target.value }))}>
                 <option value="">Não informado</option>
@@ -870,6 +880,7 @@ function LeadModal({ lead, onClose, onUpdated, onDeleted }: { lead: Lead; onClos
                   ['Empreendimento', lead.empreendimentos?.nome ?? lead.property_name ?? '—'],
                   ['Orçamento', lead.orcamento_max ? fmt(lead.orcamento_max) : '—'],
                   ['Entrada disponível', lead.entrada_disponivel || '—'],
+                  ['Tipo de renda', lead.tipo_renda || '—'],
                   ['Prazo de compra', lead.prazo_compra || '—'],
                   ['Cidade de interesse', lead.cidade_interesse || '—'],
                   ['Recebido em', lead.created_at ? new Date(lead.created_at).toLocaleString('pt-BR') : '—'],

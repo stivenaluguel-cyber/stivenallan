@@ -27,6 +27,7 @@ export default function FormContato({ empreendimento, propertyId, propertySlug, 
   const [faixaInvestimento, setFaixaInvestimento] = useState('');
   const [prazoCompra, setPrazoCompra] = useState('');
   const [entradaDisponivel, setEntradaDisponivel] = useState('');
+  const [tipoRenda, setTipoRenda] = useState('');
   const [hp, setHp] = useState(''); // honeypot: usuário real nunca vê, bot preenche → server responde 400
   const [status, setStatus] = useState<'idle' | 'enviando' | 'ok' | 'erro'>('idle');
   const startedRef = useRef(false);
@@ -51,6 +52,7 @@ export default function FormContato({ empreendimento, propertyId, propertySlug, 
       !isCasaGuaiba && faixaInvestimento && `Faixa de investimento: ${faixaInvestimento}`,
       !isCasaGuaiba && prazoCompra && `Quando pretende comprar: ${prazoCompra}`,
       !isCasaGuaiba && entradaDisponivel && `Entrada disponível: ${entradaDisponivel}`,
+      !isCasaGuaiba && tipoRenda && `Tipo de renda: ${tipoRenda}`,
     ].filter(Boolean);
     const texto = detalhes.length ? `${saudacao}\n\n${detalhes.join('\n')}` : saudacao;
     return `https://wa.me/${whatsapp || WHATSAPP}?text=${encodeURIComponent(texto)}`;
@@ -59,7 +61,7 @@ export default function FormContato({ empreendimento, propertyId, propertySlug, 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!nome || !telefone) return;
-    if (!isCasaGuaiba && (!faixaInvestimento || !prazoCompra || !entradaDisponivel)) return;
+    if (!isCasaGuaiba && (!faixaInvestimento || !prazoCompra || !entradaDisponivel || !tipoRenda)) return;
     setStatus('enviando');
     let leadId: string | null = null;
     // Aba aberta ainda dentro do gesto de clique — Safari bloqueia window.open() chamado após um await
@@ -80,6 +82,7 @@ export default function FormContato({ empreendimento, propertyId, propertySlug, 
           faixa_investimento: isCasaGuaiba ? null : faixaInvestimento,
           prazo_compra: isCasaGuaiba ? null : prazoCompra,
           entrada_disponivel: isCasaGuaiba ? null : entradaDisponivel,
+          tipo_renda: isCasaGuaiba ? null : tipoRenda,
           hp_url: hp,
           ...getAttribution(),
         }),
@@ -275,6 +278,28 @@ export default function FormContato({ empreendimento, propertyId, propertySlug, 
             <option value="30% ou mais">30% ou mais do valor</option>
             <option value="Preciso calcular">Preciso calcular</option>
             <option value="Prefiro falar no WhatsApp">Prefiro falar no WhatsApp</option>
+          </select>
+          <select
+            value={tipoRenda}
+            onChange={(e) => setTipoRenda(e.target.value)}
+            onFocus={markStarted}
+            required
+            style={selectStyle}
+            aria-label="Tipo de renda"
+          >
+            {/* O financiamento direto com a construtora dispensa comprovação
+                bancária de renda formal — o público certo pra essa condição
+                é quem tem patrimônio real mas não tem holerite CLT pra provar
+                pra um banco. Sem essa pergunta, o lead chega qualificado por
+                valor mas não pelo motivo que faz o financiamento direto ser
+                a opção certa pra ele especificamente. */}
+            <option value="" disabled>
+              Tipo de renda
+            </option>
+            <option value="CLT (carteira assinada)">CLT (carteira assinada)</option>
+            <option value="Autônomo / Profissional liberal">Autônomo / Profissional liberal</option>
+            <option value="Empresário / Sócio de empresa">Empresário / Sócio de empresa</option>
+            <option value="Aposentado / Outro">Aposentado / Outro</option>
           </select>
         </>
       )}
