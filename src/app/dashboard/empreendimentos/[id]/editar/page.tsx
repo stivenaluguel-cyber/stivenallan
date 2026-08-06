@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import { FotosImovel } from '@/components/dashboard/FotosImovel';
 
 interface Diferencial { icone: string; titulo: string; descricao: string; }
 
@@ -220,6 +221,8 @@ export default function EditarEmpreendimento() {
             <input style={inp} value={form.video_url} onChange={e => setField('video_url', e.target.value)} placeholder="https://youtube.com/..." />
           </div>
         </div>
+
+        <FotosImovel propertyId={id} />
 
         {/* Tipologia */}
         <div style={card}>
