@@ -109,7 +109,7 @@ export function FocusPreparation({
                     color: ativo ? info.cor : D.ink,
                   }}
                 >
-                  {info.emoji} {info.label}
+                  {info.icon} {info.label}
                 </button>
               )
             })}

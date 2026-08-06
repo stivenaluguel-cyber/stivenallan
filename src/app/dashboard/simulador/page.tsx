@@ -1,5 +1,6 @@
 'use client'
 import { useState, useMemo } from 'react'
+import { AlertTriangle, CheckCircle2, ChevronDown, ChevronUp, Copy, Home, Landmark, BarChart3, HardHat, Star, Wallet } from 'lucide-react'
 import { SalvarSimulacaoLead } from '@/components/dashboard/SalvarSimulacaoLead'
 import { imoveis } from '@/data/imoveis'
 import { simular, planos, tabelaCorbetta, tabelaSplit, tabelaGiassi, construtoras } from '@/data/financiamento'
@@ -301,7 +302,7 @@ export default function SimuladorPage() {
             color: D.bronze, fontSize: 13, fontWeight: 700, padding: 0,
             display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12,
           }}>
-            {showOpcoes ? '▲' : '▼'} Personalizar condição (opcional)
+            {showOpcoes ? <ChevronUp size={15} aria-hidden /> : <ChevronDown size={15} aria-hidden />} Personalizar condição (opcional)
           </button>
 
           {showOpcoes && (
@@ -338,7 +339,7 @@ export default function SimuladorPage() {
         {slug && !planos[slug] && (
           <div style={{ ...card, borderLeft: '4px solid #f59e0b', background: '#FFFBEB' }}>
             <p style={{ margin: 0, fontSize: 14, color: '#92400e' }}>
-              ⚠️ Plano de financiamento não cadastrado para este empreendimento.
+              <AlertTriangle size={15} style={{ verticalAlign: -2, marginRight: 4 }} aria-hidden /> Plano de financiamento não cadastrado para este empreendimento.
             </p>
           </div>
         )}
@@ -346,7 +347,7 @@ export default function SimuladorPage() {
         {/* ── Aviso prazo reduzido ─────────────────────────────────────── */}
         {avisoPrazo && (
           <div style={{ background: D.amberBg, border: '1px solid #FCD34D', borderRadius: 12, padding: '12px 16px', marginBottom: 16, display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-            <span style={{ fontSize: 18 }}>⚠️</span>
+            <AlertTriangle size={17} color={D.amber} aria-hidden />
             <span style={{ fontSize: 13, color: D.amber, fontWeight: 600 }}>{avisoPrazo}</span>
           </div>
         )}
@@ -356,7 +357,7 @@ export default function SimuladorPage() {
 
             {/* ── Card 1 — PARCELA A ────────────────────────────────────── */}
             <div style={{ ...card, marginBottom: 0, borderTop: '3px solid ' + D.bronze }}>
-              <p style={{ ...sectionTitle, marginBottom: 14 }}>🏗️ Parcela A — até as chaves</p>
+              <p style={{ ...sectionTitle, marginBottom: 14, display: 'flex', alignItems: 'center', gap: 6 }}><HardHat size={15} aria-hidden /> Parcela A — até as chaves</p>
               <div style={{ marginBottom: 14 }}>
                 <div style={{ fontSize: 11, color: D.muted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 2 }}>Entrada</div>
                 <div style={{ fontSize: 22, fontWeight: 800, color: D.ink }}>{fmtBRL(sim.parcelaA.entrada)}</div>
@@ -393,7 +394,7 @@ export default function SimuladorPage() {
 
             {/* ── Card 3 — À VISTA ─────────────────────────────────────── */}
             <div style={{ ...card, marginBottom: 0, borderTop: '3px solid #22c55e', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-              <p style={{ ...sectionTitle, marginBottom: 14, color: '#16a34a' }}>💰 À vista</p>
+              <p style={{ ...sectionTitle, marginBottom: 14, color: '#16a34a', display: 'flex', alignItems: 'center', gap: 6 }}><Wallet size={15} aria-hidden /> À vista</p>
               <div style={{ marginBottom: 14 }}>
                 <div style={{ fontSize: 11, color: D.muted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 2 }}>Valor com desconto</div>
                 <div style={{ fontSize: 26, fontWeight: 800, color: '#15803d' }}>{fmtBRL(sim.valorAVista)}</div>
@@ -409,7 +410,7 @@ export default function SimuladorPage() {
                 color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer',
                 transition: 'background .2s',
               }}>
-                {copiado ? '✅ Copiado!' : '📋 Copiar proposta'}
+                {copiado ? <><CheckCircle2 size={14} aria-hidden /> Copiado!</> : <><Copy size={14} aria-hidden /> Copiar proposta</>}
               </button>
               <div style={{ marginTop: 10 }}>
                 <SalvarSimulacaoLead dados={dadosSimulacao} />
@@ -421,7 +422,7 @@ export default function SimuladorPage() {
         {/* ── Card 2 — PARCELA B ───────────────────────────────────────── */}
         {sim?.parcelaB && (
           <div style={{ ...card, borderTop: '3px solid #3b82f6' }}>
-            <p style={{ ...sectionTitle, color: '#1d4ed8' }}>🏠 Parcela B — pós-chaves</p>
+            <p style={{ ...sectionTitle, color: '#1d4ed8', display: 'flex', alignItems: 'center', gap: 6 }}><Home size={15} aria-hidden /> Parcela B — pós-chaves</p>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 20 }}>
               <div>
                 <div style={{ fontSize: 11, color: D.muted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 2 }}>Saldo devedor</div>
@@ -446,7 +447,7 @@ export default function SimuladorPage() {
               <tbody>
                 {sim.parcelaB.spcMensal != null && (
                   <tr style={{ borderTop: '1px solid ' + D.line, background: '#FFF3EC' }}>
-                    <td style={{ padding: '12px 14px', fontWeight: 700, color: D.bronze }}>SPC-JS (juros simples) ★</td>
+                    <td style={{ padding: '12px 14px', fontWeight: 700, color: D.bronze }}>SPC-JS (juros simples) <Star size={11} fill="currentColor" style={{ verticalAlign: -1 }} aria-hidden /></td>
                     <td style={{ padding: '12px 14px', textAlign: 'right', fontWeight: 700, color: D.bronze }}>{fmtBRL(sim.parcelaB.spcMensal)}</td>
                     <td style={{ padding: '12px 14px', textAlign: 'right', color: D.bronze }}>{fmtBRL(sim.parcelaB.spcMensal)}</td>
                     <td style={{ padding: '12px 14px', textAlign: 'right', color: D.muted }}>{sim.parcelaB.meses} meses</td>
@@ -481,7 +482,7 @@ export default function SimuladorPage() {
             TABELA DE PRAZOS — ESTILO CORBETTA (SPC-JS)
             ═══════════════════════════════════════════════════════════════ */}
         <div style={{ ...card, borderTop: '3px solid ' + D.bronze }}>
-          <p style={{ ...sectionTitle }}>📊 Tabela de Prazos — SPC-JS (estilo Corbetta)</p>
+          <p style={{ ...sectionTitle, display: 'flex', alignItems: 'center', gap: 6 }}><BarChart3 size={15} aria-hidden /> Tabela de Prazos — SPC-JS (estilo Corbetta)</p>
 
           {/* Controles Corbetta */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 12, marginBottom: 16 }}>
@@ -588,7 +589,7 @@ export default function SimuladorPage() {
                         onClick={() => setCorbLinhaAtiva(isActive ? null : { prazo: row.prazoMeses, modo: isCorbetta ? 'split_corbetta' : 'sem_reforco' })}>
                         <td style={{ padding: '9px 12px', fontWeight: 700, color: D.ink, whiteSpace: 'nowrap', borderBottom: '1px solid ' + D.line }}>
                           {row.prazoMeses} meses
-                          {isActive && <span style={{ marginLeft: 6, fontSize: 10, background: D.bronze, color: '#fff', borderRadius: 4, padding: '1px 5px' }}>✓</span>}
+                          {isActive && <span style={{ display: 'inline-flex', marginLeft: 6, background: D.bronze, color: '#fff', borderRadius: 4, padding: '1px 5px' }}><CheckCircle2 size={10} aria-hidden /></span>}
                         </td>
                         <td style={{ padding: '9px 12px', textAlign: 'right', borderBottom: '1px solid ' + D.line }}>
                           <div style={{ fontWeight: 700, color: D.ink }}>{fmtBRL(row.semReforco.mensal)}/mês</div>
@@ -679,7 +680,7 @@ export default function SimuladorPage() {
                 </div>
                 <button onClick={() => copiarProposta({ prazo: corbLinhaAtiva.prazo, modo: corbLinhaAtiva.modo, mensal: displayMensal, reforco: displayReforco })}
                   style={{ padding: '10px 18px', borderRadius: 10, border: 'none', background: D.bronze, color: '#fff', fontWeight: 700, cursor: 'pointer', fontSize: 13 }}>
-                  {copiado ? '✅ Copiado!' : '📋 Copiar proposta'}
+                  {copiado ? <><CheckCircle2 size={14} aria-hidden /> Copiado!</> : <><Copy size={14} aria-hidden /> Copiar proposta</>}
                 </button>
               </div>
             )
@@ -713,8 +714,8 @@ export default function SimuladorPage() {
             width: '100%', background: 'none', border: 'none', cursor: 'pointer',
             display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 0,
           }}>
-            <span style={{ fontSize: 14, fontWeight: 700, color: '#374151' }}>🏦 Financiamento Bancário (simulação auxiliar)</span>
-            <span style={{ fontSize: 18, color: D.muted }}>{showBank ? '▲' : '▼'}</span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14, fontWeight: 700, color: '#374151' }}><Landmark size={15} aria-hidden /> Financiamento Bancário (simulação auxiliar)</span>
+            <span style={{ display: 'inline-flex', color: D.muted }}>{showBank ? <ChevronUp size={16} aria-hidden /> : <ChevronDown size={16} aria-hidden />}</span>
           </button>
 
           {showBank && (
@@ -750,8 +751,8 @@ export default function SimuladorPage() {
                   </div>
                 ))}
               </div>
-              <button onClick={() => setShowCronograma(v => !v)} style={{ marginTop: 14, padding: '9px 16px', borderRadius: 8, border: '1px solid ' + D.line, background: '#fff', color: D.ink, fontWeight: 600, cursor: 'pointer', fontSize: 13 }}>
-                {showCronograma ? '▲ Ocultar' : '▼ Ver'} Cronograma
+              <button onClick={() => setShowCronograma(v => !v)} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, marginTop: 14, padding: '9px 16px', borderRadius: 8, border: '1px solid ' + D.line, background: '#fff', color: D.ink, fontWeight: 600, cursor: 'pointer', fontSize: 13 }}>
+                {showCronograma ? <ChevronUp size={14} aria-hidden /> : <ChevronDown size={14} aria-hidden />} {showCronograma ? 'Ocultar' : 'Ver'} Cronograma
               </button>
             </div>
           )}

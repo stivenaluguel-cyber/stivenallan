@@ -2,6 +2,12 @@
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
+import {
+  Activity, Brain, Building2, Calculator, Calendar, Camera, Clock, FileText,
+  FolderKanban, Handshake, LogOut, Mail, Map, Repeat, Search, Send, Settings,
+  Target, Users, Wallet,
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { NotificationBell } from '@/lib/dashboard/notification-bell';
 import { PushNotificationManager } from '@/lib/dashboard/push-notification-manager';
 
@@ -11,48 +17,48 @@ const D = {
   lineDark: 'rgba(245,241,234,0.12)', activeBg: 'rgba(210,78,34,0.16)',
 };
 
-type NavItem = { href: string; label: string; icon: string };
+type NavItem = { href: string; label: string; icon: LucideIcon };
 
 const GRUPOS: { titulo: string; itens: NavItem[] }[] = [
   {
     titulo: 'PRINCIPAL',
     itens: [
-      { href: '/dashboard/crm', label: 'CRM', icon: '🗂️' },
-      { href: '/dashboard/clientes', label: 'Clientes', icon: '👥' },
-      { href: '/dashboard/propostas', label: 'Propostas', icon: '📄' },
-      { href: '/dashboard/agenda', label: 'Agenda', icon: '📅' },
+      { href: '/dashboard/crm', label: 'CRM', icon: FolderKanban },
+      { href: '/dashboard/clientes', label: 'Clientes', icon: Users },
+      { href: '/dashboard/propostas', label: 'Propostas', icon: FileText },
+      { href: '/dashboard/agenda', label: 'Agenda', icon: Calendar },
     ],
   },
   {
     titulo: 'GESTÃO',
     itens: [
-      { href: '/dashboard/financeiro', label: 'Financeiro', icon: '💰' },
-      { href: '/dashboard/comissoes', label: 'Comissões', icon: '🤝' },
-      { href: '/dashboard/empreendimentos', label: 'Empreendimentos', icon: '🏢' },
-      { href: '/dashboard/espelho', label: 'Espelho de vendas', icon: '🗺️' },
-      { href: '/dashboard/permutas', label: 'Permutas', icon: '🔁' },
-      { href: '/dashboard/leads', label: 'Leads', icon: '🎯' },
-      { href: '/dashboard/simulador', label: 'Simulador', icon: '🧮' },
-      { href: '/dashboard/relatorios', label: 'Relatórios', icon: '📊' },
-      { href: '/dashboard/automacoes', label: 'Automações', icon: '⚙️' },
-      { href: '/dashboard/base-conhecimento', label: 'Base de Conhecimento', icon: '🧠' },
-      { href: '/dashboard/campanhas', label: 'Campanhas', icon: '✉️' },
-      { href: '/dashboard/cron', label: 'Cron', icon: '⏱️' },
+      { href: '/dashboard/financeiro', label: 'Financeiro', icon: Wallet },
+      { href: '/dashboard/comissoes', label: 'Comissões', icon: Handshake },
+      { href: '/dashboard/empreendimentos', label: 'Empreendimentos', icon: Building2 },
+      { href: '/dashboard/espelho', label: 'Espelho de vendas', icon: Map },
+      { href: '/dashboard/permutas', label: 'Permutas', icon: Repeat },
+      { href: '/dashboard/leads', label: 'Leads', icon: Target },
+      { href: '/dashboard/simulador', label: 'Simulador', icon: Calculator },
+      { href: '/dashboard/relatorios', label: 'Relatórios', icon: Activity },
+      { href: '/dashboard/automacoes', label: 'Automações', icon: Settings },
+      { href: '/dashboard/base-conhecimento', label: 'Base de Conhecimento', icon: Brain },
+      { href: '/dashboard/campanhas', label: 'Campanhas', icon: Mail },
+      { href: '/dashboard/cron', label: 'Cron', icon: Clock },
     ],
   },
   {
     titulo: 'GROWTH',
     itens: [
-      { href: '/dashboard/instagram', label: 'Instagram', icon: '📸' },
-      { href: '/dashboard/ativacao', label: 'Ativação IG', icon: '📩' },
-      { href: '/dashboard/prospeccao', label: 'Prospecção', icon: '⛏️' },
-      { href: '/dashboard/rotina-seo', label: 'Rotina SEO', icon: '🔍' },
+      { href: '/dashboard/instagram', label: 'Instagram', icon: Camera },
+      { href: '/dashboard/ativacao', label: 'Ativação IG', icon: Send },
+      { href: '/dashboard/prospeccao', label: 'Prospecção', icon: Target },
+      { href: '/dashboard/rotina-seo', label: 'Rotina SEO', icon: Search },
     ],
   },
   {
     titulo: 'CONTA',
     itens: [
-      { href: '/dashboard/preferencias', label: 'Preferências', icon: '⚙️' },
+      { href: '/dashboard/preferencias', label: 'Preferências', icon: Settings },
     ],
   },
 ];
@@ -124,7 +130,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                       border: 'none', borderLeft: '3px solid ' + (active ? D.bronze : 'transparent'),
                       color: active ? D.onDark : D.onDarkMuted, fontSize: 14, fontWeight: active ? 700 : 500,
                     }}>
-                    <span style={{ fontSize: 16, width: 20, textAlign: 'center' }}>{item.icon}</span>
+                    <item.icon size={17} strokeWidth={2} style={{ width: 20, flexShrink: 0 }} aria-hidden />
                     <span style={{ whiteSpace: 'nowrap' }}>{item.label}</span>
                   </button>
                 );
@@ -136,7 +142,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
       <button onClick={handleLogout}
         style={{ display: 'flex', alignItems: 'center', gap: 11, width: '100%', textAlign: 'left', padding: '9px 10px', borderRadius: 8, cursor: 'pointer', background: 'none', border: '1px solid ' + D.lineDark, color: D.onDarkMuted, fontSize: 14, fontWeight: 600, marginTop: 12 }}>
-        <span style={{ fontSize: 16, width: 20, textAlign: 'center' }}>↩</span>
+        <LogOut size={17} strokeWidth={2} style={{ width: 20, flexShrink: 0 }} aria-hidden />
         <span>Sair</span>
       </button>
     </>

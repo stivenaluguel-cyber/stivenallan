@@ -9,6 +9,7 @@ import { MetaDiaria } from '@/components/dashboard/MetaDiaria'
 import { CalendarioMetas } from '@/components/dashboard/CalendarioMetas'
 import { ProjecaoMeta } from '@/components/dashboard/ProjecaoMeta'
 import { PortfolioTiers } from '@/components/dashboard/PortfolioTiers'
+import { AlertTriangle, Building2, Calculator, FileText, FolderKanban, Target, Wallet } from 'lucide-react'
 
 const D = {
   bg: '#F3F2EE', surface: '#FAFAF7', sidebar: '#131211', ink: '#161512',
@@ -46,12 +47,12 @@ type ResumoComissoes = { previsto: number; confirmado: number; recebido: number;
 type CubScraper = { valor_m2: number; usar_em_label: string; online: boolean }
 
 const ATALHOS = [
-  { href: '/dashboard/crm', label: 'Abrir CRM', icon: '🗂️' },
-  { href: '/dashboard/leads', label: 'Ver Leads', icon: '🎯' },
-  { href: '/dashboard/empreendimentos', label: 'Empreendimentos', icon: '🏢' },
-  { href: '/dashboard/simulador', label: 'Simulador', icon: '🧮' },
-  { href: '/dashboard/propostas', label: 'Propostas', icon: '📄' },
-  { href: '/dashboard/financeiro', label: 'Financeiro', icon: '💰' },
+  { href: '/dashboard/crm', label: 'Abrir CRM', icon: FolderKanban },
+  { href: '/dashboard/leads', label: 'Ver Leads', icon: Target },
+  { href: '/dashboard/empreendimentos', label: 'Empreendimentos', icon: Building2 },
+  { href: '/dashboard/simulador', label: 'Simulador', icon: Calculator },
+  { href: '/dashboard/propostas', label: 'Propostas', icon: FileText },
+  { href: '/dashboard/financeiro', label: 'Financeiro', icon: Wallet },
 ]
 
 export default function DashboardHome() {
@@ -167,7 +168,7 @@ export default function DashboardHome() {
 
         {semTabela > 0 && (
           <div style={{ background: '#FEF3C7', border: '1px solid #F5C542', borderRadius: 10, padding: '14px 18px', marginBottom: 24, display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-            <span style={{ fontSize: 18, flexShrink: 0 }}>⚠️</span>
+            <AlertTriangle size={18} color="#8A5A00" style={{ flexShrink: 0 }} aria-hidden />
             <div style={{ flex: 1, minWidth: 0 }}>
               <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#8A5A00' }}>
                 {semTabela} empreendimento{semTabela !== 1 ? 's' : ''} sem a tabela deste mês guardada
@@ -182,7 +183,7 @@ export default function DashboardHome() {
 
         {cubScraper && !cubScraper.online && (
           <div style={{ background: '#FEF3C7', border: '1px solid #F5C542', borderRadius: 10, padding: '14px 18px', marginBottom: 24, display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-            <span style={{ fontSize: 18, flexShrink: 0 }}>⚠️</span>
+            <AlertTriangle size={18} color="#8A5A00" style={{ flexShrink: 0 }} aria-hidden />
             <div style={{ flex: 1, minWidth: 0 }}>
               <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#8A5A00' }}>CUB/SC do site público pode estar desatualizado</p>
               <p style={{ margin: '4px 0 0', fontSize: 13, color: '#8A5A00', lineHeight: 1.5, overflowWrap: 'break-word' }}>
@@ -264,7 +265,7 @@ export default function DashboardHome() {
           {ATALHOS.map(a => (
             <button key={a.href} onClick={() => router.push(a.href)}
               style={{ display: 'flex', alignItems: 'center', gap: 12, background: D.surface, border: '1px solid ' + D.line, borderRadius: 12, padding: '16px 18px', cursor: 'pointer', textAlign: 'left' }}>
-              <span style={{ fontSize: 22 }}>{a.icon}</span>
+              <a.icon size={22} aria-hidden />
               <span style={{ fontSize: 14, fontWeight: 700, color: D.ink }}>{a.label}</span>
             </button>
           ))}

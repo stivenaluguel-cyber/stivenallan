@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { AlertTriangle, Bell } from 'lucide-react'
 
 const D = { bronze: '#D24E22', line: 'rgba(26,24,21,0.08)' }
 
@@ -85,9 +86,9 @@ export function PushNotificationManager() {
   if (status === 'checking' || status === 'unsupported' || status === 'subscribed' || status === 'denied') return null
 
   const mensagens: Record<string, string> = {
-    'precisa-instalar': '🔔 Pra receber notificação de lead novo, instale o app primeiro: toque em Compartilhar → "Adicionar à Tela de Início".',
-    default: '🔔 Ative notificações pra saber na hora quando um lead novo chegar.',
-    error: '⚠️ Não deu pra ativar notificações agora. Tente de novo em instantes.',
+    'precisa-instalar': 'Pra receber notificação de lead novo, instale o app primeiro: toque em Compartilhar → "Adicionar à Tela de Início".',
+    default: 'Ative notificações pra saber na hora quando um lead novo chegar.',
+    error: 'Não deu pra ativar notificações agora. Tente de novo em instantes.',
   }
 
   return (
@@ -99,7 +100,10 @@ export function PushNotificationManager() {
         fontSize: 13, color: '#9A3412', flexWrap: 'wrap',
       }}
     >
-      <span>{mensagens[status] ?? mensagens.default}</span>
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7 }}>
+        {status === 'error' ? <AlertTriangle size={15} aria-hidden /> : <Bell size={15} aria-hidden />}
+        {mensagens[status] ?? mensagens.default}
+      </span>
       {(status === 'default' || status === 'subscribing' || status === 'error') && (
         <button
           onClick={ativar}

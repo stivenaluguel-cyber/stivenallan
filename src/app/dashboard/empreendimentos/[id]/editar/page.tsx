@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import { AlertTriangle, CheckCircle2, ClipboardList, FileText, Home, ImageIcon, Sparkles, Trash2 } from 'lucide-react';
 import { FotosImovel } from '@/components/dashboard/FotosImovel';
 
 interface Diferencial { icone: string; titulo: string; descricao: string; }
@@ -152,19 +153,19 @@ export default function EditarEmpreendimento() {
         </div>
 
         {error && (
-          <div style={{ background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 8, padding: '12px 16px', marginBottom: 16, color: '#DC2626', fontSize: 14 }}>
-            ⚠️ {error}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 8, padding: '12px 16px', marginBottom: 16, color: '#DC2626', fontSize: 14 }}>
+            <AlertTriangle size={16} aria-hidden /> {error}
           </div>
         )}
         {success && (
-          <div style={{ background: '#F0FDF4', border: '1px solid #86EFAC', borderRadius: 8, padding: '12px 16px', marginBottom: 16, color: '#16A34A', fontSize: 14 }}>
-            ✅ Salvo com sucesso! Redirecionando...
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#F0FDF4', border: '1px solid #86EFAC', borderRadius: 8, padding: '12px 16px', marginBottom: 16, color: '#16A34A', fontSize: 14 }}>
+            <CheckCircle2 size={16} aria-hidden /> Salvo com sucesso! Redirecionando...
           </div>
         )}
 
         {/* Informações Básicas */}
         <div style={card}>
-          <h2 style={h2}>📋 Informações Básicas</h2>
+          <h2 style={{ ...h2, display: 'flex', alignItems: 'center', gap: 8 }}><ClipboardList size={16} aria-hidden /> Informações Básicas</h2>
           <div style={{ ...row, gridTemplateColumns: '1fr 1fr' }}>
             <div><label style={lbl}>Nome do Empreendimento *</label><input style={inp} value={form.nome} onChange={e => setField('nome', e.target.value)} placeholder="Ex: Residencial Aurora" /></div>
             <div><label style={lbl}>Construtora</label><input style={inp} value={form.construtora} onChange={e => setField('construtora', e.target.value)} placeholder="Ex: MRV, Cyrela..." /></div>
@@ -198,7 +199,7 @@ export default function EditarEmpreendimento() {
 
         {/* Descrição */}
         <div style={card}>
-          <h2 style={h2}>📝 Descrição</h2>
+          <h2 style={{ ...h2, display: 'flex', alignItems: 'center', gap: 8 }}><FileText size={16} aria-hidden /> Descrição</h2>
           <div style={{ marginBottom: 16 }}>
             <label style={lbl}>Descrição Curta</label>
             <input style={inp} value={form.descricao_curta} onChange={e => setField('descricao_curta', e.target.value)} placeholder="Resumo em 1 linha..." />
@@ -211,7 +212,7 @@ export default function EditarEmpreendimento() {
 
         {/* Imagens e Vídeo */}
         <div style={card}>
-          <h2 style={h2}>🖼️ Imagens e Vídeo</h2>
+          <h2 style={{ ...h2, display: 'flex', alignItems: 'center', gap: 8 }}><ImageIcon size={16} aria-hidden /> Imagens e Vídeo</h2>
           <div style={{ marginBottom: 16 }}>
             <label style={lbl}>URL da Imagem Principal</label>
             <input style={inp} value={form.imagem_principal} onChange={e => setField('imagem_principal', e.target.value)} placeholder="https://..." />
@@ -226,7 +227,7 @@ export default function EditarEmpreendimento() {
 
         {/* Tipologia */}
         <div style={card}>
-          <h2 style={h2}>🏠 Tipologia</h2>
+          <h2 style={{ ...h2, display: 'flex', alignItems: 'center', gap: 8 }}><Home size={16} aria-hidden /> Tipologia</h2>
           <div style={{ ...row, gridTemplateColumns: 'repeat(3, 1fr)' }}>
             {([['Dormitórios (mín)', 'dormitorios_min'], ['Dormitórios (máx)', 'dormitorios_max'], ['Suítes', 'suites'], ['Vagas', 'vagas']] as [string, keyof EmpreendimentoForm][]).map(([label, field]) => (
               <div key={field}>
@@ -247,7 +248,7 @@ export default function EditarEmpreendimento() {
 
         {/* Diferenciais */}
         <div style={card}>
-          <h2 style={h2}>⭐ Diferenciais</h2>
+          <h2 style={{ ...h2, display: 'flex', alignItems: 'center', gap: 8 }}><Sparkles size={16} aria-hidden /> Diferenciais</h2>
           {form.diferenciais.map((d, idx) => (
             <div key={idx} style={{ display: 'grid', gridTemplateColumns: '56px 1fr 2fr auto', gap: 8, marginBottom: 12, alignItems: 'start' }}>
               <div>
@@ -263,7 +264,7 @@ export default function EditarEmpreendimento() {
                 <input style={inp} value={d.descricao} onChange={e => updDif(idx, 'descricao', e.target.value)} placeholder="Detalhe..." />
               </div>
               <div style={{ paddingTop: 20 }}>
-                <button onClick={() => remDif(idx)} style={{ background: '#FEE2E2', border: 'none', borderRadius: 6, padding: '8px 12px', cursor: 'pointer', color: '#DC2626', fontSize: 14 }} aria-label="Remover diferencial">🗑️</button>
+                <button onClick={() => remDif(idx)} style={{ display: 'inline-flex', background: '#FEE2E2', border: 'none', borderRadius: 6, padding: '8px 12px', cursor: 'pointer', color: '#DC2626' }} aria-label="Remover diferencial"><Trash2 size={14} aria-hidden /></button>
               </div>
             </div>
           ))}
@@ -285,7 +286,7 @@ export default function EditarEmpreendimento() {
             disabled={saving}
             style={{ padding: '12px 28px', borderRadius: 8, border: 'none', background: saving ? '#F97316' : '#D24E22', color: '#fff', fontSize: 14, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1 }}
           >
-            {saving ? 'Salvando...' : '✓ Salvar Alterações'}
+            {saving ? 'Salvando...' : 'Salvar Alterações'}
           </button>
         </div>
       </div>

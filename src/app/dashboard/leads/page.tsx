@@ -1,9 +1,11 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
+import { Download, Eye, Star } from 'lucide-react'
 import { ConversaPanel } from '@/components/dashboard/ConversaPanel'
 import { ESTAGIOS_FUNIL as ESTAGIOS } from '@/lib/dashboard/estagios'
 import { motivoSemWhatsappReal, temWhatsappReal } from '@/lib/leads/normalize'
 import { ImportarLeadsCsv } from '@/components/dashboard/ImportarLeadsCsv'
+import { IconeOrigemMotivo } from '@/components/dashboard/IconeOrigemMotivo'
 
 const D = {
   bg: '#F3F2EE', surface: '#FAFAF7', ink: '#161512',
@@ -114,7 +116,9 @@ function LeadCard({ lead, onDragStart, onToggleAtencao, onSelect }: { lead: Lead
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
         <span style={{ fontWeight: 700, fontSize: 14, color: D.ink }}>{lead.nome || 'Sem nome'}</span>
-        <button onClick={(e) => { e.stopPropagation(); onToggleAtencao(lead) }} title='Requer atenção' style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 15, lineHeight: 1, color: lead.requer_atencao ? D.orange : D.line }}>★</button>
+        <button onClick={(e) => { e.stopPropagation(); onToggleAtencao(lead) }} title='Requer atenção' style={{ background: 'none', border: 'none', cursor: 'pointer', lineHeight: 1, color: lead.requer_atencao ? D.orange : D.line, display: 'inline-flex' }}>
+          <Star size={15} fill={lead.requer_atencao ? 'currentColor' : 'none'} aria-hidden />
+        </button>
       </div>
       {lead.empreendimentos?.nome && (
         <div style={{ fontSize: 12, color: D.muted, marginTop: 3 }}>{lead.empreendimentos.nome}</div>
@@ -125,12 +129,14 @@ function LeadCard({ lead, onDragStart, onToggleAtencao, onSelect }: { lead: Lead
           <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 999, background: D.bg, color: D.muted }}>{fmt(lead.orcamento_max)}</span>
         )}
       </div>
-      {(lead.visitas ?? 0) > 0 || (lead.downloads ?? 0) > 0 ? (<div style={{ display: 'flex', gap: '6px', marginTop: '6px' }}>{(lead.visitas ?? 0) > 0 && (<span style={{ fontSize: '11px', background: '#EFF6FF', color: '#1D4ED8', padding: '2px 8px', borderRadius: '999px', fontWeight: 600 }}>👁 {lead.visitas} {lead.visitas === 1 ? 'visita' : 'visitas'}</span>)}{(lead.downloads ?? 0) > 0 && (<span style={{ fontSize: '11px', background: '#FFF7ED', color: '#C2410C', padding: '2px 8px', borderRadius: '999px', fontWeight: 600 }}>⬇ {lead.downloads} {lead.downloads === 1 ? 'catálogo' : 'catálogos'}</span>)}</div>) : null}<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
+      {(lead.visitas ?? 0) > 0 || (lead.downloads ?? 0) > 0 ? (<div style={{ display: 'flex', gap: '6px', marginTop: '6px' }}>{(lead.visitas ?? 0) > 0 && (<span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: '11px', background: '#EFF6FF', color: '#1D4ED8', padding: '2px 8px', borderRadius: '999px', fontWeight: 600 }}><Eye size={11} aria-hidden /> {lead.visitas} {lead.visitas === 1 ? 'visita' : 'visitas'}</span>)}{(lead.downloads ?? 0) > 0 && (<span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: '11px', background: '#FFF7ED', color: '#C2410C', padding: '2px 8px', borderRadius: '999px', fontWeight: 600 }}><Download size={11} aria-hidden /> {lead.downloads} {lead.downloads === 1 ? 'catálogo' : 'catálogos'}</span>)}</div>) : null}<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
         <span style={{ fontSize: 11, color: D.muted }}>Score: {lead.lead_score ?? 0}</span>
         {temWhatsappReal(lead.whatsapp) ? (
           <a href={whatsappLink} target='_blank' rel='noopener noreferrer' onClick={(e) => e.stopPropagation()} style={{ fontSize: 12, fontWeight: 600, color: D.green, textDecoration: 'none' }}>WhatsApp →</a>
         ) : (
-          <span style={{ fontSize: 12, fontWeight: 600, color: D.muted }}>{motivoSemWhatsappReal(lead.whatsapp)?.emoji} {motivoSemWhatsappReal(lead.whatsapp)?.label}</span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 12, fontWeight: 600, color: D.muted }}>
+            {(() => { const m = motivoSemWhatsappReal(lead.whatsapp); return m ? <><IconeOrigemMotivo origem={m.origem} /> {m.label}</> : null })()}
+          </span>
         )}
       </div>
     </div>
@@ -343,7 +349,7 @@ style={{ position: 'absolute', top: '14px', right: '14px', width: '30px', height
 </table>
 )}
 <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#52525b', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '6px', marginTop: '16px' }}>Radar de navegação</label>
-{eventos.length === 0 ? (<p style={{ fontSize: '13px', color: '#8a8a85', marginBottom: '16px' }}>Nenhuma atividade registrada.</p>) : (<div style={{ maxHeight: '160px', overflowY: 'auto', marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '4px' }}>{eventos.map((ev, i) => (<div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 8px', borderRadius: '6px', background: ev.tipo === 'download' ? '#FFF7ED' : 'transparent' }}><span>{ev.tipo === 'download' ? '⬇' : '👁'}</span><span style={{ fontSize: '13px', color: '#18181b', flex: 1 }}>{(ev.slug||'').replace(/-/g,' ')}</span><span style={{ fontSize: '11px', color: '#8a8a85', whiteSpace: 'nowrap' }}>{ev.created_at ? new Date(ev.created_at).toLocaleString('pt-BR') : ''}</span></div>))}</div>)}
+{eventos.length === 0 ? (<p style={{ fontSize: '13px', color: '#8a8a85', marginBottom: '16px' }}>Nenhuma atividade registrada.</p>) : (<div style={{ maxHeight: '160px', overflowY: 'auto', marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '4px' }}>{eventos.map((ev, i) => (<div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 8px', borderRadius: '6px', background: ev.tipo === 'download' ? '#FFF7ED' : 'transparent' }}><span style={{ display: 'inline-flex' }}>{ev.tipo === 'download' ? <Download size={13} aria-hidden /> : <Eye size={13} aria-hidden />}</span><span style={{ fontSize: '13px', color: '#18181b', flex: 1 }}>{(ev.slug||'').replace(/-/g,' ')}</span><span style={{ fontSize: '11px', color: '#8a8a85', whiteSpace: 'nowrap' }}>{ev.created_at ? new Date(ev.created_at).toLocaleString('pt-BR') : ''}</span></div>))}</div>)}
 <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#52525b', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '6px' }}>
 Conversa WhatsApp
 </label>
@@ -388,8 +394,8 @@ style={{ flex: 1, background: '#25D366', color: '#fff', borderRadius: '10px', pa
 Chamar no WhatsApp
 </a>
 ) : (
-<div style={{ flex: 1, background: '#F3F2EE', color: '#8a8a85', borderRadius: '10px', padding: '12px', fontSize: '13px', textAlign: 'center' }}>
-{motivoSemWhatsappReal(selectedLead.whatsapp)?.emoji} Veio d{motivoSemWhatsappReal(selectedLead.whatsapp)?.artigo} {motivoSemWhatsappReal(selectedLead.whatsapp)?.label} — edite acima quando tiver o telefone
+<div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, flex: 1, background: '#F3F2EE', color: '#8a8a85', borderRadius: '10px', padding: '12px', fontSize: '13px', textAlign: 'center', justifyContent: 'center' }}>
+{(() => { const m = motivoSemWhatsappReal(selectedLead.whatsapp); if (!m) return null; return <><IconeOrigemMotivo origem={m.origem} size={13} /> Veio d{m.artigo} {m.label} — edite acima quando tiver o telefone</> })()}
 </div>
 )}
 </div>

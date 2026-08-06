@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
+import { Briefcase, CheckCircle2, Clock, Pencil, Trash2 } from 'lucide-react'
 import { NotasFiscais } from '@/components/dashboard/NotasFiscais'
 
 interface Proposta {
@@ -396,7 +397,7 @@ export default function FinanceiroPage() {
           <div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>Carregando...</div>
         ) : aceitas.length === 0 ? (
           <div style={{ padding: '3rem', textAlign: 'center', color: '#6b7280' }}>
-            <div style={{ fontSize: 36, marginBottom: 8 }}>💼</div>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 8, color: '#9ca3af' }}><Briefcase size={32} aria-hidden /></div>
             <div style={{ fontWeight: 700, marginBottom: 4 }}>Nenhuma venda concluída</div>
             <div style={{ fontSize: 14 }}>As propostas aceitas aparecerão aqui</div>
           </div>
@@ -422,8 +423,8 @@ export default function FinanceiroPage() {
                 <td style={{ padding: '0.6rem 0.75rem', textAlign: 'right', fontWeight: 600, color: '#D24E22' }}>{fmtMoeda(p.valor_proposto * (percComissao / 100))}</td>
                 <td style={{ padding: '0.6rem 0.75rem', color: '#6b7280', fontSize: '0.8rem' }}>{fmtData(p.created_at)}</td>
                 <td style={{ padding: '0.6rem 0.75rem', textAlign: 'center', whiteSpace: 'nowrap' }}>
-                  <button onClick={() => abrirEditar(p)} title="Editar" style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 15, padding: '2px 5px' }}>✏️</button>
-                  <button onClick={() => setConfirmarExcluir(p.id)} title="Excluir" style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 15, padding: '2px 5px' }}>🗑️</button>
+                  <button onClick={() => abrirEditar(p)} title="Editar" style={{ display: 'inline-flex', background: 'none', border: 'none', cursor: 'pointer', padding: '2px 5px' }}><Pencil size={14} aria-hidden /></button>
+                  <button onClick={() => setConfirmarExcluir(p.id)} title="Excluir" style={{ display: 'inline-flex', background: 'none', border: 'none', cursor: 'pointer', padding: '2px 5px' }}><Trash2 size={14} aria-hidden /></button>
                 </td>
               </tr>
                 ))}
@@ -449,7 +450,9 @@ export default function FinanceiroPage() {
         <div onClick={() => setModalVenda(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
           <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 12, padding: 28, width: '100%', maxWidth: 480, boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#111827' }}>{editandoId ? '✏️ Editar Venda' : '✅ Registrar Venda Concluída'}</h2>
+              <h2 style={{ display: 'flex', alignItems: 'center', gap: 8, margin: 0, fontSize: 18, fontWeight: 700, color: '#111827' }}>
+                {editandoId ? <Pencil size={17} aria-hidden /> : <CheckCircle2 size={17} aria-hidden />} {editandoId ? 'Editar Venda' : 'Registrar Venda Concluída'}
+              </h2>
               <button onClick={() => { setModalVenda(false); setModalEditar(false); setEditandoId(null) }} style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#6b7280' }}>×</button>
             </div>
 
@@ -508,11 +511,11 @@ export default function FinanceiroPage() {
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#16a34a', marginBottom: 4, textTransform: 'uppercase' }}>✅ Recebido (R$)</label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, fontWeight: 700, color: '#16a34a', marginBottom: 4, textTransform: 'uppercase' }}><CheckCircle2 size={13} aria-hidden /> Recebido (R$)</label>
                   <input type="text" value={vendaRecebido} onChange={e => setVendaRecebido(e.target.value)} placeholder="Valor já recebido" style={{ width: '100%', padding: '9px 12px', border: '1.5px solid #d1d5db', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' }} />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#ea580c', marginBottom: 4, textTransform: 'uppercase' }}>⏳ A Receber (R$)</label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, fontWeight: 700, color: '#ea580c', marginBottom: 4, textTransform: 'uppercase' }}><Clock size={13} aria-hidden /> A Receber (R$)</label>
                   <input type="text" value={vendaAReceber} onChange={e => setVendaAReceber(e.target.value)} placeholder="Valor pendente" style={{ width: '100%', padding: '9px 12px', border: '1.5px solid #d1d5db', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' }} />
                 </div>
               </div>
@@ -534,7 +537,7 @@ export default function FinanceiroPage() {
                 disabled={vendaSalvando || !vendaCliente.trim() || !vendaValor}
                 style={{ padding: '9px 22px', borderRadius: 8, border: 'none', background: vendaSalvando || !vendaCliente.trim() || !vendaValor ? '#d1d5db' : '#ea580c', color: '#fff', fontWeight: 700, cursor: vendaSalvando || !vendaCliente.trim() || !vendaValor ? 'not-allowed' : 'pointer' }}
               >
-                {vendaSalvando ? 'Salvando...' : editandoId ? '💾 Salvar Alterações' : '✅ Confirmar Venda'}
+                {vendaSalvando ? 'Salvando...' : editandoId ? 'Salvar Alterações' : 'Confirmar Venda'}
               </button>
             </div>
           </div>
@@ -545,7 +548,7 @@ export default function FinanceiroPage() {
       {confirmarExcluir && (
         <div onClick={() => setConfirmarExcluir(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
           <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 12, padding: 28, width: '100%', maxWidth: 360, boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
-            <h3 style={{ margin: '0 0 12px', fontSize: 18, fontWeight: 700, color: '#111827' }}>🗑️ Excluir venda?</h3>
+            <h3 style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '0 0 12px', fontSize: 18, fontWeight: 700, color: '#111827' }}><Trash2 size={17} aria-hidden /> Excluir venda?</h3>
             <p style={{ margin: '0 0 24px', color: '#6b7280', fontSize: 14 }}>Esta ação não pode ser desfeita.</p>
             <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
               <button onClick={() => setConfirmarExcluir(null)} style={{ padding: '9px 18px', borderRadius: 8, border: '1.5px solid #e5e7eb', background: '#fff', color: '#374151', fontWeight: 600, cursor: 'pointer' }}>Cancelar</button>

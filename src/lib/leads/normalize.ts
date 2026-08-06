@@ -50,14 +50,15 @@ export function temWhatsappReal(whatsapp: string | null | undefined): whatsapp i
  *
  * `artigo` existe só pra concordância nominal de quem monta frase tipo
  * "veio d{artigo} {label}" — "do Instagram" (masculino) x "da Prospecção"
- * (feminino). Quem só precisa do rótulo solto ("Só Instagram", "🏢
- * Prospecção") ignora o campo.
+ * (feminino). `origem` é só a chave pra quem quiser mostrar um ícone —
+ * quem só precisa do rótulo solto ("Só Instagram", "Prospecção") ignora o
+ * campo.
  */
-export function motivoSemWhatsappReal(whatsapp: string | null | undefined): { emoji: string; label: string; artigo: 'o' | 'a' } | null {
+export function motivoSemWhatsappReal(whatsapp: string | null | undefined): { origem: 'instagram' | 'prospeccao'; label: string; artigo: 'o' | 'a' } | null {
   if (temWhatsappReal(whatsapp)) return null
   const valor = whatsapp ?? ''
-  if (valor.startsWith(PJ_WHATSAPP_PLACEHOLDER_PREFIX)) return { emoji: '🏢', label: 'Prospecção', artigo: 'a' }
-  return { emoji: '📷', label: 'Instagram', artigo: 'o' }
+  if (valor.startsWith(PJ_WHATSAPP_PLACEHOLDER_PREFIX)) return { origem: 'prospeccao', label: 'Prospecção', artigo: 'a' }
+  return { origem: 'instagram', label: 'Instagram', artigo: 'o' }
 }
 
 // Celular brasileiro tem 11 dígitos (DDD + 9 + 8 dígitos); fixo tem 10 (DDD +

@@ -96,16 +96,16 @@ describe('motivoSemWhatsappReal', () => {
   })
 
   it('identifica o placeholder do Instagram, com artigo masculino pra concordância', () => {
-    expect(motivoSemWhatsappReal('ig:17841400000000000')).toEqual({ emoji: '📷', label: 'Instagram', artigo: 'o' })
+    expect(motivoSemWhatsappReal('ig:17841400000000000')).toEqual({ origem: 'instagram', label: 'Instagram', artigo: 'o' })
   })
 
   it('identifica o placeholder da Prospecção, com artigo feminino — não pode continuar dizendo "Instagram" pra isso', () => {
-    expect(motivoSemWhatsappReal('pj:ChIJabc123')).toEqual({ emoji: '🏢', label: 'Prospecção', artigo: 'a' })
+    expect(motivoSemWhatsappReal('pj:ChIJabc123')).toEqual({ origem: 'prospeccao', label: 'Prospecção', artigo: 'a' })
   })
 
   it('ausência de valor cai no motivo genérico (Instagram), não quebra', () => {
-    expect(motivoSemWhatsappReal(null)).toEqual({ emoji: '📷', label: 'Instagram', artigo: 'o' })
-    expect(motivoSemWhatsappReal(undefined)).toEqual({ emoji: '📷', label: 'Instagram', artigo: 'o' })
+    expect(motivoSemWhatsappReal(null)).toEqual({ origem: 'instagram', label: 'Instagram', artigo: 'o' })
+    expect(motivoSemWhatsappReal(undefined)).toEqual({ origem: 'instagram', label: 'Instagram', artigo: 'o' })
   })
 })
 

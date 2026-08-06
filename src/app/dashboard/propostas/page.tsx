@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
+import { AlertTriangle, Check, ClipboardList, X } from 'lucide-react'
 
 interface Proposta {
   id: string
@@ -201,7 +202,7 @@ export default function PropostasPage() {
           <div style={{ padding: '3rem', textAlign: 'center', color: '#666' }}>Carregando...</div>
         ) : propostas.length === 0 ? (
           <div style={{ padding: '3rem', textAlign: 'center', color: '#6b7280' }}>
-            <div style={{ fontSize: 40, marginBottom: 12 }}>📋</div>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12, color: '#9ca3af' }}><ClipboardList size={36} aria-hidden /></div>
             <div style={{ fontWeight: 700, marginBottom: 6 }}>Nenhuma proposta encontrada</div>
             <div style={{ fontSize: 14, marginBottom: 20 }}>Crie a primeira proposta para começar</div>
             <button onClick={() => setModalNova(true)} style={{ background: '#D24E22', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', fontWeight: 700, cursor: 'pointer' }}>+ Nova Proposta</button>
@@ -246,14 +247,14 @@ export default function PropostasPage() {
                         <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
                           {p.status === 'pendente' && (
                             <>
-                              <button onClick={() => mudarStatus(p.id, 'aceita')} disabled={salvando} style={{ background: '#dcfce7', color: '#16a34a', border: 'none', borderRadius: '4px', padding: '0.25rem 0.5rem', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600 }}>✓</button>
-                              <button onClick={() => mudarStatus(p.id, 'recusada')} disabled={salvando} style={{ background: '#fee2e2', color: '#dc2626', border: 'none', borderRadius: '4px', padding: '0.25rem 0.5rem', cursor: 'pointer', fontSize: '0.75rem' }}>✗</button>
+                              <button onClick={() => mudarStatus(p.id, 'aceita')} disabled={salvando} title="Aceitar" style={{ display: 'inline-flex', background: '#dcfce7', color: '#16a34a', border: 'none', borderRadius: '4px', padding: '0.25rem 0.5rem', cursor: 'pointer' }}><Check size={13} aria-hidden /></button>
+                              <button onClick={() => mudarStatus(p.id, 'recusada')} disabled={salvando} title="Recusar" style={{ display: 'inline-flex', background: '#fee2e2', color: '#dc2626', border: 'none', borderRadius: '4px', padding: '0.25rem 0.5rem', cursor: 'pointer' }}><X size={13} aria-hidden /></button>
                               <button onClick={() => mudarStatus(p.id, 'em_analise')} disabled={salvando} style={{ background: '#dbeafe', color: '#2563eb', border: 'none', borderRadius: '4px', padding: '0.25rem 0.5rem', cursor: 'pointer', fontSize: '0.75rem' }}>Análise</button>
                             </>
                           )}
                           {p.status === 'em_analise' && (
                             <>
-                              <button onClick={() => mudarStatus(p.id, 'aceita')} disabled={salvando} style={{ background: '#dcfce7', color: '#16a34a', border: 'none', borderRadius: '4px', padding: '0.25rem 0.5rem', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600 }}>✓ Aceitar</button>
+                              <button onClick={() => mudarStatus(p.id, 'aceita')} disabled={salvando} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: '#dcfce7', color: '#16a34a', border: 'none', borderRadius: '4px', padding: '0.25rem 0.5rem', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600 }}><Check size={12} aria-hidden /> Aceitar</button>
                               <button onClick={() => mudarStatus(p.id, 'recusada')} disabled={salvando} style={{ background: '#fee2e2', color: '#dc2626', border: 'none', borderRadius: '4px', padding: '0.25rem 0.5rem', cursor: 'pointer', fontSize: '0.75rem' }}>Recusar</button>
                             </>
                           )}
@@ -321,7 +322,7 @@ export default function PropostasPage() {
               <button onClick={() => setModalNova(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#666' }}>×</button>
             </div>
 
-            {erro && <div style={{ background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 8, padding: '10px 14px', marginBottom: 16, color: '#DC2626', fontSize: 13 }}>⚠️ {erro}</div>}
+            {erro && <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 8, padding: '10px 14px', marginBottom: 16, color: '#DC2626', fontSize: 13 }}><AlertTriangle size={15} aria-hidden /> {erro}</div>}
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
