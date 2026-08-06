@@ -194,7 +194,7 @@ function textoMissao(chave: ChaveComponente, a: AgregadosScoreOperacao): string 
   switch (chave) {
     case 'frequencia':
       return a.leadsParados > 0
-        ? `Registre follow-up em ${a.leadsParados} lead${a.leadsParados === 1 ? '' : 's'} que precisam de atenção`
+        ? `Registre follow-up em ${a.leadsParados} lead${a.leadsParados === 1 ? '' : 's'} que precisa${a.leadsParados === 1 ? '' : 'm'} de atenção`
         : 'Registre follow-ups no CRM para reativar a prospecção'
     case 'portfolio':
       return `Importe mais unidades no espelho de vendas — hoje ${a.unidadesAtivas} ativa${a.unidadesAtivas === 1 ? '' : 's'}`

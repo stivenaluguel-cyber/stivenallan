@@ -88,6 +88,11 @@ describe('calcularScoreOperacao — conta parcial', () => {
     expect(r.missoes[0].ganhoEstimado).toBe(30)
     expect(r.missoes[0].href).toBe('/dashboard/crm/foco')
   })
+
+  it('concorda no singular quando só 1 lead parado', () => {
+    const r = calcularScoreOperacao({ ...ZERADO, leadsParados: 1, leadsTotal: 1, unidadesTotal: 1 })
+    expect(r.missoes[0].texto).toBe('Registre follow-up em 1 lead que precisa de atenção')
+  })
 })
 
 describe('calcularScoreOperacao — conta completa', () => {
