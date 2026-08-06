@@ -26,6 +26,7 @@ export function FotosImovel({ propertyId }: { propertyId: string }) {
   const [fotos, setFotos] = useState<FotoImovel[]>([])
   const [carregando, setCarregando] = useState(true)
   const [enviando, setEnviando] = useState(false)
+  const [excluindo, setExcluindo] = useState<string | null>(null)
   const [erro, setErro] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -62,6 +63,21 @@ export function FotosImovel({ propertyId }: { propertyId: string }) {
     } finally {
       setEnviando(false)
       if (inputRef.current) inputRef.current.value = ''
+    }
+  }
+
+  async function excluir(fotoId: string) {
+    if (!confirm('Excluir esta foto? O arquivo é apagado definitivamente.')) return
+    setExcluindo(fotoId)
+    setErro('')
+    try {
+      const res = await fetch(`/api/admin/empreendimentos/${propertyId}/fotos?fotoId=${fotoId}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error((await res.json()).error || 'Falha ao excluir')
+      setFotos((atual) => atual.filter((f) => f.id !== fotoId))
+    } catch (e) {
+      setErro(e instanceof Error ? e.message : 'Falha ao excluir')
+    } finally {
+      setExcluindo(null)
     }
   }
 
@@ -105,6 +121,20 @@ export function FotosImovel({ propertyId }: { propertyId: string }) {
                   sem marca
                 </span>
               )}
+              <button
+                type="button"
+                onClick={() => excluir(f.id)}
+                disabled={excluindo === f.id}
+                title="Excluir foto"
+                style={{
+                  position: 'absolute', top: 4, right: 4, width: 24, height: 24, borderRadius: '50%',
+                  background: 'rgba(0,0,0,0.55)', color: '#fff', border: 'none', cursor: excluindo === f.id ? 'default' : 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, lineHeight: 1,
+                  opacity: excluindo === f.id ? 0.5 : 1,
+                }}
+              >
+                {excluindo === f.id ? '…' : '✕'}
+              </button>
             </div>
           ))}
         </div>

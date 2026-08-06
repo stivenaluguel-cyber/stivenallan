@@ -148,3 +148,37 @@ export async function POST(req: NextRequest, { params }: Params) {
 
   return NextResponse.json({ data: criadas, erros: erros.length > 0 ? erros : undefined }, { status: 201 })
 }
+
+/**
+ * DELETE — /api/admin/empreendimentos/[id]/fotos?fotoId=...
+ *
+ * A linha sai primeiro (mesmo padrão de api/admin/anexos/route.ts): se a
+ * ordem fosse inversa e o delete da linha falhasse, sobraria um registro
+ * apontando pra um arquivo que já não existe — pior que um arquivo órfão
+ * no storage, porque a UI mostraria uma foto que não abre.
+ */
+export async function DELETE(req: NextRequest, { params }: Params) {
+  if (!(await requireAdmin())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const { id: propertyId } = await params
+
+  const fotoId = new URL(req.url).searchParams.get('fotoId')
+  if (!fotoId) return NextResponse.json({ error: 'fotoId obrigatório' }, { status: 400 })
+
+  const client = sb()
+  const { data: foto } = await client
+    .from('properties_fotos')
+    .select('*')
+    .eq('id', fotoId)
+    .eq('property_id', propertyId)
+    .maybeSingle()
+  if (!foto) return NextResponse.json({ error: 'Foto não encontrada' }, { status: 404 })
+
+  const { error } = await client.from('properties_fotos').delete().eq('id', fotoId)
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  const paths = [foto.storage_path_original, foto.storage_path_processada].filter((p): p is string => !!p)
+  const { error: erroStorage } = await client.storage.from(BUCKET_FOTOS).remove(paths)
+  if (erroStorage) logError(SOURCE, 'linha removida mas arquivo(s) permaneceram no storage', erroStorage, { propertyId, fotoId })
+
+  return NextResponse.json({ success: true })
+}
