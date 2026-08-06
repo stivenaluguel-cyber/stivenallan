@@ -8,6 +8,7 @@ import { ScoreOperacao } from '@/components/dashboard/ScoreOperacao'
 import { MetaDiaria } from '@/components/dashboard/MetaDiaria'
 import { CalendarioMetas } from '@/components/dashboard/CalendarioMetas'
 import { ProjecaoMeta } from '@/components/dashboard/ProjecaoMeta'
+import { PortfolioTiers } from '@/components/dashboard/PortfolioTiers'
 
 const D = {
   bg: '#F3F2EE', surface: '#FAFAF7', sidebar: '#131211', ink: '#161512',
@@ -153,6 +154,7 @@ export default function DashboardHome() {
         <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'stretch', marginBottom: 24 }}>
           <ScoreOperacao />
           <MetaDiaria />
+          <PortfolioTiers />
         </div>
 
         <MetasDiarias />
