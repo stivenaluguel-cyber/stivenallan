@@ -2,9 +2,8 @@ import { describe, it, expect } from 'vitest'
 import { calcularScoreOperacao, type AgregadosScoreOperacao } from './operacao'
 
 const ZERADO: AgregadosScoreOperacao = {
-  interacoes7d: 0,
-  unidadesAtivas: 0,
-  empreendimentosDistintos: 0,
+  followups7d: 0,
+  empreendimentosComLead90d: 0,
   leads30dTotal: 0,
   leads30dAtendidos1h: 0,
   leadsParados: 0,
@@ -13,9 +12,8 @@ const ZERADO: AgregadosScoreOperacao = {
 }
 
 const COMPLETO: AgregadosScoreOperacao = {
-  interacoes7d: 25,
-  unidadesAtivas: 15,
-  empreendimentosDistintos: 7,
+  followups7d: 25,
+  empreendimentosComLead90d: 10,
   leads30dTotal: 10,
   leads30dAtendidos1h: 10,
   leadsParados: 0,
@@ -47,9 +45,8 @@ describe('calcularScoreOperacao — conta zerada', () => {
 describe('calcularScoreOperacao — conta parcial', () => {
   it('cada componente respeita o teto original e o total soma proporcional ao peso aplicável', () => {
     const agregados: AgregadosScoreOperacao = {
-      interacoes7d: 10, // metade do teto de 20 -> 15/30
-      unidadesAtivas: 5, // metade do teto de 10 -> 12.5/25 -> 13
-      empreendimentosDistintos: 3, // 5 + (3-1)/4*15 = 12.5 -> 13
+      followups7d: 10, // metade do teto de 20 -> 15/30
+      empreendimentosComLead90d: 4, // 5 + (4-1)/7*15 = 11.42 -> 11
       leads30dTotal: 4,
       leads30dAtendidos1h: 2, // 50% de 15 -> 7.5 -> 8
       leadsParados: 6,
@@ -60,21 +57,19 @@ describe('calcularScoreOperacao — conta parcial', () => {
 
     const porChave = Object.fromEntries(r.componentes.map((c) => [c.chave, c]))
     expect(porChave.frequencia.pontos).toBe(15)
-    expect(porChave.portfolio.pontos).toBe(13)
-    expect(porChave.diversificacao.pontos).toBe(13)
+    expect(porChave.diversificacao.pontos).toBe(11)
     expect(porChave.velocidade.pontos).toBe(8)
 
-    // total = round(100 * (15+13+13+8) / (30+25+20+15)) = round(100*49/90)
-    expect(r.total).toBe(54)
+    // total = round(100 * (15+11+8) / (30+20+15)) = round(100*34/65)
+    expect(r.total).toBe(52)
     expect(r.faixa).toBe('morno')
     expect(r.contaNova).toBe(false)
   })
 
   it('gera até 3 missões ordenadas pelos pontos perdidos, com número real de leads parados', () => {
     const agregados: AgregadosScoreOperacao = {
-      interacoes7d: 0,
-      unidadesAtivas: 10,
-      empreendimentosDistintos: 5,
+      followups7d: 0,
+      empreendimentosComLead90d: 8,
       leads30dTotal: 5,
       leads30dAtendidos1h: 5,
       leadsParados: 6,
@@ -110,38 +105,57 @@ describe('calcularScoreOperacao — conta completa', () => {
   })
 })
 
-describe('calcularScoreOperacao — componente ausente (Perfil) e redistribuição de peso', () => {
-  it('Perfil nunca aparece nos componentes calculados e vem reportado em omitidos', () => {
+describe('calcularScoreOperacao — componentes ausentes (Perfil e Portfólio) e redistribuição de peso', () => {
+  it('Perfil e Portfólio nunca aparecem nos componentes calculados e vêm reportados em omitidos', () => {
     const r = calcularScoreOperacao(ZERADO)
-    expect(r.componentes.some((c) => (c as { chave: string }).chave === 'perfil')).toBe(false)
-    expect(r.omitidos).toHaveLength(1)
-    expect(r.omitidos[0].chave).toBe('perfil')
+    const chaves = r.componentes.map((c) => c.chave)
+    expect(chaves).toEqual(['frequencia', 'diversificacao', 'velocidade'])
+    expect(r.omitidos.map((o) => o.chave).sort()).toEqual(['perfil', 'portfolio'])
   })
 
-  it('com só Frequência no teto, o total considera peso base 90 (sem Perfil), não 100', () => {
+  it('com só Frequência no teto, o total considera peso base 65 (sem Perfil nem Portfólio), não 100', () => {
     const agregados: AgregadosScoreOperacao = {
       ...ZERADO,
-      interacoes7d: 20, // 30/30
-      leads30dTotal: 1, // mantém Velocidade aplicável (0/1) pra isolar só a ausência do Perfil
+      followups7d: 20, // 30/30
+      leads30dTotal: 1, // mantém Velocidade aplicável (0/1) pra isolar só a ausência de Perfil/Portfólio
       leadsTotal: 1,
       unidadesTotal: 1,
     }
     const r = calcularScoreOperacao(agregados)
-    // round(100 * 30 / 90) = 33, não 30 (que seria o caso se o denominador fosse 100)
-    expect(r.total).toBe(33)
+    // round(100 * 30 / 65) = 46, não 30 (que seria o caso se o denominador fosse 100)
+    expect(r.total).toBe(46)
   })
 
-  it('com Velocidade também não-aplicável, o denominador cai pra 75 (sem Perfil nem Velocidade)', () => {
+  it('com Velocidade também não-aplicável, o denominador cai pra 50 (só Frequência + Diversificação)', () => {
     const agregados: AgregadosScoreOperacao = {
       ...ZERADO,
-      interacoes7d: 20, // 30/30
+      followups7d: 20, // 30/30
       leads30dTotal: 0, // velocidade não-aplicável
       leadsTotal: 1,
       unidadesTotal: 1,
     }
     const r = calcularScoreOperacao(agregados)
-    // round(100 * 30 / 75) = 40
-    expect(r.total).toBe(40)
+    // round(100 * 30 / 50) = 60
+    expect(r.total).toBe(60)
+  })
+})
+
+describe('calcularScoreOperacao — diversificação (teto em 8 empreendimentos)', () => {
+  it('0 empreendimentos = 0 pts', () => {
+    const r = calcularScoreOperacao({ ...ZERADO, empreendimentosComLead90d: 0, leadsTotal: 1, unidadesTotal: 1 })
+    expect(r.componentes.find((c) => c.chave === 'diversificacao')!.pontos).toBe(0)
+  })
+
+  it('1 empreendimento = 5 pts (piso)', () => {
+    const r = calcularScoreOperacao({ ...ZERADO, empreendimentosComLead90d: 1, leadsTotal: 1, unidadesTotal: 1 })
+    expect(r.componentes.find((c) => c.chave === 'diversificacao')!.pontos).toBe(5)
+  })
+
+  it('8 ou mais empreendimentos = 20 pts (teto)', () => {
+    const r8 = calcularScoreOperacao({ ...ZERADO, empreendimentosComLead90d: 8, leadsTotal: 1, unidadesTotal: 1 })
+    const r20 = calcularScoreOperacao({ ...ZERADO, empreendimentosComLead90d: 20, leadsTotal: 1, unidadesTotal: 1 })
+    expect(r8.componentes.find((c) => c.chave === 'diversificacao')!.pontos).toBe(20)
+    expect(r20.componentes.find((c) => c.chave === 'diversificacao')!.pontos).toBe(20)
   })
 })
 
@@ -149,7 +163,7 @@ describe('calcularScoreOperacao — arredondamento', () => {
   it('arredonda cada componente e o total de forma consistente (.5 pra cima)', () => {
     const agregados: AgregadosScoreOperacao = {
       ...ZERADO,
-      interacoes7d: 7, // 7/20*30 = 10.5 -> 11
+      followups7d: 7, // 7/20*30 = 10.5 -> 11
       leadsTotal: 1,
       unidadesTotal: 1,
     }
@@ -159,7 +173,7 @@ describe('calcularScoreOperacao — arredondamento', () => {
   })
 
   it('nunca deixa um componente aplicável passar do próprio teto por causa do arredondamento', () => {
-    const r = calcularScoreOperacao({ ...COMPLETO, interacoes7d: 999, unidadesAtivas: 999 })
+    const r = calcularScoreOperacao({ ...COMPLETO, followups7d: 999, empreendimentosComLead90d: 999 })
     for (const c of r.componentes) {
       if (c.pontos !== null) {
         expect(c.pontos).toBeLessThanOrEqual(c.maximo)

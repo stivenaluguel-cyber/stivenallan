@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { ESTAGIOS_FUNIL as ESTAGIOS } from '@/lib/dashboard/estagios'
 import { MetasDiarias } from '@/components/dashboard/MetasDiarias'
 import { ScoreOperacao } from '@/components/dashboard/ScoreOperacao'
+import { MetaDiaria } from '@/components/dashboard/MetaDiaria'
 import { CalendarioMetas } from '@/components/dashboard/CalendarioMetas'
 import { ProjecaoMeta } from '@/components/dashboard/ProjecaoMeta'
 
@@ -149,7 +150,10 @@ export default function DashboardHome() {
           <p style={{ margin: '6px 0 0', fontSize: 14, color: D.muted }}>Visão geral da sua operação de vendas.</p>
         </div>
 
-        <ScoreOperacao />
+        <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'stretch', marginBottom: 24 }}>
+          <ScoreOperacao />
+          <MetaDiaria />
+        </div>
 
         <MetasDiarias />
 

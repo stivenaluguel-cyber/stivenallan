@@ -22,6 +22,11 @@ const FAIXA_COR: Record<Faixa, string> = {
 
 const FAIXA_ORDEM: Faixa[] = ['frio', 'morno', 'aquecido', 'quente']
 
+const OMITIDO_LABEL: Record<string, string> = {
+  perfil: 'Perfil (foto, CRECI, WhatsApp, bio, Instagram)',
+  portfolio: 'Portfólio',
+}
+
 export function ScoreOperacao() {
   const router = useRouter()
   const [dados, setDados] = useState<ResultadoScoreOperacao | null>(null)
@@ -46,7 +51,7 @@ export function ScoreOperacao() {
   useEffect(() => { carregar() }, [carregar])
 
   return (
-    <div className="score-operacao-card" style={{ marginBottom: 24 }}>
+    <div className="score-operacao-card">
       {carregando && <ScoreSkeleton />}
 
       {!carregando && erro && (
@@ -68,7 +73,7 @@ export function ScoreOperacao() {
       )}
 
       {!carregando && !erro && dados && !dados.contaNova && (
-        <div style={{ background: D.surface, border: '1px solid ' + D.line, borderRadius: 12, padding: '20px 22px' }}>
+        <div style={{ background: D.surface, border: '1px solid ' + D.line, borderRadius: 12, padding: '20px 22px', height: '100%' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, flexWrap: 'wrap', marginBottom: 18 }}>
             <div>
               <div style={{ fontSize: 11, letterSpacing: '0.09em', textTransform: 'uppercase', color: D.muted, marginBottom: 6 }}>Score de Operação</div>
@@ -118,9 +123,11 @@ export function ScoreOperacao() {
             ))}
           </div>
 
-          <p style={{ margin: '14px 0 0', fontSize: 10.5, color: D.muted }}>
-            Perfil (foto, CRECI, WhatsApp, bio, Instagram) não entra no cálculo — esses dados ainda não têm um cadastro editável no sistema.
-          </p>
+          {dados.omitidos.length > 0 && (
+            <p style={{ margin: '14px 0 0', fontSize: 10.5, color: D.muted }}>
+              {dados.omitidos.map((o) => OMITIDO_LABEL[o.chave] ?? o.chave).join(' e ')} não entra{dados.omitidos.length === 1 ? '' : 'm'} no cálculo — sem dado real disponível ainda pra medir.
+            </p>
+          )}
 
           <MissoesOperacao missoes={dados.missoes} onIr={(href) => router.push(href)} />
         </div>
@@ -128,7 +135,7 @@ export function ScoreOperacao() {
 
       <style>{`
         .score-operacao-card { width: 100%; }
-        @media (min-width: 1024px) { .score-operacao-card { max-width: calc(33.333% - 8px); } }
+        @media (min-width: 1024px) { .score-operacao-card { flex: 1 1 380px; } }
       `}</style>
     </div>
   )
@@ -196,12 +203,12 @@ function MissoesOperacao({ missoes, onIr }: { missoes: ResultadoScoreOperacao['m
 
 function ScoreSkeleton() {
   return (
-    <div style={{ background: D.surface, border: '1px solid ' + D.line, borderRadius: 12, padding: '20px 22px' }}>
+    <div style={{ background: D.surface, border: '1px solid ' + D.line, borderRadius: 12, padding: '20px 22px', height: '100%' }}>
       <div style={{ width: 140, height: 11, borderRadius: 4, background: D.line, marginBottom: 14 }} />
       <div style={{ width: 90, height: 40, borderRadius: 6, background: D.line, marginBottom: 18 }} />
       <div style={{ width: '100%', height: 10, borderRadius: 999, background: D.line, marginBottom: 20 }} />
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: 12 }}>
-        {[0, 1, 2, 3].map((i) => (
+        {[0, 1, 2].map((i) => (
           <div key={i}>
             <div style={{ width: '70%', height: 10, borderRadius: 4, background: D.line, marginBottom: 6 }} />
             <div style={{ width: '100%', height: 6, borderRadius: 999, background: D.line }} />

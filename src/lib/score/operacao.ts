@@ -5,20 +5,29 @@
 // pronto pra UI. Nenhuma chamada de rede aqui, só matemática, pra poder ser
 // testada sem banco.
 //
-// Os 5 componentes do briefing original (Frequência, Portfólio,
-// Diversificação, Velocidade de resposta, Perfil) viraram 4: o schema não
-// tem NENHUMA coluna pra foto/CRECI/WhatsApp/bio/Instagram do corretor
-// (esses dados hoje são texto fixo no código do site público, não um
-// registro editável). Sem tabela pra consultar, "Perfil" ficou de fora — o
-// peso dele (10 pts) é redistribuído proporcionalmente entre os outros 4,
-// que somam 90 em vez de 100. Ver `COMPONENTE_PERFIL_OMITIDO` abaixo.
+// Dos 5 componentes do briefing original (Frequência, Portfólio,
+// Diversificação, Velocidade de resposta, Perfil), 2 ficaram de fora.
+// Ambos redistribuem o peso proporcionalmente entre os componentes que
+// sobram — ver `COMPONENTES_OMITIDOS` abaixo:
+//
+// - Perfil (10 pts): sem tabela pra foto/CRECI/WhatsApp/bio/Instagram do
+//   corretor — hoje é texto fixo no código do site público.
+// - Portfólio (25 pts): removido na recalibração de ago/2026. `disponivel`
+//   em empreendimentos_unidades só distingue vendida/não-vendida, não
+//   "publicada/ativada pelo corretor" — as 578 unidades entraram todas num
+//   único import em lote e ficam permanentemente disponivel=true. Sem
+//   nenhuma coluna de publicação/destaque em empreendimentos_unidades nem
+//   em empreendimentos (a única, `properties.ativo/oculto`, é uma tabela
+//   sem FK pra unidades — ligar as duas seria inventar uma equivalência que
+//   não existe), o componente ficava saturado pra sempre (25/25 fixo) e não
+//   media esforço nenhum do corretor.
 
-export type ChaveComponente = 'frequencia' | 'portfolio' | 'diversificacao' | 'velocidade'
+export type ChaveComponente = 'frequencia' | 'diversificacao' | 'velocidade'
 
 export type Componente = {
   chave: ChaveComponente
   label: string
-  /** Pontos ganhos neste componente, no teto ORIGINAL (30/25/20/15). `null` = não aplicável nesta apuração (ex.: zero leads no período). */
+  /** Pontos ganhos neste componente, no teto ORIGINAL (30/20/15). `null` = não aplicável nesta apuração (ex.: zero leads no período). */
   pontos: number | null
   /** Teto original do componente, antes de qualquer redistribuição. */
   maximo: number
@@ -50,11 +59,18 @@ export type ResultadoScoreOperacao = {
   contaNova: boolean
 }
 
-export const COMPONENTE_PERFIL_OMITIDO = {
-  chave: 'perfil',
-  motivo:
-    'Sem tabela no banco com foto/CRECI/WhatsApp/bio/Instagram do corretor — esses campos hoje são texto fixo no código do site público, não um registro editável. Peso (10 pts) redistribuído entre os outros 4 componentes.',
-}
+export const COMPONENTES_OMITIDOS: { chave: string; motivo: string }[] = [
+  {
+    chave: 'perfil',
+    motivo:
+      'Sem tabela no banco com foto/CRECI/WhatsApp/bio/Instagram do corretor — esses campos hoje são texto fixo no código do site público, não um registro editável.',
+  },
+  {
+    chave: 'portfolio',
+    motivo:
+      'Sem coluna de publicação/destaque em empreendimentos_unidades — "disponivel" só distingue vendida/não-vendida, e as 578 unidades entraram num único import em lote (permanecem 25/25 pra sempre). Removido na recalibração de ago/2026 em vez de manter saturado.',
+  },
+]
 
 const FAIXAS: { chave: Faixa; label: string; min: number; max: number }[] = [
   { chave: 'frio', label: 'Frio', min: 0, max: 30 },
@@ -64,12 +80,10 @@ const FAIXAS: { chave: Faixa; label: string; min: number; max: number }[] = [
 ]
 
 export type AgregadosScoreOperacao = {
-  /** Linhas em leads_interacoes criadas nos últimos 7 dias — follow-ups/notas/mudanças de estágio registrados. */
-  interacoes7d: number
-  /** Unidades em empreendimentos_unidades com disponivel=true (ainda não vendidas). */
-  unidadesAtivas: number
-  /** Empreendimentos distintos com pelo menos uma unidade disponivel=true. */
-  empreendimentosDistintos: number
+  /** Follow-ups ativos (ver src/lib/score/interacoes.ts) registrados nos últimos 7 dias. */
+  followups7d: number
+  /** Empreendimentos distintos que geraram pelo menos um lead (leads.empreendimento_interesse) nos últimos 90 dias. */
+  empreendimentosComLead90d: number
   /** Leads criados nos últimos 30 dias. */
   leads30dTotal: number
   /** Desses, quantos tiveram primeiro_atendimento_em registrado em menos de 1h após created_at. */
@@ -87,13 +101,13 @@ function linear(valor: number, teto: number, maximo: number): number {
   return Math.round((Math.min(Math.max(valor, 0), teto) / teto) * maximo)
 }
 
-// 0 empreendimentos = 0 pts; 1 = 5 pts; 5+ = 20 pts; linear entre 1 e 5.
-// (Só o trecho 1→5 é linear por definição do briefing — 0 é caso especial,
-// senão a reta 0→5pts em n=1 não bateria com a reta 1→20pts em n=5.)
+// 0 empreendimentos = 0 pts; 1 = 5 pts; 8+ = 20 pts; linear entre 1 e 8.
+// (Só o trecho 1→8 é linear por definição do briefing — 0 é caso especial,
+// senão a reta 0→5pts em n=1 não bateria com a reta 1→20pts em n=8.)
 function diversificacaoPontos(n: number): number {
   if (n <= 0) return 0
-  if (n >= 5) return 20
-  return Math.round(5 + ((n - 1) / 4) * 15)
+  if (n >= 8) return 20
+  return Math.round(5 + ((n - 1) / 7) * 15)
 }
 
 function faixaDe(total: number): Faixa {
@@ -103,9 +117,8 @@ function faixaDe(total: number): Faixa {
 export function calcularScoreOperacao(a: AgregadosScoreOperacao): ResultadoScoreOperacao {
   const contaNova = a.leadsTotal === 0 && a.unidadesTotal === 0
 
-  const freqPontos = linear(a.interacoes7d, 20, 30)
-  const portPontos = linear(a.unidadesAtivas, 10, 25)
-  const diversPontos = diversificacaoPontos(a.empreendimentosDistintos)
+  const freqPontos = linear(a.followups7d, 20, 30)
+  const diversPontos = diversificacaoPontos(a.empreendimentosComLead90d)
   const respAplicavel = a.leads30dTotal > 0
   const respPontos = respAplicavel ? Math.round((a.leads30dAtendidos1h / a.leads30dTotal) * 15) : null
 
@@ -115,21 +128,14 @@ export function calcularScoreOperacao(a: AgregadosScoreOperacao): ResultadoScore
       label: 'Frequência',
       pontos: freqPontos,
       maximo: 30,
-      detalhe: `${a.interacoes7d} interaç${a.interacoes7d === 1 ? 'ão' : 'ões'} nos últimos 7 dias`,
-    },
-    {
-      chave: 'portfolio',
-      label: 'Portfólio',
-      pontos: portPontos,
-      maximo: 25,
-      detalhe: `${a.unidadesAtivas} unidade${a.unidadesAtivas === 1 ? '' : 's'} ativa${a.unidadesAtivas === 1 ? '' : 's'}`,
+      detalhe: `${a.followups7d} follow-up${a.followups7d === 1 ? '' : 's'} nos últimos 7 dias`,
     },
     {
       chave: 'diversificacao',
       label: 'Diversificação',
       pontos: diversPontos,
       maximo: 20,
-      detalhe: `${a.empreendimentosDistintos} empreendimento${a.empreendimentosDistintos === 1 ? '' : 's'} com unidade ativa`,
+      detalhe: `${a.empreendimentosComLead90d} empreendimento${a.empreendimentosComLead90d === 1 ? '' : 's'} com lead nos últimos 90 dias`,
     },
     {
       chave: 'velocidade',
@@ -162,14 +168,13 @@ export function calcularScoreOperacao(a: AgregadosScoreOperacao): ResultadoScore
     proximaFaixaLabel: proximaFaixa ? proximaFaixa.label : null,
     componentes,
     missoes,
-    omitidos: [COMPONENTE_PERFIL_OMITIDO],
+    omitidos: COMPONENTES_OMITIDOS,
     contaNova,
   }
 }
 
 const HREFS: Record<ChaveComponente, string> = {
   frequencia: '/dashboard/crm/foco',
-  portfolio: '/dashboard/espelho',
   diversificacao: '/dashboard/espelho',
   velocidade: '/dashboard/crm/foco',
 }
@@ -196,10 +201,8 @@ function textoMissao(chave: ChaveComponente, a: AgregadosScoreOperacao): string 
       return a.leadsParados > 0
         ? `Registre follow-up em ${a.leadsParados} lead${a.leadsParados === 1 ? '' : 's'} que precisa${a.leadsParados === 1 ? '' : 'm'} de atenção`
         : 'Registre follow-ups no CRM para reativar a prospecção'
-    case 'portfolio':
-      return `Importe mais unidades no espelho de vendas — hoje ${a.unidadesAtivas} ativa${a.unidadesAtivas === 1 ? '' : 's'}`
     case 'diversificacao':
-      return `Cadastre unidades de mais empreendimentos — hoje você atua em ${a.empreendimentosDistintos}`
+      return `Cadastre unidades de mais empreendimentos — hoje você tem lead em ${a.empreendimentosComLead90d}`
     case 'velocidade':
       return `Responda leads novos em até 1h — hoje só ${a.leads30dAtendidos1h} de ${a.leads30dTotal} chegam nesse tempo`
   }
