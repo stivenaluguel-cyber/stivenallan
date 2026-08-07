@@ -50,6 +50,18 @@ export function logWarn(source: string, message: string, ctx?: Ctx): void {
   emit('warn', source, message, ctx)
 }
 
+// Extrai só o "tipo" de um erro externo (nome da classe / typeof) — seguro
+// pra log mesmo quando a mensagem do erro pode ecoar conteúdo controlado
+// pelo usuário (ex: erro de parsing de payload, erro de API externa que
+// inclui um trecho do corpo da requisição/resposta na mensagem).
+export function tipoDeErro(err: unknown): string {
+  // constructor.name (não .name): subclasses de Error costumam não
+  // sobrescrever .name, então instâncias de erros custom cairiam todas
+  // genericamente como "Error" — constructor.name distingue de verdade.
+  if (err instanceof Error) return err.constructor.name
+  return typeof err
+}
+
 export function logError(source: string, message: string, err?: unknown, ctx?: Ctx): void {
   emit('error', source, message, ctx, err)
   // Sentry: canal adicional pra erros. Structured JSON log continua sendo verdade primária.

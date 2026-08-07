@@ -1,4 +1,7 @@
 import { getOpenAI } from '@/lib/agent'
+import { logError, tipoDeErro } from '@/lib/log'
+
+const SOURCE = 'leads/sentimento'
 
 export type Sentimento = 'positivo' | 'neutro' | 'negativo' | 'urgente'
 
@@ -34,7 +37,14 @@ export async function classificarSentimento(mensagem: string): Promise<Sentiment
     const bruto = (response.choices[0]?.message?.content ?? '').trim().toLowerCase()
     return SENTIMENTOS_VALIDOS.find((s) => bruto.includes(s)) ?? 'neutro'
   } catch (err) {
-    console.error('[sentimento] classificarSentimento falhou, usando neutro como fallback', err)
+    // `mensagem` (texto do lead) vai no corpo da chamada pro LLM externo —
+    // erros de validação de conteúdo de algumas APIs OpenAI-compatíveis
+    // ecoam um trecho do conteúdo rejeitado na mensagem de erro. Só o tipo
+    // do erro é seguro de logar aqui.
+    logError(SOURCE, 'classificarSentimento falhou, usando neutro como fallback', undefined, {
+      errorTipo: tipoDeErro(err),
+      mensagemLength: mensagem.length,
+    })
     return 'neutro'
   }
 }

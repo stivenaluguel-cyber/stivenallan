@@ -140,6 +140,30 @@ describe('sugerirConhecimentoDeConversasResolvidas', () => {
     expect(resultado).toEqual({ avaliados: 1, sugeridos: 0 })
   })
 
+  // Regressão de PII: a transcrição real da conversa (mensagens do lead) vai
+  // no corpo da chamada pro LLM externo — um erro de API pode ecoar um
+  // trecho dela na mensagem do erro. O log não pode repassar isso.
+  it('erro do modelo ecoando a transcrição da conversa: não vaza o texto do lead, só o tipo do erro', async () => {
+    const errorSpy = vi.spyOn(console, 'error')
+    const mensagemLead = 'Meu CPF é 123.456.789-00 e quero o apartamento'
+    openaiHolder.create.mockRejectedValue(new Error(`content policy violation for input containing: "${mensagemLead}"`))
+    const supabase = fakeSupabase({
+      mudancas: [{ lead_id: 'lead-1', created_at: '2026-08-03T10:00:00Z' }],
+      interacoes: [
+        { direcao: 'entrada', mensagem: mensagemLead },
+        { direcao: 'saida', mensagem: 'Claro, vou te passar as condições.' },
+      ],
+    })
+
+    const resultado = await sugerirConhecimentoDeConversasResolvidas(supabase)
+
+    expect(resultado).toEqual({ avaliados: 1, sugeridos: 0 })
+    const textoLogado = errorSpy.mock.calls.flat().map(String).join(' | ')
+    expect(textoLogado).not.toContain(mensagemLead)
+    expect(textoLogado).not.toContain('123.456.789-00')
+    expect(textoLogado).toContain('"errorTipo":"Error"')
+  })
+
   it('lead com menos de 2 interações (conversa vazia/incompleta) é pulado sem chamar o modelo', async () => {
     const supabase = fakeSupabase({
       mudancas: [{ lead_id: 'lead-1', created_at: '2026-08-03T10:00:00Z' }],

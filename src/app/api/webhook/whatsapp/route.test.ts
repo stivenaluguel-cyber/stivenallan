@@ -50,6 +50,12 @@ type MockConfig = {
   // Mids tratados como já reservados ANTES do teste começar — simula uma
   // reentrega horas depois de outra já ter sido processada com sucesso.
   midsJaReservados?: string[]
+  // Simula falha (não-duplicata) no upsert do lead / na reserva do mid —
+  // usado pra provar que o erro do Postgres não vaza PII no log mesmo
+  // quando ele "ecoa" o valor da coluna (comportamento real do Postgres
+  // em violações de constraint).
+  upsertError?: { code: string; message: string; details?: string }
+  reservaError?: { code: string; message: string; details?: string }
 }
 
 function makeSupabase(cfg: MockConfig = {}) {
@@ -80,7 +86,10 @@ function makeSupabase(cfg: MockConfig = {}) {
         return {
           upsert: () => ({
             select: () => ({
-              single: async () => ({ data: { ...leadPadrao, ...cfg.lead }, error: null }),
+              single: async () =>
+                cfg.upsertError
+                  ? { data: null, error: cfg.upsertError }
+                  : { data: { ...leadPadrao, ...cfg.lead }, error: null },
             }),
           }),
           update: (row: Record<string, unknown>) => {
@@ -128,6 +137,9 @@ function makeSupabase(cfg: MockConfig = {}) {
                       error: { code: '23505', message: 'duplicate key value violates unique constraint "interacoes_mid_key"' },
                     }
                   }
+                  if (cfg.reservaError) {
+                    return { data: null, error: cfg.reservaError }
+                  }
                   return { data: { id: 'interacao-' + interacoesInserts.length }, error: null }
                 },
               }),
@@ -157,19 +169,30 @@ function makeReq(body: unknown, headers: Record<string, string> = { authorizatio
   } as unknown as NextRequest
 }
 
-const EVENTO_MENSAGEM = (texto: string, mid = 'MID-PADRAO-TESTE') => ({
+const EVENTO_MENSAGEM = (texto: string, mid = 'MID-PADRAO-TESTE', telefone = '5548999999999') => ({
   event: 'messages.upsert',
   instance: 'stiven',
   data: {
-    key: { remoteJid: '5548999999999@s.whatsapp.net', fromMe: false, id: mid },
+    key: { remoteJid: `${telefone}@s.whatsapp.net`, fromMe: false, id: mid },
     message: { conversation: texto },
   },
 })
 
+// Aggrega tudo que foi passado pros três níveis de console (log/warn/error)
+// numa única string — é assim que logInfo/logWarn/logError acabam saindo
+// (log.ts chama console.* por baixo), então isso cobre tanto os console.*
+// antigos remanescentes quanto qualquer chamada feita via logger estruturado.
+function textoDeTodosOsLogs(spies: { log: ReturnType<typeof vi.spyOn>; warn: ReturnType<typeof vi.spyOn>; error: ReturnType<typeof vi.spyOn> }): string {
+  return [...spies.log.mock.calls, ...spies.warn.mock.calls, ...spies.error.mock.calls]
+    .flat()
+    .map((v) => (typeof v === 'string' ? v : JSON.stringify(v)))
+    .join(' | ')
+}
+
 async function aguardarProcessamentoAssincrono() {
-  // processarEResponder roda fire-and-forget (.catch(console.error)) — dá
-  // uma volta no microtask queue pra deixar as promises internas resolverem
-  // antes de inspecionar os mocks.
+  // processarEResponder roda fire-and-forget (.catch(err => logError(...))) —
+  // dá uma volta no microtask queue pra deixar as promises internas
+  // resolverem antes de inspecionar os mocks.
   await new Promise((r) => setTimeout(r, 0))
   await new Promise((r) => setTimeout(r, 0))
   await new Promise((r) => setTimeout(r, 0))
@@ -415,5 +438,145 @@ describe('POST /api/webhook/whatsapp — idempotência', () => {
     await aguardarProcessamentoAssincrono()
 
     expect(agentHolder.processarMensagem).toHaveBeenCalledTimes(2)
+  })
+})
+
+// Regressão de PII: o webhook antigo logava `console.log('[webhook]
+// processando:', whatsapp, '|', texto.substring(0, 80))` — telefone completo
+// e um trecho real da mensagem do lead. Payload sintético igual ao usado na
+// auditoria de segurança: telefone que não pode aparecer em log nenhum, e
+// mensagem com dado sensível (CPF) que também não pode.
+describe('POST /api/webhook/whatsapp — PII nunca vai pro log', () => {
+  const TELEFONE = '5511999999999'
+  const MENSAGEM_COM_CPF = 'Meu CPF é 123.456.789-00 e quero o apartamento'
+  const TRECHO_CPF = '123.456.789-00'
+
+  let logSpy: ReturnType<typeof vi.spyOn>
+  let warnSpy: ReturnType<typeof vi.spyOn>
+  let errorSpy: ReturnType<typeof vi.spyOn>
+
+  beforeEach(() => {
+    process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://test'
+    process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-key'
+    process.env.EVOLUTION_WEBHOOK_SECRET = SECRET_VALIDO
+    logSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
+    warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    agentHolder.processarMensagem.mockClear().mockResolvedValue('resposta da IA')
+    evolutionHolder.enviarMensagem.mockClear().mockResolvedValue(true)
+    evolutionHolder.enviarAlertaEscalada.mockClear().mockResolvedValue(true)
+    optoutHolder.detectar.mockClear().mockReturnValue(false)
+    limiteHolder.podeEnviar.mockClear().mockResolvedValue(true)
+    sentimentoHolder.classificar.mockClear().mockResolvedValue('neutro')
+  })
+
+  afterEach(() => {
+    supabaseHolder.current = null as unknown as ReturnType<typeof makeSupabase>
+    vi.restoreAllMocks()
+  })
+
+  it('fluxo normal: nenhum log contém o telefone, a mensagem ou o CPF — mas mid/textoLength continuam aparecendo', async () => {
+    const mock = makeSupabase()
+    supabaseHolder.current = mock
+
+    await POST(makeReq(EVENTO_MENSAGEM(MENSAGEM_COM_CPF, 'MID-PII-1', TELEFONE)))
+    await aguardarProcessamentoAssincrono()
+
+    const textoLogado = textoDeTodosOsLogs({ log: logSpy, warn: warnSpy, error: errorSpy })
+    expect(textoLogado).not.toContain(TELEFONE)
+    expect(textoLogado).not.toContain(MENSAGEM_COM_CPF)
+    expect(textoLogado).not.toContain('Meu CPF')
+    expect(textoLogado).not.toContain(TRECHO_CPF)
+
+    // Observabilidade preservada: id opaco e metadado seguro continuam logados.
+    expect(textoLogado).toContain('MID-PII-1')
+    expect(textoLogado).toContain('"textoLength":' + MENSAGEM_COM_CPF.length)
+    expect(textoLogado).toContain('"source":"webhook/whatsapp"')
+  })
+
+  it('lead sem nome: nome não é logado (quando aplicável, só ids opacos)', async () => {
+    const mock = makeSupabase({ lead: { nome: 'Fulano de Tal Sobrenome Completo' } })
+    supabaseHolder.current = mock
+
+    await POST(makeReq(EVENTO_MENSAGEM('oi tudo bem', 'MID-PII-NOME', TELEFONE)))
+    await aguardarProcessamentoAssincrono()
+
+    const textoLogado = textoDeTodosOsLogs({ log: logSpy, warn: warnSpy, error: errorSpy })
+    expect(textoLogado).not.toContain('Fulano de Tal Sobrenome Completo')
+  })
+
+  it('falha ao resolver o lead (erro do Postgres ecoando o telefone): nem o telefone nem a mensagem completa do erro vazam — só o code', async () => {
+    const mock = makeSupabase({
+      upsertError: {
+        code: '23505',
+        message: `duplicate key value violates unique constraint "leads_whatsapp_key"`,
+        details: `Key (whatsapp)=(${TELEFONE}) already exists.`,
+      },
+    })
+    supabaseHolder.current = mock
+
+    await POST(makeReq(EVENTO_MENSAGEM(MENSAGEM_COM_CPF, 'MID-PII-2', TELEFONE)))
+    await aguardarProcessamentoAssincrono()
+
+    const textoLogado = textoDeTodosOsLogs({ log: logSpy, warn: warnSpy, error: errorSpy })
+    expect(textoLogado).not.toContain(TELEFONE)
+    expect(textoLogado).not.toContain(MENSAGEM_COM_CPF)
+    expect(textoLogado).not.toContain('already exists')
+    expect(textoLogado).toContain('"errorCode":"23505"')
+    expect(agentHolder.processarMensagem).not.toHaveBeenCalled()
+  })
+
+  it('falha ao reservar o mid (erro do Postgres ecoando a mensagem): não vaza telefone nem o texto — só o code', async () => {
+    const mock = makeSupabase({
+      reservaError: {
+        code: '23514',
+        message: `new row for relation "interacoes" violates check constraint`,
+        details: `Failing row contains (..., ${MENSAGEM_COM_CPF}, ...).`,
+      },
+    })
+    supabaseHolder.current = mock
+
+    await POST(makeReq(EVENTO_MENSAGEM(MENSAGEM_COM_CPF, 'MID-PII-3', TELEFONE)))
+    await aguardarProcessamentoAssincrono()
+
+    const textoLogado = textoDeTodosOsLogs({ log: logSpy, warn: warnSpy, error: errorSpy })
+    expect(textoLogado).not.toContain(TELEFONE)
+    expect(textoLogado).not.toContain(MENSAGEM_COM_CPF)
+    expect(textoLogado).not.toContain('Failing row')
+    expect(textoLogado).toContain('"errorCode":"23514"')
+    expect(agentHolder.processarMensagem).not.toHaveBeenCalled()
+  })
+
+  it('exceção inesperada no meio do processamento: não vaza telefone; leadId e mid aparecem pra correlação', async () => {
+    const mock = makeSupabase()
+    supabaseHolder.current = mock
+    agentHolder.processarMensagem.mockRejectedValueOnce(new Error(`falha ao processar "${MENSAGEM_COM_CPF}"`))
+
+    await POST(makeReq(EVENTO_MENSAGEM(MENSAGEM_COM_CPF, 'MID-PII-4', TELEFONE)))
+    await aguardarProcessamentoAssincrono()
+
+    const textoLogado = textoDeTodosOsLogs({ log: logSpy, warn: warnSpy, error: errorSpy })
+    expect(textoLogado).not.toContain(TELEFONE)
+    expect(textoLogado).not.toContain(MENSAGEM_COM_CPF)
+    expect(textoLogado).toContain('MID-PII-4')
+    expect(textoLogado).toContain('"leadId":"lead-1"')
+    expect(textoLogado).toContain('"errorTipo":"Error"')
+  })
+
+  it('nunca loga EVOLUTION_WEBHOOK_SECRET nem EVOLUTION_API_KEY, mesmo em erro', async () => {
+    const mock = makeSupabase({
+      upsertError: { code: 'XX000', message: 'erro interno do banco' },
+    })
+    supabaseHolder.current = mock
+    process.env.EVOLUTION_API_KEY = 'chave-api-super-secreta'
+
+    await POST(makeReq(EVENTO_MENSAGEM('oi', 'MID-PII-5', TELEFONE)))
+    await aguardarProcessamentoAssincrono()
+
+    const textoLogado = textoDeTodosOsLogs({ log: logSpy, warn: warnSpy, error: errorSpy })
+    expect(textoLogado).not.toContain(SECRET_VALIDO)
+    expect(textoLogado).not.toContain('chave-api-super-secreta')
+
+    delete process.env.EVOLUTION_API_KEY
   })
 })

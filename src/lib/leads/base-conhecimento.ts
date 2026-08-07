@@ -1,4 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { logError, tipoDeErro } from '@/lib/log'
+
+const SOURCE = 'leads/base-conhecimento'
 
 export type EntradaConhecimento = { id: string; pergunta: string; resposta: string }
 
@@ -25,14 +28,24 @@ export async function buscarConhecimentoRelevante(
       .limit(limite)
 
     if (error) {
-      console.error('[base-conhecimento] busca falhou, seguindo sem contexto extra', error)
+      // `termo` é o texto do lead usado como tsquery — em caso de erro de
+      // sintaxe do tsquery, a mensagem do Postgres pode ecoar o termo
+      // recebido. code é categórico e seguro (ex: erro de sintaxe tem um
+      // code próprio); nunca logar error.message/details inteiro aqui.
+      logError(SOURCE, 'busca de conhecimento falhou, seguindo sem contexto extra', undefined, {
+        errorCode: error.code,
+        termoLength: termo.length,
+      })
       return []
     }
     return data ?? []
   } catch (err) {
     // Nunca pode derrubar a resposta principal da IA por causa de uma
     // consulta de contexto que é só um "bônus".
-    console.error('[base-conhecimento] busca lançou exceção, seguindo sem contexto extra', err)
+    logError(SOURCE, 'busca de conhecimento lançou excecao, seguindo sem contexto extra', undefined, {
+      errorTipo: tipoDeErro(err),
+      termoLength: termo.length,
+    })
     return []
   }
 }
