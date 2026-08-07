@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { logError, logInfo, logWarn } from '@/lib/log'
 import { finishCronRun, startCronRun, type CronRunFinal } from '@/lib/cron/tracker'
+import { verificarAutenticacaoCron } from '@/lib/cron/auth'
 import { buildUnsubscribeUrl, montarHtml } from '@/lib/cron/email-followup-helpers'
 import { enviarEmailResend } from '@/lib/email/resend'
 
@@ -91,10 +92,8 @@ async function enviarEmail(para: string, assunto: string, html: string, unsubUrl
 
 export async function GET(req: NextRequest) {
   // 1) Auth — sem persist (supabase pode nem estar disponível)
-  const authHeader = req.headers.get('authorization')
-  if (authHeader !== 'Bearer ' + process.env.CRON_SECRET) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const authError = verificarAutenticacaoCron(req)
+  if (authError) return authError
 
   // 2) Envs Supabase — sem persist (obviamente)
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL

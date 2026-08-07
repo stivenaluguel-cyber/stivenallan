@@ -3,6 +3,7 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { enviarFollowUp, enviarAlertaEscalada, verificarInstancia } from '@/lib/evolution'
 import { logError, logInfo, logWarn } from '@/lib/log'
 import { finishCronRun, startCronRun, type CronRunFinal } from '@/lib/cron/tracker'
+import { verificarAutenticacaoCron } from '@/lib/cron/auth'
 import { podeEnviarAutomatico, automacaoProativaAtiva } from '@/lib/leads/whatsapp-envio-limite'
 import { leadCasaNaRegra, executarAcao, type RegraAutomacao, type LeadParaRegra } from '@/lib/automacoes/regras'
 import { sugerirConhecimentoDeConversasResolvidas } from '@/lib/leads/base-conhecimento-auto-sugestao'
@@ -311,10 +312,8 @@ async function processarRegrasAutomacao(supabase: SupabaseClient): Promise<{ ava
 
 export async function GET(req: NextRequest) {
   // 1) Auth — sem persist
-  const authHeader = req.headers.get('authorization')
-  if (authHeader !== 'Bearer ' + process.env.CRON_SECRET) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const authError = verificarAutenticacaoCron(req)
+  if (authError) return authError
 
   // 2) Envs Supabase — sem persist (não temos como)
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
