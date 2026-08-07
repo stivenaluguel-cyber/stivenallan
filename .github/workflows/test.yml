@@ -1,14 +1,18 @@
-name: Test
+name: Quality Gate
 
 on:
   push:
-    branches: ['**']
+    branches: [main]
   pull_request:
-    branches: ['**']
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  vitest:
-    name: Vitest suite
+  quality-gate:
+    name: Quality gate
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -29,3 +33,6 @@ jobs:
 
       - name: Type-check (tsc --noEmit)
         run: npx tsc --noEmit
+
+      - name: Build
+        run: npm run build
