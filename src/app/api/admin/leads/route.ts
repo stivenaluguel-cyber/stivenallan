@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
+import type { Database } from '@/types/database.generated'
 
 export async function GET(req: NextRequest) {
   const supabase = getSupabaseAdmin()
@@ -19,7 +20,14 @@ export async function GET(req: NextRequest) {
   }
 
   if (empreendimentoId) {
-    query = query.eq('empreendimento_id', empreendimentoId)
+    // Item 6A: bug real confirmado pelo tipo oficial (src/types/database.generated.ts,
+    // gerado via Supabase CLI) — `leads` nunca teve coluna `empreendimento_id`.
+    // A FK real é `empreendimento_interesse` (leads_empreendimento_interesse_fkey,
+    // ver supabase/migrations/20260726235000_baseline_schema.sql linha 599).
+    // Esse filtro sempre devolvia 400 do PostgREST quando usado (parâmetro de
+    // URL segue `empreendimento_id` de propósito — é a query string pública
+    // da API, não a coluna do banco; só o `.eq()` estava errado).
+    query = query.eq('empreendimento_interesse', empreendimentoId)
   }
 
   const { data, error } = await query
@@ -87,13 +95,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'WhatsApp é obrigatório' }, { status: 400 })
   }
 
-  const insert: Record<string, unknown> = {
+  // Tipado contra o schema real (Database['public']['Tables']['leads']['Insert'])
+  // — prova a integração: um NOME de coluna incompatível com `leads` seria
+  // rejeitado pelo TypeScript aqui. Os valores em si continuam exatamente
+  // como body os entregou (cast, não validação nova) — mesmo comportamento
+  // de runtime de antes, escopo desta tarefa é tipagem, não validação.
+  const insert: Database['public']['Tables']['leads']['Insert'] = {
     whatsapp,
-    nome: body.nome ?? null,
-    email: body.email ?? null,
-    origem: body.origem ?? null,
-    orcamento_max: body.orcamento_max ?? null,
-    estagio_funil: body.estagio_funil ?? 'primeiro_contato',
+    nome: (body.nome ?? null) as string | null,
+    email: (body.email ?? null) as string | null,
+    origem: (body.origem ?? null) as string | null,
+    orcamento_max: (body.orcamento_max ?? null) as number | null,
+    estagio_funil: (body.estagio_funil ?? 'primeiro_contato') as string,
   }
 
   const { data, error } = await supabase.from('leads').insert(insert).select().single()

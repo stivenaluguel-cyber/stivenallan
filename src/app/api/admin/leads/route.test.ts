@@ -18,10 +18,31 @@ function makeSupabase(cfg: {
   eventos?: { lead_id: string; tipo: string }[]
   interesses?: { lead_id: string; property_id: string; last_seen_at: string; properties: { nome: string; slug: string } | null }[]
 }) {
+  const eqCalls: [string, unknown][] = []
   return {
+    eqCalls,
     from(table: string) {
       if (table === 'leads') {
-        return { select: () => ({ order: () => Promise.resolve({ data: cfg.leads ?? [], error: null }) }) }
+        return {
+          select: () => ({
+            order: () => {
+              // Builder encadeável e "thenable" em qualquer ponto — espelha o
+              // query builder real do postgrest-js, onde `.eq()` pode ser
+              // chamado 0, 1 ou 2x (status, empreendimento_interesse) antes
+              // do `await query` final em route.ts.
+              const b = {
+                eq(col: string, val: unknown) {
+                  eqCalls.push([col, val])
+                  return b
+                },
+                then(resolve: (v: { data: Lead[]; error: null }) => void) {
+                  resolve({ data: cfg.leads ?? [], error: null })
+                },
+              }
+              return b
+            },
+          }),
+        }
       }
       if (table === 'lead_eventos') {
         return { select: () => Promise.resolve({ data: cfg.eventos ?? [], error: null }) }
@@ -102,5 +123,32 @@ describe('GET /api/admin/leads', () => {
     const lead2 = json.find((l: { id: string }) => l.id === 'lead-2')
     expect(lead1.interesses_count).toBe(1)
     expect(lead2.interesses_count).toBe(0)
+  })
+
+  it('Item 6A: filtro ?empreendimento_id= usa .eq("empreendimento_interesse", ...), nunca .eq("empreendimento_id", ...)', async () => {
+    const sb = makeSupabase({ leads: [{ id: 'lead-1', nome: 'Ana' }] })
+    supabaseHolder.current = sb
+    const res = await GET(makeReq('http://test/api/admin/leads?empreendimento_id=emp-123'))
+    expect(res.status).toBe(200)
+    expect(sb.eqCalls).toContainEqual(['empreendimento_interesse', 'emp-123'])
+    expect(sb.eqCalls.some(([col]) => col === 'empreendimento_id')).toBe(false)
+  })
+
+  it('Item 6A: filtro ?status= continua chamando .eq("status", ...) sem regressão de comportamento', async () => {
+    const sb = makeSupabase({ leads: [{ id: 'lead-1', nome: 'Ana' }] })
+    supabaseHolder.current = sb
+    const res = await GET(makeReq('http://test/api/admin/leads?status=novo'))
+    expect(res.status).toBe(200)
+    expect(sb.eqCalls).toContainEqual(['status', 'novo'])
+  })
+
+  it('Item 6A: status + empreendimento_id combinados aplicam os dois filtros, cada um na coluna certa', async () => {
+    const sb = makeSupabase({ leads: [{ id: 'lead-1', nome: 'Ana' }] })
+    supabaseHolder.current = sb
+    const res = await GET(makeReq('http://test/api/admin/leads?status=novo&empreendimento_id=emp-9'))
+    expect(res.status).toBe(200)
+    expect(sb.eqCalls).toContainEqual(['status', 'novo'])
+    expect(sb.eqCalls).toContainEqual(['empreendimento_interesse', 'emp-9'])
+    expect(sb.eqCalls.length).toBe(2)
   })
 })
