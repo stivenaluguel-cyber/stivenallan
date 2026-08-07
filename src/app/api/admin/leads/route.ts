@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase'
+import { requireAdmin } from '@/lib/dashboard/admin-auth'
 import type { Database } from '@/types/database.generated'
 
 export async function GET(req: NextRequest) {
+  // Defesa em profundidade: o middleware já protege /api/admin/*, mas a
+  // rota precisa fail-closed (401) sozinha também, sem depender de estar
+  // atrás do middleware (ex.: chamada direta em teste/runtime).
+  if (!await requireAdmin()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
   const supabase = getSupabaseAdmin()
   if (!supabase) return NextResponse.json({ error: 'Serviço indisponível' }, { status: 503 })
 
@@ -80,6 +86,10 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  // Mesma defesa em profundidade do GET acima — antes de tocar Supabase ou
+  // parsear o payload.
+  if (!await requireAdmin()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
   const supabase = getSupabaseAdmin()
   if (!supabase) return NextResponse.json({ error: 'Serviço indisponível' }, { status: 503 })
 
