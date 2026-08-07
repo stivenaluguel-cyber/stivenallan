@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse, after } from 'next/server'
 import { processarMensagem, type MensagemChat } from '@/lib/agent'
 import { enviarMensagem, enviarAlertaEscalada } from '@/lib/evolution'
 import { detectarPalavraChaveOptOut, MENSAGEM_CONFIRMACAO_OPTOUT } from '@/lib/leads/whatsapp-optout'
@@ -65,8 +65,19 @@ export async function POST(req: NextRequest) {
     // mesmo padrão do webhook/whatsapp-cloud/route.ts. mid é id opaco.
     logInfo(SOURCE, 'mensagem recebida', { mid, textoLength: texto.length })
 
-    processarEResponder(whatsapp, texto, mid).catch((err) =>
-      logError(SOURCE, 'processarEResponder rejeitou inesperadamente', undefined, { mid, errorTipo: tipoDeErro(err) }),
+    // after() (Next.js/Vercel): a resposta HTTP já foi decidida (200 abaixo)
+    // e não espera por isto. O runtime mantém a invocação viva até o
+    // callback terminar — diferente de um fire-and-forget "solto", cuja
+    // continuação podia ser congelada assim que a resposta HTTP saísse do
+    // servidor (comportamento não garantido em runtime serverless). Isso NÃO
+    // é uma fila persistente: se a invocação inteira morrer (crash/OOM,
+    // deploy forçando um corte abrupto), o trabalho ainda se perde — after()
+    // só resolve o caso comum de "a função encerrou cedo demais", não o de
+    // "a função morreu no meio".
+    after(() =>
+      processarEResponder(whatsapp, texto, mid).catch((err) =>
+        logError(SOURCE, 'processarEResponder rejeitou inesperadamente', undefined, { mid, errorTipo: tipoDeErro(err) }),
+      ),
     )
 
     return NextResponse.json({ ok: true })

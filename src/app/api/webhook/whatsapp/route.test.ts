@@ -42,6 +42,18 @@ vi.mock('@supabase/supabase-js', () => ({
   createClient: () => supabaseHolder.current,
 }))
 
+// after() só é válido dentro de um request scope real do Next.js — nos
+// testes, executa a callback direto (mesma abordagem já usada em
+// registrar-mudanca-estagio.test.ts). importOriginal preserva NextRequest/
+// NextResponse reais, que a rota usa de verdade pra construir a resposta.
+const { afterHolder } = vi.hoisted(() => ({
+  afterHolder: { after: vi.fn((cb: () => unknown) => { cb() }) },
+}))
+vi.mock('next/server', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('next/server')>()
+  return { ...actual, after: (cb: () => unknown) => afterHolder.after(cb) }
+})
+
 import { POST } from './route'
 
 type MockConfig = {
@@ -206,6 +218,7 @@ describe('POST /api/webhook/whatsapp', () => {
     vi.spyOn(console, 'log').mockImplementation(() => {})
     vi.spyOn(console, 'warn').mockImplementation(() => {})
     vi.spyOn(console, 'error').mockImplementation(() => {})
+    afterHolder.after.mockClear()
     agentHolder.processarMensagem.mockClear().mockResolvedValue('resposta da IA')
     evolutionHolder.enviarMensagem.mockClear().mockResolvedValue(true)
     evolutionHolder.enviarAlertaEscalada.mockClear().mockResolvedValue(true)
@@ -296,6 +309,7 @@ describe('POST /api/webhook/whatsapp — autenticação', () => {
     vi.spyOn(console, 'log').mockImplementation(() => {})
     vi.spyOn(console, 'warn').mockImplementation(() => {})
     vi.spyOn(console, 'error').mockImplementation(() => {})
+    afterHolder.after.mockClear()
     agentHolder.processarMensagem.mockClear().mockResolvedValue('resposta da IA')
     evolutionHolder.enviarMensagem.mockClear().mockResolvedValue(true)
   })
@@ -364,6 +378,7 @@ describe('POST /api/webhook/whatsapp — idempotência', () => {
     vi.spyOn(console, 'log').mockImplementation(() => {})
     vi.spyOn(console, 'warn').mockImplementation(() => {})
     vi.spyOn(console, 'error').mockImplementation(() => {})
+    afterHolder.after.mockClear()
     agentHolder.processarMensagem.mockClear().mockResolvedValue('resposta da IA')
     evolutionHolder.enviarMensagem.mockClear().mockResolvedValue(true)
   })
@@ -462,6 +477,7 @@ describe('POST /api/webhook/whatsapp — PII nunca vai pro log', () => {
     logSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
     warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
     errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    afterHolder.after.mockClear()
     agentHolder.processarMensagem.mockClear().mockResolvedValue('resposta da IA')
     evolutionHolder.enviarMensagem.mockClear().mockResolvedValue(true)
     evolutionHolder.enviarAlertaEscalada.mockClear().mockResolvedValue(true)
@@ -579,4 +595,145 @@ describe('POST /api/webhook/whatsapp — PII nunca vai pro log', () => {
 
     delete process.env.EVOLUTION_API_KEY
   })
+})
+
+// Item 4: o processamento pesado (IA, Supabase, Evolution) sai do caminho
+// síncrono da resposta HTTP e passa a rodar dentro de after() — a Vercel
+// mantém a invocação viva até o callback terminar, em vez de um
+// fire-and-forget "solto" que podia ser congelado assim que a resposta HTTP
+// saísse (comportamento não garantido em runtime serverless).
+describe('POST /api/webhook/whatsapp — lifecycle pós-resposta (after())', () => {
+  beforeEach(() => {
+    process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://test'
+    process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-key'
+    process.env.EVOLUTION_WEBHOOK_SECRET = SECRET_VALIDO
+    vi.spyOn(console, 'log').mockImplementation(() => {})
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    afterHolder.after.mockClear()
+    agentHolder.processarMensagem.mockClear().mockResolvedValue('resposta da IA')
+    evolutionHolder.enviarMensagem.mockClear().mockResolvedValue(true)
+    evolutionHolder.enviarAlertaEscalada.mockClear().mockResolvedValue(true)
+    optoutHolder.detectar.mockClear().mockReturnValue(false)
+    limiteHolder.podeEnviar.mockClear().mockResolvedValue(true)
+    sentimentoHolder.classificar.mockClear().mockResolvedValue('neutro')
+  })
+
+  afterEach(() => {
+    supabaseHolder.current = null as unknown as ReturnType<typeof makeSupabase>
+    vi.restoreAllMocks()
+  })
+
+  it('1) webhook válido responde 200 SEM esperar o processamento pesado (IA) terminar', async () => {
+    const mock = makeSupabase()
+    supabaseHolder.current = mock
+
+    let liberarIA: (v: string) => void = () => {}
+    agentHolder.processarMensagem.mockImplementation(
+      () => new Promise<string>((resolve) => { liberarIA = resolve }),
+    )
+
+    // Se a resposta esperasse a IA, este await travaria pra sempre (a
+    // promise da IA nunca é liberada antes daqui) — o teste em si é a prova.
+    const res = await POST(makeReq(EVENTO_MENSAGEM('oi')))
+
+    expect(res.status).toBe(200)
+    expect(await res.json()).toEqual({ ok: true })
+
+    // Libera a IA só depois de já ter a resposta, pra não deixar promise pendurada.
+    liberarIA('resposta da IA (liberada depois)')
+    await aguardarProcessamentoAssincrono()
+  })
+
+  it('2) mensagem válida agenda o processamento via after() — mecanismo pós-resposta oficial', async () => {
+    const mock = makeSupabase()
+    supabaseHolder.current = mock
+
+    await POST(makeReq(EVENTO_MENSAGEM('oi')))
+    await aguardarProcessamentoAssincrono()
+
+    expect(afterHolder.after).toHaveBeenCalledTimes(1)
+    expect(afterHolder.after).toHaveBeenCalledWith(expect.any(Function))
+    // O agendamento acontece antes do processamento em si terminar — after()
+    // recebeu a call, e só depois (mesma invocação, pós-resposta) a IA roda.
+    expect(agentHolder.processarMensagem).toHaveBeenCalledTimes(1)
+  })
+
+  it('3) autenticação inválida NÃO agenda processamento (after() não é chamado)', async () => {
+    const res = await POST(makeReq(EVENTO_MENSAGEM('oi'), { authorization: 'Bearer segredo-errado' }))
+    await aguardarProcessamentoAssincrono()
+
+    expect(res.status).toBe(401)
+    expect(afterHolder.after).not.toHaveBeenCalled()
+    expect(agentHolder.processarMensagem).not.toHaveBeenCalled()
+  })
+
+  it('4) evento ignorado (não é messages.upsert) NÃO agenda processamento', async () => {
+    const res = await POST(makeReq({ event: 'connection.update' }))
+    await aguardarProcessamentoAssincrono()
+
+    expect(await res.json()).toEqual({ ok: true, ignorado: true })
+    expect(afterHolder.after).not.toHaveBeenCalled()
+  })
+
+  it('4b) mensagem de grupo / status@broadcast / fromMe também NÃO agenda processamento', async () => {
+    const evtGrupo = EVENTO_MENSAGEM('oi')
+    evtGrupo.data.key.remoteJid = '123456-group@g.us'
+    await POST(makeReq(evtGrupo))
+
+    const evtFromMe = EVENTO_MENSAGEM('oi')
+    evtFromMe.data.key.fromMe = true
+    await POST(makeReq(evtFromMe))
+
+    await aguardarProcessamentoAssincrono()
+    expect(afterHolder.after).not.toHaveBeenCalled()
+  })
+
+  it('5) mensagem sem mid NÃO agenda processamento', async () => {
+    const evento = EVENTO_MENSAGEM('oi')
+    delete (evento.data.key as { id?: string }).id
+
+    const res = await POST(makeReq(evento))
+    await aguardarProcessamentoAssincrono()
+
+    expect(await res.json()).toEqual({ ok: true })
+    expect(afterHolder.after).not.toHaveBeenCalled()
+  })
+
+  it('6) falha no processamento posterior NÃO altera a resposta 200 já devolvida', async () => {
+    const mock = makeSupabase()
+    supabaseHolder.current = mock
+    agentHolder.processarMensagem.mockRejectedValue(new Error('falha simulada da IA'))
+
+    const res = await POST(makeReq(EVENTO_MENSAGEM('oi')))
+    // A resposta já foi construída e devolvida ANTES do after() rodar até o fim.
+    expect(res.status).toBe(200)
+    expect(await res.json()).toEqual({ ok: true })
+
+    // Só agora o trabalho de fundo (que vai falhar) termina de rodar.
+    await aguardarProcessamentoAssincrono()
+  })
+
+  it('7) falha posterior gera log seguro (mid + tipo do erro, sem PII) via after()', async () => {
+    const errorSpy = vi.spyOn(console, 'error')
+    const mock = makeSupabase()
+    supabaseHolder.current = mock
+    agentHolder.processarMensagem.mockRejectedValue(new Error('falha simulada da IA'))
+
+    await POST(makeReq(EVENTO_MENSAGEM('oi', 'MID-LIFECYCLE-7')))
+    await aguardarProcessamentoAssincrono()
+
+    const textoLogado = errorSpy.mock.calls.flat().map(String).join(' | ')
+    expect(textoLogado).toContain('MID-LIFECYCLE-7')
+    expect(textoLogado).toContain('"errorTipo":"Error"')
+    expect(textoLogado).not.toContain('5548999999999')
+  })
+
+  // 8) idempotência: não há teste novo aqui de propósito — processarEResponder
+  // não mudou, só passou a ser chamado de dentro de after() em vez de um
+  // .catch() solto. As reservas de mid (describe "idempotência" acima, ex.:
+  // "reentrega horas depois", "concorrência REAL", "mids diferentes não são
+  // duplicata") continuam passando sem alteração, provando que o
+  // comportamento de dedup por mid não foi afetado pela troca do mecanismo
+  // de disparo.
 })
