@@ -100,6 +100,23 @@ const cel = (u: (typeof r.unidades)[number], papel: Parameters<typeof coluna>[1]
   return x ? (x.quantidade > 1 ? `${x.quantidade}x ${brl(x.valor)}` : brl(x.valor)) : '—'
 }
 
+// A tabela do Árbor de agosto/2026 passou a trazer "PREÇO CAMPANHA" ao lado
+// do preço cheio calculado por CUB — o plano de pagamento (entrada, reforços,
+// mensais) fecha contra o campanha, que é o que vira `preco`/`valor_tabela`.
+// Avisar aqui em vez de gravar em silêncio: é uma diferença de ~10% no preço
+// que o corretor precisa ver antes de confirmar.
+const temCampanha = r.unidades.some((u) => u.preco_cheio !== null)
+if (temCampanha) {
+  console.log('\n*** PREÇO CAMPANHA na tabela: entrada/reforços/mensais fecham contra o preço promocional, não o cheio. ***')
+  console.log('| Un. | Preço cheio (CUB) | Preço campanha (= valor_tabela) | desconto |')
+  console.log('|---|---|---|---|')
+  for (const u of r.unidades) {
+    if (u.preco_cheio === null) continue
+    const desc = ((1 - u.preco / u.preco_cheio) * 100).toFixed(1)
+    console.log(`| ${u.unidade} | ${brl(u.preco_cheio)} | ${brl(u.preco)} | ${desc}% |`)
+  }
+}
+
 console.log('\n| Un. | Vagas | Depósito | m² priv. | m² global | CUB | Preço | Entrada | Reforços | Mensais | Chaves | Saldo |')
 console.log('|---|---|---|---|---|---|---|---|---|---|---|---|')
 for (const u of r.unidades) {

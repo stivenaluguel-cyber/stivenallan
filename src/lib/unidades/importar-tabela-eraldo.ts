@@ -71,7 +71,21 @@ export type UnidadeEraldo = {
   metragem_global: number
   /** Quantidade de CUB — a coluna que sustenta a conferência. */
   cub_quantidade: number
+  /**
+   * O preço que sustenta o plano de pagamento: entrada + reforços + mensais
+   * somam este valor. Nas tabelas normais é o preço cheio (CUB × quantidade).
+   * Quando a construtora publica um preço promocional ao lado do preço cheio
+   * (o Árbor, a partir de agosto/2026, com a coluna "PREÇO CAMPANHA"), é o
+   * preço promocional — é ele, não o cheio, que as colunas de pagamento
+   * fecham contra.
+   */
   preco: number
+  /**
+   * Preço cheio (CUB × quantidade), só quando a tabela também publica um
+   * preço promocional ao lado — nesse caso `preco` já é o promocional. Nas
+   * tabelas sem campanha fica null (não há dois preços a distinguir).
+   */
+  preco_cheio: number | null
   colunas: ColunaPagamento[]
 }
 
@@ -316,33 +330,46 @@ export function parsearTabelaEraldo(texto: string): ResultadoEraldo {
       rejeitadas.push({ unidade, motivo: 'percentuais do cabeçalho não lidos' })
       continue
     }
-    // Uma coluna de preço + uma por percentual. Nem mais nem menos: valor
-    // sobrando é linha colada de outra unidade, valor faltando é coluna que
-    // não foi lida.
-    if (reais.length !== pct.length + 1 || areas.length < 3) {
+    // Uma coluna de preço + uma por percentual. Nem mais nem menos — SALVO
+    // quando a construtora publica um preço promocional ao lado do preço
+    // cheio ("PREÇO CAMPANHA", visto no Árbor a partir de agosto/2026): aí
+    // entra mais uma coluna de preço antes das fatias. Nem mais nem menos que
+    // isso: valor sobrando é linha colada de outra unidade, valor faltando é
+    // coluna que não foi lida.
+    const temCampanha = reais.length === pct.length + 2
+    if ((reais.length !== pct.length + 1 && !temCampanha) || areas.length < 3) {
       rejeitadas.push({
         unidade,
-        motivo: `colunas fora do esperado (${areas.length} áreas, ${reais.length} valores; esperados 3 e ${pct.length + 1})`,
+        motivo: `colunas fora do esperado (${areas.length} áreas, ${reais.length} valores; esperados 3 e ${pct.length + 1}, ou ${pct.length + 2} com preço campanha)`,
       })
       continue
     }
 
-    const [preco, ...fatias] = reais
+    // Com campanha, a ORDEM impressa é [preço cheio, preço campanha, fatias...].
+    // As fatias de entrada/reforços/mensais fecham contra o preço campanha, não
+    // contra o cheio — conferido nas 21 unidades do Árbor de agosto/2026: 20%
+    // do preço cheio não bate com a entrada impressa, 20% do preço campanha
+    // bate ao centavo.
+    const precoCheio = temCampanha ? reais[0] : null
+    const [preco, ...fatiasValores] = temCampanha ? reais.slice(1) : reais
     const cubQtd = areas[2]
     if (!Number.isFinite(preco) || preco <= 0) problemas.push('preço ausente')
 
-    // A conferência do Eraldo: o preço tem que ser a quantidade de CUB
-    // impressa vezes o CUB do mês.
+    // A conferência do Eraldo: o preço CHEIO (antes de campanha, se houver)
+    // tem que ser a quantidade de CUB impressa vezes o CUB do mês. O preço
+    // campanha já sai descontado e não fecharia contra o CUB — por isso a
+    // conferência usa sempre o cheio.
+    const precoParaCub = precoCheio ?? preco
     if (cub === null) {
       problemas.push('CUB do cabeçalho não lido')
-    } else if (Math.abs(preco / cub - cubQtd) > TOLERANCIA_CUB) {
-      problemas.push(`CUB não fecha: ${(preco / cub).toFixed(2)} calculado ≠ ${cubQtd.toFixed(2)} impresso`)
+    } else if (Math.abs(precoParaCub / cub - cubQtd) > TOLERANCIA_CUB) {
+      problemas.push(`CUB não fecha: ${(precoParaCub / cub).toFixed(2)} calculado ≠ ${cubQtd.toFixed(2)} impresso`)
     }
 
     const qtds: number[] = []
-    for (let j = 0; j < fatias.length; j++) {
+    for (let j = 0; j < fatiasValores.length; j++) {
       const alvo = preco * pct[j]
-      const v = fatias[j]
+      const v = fatiasValores[j]
       if (!Number.isFinite(v) || v <= 0) { problemas.push(`coluna ${j + 1} ausente`); qtds.push(NaN); continue }
       const q = alvo / v
       if (Math.abs(q - Math.round(q)) > 0.02 || Math.round(q) < 1) {
@@ -375,7 +402,7 @@ export function parsearTabelaEraldo(texto: string): ResultadoEraldo {
 
     brutas.push({
       unidade,
-      valores: fatias,
+      valores: fatiasValores,
       qtds,
       u: {
         unidade,
@@ -387,6 +414,7 @@ export function parsearTabelaEraldo(texto: string): ResultadoEraldo {
         metragem_global: areas[1],
         cub_quantidade: cubQtd,
         preco,
+        preco_cheio: precoCheio,
       },
     })
   }

@@ -41,6 +41,28 @@ Apto 302 192,95 332,46 855,25 R$ 2.669.776,77 R$ 533.955,35 R$ 88.992,56 R$ 24.6
 3 - Conclusão da obra: OUT/28.
 `
 
+// Agosto/2026: o Árbor passou a publicar "PREÇO CAMPANHA" ao lado do preço
+// cheio calculado por CUB. As linhas de valores foram para 5 (preço cheio +
+// preço campanha + 3 fatias), e ficaram um dia rejeitadas com "esperados 3 e
+// 4" antes do parser aprender a segunda coluna de preço. Números reais do PDF
+// de agosto/2026, unidades 301 e 302.
+const ARBOR_CAMPANHA = `CUB (AGOSTO/2026)  R$ 3.151,24 RUA BARÃO DO RIO BRANCO, CENTRO - CRICIÚMA/SC
+ÁREAS REFORÇOS PARCELAS
+UNIDADES Entrada
+APTO PREÇO CAMPANHA ANUAIS x MENSAIS x
+GLOBAL TOTAL CUB (20%)
+(m²) (R$) (R$) 5 62
+APTO DEP. VAGAS GARAGEM (m²)
+PRIVAT. 20% 30% 50%
+Dep. 6 V 05 V 27A/B
+Apto 301 192,95 332,55 855,48 R$ 2.695.815,46 R$ 2.426.233,91 R$ 485.246,78 R$ 145.574,03 R$ 19.566,40
+(Subsolo) (Subsolo) (Subsolo)
+Dep. 5 V 59 V 26A/B
+Apto 302 192,95 332,46 855,25 R$ 2.695.109,38 R$ 2.425.598,44 R$ 485.119,69 R$ 145.535,91 R$ 19.561,28
+(Subsolo) (G1) (Subsolo)
+3 - Conclusão da obra: OUT/28.
+`
+
 const HORIZON = `CUB (JULHO/2026)  R$ 3.121,62 LANÇAMENTO - AV. DOS ESPORTES, BALNEÁRIO RINCÃO/SC
 ÁREAS FIN. BANCÁRIO OU
 PARCELAS
@@ -94,6 +116,50 @@ describe('estrutura de pagamento — cada tabela tem a sua', () => {
     expect(coluna(r.unidades[0], 'saldo')).toBeNull()
     expect(r.quantidades).toEqual([1, 6, 65])
     expect(r.cabecalho.previsao_entrega).toBe('OUT/28')
+  })
+
+  it('lê o preço campanha do Árbor (ago/2026) sem rejeitar por "colunas fora do esperado"', () => {
+    const r = parsearTabelaEraldo(ARBOR_CAMPANHA)
+
+    expect(r.rejeitadas).toEqual([])
+    expect(r.unidades).toHaveLength(2)
+    expect(r.cabecalho.percentuais).toEqual([0.2, 0.3, 0.5])
+    expect(r.quantidades).toEqual([1, 5, 62])
+
+    // `preco` é o que sustenta o plano de pagamento — o campanha, não o
+    // cheio: 20% de 2.426.233,91 é a entrada impressa (485.246,78); 20% de
+    // 2.695.815,46 (o cheio) não bateria.
+    const un301 = r.unidades[0]
+    expect(un301.unidade).toBe('301')
+    expect(un301.preco).toBeCloseTo(2426233.91, 2)
+    expect(un301.preco_cheio).toBeCloseTo(2695815.46, 2)
+    expect(coluna(un301, 'entrada')?.valor).toBeCloseTo(485246.78, 2)
+    expect(coluna(un301, 'reforcos')).toMatchObject({ quantidade: 5 })
+    expect(coluna(un301, 'mensais')).toMatchObject({ quantidade: 62 })
+
+    // A conferência de CUB usa sempre o preço CHEIO — ele é o que fecha
+    // contra "quantidade de CUB × valor do CUB", não o campanha (já
+    // descontado).
+    expect(un301.cub_quantidade).toBeCloseTo(855.48, 2)
+  })
+
+  it('nas tabelas sem campanha, preco_cheio fica null', () => {
+    expect(parsearTabelaEraldo(ARBOR).unidades[0].preco_cheio).toBeNull()
+    expect(parsearTabelaEraldo(GRAN_MICHEL).unidades[0].preco_cheio).toBeNull()
+  })
+
+  it('rejeita a unidade do Árbor-campanha cujo preço cheio não fecha com o CUB', () => {
+    // Preço cheio adulterado; o campanha e as fatias continuam consistentes
+    // entre si, então só a conferência de CUB (que usa o cheio) denuncia.
+    const adulterado = ARBOR_CAMPANHA.replace(
+      'R$ 2.695.815,46 R$ 2.426.233,91',
+      'R$ 2.700.000,00 R$ 2.426.233,91',
+    )
+    const r = parsearTabelaEraldo(adulterado)
+
+    expect(r.unidades.map((u) => u.unidade)).toEqual(['302'])
+    expect(r.rejeitadas[0].unidade).toBe('301')
+    expect(r.rejeitadas[0].motivo).toContain('CUB não fecha')
   })
 
   it('separa o pagamento nas chaves do Horizon das parcelas mensais', () => {
