@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { getOpenAI } from '@/lib/agent'
-import { logError, logWarn } from '@/lib/log'
+import { logError, logWarn, tipoDeErro } from '@/lib/log'
 
 // Estágios que sinalizam "essa conversa deu certo" — só delas vale a pena
 // tirar um par pergunta/resposta reutilizável. Roda dentro do cron diário
@@ -47,7 +47,13 @@ async function gerarParConhecimento(interacoes: InteracaoWhatsapp[]): Promise<{ 
 
     return { pergunta: pergunta.slice(0, 500), resposta: resposta.slice(0, 2000) }
   } catch (err) {
-    logError(SOURCE, 'gerarParConhecimento falhou, pulando esse lead', err)
+    // `transcricao` (mensagens reais do lead) vai no corpo da chamada pro
+    // LLM externo — mesmo cuidado de sentimento.ts: erro de API externa
+    // pode ecoar um trecho do conteúdo enviado. Só o tipo do erro é seguro.
+    logError(SOURCE, 'gerarParConhecimento falhou, pulando esse lead', undefined, {
+      errorTipo: tipoDeErro(err),
+      transcricaoLength: transcricao.length,
+    })
     return null
   }
 }

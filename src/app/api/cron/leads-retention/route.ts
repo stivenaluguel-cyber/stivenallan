@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { deleteLeadCascade } from '@/lib/leads/delete-lead'
 import { logError, logInfo } from '@/lib/log'
+import { verificarAutenticacaoCron } from '@/lib/cron/auth'
 
 // Política de retenção de leads. NÃO agendado como cron ainda (rodar manualmente
 // via curl com o CRON_SECRET) — pode virar entrada em vercel.json quando fizer sentido.
@@ -49,10 +50,8 @@ async function findCandidates(
 }
 
 export async function GET(req: NextRequest) {
-  const authHeader = req.headers.get('authorization')
-  if (authHeader !== 'Bearer ' + process.env.CRON_SECRET) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const authError = verificarAutenticacaoCron(req)
+  if (authError) return authError
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -76,10 +75,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const authHeader = req.headers.get('authorization')
-  if (authHeader !== 'Bearer ' + process.env.CRON_SECRET) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const authError = verificarAutenticacaoCron(req)
+  if (authError) return authError
 
   const url = new URL(req.url)
   const confirmed = url.searchParams.get('confirm') === 'true'

@@ -1,12 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse, after } from 'next/server'
 import { processarMensagem, type MensagemChat } from '@/lib/agent'
 import { enviarMensagem, enviarAlertaEscalada } from '@/lib/evolution'
 import { detectarPalavraChaveOptOut, MENSAGEM_CONFIRMACAO_OPTOUT } from '@/lib/leads/whatsapp-optout'
 import { podeEnviarAutomatico } from '@/lib/leads/whatsapp-envio-limite'
 import { classificarSentimento } from '@/lib/leads/sentimento'
 import { autenticarWebhookEvolution } from '@/lib/leads/evolution-webhook-auth'
+import { logInfo, logWarn, logError, tipoDeErro } from '@/lib/log'
 
 export const dynamic = 'force-dynamic'
+
+const SOURCE = 'webhook/whatsapp'
 
 export async function POST(req: NextRequest) {
   // Autenticação ANTES de qualquer leitura/alteração de lead — sem isso,
@@ -22,13 +25,13 @@ export async function POST(req: NextRequest) {
   if (!autenticado) {
     // Nunca logar o header recebido nem o segredo esperado — só o fato de
     // ter sido rejeitado.
-    console.warn('[webhook/whatsapp] autenticacao rejeitada')
+    logWarn(SOURCE, 'autenticacao rejeitada')
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   try {
     const body = await req.json()
-    console.log('[webhook] event:', body.event, '| instance:', body.instance)
+    logInfo(SOURCE, 'evento recebido', { event: body.event, instance: body.instance })
 
     // Filtrar apenas mensagens recebidas de usuarios reais
     if (body.event !== 'messages.upsert') {
@@ -57,14 +60,34 @@ export async function POST(req: NextRequest) {
     if (!texto.trim()) return NextResponse.json({ ok: true })
 
     const whatsapp = from.replace('@s.whatsapp.net', '')
-    console.log('[webhook] processando:', whatsapp, '|', texto.substring(0, 80))
+    // Nunca logar `whatsapp` (telefone) nem `texto` — convenção de PII de
+    // src/lib/log.ts ("nunca inclua PII... só ids opacos + status/counts"),
+    // mesmo padrão do webhook/whatsapp-cloud/route.ts. mid é id opaco.
+    logInfo(SOURCE, 'mensagem recebida', { mid, textoLength: texto.length })
 
-    processarEResponder(whatsapp, texto, mid).catch(console.error)
+    // after() (Next.js/Vercel): a resposta HTTP já foi decidida (200 abaixo)
+    // e não espera por isto. O runtime mantém a invocação viva até o
+    // callback terminar — diferente de um fire-and-forget "solto", cuja
+    // continuação podia ser congelada assim que a resposta HTTP saísse do
+    // servidor (comportamento não garantido em runtime serverless). Isso NÃO
+    // é uma fila persistente: se a invocação inteira morrer (crash/OOM,
+    // deploy forçando um corte abrupto), o trabalho ainda se perde — after()
+    // só resolve o caso comum de "a função encerrou cedo demais", não o de
+    // "a função morreu no meio".
+    after(() =>
+      processarEResponder(whatsapp, texto, mid).catch((err) =>
+        logError(SOURCE, 'processarEResponder rejeitou inesperadamente', undefined, { mid, errorTipo: tipoDeErro(err) }),
+      ),
+    )
 
     return NextResponse.json({ ok: true })
 
   } catch (err) {
-    console.error('[webhook/whatsapp]', err)
+    // req.json() em payload malformado pode, em algumas versões do V8,
+    // ecoar um fragmento do corpo bruto na mensagem do SyntaxError — o
+    // corpo é o payload da Evolution, que carrega o texto do lead. Só o
+    // tipo do erro é seguro de logar aqui.
+    logError(SOURCE, 'falha ao processar webhook', undefined, { errorTipo: tipoDeErro(err) })
     return NextResponse.json({ erro: 'Erro interno' }, { status: 500 })
   }
 }
@@ -75,6 +98,11 @@ async function processarEResponder(whatsapp: string, texto: string, mid: string)
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
+
+  // Hoisted fora do try só pra ficar disponível (se já resolvido) no catch
+  // final — id opaco, seguro de logar, e melhora a correlação de erros sem
+  // precisar do telefone.
+  let leadId: string | undefined
 
   try {
     // Resolve-ou-cria o lead atomicamente (unique index em leads.whatsapp,
@@ -94,9 +122,13 @@ async function processarEResponder(whatsapp: string, texto: string, mid: string)
       .single()
 
     if (upsertErr || !lead) {
-      console.error('[processarEResponder] falha ao resolver lead', whatsapp, upsertErr)
+      // Nunca logar `whatsapp` nem o erro do Postgres inteiro — uma
+      // violação de constraint pode ecoar o valor da coluna na mensagem/
+      // detail do erro. code é categórico, seguro (ex: "23505").
+      logError(SOURCE, 'falha ao resolver lead', undefined, { mid, errorCode: upsertErr?.code })
       return
     }
+    leadId = lead.id
 
     // RESERVA do mid — o único portão que decide quem processa este evento.
     // Nenhum efeito (notificar lead novo, chamar IA, enviar WhatsApp, mudar
@@ -127,13 +159,15 @@ async function processarEResponder(whatsapp: string, texto: string, mid: string)
         // processada) — a linha do vencedor nunca é apagada nem sobrescrita
         // por este caminho, então o mid não volta a ficar disponível pra
         // reprocessamento acidental.
-        console.log('[processarEResponder] evento duplicado (mid ja reservado), ignorando')
+        logInfo(SOURCE, 'evento duplicado (mid ja reservado), ignorando', { mid, leadId })
         return
       }
       // Falha não relacionada a duplicata (erro transitório de rede/DB) —
       // sem conseguir reservar o mid não dá pra garantir que não vai
-      // duplicar em cima de um retry, então não segue pros efeitos.
-      console.error('[processarEResponder] falha ao reservar mid', whatsapp, reservaErr)
+      // duplicar em cima de um retry, então não segue pros efeitos. Mesmo
+      // cuidado de não logar `whatsapp` nem o erro inteiro (o insert grava
+      // `mensagem: texto` — uma falha de constraint poderia ecoar o texto).
+      logError(SOURCE, 'falha ao reservar mid', undefined, { mid, leadId, errorCode: reservaErr.code })
       return
     }
 
@@ -149,7 +183,7 @@ async function processarEResponder(whatsapp: string, texto: string, mid: string)
     if (Number.isFinite(idadeMs) && idadeMs >= 0 && idadeMs < 90_000) {
       const { notificarLeadNovo } = await import('@/lib/leads/notificar-lead-novo')
       notificarLeadNovo(supabase, { id: lead.id, nome: lead.nome, origem: lead.origem ?? 'whatsapp' })
-        .catch((e) => console.error('[processarEResponder] notificacao falhou', e))
+        .catch((e) => logError(SOURCE, 'notificacao de lead novo falhou', undefined, { mid, leadId, errorTipo: tipoDeErro(e) }))
     }
 
     // Histórico ANTES de logar a mensagem atual (evita ter que filtrar a
@@ -235,7 +269,7 @@ async function processarEResponder(whatsapp: string, texto: string, mid: string)
     // corretor no painel (foi logada como 'entrada' a pergunta do lead);
     // só o envio automático fica em espera até o corretor assumir.
     if (!(await podeEnviarAutomatico(supabase, lead.id))) {
-      console.warn('[processarEResponder] limite diário de envio automático atingido', whatsapp)
+      logWarn(SOURCE, 'limite diario de envio automatico atingido', { mid, leadId })
       return
     }
 
@@ -262,6 +296,10 @@ async function processarEResponder(whatsapp: string, texto: string, mid: string)
     }
 
   } catch (err) {
-    console.error('[processarEResponder]', whatsapp, err)
+    // Catch-all: nunca logar `whatsapp` nem o erro inteiro — pode vir da IA,
+    // do Supabase ou da Evolution, todos com texto do lead em algum ponto da
+    // cadeia. leadId (se já resolvido) + mid + tipo do erro bastam pra
+    // investigar sem expor conteúdo.
+    logError(SOURCE, 'processarEResponder falhou', undefined, { mid, leadId, errorTipo: tipoDeErro(err) })
   }
 }

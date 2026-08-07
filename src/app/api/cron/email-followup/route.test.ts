@@ -197,6 +197,13 @@ describe('GET /api/cron/email-followup', () => {
     expect(res.status).toBe(401)
   })
 
+  it('503 "Cron não configurado" quando CRON_SECRET está ausente — "Bearer undefined" nunca autentica', async () => {
+    delete process.env.CRON_SECRET
+    const res = await GET(makeReq({ authorization: 'Bearer undefined' }))
+    expect(res.status).toBe(503)
+    expect(await res.json()).toEqual({ error: 'Cron não configurado' })
+  })
+
   it('skipped quando RESEND_FROM ausente', async () => {
     delete process.env.RESEND_FROM
     const res = await GET(makeReq({ authorization: 'Bearer cron-secret' }))

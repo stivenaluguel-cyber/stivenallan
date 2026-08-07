@@ -52,4 +52,24 @@ describe('classificarSentimento', () => {
     expect(await classificarSentimento('   ')).toBe('neutro')
     expect(openaiHolder.create).not.toHaveBeenCalled()
   })
+
+  // Regressão de PII: `mensagem` (texto real do lead) vai no corpo da
+  // chamada pro LLM externo — um erro de validação de conteúdo de uma API
+  // OpenAI-compatível pode ecoar um trecho do que foi enviado na mensagem
+  // do erro. O log não pode repassar isso, só o tipo do erro.
+  it('erro da API externa ecoando o conteúdo enviado: não vaza o texto do lead no log, só o tipo do erro', async () => {
+    const errorSpy = vi.spyOn(console, 'error')
+    const mensagem = 'Meu CPF é 123.456.789-00 e quero o apartamento'
+    openaiHolder.create.mockRejectedValue(new Error(`content policy violation for input: "${mensagem}"`))
+    const { classificarSentimento } = await import('./sentimento')
+
+    const resultado = await classificarSentimento(mensagem)
+
+    expect(resultado).toBe('neutro')
+    const textoLogado = errorSpy.mock.calls.flat().map(String).join(' | ')
+    expect(textoLogado).not.toContain(mensagem)
+    expect(textoLogado).not.toContain('123.456.789-00')
+    expect(textoLogado).toContain('"errorTipo":"Error"')
+    expect(textoLogado).toContain('"mensagemLength":' + mensagem.length)
+  })
 })

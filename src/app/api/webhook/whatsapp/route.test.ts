@@ -42,6 +42,18 @@ vi.mock('@supabase/supabase-js', () => ({
   createClient: () => supabaseHolder.current,
 }))
 
+// after() só é válido dentro de um request scope real do Next.js — nos
+// testes, executa a callback direto (mesma abordagem já usada em
+// registrar-mudanca-estagio.test.ts). importOriginal preserva NextRequest/
+// NextResponse reais, que a rota usa de verdade pra construir a resposta.
+const { afterHolder } = vi.hoisted(() => ({
+  afterHolder: { after: vi.fn((cb: () => unknown) => { cb() }) },
+}))
+vi.mock('next/server', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('next/server')>()
+  return { ...actual, after: (cb: () => unknown) => afterHolder.after(cb) }
+})
+
 import { POST } from './route'
 
 type MockConfig = {
@@ -50,6 +62,12 @@ type MockConfig = {
   // Mids tratados como já reservados ANTES do teste começar — simula uma
   // reentrega horas depois de outra já ter sido processada com sucesso.
   midsJaReservados?: string[]
+  // Simula falha (não-duplicata) no upsert do lead / na reserva do mid —
+  // usado pra provar que o erro do Postgres não vaza PII no log mesmo
+  // quando ele "ecoa" o valor da coluna (comportamento real do Postgres
+  // em violações de constraint).
+  upsertError?: { code: string; message: string; details?: string }
+  reservaError?: { code: string; message: string; details?: string }
 }
 
 function makeSupabase(cfg: MockConfig = {}) {
@@ -80,7 +98,10 @@ function makeSupabase(cfg: MockConfig = {}) {
         return {
           upsert: () => ({
             select: () => ({
-              single: async () => ({ data: { ...leadPadrao, ...cfg.lead }, error: null }),
+              single: async () =>
+                cfg.upsertError
+                  ? { data: null, error: cfg.upsertError }
+                  : { data: { ...leadPadrao, ...cfg.lead }, error: null },
             }),
           }),
           update: (row: Record<string, unknown>) => {
@@ -128,6 +149,9 @@ function makeSupabase(cfg: MockConfig = {}) {
                       error: { code: '23505', message: 'duplicate key value violates unique constraint "interacoes_mid_key"' },
                     }
                   }
+                  if (cfg.reservaError) {
+                    return { data: null, error: cfg.reservaError }
+                  }
                   return { data: { id: 'interacao-' + interacoesInserts.length }, error: null }
                 },
               }),
@@ -157,19 +181,30 @@ function makeReq(body: unknown, headers: Record<string, string> = { authorizatio
   } as unknown as NextRequest
 }
 
-const EVENTO_MENSAGEM = (texto: string, mid = 'MID-PADRAO-TESTE') => ({
+const EVENTO_MENSAGEM = (texto: string, mid = 'MID-PADRAO-TESTE', telefone = '5548999999999') => ({
   event: 'messages.upsert',
   instance: 'stiven',
   data: {
-    key: { remoteJid: '5548999999999@s.whatsapp.net', fromMe: false, id: mid },
+    key: { remoteJid: `${telefone}@s.whatsapp.net`, fromMe: false, id: mid },
     message: { conversation: texto },
   },
 })
 
+// Aggrega tudo que foi passado pros três níveis de console (log/warn/error)
+// numa única string — é assim que logInfo/logWarn/logError acabam saindo
+// (log.ts chama console.* por baixo), então isso cobre tanto os console.*
+// antigos remanescentes quanto qualquer chamada feita via logger estruturado.
+function textoDeTodosOsLogs(spies: { log: ReturnType<typeof vi.spyOn>; warn: ReturnType<typeof vi.spyOn>; error: ReturnType<typeof vi.spyOn> }): string {
+  return [...spies.log.mock.calls, ...spies.warn.mock.calls, ...spies.error.mock.calls]
+    .flat()
+    .map((v) => (typeof v === 'string' ? v : JSON.stringify(v)))
+    .join(' | ')
+}
+
 async function aguardarProcessamentoAssincrono() {
-  // processarEResponder roda fire-and-forget (.catch(console.error)) — dá
-  // uma volta no microtask queue pra deixar as promises internas resolverem
-  // antes de inspecionar os mocks.
+  // processarEResponder roda fire-and-forget (.catch(err => logError(...))) —
+  // dá uma volta no microtask queue pra deixar as promises internas
+  // resolverem antes de inspecionar os mocks.
   await new Promise((r) => setTimeout(r, 0))
   await new Promise((r) => setTimeout(r, 0))
   await new Promise((r) => setTimeout(r, 0))
@@ -183,6 +218,7 @@ describe('POST /api/webhook/whatsapp', () => {
     vi.spyOn(console, 'log').mockImplementation(() => {})
     vi.spyOn(console, 'warn').mockImplementation(() => {})
     vi.spyOn(console, 'error').mockImplementation(() => {})
+    afterHolder.after.mockClear()
     agentHolder.processarMensagem.mockClear().mockResolvedValue('resposta da IA')
     evolutionHolder.enviarMensagem.mockClear().mockResolvedValue(true)
     evolutionHolder.enviarAlertaEscalada.mockClear().mockResolvedValue(true)
@@ -273,6 +309,7 @@ describe('POST /api/webhook/whatsapp — autenticação', () => {
     vi.spyOn(console, 'log').mockImplementation(() => {})
     vi.spyOn(console, 'warn').mockImplementation(() => {})
     vi.spyOn(console, 'error').mockImplementation(() => {})
+    afterHolder.after.mockClear()
     agentHolder.processarMensagem.mockClear().mockResolvedValue('resposta da IA')
     evolutionHolder.enviarMensagem.mockClear().mockResolvedValue(true)
   })
@@ -341,6 +378,7 @@ describe('POST /api/webhook/whatsapp — idempotência', () => {
     vi.spyOn(console, 'log').mockImplementation(() => {})
     vi.spyOn(console, 'warn').mockImplementation(() => {})
     vi.spyOn(console, 'error').mockImplementation(() => {})
+    afterHolder.after.mockClear()
     agentHolder.processarMensagem.mockClear().mockResolvedValue('resposta da IA')
     evolutionHolder.enviarMensagem.mockClear().mockResolvedValue(true)
   })
@@ -416,4 +454,286 @@ describe('POST /api/webhook/whatsapp — idempotência', () => {
 
     expect(agentHolder.processarMensagem).toHaveBeenCalledTimes(2)
   })
+})
+
+// Regressão de PII: o webhook antigo logava `console.log('[webhook]
+// processando:', whatsapp, '|', texto.substring(0, 80))` — telefone completo
+// e um trecho real da mensagem do lead. Payload sintético igual ao usado na
+// auditoria de segurança: telefone que não pode aparecer em log nenhum, e
+// mensagem com dado sensível (CPF) que também não pode.
+describe('POST /api/webhook/whatsapp — PII nunca vai pro log', () => {
+  const TELEFONE = '5511999999999'
+  const MENSAGEM_COM_CPF = 'Meu CPF é 123.456.789-00 e quero o apartamento'
+  const TRECHO_CPF = '123.456.789-00'
+
+  let logSpy: ReturnType<typeof vi.spyOn>
+  let warnSpy: ReturnType<typeof vi.spyOn>
+  let errorSpy: ReturnType<typeof vi.spyOn>
+
+  beforeEach(() => {
+    process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://test'
+    process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-key'
+    process.env.EVOLUTION_WEBHOOK_SECRET = SECRET_VALIDO
+    logSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
+    warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    afterHolder.after.mockClear()
+    agentHolder.processarMensagem.mockClear().mockResolvedValue('resposta da IA')
+    evolutionHolder.enviarMensagem.mockClear().mockResolvedValue(true)
+    evolutionHolder.enviarAlertaEscalada.mockClear().mockResolvedValue(true)
+    optoutHolder.detectar.mockClear().mockReturnValue(false)
+    limiteHolder.podeEnviar.mockClear().mockResolvedValue(true)
+    sentimentoHolder.classificar.mockClear().mockResolvedValue('neutro')
+  })
+
+  afterEach(() => {
+    supabaseHolder.current = null as unknown as ReturnType<typeof makeSupabase>
+    vi.restoreAllMocks()
+  })
+
+  it('fluxo normal: nenhum log contém o telefone, a mensagem ou o CPF — mas mid/textoLength continuam aparecendo', async () => {
+    const mock = makeSupabase()
+    supabaseHolder.current = mock
+
+    await POST(makeReq(EVENTO_MENSAGEM(MENSAGEM_COM_CPF, 'MID-PII-1', TELEFONE)))
+    await aguardarProcessamentoAssincrono()
+
+    const textoLogado = textoDeTodosOsLogs({ log: logSpy, warn: warnSpy, error: errorSpy })
+    expect(textoLogado).not.toContain(TELEFONE)
+    expect(textoLogado).not.toContain(MENSAGEM_COM_CPF)
+    expect(textoLogado).not.toContain('Meu CPF')
+    expect(textoLogado).not.toContain(TRECHO_CPF)
+
+    // Observabilidade preservada: id opaco e metadado seguro continuam logados.
+    expect(textoLogado).toContain('MID-PII-1')
+    expect(textoLogado).toContain('"textoLength":' + MENSAGEM_COM_CPF.length)
+    expect(textoLogado).toContain('"source":"webhook/whatsapp"')
+  })
+
+  it('lead sem nome: nome não é logado (quando aplicável, só ids opacos)', async () => {
+    const mock = makeSupabase({ lead: { nome: 'Fulano de Tal Sobrenome Completo' } })
+    supabaseHolder.current = mock
+
+    await POST(makeReq(EVENTO_MENSAGEM('oi tudo bem', 'MID-PII-NOME', TELEFONE)))
+    await aguardarProcessamentoAssincrono()
+
+    const textoLogado = textoDeTodosOsLogs({ log: logSpy, warn: warnSpy, error: errorSpy })
+    expect(textoLogado).not.toContain('Fulano de Tal Sobrenome Completo')
+  })
+
+  it('falha ao resolver o lead (erro do Postgres ecoando o telefone): nem o telefone nem a mensagem completa do erro vazam — só o code', async () => {
+    const mock = makeSupabase({
+      upsertError: {
+        code: '23505',
+        message: `duplicate key value violates unique constraint "leads_whatsapp_key"`,
+        details: `Key (whatsapp)=(${TELEFONE}) already exists.`,
+      },
+    })
+    supabaseHolder.current = mock
+
+    await POST(makeReq(EVENTO_MENSAGEM(MENSAGEM_COM_CPF, 'MID-PII-2', TELEFONE)))
+    await aguardarProcessamentoAssincrono()
+
+    const textoLogado = textoDeTodosOsLogs({ log: logSpy, warn: warnSpy, error: errorSpy })
+    expect(textoLogado).not.toContain(TELEFONE)
+    expect(textoLogado).not.toContain(MENSAGEM_COM_CPF)
+    expect(textoLogado).not.toContain('already exists')
+    expect(textoLogado).toContain('"errorCode":"23505"')
+    expect(agentHolder.processarMensagem).not.toHaveBeenCalled()
+  })
+
+  it('falha ao reservar o mid (erro do Postgres ecoando a mensagem): não vaza telefone nem o texto — só o code', async () => {
+    const mock = makeSupabase({
+      reservaError: {
+        code: '23514',
+        message: `new row for relation "interacoes" violates check constraint`,
+        details: `Failing row contains (..., ${MENSAGEM_COM_CPF}, ...).`,
+      },
+    })
+    supabaseHolder.current = mock
+
+    await POST(makeReq(EVENTO_MENSAGEM(MENSAGEM_COM_CPF, 'MID-PII-3', TELEFONE)))
+    await aguardarProcessamentoAssincrono()
+
+    const textoLogado = textoDeTodosOsLogs({ log: logSpy, warn: warnSpy, error: errorSpy })
+    expect(textoLogado).not.toContain(TELEFONE)
+    expect(textoLogado).not.toContain(MENSAGEM_COM_CPF)
+    expect(textoLogado).not.toContain('Failing row')
+    expect(textoLogado).toContain('"errorCode":"23514"')
+    expect(agentHolder.processarMensagem).not.toHaveBeenCalled()
+  })
+
+  it('exceção inesperada no meio do processamento: não vaza telefone; leadId e mid aparecem pra correlação', async () => {
+    const mock = makeSupabase()
+    supabaseHolder.current = mock
+    agentHolder.processarMensagem.mockRejectedValueOnce(new Error(`falha ao processar "${MENSAGEM_COM_CPF}"`))
+
+    await POST(makeReq(EVENTO_MENSAGEM(MENSAGEM_COM_CPF, 'MID-PII-4', TELEFONE)))
+    await aguardarProcessamentoAssincrono()
+
+    const textoLogado = textoDeTodosOsLogs({ log: logSpy, warn: warnSpy, error: errorSpy })
+    expect(textoLogado).not.toContain(TELEFONE)
+    expect(textoLogado).not.toContain(MENSAGEM_COM_CPF)
+    expect(textoLogado).toContain('MID-PII-4')
+    expect(textoLogado).toContain('"leadId":"lead-1"')
+    expect(textoLogado).toContain('"errorTipo":"Error"')
+  })
+
+  it('nunca loga EVOLUTION_WEBHOOK_SECRET nem EVOLUTION_API_KEY, mesmo em erro', async () => {
+    const mock = makeSupabase({
+      upsertError: { code: 'XX000', message: 'erro interno do banco' },
+    })
+    supabaseHolder.current = mock
+    process.env.EVOLUTION_API_KEY = 'chave-api-super-secreta'
+
+    await POST(makeReq(EVENTO_MENSAGEM('oi', 'MID-PII-5', TELEFONE)))
+    await aguardarProcessamentoAssincrono()
+
+    const textoLogado = textoDeTodosOsLogs({ log: logSpy, warn: warnSpy, error: errorSpy })
+    expect(textoLogado).not.toContain(SECRET_VALIDO)
+    expect(textoLogado).not.toContain('chave-api-super-secreta')
+
+    delete process.env.EVOLUTION_API_KEY
+  })
+})
+
+// Item 4: o processamento pesado (IA, Supabase, Evolution) sai do caminho
+// síncrono da resposta HTTP e passa a rodar dentro de after() — a Vercel
+// mantém a invocação viva até o callback terminar, em vez de um
+// fire-and-forget "solto" que podia ser congelado assim que a resposta HTTP
+// saísse (comportamento não garantido em runtime serverless).
+describe('POST /api/webhook/whatsapp — lifecycle pós-resposta (after())', () => {
+  beforeEach(() => {
+    process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://test'
+    process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-key'
+    process.env.EVOLUTION_WEBHOOK_SECRET = SECRET_VALIDO
+    vi.spyOn(console, 'log').mockImplementation(() => {})
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    afterHolder.after.mockClear()
+    agentHolder.processarMensagem.mockClear().mockResolvedValue('resposta da IA')
+    evolutionHolder.enviarMensagem.mockClear().mockResolvedValue(true)
+    evolutionHolder.enviarAlertaEscalada.mockClear().mockResolvedValue(true)
+    optoutHolder.detectar.mockClear().mockReturnValue(false)
+    limiteHolder.podeEnviar.mockClear().mockResolvedValue(true)
+    sentimentoHolder.classificar.mockClear().mockResolvedValue('neutro')
+  })
+
+  afterEach(() => {
+    supabaseHolder.current = null as unknown as ReturnType<typeof makeSupabase>
+    vi.restoreAllMocks()
+  })
+
+  it('1) webhook válido responde 200 SEM esperar o processamento pesado (IA) terminar', async () => {
+    const mock = makeSupabase()
+    supabaseHolder.current = mock
+
+    let liberarIA: (v: string) => void = () => {}
+    agentHolder.processarMensagem.mockImplementation(
+      () => new Promise<string>((resolve) => { liberarIA = resolve }),
+    )
+
+    // Se a resposta esperasse a IA, este await travaria pra sempre (a
+    // promise da IA nunca é liberada antes daqui) — o teste em si é a prova.
+    const res = await POST(makeReq(EVENTO_MENSAGEM('oi')))
+
+    expect(res.status).toBe(200)
+    expect(await res.json()).toEqual({ ok: true })
+
+    // Libera a IA só depois de já ter a resposta, pra não deixar promise pendurada.
+    liberarIA('resposta da IA (liberada depois)')
+    await aguardarProcessamentoAssincrono()
+  })
+
+  it('2) mensagem válida agenda o processamento via after() — mecanismo pós-resposta oficial', async () => {
+    const mock = makeSupabase()
+    supabaseHolder.current = mock
+
+    await POST(makeReq(EVENTO_MENSAGEM('oi')))
+    await aguardarProcessamentoAssincrono()
+
+    expect(afterHolder.after).toHaveBeenCalledTimes(1)
+    expect(afterHolder.after).toHaveBeenCalledWith(expect.any(Function))
+    // O agendamento acontece antes do processamento em si terminar — after()
+    // recebeu a call, e só depois (mesma invocação, pós-resposta) a IA roda.
+    expect(agentHolder.processarMensagem).toHaveBeenCalledTimes(1)
+  })
+
+  it('3) autenticação inválida NÃO agenda processamento (after() não é chamado)', async () => {
+    const res = await POST(makeReq(EVENTO_MENSAGEM('oi'), { authorization: 'Bearer segredo-errado' }))
+    await aguardarProcessamentoAssincrono()
+
+    expect(res.status).toBe(401)
+    expect(afterHolder.after).not.toHaveBeenCalled()
+    expect(agentHolder.processarMensagem).not.toHaveBeenCalled()
+  })
+
+  it('4) evento ignorado (não é messages.upsert) NÃO agenda processamento', async () => {
+    const res = await POST(makeReq({ event: 'connection.update' }))
+    await aguardarProcessamentoAssincrono()
+
+    expect(await res.json()).toEqual({ ok: true, ignorado: true })
+    expect(afterHolder.after).not.toHaveBeenCalled()
+  })
+
+  it('4b) mensagem de grupo / status@broadcast / fromMe também NÃO agenda processamento', async () => {
+    const evtGrupo = EVENTO_MENSAGEM('oi')
+    evtGrupo.data.key.remoteJid = '123456-group@g.us'
+    await POST(makeReq(evtGrupo))
+
+    const evtFromMe = EVENTO_MENSAGEM('oi')
+    evtFromMe.data.key.fromMe = true
+    await POST(makeReq(evtFromMe))
+
+    await aguardarProcessamentoAssincrono()
+    expect(afterHolder.after).not.toHaveBeenCalled()
+  })
+
+  it('5) mensagem sem mid NÃO agenda processamento', async () => {
+    const evento = EVENTO_MENSAGEM('oi')
+    delete (evento.data.key as { id?: string }).id
+
+    const res = await POST(makeReq(evento))
+    await aguardarProcessamentoAssincrono()
+
+    expect(await res.json()).toEqual({ ok: true })
+    expect(afterHolder.after).not.toHaveBeenCalled()
+  })
+
+  it('6) falha no processamento posterior NÃO altera a resposta 200 já devolvida', async () => {
+    const mock = makeSupabase()
+    supabaseHolder.current = mock
+    agentHolder.processarMensagem.mockRejectedValue(new Error('falha simulada da IA'))
+
+    const res = await POST(makeReq(EVENTO_MENSAGEM('oi')))
+    // A resposta já foi construída e devolvida ANTES do after() rodar até o fim.
+    expect(res.status).toBe(200)
+    expect(await res.json()).toEqual({ ok: true })
+
+    // Só agora o trabalho de fundo (que vai falhar) termina de rodar.
+    await aguardarProcessamentoAssincrono()
+  })
+
+  it('7) falha posterior gera log seguro (mid + tipo do erro, sem PII) via after()', async () => {
+    const errorSpy = vi.spyOn(console, 'error')
+    const mock = makeSupabase()
+    supabaseHolder.current = mock
+    agentHolder.processarMensagem.mockRejectedValue(new Error('falha simulada da IA'))
+
+    await POST(makeReq(EVENTO_MENSAGEM('oi', 'MID-LIFECYCLE-7')))
+    await aguardarProcessamentoAssincrono()
+
+    const textoLogado = errorSpy.mock.calls.flat().map(String).join(' | ')
+    expect(textoLogado).toContain('MID-LIFECYCLE-7')
+    expect(textoLogado).toContain('"errorTipo":"Error"')
+    expect(textoLogado).not.toContain('5548999999999')
+  })
+
+  // 8) idempotência: não há teste novo aqui de propósito — processarEResponder
+  // não mudou, só passou a ser chamado de dentro de after() em vez de um
+  // .catch() solto. As reservas de mid (describe "idempotência" acima, ex.:
+  // "reentrega horas depois", "concorrência REAL", "mids diferentes não são
+  // duplicata") continuam passando sem alteração, provando que o
+  // comportamento de dedup por mid não foi afetado pela troca do mecanismo
+  // de disparo.
 })

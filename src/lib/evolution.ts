@@ -1,6 +1,10 @@
 // Cliente para a Evolution API (WhatsApp)
 // Docs: https://doc.evolution-api.com
 
+import { logWarn, logError } from '@/lib/log'
+
+const SOURCE = 'evolution'
+
 const BASE_URL = process.env.EVOLUTION_API_URL!      // ex: https://evo.seudominio.com
 const API_KEY  = process.env.EVOLUTION_API_KEY!
 const INSTANCE = process.env.EVOLUTION_INSTANCE!     // ex: 'stiven'
@@ -37,7 +41,7 @@ function ambienteDeProducaoReal(): boolean {
 // ============================================
 export async function enviarMensagem(para: string, texto: string): Promise<boolean> {
   if (!ambienteDeProducaoReal()) {
-    console.warn(`[evolution] envio bloqueado: VERCEL_ENV="${process.env.VERCEL_ENV ?? ''}" (só 'production' envia de verdade)`)
+    logWarn(SOURCE, 'envio bloqueado (só \'production\' envia de verdade)', { vercelEnv: process.env.VERCEL_ENV ?? '' })
     return false
   }
   try {
@@ -58,13 +62,19 @@ export async function enviarMensagem(para: string, texto: string): Promise<boole
     })
 
     if (!res.ok) {
-      const err = await res.text()
-      console.error('[evolution] enviarMensagem error:', res.status, err)
+      // Nunca logar o corpo da resposta de erro: o request continha o
+      // telefone (`number`) e o texto (`text`) do lead, e é comum a
+      // Evolution ecoar o payload inválido de volta na mensagem de erro.
+      // Só o status HTTP é seguro aqui.
+      logError(SOURCE, 'falha ao enviar mensagem', undefined, { status: res.status })
       return false
     }
     return true
   } catch (err) {
-    console.error('[evolution] enviarMensagem exception:', err)
+    // Exceção de fetch (rede/DNS/timeout) — não é resposta de uma API
+    // externa, então não carrega o payload de volta; a mensagem costuma
+    // ser genérica ("fetch failed"), segura de logar.
+    logError(SOURCE, 'falha ao enviar mensagem (excecao)', err)
     return false
   }
 }

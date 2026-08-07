@@ -70,6 +70,47 @@ describe('evolution enviarMensagem', () => {
 
     expect(ok).toBe(false)
   })
+
+  // Regressão de PII: o request pra Evolution carrega `number` (telefone) e
+  // `text` (mensagem) do lead. Uma API mal comportada pode ecoar o payload
+  // inválido de volta no corpo do erro — o log não pode repassar isso, só o
+  // status HTTP é seguro.
+  it('resposta de erro da Evolution ecoando telefone/mensagem no corpo: não vaza no log, só o status', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const telefone = '5511999999999'
+    const mensagem = 'Meu CPF é 123.456.789-00 e quero o apartamento'
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 400,
+      text: async () => JSON.stringify({ status: 400, error: 'Bad Request', echo: { number: telefone, text: mensagem } }),
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    const { enviarMensagem } = await import('./evolution')
+    const ok = await enviarMensagem(telefone, mensagem)
+
+    expect(ok).toBe(false)
+    const textoLogado = errorSpy.mock.calls.flat().map(String).join(' | ')
+    expect(textoLogado).not.toContain(telefone)
+    expect(textoLogado).not.toContain(mensagem)
+    expect(textoLogado).not.toContain('123.456.789-00')
+    expect(textoLogado).toContain('"status":400')
+    errorSpy.mockRestore()
+  })
+
+  it('exceção de rede (fetch falhou) — mensagem genérica, sem payload, é logada normalmente', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const fetchMock = vi.fn().mockRejectedValue(new Error('fetch failed'))
+    vi.stubGlobal('fetch', fetchMock)
+
+    const { enviarMensagem } = await import('./evolution')
+    const ok = await enviarMensagem('5548999999999', 'oi')
+
+    expect(ok).toBe(false)
+    const textoLogado = errorSpy.mock.calls.flat().map(String).join(' | ')
+    expect(textoLogado).toContain('fetch failed')
+    errorSpy.mockRestore()
+  })
 })
 
 // Trava fail-closed: preview/development compartilham as mesmas credenciais

@@ -1,50 +1,5 @@
-import { getSupabaseAdmin } from '@/lib/supabase'
 import Link from 'next/link'
-
-async function getDashboardStats() {
-  try {
-    const supabase = getSupabaseAdmin()
-    if (!supabase) return null
-
-    const [
-      { count: totalEmpreendimentos },
-      { count: totalLeads },
-      { count: leadsNovos },
-      { count: empreendimentosDestaque },
-    ] = await Promise.all([
-      supabase.from('empreendimentos').select('*', { count: 'exact', head: true }),
-      supabase.from('leads').select('*', { count: 'exact', head: true }),
-      supabase.from('leads').select('*', { count: 'exact', head: true }).eq('status', 'novo'),
-      supabase.from('empreendimentos').select('*', { count: 'exact', head: true }).eq('destaque', true),
-    ])
-
-    return {
-      totalEmpreendimentos: totalEmpreendimentos || 0,
-      totalLeads: totalLeads || 0,
-      leadsNovos: leadsNovos || 0,
-      empreendimentosDestaque: empreendimentosDestaque || 0,
-    }
-  } catch {
-    return null
-  }
-}
-
-async function getRecentLeads() {
-  try {
-    const supabase = getSupabaseAdmin()
-    if (!supabase) return []
-
-    const { data } = await supabase
-      .from('leads')
-      .select('id, nome, telefone, status, created_at, empreendimentos(nome)')
-      .order('created_at', { ascending: false })
-      .limit(5)
-
-    return data || []
-  } catch {
-    return []
-  }
-}
+import { getDashboardStats, getRecentLeads } from './dashboard-data'
 
 const STATUS_BADGE: Record<string, string> = {
   novo: 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20',
@@ -82,13 +37,6 @@ export default async function AdminDashboard() {
       icon: '🔔',
       href: '/admin/crm?status=novo',
       color: 'text-yellow-400',
-    },
-    {
-      label: 'Em Destaque',
-      value: stats?.empreendimentosDestaque ?? '—',
-      icon: '⭐',
-      href: '/admin/empreendimentos?destaque=true',
-      color: 'text-[#c9a24b]',
     },
   ]
 
@@ -133,25 +81,36 @@ export default async function AdminDashboard() {
           </div>
         ) : (
           <div className="divide-y divide-[#2c3035]">
-            {recentLeads.map((lead: any) => (
+            {recentLeads.map((lead) => {
+              // Item 6A: `leads.empreendimento_interesse` não tem UNIQUE
+              // constraint, então o tipo oficial marca essa FK como
+              // isOneToOne:false — o embed `empreendimentos(nome)` tipa como
+              // array mesmo vindo do lado "muitos leads → um empreendimento"
+              // (limitação conhecida do gerador; mesmo padrão defensivo já
+              // usado em src/app/api/admin/leads/route.ts).
+              const empreendimento = Array.isArray(lead.empreendimentos)
+                ? lead.empreendimentos[0]
+                : lead.empreendimentos
+              return (
               <div key={lead.id} className="px-6 py-4 flex items-center justify-between">
                 <div>
                   <p className="font-medium">{lead.nome}</p>
-                  <p className="text-[#a7adb4] text-sm">{lead.telefone}</p>
-                  {lead.empreendimentos && (
-                    <p className="text-[#a7adb4] text-xs mt-0.5">📍 {(lead.empreendimentos as any).nome}</p>
+                  <p className="text-[#a7adb4] text-sm">{lead.whatsapp}</p>
+                  {empreendimento && (
+                    <p className="text-[#a7adb4] text-xs mt-0.5">📍 {empreendimento.nome}</p>
                   )}
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className={`text-xs px-2.5 py-1 rounded-full ${STATUS_BADGE[lead.status] || 'bg-gray-700'}`}>
+                  <span className={`text-xs px-2.5 py-1 rounded-full ${(lead.status && STATUS_BADGE[lead.status]) || 'bg-gray-700'}`}>
                     {lead.status}
                   </span>
                   <span className="text-[#a7adb4] text-xs">
-                    {new Date(lead.created_at).toLocaleDateString('pt-BR')}
+                    {lead.created_at ? new Date(lead.created_at).toLocaleDateString('pt-BR') : '—'}
                   </span>
                 </div>
               </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </div>

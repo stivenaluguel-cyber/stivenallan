@@ -14,7 +14,7 @@ vi.mock('@sentry/nextjs', () => ({
     (sentrySpies.captureMessage as unknown as (...a: unknown[]) => unknown)(...args),
 }))
 
-import { logError, logInfo, logWarn } from './log'
+import { logError, logInfo, logWarn, tipoDeErro } from './log'
 
 type Parsed = {
   level: string
@@ -202,5 +202,21 @@ describe('Sentry integration (E4)', () => {
     expect(() => logError('src', 'msg', new Error('boom'))).not.toThrow()
     // O JSON log foi emitido antes da falha do Sentry
     expect(errSpy).toHaveBeenCalled()
+  })
+})
+
+describe('tipoDeErro', () => {
+  it('devolve o nome da classe pra instâncias de Error, sem tocar em .message', () => {
+    expect(tipoDeErro(new Error('contém PII: 5511999999999'))).toBe('Error')
+    expect(tipoDeErro(new TypeError('x'))).toBe('TypeError')
+    class ErroCustom extends Error {}
+    expect(tipoDeErro(new ErroCustom('y'))).toBe('ErroCustom')
+  })
+
+  it('devolve o typeof pra valores que não são Error', () => {
+    expect(tipoDeErro('string crua')).toBe('string')
+    expect(tipoDeErro({ code: 'X' })).toBe('object')
+    expect(tipoDeErro(undefined)).toBe('undefined')
+    expect(tipoDeErro(null)).toBe('object')
   })
 })

@@ -79,6 +79,13 @@ describe('GET/POST /api/cron/leads-retention', () => {
       expect(res.status).toBe(401)
     })
 
+    it('503 "Cron não configurado" quando CRON_SECRET está ausente — "Bearer undefined" nunca autentica', async () => {
+      delete process.env.CRON_SECRET
+      const res = await GET(makeReq('http://x/api/cron/leads-retention', { authorization: 'Bearer undefined' }))
+      expect(res.status).toBe(503)
+      expect(await res.json()).toEqual({ error: 'Cron não configurado' })
+    })
+
     it('503 sem envs do Supabase', async () => {
       delete process.env.NEXT_PUBLIC_SUPABASE_URL
       const res = await GET(makeReq('http://x/api/cron/leads-retention', { authorization: 'Bearer cron-secret' }))
@@ -114,6 +121,13 @@ describe('GET/POST /api/cron/leads-retention', () => {
     it('401 sem Bearer', async () => {
       const res = await POST(makeReq('http://x/api/cron/leads-retention'))
       expect(res.status).toBe(401)
+    })
+
+    it('503 "Cron não configurado" quando CRON_SECRET está ausente — "Bearer undefined" nunca autentica', async () => {
+      delete process.env.CRON_SECRET
+      const res = await POST(makeReq('http://x/api/cron/leads-retention', { authorization: 'Bearer undefined' }))
+      expect(res.status).toBe(503)
+      expect(await res.json()).toEqual({ error: 'Cron não configurado' })
     })
 
     it('sem ?confirm=true → também roda em dry-run, sem apagar nada', async () => {

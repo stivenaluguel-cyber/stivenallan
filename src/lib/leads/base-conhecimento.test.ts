@@ -23,9 +23,15 @@ function fakeSupabase(data: unknown, error: unknown = null) {
   }
 }
 
+let errorSpy: ReturnType<typeof vi.spyOn>
+
 beforeEach(() => {
-  vi.spyOn(console, 'error').mockImplementation(() => {})
+  errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 })
+
+function textoLogado(): string {
+  return errorSpy.mock.calls.flat().map(String).join(' | ')
+}
 
 describe('buscarConhecimentoRelevante', () => {
   it('retorna as entradas encontradas', async () => {
@@ -54,6 +60,25 @@ describe('buscarConhecimentoRelevante', () => {
     const { supabase } = fakeSupabase(null, new Error('timeout'))
     const resultado = await buscarConhecimentoRelevante(supabase, 'oi')
     expect(resultado).toEqual([])
+  })
+
+  // Regressão de PII: `pergunta` (texto do lead) vira o termo de um
+  // tsquery — em caso de erro de sintaxe, o Postgres pode ecoar o termo
+  // recebido na mensagem/details do erro. O log não pode repassar isso.
+  it('erro do Postgres ecoando o termo de busca (tsquery malformado): não vaza o texto do lead, só o code', async () => {
+    const mensagem = 'Meu CPF é 123.456.789-00 e quero o apartamento'
+    const { supabase } = fakeSupabase(null, {
+      code: '42601',
+      message: `syntax error in tsquery: "${mensagem}"`,
+      details: null,
+    })
+
+    const resultado = await buscarConhecimentoRelevante(supabase, mensagem)
+
+    expect(resultado).toEqual([])
+    expect(textoLogado()).not.toContain(mensagem)
+    expect(textoLogado()).not.toContain('123.456.789-00')
+    expect(textoLogado()).toContain('42601')
   })
 })
 
