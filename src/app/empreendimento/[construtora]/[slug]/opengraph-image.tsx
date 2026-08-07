@@ -51,9 +51,9 @@ export default async function Image({
       .eq('slug', slug)
       .eq('construtora_slug', construtora)
       .maybeSingle();
-    nome = dbProp?.nome;
-    cidade = dbProp?.cidade;
-    uf = dbProp?.uf;
+    nome = dbProp?.nome ?? undefined;
+    cidade = dbProp?.cidade ?? undefined;
+    uf = dbProp?.uf ?? undefined;
     imagem = dbProp?.cover_image_url ?? undefined;
   }
 
