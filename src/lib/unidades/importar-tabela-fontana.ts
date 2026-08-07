@@ -440,7 +440,20 @@ export function contarLinhasPelaRepeticaoDoCub(texto: string): number | null {
   // "1.863.607,14 14.616,37" virava "14 14" — duas vezes —, e a conferência
   // acusava 57 linhas onde há 55, bloqueando uma importação correta.
   // O par tem que ser de inteiros soltos, não de pedaços de decimal.
-  const pares = [...corpo.matchAll(/(?<![\d.,])(\d{1,3}(?:\.\d{3})*)(?![\d.,])\s+\1(?![\d.,])/g)]
+  //
+  // A quinta armadilha, e a razão do `\p{L}` nas duas bordas: prédio de mais
+  // de uma torre imprime o rótulo da torre com um espaço NORMAL antes do
+  // dígito de dormitórios — "703 T2 2 19T", não "T22". O problema não é a
+  // colagem; é que `(?<![\d.,])` sozinho deixa passar um dígito precedido de
+  // LETRA. O "2" final de "T2" vira candidato a inteiro solto, e casa com o
+  // "2" de dormitórios logo depois como se fosse o par redundante do CUB. No
+  // Pavia Torre 2 (agosto/2026) isso inventava uma 10ª linha para uma tabela
+  // de 9, e a importação bloqueava dizendo que sumiu uma unidade — quando na
+  // verdade sobrou uma falsa. Um número que nasce dentro de um código como
+  // "T2", "CUB06" ou "B1" não é um inteiro solto, e as bordas do par
+  // precisam excluir letra dos dois lados, não só dígito e pontuação
+  // decimal.
+  const pares = [...corpo.matchAll(/(?<![\d.,\p{L}])(\d{1,3}(?:\.\d{3})*)(?![\d.,\p{L}])\s+\1(?![\d.,\p{L}])/gu)]
   return pares.length > 0 ? pares.length : null
 }
 

@@ -558,6 +558,59 @@ CUB06 - Julho - R$ 3.121,62 ENTRADA 1 X R$ CUB06 100% CUB06 904 B 2 44S - 2ºSS 
   })
 })
 
+describe('rótulo da torre com o mesmo dígito dos dormitórios — Pavia Torre 2 (agosto/2026)', () => {
+  // Tabela real do Pavia (04/08/2026), Torre 1 + Torre 2 num arquivo só —
+  // assim que a Fontana publica prédio de mais de uma torre. A unidade 703
+  // tem 2 dormitórios, e o rótulo da torre é "T2": o texto extraído traz
+  // "703 T2 2 19T - 2ºSS ...", com espaço NORMAL entre "T2" e o "2" de
+  // dormitórios — não colado, ao contrário do que uma investigação anterior
+  // supôs.
+  //
+  // O bug não estava no fatiador, e sim em `contarLinhasPelaRepeticaoDoCub`.
+  // A borda esquerda do par, `(?<![\d.,])`, deixava passar um dígito
+  // precedido de LETRA — o "2" final de "T2" virava candidato a inteiro
+  // solto e casava com o "2" de dormitórios logo depois, formando um par
+  // fantasma que não é a repetição do CUB. Isso inflava o "esperado" de 5
+  // para 6 (9 para 10 na tabela completa das duas torres) e bloqueava uma
+  // importação sem nenhuma unidade perdida e sem nenhuma rejeitada.
+  const PAVIA_T1_T2 = `AV. DOS IMIGRANTES - RIO MAINA - CRICIUMA/SC Data emissão: 04/08/2026 08:25:31
+Vigência desta tabela: Agosto/2026
+Empresa: CONSTRUTORA FONTANA LTDA - PAVIA CUB06 - Agosto - R$ 3.151,24
+UNIDADE ÁREA APROXIMADA CONDIÇÕES CONDIÇÕES DE VENDA TOTAL VENDA TOTAL VENDA
+PRIVATIVA ENTRADA FINANCIAMENTO
+APART DMT BOX DEP UNIDADE PRIVATIVA TOTAL (m²) R$ 100% R$ CUB06 100% CUB06
+(m²) BOX (m²)
+1 X 1 X
+101 T1 3 166D - T 79,84 34,87 158,71 90.283,03 601.886,84 511.603,81 601.886,84 191 191
+704 T1 3 145D - 1ºSS 79,33 31,35 153,66 94.064,51 627.096,76 533.032,25 627.096,76 199 199
+Observações:
+1) POLITICA COMERCIAL: OPÇÃO 01: FINANCIAMENTO BANCÁRIO
+104 T2 3 73D - 2ºSS 79,33 29,50 151,42 84.610,79 564.071,96 479.461,17 564.071,96 179 179
+703 T2 2 19T - 2ºSS 69,29 49,04 160,78 91.228,40 608.189,32 516.960,92 608.189,32 193 193
+704 T2 3 97T - 1ºSS 79,33 37,50 161,29 96.427,94 642.852,96 546.425,02 642.852,96 204 204
+Observações:
+1) POLITICA COMERCIAL: OPÇÃO 01: FINANCIAMENTO BANCÁRIO`
+
+  it('a conferência de linhas conta 5 — o "2 2" de "T2 2" não é a repetição do CUB', () => {
+    expect(contarLinhasPelaRepeticaoDoCub(PAVIA_T1_T2)).toBe(5)
+  })
+
+  it('as 5 unidades das duas torres entram sem rejeição e sem bloqueio', () => {
+    const r = parsearTabelaFontana(PAVIA_T1_T2)
+    expect(r.unidades.map(u => `${u.bloco}:${u.unidade}`)).toEqual([
+      'T1:101', 'T1:704', 'T2:104', 'T2:703', 'T2:704',
+    ])
+    expect(r.rejeitadas).toEqual([])
+    expect(r.conferenciaLinhas).toEqual({ esperado: 5, lidas: 5, confere: true })
+  })
+
+  it('a unidade 703 mantém 2 dormitórios — o dígito de "T2" não vira parte do par', () => {
+    const r = parsearTabelaFontana(PAVIA_T1_T2)
+    const u = r.unidades.find(x => x.bloco === 'T2' && x.unidade === '703')
+    expect(u?.dormitorios).toBe(2)
+  })
+})
+
 describe('tabelas reais de julho/2026 — regressão do fatiador com bloco opcional', () => {
   // Trechos FIÉIS das tabelas já importadas e conferidas contra produção.
   // Existem porque o grupo opcional do bloco (`(?:[A-Z]\s+)?`) afrouxa o
