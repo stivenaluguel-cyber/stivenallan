@@ -10,9 +10,13 @@ vi.mock('bcryptjs', () => ({
 
 // JWT/cookie não são o alvo desta tarefa (rate limit) — createToken mockado
 // evita depender de JWT_SECRET real nos testes, sem alterar o comportamento
-// de produção (a rota real continua usando @/lib/auth como está).
+// de produção (a rota real continua usando @/lib/auth como está). Hoisted
+// pra poder asserir "createToken NÃO foi chamado" em erro real de Supabase.
+const { authHolder } = vi.hoisted(() => ({
+  authHolder: { createToken: vi.fn(async (..._args: unknown[]) => 'token-de-teste') },
+}))
 vi.mock('@/lib/auth', () => ({
-  createToken: vi.fn(async () => 'token-de-teste'),
+  createToken: (...args: unknown[]) => authHolder.createToken(...args),
 }))
 
 const { supabaseHolder } = vi.hoisted(() => ({
@@ -28,17 +32,20 @@ const { __resetForTests: resetRateLimit } = rateLimitModule
 
 type AdminRow = { id: string; nome: string; senha_hash: string }
 
-function makeSupabase(cfg: { admin?: AdminRow | null } = {}) {
+function makeSupabase(cfg: { admin?: AdminRow | null; dbError?: { code: string; message: string } } = {}) {
   return {
     from(table: string) {
       if (table === 'admin_users') {
         return {
           select: () => ({
             eq: () => ({
-              single: async () =>
-                cfg.admin
-                  ? { data: cfg.admin, error: null }
-                  : { data: null, error: { message: 'not found' } },
+              // maybeSingle() real: zero linhas → { data: null, error: null }
+              // (NUNCA um erro); erro real/múltiplas linhas → { data: null,
+              // error: {...} }. Mock reflete exatamente esse contrato.
+              maybeSingle: async () => {
+                if (cfg.dbError) return { data: null, error: cfg.dbError }
+                return { data: cfg.admin ?? null, error: null }
+              },
             }),
           }),
         }
@@ -65,6 +72,7 @@ describe('POST /api/auth/login — rate limit', () => {
     delete process.env.UPSTASH_REDIS_REST_TOKEN
     resetRateLimit()
     bcryptHolder.compare.mockReset().mockResolvedValue(true)
+    authHolder.createToken.mockClear()
     vi.spyOn(console, 'log').mockImplementation(() => {})
     vi.spyOn(console, 'warn').mockImplementation(() => {})
     vi.spyOn(console, 'error').mockImplementation(() => {})
@@ -310,6 +318,7 @@ describe('POST /api/auth/login — terceira dimensão (account limiter)', () => 
     delete process.env.UPSTASH_REDIS_REST_TOKEN
     resetRateLimit()
     bcryptHolder.compare.mockReset().mockResolvedValue(true)
+    authHolder.createToken.mockClear()
     vi.spyOn(console, 'log').mockImplementation(() => {})
     vi.spyOn(console, 'warn').mockImplementation(() => {})
     vi.spyOn(console, 'error').mockImplementation(() => {})
@@ -449,4 +458,287 @@ describe('POST /api/auth/login — terceira dimensão (account limiter)', () => 
     const { status } = await callPost({ ...body, senha: 'certa' }, { 'x-forwarded-for': '26.26.26.3' })
     expect(status).toBe(200)
   })
+})
+
+// Item 5B: equalização estrutural de timing entre "conta não existe" e
+// "conta existe + senha errada" — os dois caminhos agora executam
+// exatamente UM bcrypt.compare cada (contra o hash real ou um hash dummy
+// estático), em vez de o caminho "não existe" retornar sem pagar o custo
+// do bcrypt.
+describe('POST /api/auth/login — equalização de timing (dummy hash)', () => {
+  beforeEach(() => {
+    process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://test'
+    process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-key'
+    delete process.env.UPSTASH_REDIS_REST_URL
+    delete process.env.UPSTASH_REDIS_REST_TOKEN
+    resetRateLimit()
+    bcryptHolder.compare.mockReset().mockResolvedValue(true)
+    authHolder.createToken.mockClear()
+    vi.spyOn(console, 'log').mockImplementation(() => {})
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+  })
+
+  afterEach(() => {
+    supabaseHolder.current = null as unknown as ReturnType<typeof makeSupabase>
+    vi.restoreAllMocks()
+  })
+
+  // 1) conta existente + senha errada: bcrypt.compare 1x, hash REAL
+  it('conta existente + senha errada: bcrypt.compare chamado 1x contra o hash real', async () => {
+    supabaseHolder.current = makeSupabase({ admin: ADMIN_PADRAO })
+    bcryptHolder.compare.mockResolvedValue(false)
+    const { status, json } = await callPost(
+      { email: 'admin@x.com', senha: 'errada' },
+      { 'x-forwarded-for': '30.30.30.1' },
+    )
+    expect(status).toBe(401)
+    expect(json.error).toBe('Credenciais invalidas')
+    expect(bcryptHolder.compare).toHaveBeenCalledTimes(1)
+    expect(bcryptHolder.compare).toHaveBeenCalledWith('errada', ADMIN_PADRAO.senha_hash)
+  })
+
+  // 2) conta inexistente: bcrypt.compare 1x, hash DUMMY (nunca o real, nunca vazio)
+  it('conta inexistente: bcrypt.compare chamado 1x contra um hash dummy (nunca o real, nunca vazio)', async () => {
+    supabaseHolder.current = makeSupabase({ admin: null })
+    const { status, json } = await callPost(
+      { email: 'nao-existe@x.com', senha: 'qualquer' },
+      { 'x-forwarded-for': '30.30.30.2' },
+    )
+    expect(status).toBe(401)
+    expect(json.error).toBe('Credenciais invalidas')
+    expect(bcryptHolder.compare).toHaveBeenCalledTimes(1)
+    const [senhaPassada, hashPassado] = bcryptHolder.compare.mock.calls[0] as [string, string]
+    expect(senhaPassada).toBe('qualquer')
+    expect(hashPassado).not.toBe(ADMIN_PADRAO.senha_hash)
+    expect(hashPassado).toBeTruthy()
+    expect(hashPassado).toMatch(/^\$2[aby]\$10\$/) // bcrypt válido, cost factor 10 (mesmo dos hashes reais)
+  })
+
+  it('o hash dummy é sempre o mesmo valor entre requisições diferentes (constante estática, não gerado por request)', async () => {
+    supabaseHolder.current = makeSupabase({ admin: null })
+    await callPost({ email: 'inexistente-1@x.com', senha: 'x' }, { 'x-forwarded-for': '30.30.30.3' })
+    const hash1 = bcryptHolder.compare.mock.calls[0][1]
+
+    bcryptHolder.compare.mockClear()
+    await callPost({ email: 'inexistente-2@x.com', senha: 'x' }, { 'x-forwarded-for': '30.30.30.4' })
+    const hash2 = bcryptHolder.compare.mock.calls[0][1]
+
+    expect(hash1).toBe(hash2)
+  })
+
+  // 3) os dois caminhos inválidos retornam exatamente o mesmo status e body
+  it('conta inexistente e senha errada retornam exatamente o mesmo status e body', async () => {
+    supabaseHolder.current = makeSupabase({ admin: null })
+    const inexistente = await callPost({ email: 'x1@x.com', senha: 'a' }, { 'x-forwarded-for': '30.30.30.5' })
+
+    supabaseHolder.current = makeSupabase({ admin: ADMIN_PADRAO })
+    bcryptHolder.compare.mockResolvedValue(false)
+    const senhaErrada = await callPost({ email: 'x2@x.com', senha: 'a' }, { 'x-forwarded-for': '30.30.30.6' })
+
+    expect(inexistente.status).toBe(senhaErrada.status)
+    expect(inexistente.json).toEqual(senhaErrada.json)
+  })
+
+  // 4) login válido: bcrypt 1x, hash real, continua 200
+  it('login válido: bcrypt.compare chamado 1x contra o hash real, continua retornando 200', async () => {
+    supabaseHolder.current = makeSupabase({ admin: ADMIN_PADRAO })
+    bcryptHolder.compare.mockResolvedValue(true)
+    const { status, json } = await callPost(
+      { email: 'admin@x.com', senha: 'correta' },
+      { 'x-forwarded-for': '30.30.30.7' },
+    )
+    expect(status).toBe(200)
+    expect(json.success).toBe(true)
+    expect(bcryptHolder.compare).toHaveBeenCalledTimes(1)
+    expect(bcryptHolder.compare).toHaveBeenCalledWith('correta', ADMIN_PADRAO.senha_hash)
+  })
+
+  // 5) bloqueado por rate limit: bcrypt ZERO vezes
+  it('bloqueado por rate limit: bcrypt.compare NÃO é chamado', async () => {
+    supabaseHolder.current = makeSupabase({ admin: ADMIN_PADRAO })
+    const body = { email: 'bloqueado-timing@x.com', senha: 'x' }
+    const headers = { 'x-forwarded-for': '30.30.30.8' }
+    for (let i = 0; i < 5; i++) await callPost(body, headers)
+    bcryptHolder.compare.mockClear()
+    const { status } = await callPost(body, headers)
+    expect(status).toBe(429)
+    expect(bcryptHolder.compare).not.toHaveBeenCalled()
+  })
+
+  // 6) campos ausentes/inválidos: bcrypt ZERO vezes
+  it('campos ausentes: bcrypt.compare NÃO é chamado', async () => {
+    const { status } = await callPost({ email: '', senha: '' }, { 'x-forwarded-for': '30.30.30.9' })
+    expect(status).toBe(400)
+    expect(bcryptHolder.compare).not.toHaveBeenCalled()
+  })
+
+  // 7) senha nunca aparece em log mesmo no caminho do hash dummy
+  it('senha nunca aparece em log mesmo no caminho do hash dummy', async () => {
+    const logSpy = vi.spyOn(console, 'log')
+    const warnSpy = vi.spyOn(console, 'warn')
+    const errorSpy = vi.spyOn(console, 'error')
+    supabaseHolder.current = makeSupabase({ admin: null })
+    await callPost(
+      { email: 'inexistente-log@x.com', senha: 'SenhaSuperSecretaTimingTest456' },
+      { 'x-forwarded-for': '30.30.30.10' },
+    )
+    const textoLogado = [...logSpy.mock.calls, ...warnSpy.mock.calls, ...errorSpy.mock.calls]
+      .flat().map(String).join(' | ')
+    expect(textoLogado).not.toContain('SenhaSuperSecretaTimingTest456')
+  })
+
+  // 8) e-mail completo nunca aparece em log no caminho do hash dummy
+  it('email completo nunca aparece em log no caminho do hash dummy', async () => {
+    const logSpy = vi.spyOn(console, 'log')
+    const warnSpy = vi.spyOn(console, 'warn')
+    const errorSpy = vi.spyOn(console, 'error')
+    supabaseHolder.current = makeSupabase({ admin: null })
+    await callPost(
+      { email: 'email-completo-nao-pode-vazar@dominio.com', senha: 'x' },
+      { 'x-forwarded-for': '30.30.30.11' },
+    )
+    const textoLogado = [...logSpy.mock.calls, ...warnSpy.mock.calls, ...errorSpy.mock.calls]
+      .flat().map(String).join(' | ')
+    expect(textoLogado).not.toContain('email-completo-nao-pode-vazar@dominio.com')
+  })
+
+  // 9) dummy hash nunca é retornado ao cliente
+  it('dummy hash nunca aparece no corpo ou nos headers da resposta ao cliente', async () => {
+    supabaseHolder.current = makeSupabase({ admin: null })
+    const { json, res } = await callPost(
+      { email: 'nao-existe-resposta@x.com', senha: 'x' },
+      { 'x-forwarded-for': '30.30.30.12' },
+    )
+    const corpoBruto = JSON.stringify(json)
+    expect(corpoBruto).not.toContain('$2a$10$')
+    expect(corpoBruto).not.toContain('senha_hash')
+    const headersTexto = JSON.stringify([...res.headers.entries()])
+    expect(headersTexto).not.toContain('$2a$10$')
+  })
+
+  // 10) nenhum teste deste describe toca Supabase real, Redis real ou rede —
+  // @supabase/supabase-js está mockado (linha ~21) e UPSTASH_REDIS_REST_URL/
+  // _TOKEN são deletadas no beforeEach, então checkRateLimit nem instancia o
+  // client Redis (ver rate-limit.ts: getUpstashRedis() retorna null sem as
+  // envs). Propriedade estrutural do arquivo, não um assert único.
+})
+
+// Revisão final: troca de .single() por .maybeSingle() na consulta a
+// admin_users, pra distinguir de verdade "zero linhas" (não é erro) de
+// "erro real / múltiplas linhas" (é erro) — evita mascarar indisponibilidade
+// do Supabase como "credencial inválida".
+describe('POST /api/auth/login — tratamento de erro real do Supabase (maybeSingle)', () => {
+  beforeEach(() => {
+    process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://test'
+    process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-key'
+    delete process.env.UPSTASH_REDIS_REST_URL
+    delete process.env.UPSTASH_REDIS_REST_TOKEN
+    resetRateLimit()
+    bcryptHolder.compare.mockReset().mockResolvedValue(true)
+    authHolder.createToken.mockClear()
+    vi.spyOn(console, 'log').mockImplementation(() => {})
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+  })
+
+  afterEach(() => {
+    supabaseHolder.current = null as unknown as ReturnType<typeof makeSupabase>
+    vi.restoreAllMocks()
+  })
+
+  // 1) zero rows: admin null, SEM erro — bcrypt 1x com dummy hash, 401 genérico
+  it('zero rows (maybeSingle sem erro): bcrypt 1x com dummy hash, 401 genérico', async () => {
+    supabaseHolder.current = makeSupabase({ admin: null })
+    const { status, json } = await callPost(
+      { email: 'zero-rows@x.com', senha: 'x' },
+      { 'x-forwarded-for': '31.31.31.1' },
+    )
+    expect(status).toBe(401)
+    expect(json.error).toBe('Credenciais invalidas')
+    expect(bcryptHolder.compare).toHaveBeenCalledTimes(1)
+    const [, hashPassado] = bcryptHolder.compare.mock.calls[0] as [string, string]
+    expect(hashPassado).not.toBe(ADMIN_PADRAO.senha_hash)
+  })
+
+  // 2) uma row + senha errada: bcrypt 1x com hash real, mesmo 401
+  it('uma row + senha errada: bcrypt 1x com hash real, mesmo 401 genérico', async () => {
+    supabaseHolder.current = makeSupabase({ admin: ADMIN_PADRAO })
+    bcryptHolder.compare.mockResolvedValue(false)
+    const { status, json } = await callPost(
+      { email: 'uma-row@x.com', senha: 'errada' },
+      { 'x-forwarded-for': '31.31.31.2' },
+    )
+    expect(status).toBe(401)
+    expect(json.error).toBe('Credenciais invalidas')
+    expect(bcryptHolder.compare).toHaveBeenCalledTimes(1)
+    expect(bcryptHolder.compare).toHaveBeenCalledWith('errada', ADMIN_PADRAO.senha_hash)
+  })
+
+  // 3) uma row + senha correta: 200
+  it('uma row + senha correta: 200', async () => {
+    supabaseHolder.current = makeSupabase({ admin: ADMIN_PADRAO })
+    bcryptHolder.compare.mockResolvedValue(true)
+    const { status, json } = await callPost(
+      { email: 'uma-row-ok@x.com', senha: 'certa' },
+      { 'x-forwarded-for': '31.31.31.3' },
+    )
+    expect(status).toBe(200)
+    expect(json.success).toBe(true)
+  })
+
+  // 4) erro real do Supabase: 500 genérico, bcrypt ZERO vezes, createToken ZERO vezes
+  it('erro real do Supabase (timeout/rede): 500 genérico, bcrypt e createToken NÃO chamados', async () => {
+    supabaseHolder.current = makeSupabase({ dbError: { code: '57014', message: 'canceling statement due to statement timeout' } })
+    const { status, json } = await callPost(
+      { email: 'erro-real@x.com', senha: 'x' },
+      { 'x-forwarded-for': '31.31.31.4' },
+    )
+    expect(status).toBe(500)
+    expect(json.error).toBe('Erro interno')
+    expect(bcryptHolder.compare).not.toHaveBeenCalled()
+    expect(authHolder.createToken).not.toHaveBeenCalled()
+  })
+
+  // 5) múltiplas rows (PGRST116 via maybeSingle): 500, não autentica
+  it('múltiplas rows inesperadas (PGRST116 do maybeSingle): 500, não autentica', async () => {
+    supabaseHolder.current = makeSupabase({
+      dbError: { code: 'PGRST116', message: 'JSON object requested, multiple (or no) rows returned' },
+    })
+    const { status, json } = await callPost(
+      { email: 'multiplas-rows@x.com', senha: 'x' },
+      { 'x-forwarded-for': '31.31.31.5' },
+    )
+    expect(status).toBe(500)
+    expect(json.error).toBe('Erro interno')
+    expect(bcryptHolder.compare).not.toHaveBeenCalled()
+    expect(authHolder.createToken).not.toHaveBeenCalled()
+    expect(json.success).toBeUndefined()
+  })
+
+  // 6) log do erro real: nunca email, senha, dummy hash ou hash real
+  it('log do erro real de Supabase nunca contém email, senha, dummy hash ou hash real', async () => {
+    const logSpy = vi.spyOn(console, 'log')
+    const warnSpy = vi.spyOn(console, 'warn')
+    const errorSpy = vi.spyOn(console, 'error')
+    supabaseHolder.current = makeSupabase({
+      dbError: { code: '57014', message: 'canceling statement due to statement timeout' },
+    })
+
+    await callPost(
+      { email: 'log-erro-nao-pode-vazar@dominio.com', senha: 'SenhaSecretaDoErro789' },
+      { 'x-forwarded-for': '31.31.31.6' },
+    )
+
+    const textoLogado = [...logSpy.mock.calls, ...warnSpy.mock.calls, ...errorSpy.mock.calls]
+      .flat().map(String).join(' | ')
+    expect(textoLogado).not.toContain('log-erro-nao-pode-vazar@dominio.com')
+    expect(textoLogado).not.toContain('SenhaSecretaDoErro789')
+    expect(textoLogado).not.toContain('$2a$10$') // nem dummy nem hash real (nenhum bcrypt rodou)
+    expect(textoLogado).toContain('57014') // código categórico, seguro, presente
+  })
+
+  // 7) os testes de rate limit e timing (describes anteriores) continuam
+  // passando sem alteração — verificado rodando o arquivo inteiro (33
+  // testes pré-existentes + estes novos), não repetido aqui individualmente.
 })

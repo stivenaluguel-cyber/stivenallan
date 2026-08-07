@@ -5,8 +5,11 @@ import bcrypt from 'bcryptjs'
 import { createToken } from '@/lib/auth'
 import { extractIp } from '@/lib/leads/anti-spam'
 import { checkRateLimit } from '@/lib/leads/rate-limit'
+import { logError } from '@/lib/log'
 
 export const dynamic = 'force-dynamic'
+
+const SOURCE = 'auth/login'
 
 // Três dimensões, reaproveitando a mesma infra de rate limit do módulo de
 // leads (Upstash quando configurado — distribuído entre instâncias —, com
@@ -37,6 +40,19 @@ const LOGIN_ACCOUNT_LIMIT = { identifier: 'admin-login-account', limit: 20, wind
 function accountKeyFromEmail(emailNormalizado: string): string {
   return createHash('sha256').update(emailNormalizado).digest('hex')
 }
+
+// Hash bcrypt válido, estático, cost factor 10 — o MESMO cost factor usado
+// pra gerar hashes reais de admin (ver bcrypt.hash(novaSenha, 10) em
+// src/app/api/auth/redefinir-senha/route.ts). Gerado uma única vez em
+// desenvolvimento a partir de bytes aleatórios (nunca uma senha real, nunca
+// reutilizado em lugar nenhum) — não é segredo, não precisa de env, e não
+// pode ser gerado a cada request (isso reintroduziria custo variável).
+// Usado só como alvo de bcrypt.compare() quando a conta não existe, pra que
+// esse caminho pague o MESMO custo computacional do caminho "conta existe,
+// senha errada" — sem isso, e-mail inexistente responde bem mais rápido
+// (sem bcrypt) do que e-mail existente (com bcrypt), um sinal mensurável de
+// enumeração de contas.
+const DUMMY_BCRYPT_HASH = '$2a$10$D7unvNoztzuDkRl2UjPcB.HYpluzPCzwGvhC.PXG7LQKpjXuVBlGO'
 
 function respostaBloqueada(retryAfter: number | undefined, fallbackSeconds: number) {
   // Mensagem genérica de propósito: não revela qual das três dimensões (IP,
@@ -102,18 +118,37 @@ export async function POST(request: NextRequest) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
 
+    // maybeSingle() (não single()) distingue de verdade os três casos: zero
+    // linhas devolve { data: null, error: null } (sem erro nenhum — não é
+    // "single() não achou" colapsado em PGRST116); mais de uma linha devolve
+    // um erro real (PGRST116, sintetizado client-side, ver postgrest-js);
+    // qualquer outro problema (timeout, rede, schema) também vem como erro
+    // real. Confirmado lendo o source instalado de @supabase/postgrest-js.
     const { data: admin, error } = await supabase
       .from('admin_users')
       .select('*')
       .eq('email', emailNormalizado)
-      .single()
+      .maybeSingle()
 
-    if (error || !admin) {
-      return NextResponse.json({ error: 'Credenciais invalidas' }, { status: 401 })
+    if (error) {
+      // Falha real (rede, timeout, schema, ou múltiplas linhas inesperadas
+      // — nunca "usuário não encontrado", isso vem sem erro acima). Nunca
+      // mascarada como credencial inválida, e nunca disfarçada rodando
+      // bcrypt só pra esconder a falha. Só o código categórico vai pro log
+      // — nunca email, senha, hash real ou dummy.
+      logError(SOURCE, 'falha ao consultar admin_users', undefined, { errorCode: error.code })
+      return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
     }
 
-    const senhaValida = await bcrypt.compare(senha, admin.senha_hash)
-    if (!senhaValida) {
+    // Daqui em diante, admin === null significa, com certeza, "zero linhas"
+    // — não erro. Equaliza estruturalmente os dois caminhos "credencial
+    // inválida": conta inexistente e senha errada de conta existente
+    // executam exatamente UM bcrypt.compare cada, contra hash real (conta
+    // existe) ou hash dummy (conta não existe) — nunca contra hash vazio.
+    const hashParaComparar = admin?.senha_hash ?? DUMMY_BCRYPT_HASH
+    const senhaValida = await bcrypt.compare(senha, hashParaComparar)
+
+    if (!admin || !senhaValida) {
       return NextResponse.json({ error: 'Credenciais invalidas' }, { status: 401 })
     }
 
