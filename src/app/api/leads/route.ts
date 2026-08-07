@@ -16,6 +16,7 @@ const GROWTH_FIELDS = [
   'faixa_investimento',
   'prazo_compra',
   'entrada_disponivel',
+  'tipo_renda',
   'utm_source',
   'utm_medium',
   'utm_campaign',
