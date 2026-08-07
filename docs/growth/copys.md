@@ -200,3 +200,95 @@ stivenallan.com.br
 - Viu story: "Oi {nome}, vi que acompanhou o story do {empreendimento}. Quer que eu te envie as plantas e as condições direto com a construtora?"
 - Curtiu anúncio: "Oi {nome}! O {empreendimento} chamou sua atenção? Te conto o que o anúncio não mostra: como funciona comprar sem banco."
 - Respondeu enquete/reagiu: "Oi {nome}! Valeu pela reação 😊 Posso te fazer uma pergunta rápida — praia ou cidade: qual combina mais com o seu próximo endereço?"
+
+---
+
+## 7. Meta Ads — Tremezzo / Parco Savello, estrutura completa (2026-08-07)
+
+Conta `2805712063086349` (Stiven Allan — Corretor de Imóveis, confirmado dono via
+`ads_get_ad_account_pages`, não por achismo — ver [[meta-ads-mcp-conectado]]). Página:
+"Stiven Allan - Corretor de Imóveis" (`413891219211869`).
+
+### 7.1 Estratégia — funil de 4 camadas
+
+O funil inteiro já está desenhado e construído no Gerenciador; só as pontas (topo e
+remarketing) estão desligadas hoje. Duas camadas do meio é que estão realmente ativas.
+
+| Camada | Campanha | Ad set / público | Status real |
+|---|---|---|---|
+| Topo (visita de perfil) | IG Topo \| Visitas ao perfil \| Sul de SC | Perfil IG \| 6 cidades \| Amplo | Pronta, campanha PAUSADA |
+| Meio (tráfego pro site, por empreendimento) | [SITE/CADASTRO] Tremezzo - Criciúma / [SITE/CADASTRO] Parco Savello - Criciúma | Criciúma 20km, LP views, todas plataformas + WhatsApp | Prontas, PAUSADAS |
+| Meio (tráfego pra LP financiamento, teste A/B) | Site \| Tráfego barato \| LP Financiamento \| Sul de SC | Amplo (6 cidades) vs. Interesse (Apartamento/Imóveis) | **ATIVA** — Amplo rodando (R$11/dia), Interesse pausado mas com dado real |
+| Fundo (conversa direta) | [FINANCIAMENTO DIRETO] Parco Savello + Tremezzo - WhatsApp (consolidada) | Criciúma 20km, 30-60 anos, só IG+WhatsApp | **ATIVA** (R$50/dia) |
+| Fundo standalone | [FINANCIAMENTO DIRETO] Tremezzo - Criciúma - WhatsApp | Mesmo desenho, só Tremezzo | Pronta, PAUSADA (versão pré-fusão com Parco Savello) |
+| Remarketing | IG Conversas \| DM para o Kanban \| Sul de SC | Remarketing \| Engajadores 365d \| DM | Pronta, PAUSADA |
+
+### 7.2 As 6 cidades do público "amplo" (raio 17km cada)
+
+Criciúma, Siderópolis, Cocal do Sul, Nova Veneza, Içara e Forquilhinha — confirmado por
+coordenada, bate com a região Sul de SC já mapeada em [[projeto-site-stivenallan]].
+
+### 7.3 Campanha 1 — WhatsApp consolidada (ATIVA)
+
+- Objetivo OUTCOME_LEADS · otimização CONVERSATIONS · R$50/dia · lance "Maior volume"
+- Público: Criciúma + 20km (residentes e recentes), 30-60 anos, todos os gêneros
+- Plataformas: **só Instagram e WhatsApp** (feed/story/reels/perfil + WhatsApp status), só mobile
+- Advantage+ audience ligado
+
+### 7.4 Campanha 2 — Site tráfego barato / LP Financiamento (ATIVA, com A/B de público)
+
+- Objetivo LINK_CLICKS · otimização LANDING_PAGE_VIEWS · R$11/dia
+- **Ad set Amplo** (ativo): 6 cidades acima, 18-65, Facebook+Instagram+Audience Network+Messenger+Threads, mobile+desktop, Advantage+ sem restringir interesse
+- **Ad set Interesse** (pausado, com dado real): mesmas 6 cidades + interesse `Apartamento (imóveis)` + `Imóveis (indústria)`
+- **Sinal do A/B até agora (inconclusivo):** pro anúncio de localização, Interesse trouxe mais volume por menos custo (R$0,15 vs R$0,19/view); mas o anúncio em vídeo teve MUITO mais alcance e custo menor no lado Amplo (355 views a R$0,11 vs 10 views a R$0,30 no Interesse). Não pausar nenhum lado ainda, amostra pequena.
+
+### 7.5 Remarketing pronto (não ligado)
+
+Campanha "IG Conversas | DM para o Kanban", ad set "Remarketing | Engajadores 365d | DM",
+com 2 públicos customizados já criados:
+- **"IG Engajadores 365d — @stivenallan.ofc"** — quem interagiu com o perfil no Instagram no último ano
+- **"Site — visitantes 180d (pixel Stiven Allan)"** — visitantes do site nos últimos 180 dias via o pixel real `364836344657445` (mesmo pixel de [[stivenallan-rastreamento-contas-e-ids]])
+
+### 7.6 Ângulos de copy novos (2026-08-07)
+
+> Contexto: as campanhas ativas do Tremezzo (Story A v3 / Story B v2) e do Parco Savello
+> (Story A v3 / Story B v2) tinham o MESMO texto entre as duas variantes de cada
+> empreendimento — só o visual mudava. Ou seja, não havia teste de mensagem, só de
+> criativo visual. Os 5 anúncios abaixo foram criados como novas variantes (mesma imagem
+> já aprovada, texto novo) pra isolar a mensagem como variável de teste. Todos criados
+> em **PAUSED** na conta `2805712063086349`, ad set `120247157489630778`, página "Stiven
+> Allan - Corretor de Imóveis" — revisar e ativar manualmente no Gerenciador.
+
+### Tremezzo (R$1.220.553 — 3 dorm/1 suíte, 125m²)
+
+**Ângulo Dor** — ad `120247189700130778`
+**Título:** Sem banco, sem burocracia — Tremezzo
+**Texto:** Cansado de juntar 20% pro banco aprovar e ainda torcer? No Tremezzo você negocia direto com a construtora, sem análise de crédito bancária. 3 dormitórios (1 suíte), 125m², Criciúma.
+
+**Ângulo Curiosidade** — ad `120247189696690778`
+**Título:** Como financiar sem passar no banco?
+**Texto:** Por que dá pra financiar um apê de R$1,2 milhão sem passar no banco? A Fontana financia direto, parcelas em até 72x. Conheça as condições reais do Tremezzo.
+
+**Ângulo Prova/Urgência** — ad `120247189697140778`
+**Título:** Tabela vigente do Tremezzo
+**Texto:** Preço sobe a cada fase da obra — poucas unidades ainda na tabela atual. Fale com o corretor e garanta a condição de hoje no Tremezzo.
+
+### Parco Savello (R$998.918 — 3 dorm/2 suítes, 93m²)
+
+**Ângulo Dor** — ad `120247189701020778`
+**Título:** Mais espaço pra família — Parco Savello
+**Texto:** Apartamento pequeno já não cabe mais a rotina da família? Parco Savello tem 93m², 2 suítes e 650m² de lazer no condomínio, em frente ao Parque da Prefeitura.
+
+**Ângulo Prova/Urgência** — ad `120247189698710778`
+**Título:** Tabela vigente do Parco Savello
+**Texto:** Valor por fase de obra — peça a tabela atual antes do próximo reajuste e garanta a condição de hoje no Parco Savello.
+
+Todos com CTA `WHATSAPP_MESSAGE` → wa.me/5548991642332. **Não têm `instagram_user_id`
+setado** (não confirmei o ID da conta Instagram vinculada) — podem não entregar em
+posicionamento Instagram até isso ser ajustado no Gerenciador.
+
+**Fora do escopo, não mexido:** a conta `295291531681627` (anúncio "Casa 2 Dormitórios,
+São Sebastião") pertence ao corretor parceiro Fernando Bortoluzzi, não ao Stiven — ver
+[[meta-ads-mcp-conectado]]. Briefing de 3 ângulos pra esse imóvel foi discutido no chat
+mas NÃO foi criado no Gerenciador; só faz sentido se for pedido explicitamente no
+contexto do projeto do Fernando.
