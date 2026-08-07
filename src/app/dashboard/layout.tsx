@@ -19,6 +19,31 @@ const D = {
 
 type NavItem = { href: string; label: string; icon: LucideIcon };
 
+export type DashboardLogoutResult = { ok: true } | { ok: false; erro: string };
+
+// Extraida do componente para poder ser testada sem jsdom. Chama a rota que
+// apaga o cookie HttpOnly dashboard_token no servidor (JS do browser nao
+// consegue apagar HttpOnly). So considera o logout concluido - e so entao
+// limpa o sessionStorage e redireciona - quando a resposta e 2xx. Erro de
+// rede ou resposta nao-2xx nao pode fingir sucesso: o cookie real continua
+// valido, entao a UI precisa refletir a falha e permitir nova tentativa.
+export async function performDashboardLogout(router: { push: (href: string) => void }): Promise<DashboardLogoutResult> {
+  let res: Response;
+  try {
+    res = await fetch('/api/auth/logout', { method: 'POST' });
+  } catch {
+    return { ok: false, erro: 'Erro de conexão. Tente novamente.' };
+  }
+
+  if (!res.ok) {
+    return { ok: false, erro: 'Não foi possível sair. Tente novamente.' };
+  }
+
+  if (typeof window !== 'undefined') sessionStorage.clear();
+  router.push('/dashboard/login');
+  return { ok: true };
+}
+
 const GRUPOS: { titulo: string; itens: NavItem[] }[] = [
   {
     titulo: 'PRINCIPAL',
@@ -94,10 +119,17 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
+  const [logoutErro, setLogoutErro] = useState('');
   const pageLabel = getLabel(pathname);
 
-  const handleLogout = () => {
-    if (typeof window !== 'undefined') { sessionStorage.clear(); router.push('/'); }
+  const handleLogout = async () => {
+    if (loggingOut) return;
+    setLoggingOut(true);
+    setLogoutErro('');
+    const result = await performDashboardLogout(router);
+    if (!result.ok) setLogoutErro(result.erro);
+    setLoggingOut(false);
   };
   const handleNav = (href: string) => { setMenuOpen(false); router.push(href); };
 
@@ -140,11 +172,14 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         ))}
       </nav>
 
-      <button onClick={handleLogout}
-        style={{ display: 'flex', alignItems: 'center', gap: 11, width: '100%', textAlign: 'left', padding: '9px 10px', borderRadius: 8, cursor: 'pointer', background: 'none', border: '1px solid ' + D.lineDark, color: D.onDarkMuted, fontSize: 14, fontWeight: 600, marginTop: 12 }}>
+      <button onClick={handleLogout} disabled={loggingOut}
+        style={{ display: 'flex', alignItems: 'center', gap: 11, width: '100%', textAlign: 'left', padding: '9px 10px', borderRadius: 8, cursor: loggingOut ? 'default' : 'pointer', background: 'none', border: '1px solid ' + D.lineDark, color: D.onDarkMuted, fontSize: 14, fontWeight: 600, marginTop: 12, opacity: loggingOut ? 0.6 : 1 }}>
         <LogOut size={17} strokeWidth={2} style={{ width: 20, flexShrink: 0 }} aria-hidden />
-        <span>Sair</span>
+        <span>{loggingOut ? 'Saindo...' : 'Sair'}</span>
       </button>
+      {logoutErro && (
+        <div style={{ color: '#ff6b6b', fontSize: 11, marginTop: 6, padding: '0 2px' }}>{logoutErro}</div>
+      )}
     </>
   );
 
