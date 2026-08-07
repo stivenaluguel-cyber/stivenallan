@@ -10,6 +10,7 @@ import { motivoSemWhatsappReal, temWhatsappReal } from '@/lib/leads/normalize'
 import { PainelScore, type DetalheScore } from '@/components/dashboard/PainelScore'
 import { AnexosLead } from '@/components/dashboard/AnexosLead'
 import { EnvolvidosLead } from '@/components/dashboard/EnvolvidosLead'
+import { NovoLeadModal } from '@/components/dashboard/NovoLeadModal'
 import { CORES_SLA, statusSla } from '@/lib/leads/sla'
 import type { TimelineItem, TimelineKind } from '@/lib/dashboard/lead-timeline'
 import {
@@ -947,6 +948,7 @@ function CrmPageInner() {
   const [busca, setBusca] = useState('')
   const [dragId, setDragId] = useState<string | null>(null)
   const [selected, setSelected] = useState<Lead | null>(null)
+  const [modalNovoLead, setModalNovoLead] = useState(false)
 
   const load = useCallback(async () => {
     const [lRes, eRes, cRes] = await Promise.all([
@@ -1052,6 +1054,7 @@ function CrmPageInner() {
 
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 16, alignItems: 'center' }}>
               <input value={busca} onChange={e => setBusca(e.target.value)} placeholder="Buscar nome ou WhatsApp..." style={{ padding: '10px 12px', borderRadius: 8, border: '1px solid ' + D.line, background: '#fff', color: D.ink, fontSize: 14, outline: 'none', minWidth: 260 }} />
+              <button onClick={() => setModalNovoLead(true)} style={{ padding: '10px 18px', borderRadius: 8, border: 'none', background: D.bronze, color: '#fff', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', minHeight: 44 }}>+ Novo Lead</button>
               <button
                 onClick={() => router.push('/dashboard/crm/foco')}
                 disabled={focoCount === 0}
@@ -1093,6 +1096,10 @@ function CrmPageInner() {
 
       {selected && (
         <LeadModal lead={selected} onClose={() => setSelected(null)} onUpdated={(l) => { setLeads(prev => prev.map(x => x.id === l.id ? l : x)); setSelected(l) }} onDeleted={(id) => { setLeads(prev => prev.filter(x => x.id !== id)); setSelected(null) }} />
+      )}
+
+      {modalNovoLead && (
+        <NovoLeadModal onClose={() => setModalNovoLead(false)} onSaved={() => { setModalNovoLead(false); load() }} />
       )}
     </div>
   )
