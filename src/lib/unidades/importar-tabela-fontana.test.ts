@@ -1026,3 +1026,179 @@ describe('código de box com três letras', () => {
     expect(r.unidades.map(u => u.box_codigo)).toEqual(['91S', '04S', '02S', '89E', '96E'])
   })
 })
+
+const CUB_AGOSTO = 3151.24
+
+describe('box quebrado em duas linhas — extração erra a ordem (agosto/2026)', () => {
+  // Quando as duas vagas do box têm sufixo PRÓPRIO cada uma, o texto não
+  // cabe numa linha só na célula do PDF, e o extrator imprime NA ORDEM
+  // ERRADA: o COMEÇO do box vem ANTES da linha numérica da unidade, e o
+  // RESTO — normalmente uma palavra só ("Gar", "2ºSS", "Pav") — vem DEPOIS
+  // dela. Sozinha, a linha da unidade ia direto do dígito de dormitórios
+  // para o primeiro valor em R$, sem nenhum box no meio, e por isso nem era
+  // reconhecida como início de unidade — sumia com "código de box fora do
+  // padrão" numa linha que nunca tinha sido lida. Recortes reais dos PDFs.
+
+  it('Fidenza 702: "10E-SS e 32S-2º Pav Gar" — duas vagas, cada uma com sua letra, unidas por "e"', () => {
+    const texto = `CUB06 - Agosto - R$ 3.151,24 ENTRADA 1 X REFORÇO ANUAL 6 X PARCELA MENSAL 72 X
+701 3 09E - SS e 19S – T 149,52 32,65 267,04 516.803,42 2.584.017,12 101.336,54 2.584.017,12 20.266,59 820 2.584.017,12 820 820
+10E-SS e 32S-2º Pav
+702 3 161,45 35,70 289,17 533.820,06 2.669.100,28 104.673,22 2.669.100,28 20.933,90 847 2.669.100,28 847 847
+Gar
+801 3 07 e 08S - SS 149,52 24,75 257,11 514.282,37 2.571.411,84 100.842,20 2.571.411,84 20.167,73 816 2.571.411,84 816 816
+Observações:`
+    const r = parsearTabelaFontana(texto, CUB_AGOSTO)
+    expect(r.rejeitadas).toEqual([])
+    const u = r.unidades.find(x => x.unidade === '702')
+    expect(u).toBeDefined()
+    expect(u!.box_codigo).toBe('10E')
+    expect(u!.cub_fator).toBe(847)
+    expect(u!.valor_tabela).toBe(2669100.28)
+  })
+
+  it('Bosco del Montello (Torre B) 1003: "82E - 1ºSS/119S - 2ºSS" — duas vagas unidas por "/"', () => {
+    const texto = `CUB06 - Agosto - R$ 3.151,24 ENTRADA 1 X FINANCIAMENTO 1 X
+904 B 2 44S - 2ºSS 66,36 12,00 107,35 87.919,60 586.130,64 498.211,04 586.130,64 186 186
+82E - 1ºSS/119S -
+1003 B 2 66,36 32,75 132,25 100.682,12 671.214,12 570.532,00 671.214,12 213 213
+2ºSS
+1004 B 2 160S e 163E - 2ºSS 66,36 26,00 124,08 103.518,23 690.121,56 586.603,33 690.121,56 219 219
+Observações:`
+    const r = parsearTabelaFontana(texto, CUB_AGOSTO)
+    expect(r.rejeitadas).toEqual([])
+    const u = r.unidades.find(x => x.unidade === '1003')
+    expect(u).toBeDefined()
+    expect(u!.bloco).toBe('B')
+    expect(u!.box_codigo).toBe('82E')
+    expect(u!.formato).toBe('entrada_financiamento')
+    expect(u!.valor_entrada_min + u!.saldo_financiamento).toBeCloseTo(u!.valor_tabela, 2)
+  })
+
+  it('Due Fratelli 306: "178S-2ºSS/04M-2ºPav" — mesma quebra, formato entrada+financiamento', () => {
+    const texto = `CUB06 - Agosto - R$ 3.151,24 ENTRADA 1 X FINANCIAMENTO 1 X
+178S-2ºSS/04M-
+306 2 160,99 14,40 227,29 136.606,25 910.708,36 774.102,11 910.708,36 289 289
+2ºPav
+404 3 35S e 2M - 2º Pav 92,94 14,40 141,68 145.587,29 970.581,92 824.994,63 970.581,92 308 308
+Observações:`
+    const r = parsearTabelaFontana(texto, CUB_AGOSTO)
+    expect(r.rejeitadas).toEqual([])
+    const u = r.unidades.find(x => x.unidade === '306')
+    expect(u).toBeDefined()
+    expect(u!.box_codigo).toBe('178S')
+    expect(u!.valor_tabela).toBe(910708.36)
+  })
+
+  it('Lavis 801: "105 e 106S - 2º Pav Gar" — dois números com UMA letra compartilhada', () => {
+    const texto = `CUB06 - Agosto - R$ 3.151,24 ENTRADA 1 X REFORÇO ANUAL 6 X PARCELA MENSAL 72 X
+704 3 109D - 2º Pav Gar 132,00 24,00 226,41 355.459,87 1.777.299,36 69.699,76 1.777.299,36 13.939,46 564 1.777.299,36 564 564
+105 e 106S - 2º Pav
+801 3 125,98 24,00 217,50 364.283,34 1.821.416,72 71.429,89 1.821.416,72 14.285,47 578 1.821.416,72 578 578
+Gar
+Observações:`
+    const r = parsearTabelaFontana(texto, CUB_AGOSTO)
+    expect(r.rejeitadas).toEqual([])
+    const u = r.unidades.find(x => x.unidade === '801')
+    expect(u).toBeDefined()
+    expect(u!.box_codigo).toBe('105 e 106S')
+    expect(u!.cub_fator).toBe(578)
+  })
+
+  it('Lavis 1801: a mesma quebra, mais um DEP solto ("100") entre a unidade e o primeiro decimal', () => {
+    // "100" não é o box — é a coluna DEP (depósito), que o cabeçalho também
+    // declara. O box de verdade, "97 e 100S", só existe reconstruído.
+    const texto = `CUB06 - Agosto - R$ 3.151,24 ENTRADA 1 X REFORÇO ANUAL 6 X PARCELA MENSAL 72 X
+1704 3 22 e 31S - 1ºSS 22 132,00 26,30 227,63 431.089,63 2.155.448,16 84.529,49 2.155.448,16 16.905,30 684 2.155.448,16 684 684
+97 e 100S - 2º Pav
+1801 3 100 125,98 25,40 226,54 436.131,62 2.180.658,08 85.518,14 2.180.658,08 17.103,02 692 2.180.658,08 692 692
+Gar
+Observações:`
+    const r = parsearTabelaFontana(texto, CUB_AGOSTO)
+    expect(r.rejeitadas).toEqual([])
+    const u = r.unidades.find(x => x.unidade === '1801')
+    expect(u).toBeDefined()
+    expect(u!.box_codigo).toBe('97 e 100S')
+    expect(u!.cub_fator).toBe(692)
+    expect(u!.valor_tabela).toBe(2180658.08)
+  })
+
+  it('Monte Leone 503: "14D - 1ºSS e 05S - 2ºSS", CUB de 4 dígitos (1.110)', () => {
+    const texto = `CUB06 - Agosto - R$ 3.151,24 ENTRADA 1 X REFORÇO ANUAL 6 X PARCELA MENSAL 72 X
+502 4 15D e 20S - 1ºSS 240,30 38,50 412,10 744.953,14 3.724.765,68 146.072,89 3.724.765,68 29.213,54 1.182 3.724.765,68 1.182 1.182
+14D - 1ºSS e 05S -
+503 4 232,70 39,50 402,40 699.575,28 3.497.876,40 137.175,05 3.497.876,40 27.434,04 1.110 3.497.876,40 1.110 1.110
+2ºSS
+601 4 29D e 24S - 1ºSS 253,80 37,50 430,61 796.003,22 3.980.016,12 156.082,97 3.980.016,12 31.215,49 1.263 3.980.016,12 1.263 1.263
+Observações:`
+    const r = parsearTabelaFontana(texto, CUB_AGOSTO)
+    expect(r.rejeitadas).toEqual([])
+    const u = r.unidades.find(x => x.unidade === '503')
+    expect(u).toBeDefined()
+    expect(u!.box_codigo).toBe('14D')
+    expect(u!.cub_fator).toBe(1110)
+    expect(u!.cub_fator * CUB_AGOSTO).toBeCloseTo(u!.valor_tabela, 1)
+  })
+
+  it('Monte Leone 1303: quebra + DEP ("01") + CUB de 4 dígitos, tudo junto', () => {
+    const texto = `CUB06 - Agosto - R$ 3.151,24 ENTRADA 1 X REFORÇO ANUAL 6 X PARCELA MENSAL 72 X
+1301 4 42E - T, 43 e 44S - T 03 253,80 45,00 446,32 928.355,30 4.641.776,52 182.035,00 4.641.776,52 36.405,71 1.473 4.641.776,52 1.473 1.473
+37E -T, 63 e 67S - 1º
+1303 4 01 232,70 40,25 412,38 835.708,85 4.178.544,24 163.868,58 4.178.544,24 32.772,55 1.326 4.178.544,24 1.326 1.326
+Pav
+Observações:`
+    const r = parsearTabelaFontana(texto, CUB_AGOSTO)
+    expect(r.rejeitadas).toEqual([])
+    const u = r.unidades.find(x => x.unidade === '1303')
+    expect(u).toBeDefined()
+    expect(u!.box_codigo).toBe('37E')
+    expect(u!.cub_fator).toBe(1326)
+    expect(u!.valor_tabela).toBe(4178544.24)
+  })
+
+  it('a linha ANTERIOR completa nunca vira fragmento — só a curta e sem decimal', () => {
+    // Garantia de baixo risco do reparo: uma linha cheia de decimais (a
+    // unidade anterior de verdade) nunca satisfaz "parece fragmento de box",
+    // então o reparo não pode "roubar" o fim de uma unidade que já leu bem.
+    const texto = `CUB06 - Agosto - R$ 3.151,24 ENTRADA 1 X REFORÇO ANUAL 6 X PARCELA MENSAL 72 X
+704 3 109D - 2º Pav Gar 132,00 24,00 226,41 355.459,87 1.777.299,36 69.699,76 1.777.299,36 13.939,46 564 1.777.299,36 564 564
+801 3 125,98 24,00 217,50 364.283,34 1.821.416,72 71.429,89 1.821.416,72 14.285,47 578 1.821.416,72 578 578
+Observações:`
+    const r = parsearTabelaFontana(texto, CUB_AGOSTO)
+    // Sem fragmento antes, 801 continua sem box — e como não há box nem
+    // depósito ali, a recuperação por número (aritmética à parte) ainda
+    // aceita a linha com box nulo, exatamente como o caso "box ausente".
+    expect(r.rejeitadas).toEqual([])
+    const u = r.unidades.find(x => x.unidade === '801')
+    expect(u).toBeDefined()
+    expect(u!.box_codigo).toBeNull()
+    expect(r.unidades.find(x => x.unidade === '704')!.box_codigo).toBe('109D')
+  })
+})
+
+describe('box genuinamente ausente — célula vazia, não fragmento quebrado', () => {
+  // Diferente do caso acima: aqui não sobra NENHUM fragmento de box em volta
+  // da linha — a célula está mesmo em branco no PDF. `box_codigo` sai null,
+  // e a linha só entra em `unidades` se a aritmética fechar igual a
+  // qualquer outra — a mesma rede de sempre, não uma exceção para o box.
+  it('aceita a linha com box null quando a aritmética fecha', () => {
+    const semBox = TABELA.replace('04S - T ', '')
+    const r = parsearTabelaFontana(semBox, CUB_JULHO)
+    expect(r.rejeitadas).toEqual([])
+    const u = r.unidades.find(x => x.unidade === '104')
+    expect(u).toBeDefined()
+    expect(u!.box_codigo).toBeNull()
+    expect(u!.valor_tabela).toBe(655540.20)
+    expect(u!.cub_fator).toBe(210)
+  })
+
+  it('NÃO aceita se a aritmética não fechar — não é lixo virando unidade', () => {
+    // A mesma linha sem box, mas com o total adulterado: a conta não bate, e
+    // a recuperação por número tem que recusar igual a qualquer outra linha.
+    const semBoxQuebrado = TABELA
+      .replace('04S - T ', '')
+      .replace('52.443,22 655.540,20', '52.443,22 999.999,99')
+    const r = parsearTabelaFontana(semBoxQuebrado, CUB_JULHO)
+    expect(r.unidades.map(u => u.unidade)).not.toContain('104')
+    expect(r.rejeitadas.map(x => x.unidade)).toContain('104')
+  })
+})

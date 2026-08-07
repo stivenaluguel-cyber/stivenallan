@@ -465,161 +465,234 @@ function andarDe(unidade: string): number | null {
   return Number.isFinite(a) && a > 0 ? a : null
 }
 
-export function parsearTabelaFontana(
-  texto: string,
-  cubDoSistema?: number | null,
-): ResultadoTabela {
-  const cabecalho = parseCabecalho(texto)
-  const forma = detectarFormatoLinha(texto)
-  const doRodape = lerDormitoriosDoRodape(texto)
-  const regrasPorFinal = lerRegrasPorFinal(texto)
-  const colunasTrocadas = parcelaVemAntesDoReforco(texto)
-  const unidades: UnidadeImportada[] = []
-  const rejeitadas: LinhaRejeitadaTabela[] = []
+/**
+ * Conserta o box que quebrou em duas linhas na extração do PDF.
+ *
+ * Quando as duas vagas do box têm sufixo PRÓPRIO cada uma — "10E-SS e
+ * 32S-2º Pav Gar", "82E - 1ºSS/119S - 2ºSS" — o texto não cabe numa linha só
+ * na célula, e o extrator imprime NA ORDEM ERRADA: o COMEÇO do box vem ANTES
+ * da linha numérica da unidade, e o RESTO — normalmente uma palavra só
+ * ("Gar", "2ºSS", "Pav") — vem DEPOIS dela. Sozinha, a linha da unidade vai
+ * direto do dígito de dormitórios para o primeiro valor em R$, sem nenhum
+ * código de box no meio, e por isso nem é reconhecida como início de
+ * unidade — vira "código de box fora do padrão" numa linha que nunca chegou
+ * a ser lida.
+ *
+ * Achado real em cinco tabelas (Agosto/2026): Fidenza 702, Bosco del
+ * Montello (Torre B) 1003, Due Fratelli 306, Monte Leone
+ * 503/1202/1203/1303, e dez unidades do Lavis — sempre as mesmas três
+ * linhas seguidas: fragmento, linha numérica sem box, fragmento.
+ *
+ * A reconstrução é conservadora por construção, não por uma lista de
+ * exceções: só mexe quando a linha ANTES é curta, sem vírgula decimal e não
+ * é o início de outra unidade — ou seja, só quando não sobra nada "de
+ * verdade" ali além do fragmento de box. A linha completa da unidade
+ * ANTERIOR (cheia de decimais) nunca casa com isso, e por isso nunca é
+ * tocada. O que sai daqui ainda passa pelas MESMAS invariantes aritméticas
+ * de sempre — este reparo só entrega uma linha inteira para o fatiador
+ * ler; não valida nada sozinho.
+ */
+function repararBoxQuebradoEmDuasLinhas(texto: string): string {
+  const linhas = texto.split('\n')
+  const TEM_DECIMAL = /\d[\d.]*,\d{2}/
+  const PARECE_INICIO_DE_LINHA = /^\d{3,4}\s+(?:[A-Z]\d?\s+)?\d\s+/
+  const pareceFragmentoDeBox = (l: string): boolean => {
+    const t = l.trim()
+    if (!t || t.length > 40) return false
+    if (TEM_DECIMAL.test(t)) return false
+    if (PARECE_INICIO_DE_LINHA.test(t)) return false
+    if (/^Observa[çc][õo]es/i.test(t)) return false
+    return /[A-Za-zºª]/.test(t)
+  }
+  // Unidade sem box: número, bloco opcional, dígito de dormitórios, um DEP
+  // opcional (número solto sem letra — é a coluna DEP, não o box) e cai
+  // direto no primeiro decimal.
+  const SEM_BOX = /^(\d{3,4}\s+(?:[A-Z]\d?\s+)?\d)\s+(?:(\d{1,3})\s+)?(\d[\d.]*,\d{2}.*)$/
 
-  for (const bruto of fatiarUnidades(texto, forma)) {
-    const chunk = bruto.trim()
-    const unidade = chunk.match(/^(\d{3,4})/)?.[1] ?? '?'
-    // Letra da torre, quando o prédio tem mais de uma ("904 B 2 44S" → "B").
-    // Vai para a coluna `bloco`, que é como o espelho agrupa a grade.
-    // Uma ou duas posições: o Bosco escreve "904 B 2 44S" e o Pavia,
-    // "101 T1 3 166D". Prédio de várias torres repete o número do apartamento,
-    // e é o bloco que os distingue na chave.
-    const bloco = chunk.match(/^\d{3,4}\s+([A-Z]\d?)\s+\d\s/)?.[1] ?? null
-    // Sem coluna de dormitórios, o número vem do rodapé — é o que a
-    // construtora declara para o prédio inteiro.
-    const padrao = PADROES[forma]
-    const dormitorios = padrao.dormitorios
-      ? Number(chunk.match(padrao.dormitorios)?.[1] ?? 0)
-      : (regraDaUnidade(unidade, regrasPorFinal)?.dormitorios ?? doRodape.dormitorios ?? 0)
-    // Só o código, sem o sufixo de pavimento ("89E", não "89E - 3º"): o andar
-    // já sai do número da unidade.
-    const boxCodigo = chunk.match(padrao.box)?.[1] ?? null
+  for (let i = 1; i < linhas.length - 1; i++) {
+    const m = linhas[i].trim().match(SEM_BOX)
+    if (!m) continue
+    const antes = linhas[i - 1].trim()
+    if (!pareceFragmentoDeBox(antes)) continue
 
-    // Tokeniza a PARTIR do primeiro decimal. Antes dele só há ruído numérico
-    // ("91S", "3º Pav") que confundiria a contagem de colunas.
-    const primeiroDecimal = chunk.search(/\d[\d.]*,\d{2}/)
-    if (primeiroDecimal < 0) {
-      rejeitadas.push({ unidade, motivo: 'nenhum valor numérico na linha' })
-      continue
-    }
-    const cauda = chunk.slice(primeiroDecimal)
-
-    const decimais = [...cauda.matchAll(/\d[\d.]*,\d{2}/g)].map((m) => moeda(m[0]))
-    // O fator CUB é o primeiro inteiro solto depois dos decimais começarem.
-    //
-    // Acima de mil o PDF escreve a quantidade com separador de milhar —
-    // "1.192", não "1192". Casar só 2–4 dígitos seguidos capturava o pedaço
-    // DEPOIS do ponto: 1.192 virava 192, 1.068 virava 68. A invariante
-    // `total = quantidade × CUB` derrubava a linha, e o Monte Leone (todas as
-    // 26 unidades passam de 1.000 CUBs) voltava 26 de 26 rejeitadas.
-    //
-    // A forma com separador vem primeiro: 4 dígitos corridos ainda casam pela
-    // segunda alternativa, então tabela sem separador continua igual.
-    const inteiro = cauda.replace(/\d[\d.]*,\d{2}/g, ' ').match(/\b(\d{1,3}(?:\.\d{3})+|\d{2,4})\b/)
-    const cubFator = inteiro ? Number(inteiro[1].replace(/\./g, '')) : null
-
-    // Ordem das colunas no PDF: área, box, total m², entrada, total venda,
-    // reforço, (total repetido), parcela, (total), financiamento, (total).
-    // 7 colunas basta para o formato simples (área, box, total m², entrada,
-    // total, financiamento e o total repetido); o parcelado precisa de 10.
-    if (decimais.length < 7 || cubFator === null) {
-      rejeitadas.push({ unidade, motivo: `colunas insuficientes (${decimais.length} valores, fator ${cubFator})` })
-      continue
+    let depois = ''
+    let iDepois = -1
+    if (i + 1 < linhas.length && pareceFragmentoDeBox(linhas[i + 1])) {
+      depois = linhas[i + 1].trim()
+      iDepois = i + 1
     }
 
-    const [metragem, boxM2, totalM2, entrada, total] = decimais
+    const box = depois ? `${antes} ${depois}` : antes
+    const dep = m[2] ? ` ${m[2]}` : ''
+    linhas[i] = `${m[1]} ${box}${dep} ${m[3]}`
+    linhas[i - 1] = ''
+    if (iDepois >= 0) linhas[iDepois] = ''
+  }
+  return linhas.join('\n')
+}
 
-    // Qual formato é esta linha? A pergunta se responde pela aritmética, não
-    // por um rótulo no PDF: no formato simples, entrada + o valor seguinte
-    // fecham o total exato.
-    // Colunas do formato simples: área, box, total m², entrada, total,
-    // FINANCIAMENTO, total repetido. O financiamento é o índice 5.
-    const ehSimples =
-      decimais.length < 10 &&
-      decimais[5] !== undefined &&
-      Math.abs(entrada + decimais[5] - total) <= TOLERANCIA_REAIS
+type ResultadoChunk =
+  | { tipo: 'ok'; dados: UnidadeImportada }
+  | { tipo: 'rejeitada'; unidade: string; motivo: string }
 
-    const formato: FormatoTabela = ehSimples ? 'entrada_financiamento' : 'parcelado'
-    // Qual das duas colunas é qual depende do cabeçalho desta tabela.
-    const reforco = ehSimples ? 0 : (colunasTrocadas ? decimais[7] : decimais[5])
-    const parcela = ehSimples ? 0 : (colunasTrocadas ? decimais[5] : decimais[7])
+/**
+ * Interpreta UM chunk de unidade já fatiado e devolve o registro pronto ou o
+ * motivo da rejeição.
+ *
+ * Extraído do loop principal para que ele e `tentarRecuperarSemBox` (logo
+ * abaixo) usem exatamente a mesma régua — nenhuma das duas entradas passa
+ * por uma invariante mais frouxa que a outra.
+ */
+function interpretarChunkDeUnidade(
+  bruto: string,
+  forma: FormatoLinha,
+  cabecalho: CabecalhoTabela,
+  doRodape: { dormitorios: number | null; suites: number | null },
+  regrasPorFinal: RegraPorFinal[],
+  colunasTrocadas: boolean,
+): ResultadoChunk {
+  const chunk = bruto.trim()
+  const unidade = chunk.match(/^(\d{3,4})/)?.[1] ?? '?'
+  // Letra da torre, quando o prédio tem mais de uma ("904 B 2 44S" → "B").
+  // Vai para a coluna `bloco`, que é como o espelho agrupa a grade.
+  // Uma ou duas posições: o Bosco escreve "904 B 2 44S" e o Pavia,
+  // "101 T1 3 166D". Prédio de várias torres repete o número do apartamento,
+  // e é o bloco que os distingue na chave.
+  const bloco = chunk.match(/^\d{3,4}\s+([A-Z]\d?)\s+\d\s/)?.[1] ?? null
+  // Sem coluna de dormitórios, o número vem do rodapé — é o que a
+  // construtora declara para o prédio inteiro.
+  const padrao = PADROES[forma]
+  const dormitorios = padrao.dormitorios
+    ? Number(chunk.match(padrao.dormitorios)?.[1] ?? 0)
+    : (regraDaUnidade(unidade, regrasPorFinal)?.dormitorios ?? doRodape.dormitorios ?? 0)
+  // Só o código, sem o sufixo de pavimento ("89E", não "89E - 3º"): o andar
+  // já sai do número da unidade. Fica `null` quando a célula do box está
+  // genuinamente vazia — o regex exige a letra, não inventa uma.
+  const boxCodigo = chunk.match(padrao.box)?.[1] ?? null
 
-    // O financiamento é DERIVADO, não lido por posição.
-    //
-    // Antes vinha de `decimais[9]`, e o Tremezzo quebrou isso: a tabela dele
-    // não tem coluna de financiamento, porque são 100% até as chaves em 72
-    // parcelas — o índice 9 nem existe. Derivar do que sobra e depois conferir
-    // contra as colunas do PDF vale para os dois casos e não depende da ordem.
-    const npCab = cabecalho.parcelas_qtd ?? 40
-    const nrCab = cabecalho.reforcos_qtd ?? 4
-    const ateChavesCalc = entrada + npCab * parcela + nrCab * reforco
-    const restante = Math.round((total - ateChavesCalc) * 100) / 100
+  // Tokeniza a PARTIR do primeiro decimal. Antes dele só há ruído numérico
+  // ("91S", "3º Pav") que confundiria a contagem de colunas.
+  const primeiroDecimal = chunk.search(/\d[\d.]*,\d{2}/)
+  if (primeiroDecimal < 0) {
+    return { tipo: 'rejeitada', unidade, motivo: 'nenhum valor numérico na linha' }
+  }
+  const cauda = chunk.slice(primeiroDecimal)
 
-    // O valor DERIVADO diz o que procurar; o IMPRESSO é o que vale. Multiplicar
-    // 40 parcelas arredondadas em centavos não reconstrói o total exato: no
-    // Pineto a derivação dá 489.470,09 e o PDF imprime 489.470,02. Sete
-    // centavos que iriam para o contrato do cliente.
-    const impressoProximo = decimais.find((d) => Math.abs(d - restante) <= TOLERANCIA_REAIS)
-    const financiamento = ehSimples
-      ? decimais[5]
-      : Math.abs(restante) <= TOLERANCIA_REAIS
-        ? 0
-        : (impressoProximo ?? restante)
+  const decimais = [...cauda.matchAll(/\d[\d.]*,\d{2}/g)].map((m) => moeda(m[0]))
+  // O fator CUB é o primeiro inteiro solto depois dos decimais começarem.
+  //
+  // Acima de mil o PDF escreve a quantidade com separador de milhar —
+  // "1.192", não "1192". Casar só 2–4 dígitos seguidos capturava o pedaço
+  // DEPOIS do ponto: 1.192 virava 192, 1.068 virava 68. A invariante
+  // `total = quantidade × CUB` derrubava a linha, e o Monte Leone (todas as
+  // 26 unidades passam de 1.000 CUBs) voltava 26 de 26 rejeitadas.
+  //
+  // A forma com separador vem primeiro: 4 dígitos corridos ainda casam pela
+  // segunda alternativa, então tabela sem separador continua igual.
+  const inteiro = cauda.replace(/\d[\d.]*,\d{2}/g, ' ').match(/\b(\d{1,3}(?:\.\d{3})+|\d{2,4})\b/)
+  const cubFator = inteiro ? Number(inteiro[1].replace(/\./g, '')) : null
 
-    // ── As invariantes ────────────────────────────────────────────────
-    const problemas: string[] = []
+  // Ordem das colunas no PDF: área, box, total m², entrada, total venda,
+  // reforço, (total repetido), parcela, (total), financiamento, (total).
+  // 7 colunas basta para o formato simples (área, box, total m², entrada,
+  // total, financiamento e o total repetido); o parcelado precisa de 10.
+  if (decimais.length < 7 || cubFator === null) {
+    return { tipo: 'rejeitada', unidade, motivo: `colunas insuficientes (${decimais.length} valores, fator ${cubFator})` }
+  }
 
-    // Antes de qualquer comparação: número que faltou vira NaN, e TODA
-    // comparação com NaN é falsa — `Math.abs(NaN - x) > tolerancia` dá false.
-    // Sem esta guarda, uma linha com coluna faltando passava por todas as
-    // invariantes sem disparar nenhuma e entrava como válida.
-    const numeros = { entrada, total, financiamento, parcela, reforco }
-    for (const [nome, v] of Object.entries(numeros)) {
-      if (!Number.isFinite(v)) problemas.push(`${nome} ausente ou ilegível`)
+  const [metragem, boxM2, totalM2, entrada, total] = decimais
+
+  // Qual formato é esta linha? A pergunta se responde pela aritmética, não
+  // por um rótulo no PDF: no formato simples, entrada + o valor seguinte
+  // fecham o total exato.
+  // Colunas do formato simples: área, box, total m², entrada, total,
+  // FINANCIAMENTO, total repetido. O financiamento é o índice 5.
+  const ehSimples =
+    decimais.length < 10 &&
+    decimais[5] !== undefined &&
+    Math.abs(entrada + decimais[5] - total) <= TOLERANCIA_REAIS
+
+  const formato: FormatoTabela = ehSimples ? 'entrada_financiamento' : 'parcelado'
+  // Qual das duas colunas é qual depende do cabeçalho desta tabela.
+  const reforco = ehSimples ? 0 : (colunasTrocadas ? decimais[7] : decimais[5])
+  const parcela = ehSimples ? 0 : (colunasTrocadas ? decimais[5] : decimais[7])
+
+  // O financiamento é DERIVADO, não lido por posição.
+  //
+  // Antes vinha de `decimais[9]`, e o Tremezzo quebrou isso: a tabela dele
+  // não tem coluna de financiamento, porque são 100% até as chaves em 72
+  // parcelas — o índice 9 nem existe. Derivar do que sobra e depois conferir
+  // contra as colunas do PDF vale para os dois casos e não depende da ordem.
+  const npCab = cabecalho.parcelas_qtd ?? 40
+  const nrCab = cabecalho.reforcos_qtd ?? 4
+  const ateChavesCalc = entrada + npCab * parcela + nrCab * reforco
+  const restante = Math.round((total - ateChavesCalc) * 100) / 100
+
+  // O valor DERIVADO diz o que procurar; o IMPRESSO é o que vale. Multiplicar
+  // 40 parcelas arredondadas em centavos não reconstrói o total exato: no
+  // Pineto a derivação dá 489.470,09 e o PDF imprime 489.470,02. Sete
+  // centavos que iriam para o contrato do cliente.
+  const impressoProximo = decimais.find((d) => Math.abs(d - restante) <= TOLERANCIA_REAIS)
+  const financiamento = ehSimples
+    ? decimais[5]
+    : Math.abs(restante) <= TOLERANCIA_REAIS
+      ? 0
+      : (impressoProximo ?? restante)
+
+  // ── As invariantes ────────────────────────────────────────────────
+  const problemas: string[] = []
+
+  // Antes de qualquer comparação: número que faltou vira NaN, e TODA
+  // comparação com NaN é falsa — `Math.abs(NaN - x) > tolerancia` dá false.
+  // Sem esta guarda, uma linha com coluna faltando passava por todas as
+  // invariantes sem disparar nenhuma e entrava como válida.
+  const numeros = { entrada, total, financiamento, parcela, reforco }
+  for (const [nome, v] of Object.entries(numeros)) {
+    if (!Number.isFinite(v)) problemas.push(`${nome} ausente ou ilegível`)
+  }
+
+  if (cabecalho.cub_valor) {
+    const esperado = cubFator * cabecalho.cub_valor
+    if (Math.abs(esperado - total) > TOLERANCIA_REAIS) {
+      problemas.push(`total ${total.toFixed(2)} ≠ ${cubFator} × CUB ${cabecalho.cub_valor.toFixed(2)} = ${esperado.toFixed(2)}`)
+    }
+  }
+
+  if (formato === 'parcelado') {
+    // Quantidades da PRÓPRIA tabela. O Pineto é 40 parcelas + 4 reforços
+    // fechando 30% até as chaves, com 70% financiados; o Tremezzo é 72 + 6
+    // fechando 100%, sem financiamento nenhum. Fixar 40/4 e 30/70 recusava
+    // tudo que não fosse o Pineto.
+    if (!(parcela > 0) || !(reforco > 0)) {
+      problemas.push('parcela ou reforço zerado numa tabela parcelada')
     }
 
-    if (cabecalho.cub_valor) {
-      const esperado = cubFator * cabecalho.cub_valor
-      if (Math.abs(esperado - total) > TOLERANCIA_REAIS) {
-        problemas.push(`total ${total.toFixed(2)} ≠ ${cubFator} × CUB ${cabecalho.cub_valor.toFixed(2)} = ${esperado.toFixed(2)}`)
-      }
+    // Quando há saldo a financiar, o valor derivado tem que APARECER entre
+    // as colunas do PDF. É o que impede a conta de fechar por construção:
+    // se o número não está impresso na tabela, alguma coluna foi lida errado.
+    if (financiamento > 0 && impressoProximo === undefined) {
+      problemas.push(
+        `saldo de ${restante.toFixed(2)} não aparece na linha — entrada+${npCab}p+${nrCab}r não bate com as colunas`,
+      )
     }
-
-    if (formato === 'parcelado') {
-      // Quantidades da PRÓPRIA tabela. O Pineto é 40 parcelas + 4 reforços
-      // fechando 30% até as chaves, com 70% financiados; o Tremezzo é 72 + 6
-      // fechando 100%, sem financiamento nenhum. Fixar 40/4 e 30/70 recusava
-      // tudo que não fosse o Pineto.
-      if (!(parcela > 0) || !(reforco > 0)) {
-        problemas.push('parcela ou reforço zerado numa tabela parcelada')
-      }
-
-      // Quando há saldo a financiar, o valor derivado tem que APARECER entre
-      // as colunas do PDF. É o que impede a conta de fechar por construção:
-      // se o número não está impresso na tabela, alguma coluna foi lida errado.
-      if (financiamento > 0 && impressoProximo === undefined) {
-        problemas.push(
-          `saldo de ${restante.toFixed(2)} não aparece na linha — entrada+${npCab}p+${nrCab}r não bate com as colunas`,
-        )
-      }
-    } else {
-      // Aqui a conta é uma só, e tem que fechar no centavo: quem entra na
-      // entrada mais quem financia é o imóvel inteiro.
-      if (Math.abs(entrada + financiamento - total) > TOLERANCIA_REAIS) {
-        problemas.push(`entrada ${entrada.toFixed(2)} + financiamento ${financiamento.toFixed(2)} ≠ total ${total.toFixed(2)}`)
-      }
-      if (!(entrada > 0) || !(financiamento > 0)) {
-        problemas.push('entrada ou financiamento zerado')
-      }
+  } else {
+    // Aqui a conta é uma só, e tem que fechar no centavo: quem entra na
+    // entrada mais quem financia é o imóvel inteiro.
+    if (Math.abs(entrada + financiamento - total) > TOLERANCIA_REAIS) {
+      problemas.push(`entrada ${entrada.toFixed(2)} + financiamento ${financiamento.toFixed(2)} ≠ total ${total.toFixed(2)}`)
     }
-
-    if (problemas.length > 0) {
-      rejeitadas.push({ unidade, motivo: problemas.join(' · ') })
-      continue
+    if (!(entrada > 0) || !(financiamento > 0)) {
+      problemas.push('entrada ou financiamento zerado')
     }
+  }
 
-    unidades.push({
+  if (problemas.length > 0) {
+    return { tipo: 'rejeitada', unidade, motivo: problemas.join(' · ') }
+  }
+
+  return {
+    tipo: 'ok',
+    dados: {
       formato,
       parcelas_qtd: formato === 'parcelado' ? (cabecalho.parcelas_qtd ?? 40) : 0,
       reforcos_qtd: formato === 'parcelado' ? (cabecalho.reforcos_qtd ?? 4) : 0,
@@ -643,18 +716,93 @@ export function parsearTabelaFontana(
       reforco_anual: reforco,
       saldo_financiamento: financiamento,
       cub_fator: cubFator,
-    })
+    },
+  }
+}
+
+/**
+ * Última rede: a unidade some do fatiador porque a célula do box está
+ * genuinamente VAZIA no PDF — não é fragmento quebrado em duas linhas (isso
+ * já foi consertado por `repararBoxQuebradoEmDuasLinhas`, antes de chegar
+ * aqui). Localiza a linha pelo NÚMERO da unidade perdida, direto no corpo —
+ * sem depender do fatiador —, monta o chunk na mão e roda a MESMA
+ * interpretação e as MESMAS invariantes de qualquer outra linha: só entra em
+ * `unidades` se a conta fechar. `box_codigo` sai `null` — o regex exige a
+ * letra, e um número solto ali é ambíguo com a coluna DEP (ver comentário de
+ * `repararBoxQuebradoEmDuasLinhas`); nenhum dos dois vira box por adivinhação.
+ *
+ * Restrita à forma `com_dormitorios`: sem o dígito de dormitórios como âncora
+ * — a mesma razão que já limita `unidadesPerdidas` na forma sem essa coluna —
+ * "achar" o início de uma unidade vazia vira aposta, não leitura.
+ */
+function tentarRecuperarSemBox(
+  texto: string,
+  numeroUnidade: string,
+  forma: FormatoLinha,
+  cabecalho: CabecalhoTabela,
+  doRodape: { dormitorios: number | null; suites: number | null },
+  regrasPorFinal: RegraPorFinal[],
+  colunasTrocadas: boolean,
+): UnidadeImportada | null {
+  if (forma !== 'com_dormitorios') return null
+
+  const corpo = corpoSemRodapes(texto)
+  // Número da unidade, bloco opcional, dígito de dormitórios, um DEP
+  // opcional (número solto sem letra) e cai direto num valor em R$:
+  // exatamente o formato de uma linha cujo box está em branco.
+  const inicio = new RegExp(
+    `\\b${numeroUnidade}\\s+(?:[A-Z]\\d?\\s+)?\\d\\s+(?:\\d{1,3}\\s+)?(?=\\d[\\d.]*,\\d{2})`,
+  )
+  const m = inicio.exec(corpo)
+  if (!m) return null
+
+  const proximaLinha = /\b\d{3,4}\s+(?:[A-Z]\d?\s+)?\d\s+/g
+  proximaLinha.lastIndex = m.index + m[0].length
+  const prox = proximaLinha.exec(corpo)
+  const chunk = corpo.slice(m.index, prox ? prox.index : corpo.length)
+
+  const resultado = interpretarChunkDeUnidade(chunk, forma, cabecalho, doRodape, regrasPorFinal, colunasTrocadas)
+  return resultado.tipo === 'ok' && resultado.dados.unidade === numeroUnidade ? resultado.dados : null
+}
+
+export function parsearTabelaFontana(
+  textoOriginal: string,
+  cubDoSistema?: number | null,
+): ResultadoTabela {
+  // Primeiro conserta o box quebrado em duas linhas (fragmento antes da linha
+  // da unidade, resto depois) — ver o comentário da função. Tudo daqui para
+  // baixo — cabeçalho, formato, fatiador, varredura de perdidas, contagem
+  // pela repetição do CUB — trabalha sobre o texto já reparado.
+  const texto = repararBoxQuebradoEmDuasLinhas(textoOriginal)
+  const cabecalho = parseCabecalho(texto)
+  const forma = detectarFormatoLinha(texto)
+  const doRodape = lerDormitoriosDoRodape(texto)
+  const regrasPorFinal = lerRegrasPorFinal(texto)
+  const colunasTrocadas = parcelaVemAntesDoReforco(texto)
+  const unidades: UnidadeImportada[] = []
+  const rejeitadas: LinhaRejeitadaTabela[] = []
+
+  for (const bruto of fatiarUnidades(texto, forma)) {
+    const resultado = interpretarChunkDeUnidade(bruto, forma, cabecalho, doRodape, regrasPorFinal, colunasTrocadas)
+    if (resultado.tipo === 'ok') unidades.push(resultado.dados)
+    else rejeitadas.push({ unidade: resultado.unidade, motivo: resultado.motivo })
   }
 
   // Nada pode sumir em silêncio: o que a varredura encontrou e o fatiador não
-  // capturou vira rejeição explícita, com o motivo.
+  // capturou vira rejeição explícita, com o motivo — a menos que a unidade
+  // ainda dê para recuperar (box genuinamente vazio, aritmética batendo).
   const capturadas = new Set(unidades.map((u) => u.unidade))
   for (const r of rejeitadas) capturadas.add(r.unidade)
   for (const n of unidadesPerdidas(texto, capturadas, forma)) {
-    rejeitadas.push({
-      unidade: n,
-      motivo: 'linha não reconhecida — código de box fora do padrão (ex.: "09 e 16S")',
-    })
+    const recuperada = tentarRecuperarSemBox(texto, n, forma, cabecalho, doRodape, regrasPorFinal, colunasTrocadas)
+    if (recuperada) {
+      unidades.push(recuperada)
+    } else {
+      rejeitadas.push({
+        unidade: n,
+        motivo: 'linha não reconhecida — código de box fora do padrão (ex.: "09 e 16S")',
+      })
+    }
   }
 
   // Lidas = o que virou registro MAIS o que foi recusado com motivo. As duas
