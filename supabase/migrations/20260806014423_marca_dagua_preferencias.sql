@@ -2,7 +2,7 @@
 --
 -- ⚠️ DEPENDÊNCIA ENTRE BRANCHES: esta migration faz ALTER TABLE em
 -- `crm_preferencias`, criada na branch feat/score-operacao-dashboard
--- (migration 20260805230000_crm_preferencias.sql, ainda não mesclada nesta
+-- (migration 20260806011006_crm_preferencias.sql, ainda não mesclada nesta
 -- branch — por isso não aparece em supabase/migrations/ aqui). A tabela JÁ
 -- EXISTE em produção (aplicada em 05/08/2026 com autorização explícita do
 -- usuário), mas a migration de CREATE TABLE só existe no histórico daquela

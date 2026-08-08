@@ -29,7 +29,7 @@ risco direto de bloqueio da conta.
 | --- | --- |
 | Playbooks de abordagem (1 por origem) | `src/lib/instagram/playbooks.ts` |
 | Vocabulário/tipos da fila + contador diário | `src/lib/instagram/ativacoes.ts` |
-| Tabela da fila (`crm_ativacoes_instagram`) | `supabase/migrations/20260731003100_crm_ativacoes_instagram.sql` |
+| Tabela da fila (`crm_ativacoes_instagram`) | `supabase/migrations/20260801123135_crm_ativacoes_instagram.sql` |
 | API da fila (GET/POST lote/PATCH parcial/DELETE) | `src/app/api/admin/ativacoes/route.ts` |
 | Kanban de ativação (5 status, copiar abordagem) | `src/app/dashboard/ativacao/page.tsx` |
 | Webhook de DM (cria lead + interação) | `src/app/api/webhook/instagram/route.ts` |

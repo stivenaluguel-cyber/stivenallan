@@ -1,4 +1,4 @@
--- ROLLBACK da migration 20260729171057_score_anexos_financeiro_metas
+-- ROLLBACK da migration 20260729185240_score_anexos_financeiro_metas
 --
 -- ⚠️ NÃO EXECUTADO. Documento de contingência.
 -- Execute apenas se as 10 frentes precisarem ser revertidas DEPOIS de já

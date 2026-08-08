@@ -454,7 +454,7 @@ As 3 `properties` de seed podem ficar — são sintéticas e o banco é descart�
 
 ## 9. Rollback
 
-`supabase/rollback/20260805003000_lead_gate_identity_and_sessions_rollback.sql`.
+`supabase/rollback/20260805163512_lead_gate_identity_and_sessions_rollback.sql`.
 
 Confirmei via query read-only que **os 13 objetos nomeados nele existem com o
 nome exato** no descartável — com `IF EXISTS`, um typo faria o objeto sobreviver
@@ -785,7 +785,7 @@ Nenhum outro commit de código foi necessário nesta fase — Kanban, dedup, Wha
 ## 13. Plano de publicação (documentado, NADA executado)
 
 1. **Backup do Supabase de produção** antes de qualquer migration — snapshot completo via painel ou `pg_dump`.
-2. **Aplicar a migration** `20260805003000_lead_gate_identity_and_sessions.sql` em produção, isolada (não em lote com outras pendentes).
+2. **Aplicar a migration** `20260805163512_lead_gate_identity_and_sessions.sql` em produção, isolada (não em lote com outras pendentes).
 3. **Validar o schema pós-aplicação**: `list_tables`, `get_advisors` (RLS habilitado sem policy nas 3 tabelas novas — padrão do projeto), conferir os 13 objetos do rollback existem com nome exato.
 4. **Deploy do código com as flags desligadas** (`LEAD_GATE_ENABLED` ausente/false em produção) — zero mudança visível nas 36 páginas.
 5. **Smoke test sem gate ativo**: as 36 páginas carregam normalmente, build de produção confirma Parco `○` estático.
@@ -826,7 +826,7 @@ sessão válida.
 ### 14.3 Identidade telefônica com e sem DDI
 
 Adicionada a migration aditiva
-`20260805180000_lead_gate_phone_identity.sql`. A RPC reduz a entrada ao formato
+`20260805163910_lead_gate_phone_identity.sql`. A RPC reduz a entrada ao formato
 local e procura tanto `DDD+número` quanto `55+DDD+número` antes de criar lead.
 Isso impede o gate de duplicar um contato legado vindo de Meta/Evolution com
 DDI. Não há backfill, alteração destrutiva nem índice único funcional: se o
@@ -879,7 +879,7 @@ Objetivo desta rodada: preparar um Preview seguro. Migration validada, auditoria
 concluída, **push e deploy NÃO executados** — sem autorização explícita nesta
 tarefa. Produção intocada.
 
-### 15.1 Migration `20260805180000_lead_gate_phone_identity.sql`
+### 15.1 Migration `20260805163910_lead_gate_phone_identity.sql`
 
 Aplicada **somente** em `pauvicgtaqgulwdxwcgf` ("qa-lead-gate-descartavel"),
 via `apply_migration`. `pg_get_functiondef` conferido antes e depois: o corpo em

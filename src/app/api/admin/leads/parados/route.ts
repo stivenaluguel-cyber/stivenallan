@@ -8,7 +8,7 @@ const sb = () => createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env
 /**
  * GET /api/admin/leads/parados — fila de leads abertos ordenada pelo maior
  * tempo sem interação. Reaproveita a RPC `leads_parados` (já em produção,
- * criada em 20260729171057_score_anexos_financeiro_metas.sql pro relatório
+ * criada em 20260729185240_score_anexos_financeiro_metas.sql pro relatório
  * de leads parados) em vez de duplicar a lógica — ela já junta o último
  * evento em leads_interacoes E crm_focus_events, filtra fechado/perdido, e
  * ordena por última movimentação ascendente (mais parado primeiro).

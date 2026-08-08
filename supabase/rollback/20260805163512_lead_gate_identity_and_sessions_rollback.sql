@@ -1,4 +1,4 @@
--- Rollback de 20260805003000_lead_gate_identity_and_sessions.sql
+-- Rollback de 20260805163512_lead_gate_identity_and_sessions.sql
 -- Ordem inversa da migration. Não remove nenhuma coluna/tabela pré-existente.
 
 drop function if exists public.record_property_interest(uuid, uuid, text, text, text, text, text, text, text, text, integer);

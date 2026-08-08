@@ -11,7 +11,7 @@ let cache: { resultado: ResultadoScoreOperacao; expiraEm: number } | null = null
 
 /**
  * Todos os agregados vêm de UMA RPC (score_operacao_agregados, ver
- * supabase/migrations/20260805220000_score_operacao_agregados_v2.sql) — um
+ * supabase/migrations/20260806004844_score_operacao_agregados_v2.sql) — um
  * round-trip só ao banco, sem N+1. O resultado calculado fica em memória
  * por 60s: é dado que muda devagar (follow-ups da semana, leads por
  * empreendimento) e não vale recalcular a cada refresh do dashboard.

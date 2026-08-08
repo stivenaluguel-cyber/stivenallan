@@ -8,7 +8,7 @@
 -- Original e processada (com marca d'água) ficam em paths separados no
 -- mesmo bucket `imoveis` (já existe, público, sem restrição de tipo/tamanho
 -- — não precisa de bucket novo aqui, só o de logo em
--- 20260806090000_marca_dagua_preferencias.sql). `storage_path_processada`
+-- 20260806014423_marca_dagua_preferencias.sql). `storage_path_processada`
 -- fica NULL até o processamento rodar (upload sem logo configurada) e é
 -- regravada quando o corretor troca a logo e reprocessa em lote — o
 -- original nunca é sobrescrito, é sempre a fonte da regeneração.
