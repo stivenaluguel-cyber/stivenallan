@@ -26,17 +26,28 @@ export async function GET(_req: NextRequest, { params }: Params) {
       .eq('lead_id', leadId).order('created_at', { ascending: false }).limit(100),
     client.from('interacoes').select('id, canal, direcao, mensagem, created_at, processado_por_ia, sentimento')
       .eq('lead_id', leadId).order('created_at', { ascending: false }).limit(100),
-    client.from('crm_agenda').select('id, titulo, tipo, inicio, status')
+    client.from('crm_agenda').select('id, titulo, tipo, inicio, status, properties(nome)')
       .eq('lead_id', leadId).order('inicio', { ascending: false }).limit(50),
     client.from('crm_focus_events').select('id, action_type, created_at, metadata')
       .eq('lead_id', leadId).order('created_at', { ascending: false }).limit(100),
   ])
 
+  // isOneToOne:false no schema oficial tipa o embed `properties(nome)` como
+  // array mesmo sendo, na prática, "um compromisso aponta pra no máximo um
+  // imóvel" — mesmo padrão defensivo já usado em outras rotas (ex.:
+  // src/app/api/admin/leads/route.ts). Normaliza pra `property_nome` antes
+  // de entregar a buildLeadTimeline(), que é puro e não conhece o shape do
+  // Supabase.
+  const agendaNormalizada = (agenda.data ?? []).map((ev) => {
+    const propriedade = Array.isArray(ev.properties) ? ev.properties[0] : ev.properties
+    return { id: ev.id, titulo: ev.titulo, tipo: ev.tipo, inicio: ev.inicio, status: ev.status, property_nome: propriedade?.nome ?? null }
+  })
+
   const timeline = buildLeadTimeline({
     anotacoesLegadas: lead.data?.anotacoes ?? null,
     interacoesLead: interacoesLead.data ?? [],
     mensagens: mensagens.data ?? [],
-    agenda: agenda.data ?? [],
+    agenda: agendaNormalizada,
     eventosFoco: eventosFoco.data ?? [],
   })
 

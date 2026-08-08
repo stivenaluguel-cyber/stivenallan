@@ -67,7 +67,7 @@ export type TimelineSources = {
   anotacoesLegadas?: string | null
   interacoesLead?: { id: string; tipo: string; descricao: string; estagio_de?: string | null; estagio_para?: string | null; created_at: string }[]
   mensagens?: { id: string; canal: string | null; direcao: string; mensagem: string; created_at: string; processado_por_ia?: boolean | null; sentimento?: string | null }[]
-  agenda?: { id: string; titulo: string; tipo: string | null; inicio: string; status: string | null }[]
+  agenda?: { id: string; titulo: string; tipo: string | null; inicio: string; status: string | null; property_nome?: string | null }[]
   eventosFoco?: { id: string; action_type: string; created_at: string; metadata?: Record<string, unknown> | null }[]
 }
 
@@ -115,12 +115,13 @@ export function buildLeadTimeline(sources: TimelineSources): TimelineItem[] {
   }
 
   for (const ev of sources.agenda ?? []) {
+    const situacao = 'Situação: ' + (ev.status ?? 'agendado')
     itens.push({
       id: 'agenda:' + ev.id,
       kind: 'compromisso',
       data: ev.inicio,
       titulo: ev.titulo,
-      descricao: 'Situação: ' + (ev.status ?? 'agendado'),
+      descricao: ev.property_nome ? `Imóvel: ${ev.property_nome} · ${situacao}` : situacao,
       origem: 'Agenda',
     })
   }

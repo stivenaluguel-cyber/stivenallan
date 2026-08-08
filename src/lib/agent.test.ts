@@ -92,8 +92,9 @@ describe('processarMensagem — integração com a base de conhecimento (RAG lev
 
 // ============================================
 // Item 9 — executarTool: mass assignment, WhatsApp canônico, erro ≠ sucesso
+// Item 10B — executarTool: agendar_visita grava em crm_agenda
 // ============================================
-type ErroSimulado = { message: string }
+type ErroSimulado = { message: string; code?: string }
 type Resultado<T> = { data: T; error: ErroSimulado | null }
 
 function selectBuilder<T>(resultado: Resultado<T>) {
@@ -116,18 +117,30 @@ function selectBuilder<T>(resultado: Resultado<T>) {
 
 function configurarSupabase(cfg: {
   properties?: Resultado<unknown>
+  // Resultado da query de validação de UMA property (agendar_visita, select
+  // por slug + maybeSingle). Cai pra `properties` se ausente.
+  propriedade?: Resultado<unknown>
   leadsSelect?: Resultado<unknown>
   leadsUpdate?: { error: ErroSimulado | null }
   leadsInsert?: { error: ErroSimulado | null }
   agendamentosInsert?: { error: ErroSimulado | null }
+  // Uma entrada por chamada CONSECUTIVA de crm_agenda.select(...).eq('client_event_id', ...).
+  // A 1a é o pré-check de idempotência; se o INSERT devolver 23505, a 2a
+  // (se existir) é a tentativa de recuperação da linha. Índice trava no
+  // último item se houver menos entradas que chamadas.
+  agendaSelectSequencia?: Resultado<unknown>[]
+  agendaInsert?: { data: unknown; error: ErroSimulado | null }
 }) {
   const leadsUpdatePayloads: Record<string, unknown>[] = []
   const leadsInsertPayloads: Record<string, unknown>[] = []
   const agendamentosInsertPayloads: Record<string, unknown>[] = []
+  const crmAgendaInsertPayloads: Record<string, unknown>[] = []
+  const agendaSelectSequencia = cfg.agendaSelectSequencia ?? [{ data: null, error: null }]
+  let agendaSelectChamada = 0
 
   supabaseFromMock.mockImplementation((table: string) => {
     if (table === 'properties') {
-      return { select: (..._a: unknown[]) => selectBuilder(cfg.properties ?? { data: [], error: null }) }
+      return { select: (..._a: unknown[]) => selectBuilder(cfg.propriedade ?? cfg.properties ?? { data: [], error: null }) }
     }
     if (table === 'leads') {
       return {
@@ -142,6 +155,23 @@ function configurarSupabase(cfg: {
         },
       }
     }
+    if (table === 'crm_agenda') {
+      return {
+        select: (..._a: unknown[]) => {
+          const idx = Math.min(agendaSelectChamada, agendaSelectSequencia.length - 1)
+          agendaSelectChamada++
+          return selectBuilder(agendaSelectSequencia[idx])
+        },
+        insert: (payload: Record<string, unknown>) => {
+          crmAgendaInsertPayloads.push(payload)
+          return {
+            select: (..._a: unknown[]) => ({
+              single: () => Promise.resolve(cfg.agendaInsert ?? { data: null, error: { message: 'agendaInsert não configurado neste teste' } }),
+            }),
+          }
+        },
+      }
+    }
     if (table === 'agendamentos') {
       return {
         insert: (payload: Record<string, unknown>) => {
@@ -153,7 +183,7 @@ function configurarSupabase(cfg: {
     throw new Error(`tabela inesperada no teste: ${table}`)
   })
 
-  return { leadsUpdatePayloads, leadsInsertPayloads, agendamentosInsertPayloads }
+  return { leadsUpdatePayloads, leadsInsertPayloads, agendamentosInsertPayloads, crmAgendaInsertPayloads }
 }
 
 const WHATSAPP_CANONICO = '5548911112222'
@@ -401,11 +431,226 @@ describe('executarTool — atualizar_lead', () => {
   })
 })
 
-describe('executarTool — agendar_visita', () => {
-  const argsValidos = { empreendimento_slug: 'monte-leone', data_preferencia: '2026-08-20', horario_preferencia: '14:00' }
-  const propriedadeAtiva = { data: { id: 'prop-1', nome: 'Monte Leone' }, error: null }
+describe('paraInstanteUtcAgendamento (helper puro — Item 10B)', () => {
+  it('N) 14:30 em São Paulo (UTC-03:00) equivale a 17:30 UTC', async () => {
+    const { paraInstanteUtcAgendamento } = await import('./agent')
+    const instanteMs = paraInstanteUtcAgendamento('2026-08-10', '14:30')
+    expect(instanteMs).toBeDefined()
+    expect(new Date(instanteMs!).toISOString()).toBe('2026-08-10T17:30:00.000Z')
+  })
 
-  it('K) args tentando outro lead_whatsapp é ignorado — busca usa exclusivamente o WhatsApp canônico', async () => {
+  it('O) data impossível (31 de fevereiro) retorna undefined', async () => {
+    const { paraInstanteUtcAgendamento } = await import('./agent')
+    expect(paraInstanteUtcAgendamento('2026-02-31', '10:00')).toBeUndefined()
+  })
+
+  it('O2) mês 13 retorna undefined', async () => {
+    const { paraInstanteUtcAgendamento } = await import('./agent')
+    expect(paraInstanteUtcAgendamento('2026-13-10', '10:00')).toBeUndefined()
+  })
+
+  it('O3) dia 00 retorna undefined', async () => {
+    const { paraInstanteUtcAgendamento } = await import('./agent')
+    expect(paraInstanteUtcAgendamento('2026-08-00', '10:00')).toBeUndefined()
+  })
+
+  it('O4) 29 de fevereiro em ano bissexto (2028) é válido', async () => {
+    const { paraInstanteUtcAgendamento } = await import('./agent')
+    expect(paraInstanteUtcAgendamento('2028-02-29', '10:00')).toBeDefined()
+  })
+
+  it('O5) 29 de fevereiro em ano NÃO bissexto (2026) retorna undefined', async () => {
+    const { paraInstanteUtcAgendamento } = await import('./agent')
+    expect(paraInstanteUtcAgendamento('2026-02-29', '10:00')).toBeUndefined()
+  })
+
+  it('P) hora 25 retorna undefined', async () => {
+    const { paraInstanteUtcAgendamento } = await import('./agent')
+    expect(paraInstanteUtcAgendamento('2026-08-10', '25:00')).toBeUndefined()
+  })
+
+  it('P2) minuto 60 retorna undefined', async () => {
+    const { paraInstanteUtcAgendamento } = await import('./agent')
+    expect(paraInstanteUtcAgendamento('2026-08-10', '14:60')).toBeUndefined()
+  })
+
+  it('horário 23:30 (legítimo, vira o dia seguinte em UTC) continua válido', async () => {
+    const { paraInstanteUtcAgendamento } = await import('./agent')
+    const instanteMs = paraInstanteUtcAgendamento('2026-08-10', '23:30')
+    expect(instanteMs).toBeDefined()
+    expect(new Date(instanteMs!).toISOString()).toBe('2026-08-11T02:30:00.000Z')
+  })
+})
+
+describe('paraDataHoraAgendamento (helper puro — Item 10B) — rejeita passado', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-08-08T12:00:00.000Z'))
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('Q) instante no passado retorna undefined', async () => {
+    const { paraDataHoraAgendamento } = await import('./agent')
+    expect(paraDataHoraAgendamento('2026-08-01', '10:00')).toBeUndefined()
+  })
+
+  it('instante futuro retorna ISO UTC válido', async () => {
+    const { paraDataHoraAgendamento } = await import('./agent')
+    expect(paraDataHoraAgendamento('2026-08-10', '14:30')).toBe('2026-08-10T17:30:00.000Z')
+  })
+})
+
+describe('gerarClientEventIdAgendaIA (helper puro — Item 10B)', () => {
+  it('J) produz um UUID válido', async () => {
+    const { gerarClientEventIdAgendaIA } = await import('./agent')
+    const id = gerarClientEventIdAgendaIA('lead-1', 'prop-1', '2026-08-10T17:30:00.000Z')
+    expect(id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/)
+  })
+
+  it('K) mesma tripla lead/property/início produz sempre o mesmo UUID', async () => {
+    const { gerarClientEventIdAgendaIA } = await import('./agent')
+    const a = gerarClientEventIdAgendaIA('lead-1', 'prop-1', '2026-08-10T17:30:00.000Z')
+    const b = gerarClientEventIdAgendaIA('lead-1', 'prop-1', '2026-08-10T17:30:00.000Z')
+    expect(a).toBe(b)
+  })
+
+  it('L) horário diferente produz UUID diferente', async () => {
+    const { gerarClientEventIdAgendaIA } = await import('./agent')
+    const a = gerarClientEventIdAgendaIA('lead-1', 'prop-1', '2026-08-10T17:30:00.000Z')
+    const b = gerarClientEventIdAgendaIA('lead-1', 'prop-1', '2026-08-10T18:30:00.000Z')
+    expect(a).not.toBe(b)
+  })
+
+  it('M) property diferente produz UUID diferente', async () => {
+    const { gerarClientEventIdAgendaIA } = await import('./agent')
+    const a = gerarClientEventIdAgendaIA('lead-1', 'prop-1', '2026-08-10T17:30:00.000Z')
+    const b = gerarClientEventIdAgendaIA('lead-1', 'prop-2', '2026-08-10T17:30:00.000Z')
+    expect(a).not.toBe(b)
+  })
+
+  it('lead diferente produz UUID diferente', async () => {
+    const { gerarClientEventIdAgendaIA } = await import('./agent')
+    const a = gerarClientEventIdAgendaIA('lead-1', 'prop-1', '2026-08-10T17:30:00.000Z')
+    const b = gerarClientEventIdAgendaIA('lead-2', 'prop-1', '2026-08-10T17:30:00.000Z')
+    expect(a).not.toBe(b)
+  })
+})
+
+describe('executarTool — agendar_visita (Item 10B: crm_agenda)', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-08-08T12:00:00.000Z'))
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  const argsValidos = { empreendimento_slug: 'monte-leone', data_preferencia: '2026-08-10', horario_preferencia: '14:30' }
+  const INICIO_ESPERADO = '2026-08-10T17:30:00.000Z'
+  const propriedadeAtiva = {
+    data: { id: 'prop-1', nome: 'Monte Leone', slug: 'monte-leone', endereco: 'Rua das Flores, 100', bairro: 'Centro', cidade: 'Criciúma' },
+    error: null,
+  }
+  const leadQualificado = { data: { id: 'lead-1', estagio_funil: 'qualificado' }, error: null }
+  const agendaInsertadaOk = { data: { id: 'agenda-1', status: 'agendado', property_id: 'prop-1', lead_id: 'lead-1', inicio: INICIO_ESPERADO }, error: null }
+
+  it('A) agenda visita nova: insere em crm_agenda', async () => {
+    const { executarTool } = await import('./agent')
+    const sb = configurarSupabase({ leadsSelect: leadQualificado, propriedade: propriedadeAtiva, agendaInsert: agendaInsertadaOk })
+
+    const resultado = await executarTool('agendar_visita', argsValidos, WHATSAPP_CANONICO)
+
+    expect(resultado).toContain('Visita registrada')
+    expect(sb.crmAgendaInsertPayloads).toHaveLength(1)
+  })
+
+  it('B) zero INSERT na tabela legada agendamentos', async () => {
+    const { executarTool } = await import('./agent')
+    const sb = configurarSupabase({ leadsSelect: leadQualificado, propriedade: propriedadeAtiva, agendaInsert: agendaInsertadaOk })
+
+    await executarTool('agendar_visita', argsValidos, WHATSAPP_CANONICO)
+    expect(sb.agendamentosInsertPayloads).toHaveLength(0)
+  })
+
+  it('C/D/E/F) payload contém lead_id, property_id, status=agendado, tipo=visita', async () => {
+    const { executarTool } = await import('./agent')
+    const sb = configurarSupabase({ leadsSelect: leadQualificado, propriedade: propriedadeAtiva, agendaInsert: agendaInsertadaOk })
+
+    await executarTool('agendar_visita', argsValidos, WHATSAPP_CANONICO)
+
+    const payload = sb.crmAgendaInsertPayloads[0]
+    expect(payload.lead_id).toBe('lead-1')
+    expect(payload.property_id).toBe('prop-1')
+    expect(payload.status).toBe('agendado')
+    expect(payload.tipo).toBe('visita')
+    expect(payload.inicio).toBe(INICIO_ESPERADO)
+  })
+
+  it('G) título contém o nome da property', async () => {
+    const { executarTool } = await import('./agent')
+    const sb = configurarSupabase({ leadsSelect: leadQualificado, propriedade: propriedadeAtiva, agendaInsert: agendaInsertadaOk })
+
+    await executarTool('agendar_visita', argsValidos, WHATSAPP_CANONICO)
+    expect(sb.crmAgendaInsertPayloads[0].titulo).toContain('Monte Leone')
+  })
+
+  it('H) local usa o endereço da property quando disponível', async () => {
+    const { executarTool } = await import('./agent')
+    const sb = configurarSupabase({ leadsSelect: leadQualificado, propriedade: propriedadeAtiva, agendaInsert: agendaInsertadaOk })
+
+    await executarTool('agendar_visita', argsValidos, WHATSAPP_CANONICO)
+    expect(sb.crmAgendaInsertPayloads[0].local).toBe('Rua das Flores, 100')
+  })
+
+  it('I) sem endereço, local cai no fallback bairro/cidade', async () => {
+    const { executarTool } = await import('./agent')
+    const sb = configurarSupabase({
+      leadsSelect: leadQualificado,
+      propriedade: { data: { id: 'prop-1', nome: 'Monte Leone', slug: 'monte-leone', endereco: null, bairro: 'Centro', cidade: 'Criciúma' }, error: null },
+      agendaInsert: agendaInsertadaOk,
+    })
+
+    await executarTool('agendar_visita', argsValidos, WHATSAPP_CANONICO)
+    expect(sb.crmAgendaInsertPayloads[0].local).toBe('Centro, Criciúma')
+  })
+
+  it('J) client_event_id gravado é um UUID válido', async () => {
+    const { executarTool } = await import('./agent')
+    const sb = configurarSupabase({ leadsSelect: leadQualificado, propriedade: propriedadeAtiva, agendaInsert: agendaInsertadaOk })
+
+    await executarTool('agendar_visita', argsValidos, WHATSAPP_CANONICO)
+    expect(sb.crmAgendaInsertPayloads[0].client_event_id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/)
+  })
+
+  it('O) data impossível: não cria agenda', async () => {
+    const { executarTool } = await import('./agent')
+    const sb = configurarSupabase({})
+    const resultado = await executarTool('agendar_visita', { ...argsValidos, data_preferencia: '2026-02-31' }, WHATSAPP_CANONICO)
+    expect(sb.crmAgendaInsertPayloads).toHaveLength(0)
+    expect(resultado).not.toContain('Visita registrada')
+  })
+
+  it('P) horário impossível: não cria agenda', async () => {
+    const { executarTool } = await import('./agent')
+    const sb = configurarSupabase({})
+    const resultado = await executarTool('agendar_visita', { ...argsValidos, horario_preferencia: '25:00' }, WHATSAPP_CANONICO)
+    expect(sb.crmAgendaInsertPayloads).toHaveLength(0)
+    expect(resultado).not.toContain('Visita registrada')
+  })
+
+  it('Q) instante no passado: não cria agenda', async () => {
+    const { executarTool } = await import('./agent')
+    const sb = configurarSupabase({})
+    const resultado = await executarTool('agendar_visita', { ...argsValidos, data_preferencia: '2026-08-01' }, WHATSAPP_CANONICO)
+    expect(sb.crmAgendaInsertPayloads).toHaveLength(0)
+    expect(resultado).not.toContain('Visita registrada')
+  })
+
+  it('args tentando outro lead_whatsapp é ignorado — busca usa exclusivamente o WhatsApp canônico', async () => {
     const { executarTool } = await import('./agent')
     let whatsappUsadoNoEq: unknown
     supabaseFromMock.mockImplementation((table: string) => {
@@ -414,14 +659,19 @@ describe('executarTool — agendar_visita', () => {
           select: () => ({
             eq: (_col: string, val: unknown) => {
               whatsappUsadoNoEq = val
-              return { maybeSingle: () => Promise.resolve({ data: { id: 'lead-1', estagio_funil: 'qualificado' }, error: null }) }
+              return { maybeSingle: () => Promise.resolve(leadQualificado) }
             },
           }),
           update: () => ({ eq: () => Promise.resolve({ error: null }) }),
         }
       }
       if (table === 'properties') return { select: () => selectBuilder(propriedadeAtiva) }
-      if (table === 'agendamentos') return { insert: () => Promise.resolve({ error: null }) }
+      if (table === 'crm_agenda') {
+        return {
+          select: () => selectBuilder({ data: null, error: null }),
+          insert: () => ({ select: () => ({ single: () => Promise.resolve(agendaInsertadaOk) }) }),
+        }
+      }
       throw new Error(`tabela inesperada: ${table}`)
     })
 
@@ -431,118 +681,187 @@ describe('executarTool — agendar_visita', () => {
     expect(whatsappUsadoNoEq).not.toBe('5599999999999')
   })
 
-  it('L) lead não existe: não cria agendamento', async () => {
+  it('lead não existe: não cria agendamento', async () => {
     const { executarTool } = await import('./agent')
     const sb = configurarSupabase({ leadsSelect: { data: null, error: null } })
 
     const resultado = await executarTool('agendar_visita', argsValidos, WHATSAPP_CANONICO)
 
-    expect(sb.agendamentosInsertPayloads).toHaveLength(0)
+    expect(sb.crmAgendaInsertPayloads).toHaveLength(0)
     expect(resultado.toLowerCase()).toContain('não encontrado')
   })
 
-  it('M) erro ao buscar lead: não cria agendamento e não retorna sucesso', async () => {
+  it('erro ao buscar lead: não cria agendamento e não retorna sucesso', async () => {
     const { executarTool } = await import('./agent')
     const sb = configurarSupabase({ leadsSelect: { data: null, error: { message: 'timeout' } } })
 
     const resultado = await executarTool('agendar_visita', argsValidos, WHATSAPP_CANONICO)
 
-    expect(sb.agendamentosInsertPayloads).toHaveLength(0)
-    expect(resultado).not.toContain('Visita agendada com sucesso')
+    expect(sb.crmAgendaInsertPayloads).toHaveLength(0)
+    expect(resultado).not.toContain('Visita registrada')
   })
 
-  it('N) empreendimento inexistente/inativo: não agenda', async () => {
+  it('empreendimento inexistente/inativo: não agenda', async () => {
+    const { executarTool } = await import('./agent')
+    const sb = configurarSupabase({ leadsSelect: leadQualificado, propriedade: { data: null, error: null } })
+
+    const resultado = await executarTool('agendar_visita', argsValidos, WHATSAPP_CANONICO)
+
+    expect(sb.crmAgendaInsertPayloads).toHaveLength(0)
+    expect(resultado).not.toContain('Visita registrada')
+  })
+
+  it('R) evento idempotente já existente/agendado: zero insert, handoff pode ser concluído', async () => {
     const { executarTool } = await import('./agent')
     const sb = configurarSupabase({
-      leadsSelect: { data: { id: 'lead-1', estagio_funil: 'qualificado' }, error: null },
-      properties: { data: null, error: null },
+      leadsSelect: leadQualificado,
+      propriedade: propriedadeAtiva,
+      agendaSelectSequencia: [{ data: { id: 'agenda-existente', status: 'agendado', property_id: 'prop-1', lead_id: 'lead-1', inicio: INICIO_ESPERADO }, error: null }],
     })
 
     const resultado = await executarTool('agendar_visita', argsValidos, WHATSAPP_CANONICO)
 
-    expect(sb.agendamentosInsertPayloads).toHaveLength(0)
-    expect(resultado).not.toContain('Visita agendada com sucesso')
+    expect(sb.crmAgendaInsertPayloads).toHaveLength(0)
+    expect(resultado).toContain('Visita registrada')
   })
 
-  it('O) erro no insert de agendamento: não muda estágio e não retorna sucesso', async () => {
+  it('evento existente com status inativo (cancelado) NÃO é reaproveitado como nova visita', async () => {
     const { executarTool } = await import('./agent')
     const sb = configurarSupabase({
-      leadsSelect: { data: { id: 'lead-1', estagio_funil: 'qualificado' }, error: null },
-      properties: propriedadeAtiva,
-      agendamentosInsert: { error: { message: 'db down' } },
+      leadsSelect: leadQualificado,
+      propriedade: propriedadeAtiva,
+      agendaSelectSequencia: [{ data: { id: 'agenda-cancelada', status: 'cancelado', property_id: 'prop-1', lead_id: 'lead-1', inicio: INICIO_ESPERADO }, error: null }],
     })
+
+    const resultado = await executarTool('agendar_visita', argsValidos, WHATSAPP_CANONICO)
+
+    expect(sb.crmAgendaInsertPayloads).toHaveLength(0)
+    expect(resultado).not.toContain('Visita registrada')
+  })
+
+  it('S) erro no SELECT de idempotência: zero insert, zero stage update', async () => {
+    const { executarTool } = await import('./agent')
+    const sb = configurarSupabase({
+      leadsSelect: leadQualificado,
+      propriedade: propriedadeAtiva,
+      agendaSelectSequencia: [{ data: null, error: { message: 'timeout' } }],
+    })
+
+    const resultado = await executarTool('agendar_visita', argsValidos, WHATSAPP_CANONICO)
+
+    expect(sb.crmAgendaInsertPayloads).toHaveLength(0)
+    expect(sb.leadsUpdatePayloads).toHaveLength(0)
+    expect(resultado).not.toContain('Visita registrada')
+  })
+
+  it('T) INSERT sucesso: stage + handoff', async () => {
+    const { executarTool } = await import('./agent')
+    const sb = configurarSupabase({ leadsSelect: leadQualificado, propriedade: propriedadeAtiva, agendaInsert: agendaInsertadaOk })
+
+    await executarTool('agendar_visita', argsValidos, WHATSAPP_CANONICO)
+
+    expect(sb.leadsUpdatePayloads[0]).toMatchObject({ estagio_funil: 'visita_agendada', atendimento_humano_ativo: true })
+  })
+
+  it('U) INSERT erro comum: zero stage/handoff', async () => {
+    const { executarTool } = await import('./agent')
+    const sb = configurarSupabase({ leadsSelect: leadQualificado, propriedade: propriedadeAtiva, agendaInsert: { data: null, error: { message: 'db down' } } })
 
     const resultado = await executarTool('agendar_visita', argsValidos, WHATSAPP_CANONICO)
 
     expect(sb.leadsUpdatePayloads).toHaveLength(0)
-    expect(resultado).not.toContain('Visita agendada com sucesso')
+    expect(resultado).not.toContain('Visita registrada')
     expect(registrarMudancaEstagioMock).not.toHaveBeenCalled()
   })
 
-  it('P) insert sucesso + update de estágio sucesso: retorna sucesso', async () => {
+  it('V) INSERT 23505 + recuperação da linha: zero duplicação, prossegue para handoff', async () => {
     const { executarTool } = await import('./agent')
-    configurarSupabase({
-      leadsSelect: { data: { id: 'lead-1', estagio_funil: 'qualificado' }, error: null },
-      properties: propriedadeAtiva,
+    const sb = configurarSupabase({
+      leadsSelect: leadQualificado,
+      propriedade: propriedadeAtiva,
+      agendaSelectSequencia: [
+        { data: null, error: null },
+        { data: { id: 'agenda-race', status: 'agendado', property_id: 'prop-1', lead_id: 'lead-1', inicio: INICIO_ESPERADO }, error: null },
+      ],
+      agendaInsert: { data: null, error: { message: 'duplicate key', code: '23505' } },
     })
 
     const resultado = await executarTool('agendar_visita', argsValidos, WHATSAPP_CANONICO)
-    expect(resultado).toContain('Visita agendada com sucesso')
+
+    expect(sb.crmAgendaInsertPayloads).toHaveLength(1)
+    expect(resultado).toContain('Visita registrada')
+    expect(sb.leadsUpdatePayloads[0]).toMatchObject({ estagio_funil: 'visita_agendada' })
   })
 
-  it('Q) insert sucesso + update de estágio falha: não retorna sucesso pleno, não insere de novo, indica falha parcial', async () => {
+  it('W) INSERT 23505 + recuperação falha: não retorna sucesso', async () => {
     const { executarTool } = await import('./agent')
     const sb = configurarSupabase({
-      leadsSelect: { data: { id: 'lead-1', estagio_funil: 'qualificado' }, error: null },
-      properties: propriedadeAtiva,
+      leadsSelect: leadQualificado,
+      propriedade: propriedadeAtiva,
+      agendaSelectSequencia: [
+        { data: null, error: null },
+        { data: null, error: { message: 'timeout na recuperação' } },
+      ],
+      agendaInsert: { data: null, error: { message: 'duplicate key', code: '23505' } },
+    })
+
+    const resultado = await executarTool('agendar_visita', argsValidos, WHATSAPP_CANONICO)
+
+    expect(resultado).not.toContain('Visita registrada')
+    expect(sb.leadsUpdatePayloads).toHaveLength(0)
+  })
+
+  it('X) agenda persistida + stage update falha: falha parcial honesta', async () => {
+    const { executarTool } = await import('./agent')
+    const sb = configurarSupabase({
+      leadsSelect: leadQualificado,
+      propriedade: propriedadeAtiva,
+      agendaInsert: agendaInsertadaOk,
       leadsUpdate: { error: { message: 'db down' } },
     })
 
     const resultado = await executarTool('agendar_visita', argsValidos, WHATSAPP_CANONICO)
 
-    expect(sb.agendamentosInsertPayloads).toHaveLength(1)
-    expect(resultado).not.toContain('Visita agendada com sucesso')
+    expect(sb.crmAgendaInsertPayloads).toHaveLength(1)
+    expect(resultado).not.toContain('Visita registrada')
     expect(resultado.toLowerCase()).toContain('escalad')
     expect(registrarMudancaEstagioMock).not.toHaveBeenCalled()
   })
 
-  it('R) handoff humano: atendimento_humano_ativo vira true após agendamento confirmado', async () => {
+  it('Y) retry depois de falha parcial: encontra agenda existente, não reinsere, conclui stage/handoff', async () => {
     const { executarTool } = await import('./agent')
     const sb = configurarSupabase({
-      leadsSelect: { data: { id: 'lead-1', estagio_funil: 'qualificado' }, error: null },
-      properties: propriedadeAtiva,
+      leadsSelect: leadQualificado,
+      propriedade: propriedadeAtiva,
+      agendaSelectSequencia: [{ data: { id: 'agenda-1', status: 'agendado', property_id: 'prop-1', lead_id: 'lead-1', inicio: INICIO_ESPERADO }, error: null }],
+    })
+
+    const resultado = await executarTool('agendar_visita', argsValidos, WHATSAPP_CANONICO)
+
+    expect(sb.crmAgendaInsertPayloads).toHaveLength(0)
+    expect(resultado).toContain('Visita registrada')
+    expect(sb.leadsUpdatePayloads[0]).toMatchObject({ estagio_funil: 'visita_agendada' })
+  })
+
+  it('Z) estágio já é visita_agendada: histórico não duplica', async () => {
+    const { executarTool } = await import('./agent')
+    configurarSupabase({
+      leadsSelect: { data: { id: 'lead-1', estagio_funil: 'visita_agendada' }, error: null },
+      propriedade: propriedadeAtiva,
+      agendaInsert: agendaInsertadaOk,
     })
 
     await executarTool('agendar_visita', argsValidos, WHATSAPP_CANONICO)
-
-    expect(sb.leadsUpdatePayloads[0]).toMatchObject({
-      estagio_funil: 'visita_agendada',
-      atendimento_humano_ativo: true,
-    })
+    expect(registrarMudancaEstagioMock).not.toHaveBeenCalled()
   })
 
-  it('S) histórico de estágio é registrado exatamente 1 vez quando o estágio realmente muda', async () => {
+  it('AA) estágio muda: registrarMudancaEstagio chamado exatamente 1x', async () => {
     const { executarTool } = await import('./agent')
-    configurarSupabase({
-      leadsSelect: { data: { id: 'lead-1', estagio_funil: 'qualificado' }, error: null },
-      properties: propriedadeAtiva,
-    })
+    configurarSupabase({ leadsSelect: leadQualificado, propriedade: propriedadeAtiva, agendaInsert: agendaInsertadaOk })
 
     await executarTool('agendar_visita', argsValidos, WHATSAPP_CANONICO)
 
     expect(registrarMudancaEstagioMock).toHaveBeenCalledTimes(1)
     expect(registrarMudancaEstagioMock).toHaveBeenCalledWith(expect.anything(), 'lead-1', 'qualificado', 'visita_agendada')
-  })
-
-  it('S2) estágio já era visita_agendada: não registra histórico de novo', async () => {
-    const { executarTool } = await import('./agent')
-    configurarSupabase({
-      leadsSelect: { data: { id: 'lead-1', estagio_funil: 'visita_agendada' }, error: null },
-      properties: propriedadeAtiva,
-    })
-
-    await executarTool('agendar_visita', argsValidos, WHATSAPP_CANONICO)
-
-    expect(registrarMudancaEstagioMock).not.toHaveBeenCalled()
   })
 })

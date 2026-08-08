@@ -135,4 +135,27 @@ describe('buildLeadTimeline', () => {
     })
     expect(timeline[0].sentimento).toBeNull()
   })
+
+  it('Item 10B: agenda com property_nome inclui o imóvel na descrição', () => {
+    const timeline = buildLeadTimeline({
+      agenda: [{ id: 'a1', titulo: 'Visita', tipo: 'visita', inicio: '2026-08-10T17:30:00Z', status: 'agendado', property_nome: 'Parco Savello' }],
+    })
+    expect(timeline[0].descricao).toContain('Parco Savello')
+    expect(timeline[0].descricao).toContain('agendado')
+    expect(timeline[0].descricao).toBe('Imóvel: Parco Savello · Situação: agendado')
+  })
+
+  it('Item 10B: agenda sem property_nome preserva o comportamento antigo (só a situação)', () => {
+    const timeline = buildLeadTimeline({
+      agenda: [{ id: 'a1', titulo: 'Reunião', tipo: 'reuniao', inicio: '2026-08-10T17:30:00Z', status: 'agendado' }],
+    })
+    expect(timeline[0].descricao).toBe('Situação: agendado')
+  })
+
+  it('Item 10B: agenda antiga com property_nome ausente (undefined, não gravado no schema quando a coluna nao existia) continua funcionando', () => {
+    const timeline = buildLeadTimeline({
+      agenda: [{ id: 'a1', titulo: 'Visita antiga', tipo: 'visita', inicio: '2026-01-01T10:00:00Z', status: 'concluido', property_nome: null }],
+    })
+    expect(timeline[0].descricao).toBe('Situação: concluido')
+  })
 })
