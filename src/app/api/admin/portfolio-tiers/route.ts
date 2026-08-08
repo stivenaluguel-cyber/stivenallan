@@ -12,7 +12,7 @@ let cache: { resultado: ResultadoPortfolioTiers; expiraEm: number } | null = nul
 /**
  * GET — distribuição do portfólio publicado por faixa de preço. Todo o
  * agregado vem de UMA RPC (portfolio_precos_referencia, ver
- * supabase/migrations/20260806110000_portfolio_precos_referencia.sql) —
+ * supabase/migrations/20260806021324_portfolio_precos_referencia.sql) —
  * mesmo padrão do Score/Meta Diária, um round-trip só. Cache de 60s: é
  * dado que muda devagar (preço de tabela e status ativo não mudam a cada
  * minuto).

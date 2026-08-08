@@ -1,4 +1,4 @@
--- Rollback de 20260730134843_tabelas_precos_empreendimento.sql
+-- Rollback de 20260730140950_tabelas_precos_empreendimento.sql
 --
 -- ATENÇÃO: derruba a tabela e, com ela, o registro de qual PDF pertence a qual
 -- empreendimento. Os arquivos em si continuam no bucket privado, sob
