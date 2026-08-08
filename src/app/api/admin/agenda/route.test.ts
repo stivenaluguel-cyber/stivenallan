@@ -21,7 +21,7 @@ vi.mock('@supabase/supabase-js', () => ({
 }))
 
 // Import DEPOIS dos vi.mock (hoistados pro topo do arquivo).
-import { POST, PATCH } from './route'
+import { GET, POST, PATCH } from './route'
 
 // Simula crm_agenda em memória, incluindo o comportamento do unique index
 // PARCIAL em client_event_id (migration 0016): duas linhas com o mesmo
@@ -77,6 +77,80 @@ async function callPost(body: unknown) {
   const json = await res.json()
   return { status: res.status, json }
 }
+
+// Mock pro GET: só precisa do encadeamento select().gte().lte().order(),
+// awaitable no final (thenable), devolvendo as linhas configuradas.
+function makeSupabaseGet(rows: Record<string, unknown>[]) {
+  const chain = {
+    gte: (..._a: unknown[]) => chain,
+    lte: (..._a: unknown[]) => chain,
+    order: (..._a: unknown[]) => chain,
+    then: (resolve: (v: { data: Record<string, unknown>[]; error: null }) => void) => resolve({ data: rows, error: null }),
+  }
+  return {
+    from(table: string) {
+      if (table !== 'crm_agenda') throw new Error('Tabela inesperada no teste: ' + table)
+      return { select: (..._a: unknown[]) => chain }
+    },
+  }
+}
+
+function callGet(url = 'http://test/api/admin/agenda') {
+  return GET({ url } as unknown as NextRequest)
+}
+
+describe('GET /api/admin/agenda — inclui a relação de properties (Item 10B)', () => {
+  beforeEach(() => {
+    process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://test'
+    process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-key'
+    process.env.JWT_SECRET = 'segredo-de-teste-com-32-caracteres-minimos'
+  })
+
+  afterEach(() => {
+    supabaseHolder.current = null as unknown as ReturnType<typeof makeSupabase>
+  })
+
+  it('evento com property relacionada: a relação properties chega na resposta', async () => {
+    supabaseHolder.current = makeSupabaseGet([
+      { id: 'agenda-1', titulo: 'Visita', tipo: 'visita', inicio: '2026-08-10T17:30:00Z', status: 'agendado', leads: { nome: 'Ana', whatsapp: '5548999999999' }, properties: { nome: 'Monte Leone', slug: 'monte-leone', endereco: 'Rua X, 100' } },
+    ]) as unknown as ReturnType<typeof makeSupabase>
+
+    const res = await callGet()
+    const json = await res.json()
+
+    expect(res.status).toBe(200)
+    expect(json.data[0].properties).toEqual({ nome: 'Monte Leone', slug: 'monte-leone', endereco: 'Rua X, 100' })
+  })
+
+  it('evento manual antigo sem property (property_id null) continua funcionando normalmente', async () => {
+    supabaseHolder.current = makeSupabaseGet([
+      { id: 'agenda-2', titulo: 'Reunião', tipo: 'reuniao', inicio: '2026-08-10T15:00:00Z', status: 'agendado', leads: null, properties: null },
+    ]) as unknown as ReturnType<typeof makeSupabase>
+
+    const res = await callGet()
+    const json = await res.json()
+
+    expect(res.status).toBe(200)
+    expect(json.data[0].properties).toBeNull()
+    expect(json.data[0].data_hora).toBe('2026-08-10T15:00:00Z')
+  })
+
+  it('mapeamento data_hora = inicio permanece preservado', async () => {
+    supabaseHolder.current = makeSupabaseGet([
+      { id: 'agenda-3', titulo: 'X', tipo: 'reuniao', inicio: '2026-08-10T09:00:00Z', status: 'agendado' },
+    ]) as unknown as ReturnType<typeof makeSupabase>
+
+    const res = await callGet()
+    const json = await res.json()
+    expect(json.data[0].data_hora).toBe('2026-08-10T09:00:00Z')
+  })
+
+  it('autenticação continua exigida: com o mesmo cookie válido de sempre, GET responde 200 (requireAdmin() não foi removido nem contornado pela mudança do join)', async () => {
+    supabaseHolder.current = makeSupabaseGet([]) as unknown as ReturnType<typeof makeSupabase>
+    const res = await callGet()
+    expect(res.status).toBe(200)
+  })
+})
 
 describe('POST /api/admin/agenda — idempotência por client_event_id', () => {
   beforeEach(() => {

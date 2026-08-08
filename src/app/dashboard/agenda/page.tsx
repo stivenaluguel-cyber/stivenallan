@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect, useCallback, useMemo } from 'react'
-import { Calendar, Car, Check, Map, MapPin, User, X } from 'lucide-react'
+import { Building2, Calendar, Car, Check, Map, MapPin, User, X } from 'lucide-react'
 import {
   agruparPorDia, deslocar, intervaloDaVista, linksDeNavegacao, rotuloDoPeriodo,
   VISTAS, type Vista,
@@ -16,6 +16,12 @@ interface Evento {
   status: string
   lembrete_min?: number
   leads?: { nome: string; telefone: string; whatsapp: string }
+  // isOneToOne:false no schema oficial (mesmo padrão já usado pra leads() em
+  // outras rotas) faz o embed tipar como array mesmo sendo, na prática,
+  // "um compromisso aponta pra no máximo um imóvel" — tratado com
+  // Array.isArray() no render abaixo. null para compromissos sem imóvel
+  // vinculado (evento manual antigo ou reunião/ligação sem property).
+  properties?: { nome: string | null; slug: string; endereco: string | null } | { nome: string | null; slug: string; endereco: string | null }[] | null
 }
 
 const TIPOS = [
@@ -155,6 +161,7 @@ export default function AgendaPage() {
         {grupo.eventos.map(ev => {
           const tipo = getTipo(ev.tipo)
           const concluido = ev.status === 'concluido'
+          const propriedade = Array.isArray(ev.properties) ? ev.properties[0] : ev.properties
           return (
             <div key={ev.id} style={{ background: '#fff', borderRadius: '12px', border: '1px solid #e5e7eb', padding: '1rem 1.25rem', display: 'flex', gap: '1rem', alignItems: 'flex-start', opacity: concluido ? 0.6 : 1, borderLeft: '4px solid ' + tipo.cor }}>
               <div style={{ textAlign: 'center', minWidth: '3rem' }}>
@@ -167,6 +174,11 @@ export default function AgendaPage() {
                   <span style={{ padding: '0.15rem 0.5rem', borderRadius: '999px', background: tipo.cor + '20', color: tipo.cor, fontSize: '0.7rem', fontWeight: 700 }}>{tipo.label}</span>
                   {concluido && <span style={{ padding: '0.15rem 0.5rem', borderRadius: '999px', background: '#dcfce7', color: '#16a34a', fontSize: '0.7rem', fontWeight: 700 }}>Concluído</span>}
                 </div>
+                {propriedade?.nome && (
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: '#666', fontSize: '0.8rem', marginBottom: '0.35rem' }}>
+                    <Building2 size={13} aria-hidden /> {propriedade.nome}
+                  </div>
+                )}
                 {ev.local && (
                   <div style={{ color: '#666', fontSize: '0.8rem', marginBottom: '0.35rem' }}>
                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><MapPin size={13} aria-hidden /> {ev.local}</div>

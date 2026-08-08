@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
 
   const { data, error } = await sb()
     .from('crm_agenda')
-    .select(`*, leads(nome, whatsapp)`)
+    .select(`*, leads(nome, whatsapp), properties(nome, slug, endereco)`)
     .gte('inicio', data_ini + 'T00:00:00')
     .lte('inicio', data_fim + 'T23:59:59')
     .order('inicio', { ascending: true })

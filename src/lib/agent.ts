@@ -1,4 +1,5 @@
 import OpenAI from 'openai'
+import { createHash } from 'crypto'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { buscarConhecimentoRelevante, montarBlocoContexto } from '@/lib/leads/base-conhecimento'
 import { registrarMudancaEstagio } from '@/lib/leads/registrar-mudanca-estagio'
@@ -114,14 +115,82 @@ export function maximoSuitesTexto(valor: string | null): number | undefined {
 const DATA_REGEX = /^\d{4}-\d{2}-\d{2}$/
 const HORA_REGEX = /^([01]\d|2[0-3]):[0-5]\d$/
 
-// data_hora em `agendamentos` e um unico timestamp obrigatorio — nao existe
-// coluna separada de data/horario no schema real (ver PASSO 12 do relatorio
-// desta tarefa). Sem os dois validos, nao ha valor honesto pra gravar.
-function paraDataHora(dataPreferencia: unknown, horarioPreferencia: unknown): string | undefined {
+// crm_agenda.inicio é timestamptz — precisa de um instante UTC inequívoco,
+// não um horário civil solto. A operação é toda em Santa Catarina
+// (America/Sao_Paulo), que desde 2019 é UTC-03:00 fixo o ano inteiro (Brasil
+// aboliu horário de verão) — então "somar 3 horas" é seguro e correto pra
+// qualquer data deste sistema, sem precisar de biblioteca de timezone.
+//
+// A validação de calendário acontece ANTES de qualquer deslocamento de
+// fuso: Date.UTC "rola" datas/horas inválidas (31 de fevereiro vira 3 de
+// março; hora 24 vira meia-noite do dia seguinte) em vez de rejeitar — o
+// round-trip abaixo (comparar os componentes UTC de volta contra o que foi
+// pedido) é o jeito padrão de detectar isso sem depender de biblioteca
+// externa de datas. Fazer essa checagem só com os componentes civis (sem o
+// +3h) evita falso-negativo em horários como 23:30, que legitimamente viram
+// o dia seguinte em UTC.
+export function paraInstanteUtcAgendamento(dataPreferencia: unknown, horarioPreferencia: unknown): number | undefined {
   if (typeof dataPreferencia !== 'string' || !DATA_REGEX.test(dataPreferencia)) return undefined
   if (typeof horarioPreferencia !== 'string' || !HORA_REGEX.test(horarioPreferencia)) return undefined
-  const iso = `${dataPreferencia}T${horarioPreferencia}:00`
-  return Number.isNaN(new Date(iso).getTime()) ? undefined : iso
+
+  const [ano, mes, dia] = dataPreferencia.split('-').map(Number)
+  const [hora, minuto] = horarioPreferencia.split(':').map(Number)
+
+  const civilMs = Date.UTC(ano, mes - 1, dia, hora, minuto, 0, 0)
+  const civil = new Date(civilMs)
+  const calendarioValido =
+    civil.getUTCFullYear() === ano &&
+    civil.getUTCMonth() === mes - 1 &&
+    civil.getUTCDate() === dia &&
+    civil.getUTCHours() === hora &&
+    civil.getUTCMinutes() === minuto
+  if (!calendarioValido) return undefined
+
+  return civilMs + 3 * 60 * 60 * 1000
+}
+
+// Só grava se o instante calculado for estritamente futuro no momento da
+// chamada — Date.now() é lido aqui (não recebido por parâmetro) de
+// propósito, pros testes usarem fake timers/system time do Vitest, igual a
+// outros pontos do projeto que dependem de "agora".
+export function paraDataHoraAgendamento(dataPreferencia: unknown, horarioPreferencia: unknown): string | undefined {
+  const instanteMs = paraInstanteUtcAgendamento(dataPreferencia, horarioPreferencia)
+  if (instanteMs === undefined) return undefined
+  if (instanteMs <= Date.now()) return undefined
+  return new Date(instanteMs).toISOString()
+}
+
+const TITULO_MAX = 200 // crm_agenda.titulo é varchar(200) — auditado via SQL antes de escrever isto.
+
+function construirTituloVisita(propertyNome: string | null): string {
+  const nome = propertyNome && propertyNome.trim() ? propertyNome.trim() : 'empreendimento'
+  const titulo = `Visita · ${nome}`
+  return titulo.length > TITULO_MAX ? titulo.slice(0, TITULO_MAX) : titulo
+}
+
+function construirLocalVisita(propriedade: { endereco: string | null; bairro: string | null; cidade: string | null }): string | null {
+  if (propriedade.endereco && propriedade.endereco.trim()) return propriedade.endereco.trim()
+  const partes = [propriedade.bairro, propriedade.cidade].filter((p): p is string => !!p && p.trim().length > 0)
+  return partes.length > 0 ? partes.join(', ') : null
+}
+
+// Namespace fixo e arbitrário (só precisa ser estável entre execuções) pra
+// gerar client_event_id determinístico via UUID v5 (RFC 4122) — SHA-1 de
+// namespace+nome, nunca Math.random()/Date.now()/randomUUID(), que mudariam
+// a cada retry e quebrariam a idempotência. A MESMA tripla
+// lead+property+inicio sempre produz o MESMO UUID; mudar qualquer um dos
+// três produz outro.
+const AGENDA_IA_UUID_NAMESPACE = '2f3f5d2e-6d0f-5f2a-8f7a-1b6c9a2e7d4c'
+
+export function gerarClientEventIdAgendaIA(leadId: string, propertyId: string, inicioUtcIso: string): string {
+  const nome = `allan-agenda:v1:${leadId}:${propertyId}:${inicioUtcIso}`
+  const namespaceBytes = Buffer.from(AGENDA_IA_UUID_NAMESPACE.replace(/-/g, ''), 'hex')
+  const hash = createHash('sha1').update(Buffer.concat([namespaceBytes, Buffer.from(nome, 'utf8')])).digest()
+  const bytes = Buffer.from(hash.subarray(0, 16))
+  bytes[6] = (bytes[6] & 0x0f) | 0x50
+  bytes[8] = (bytes[8] & 0x3f) | 0x80
+  const hex = bytes.toString('hex')
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20, 32)}`
 }
 
 // ============================================
@@ -326,9 +395,9 @@ export async function executarTool(nome: string, args: Record<string, unknown>, 
       return 'Não foi possível agendar: informe o empreendimento antes de confirmar a visita.'
     }
 
-    const dataHora = paraDataHora(args.data_preferencia, args.horario_preferencia)
-    if (!dataHora) {
-      return 'Não foi possível agendar: peça ao cliente uma data (AAAA-MM-DD) e um horário (HH:MM) válidos antes de confirmar a visita.'
+    const inicioIso = paraDataHoraAgendamento(args.data_preferencia, args.horario_preferencia)
+    if (!inicioIso) {
+      return 'Não foi possível agendar: peça ao cliente uma data (AAAA-MM-DD) e um horário (HH:MM) válidos e futuros antes de confirmar a visita.'
     }
 
     const { data: lead, error: leadError } = await supabase
@@ -343,13 +412,9 @@ export async function executarTool(nome: string, args: Record<string, unknown>, 
     }
     if (!lead) return 'Lead não encontrado. Registre o lead primeiro.'
 
-    // Sem FK real entre `agendamentos.empreendimento_id` (tabela legada
-    // `empreendimentos`) e `properties` (ver comentário no insert abaixo),
-    // então validar existência/disponibilidade aqui é a única garantia
-    // possível de que o slug corresponde a um empreendimento real e ativo.
     const { data: propriedade, error: propriedadeError } = await supabase
       .from('properties')
-      .select('id, nome')
+      .select('id, nome, slug, endereco, bairro, cidade')
       .eq('slug', empreendimentoSlug)
       .eq('ativo', true)
       .eq('oculto', false)
@@ -361,24 +426,83 @@ export async function executarTool(nome: string, args: Record<string, unknown>, 
     }
     if (!propriedade) return 'Empreendimento não encontrado ou indisponível. Confirme o nome antes de agendar.'
 
-    // agendamentos.empreendimento_id referencia a tabela LEGADA
-    // `empreendimentos` (Relationships no schema oficial), não `properties`
-    // — as duas tabelas não têm coluna de ligação entre si, então não há
-    // como popular esse FK a partir de um properties.slug sem risco de
-    // gravar um valor inválido. O nome do empreendimento vai em
-    // `observacoes` (texto livre), que é onde o corretor de fato vê a
-    // informação hoje.
-    const { error: insertError } = await supabase.from('agendamentos').insert({
-      lead_id: lead.id,
-      data_hora: dataHora,
-      status: 'pendente',
-      tipo: 'visita',
-      observacoes: `Visita solicitada: ${propriedade.nome ?? empreendimentoSlug}`,
-      created_at: new Date().toISOString(),
-    })
+    // Idempotência determinística: a mesma intenção (lead+property+inicio)
+    // sempre calcula o mesmo client_event_id, então um retry (webhook
+    // repetido, timeout de rede) consulta e encontra o registro já criado
+    // em vez de duplicar. Índice real: crm_agenda_client_event_id_unique
+    // (UNIQUE parcial, WHERE client_event_id IS NOT NULL — auditado via
+    // pg_indexes no Item 10A).
+    const clientEventId = gerarClientEventIdAgendaIA(lead.id, propriedade.id, inicioIso)
 
-    if (insertError) {
-      logError('agent.agendar_visita', 'falha ao inserir agendamento', insertError)
+    const { data: existente, error: existenteError } = await supabase
+      .from('crm_agenda')
+      .select('id, status, property_id, lead_id, inicio')
+      .eq('client_event_id', clientEventId)
+      .maybeSingle()
+
+    if (existenteError) {
+      logError('agent.agendar_visita', 'falha ao consultar idempotência da agenda', existenteError)
+      return 'Não foi possível confirmar o agendamento agora. Não confirme a visita ao cliente.'
+    }
+
+    type AgendaEncontrada = { id: string; status: string | null; property_id: string | null; lead_id: string | null; inicio: string }
+    let agenda: AgendaEncontrada | null = null
+
+    if (existente) {
+      // Retry idempotente de verdade só quando o evento ainda está ativo.
+      // Se já foi cancelado/concluído/não-compareceu, reaproveitar a MESMA
+      // linha pra uma "nova" visita seria mentir sobre o que realmente
+      // aconteceu — melhor escalar do que criar essa ambiguidade.
+      if (existente.status === 'agendado') {
+        agenda = existente
+      } else {
+        return 'Já existe um registro anterior para esta visita que não está mais ativo. Escale ao Stiven antes de confirmar um novo agendamento.'
+      }
+    } else {
+      const { data: inserida, error: insertError } = await supabase
+        .from('crm_agenda')
+        .insert({
+          lead_id: lead.id,
+          property_id: propriedade.id,
+          client_event_id: clientEventId,
+          titulo: construirTituloVisita(propriedade.nome),
+          inicio: inicioIso,
+          tipo: 'visita',
+          status: 'agendado',
+          local: construirLocalVisita(propriedade),
+          descricao: 'Visita agendada pela Allan IA.',
+          lembrete_min: 30,
+        })
+        .select('id, status, property_id, lead_id, inicio')
+        .single()
+
+      if (insertError) {
+        if (insertError.code === '23505') {
+          // Corrida real entre duas execuções simultâneas: o pré-check acima
+          // não pegou porque as duas passaram por ele antes de qualquer
+          // inserir. Recupera a linha que a outra execução acabou de criar —
+          // nunca duplica, nunca finge que a corrida não aconteceu.
+          const { data: recuperada, error: recuperadaError } = await supabase
+            .from('crm_agenda')
+            .select('id, status, property_id, lead_id, inicio')
+            .eq('client_event_id', clientEventId)
+            .maybeSingle()
+
+          if (recuperadaError || !recuperada) {
+            logError('agent.agendar_visita', 'corrida 23505 sem recuperacao da linha', recuperadaError ?? insertError)
+            return 'Não foi possível confirmar o agendamento agora. Não confirme a visita ao cliente.'
+          }
+          agenda = recuperada
+        } else {
+          logError('agent.agendar_visita', 'falha ao inserir agenda', insertError)
+          return 'Não foi possível registrar o agendamento agora. Não confirme a visita ao cliente.'
+        }
+      } else {
+        agenda = inserida
+      }
+    }
+
+    if (!agenda) {
       return 'Não foi possível registrar o agendamento agora. Não confirme a visita ao cliente.'
     }
 
@@ -389,12 +513,13 @@ export async function executarTool(nome: string, args: Record<string, unknown>, 
     // calado a partir de agora, exatamente a regra de negócio deste item
     // (IA conduz até agendar; depois disso, Stiven assume). Uma única
     // chamada .update() com os dois campos é atômica no Postgres — não
-    // precisa de transação improvisada.
+    // precisa de transação improvisada. .eq('id', lead.id) em vez de
+    // whatsapp porque o lead já foi resolvido acima — mais preciso.
     const { error: updateError } = await supabase.from('leads').update({
       estagio_funil: 'visita_agendada',
       atendimento_humano_ativo: true,
       updated_at: new Date().toISOString(),
-    }).eq('whatsapp', whatsapp)
+    }).eq('id', lead.id)
 
     if (updateError) {
       logError('agent.agendar_visita', 'falha ao atualizar estágio após agendamento', updateError)
@@ -405,7 +530,7 @@ export async function executarTool(nome: string, args: Record<string, unknown>, 
       await registrarMudancaEstagio(supabase, lead.id, estagioAntes ?? 'primeiro_contato', 'visita_agendada')
     }
 
-    return 'Visita agendada com sucesso. O atendimento será direcionado ao Stiven.'
+    return 'Visita registrada na agenda. O atendimento será direcionado ao Stiven.'
   }
 
   return 'Tool não reconhecida.'
