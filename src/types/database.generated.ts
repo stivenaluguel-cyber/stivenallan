@@ -9,8 +9,12 @@
 // us-east-2 — o mesmo ref usado em NEXT_PUBLIC_SUPABASE_URL em produção).
 // CLI já estava autenticado nesta sessão (login de uma sessão anterior) —
 // nenhuma credencial foi criada, exposta ou inventada pra gerar isto.
-// Gerado em 2026-08-07. Cobre as 73 tabelas do schema `public` na íntegra —
-// não é um subconjunto nem contém stubs/`any` em lugar nenhum.
+// Gerado em 2026-08-08 (Item 10A: regenerado após a migration
+// 20260808020000_crm_agenda_property_id.sql — único diff real vs a versão
+// anterior é crm_agenda.property_id em Row/Insert/Update + o Relationship
+// crm_agenda_property_id_fkey; nenhum outro schema drift). Cobre as 73
+// tabelas do schema `public` na íntegra — não é um subconjunto nem contém
+// stubs/`any` em lugar nenhum.
 //
 // Pra regenerar depois de uma migration nova, rode o mesmo comando acima
 // (read-only, não altera nada no banco) e substitua este arquivo inteiro.
@@ -544,6 +548,7 @@ export type Database = {
           lead_id: string | null
           lembrete_min: number | null
           local: string | null
+          property_id: string | null
           status: string | null
           tipo: string | null
           titulo: string
@@ -561,6 +566,7 @@ export type Database = {
           lead_id?: string | null
           lembrete_min?: number | null
           local?: string | null
+          property_id?: string | null
           status?: string | null
           tipo?: string | null
           titulo: string
@@ -578,6 +584,7 @@ export type Database = {
           lead_id?: string | null
           lembrete_min?: number | null
           local?: string | null
+          property_id?: string | null
           status?: string | null
           tipo?: string | null
           titulo?: string
@@ -603,6 +610,13 @@ export type Database = {
             columns: ["lead_id"]
             isOneToOne: false
             referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_agenda_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
             referencedColumns: ["id"]
           },
         ]
