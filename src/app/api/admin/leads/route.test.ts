@@ -1,15 +1,22 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { NextRequest } from 'next/server'
 
-const { supabaseHolder } = vi.hoisted(() => ({
-  supabaseHolder: { current: null as unknown as ReturnType<typeof makeSupabase> | null },
-}))
+const { supabaseHolder, requireAdminHolder, getSupabaseAdminMock } = vi.hoisted(() => {
+  const supabaseHolder = { current: null as unknown as ReturnType<typeof makeSupabase> | null }
+  const requireAdminHolder = { current: async () => 'admin-1' as string | null }
+  const getSupabaseAdminMock = vi.fn(() => supabaseHolder.current)
+  return { supabaseHolder, requireAdminHolder, getSupabaseAdminMock }
+})
 
 vi.mock('@/lib/supabase', () => ({
-  getSupabaseAdmin: () => supabaseHolder.current,
+  getSupabaseAdmin: getSupabaseAdminMock,
 }))
 
-import { GET } from './route'
+vi.mock('@/lib/dashboard/admin-auth', () => ({
+  requireAdmin: () => requireAdminHolder.current(),
+}))
+
+import { GET, POST } from './route'
 
 type Lead = { id: string; nome: string }
 
@@ -59,6 +66,10 @@ function makeReq(url = 'http://test/api/admin/leads') {
   return { url } as unknown as NextRequest
 }
 
+function makePostReq(body: unknown, url = 'http://test/api/admin/leads') {
+  return { url, json: async () => body } as unknown as NextRequest
+}
+
 describe('GET /api/admin/leads', () => {
   beforeEach(() => {
     vi.spyOn(console, 'error').mockImplementation(() => {})
@@ -66,6 +77,16 @@ describe('GET /api/admin/leads', () => {
 
   afterEach(() => {
     supabaseHolder.current = null
+    requireAdminHolder.current = async () => 'admin-1'
+    getSupabaseAdminMock.mockClear()
+  })
+
+  it('Item 8: sem sessao admin, GET retorna 401 e nunca chama getSupabaseAdmin()', async () => {
+    requireAdminHolder.current = async () => null
+    const res = await GET(makeReq())
+    expect(res.status).toBe(401)
+    expect(await res.json()).toEqual({ error: 'Unauthorized' })
+    expect(getSupabaseAdminMock).not.toHaveBeenCalled()
   })
 
   it('503 quando o supabase admin nao esta configurado', async () => {
@@ -150,5 +171,90 @@ describe('GET /api/admin/leads', () => {
     expect(sb.eqCalls).toContainEqual(['status', 'novo'])
     expect(sb.eqCalls).toContainEqual(['empreendimento_interesse', 'emp-9'])
     expect(sb.eqCalls.length).toBe(2)
+  })
+})
+
+function makeInsertSupabase(cfg: { insertedRow?: Record<string, unknown>; error?: { message: string } | null } = {}) {
+  const inserts: Record<string, unknown>[] = []
+  return {
+    inserts,
+    from(table: string) {
+      if (table === 'leads') {
+        return {
+          insert: (row: Record<string, unknown>) => {
+            inserts.push(row)
+            return {
+              select: () => ({
+                single: () => Promise.resolve(
+                  cfg.error
+                    ? { data: null, error: cfg.error }
+                    : { data: cfg.insertedRow ?? { id: 'lead-novo', ...row }, error: null }
+                ),
+              }),
+            }
+          },
+        }
+      }
+      throw new Error(`Unexpected table: ${table}`)
+    },
+  }
+}
+
+describe('POST /api/admin/leads', () => {
+  beforeEach(() => {
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+  })
+
+  afterEach(() => {
+    supabaseHolder.current = null
+    requireAdminHolder.current = async () => 'admin-1'
+    getSupabaseAdminMock.mockClear()
+  })
+
+  it('Item 8: sem sessao admin, POST retorna 401, nunca chama getSupabaseAdmin() nem parseia o body', async () => {
+    requireAdminHolder.current = async () => null
+    let bodyLido = false
+    const req = { url: 'http://test/api/admin/leads', json: async () => { bodyLido = true; return {} } } as unknown as NextRequest
+    const res = await POST(req)
+    expect(res.status).toBe(401)
+    expect(await res.json()).toEqual({ error: 'Unauthorized' })
+    expect(getSupabaseAdminMock).not.toHaveBeenCalled()
+    expect(bodyLido).toBe(false)
+  })
+
+  it('503 quando o supabase admin nao esta configurado (com sessao valida)', async () => {
+    supabaseHolder.current = null
+    const res = await POST(makePostReq({ whatsapp: '48999999999' }))
+    expect(res.status).toBe(503)
+  })
+
+  it('whatsapp continua obrigatorio: 400 quando ausente', async () => {
+    const sb = makeInsertSupabase()
+    supabaseHolder.current = sb as unknown as ReturnType<typeof makeSupabase>
+    const res = await POST(makePostReq({ nome: 'Ana' }))
+    expect(res.status).toBe(400)
+    expect(sb.inserts).toHaveLength(0)
+  })
+
+  it('sanitiza whatsapp para digitos e insere com os campos permitidos', async () => {
+    const sb = makeInsertSupabase()
+    supabaseHolder.current = sb as unknown as ReturnType<typeof makeSupabase>
+    const res = await POST(makePostReq({ whatsapp: '(48) 99999-9999', nome: 'Ana', email: 'ana@ex.com', origem: 'Site', orcamento_max: 500000 }))
+    expect(res.status).toBe(201)
+    expect(sb.inserts[0]).toMatchObject({
+      whatsapp: '48999999999',
+      nome: 'Ana',
+      email: 'ana@ex.com',
+      origem: 'Site',
+      orcamento_max: 500000,
+    })
+  })
+
+  it('201 no sucesso, devolvendo o registro inserido', async () => {
+    const sb = makeInsertSupabase({ insertedRow: { id: 'lead-1', whatsapp: '48999999999' } })
+    supabaseHolder.current = sb as unknown as ReturnType<typeof makeSupabase>
+    const res = await POST(makePostReq({ whatsapp: '48999999999' }))
+    expect(res.status).toBe(201)
+    expect(await res.json()).toEqual({ id: 'lead-1', whatsapp: '48999999999' })
   })
 })
